@@ -63,13 +63,15 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<fsdir.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -130,7 +132,7 @@ int progng(PROGINFO *pip,DIRSHOWN *sdp,MKDIRLIST_ENT *dsp,emit_t emit) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    char	timebuf[TIMEBUFLEN+1] ;
-	    timestr_log(dsp->mtime,timebuf),
+	    strtime_log(dsp->mtime,timebuf),
 	    debugprintf("progng: ent umt=%s \n",timebuf) ;
 	    }
 #endif
@@ -202,7 +204,7 @@ local int procartload(PROGINFO *pip,DIRSHOWN *sdp,artlist *alp,
 		MKDIRLIST_ENT *dsp)
 {
 	MKDIRLIST_ENT	*dsp2 ;
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -251,7 +253,7 @@ local int procartdir(PROGINFO *pip,artlist *alp,cchar *ngd)
 	if ((rs = mkpath2(apath,nd,ngd)) >= 0) {
 	    fsdir	dir ;
 	    fsdir_ent	ds ;
-	    const int	alen = rs ;
+	    cint	alen = rs ;
 
 	    if ((rs = fsdir_open(&dir,apath)) >= 0) {
 		USTAT	sb ;
@@ -323,13 +325,13 @@ local int procartlook(PROGINFO *pip,artlist *alp,MKDIRLIST_ENT *dsp,
 	    if (DEBUGLEVEL(4)) {
 		char	timebuf[TIMEBUFLEN+1] ;
 	        debugprintf("progng/procartlook: ai=%d mtime=%s\n",ai,
-	            timestr_log(dsp->mtime,timebuf)) ;
+	            strtime_log(dsp->mtime,timebuf)) ;
 	        debugprintf("progng/procartlook: ngd=%s\n",
 	            ngd) ;
 	        debugprintf("progng/procartlook: fname=%s\n",
 	            fname) ;
 	        debugprintf("progng/procartlook: amt=%s\n",
-	            timestr_log(amt,timebuf)) ;
+	            strtime_log(amt,timebuf)) ;
 	    }
 #endif /* CF_DEBUG */
 
@@ -356,7 +358,7 @@ local int procartlook(PROGINFO *pip,artlist *alp,MKDIRLIST_ENT *dsp,
 #endif
 
 	        {
-	            const int	blen = MAXNAMELEN ;
+	            cint	blen = MAXNAMELEN ;
 	            int		bl ;
 	            cchar	*bp ;
 	            char	bname[MAXNAMELEN+1] ;
@@ -392,9 +394,9 @@ local int procartlook(PROGINFO *pip,artlist *alp,MKDIRLIST_ENT *dsp,
 	            debugprintf("progng/procartlook: emit() rv=%d\n",
 			retval) ;
 	            debugprintf("progng/procartlook: mtime_seen=%s\n",
-	                timestr_log(mtime_seen,timebuf)) ;
+	                strtime_log(mtime_seen,timebuf)) ;
 	            debugprintf("progng/procartlook: amt=%s\n",
-	                timestr_log(amt,timebuf)) ;
+	                strtime_log(amt,timebuf)) ;
 	        }
 #endif /* CF_DEBUG */
 
@@ -462,8 +464,8 @@ local int procartlook(PROGINFO *pip,artlist *alp,MKDIRLIST_ENT *dsp,
 	    debugprintf("progng/procartlook: ret retval=%d\n",
 	        retval) ;
 	    debugprintf("progng/procartlook: mt=%s old_umt=%s\n",
-	        timestr_log(mtime_seen,timebuf1),
-	        timestr_log(dsp->mtime,timebuf2)) ;
+	        strtime_log(mtime_seen,timebuf1),
+	        strtime_log(dsp->mtime,timebuf2)) ;
 	}
 #endif
 
