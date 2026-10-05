@@ -100,38 +100,38 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int procline(PROGINFO *,void *,BC *,cchar *,int) ;
+local int procline(PROGINFO *,void *,BC *,cchar *,int) ;
 
-static int bookstart(PI *,bfile *,BC *,BB *) ;
-static int bookend(PI *,bfile *,BC *) ;
+local int bookstart(PI *,bfile *,BC *,BB *) ;
+local int bookend(PI *,bfile *,BC *) ;
 
-static int chapterstart(PI *,bfile *,BC *) ;
-static int chapterend(PI *,bfile *,BC *) ;
+local int chapterstart(PI *,bfile *,BC *) ;
+local int chapterend(PI *,bfile *,BC *) ;
 
-static int versestartone(PI *,bfile *,BC *) ;
-static int versestart(PI *,bfile *,BC *) ;
-static int verseend(PI *,bfile *,BC *) ;
+local int versestartone(PI *,bfile *,BC *) ;
+local int versestart(PI *,bfile *,BC *) ;
+local int verseend(PI *,bfile *,BC *) ;
 
-static int	handleversezero(PI *,bfile *,cchar *,int) ;
+local int	handleversezero(PI *,bfile *,cchar *,int) ;
 
-static int	printletter(PI *,bfile *,int,cchar *,int) ;
-static int	printversenum(PI *,bfile *,int) ;
-static int	printwords(PI *,bfile *,cchar *,int) ;
-static int	printversezero(PI *,bfile *) ;
-static int	printwordsend(PI *,bfile *) ;
+local int	printletter(PI *,bfile *,int,cchar *,int) ;
+local int	printversenum(PI *,bfile *,int) ;
+local int	printwords(PI *,bfile *,cchar *,int) ;
+local int	printversezero(PI *,bfile *) ;
+local int	printwordsend(PI *,bfile *) ;
 
-static int	mkfixbuf(PI *,char *,int,cchar *,int) ;
-static int	mkfixbufend(PI *,char *,int) ;
+local int	mkfixbuf(PI *,char *,int,cchar *,int) ;
+local int	mkfixbufend(PI *,char *,int) ;
 
-static int	setchapter(PI *,bfile *,int) ;
-static int	setverse(PI *,bfile *,int) ;
+local int	setchapter(PI *,bfile *,int) ;
+local int	setverse(PI *,bfile *,int) ;
 
-static int	keepstart(PI *,bfile *) ;
-static int	keepend(PI *,bfile *) ;
+local int	keepstart(PI *,bfile *) ;
+local int	keepend(PI *,bfile *) ;
 
-static int	outcols_short(PI *) ;
-static int	outcols_get(PI *,int) ;
-static int	outcols_normal(PI *) ;
+local int	outcols_short(PI *) ;
+local int	outcols_get(PI *,int) ;
+local int	outcols_normal(PI *) ;
 
 
 
@@ -233,7 +233,7 @@ int bibleset_proc(PI *pip,bfile *ofp,cc *fname) noex {
 
 /* local subroutines */
 
-static int procline(PROGINFO *pip,void *ofp,BC *bcp,cc *sp,int sl) noex {
+local int procline(PROGINFO *pip,void *ofp,BC *bcp,cc *sp,int sl) noex {
 	int		rs ;
 	int		wlen = 0 ;
 
@@ -391,7 +391,7 @@ static int procline(PROGINFO *pip,void *ofp,BC *bcp,cc *sp,int sl) noex {
 }
 /* end subroutine (procline) */
 
-static int bookstart(PI *pip,bfile *ofp,BC *bcp,BB *bbp) noex {
+local int bookstart(PI *pip,bfile *ofp,BC *bcp,BB *bbp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar	*fmt ;
@@ -476,7 +476,7 @@ static int bookstart(PI *pip,bfile *ofp,BC *bcp,BB *bbp) noex {
 }
 /* end subroutine (bookstart) */
 
-static int bookend(PI *pip,bfile *ofp,BC *bcp) noex {
+local int bookend(PI *pip,bfile *ofp,BC *bcp) noex {
 	biblebook	*bbp = &pip->bb ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -512,7 +512,7 @@ static int bookend(PI *pip,bfile *ofp,BC *bcp) noex {
 }
 /* end subroutine (bookend) */
 
-static int chapterstart(PI *pip,bfile *ofp,BC *bcp) noex {
+local int chapterstart(PI *pip,bfile *ofp,BC *bcp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		chapter = bcp->chapter ;
@@ -596,7 +596,7 @@ static int chapterstart(PI *pip,bfile *ofp,BC *bcp) noex {
 }
 /* end subroutine (chapterstart) */
 
-static int chapterend(PI *pip,bfile *ofp,BC *bcp) noex {
+local int chapterend(PI *pip,bfile *ofp,BC *bcp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -624,7 +624,7 @@ static int chapterend(PI *pip,bfile *ofp,BC *bcp) noex {
 }
 /* end subroutine (chapterend) */
 
-static int versestart(PI *pip,bfile *ofp,BC *bcp) noex {
+local int versestart(PI *pip,bfile *ofp,BC *bcp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		verse = bcp->verse ;
@@ -708,7 +708,7 @@ static int versestart(PI *pip,bfile *ofp,BC *bcp) noex {
 }
 /* end subroutine (versestart) */
 
-static int verseend(PI *pip,bfile *ofp,BC *bcp) noex {
+local int verseend(PI *pip,bfile *ofp,BC *bcp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -777,7 +777,7 @@ static int verseend(PI *pip,bfile *ofp,BC *bcp) noex {
 }
 /* end subroutine (verseend) */
 
-static int versestartone(PI *pip,bfile *ofp,BC *bcp) noex {
+local int versestartone(PI *pip,bfile *ofp,BC *bcp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		verse = bcp->verse ;
@@ -793,7 +793,7 @@ static int versestartone(PI *pip,bfile *ofp,BC *bcp) noex {
 }
 /* end subroutine (versestartone) */
 
-static int printletter(PI *pip,bfile *ofp,int verse,cc *lp,int ll) noex {
+local int printletter(PI *pip,bfile *ofp,int verse,cc *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -820,7 +820,7 @@ static int printletter(PI *pip,bfile *ofp,int verse,cc *lp,int ll) noex {
 }
 /* end subroutine (printletter) */
 
-static int printversenum(PI *pip,bfile *ofp,int verse) noex {
+local int printversenum(PI *pip,bfile *ofp,int verse) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	char		digbuf[DIGBUFLEN + 1] ;
@@ -890,7 +890,7 @@ static int printversenum(PI *pip,bfile *ofp,int verse) noex {
 }
 /* end subroutine (printversenum) */
 
-static int handleversezero(PI *pip,bfile *ofp,char *buf,int buflen) noex {
+local int handleversezero(PI *pip,bfile *ofp,char *buf,int buflen) noex {
 	int		rs = SR_OK ;
 	int		sl, cl, wl ;
 	int		si ;
@@ -946,7 +946,7 @@ static int handleversezero(PI *pip,bfile *ofp,char *buf,int buflen) noex {
 }
 /* end subroutine (handleversezero) */
 
-static int printwords(PI *pip,bfile *ofp,cchar *sp,int sl) noex {
+local int printwords(PI *pip,bfile *ofp,cchar *sp,int sl) noex {
 	wordfill	w ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1042,7 +1042,7 @@ static int printwords(PI *pip,bfile *ofp,cchar *sp,int sl) noex {
 }
 /* end subroutine (printwords) */
 
-static int printwordsend(PI *pip,bfile *ofp) noex {
+local int printwordsend(PI *pip,bfile *ofp) noex {
 	cint		flen = FIXBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
@@ -1057,7 +1057,7 @@ static int printwordsend(PI *pip,bfile *ofp) noex {
 }
 /* end subroutine (printwordsend) */
 
-static int printversezero(PI *pip,bfile *ofp) noex {
+local int printversezero(PI *pip,bfile *ofp) noex {
 	int		rs = SR_OK ;
 	int		c ;
 	int		ll ;
@@ -1094,7 +1094,7 @@ static int printversezero(PI *pip,bfile *ofp) noex {
 }
 /* end subroutine (printversezero) */
 
-static int mkfixbuf(PI *pip,char *buf,int buflen,cc *sp,int sl) noex {
+local int mkfixbuf(PI *pip,char *buf,int buflen,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si ;
 	int		cl ;
@@ -1160,7 +1160,7 @@ static int mkfixbuf(PI *pip,char *buf,int buflen,cc *sp,int sl) noex {
 }
 /* end subroutine (mkfixbuf) */
 
-static int mkfixbufend(PI *pip,char *buf,int buflen) noex {
+local int mkfixbufend(PI *pip,char *buf,int buflen) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ; /* return-value */
 	if (pip->c.vmissing > 0) {
@@ -1179,7 +1179,7 @@ static int mkfixbufend(PI *pip,char *buf,int buflen) noex {
 }
 /* end subroutine (mkfixbufend) */
 
-static int setverse(PI *pip,bfile *ofp,int v) noex {
+local int setverse(PI *pip,bfile *ofp,int v) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	if (! pip->fl.setverse) {
@@ -1192,7 +1192,7 @@ static int setverse(PI *pip,bfile *ofp,int v) noex {
 }
 /* end subroutine (setverse) */
 
-static int setchapter(PI *pip,bfile *ofp,int v) noex {
+local int setchapter(PI *pip,bfile *ofp,int v) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	if (! pip->fl.setchapter) {
@@ -1205,7 +1205,7 @@ static int setchapter(PI *pip,bfile *ofp,int v) noex {
 }
 /* end subroutine (setchapter) */
 
-static int keepstart(PI *pip,bfile *ofp) noex {
+local int keepstart(PI *pip,bfile *ofp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -1238,7 +1238,7 @@ static int keepstart(PI *pip,bfile *ofp) noex {
 }
 /* end subroutine (keepstart) */
 
-static int keepend(PI *pip,bfile *ofp) noex {
+local int keepend(PI *pip,bfile *ofp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -1260,13 +1260,13 @@ static int keepend(PI *pip,bfile *ofp) noex {
 }
 /* end subroutine (keepend) */
 
-static int outcols_short(PI *pip) noex {
+local int outcols_short(PI *pip) noex {
 	pip->fl.tmpshortcol = true ;
 	return SR_OK ;
 }
 /* end subroutine (outcols_short) */
 
-static int outcols_get(PI *pip,int linewidth) noex {
+local int outcols_get(PI *pip,int linewidth) noex {
 	int		cbl = MIN(linewidth,COLUMNS) ;
 	if (pip->fl.tmpshortcol) {
 	    cbl = MIN(40,COLUMNS) ;
@@ -1275,7 +1275,7 @@ static int outcols_get(PI *pip,int linewidth) noex {
 }
 /* end subroutine (outcols_get) */
 
-static int outcols_normal(PI *pip) noex {
+local int outcols_normal(PI *pip) noex {
 	pip->fl.tmpshortcol = false ;
 	return SR_OK ;
 }
