@@ -50,9 +50,9 @@
 
 /* external subroutines */
 
-extern int	sfsub(const char *,int,const char *,char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sfsub(cchar *,int,cchar *,char **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 
 
 /* external variables */
@@ -86,7 +86,7 @@ static const uchar	terms[] = {
 int process(pip,ofp,fname)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	FIELD	fsb ;
 
