@@ -51,9 +51,9 @@
 
 /* external subroutines */
 
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sfsub(cchar *,int,cchar *,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 
 
 /* external variables */
@@ -85,13 +85,13 @@ static const uchar	terms[] = {
 int progkjv(pip,ofp,fname)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	FIELD	fsb ;
 
 	bfile	infile ;
 
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -107,8 +107,8 @@ const char	fname[] ;
 	int	f_book = FALSE ;
 	int	f ;
 
-	const char	*sp, *cp ;
-	const char	*fp ;
+	cchar	*sp, *cp ;
+	cchar	*fp ;
 
 	char	lbuf[LINEBUFLEN + 1] ;
 
