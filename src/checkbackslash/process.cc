@@ -82,7 +82,7 @@ char		fname[] ;
 PARAMOPT	*pp ;
 {
 	bfile		infile ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		i, len ;
 	int		line ;
