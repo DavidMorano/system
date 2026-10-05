@@ -60,7 +60,7 @@ int cfbbdate(PROGINFO *pip,cchar *s,int slen,time_t *rp)
 	int		i, lr ;
 	int		century, year, month, day, hour, min, sec ;
 	int		ch ;
-	const char	*cp = s ;
+	cchar	*cp = s ;
 	char		name[DATE_TZNAMESIZE + 1] ;
 
 	if (rp != NULL)
