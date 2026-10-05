@@ -58,7 +58,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	proghdr_startup(PROGINFO *) ;
+local int	proghdr_startup(PROGINFO *) ;
 
 
 /* local variables */
@@ -102,12 +102,12 @@ int proghdr_trans(PROGINFO *pip,char *rbuf,int rlen,cchar *sp,int sl,int c)
 #endif
 	if ((rs = proghdr_startup(pip)) >= 0) {
 	    HDRDECODE	*hdp = (HDRDECODE *) pip->hdr ;
-	    const int	wsize = ((sl+1) * sizeof(wchar_t)) ;
-	    const int	wlen = sl ;
+	    cint	wsize = ((sl+1) * sizeof(wchar_t)) ;
+	    cint	wlen = sl ;
 	    wchar_t	*wbuf ;
 	    if ((rs = uc_malloc(wsize,&wbuf)) >= 0) {
 	        if ((rs = hdrdecode_proc(hdp,wbuf,wlen,sp,sl)) >= 0) {
-		    const int	n = MIN(c,rs) ;
+		    cint	n = MIN(c,rs) ;
 		    int		tlen ;
 		    char	*tbuf ;
 		    tlen = (n*2) ;
@@ -134,7 +134,7 @@ int proghdr_trans(PROGINFO *pip,char *rbuf,int rlen,cchar *sp,int sl,int c)
 /* local subroutines */
 
 
-static int proghdr_startup(PROGINFO *pip)
+local int proghdr_startup(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 #if	CF_DEBUG
@@ -143,7 +143,7 @@ static int proghdr_startup(PROGINFO *pip)
 #endif
 	if (pip->hdr == NULL) {
 	    HDRDECODE	*hdrp ;
-	    const int	osize = sizeof(HDRDECODE) ;
+	    cint	osize = sizeof(HDRDECODE) ;
 	    if ((rs = uc_malloc(osize,&hdrp)) >= 0) {
 		cchar	*pr = pip->pr ;
 	        if ((rs = hdrdecode_start(hdrp,pr)) >= 0) {
