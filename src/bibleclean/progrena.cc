@@ -47,17 +47,17 @@
 
 /* external subroutines */
 
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	field_word(FIELD *,const uchar *,const char **) ;
+extern int	sfsub(cchar *,int,cchar *,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	field_word(FIELD *,const uchar *,cchar **) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -72,9 +72,9 @@ struct cv {
 
 /* forward references */
 
-static int	isbook(const char *,int) ;
-static int	ischap(const char *,int) ;
-static int	iscite(const char *,int,struct cv *) ;
+local int	isbook(cchar *,int) ;
+local int	ischap(cchar *,int) ;
+local int	iscite(cchar *,int,struct cv *) ;
 
 
 /* local variables */
@@ -90,7 +90,7 @@ static const uchar	wterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char	*states[] = {
+static cchar	*states[] = {
 	"search",
 	"getbook",
 	"getchap",
@@ -113,7 +113,7 @@ enum states {
 int progrena(pip,ofp,fname)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	struct cv	cite ;
 
@@ -133,8 +133,8 @@ const char	fname[] ;
 	int	f_abandon = FALSE ;
 	int	f_cite = FALSE ;
 
-	const char	*fp ;
-	const char	*sp ;
+	cchar	*fp ;
+	cchar	*sp ;
 
 	char	linebuf[LINEBUFLEN + 1] ;
 
@@ -365,8 +365,8 @@ ret0:
 /* local subroutines */
 
 
-static int isbook(fp,fl)
-const char	*fp ;
+local int isbook(fp,fl)
+cchar	*fp ;
 int		fl ;
 {
 	int	n = 4 ;
@@ -379,8 +379,8 @@ int		fl ;
 /* end subroutine (isbook) */
 
 
-static int ischap(fp,fl)
-const char	*fp ;
+local int ischap(fp,fl)
+cchar	*fp ;
 int		fl ;
 {
 	int	n = 7 ;
@@ -393,18 +393,18 @@ int		fl ;
 /* end subroutine (ischap) */
 
 
-static int iscite(fp,fl,cvp)
-const char	*fp ;
+local int iscite(fp,fl,cvp)
+cchar	*fp ;
 int		fl ;
 struct cv	*cvp ;
 {
-	const char	*tp ;
+	cchar	*tp ;
 
 	int	rs1 ;
 	int	cl ;
 	int	f = FALSE ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if ((tp = strnchr(fp,fl,':')) != NULL) {
