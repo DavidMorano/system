@@ -85,7 +85,7 @@
 extern "C" int	b_cksumpass(int,cchar **,void *) ;
 extern "C" int	p_cksumpass(int,cchar **,cchar **,void *) ;
 
-extern "C" int	printhelp(void *,const char *,const char *,const char *) ;
+extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -141,43 +141,43 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *,cchar *) ;
-static int	procoutfile(PROGINFO *,cchar *) ;
-static int	procoutall(PROGINFO *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *,cchar *) ;
+local int	procoutfile(PROGINFO *,cchar *) ;
+local int	procoutall(PROGINFO *) ;
 
-static int	procsum_begin(PROGINFO *) ;
-static int	procsum_end(PROGINFO *) ;
-static int	procsum_pass(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procsum_begin(PROGINFO *) ;
+local int	procsum_end(PROGINFO *) ;
+local int	procsum_pass(PROGINFO *,SHIO *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_ckbegin(LOCINFO *) ;
-static int	locinfo_ckend(LOCINFO *) ;
-static int	locinfo_cktxbegin(LOCINFO *) ;
-static int	locinfo_cktxend(LOCINFO *) ;
-static int	locinfo_ckaccum(LOCINFO *,cchar *,int) ;
-static int	locinfo_repupdate(LOCINFO *,int) ;
-static int	locinfo_repbegin(LOCINFO *) ;
-static int	locinfo_repend(LOCINFO *) ;
-static int	locinfo_getsum(LOCINFO *,uint *) ;
-static int	locinfo_getsumall(LOCINFO *,uint *) ;
-static int	locinfo_bytesfile(LOCINFO *,ulonglong *) ;
-static int	locinfo_bytesall(LOCINFO *,ulonglong *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_ckbegin(LOCINFO *) ;
+local int	locinfo_ckend(LOCINFO *) ;
+local int	locinfo_cktxbegin(LOCINFO *) ;
+local int	locinfo_cktxend(LOCINFO *) ;
+local int	locinfo_ckaccum(LOCINFO *,cchar *,int) ;
+local int	locinfo_repupdate(LOCINFO *,int) ;
+local int	locinfo_repbegin(LOCINFO *) ;
+local int	locinfo_repend(LOCINFO *) ;
+local int	locinfo_getsum(LOCINFO *,uint *) ;
+local int	locinfo_getsumall(LOCINFO *,uint *) ;
+local int	locinfo_bytesfile(LOCINFO *,ulonglong *) ;
+local int	locinfo_bytesall(LOCINFO *,ulonglong *) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif /* CF_LOCSETENT */
 
 
 /* local variables */
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"cksumpass",
 	NULL
 } ;
@@ -187,7 +187,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -221,7 +221,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"type",
 	NULL
 } ;
@@ -288,7 +288,7 @@ int p_cksumpass(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
+local int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -306,16 +306,16 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pm = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pm = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -367,7 +367,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -609,7 +609,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -897,13 +897,13 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	SHIO		*efp = (SHIO *) pip->efp ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-sf <sumfile>] [<file(s)> ...]\n" ;
 	if (rs >= 0) rs = shio_printf(efp,fmt,pn,pn) ;
@@ -922,7 +922,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -979,7 +979,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,
 		cchar *ofn,cchar *afn,cchar *ifn)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
@@ -1030,7 +1030,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,
 		cchar *afn,cchar *ifn)
 {
 	int		rs = SR_OK ;
@@ -1072,7 +1072,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,
 	    if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1122,7 +1122,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,
 /* end subroutine (procargs) */
 
 
-static int procoutfile(PROGINFO *pip,cchar *sfn)
+local int procoutfile(PROGINFO *pip,cchar *sfn)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -1150,7 +1150,7 @@ static int procoutfile(PROGINFO *pip,cchar *sfn)
 /* end subroutine (procoutfile) */
 
 
-static int procoutall(PROGINFO *pip)
+local int procoutall(PROGINFO *pip)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -1178,7 +1178,7 @@ static int procoutall(PROGINFO *pip)
 /* end subroutine (procoutall) */
 
 
-static int procsum_begin(PROGINFO *pip)
+local int procsum_begin(PROGINFO *pip)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs ;
@@ -1194,7 +1194,7 @@ static int procsum_begin(PROGINFO *pip)
 /* end subroutine (procsum_begin) */
 
 
-static int procsum_end(PROGINFO *pip)
+local int procsum_end(PROGINFO *pip)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -1212,7 +1212,7 @@ static int procsum_end(PROGINFO *pip)
 /* end subroutine (procsum_end) */
 
 
-static int procsum_pass(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
+local int procsum_pass(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	NULSTR		fs ;
@@ -1233,12 +1233,12 @@ static int procsum_pass(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 	    SHIO	sfile, *sfp = &sfile ;
 	    if ((sfn[0] == '\0') || (sfn[0] == '-')) sfn = STDFNIN ;
 	    if ((rs = shio_open(sfp,sfn,"r",0666)) >= 0) {
-	        const int	slen = getpagesize() ;
+	        cint	slen = getpagesize() ;
 	        char	*sbuf ;
 	        if ((rs = uc_malloc(slen,&sbuf)) >= 0) {
 	            if ((rs = locinfo_cktxbegin(lip)) >= 0) {
 	                while ((rs = shio_read(sfp,sbuf,slen)) > 0) {
-	                    const int	len = rs ;
+	                    cint	len = rs ;
 	                    if ((rs = locinfo_ckaccum(lip,sbuf,len)) >= 0) {
 	                        if ((rs = shio_write(ofp,sbuf,len)) >= 0) {
 	                            wlen += rs ;
@@ -1285,7 +1285,7 @@ static int procsum_pass(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 /* end subroutine (procsum_pass) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1297,7 +1297,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1315,7 +1315,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_ckbegin(LOCINFO *lip)
+local int locinfo_ckbegin(LOCINFO *lip)
 {
 	int		rs ;
 	if ((rs = cksum_start(&lip->sum)) >= 0) {
@@ -1326,7 +1326,7 @@ static int locinfo_ckbegin(LOCINFO *lip)
 /* end subroutine (locinfo_ckbegin) */
 
 
-static int locinfo_ckend(LOCINFO *lip)
+local int locinfo_ckend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1340,7 +1340,7 @@ static int locinfo_ckend(LOCINFO *lip)
 /* end subroutine (locinfo_ckend) */
 
 
-static int locinfo_cktxbegin(LOCINFO *lip)
+local int locinfo_cktxbegin(LOCINFO *lip)
 {
 	lip->sf.clear() ;
 	return cksum_begin(&lip->sum) ;
@@ -1348,7 +1348,7 @@ static int locinfo_cktxbegin(LOCINFO *lip)
 /* end subroutine (locinfo_cktxbegin) */
 
 
-static int locinfo_cktxend(LOCINFO *lip)
+local int locinfo_cktxend(LOCINFO *lip)
 {
 	lip->st += lip->sf ;
 	return cksum_end(&lip->sum) ;
@@ -1356,11 +1356,11 @@ static int locinfo_cktxend(LOCINFO *lip)
 /* end subroutine (locinfo_cktxend) */
 
 
-static int locinfo_ckaccum(LOCINFO *lip,cchar *sbuf,int slen)
+local int locinfo_ckaccum(LOCINFO *lip,cchar *sbuf,int slen)
 {
 	int		rs = SR_OK ;
 	if (lip->open.sum) {
-	    const void	*bp = (const void *) sbuf ;
+	    cvoid	*bp = (cvoid *) sbuf ;
 	    rs = cksum_accum(&lip->sum,bp,slen) ;
 	}
 	return rs ;
@@ -1368,7 +1368,7 @@ static int locinfo_ckaccum(LOCINFO *lip,cchar *sbuf,int slen)
 /* end subroutine (locinfo_ckaccum) */
 
 
-static int locinfo_repbegin(LOCINFO *lip)
+local int locinfo_repbegin(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1392,7 +1392,7 @@ static int locinfo_repbegin(LOCINFO *lip)
 /* end subroutine (locinfo_repbegin) */
 
 
-static int locinfo_repend(LOCINFO *lip)
+local int locinfo_repend(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1412,7 +1412,7 @@ static int locinfo_repend(LOCINFO *lip)
 /* end subroutine (locinfo_repend) */
 
 
-static int locinfo_repupdate(LOCINFO *lip,int len)
+local int locinfo_repupdate(LOCINFO *lip,int len)
 {
 	int		rs = SR_OK ;
 	lip->sf += len ;
@@ -1421,7 +1421,7 @@ static int locinfo_repupdate(LOCINFO *lip,int len)
 /* end subroutine (locinfo_repupdate) */
 
 
-static int locinfo_getsum(LOCINFO *lip,uint *rp)
+local int locinfo_getsum(LOCINFO *lip,uint *rp)
 {
 	int		rs = SR_OK ;
 	if (lip->open.sum) {
@@ -1432,7 +1432,7 @@ static int locinfo_getsum(LOCINFO *lip,uint *rp)
 /* end subroutine (locinfo_getsum) */
 
 
-static int locinfo_getsumall(LOCINFO *lip,uint *rp)
+local int locinfo_getsumall(LOCINFO *lip,uint *rp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1449,7 +1449,7 @@ static int locinfo_getsumall(LOCINFO *lip,uint *rp)
 /* end subroutine (locinfo_getsumall) */
 
 
-static int locinfo_bytesfile(LOCINFO *lip,ulonglong *bytep)
+local int locinfo_bytesfile(LOCINFO *lip,ulonglong *bytep)
 {
 	*bytep = lip->sf.bytes ;
 	return SR_OK ;
@@ -1457,7 +1457,7 @@ static int locinfo_bytesfile(LOCINFO *lip,ulonglong *bytep)
 /* end subroutine (locinfo_bytesfile) */
 
 
-static int locinfo_bytesall(LOCINFO *lip,ulonglong *bytep)
+local int locinfo_bytesall(LOCINFO *lip,ulonglong *bytep)
 {
 	*bytep = lip->st.bytes ;
 	return SR_OK ;
@@ -1466,7 +1466,7 @@ static int locinfo_bytesall(LOCINFO *lip,ulonglong *bytep)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
