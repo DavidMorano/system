@@ -86,8 +86,8 @@ PROGINFO	*pip ;
 MKDIRLIST_ENT	*dsp ;
 int		ai ;
 ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	af[] ;
+cchar	ngdir[] ;
+cchar	af[] ;
 {
 	int		rs = EMIT_OK ;
 
