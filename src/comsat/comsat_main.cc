@@ -78,7 +78,7 @@
 #include	<ascii.h>
 #include	<strn.h>		/* |strnrbrk(3uc)| */
 #include	<mnw.h>			/* |mnwcpy(3uc)| */
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<getpf.h>
 #include	<inetaddrx.h>		/* |inet4int(3uc)| */
 #include	<hasx.h>
@@ -1370,7 +1370,7 @@ local int process(proginfo *pip) noex {
 	                }
 	                if (pip->open.logprog) {
 	                    char	tbuf[TIMEBUFLEN+1] ;
-	                    timestr_logz(pip->daytime,tbuf) ;
+	                    strtime_logz(pip->daytime,tbuf) ;
 	                    proglog_printf(pip,"%s exiting",tbuf) ;
 	                }
     
