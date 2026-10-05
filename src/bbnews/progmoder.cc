@@ -110,7 +110,7 @@ int progmoder(PROGINFO *pip,MKDIRLIST *ngp,cchar *ofn)
 {
 	MKDIRLIST_ENT	*dsp ;
 	bfile		ofile, *ofp = &ofile ;
-	const int	pm = pip->progmode ;
+	cint	pm = pip->progmode ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cmode ;
@@ -292,7 +292,7 @@ PROGINFO	*pip ;
 EXPCOOK		*ecp ;
 int		tc ;
 {
-	const int	dlen = DIGBUFLEN ;
+	cint	dlen = DIGBUFLEN ;
 	int		rs ;
 	char		dbuf[DIGBUFLEN+1] ;
 
@@ -310,7 +310,7 @@ bfile		*ofp ;
 MKDIRLIST_ENT	*dsp ;
 {
 	bfile		dfile ;
-	const int	llen = MAXPATHLEN ;
+	cint	llen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		wlen = 0 ;
