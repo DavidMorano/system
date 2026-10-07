@@ -49,7 +49,7 @@ module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* CSTD |INT_MAX| */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<new>			/* C++STD */
@@ -83,7 +83,6 @@ using libu::snvprintf ;			/* subroutine */
 /* local variables */
 
 constexpr int	flen = MAXPATHLEN ;
-
 int		dfd = -1 ;
 
 
