@@ -199,7 +199,7 @@ extern "C" {
 
 constexpr intvals	intval ;
 static vars		var ;
-const int		rsn = SR_NOTFOUND ;
+cint		rsn = SR_NOTFOUND ;
 const bool		f_fnamecmp = CF_FNAMECMP ;
 
 
