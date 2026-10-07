@@ -94,13 +94,20 @@ using libu::umem ;			/* variable */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int		maxnamelen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
 
 /* local variables */
 
-static cint		maxnamelen = ulibval.maxnamelen ;
+static vars		var ;
 constexpr bool		f_readdirr = F_READDIRR ;
 
 
@@ -114,17 +121,17 @@ int posixdir::open(cchar *fn) noex {
 	if (fn) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
-		if ((rs = maxnamelen) >= 0) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	            if ((rs = bufbegin(fn)) >= 0) ylikely {
 	                fname = fn ;
 	                if ((rs = callout(&posixdir::diropen)) >= 0) {
 			    magval = POSIXDIR_MAGIC ;
-			}
+			} /* end */
 			if (rs < 0) {
 			    bufend() ;
 			} /* end if (error) */
 	            } /* end if (bufbegin) */
-		} /* end if (maxnamelen) */
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -195,11 +202,11 @@ int posixdir::bufbegin(cchar *fn) noex {
 	if_constexpr (f_readdirr) {
 	    cint	req = _PC_NAME_MAX ;
 	    if ((rs = u_pathconf(fn,req,nullptr)) >= 0) {
-	        cint	dsz = (max(maxnamelen,rs) + szof(dirent)) + 1 ;
+	        cint	dsz = (max(var.maxnamelen,rs) + szof(dirent)) + 1 ;
 		if (void *vp ; (rs = umem.mall(dsz,&vp)) >= 0) {
 		    debuf = (dirent *) vp ;
 		    memclear(vp,dsz) ;
-		}
+		} /* end if (memory-acquire) */
 	    } /* end if (u_pathconf) */
 	} else {
 	    rs = SR_OK ;
@@ -215,7 +222,7 @@ int posixdir::bufend() noex {
 	    if (rs >= 0) rs = rs1 ;
 	    debuf = nullptr ;
 	    delen = 0 ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end method (posixdir::bufend) */
 
@@ -263,7 +270,7 @@ int posixdir::diropen() noex {
 	    dirp = p ;
 	} else {
 	    rs = (neg errno) ;
-	}
+	} /* end if */
 	return rs ;
 } /* end method (posixdir::diropen) */
 
@@ -352,7 +359,7 @@ int posixdir::dirrewind() noex {
 void posixdir::dtor() noex {
     	if (cint rs = close() ; rs < 0) {
 	    ulogerror("posixdir",rs,"dtor-close") ;
-	}
+	} /* end */
 } /* end method */
 
 int posixdir_te::operator () (mut off_t *fop) noex {
@@ -381,5 +388,13 @@ posixdir_co::operator int () noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (posixdir_co::operator) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = ulibval.maxnamelen) >= 0) ylikely {
+	    maxnamelen = rs ;
+	} /* end */
+	return rs ;
+} /* end method (vars::operator) */
 
 
