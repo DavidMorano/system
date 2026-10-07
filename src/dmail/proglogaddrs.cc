@@ -37,19 +37,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<csignal>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<logfile.h>
 #include	<vecstr.h>
@@ -62,6 +61,8 @@
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -119,10 +120,6 @@ extern int	cfdeci(cchar *,int,int *) ;
 
 extern int	sfsubstance(cchar *,int,cchar **) ;
 
-extern char	*timestr_edate(time_t,char *) ;
-extern char	*timestr_hdate(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* external variables */
 
@@ -132,16 +129,16 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int proglogaddr(struct proginfo *,MAILMSG *,int) ;
+local int proglogaddr(struct proginfo *,MAILMSG *,int) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-static int debug_fsize(bfile *) ;
+local int debug_fsize(bfile *) ;
 #endif
 
 
 /* local variables */
 
-static const int	hikeys[] = {
+constexpr int		hikeys[] = {
 	HI_ERRORSTO,
 	HI_SENDER,
 	HI_REPLYTO,
@@ -153,8 +150,10 @@ static const int	hikeys[] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int proglogaddrs(pip,msgp)
 struct proginfo	*pip ;
@@ -178,7 +177,7 @@ MAILMSG		*msgp ;
 /* local subroutines */
 
 
-static int proglogaddr(pip,msgp,hi)
+local int proglogaddr(pip,msgp,hi)
 struct proginfo	*pip ;
 MAILMSG		*msgp ;
 int		hi ;
