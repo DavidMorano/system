@@ -90,7 +90,7 @@
 
 /* forward references */
 
-static int	tty_wps(), tty_wait(), tty_echo(), tty_risr(), tty_tisr() ;
+local int	tty_wps(), tty_wait(), tty_echo(), tty_risr(), tty_tisr() ;
 
 
 /* static data */
@@ -728,7 +728,7 @@ int	fd ;
 
 
 /* write out a prompt string */
-static int tty_wps(ucbp,buf,len)
+local int tty_wps(ucbp,buf,len)
 struct ucb	*ucbp ;
 uchar	*buf ;
 int	len ;
@@ -743,7 +743,7 @@ int	len ;
 
 
 /* wait for a character to arrive */
-static int tty_wait(ucbp,timeout)
+local int tty_wait(ucbp,timeout)
 struct ucb	*ucbp ;
 int		timeout ;
 {
@@ -909,7 +909,7 @@ enter:
 
 
 /* check for receiver got some thing */
-static int tty_risr(ucbp,buf,len)
+local int tty_risr(ucbp,buf,len)
 struct ucb	*ucbp ;
 uchar	buf[] ;
 int	len ;
@@ -1001,7 +1001,7 @@ done:
 
 
 /* echo */
-static int tty_echo(ucbp,buf,len)
+local int tty_echo(ucbp,buf,len)
 struct ucb	*ucbp ;
 uchar	buf[] ;
 int	len ;
