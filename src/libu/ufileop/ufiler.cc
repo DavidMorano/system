@@ -157,26 +157,26 @@ namespace {
 	    sz = s ;
 	    foff = fo ;
 	    oo = o ;
-	} ;
+	} ; /* end */
 	ufiler(char *rb,int rl) noex : rbuf(rb), rlen(rl) { } ;
 	int callstd(cchar *fn) noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
 		rs = (this->*m)(fn) ;
-	    }
+	    } /* end */
 	    return rs ;
-	} ;
-	void submem(ufiler_m mem) noex {
-	    m = mem ;
-	} ;
-	int imkdir(cchar *) noex ;
-	int imknod(cchar *) noex ;
-	int irename(cchar *) noex ;
-	int iresolvepath(cchar *) noex ;
-	int irmdir(cchar *) noex ;
-	int isymlink(cchar *) noex ;
-	int ixattrget(cchar *) noex ;
-	int ixattrset(cchar *) noex ;
+	} ; /* end */
+	void submem(ufiler_m meth) noex {
+	    m = meth ;
+	} ; /* end */
+	int imkdir	(cchar *) noex ;
+	int imknod	(cchar *) noex ;
+	int irename	(cchar *) noex ;
+	int iresolve	(cchar *) noex ;
+	int irmdir	(cchar *) noex ;
+	int isymlink	(cchar *) noex ;
+	int ixattrget	(cchar *) noex ;
+	int ixattrset	(cchar *) noex ;
     } ; /* end struct (ufiler) */
 } /* end namespace */
 
@@ -187,7 +187,7 @@ local int getrlen(int rlen) noex {
 	int		rs ;
 	if ((rs = rlen) < 0) {
 	    rs = ulibval.maxpathlen ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (getrlen) */
 
@@ -405,7 +405,7 @@ int u_resolvepath(cchar *fname,char *rbuf,int rlen) noex {
 	    if (fname[0]) ylikely {
 	        if ((rs = getrlen(rlen)) >= 0) ylikely {
 	            ufiler	fo(rbuf,rs) ;
-	            fo.m = &ufiler::iresolvepath ;
+	            fo.m = &ufiler::iresolve ;
 	            rs = fo(fname) ;
 	        } /* end if (getrlen) */
 	    } /* end if (valid) */
@@ -544,9 +544,9 @@ int ufiler::irename(cchar *fn) noex {
 	return rs ;
 } /* end method (ufiler::irename) */
 
-int ufiler::iresolvepath(cchar *fn) noex {
+int ufiler::iresolve(cchar *fn) noex {
     	return std_resolvepath(fn,rbuf,rlen) ;
-} /* end method (ufiler::iresolvepath) */
+} /* end method (ufiler::iresolve) */
 
 int ufiler::irmdir(cchar *fn) noex {
 	int		rs ;
