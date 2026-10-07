@@ -63,16 +63,16 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 extern void	munge(PROGINFO *,int,ULONG *,ULONG *,ULONG *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -98,9 +98,9 @@ struct msgstate {
 
 /* forward references */
 
-static int	decode_start(PROGINFO *,struct msgstate *,int,int) ;
-static int	decode_proc(PROGINFO *,struct msgstate *,char *,int) ;
-static int	decode_finish(PROGINFO *,struct msgstate *) ;
+local int	decode_start(PROGINFO *,struct msgstate *,int,int) ;
+local int	decode_proc(PROGINFO *,struct msgstate *,char *,int) ;
+local int	decode_finish(PROGINFO *,struct msgstate *) ;
 
 
 /* local variables */
@@ -962,7 +962,7 @@ badtmpmk2:
 
 #if	CF_UNIFIED
 
-static int decode_start(pip,msp,l1,l2)
+local int decode_start(pip,msp,l1,l2)
 PROGINFO	*pip ;
 struct msgstate	*msp ;
 int		l1, l2 ;
@@ -996,7 +996,7 @@ bad0:
 /* end subroutine (decode_start) */
 
 
-static int decode_proc(pip,msp,data,datalen)
+local int decode_proc(pip,msp,data,datalen)
 PROGINFO	*pip ;
 struct msgstate	*msp ;
 char		data[] ;
@@ -1046,7 +1046,7 @@ int		datalen ;
 /* end subroutine (decode_proc) */
 
 
-static int decode_finish(pip,msp)
+local int decode_finish(pip,msp)
 PROGINFO	*pip ;
 struct msgstate	*msp ;
 {
