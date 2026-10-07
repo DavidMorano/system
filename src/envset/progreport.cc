@@ -38,11 +38,12 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<tmtime.hh>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -82,9 +83,9 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	mkreportfile(PROGINFO *,char *,cchar *) ;
-static int	mkreportout(PROGINFO *,cchar *,cchar *,int,cchar **,int) ;
-static int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
+local int	mkreportfile(PROGINFO *,char *,cchar *) ;
+local int	mkreportout(PROGINFO *,cchar *,cchar *,int,cchar **,int) ;
+local int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
 
 
 /* exported subroutines */
@@ -92,7 +93,7 @@ static int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
 
 int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 {
-	const int	ulen = USERNAMELEN ;
+	cint	ulen = USERNAMELEN ;
 	int		rs ;
 	char		ubuf[USERNAMELEN+1] ;
 
@@ -107,12 +108,12 @@ int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 	    if ((rs = mktmpreportdir(rbuf,ubuf,dname,dm)) >= 0) {
 	        char	fbuf[MAXPATHLEN+1] ;
 	        if ((rs = mkreportfile(pip,fbuf,rbuf)) >= 0) {
-	            const int	nlen = NODENAMELEN ;
+	            cint	nlen = NODENAMELEN ;
 	            char	nbuf[NODENAMELEN+1] ;
 	            if (pip->pid == 0) pip->pid = getpid() ;
 	            if ((rs = getnodename(nbuf,nlen)) >= 0) {
-	                const int	llen = LOGIDLEN ;
-	                const int	v = pip->pid ;
+	                cint	llen = LOGIDLEN ;
+	                cint	v = pip->pid ;
 	                cchar		*onn = pip->nodename ;
 	                char		lbuf[LOGIDLEN+1] ;
 	                pip->nodename = nbuf ;
@@ -136,14 +137,14 @@ int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 /* local subroutines */
 
 
-static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
+local int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 {
 	TMTIME		mt ;
 	const time_t	dt = pip->daytime ;
 	int		rs ;
 
 	if ((rs = tmtime_timelocal(&mt,dt)) >= 0) {
-	    const int	tlen = TIMEBUFLEN ;
+	    cint	tlen = TIMEBUFLEN ;
 	    cchar	*fmt = "r%y%m%d%H%M%S" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
 	    if ((rs = sntmtime(tbuf,tlen,&mt,fmt)) >= 0) {
@@ -156,7 +157,7 @@ static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 /* end subroutine (mkreportfile) */
 
 
-static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
+local int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 	int ac,cchar **av,int rv)
 {
 	bfile		rfile, *rfp = &rfile ;
@@ -164,9 +165,9 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 	int		rs ;
 	cchar		*fmt ;
 	char		tbuf[TIMEBUFLEN+1] ;
-	timestr_logz(dt,tbuf) ;
+	strtime_logz(dt,tbuf) ;
 	if ((rs = bopen(rfp,fbuf,"wct",0666)) >= 0) {
-	    const int	al = DISARGLEN ;
+	    cint	al = DISARGLEN ;
 	    int		v = pip->pid ;
 	    int		i ;
 
@@ -203,7 +204,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 
 
 /* ARGSUSED */
-static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
+local int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
 {
 	cchar		*rdname = REPORTDNAME ;
 	int		rs ;
