@@ -46,7 +46,7 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
 #include	<pingstatdb.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -141,7 +141,7 @@ int process(PI *pip,VS *dp,VS *ep,PSD *psp,cc *name,int mpint,int to) noex {
 	    debugprintf("process: name=\"%s\" to=%d f_update=%d dt=%s\n",
 	        name,to,
 	        f_update,
-	        timestr_log(dt,timebuf)) ;
+	        strtime_log(dt,timebuf)) ;
 	    debugprintf("process: mpint=%d\n",mpint) ;
 	}
 #endif
@@ -188,7 +188,7 @@ int process(PI *pip,VS *dp,VS *ep,PSD *psp,cc *name,int mpint,int to) noex {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
 	            debugprintf("process: lastcheck=%s\n",
-	                timestr_log(lastcheck,timebuf)) ;
+	                strtime_log(lastcheck,timebuf)) ;
 #endif
 
 	        if ((dt - lastcheck) < mpint) {
@@ -290,7 +290,7 @@ int process(PI *pip,VS *dp,VS *ep,PSD *psp,cc *name,int mpint,int to) noex {
 #endif
 
 	            logfile_printf(&pip->lh,"%s %s %s\n",
-	                timestr_logz(dtaytime,timebuf),
+	                strtime_logz(dtaytime,timebuf),
 	                ((f_state1) ? "U" : "D"),
 	                name) ;
 
@@ -298,7 +298,7 @@ int process(PI *pip,VS *dp,VS *ep,PSD *psp,cc *name,int mpint,int to) noex {
 
 	            if (pip->sumfp != nullptr) {
 	                bprintf(pip->sumfp,"%s %s %s\n",
-	                    timestr_logz(dt,timebuf),
+	                    strtime_logz(dt,timebuf),
 	                    ((f_state1) ? "U" : "D"), name) ;
 	            } /* end if (summary file entry) */
 
@@ -336,7 +336,7 @@ int process(PI *pip,VS *dp,VS *ep,PSD *psp,cc *name,int mpint,int to) noex {
 	                bprintf(pip->ofp,"%*d %s %s (%s)\n",
 	                    RF_NUMDIGITS,pep->count,
 	                    cdate,pdate,
-	                    timestr_elapsed((dt - ptime),timebuf)) ;
+	                    strtime_elapsed((dt - ptime),timebuf)) ;
 		    } else {
 	                bprintf(pip->ofp,"%*d %s %s\n",
 	                    RF_NUMDIGITS,pep->count,
