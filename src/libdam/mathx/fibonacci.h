@@ -33,10 +33,10 @@ extern long		fibonacci(int) noex ;
 extern double		fibonaccid(int) noex ;
 extern longdouble	fibonaccil(int) noex ;
 
-static inline double dfibonacci(int v) noex {
+local inline double dfibonacci(int v) noex {
     	return fibonaccid(v) ;
 }
-static inline longdouble lfibonacci(int v) noex {
+local inline longdouble lfibonacci(int v) noex {
     	return fibonaccil(v) ;
 }
 
