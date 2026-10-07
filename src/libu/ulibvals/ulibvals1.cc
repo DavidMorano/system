@@ -1,8 +1,8 @@
-/* ulibvals1 MODULE */
+/* ulibvals1 MODULE (implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* retrieve various Ukernel-Library-Values */
+/* retrieve various Kernel-Library-Values */
 /* version %I% last-modified %G% */
 
 
@@ -39,88 +39,45 @@ module ;
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<bit>			/* C++STD |endian(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usysdefs.h>		/* LIBU |DIGBASE_MAX| */
-#include	<ulogerror.h>		/* LIBU */
-#include	<usysflag.h>		/* LIBU */
-#include	<sysconfcmds.h>		/* LIBU |_SC_{xx}| */
 #include	<localmisc.h>		/* LIBU |{xxx}BUFLEN| */
-
-#pragma		GCC dependency		"mod/usysconf.ccm"
 
 module ulibvals ;
 
-import usysconf ;			/* |usysconfval(3u)| */
 
-using std::endian ;
+ulibvaler_co ulibvaler::endianval	(ulibvalmem_endianval) ;
+ulibvaler_co ulibvaler::pagesz		(ulibvalmem_pagesz) ;
+ulibvaler_co ulibvaler::clktck		(ulibvalmem_clktck) ;
+ulibvaler_co ulibvaler::maxbase		(ulibvalmem_maxbase) ;
+ulibvaler_co ulibvaler::maxpid		(ulibvalmem_maxpid) ;
+ulibvaler_co ulibvaler::maxarg		(ulibvalmem_maxarg) ;
+ulibvaler_co ulibvaler::maxline		(ulibvalmem_maxline) ;
+ulibvaler_co ulibvaler::maxlink		(ulibvalmem_maxlink) ;
+ulibvaler_co ulibvaler::maxlogin	(ulibvalmem_maxlogin) ;
+ulibvaler_co ulibvaler::maxsymloop	(ulibvalmem_maxsymloop) ;
+ulibvaler_co ulibvaler::maxsymbol	(ulibvalmem_maxsymbol) ;
+ulibvaler_co ulibvaler::maxgroups	(ulibvalmem_maxgroups) ;
+ulibvaler_co ulibvaler::maxnamelen	(ulibvalmem_maxnamelen) ;
+ulibvaler_co ulibvaler::maxpathlen	(ulibvalmem_maxpathlen) ;
+ulibvaler_co ulibvaler::maxmsglen	(ulibvalmem_maxmsglen) ;
+ulibvaler_co ulibvaler::maxsysuid	(ulibvalmem_maxsysuid) ;
+ulibvaler_co ulibvaler::maxtzname	(ulibvalmem_maxtzname) ;
+ulibvaler_co ulibvaler::maxtzabbr	(ulibvalmem_maxtzabbr) ;
+ulibvaler_co ulibvaler::nodenamelen	(ulibvalmem_nodenamelen) ;
+ulibvaler_co ulibvaler::usernamelen	(ulibvalmem_usernamelen) ;
+ulibvaler_co ulibvaler::groupnamelen	(ulibvalmem_groupnamelen) ;
+ulibvaler_co ulibvaler::projnamelen	(ulibvalmem_projnamelen) ;
+ulibvaler_co ulibvaler::protnamelen	(ulibvalmem_protnamelen) ;
+ulibvaler_co ulibvaler::hostnamelen	(ulibvalmem_hostnamelen) ;
+ulibvaler_co ulibvaler::servnamelen	(ulibvalmem_servnamelen) ;
+ulibvaler_co ulibvaler::binbuflen	(ulibvalmem_binbuflen) ;
+ulibvaler_co ulibvaler::octbuflen	(ulibvalmem_octbuflen) ;
+ulibvaler_co ulibvaler::decbuflen	(ulibvalmem_decbuflen) ;
+ulibvaler_co ulibvaler::hexbuflen	(ulibvalmem_hexbuflen) ;
+ulibvaler_co ulibvaler::digbuflen	(ulibvalmem_digbuflen) ;
 
-#ifndef	SYSUID_MAX
-#define	SYSUID_MAX	(500 - 1)	/* from Apple-Darwin? */
-#endif
-
-static int	rscum ;
-
-local constexpr int mkendian() noex {
-    	using enum	endian ;	/* get the values */
-    	int	n ;
-	if_constexpr (native == little) {
-	    n = 0 ;
-	} else if_constexpr (native == big) {
-	    n = 1 ;
-	} else {
-	    n = 2 ;
-	} /* end if_constexpr */
-	return n ;
-} /* end subroutine (mkendian) */
-
-int getval(int cmd) noex {
-    	int		rs ;
-	if ((rs = rscum) >= 0) {
-	    if ((rs = usysconfval(cmd)) < 0) {
-	        rscum = rs ;
-	        ulogerror("ulibvals",rs,"getval") ;
-	    }
-	}
-	return rs ;
-} /* end subroutine (getval) */
-
-const int ulibvals::endianval		= mkendian() ;
-const int ulibvals::pagesz		= getval(_SC_PAGESIZE) ;
-const int ulibvals::clktck		= getval(_SC_CLK_TCK) ;
-const int ulibvals::maxbase		= DIGBASE_MAX ;
-const int ulibvals::maxpid		= getval(_SC_PID_MAX) ;
-const int ulibvals::maxarg		= getval(_SC_ARG_MAX) ;
-const int ulibvals::maxline		= getval(_SC_LINE_MAX) ;
-const int ulibvals::maxlink		= getval(_SC_LINK_MAX) ;
-const int ulibvals::maxlogin		= getval(_SC_LOGIN_NAME_MAX) ;
-const int ulibvals::maxsymloop		= getval(_SC_SYMLOOP_MAX) ;
-const int ulibvals::maxsymbol		= getval(_SC_SYMBOL_MAX) ;
-const int ulibvals::maxgroups		= getval(_SC_NGROUPS_MAX) ;
-const int ulibvals::maxnamelen		= getval(_SC_NAME_MAX) ;
-const int ulibvals::maxpathlen		= getval(_SC_PATH_MAX) ;
-const int ulibvals::maxmsglen		= getval(_SC_MSG_MAX) ;
-const int ulibvals::maxsysuid		= SYSUID_MAX ;
-const int ulibvals::maxtzname		= getval(_SC_TZNAME_MAX) ;
-const int ulibvals::maxtzabbr		= TZABBR_MAX ;
-const int ulibvals::nodenamelen		= getval(_SC_NODENAME_MAX) ;
-const int ulibvals::usernamelen		= getval(_SC_USERNAME_MAX) ;
-const int ulibvals::groupnamelen	= getval(_SC_GROUPNAME_MAX) ;
-const int ulibvals::projnamelen		= getval(_SC_PROJECTNAME_MAX) ;
-const int ulibvals::protnamelen		= getval(_SC_PROTNAME_MAX) ;
-const int ulibvals::hostnamelen		= getval(_SC_HOSTNAME_MAX) ;
-const int ulibvals::servnamelen		= getval(_SC_SERVNAME_MAX) ;
-const int ulibvals::binbuflen		= BINBUFLEN ;	/* for |int256_t| */
-const int ulibvals::octbuflen		= OCTBUFLEN ;	/* for |int256_t| */
-const int ulibvals::decbuflen		= DECBUFLEN ;	/* for |int256_t| */
-const int ulibvals::hexbuflen		= HEXBUFLEN ;	/* for |int256_t| */
-const int ulibvals::digbuflen		= DIGBUFLEN ;	/* for |int256_t| */
-
-ulibvals::operator int () noex {
-	return rscum ;
-} /* end method */
-
-const ulibvals	ulibval ;
+ulibvaler		ulibval ;
 
 
