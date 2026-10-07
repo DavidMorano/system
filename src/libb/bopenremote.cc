@@ -75,7 +75,7 @@ char	cmd[] ;
 	UTSNAME		uts ;
 	bfile		jobfile, *jfp = &jobfile ;
 	pid_t		pid ;
-	int		rs = SR_BAD ;
+	int		rs = SR_BADE ;
 	int		i ;
 	int		klen ;
 	int		f_cwd = FALSE ;
@@ -113,7 +113,7 @@ char	cmd[] ;
 
 	    cmd_rsh = "/usr/ucb/rsh" ;
 	    if (u_access(cmd_rsh,X_OK) != 0) 
-		return SR_BAD ;
+		return SR_BADE ;
 
 	}
 
@@ -122,7 +122,7 @@ char	cmd[] ;
 
 	    cmd_rcp = "/usr/ucb/rcp" ;
 	    if (u_access(cmd_rcp,X_OK) != 0) 
-		return SR_BAD ;
+		return SR_BADE ;
 
 	}
 
@@ -387,7 +387,7 @@ badhost:
 
 #ifdef	COMMENT
 
-static void fixdisplay(host)
+local void fixdisplay(host)
 char	host[] ;
 {
 	struct utsname	uts ;
