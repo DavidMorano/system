@@ -44,7 +44,7 @@ OBJPART=
 
 OBJPRIME= deb0.o
 
-OBJ0= deb1.o
+OBJ0= deb1.o deb2.o
 OBJ1= 
 OBJ2= 
 OBJ3= 
@@ -151,6 +151,6 @@ deb0.o:		deb.ccm					$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 deb1.o:		deb1.cc deb0.o				$(INCS)
-	$(COMPILE.cc) $<
+deb2.o:		deb2.cc deb0.o				$(INCS)
 
 
