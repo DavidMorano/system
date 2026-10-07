@@ -62,9 +62,9 @@ extern int	isNotPresent(int) ;
 
 /* forward references */
 
-static int	procdircheck(PROGINFO *,const char *,mode_t) ;
-static int	procdirmk(PROGINFO *,cchar *,mode_t) ;
-static int	procdirgroup(PROGINFO *) ;
+local int	procdircheck(PROGINFO *,cchar *,mode_t) ;
+local int	procdirmk(PROGINFO *,cchar *,mode_t) ;
+local int	procdirgroup(PROGINFO *) ;
 
 
 /* local variables */
@@ -121,7 +121,7 @@ int progjobdir(PROGINFO *pip,char *jobdname)
 
 
 /* check if a directory exists and has the correct permissions */
-static int procdircheck(PROGINFO *pip,cchar *dname,mode_t dm)
+local int procdircheck(PROGINFO *pip,cchar *dname,mode_t dm)
 {
 	ustat	sb ;
 	int		rs ;
@@ -139,7 +139,7 @@ static int procdircheck(PROGINFO *pip,cchar *dname,mode_t dm)
 /* end subroutine (procdircheck) */
 
 
-static int procdirmk(PROGINFO *pip,cchar *dname,mode_t dm)
+local int procdirmk(PROGINFO *pip,cchar *dname,mode_t dm)
 {
 	int		rs ;
 	if ((rs = mkdirs(dname,dm)) >= 0) {
@@ -156,7 +156,7 @@ static int procdirmk(PROGINFO *pip,cchar *dname,mode_t dm)
 /* end subroutine (procdirmk) */
 
 
-static int procdirgroup(PROGINFO *pip)
+local int procdirgroup(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
