@@ -38,17 +38,17 @@ module ;
 
 module sysdbfnames ;
 
-const char sysdbfnames::passwd[] 	= "passwd" ;
-const char sysdbfnames::shadow[]	= "shadow" ;
-const char sysdbfnames::userattr[]	= "userattr" ;
-const char sysdbfnames::group[]		= "group" ;
-const char sysdbfnames::project[]	= "project" ;
-const char sysdbfnames::shells[]	= "shells" ;
-const char sysdbfnames::protocols[]	= "protocols" ;
-const char sysdbfnames::networks[]	= "networks" ;
-const char sysdbfnames::netmasks[]	= "netmasks" ;
-const char sysdbfnames::hosts[]		= "hosts" ;
-const char sysdbfnames::services[]	= "services" ;
+cchar sysdbfnames::passwd[] 	= "passwd" ;
+cchar sysdbfnames::shadow[]	= "shadow" ;
+cchar sysdbfnames::userattr[]	= "userattr" ;
+cchar sysdbfnames::group[]		= "group" ;
+cchar sysdbfnames::project[]	= "project" ;
+cchar sysdbfnames::shells[]	= "shells" ;
+cchar sysdbfnames::protocols[]	= "protocols" ;
+cchar sysdbfnames::networks[]	= "networks" ;
+cchar sysdbfnames::netmasks[]	= "netmasks" ;
+cchar sysdbfnames::hosts[]		= "hosts" ;
+cchar sysdbfnames::services[]	= "services" ;
 
 constexpr sysdbfnames	sysdbfname ;
 
