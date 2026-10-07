@@ -2,48 +2,46 @@
 
 /* process messages on the input stream */
 
-
 #define	CF_DEBUGS	0
 #define	CF_DEBUG	1
 
-
 /* revision history:
 
-	= 96/03/01, David A­D­ Morano
-
+	= 1996-03-01, David A­D­ Morano
 	The subroutine was adapted from other programs that
 	do similar things.
 
-
 */
 
+/* Copyright © 1996 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /******************************************************************************
 
+  	Description:
 	This subroutine processes messages that are present on the
 	input stream.
 
-
-
 ******************************************************************************/
 
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
 #include	<ctime>
-#include	<cstdlib>
+#include	<csignal>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<logfile.h>
 #include	<varsub.h>
 #include	<dater.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -68,8 +66,6 @@
 
 
 /* external subroutines */
-
-extern char	*timestr_logz(time_t, char *) ;
 
 
 /* external variables */
