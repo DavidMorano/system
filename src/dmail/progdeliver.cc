@@ -53,9 +53,10 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
-#include	<bfile.h>
 #include	<sigblocker.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"mailspool.h"
 #include	"lkmail.h"
@@ -87,7 +88,6 @@ extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -98,10 +98,10 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	progdeliverer(proginfo *,int,RECIP *,cchar *,int) ;
-static int	progdeliver_mbo(proginfo *,RECIP *,int,int) ;
-static int	progdeliver_lockinfo(proginfo *,MAILSPOOL *) ;
-static int	mklockinfo(proginfo *,char *,int,time_t) ;
+local int	progdeliverer(proginfo *,int,RECIP *,cchar *,int) ;
+local int	progdeliver_mbo(proginfo *,RECIP *,int,int) ;
+local int	progdeliver_lockinfo(proginfo *,MAILSPOOL *) ;
+local int	mklockinfo(proginfo *,char *,int,time_t) ;
 
 
 /* local variables */
@@ -172,7 +172,7 @@ int progdeliver(proginfo *pip,int tfd,RECIP *rp) noex {
 
 /* local subroutines */
 
-static int progdeliverer(proginfo *pip,int tfd,RECIP *rp,cc *md,int f) noex {
+local int progdeliverer(proginfo *pip,int tfd,RECIP *rp,cc *md,int f) noex {
 	sigblocker	blocks ;
 	int		rs ;
 	int		rs1 ;
@@ -191,11 +191,11 @@ static int progdeliverer(proginfo *pip,int tfd,RECIP *rp,cc *md,int f) noex {
 	    if ((rs = u_rewind(tfd)) >= 0) {
 	        MAILSPOOL	ms ;
 		mode_t		om = 0660 ;
-		const int	to = pip->to_spool ;
+		cint	to = pip->to_spool ;
 		int		of = (O_CREAT|O_RDWR|O_APPEND) ;
 		cchar		*un = rp->recipient ;
 	        if ((rs = mailspool_open(&ms,md,un,of,om,to)) >= 0) {
-		    const int	mfd = rs ;
+		    cint	mfd = rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("progdeliverer: mailspool_open() rs=%d\n",rs) ;
@@ -235,7 +235,7 @@ static int progdeliverer(proginfo *pip,int tfd,RECIP *rp,cc *md,int f) noex {
 /* end subroutine (progdeliverer) */
 
 /* ARGSUSED */
-static int progdeliver_mbo(proginfo *pip,RECIP *rp,int mbo,int f) noex {
+local int progdeliver_mbo(proginfo *pip,RECIP *rp,int mbo,int f) noex {
 	int		rs = SR_OK ;
 	if (f) {
 	    rs = recip_mbo(rp,mbo) ;
@@ -244,7 +244,7 @@ static int progdeliver_mbo(proginfo *pip,RECIP *rp,int mbo,int f) noex {
 }
 /* end subroutine (progdeliver_mbo) */
 
-static int progdeliver_lockinfo(proginfo *pip,MAILSPOOL *msp) noex {
+local int progdeliver_lockinfo(proginfo *pip,MAILSPOOL *msp) noex {
 	custime		dt = pip->daytime ;
 	cint		llen = LOCKBUFLEN ;
 	int		rs ;
@@ -265,7 +265,7 @@ static int progdeliver_lockinfo(proginfo *pip,MAILSPOOL *msp) noex {
 /* end subroutine (progdeliver_lockinfo) */
 
 /* make (create) the information that goes into the mail-lock file */
-static int mklockinfo(proginfo *pip,char *rbuf,int rlen,time_t ti_now) noex {
+local int mklockinfo(proginfo *pip,char *rbuf,int rlen,time_t ti_now) noex {
 	int		rs ;
 	int		rs1 ;
 	if (sbuf b ; (rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
@@ -278,7 +278,7 @@ static int mklockinfo(proginfo *pip,char *rbuf,int rlen,time_t ti_now) noex {
 	    /* line 3 */
 	    {
 		char	tbuf[TIMEBUFLEN + 1] ;
-	        timestr_logz(ti_now,tbuf) ;
+	        strtime_logz(ti_now,tbuf) ;
 	        sbuf_strw(&b,tbuf,-1) ;
 	        sbuf_chr(&b,' ') ;
 	        sbuf_strw(&b,pip->progname,-1) ;
