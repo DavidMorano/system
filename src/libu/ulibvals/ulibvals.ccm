@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-/* retrieve various Ukernel-Library-Values */
+/* retrieve various Kernel-Library-Values */
 /* version %I% last-modified %G% */
 
 
@@ -14,17 +14,22 @@
 	= 2020-05-07, David A-D- Morano
 	I converted this (formerly a header-only file) to a module.
 
+	= 2026-10-05, David A-D- Morano
+	I changed this to an operational model where the values get
+	initialized when first accessed rather than at module load
+	time.
+
 */
 
-/* Copyright © 2001,2020 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2001,2020,2026 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-  	Name:
+  	Module:
 	ulibvals
 
 	Description:
-	This module contains a structure (ULIBVALS) that itself
+	This module contains a structure (ULIBVALER) that itself
 	contains various system related integer values.
 
 	Synopsis:
@@ -49,43 +54,87 @@ module ;
 export module ulibvals ;
 
 export {
-    struct ulibvals {
-	static const int	endianval ;
-	static const int	pagesz ;
-	static const int	clktck ;
-	static const int	maxbase ;
-	static const int	maxpid ;	/* max PID value */
-	static const int	maxarg ;
-	static const int	maxline ;
-	static const int	maxlink ;
-	static const int	maxlogin ;
-	static const int	maxsymloop ;
-	static const int	maxsymbol ;
-	static const int	maxgroups ;
-	static const int	maxnamelen ;	/* file-system */
-	static const int	maxpathlen ;	/* file-system */
-	static const int	maxmsglen ;	/* Maximum-Message-Length */
-	static const int	maxsysuid ;	/* maximum-system-UID */
-	static const int	maxtzname ;	/* maximum tz-name length */
-	static const int	maxtzabbr ;	/* maximum tz-abbr length */
-	static const int	nodenamelen ;	/* name system node */
-	static const int	usernamelen ;	/* name system user */
-	static const int	groupnamelen ;	/* name system group */
-	static const int	projnamelen ;	/* name system project */
-	static const int	protnamelen ;	/* name network protocol */
-	static const int	hostnamelen ;	/* name network host*/
-	static const int	servnamelen ;	/* name network serice */
-	static const int	binbuflen ;	/* for |int256_t| */
-	static const int	octbuflen ;	/* for |int256_t| */
-	static const int	decbuflen ;	/* for |int256_t| */
-	static const int	hexbuflen ;	/* for |int256_t| */
-	static const int	digbuflen ;	/* for |int256_t| */
+    struct ulibvaler ;
+    enum ulibvalmems {
+	ulibvalmem_endianval,
+	ulibvalmem_pagesz,
+	ulibvalmem_clktck,
+	ulibvalmem_maxbase,
+	ulibvalmem_maxpid,
+	ulibvalmem_maxarg,
+	ulibvalmem_maxline,
+	ulibvalmem_maxlink,
+	ulibvalmem_maxlogin,
+	ulibvalmem_maxsymloop,
+	ulibvalmem_maxsymbol,
+	ulibvalmem_maxgroups,
+	ulibvalmem_maxnamelen,
+	ulibvalmem_maxpathlen,
+	ulibvalmem_maxmsglen,
+	ulibvalmem_maxsysuid,
+	ulibvalmem_maxtzname,
+	ulibvalmem_maxtzabbr,
+	ulibvalmem_nodenamelen,
+	ulibvalmem_usernamelen,
+	ulibvalmem_groupnamelen,
+	ulibvalmem_projnamelen,
+	ulibvalmem_protnamelen,
+	ulibvalmem_hostnamelen,
+	ulibvalmem_servnamelen,
+	ulibvalmem_binbuflen,
+	ulibvalmem_octbuflen,
+	ulibvalmem_decbuflen,
+	ulibvalmem_hexbuflen,
+	ulibvalmem_digbuflen,
+	ulibvalmem_overlast
+    } ; /* end enum (ulibvalmem) */
+    struct ulibvaler_co {
+	int		val ;
+	ulibvalmems	w ;
+	ulibvaler_co() = delete ;
+	ulibvaler_co(ulibvalmems ªw) noex : val(0), w(ªw) { } ; 
+    	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ; /* end */
+    } ; /* end struct (ulibvaler_co) */
+    struct ulibvaler {
+	static ulibvaler_co	endianval ;
+	static ulibvaler_co	pagesz ;
+	static ulibvaler_co	clktck ;
+	static ulibvaler_co	maxbase ;
+	static ulibvaler_co	maxpid ;	/* max PID value */
+	static ulibvaler_co	maxarg ;
+	static ulibvaler_co	maxline ;
+	static ulibvaler_co	maxlink ;
+	static ulibvaler_co	maxlogin ;
+	static ulibvaler_co	maxsymloop ;
+	static ulibvaler_co	maxsymbol ;
+	static ulibvaler_co	maxgroups ;
+	static ulibvaler_co	maxnamelen ;	/* file-system */
+	static ulibvaler_co	maxpathlen ;	/* file-system */
+	static ulibvaler_co	maxmsglen ;	/* Maximum-Message-Length */
+	static ulibvaler_co	maxsysuid ;	/* maximum-system-UID */
+	static ulibvaler_co	maxtzname ;	/* maximum tz-name length */
+	static ulibvaler_co	maxtzabbr ;	/* maximum tz-abbr length */
+	static ulibvaler_co	nodenamelen ;	/* name system node */
+	static ulibvaler_co	usernamelen ;	/* name system user */
+	static ulibvaler_co	groupnamelen ;	/* name system group */
+	static ulibvaler_co	projnamelen ;	/* name system project */
+	static ulibvaler_co	protnamelen ;	/* name network protocol */
+	static ulibvaler_co	hostnamelen ;	/* name network host*/
+	static ulibvaler_co	servnamelen ;	/* name network serice */
+	static ulibvaler_co	binbuflen ;	/* for |int256_t| */
+	static ulibvaler_co	octbuflen ;	/* for |int256_t| */
+	static ulibvaler_co	decbuflen ;	/* for |int256_t| */
+	static ulibvaler_co	hexbuflen ;	/* for |int256_t| */
+	static ulibvaler_co	digbuflen ;	/* for |int256_t| */
 	operator int () noex ;
-    } ; /* end struct (ulibvals) */
+    } ; /* end struct (ulibvaler) */
 } /* end export */
 
 export {
-    extern const ulibvals	ulibval ;
+    extern ulibvaler		ulibval ;
 } /* end extern */
 
 
