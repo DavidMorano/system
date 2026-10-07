@@ -159,7 +159,7 @@ vars::operator int () noex {
     	int		rs ;
 	if ((rs = upagesize()) >= 0) ylikely {
 	    var.pagesz = rs ;
-	}
+	} /* end if */
 	return rs ;
 } /* end method (vars::operator) */
 
@@ -172,10 +172,10 @@ local int getsize(int fd) noex {
 		} else {
 		    clong fsize = long(sb.st_size) ;
 		    rs = intsat(fsize) ;
-		}
+		} /* end if */
 	    } else {
 		rs = var.pagesz ;
-	    }
+	    } /* end if */
 	} /* end if (u_fstat) */
     	return rs ;
 } /* end subroutine (getsize) */
