@@ -67,7 +67,7 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<ctdec.h>		/* LIBUC */
 #include	<nleadstr.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<satarith.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |DIGBUFLEN| + |TIMEBUFLEN| */
@@ -471,7 +471,7 @@ local int filecounts_update(FC *op,WKR *wp) noex {
 	int		c = 0 ;
 	char		tbuf[TIMEBUFLEN + 1] ;
 	/* create the time-string to put in the DB file */
-	timestr_logz(dt,tbuf) ;
+	strtime_logz(dt,tbuf) ;
 	/* sort the entries by offset (w/ new ones at the rear) */
 	if ((rs = worker_sort(wp)) >= 0) ylikely {
 	    FC_N	*nlp = wp->nlp ;
