@@ -47,10 +47,8 @@
 #include	"umem.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/ulibvals.ccm"
 
 import libutil ;			/* |getlenstr(3u)| + |memclear(3u)| */
-import ulibvals ;			/* |getlenstr(3u)| + |memclear(3u)| */
 
 /* local defines */
 
@@ -77,6 +75,7 @@ namespace {
 	static cint	maxpath		= _SC_PATH_MAX ;
 	static cint	maxnode		= _SC_NODENAME_MAX ;
 	static cint	maxzone		= _SC_TZNAME_MAX ;
+	static cint	pagesz		= _SC_PAGESIZE ;
     } ; /* end struct (valcmds) */
 } /* end namespace */
 
@@ -89,6 +88,7 @@ namespace {
 	int	maxpathlen ;
 	int	maxnodelen ;
 	int	maxzonelen ;
+	int	pagesz ;
     } ; /* end struct (valmgr_vals) */
     struct valmgr {
 	valmgr_vals	v ;
@@ -120,7 +120,6 @@ namespace {
 
 constexpr valcmds	valcmd ;
 static valmgr		valer ;
-static cint		pagesz		= ulibval.pagesz ;
 
 
 /* exported variables */
@@ -210,10 +209,10 @@ namespace libu {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rpp) ylikely {
-	    if ((rs = pagesz) >= 0) {
+	    if ((rs = valer(valcmd.pagesz)) >= 0) {
 	        len = rs ;
 	        rs = vall(len,rpp) ;
-	    }
+	    } /* end if (valer) */
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
     } /* end method (umems::ps) */
@@ -345,7 +344,7 @@ sysret_t umgr::stdfree(int,void *) noex {
 	free(cp) ;
 	if (errno) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (umgr::stdfree) */
 
@@ -356,7 +355,7 @@ sysret_t umgr::stdfree(int,void *) noex {
 		rsl = get(cmd) ;		\
 	        name = rsl ;			\
 	    } ; rsl ;				\
-	})
+	}) /* end macro */
 
 int valmgr::operator () (int cmd) noex {
     	int		rs = SR_BUGCHECK ;
