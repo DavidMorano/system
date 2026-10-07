@@ -59,12 +59,13 @@
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<bfile.h>
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<fsdir.h>
 #include	<lfm.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -82,14 +83,12 @@
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	checklockfile(struct proginfo *,bfile *,char *,char *,
 				time_t,pid_t) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*timevalstr_ulog(struct timeval *,char *) ;
 
 
@@ -101,22 +100,22 @@ extern char	*timevalstr_ulog(struct timeval *,char *) ;
 
 /* forward references */
 
-static int	dirtest(int,char *,ustat *) ;
+local int	dirtest(int,char *,ustat *) ;
 
-static void	makejobid(struct proginfo *,int *,char *) ;
-static void	int_term() ;
+local void	makejobid(struct proginfo *,int *,char *) ;
+local void	int_term() ;
 
 
 /* local (global) variables */
 
-static int	f_exit = FALSE ;
+local int	f_exit = FALSE ;
 
 
 /* local variables */
 
 /* built-in function table */
 
-static const char	*funcs[] = {
+static cchar	*funcs[] = {
 	"REPORT",
 	"EXIT",
 	NULL
@@ -296,12 +295,12 @@ int		maxjobs, filetime ;
 	                if (pip->fl.srvtab)
 	                    logfile_printf(&pip->lh,
 	                        "%s the service file changed\n",
-	                        timestr_logz(ssb.st_mtime,timebuf)) ;
+	                        strtime_logz(ssb.st_mtime,timebuf)) ;
 
 	                else
 	                    logfile_printf(&pip->lh,
 	                        "%s the service file has returned\n",
-	                        timestr_logz(ssb.st_mtime,timebuf)) ;
+	                        strtime_logz(ssb.st_mtime,timebuf)) ;
 
 	                daytime = time(NULL) ;
 
@@ -334,14 +333,14 @@ int		maxjobs, filetime ;
 
 	                    logfile_printf(&pip->lh,
 	                        "%s the new service file is %s\n",
-	                        timestr_logz(daytime,timebuf),
+	                        strtime_logz(daytime,timebuf),
 	                        (pip->fl.srvtab) ? "OK" : "BAD") ;
 
 	                } else {
 
 	                    logfile_printf(&pip->lh,
 	                        "%s the new service file is not accessible\n",
-	                        timestr_logz(ssb.st_mtime,timebuf)) ;
+	                        strtime_logz(ssb.st_mtime,timebuf)) ;
 
 	                    u_close(sfd) ;
 
@@ -358,7 +357,7 @@ int		maxjobs, filetime ;
 	                pip->fl.srvtab = FALSE ;
 	                logfile_printf(&pip->lh,
 	                    "%s service file went away\n",
-	                    timestr_logz(ssb.st_mtime,timebuf)) ;
+	                    strtime_logz(ssb.st_mtime,timebuf)) ;
 
 	                u_close(sfd) ;
 
@@ -407,7 +406,7 @@ int		maxjobs, filetime ;
 	            f_directory = TRUE ;
 	            logfile_printf(&pip->lh,
 	                "%s directory came back\n",
-	                timestr_logz(daytime,timebuf)) ;
+	                strtime_logz(daytime,timebuf)) ;
 
 	            sleeptime = pip->polltime ;
 
@@ -427,7 +426,7 @@ int		maxjobs, filetime ;
 	            f_directory = FALSE ;
 	            logfile_printf(&pip->lh,
 	                "%s directory went away\n",
-	                timestr_logz(daytime,timebuf)) ;
+	                strtime_logz(daytime,timebuf)) ;
 
 	        }
 
@@ -449,10 +448,10 @@ int		maxjobs, filetime ;
 	        debugprintf("watch: about to decide about looking\n") ;
 
 	        debugprintf("watch: timdir=%s\n",
-	                    timestr_log(tim_dir,timebuf2)) ;
+	                    strtime_log(tim_dir,timebuf2)) ;
 
 	        debugprintf("watch: dir_mtime=%s\n",
-	                    timestr_log(dsb.st_mtime,timebuf)) ;
+	                    strtime_log(dsb.st_mtime,timebuf)) ;
 
 	}
 #endif /* CF_DEBUG */
@@ -480,8 +479,8 @@ int		maxjobs, filetime ;
 	                    timevalstr_ulog(&tod,timebuf)) ;
 
 	                debugprintf("watch: dir_mtime=%s timdir=%s\n",
-	                    timestr_log(dsb.st_mtime,timebuf),
-	                    timestr_log(tim_dir,timebuf2)) ;
+	                    strtime_log(dsb.st_mtime,timebuf),
+	                    strtime_log(tim_dir,timebuf2)) ;
 
 	            } else if (nwatch > 0)
 	                debugprintf("watch: DIR nwatch=%d\n",nwatch) ;
@@ -548,7 +547,7 @@ int		maxjobs, filetime ;
 					dnp) ;
 	                        debugprintf("watch: job state=%d\n",jep->state) ;
 	                        debugprintf("watch: job mtime=%s\n",
-					timestr_log(jsb.st_mtime,timebuf)) ;
+					strtime_log(jsb.st_mtime,timebuf)) ;
 			}
 #endif /* CF_DEBUG */
 
@@ -562,7 +561,7 @@ int		maxjobs, filetime ;
 	                                debugprintf("watch: filetime=%d\n",
 						filetime) ;
 	                                debugprintf("watch: daytime %s\n",
-						timestr_log(daytime,timebuf)) ;
+						strtime_log(daytime,timebuf)) ;
 					}
 #endif
 
@@ -596,7 +595,7 @@ int		maxjobs, filetime ;
 
 	                                logfile_printf(&pip->lh,
 						"%s processing job, size=%lu\n",
-	                                    timestr_logz(daytime,timebuf),
+	                                    strtime_logz(daytime,timebuf),
 						jep->size) ;
 
 #if	CF_DEBUG
@@ -646,7 +645,7 @@ int		maxjobs, filetime ;
 
 	                                logfile_printf(&pip->lh,
 	                                    "%s job has to wait\n",
-	                                    timestr_logz(daytime,timebuf)) ;
+	                                    strtime_logz(daytime,timebuf)) ;
 
 	                            } /* end if (want to start or not) */
 
@@ -680,7 +679,7 @@ int		maxjobs, filetime ;
 
 	                            logfile_printf(&pip->lh, 
 					"%s processing job, size=%lu\n",
-	                                timestr_logz(daytime,timebuf),
+	                                strtime_logz(daytime,timebuf),
 					jep->size) ;
 
 #if	CF_DEBUG
@@ -741,7 +740,7 @@ int		maxjobs, filetime ;
 #endif
 
 	                    logfile_printf(&pip->lh, "%s job entering\n",
-	                        timestr_logz(daytime,timebuf)) ;
+	                        strtime_logz(daytime,timebuf)) ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel >= 4)
@@ -840,12 +839,12 @@ int		maxjobs, filetime ;
 	                logfile_setid(&pip->lh,jep->logid) ;
 
 	                logfile_printf(&pip->lh, "%s job completed, ex=%d\n",
-	                    timestr_logz(daytime,timebuf),
+	                    strtime_logz(daytime,timebuf),
 	                    (child_stat & 255)) ;
 
 			elapsed = daytime - jep->daytime ;
 	                logfile_printf(&pip->lh, "elapsed time %s\n",
-	                    timestr_elapsed(elapsed,timebuf)) ;
+	                    strtime_elapsed(elapsed,timebuf)) ;
 
 	                job_end(jlp,jep,pip,child_stat) ;
 
@@ -891,7 +890,7 @@ int		maxjobs, filetime ;
 
 	            logfile_printf(&pip->lh,
 			"%s processing job (2), size=%lu\n",
-	                timestr_logz(daytime,timebuf),
+	                strtime_logz(daytime,timebuf),
 			jep->size) ;
 
 #if	CF_DEBUG
@@ -984,7 +983,7 @@ int		maxjobs, filetime ;
 	                logfile_setid(&pip->lh,jep->logid) ;
 
 	                logfile_printf(&pip->lh, "%s processing old job\n",
-	                    timestr_logz(daytime,timebuf)) ;
+	                    strtime_logz(daytime,timebuf)) ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel >= 4)
@@ -1026,7 +1025,7 @@ int		maxjobs, filetime ;
 
 	            logfile_printf(&pip->lh,
 	                "%s lost my lock file, other PID=%d\n",
-	                timestr_logz(daytime,timebuf),
+	                strtime_logz(daytime,timebuf),
 	                rs) ;
 
 	            goto badlockfile ;
@@ -1057,7 +1056,7 @@ int		maxjobs, filetime ;
 
 	            logfile_printf(&pip->lh,
 	                "%s lost my PID file, other pid=%d\n",
-	                timestr_logz(daytime,timebuf),
+	                strtime_logz(daytime,timebuf),
 	                ci.pid) ;
 
 	            goto badpidfile ;
@@ -1133,7 +1132,7 @@ int		maxjobs, filetime ;
 		if (rs < 0) {
 
 			logfile_printf(&pip->lh,"%s bad poll (%d)\n",
-	    			timestr_logz(daytime,timebuf),rs) ;
+	    			strtime_logz(daytime,timebuf),rs) ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel >= 4) {
@@ -1178,7 +1177,7 @@ int		maxjobs, filetime ;
 
 
 	logfile_printf(&pip->lh,"%s program exiting\n",
-	    timestr_logz(daytime,timebuf)) ;
+	    strtime_logz(daytime,timebuf)) ;
 
 ret3:
 	if (pip->fl.interrupt) 
@@ -1219,7 +1218,7 @@ badpidfile:
 
 
 /* make a job ID for loging purposes */
-static void makejobid(pip,ip,logid)
+local void makejobid(pip,ip,logid)
 struct proginfo	*pip ;
 int	*ip ;
 char	logid[LOGIDLEN] ;
@@ -1240,7 +1239,7 @@ char	logid[LOGIDLEN] ;
 
 #ifdef	COMMENT
 
-static void internal(filename)
+local void internal(filename)
 char	filename[] ;
 {
 	int	i, srs = FALSE ;
@@ -1275,7 +1274,7 @@ char	filename[] ;
 #endif /* COMMENT */
 
 
-static int dirtest(dfd,dirname,sbp)
+local int dirtest(dfd,dirname,sbp)
 int		dfd ;
 char		dirname[] ;
 ustat	*sbp ;
@@ -1306,7 +1305,7 @@ ustat	*sbp ;
 /* end subroutine (dirtest) */
 
 
-static void int_term(sn)
+local void int_term(sn)
 int	sn ;
 {
 
