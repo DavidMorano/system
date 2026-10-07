@@ -19,27 +19,29 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine provides the actual check and fix on the
 	files specified.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<csignal>
 #include	<unistd.h>
 #include	<ctime>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<ascii.h>
-#include	<nulstr.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"defs.h"
 
@@ -53,17 +55,9 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	sfthing(const char *,int,const char *,const char **) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*timestr_logz(time_t,char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	sfthing(cchar *,int,cchar *,cchar **) ;
 
 
 /* external variables */
@@ -74,24 +68,26 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	progfiler(PROGINFO *,bfile *,const char *) ;
-static int	fileneed(PROGINFO *,bfile *) ;
-static int	filefix(PROGINFO *,bfile *) ;
+local int	progfiler(PROGINFO *,bfile *,cchar *) ;
+local int	fileneed(PROGINFO *,bfile *) ;
+local int	filefix(PROGINFO *,bfile *) ;
 
 
 /* local variables */
 
-static const char	ssb[] = {
+constexpr char		ssb[] = {
 	CH_LBRACE, CH_RBRACE, 0
-} ;
+} ; /* end array */
 
-static const char	ssp[] = {
+constexpr char		ssp[] = {
 	CH_LPAREN, CH_RPAREN, 0
-} ;
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int progfile(PROGINFO *pip,bfile *ofp,cchar *fp,int fl)
 {
@@ -116,7 +112,7 @@ int progfile(PROGINFO *pip,bfile *ofp,cchar *fp,int fl)
 
 
 /* ARGSUSED */
-static int progfiler(PROGINFO *pip,bfile *ofp,cchar *fname)
+local int progfiler(PROGINFO *pip,bfile *ofp,cchar *fname)
 {
 	bfile		infile ;
 	int		rs = SR_OK ;
@@ -215,14 +211,14 @@ static int progfiler(PROGINFO *pip,bfile *ofp,cchar *fname)
 /* end subroutine (progfiler) */
 
 
-static int fileneed(PROGINFO *pip,bfile *ifp)
+local int fileneed(PROGINFO *pip,bfile *ifp)
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		len ;
 	int		f_bol, f_eol ;
 	int		f_need ;
-	const char	*ss ;
+	cchar	*ss ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
 	ss = (pip->fl.backward) ? ssp : ssb ;
@@ -264,20 +260,20 @@ static int fileneed(PROGINFO *pip,bfile *ifp)
 /* end subroutine (fileneed) */
 
 
-static int filefix(PROGINFO *pip,bfile *ifp)
+local int filefix(PROGINFO *pip,bfile *ifp)
 {
 	bfile		tmpfile ;
 	off_t	boff ;
 	off_t	off ;
 	off_t	off_seek = -1 ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		len ;
 	int		kl, sl, cl ;
 	int		rlen ;
 	int		wlen = 0 ;
-	const char	*ss ;
-	const char	*kp, *sp, *cp ;
+	cchar	*ss ;
+	cchar	*kp, *sp, *cp ;
 	char		template[MAXPATHLEN + 1] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		lbuf[LINEBUFLEN + 1] ;
