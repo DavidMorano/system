@@ -73,10 +73,10 @@
 extern void	munge(PROGINFO *,int,ULONG *,ULONG *,ULONG *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -92,7 +92,7 @@ extern int	strlinelen(const char *,int,int) ;
 static ULONG	packlong(uint,uint) ;
 #endif
 
-static void	blockfinish(PROGINFO *,
+local void	blockfinish(PROGINFO *,
 			ULONG *,int,int,ECMSGDESC *,
 			RANDOMVAR *) ;
 
@@ -418,7 +418,7 @@ ret0:
 /* local subroutines */
 
 
-static void blockfinish(pip,block,n,len,mdp,rvp)
+local void blockfinish(pip,block,n,len,mdp,rvp)
 PROGINFO	*pip ;
 ULONG		block[] ;
 int		n ;
