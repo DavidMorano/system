@@ -64,8 +64,8 @@ extern int	debugprintf(cchar *,...) ;
 extern int	strnnlen(cchar *,int,int) ;
 #endif
 
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*strdcpy2w(char *,int,const char *,const char *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
+extern char	*strdcpy2w(char *,int,cchar *,cchar *,int) ;
 extern char	*strdcpy3w(char *,int,cchar *,cchar *,cchar *,int) ;
 
 
@@ -91,16 +91,16 @@ typedef int (*libcaller)(libent,int,cchar **,cchar **,void *) ;
 
 int progshlib(pip,shlibfname,argz,alp,enp,enl)
 PROGINFO	*pip ;
-const char	shlibfname[] ;
-const char	argz[] ;
+cchar	shlibfname[] ;
+cchar	argz[] ;
 VECSTR		*alp ;
-const char	*enp ;
+cchar	*enp ;
 int		enl ;
 {
 	VECSTR		*elp = &pip->exports ;
-	const char	**av ;
-	const char	**ev ;
-	const int	dlmode = RTLD_LAZY ;
+	cchar	**av ;
+	cchar	**ev ;
+	cint	dlmode = RTLD_LAZY ;
 	int		rs = SR_OK ;
 	int		size ;
 	int		entrylen ;
@@ -108,7 +108,7 @@ int		enl ;
 	int		ex ;
 	int		(*soentry)(int,cchar **,cchar **,void *) ;
 	int		(*socaller)(libent,int,cchar **,cchar **,void *) ;
-	const char	*callername = LIBCALLFUNC ;
+	cchar	*callername = LIBCALLFUNC ;
 	char		*entrybuf = NULL ;
 	char		*p ;
 	void		*sop ;
@@ -142,7 +142,7 @@ int		enl ;
 	if (sop == NULL) {
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5)) {
-		const char *es = dlerror() ;
+		cchar *es = dlerror() ;
 	        debugprintf("progshlib: dlerror() >%s<\n",es) ;
 	    }
 #endif
