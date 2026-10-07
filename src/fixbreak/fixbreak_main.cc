@@ -55,7 +55,7 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
 
 /* forward references */
