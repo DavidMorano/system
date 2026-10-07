@@ -63,6 +63,7 @@
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<srvtab.h>
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -98,7 +99,7 @@ extern int	expander() ;
 
 /* forward references */
 
-static int usage(PROGINFO *) ;
+local int usage(PROGINFO *) ;
 
 
 /* local variables */
@@ -257,7 +258,7 @@ cchar	*envv[] ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -1114,7 +1115,7 @@ cchar	*envv[] ;
 	        daytime = time(NULL) ;
 
 	    bprintf(lfp,"%s: %s Directory Watcher Daemon (DWD) started\n",
-	        pip->progname,timestr_logz(daytime,timebuf)) ;
+	        pip->progname,strtime_logz(daytime,timebuf)) ;
 
 	    bflush(pip->lfp) ;
 
@@ -1181,7 +1182,7 @@ cchar	*envv[] ;
 	    logfile_printf(&pip->lh,"") ;
 
 	    logfile_printf(&pip->lh,"%s %s started",
-	        timestr_logz(daytime,timebuf),
+	        strtime_logz(daytime,timebuf),
 	        BANNER) ;
 
 	    logfile_printf(&pip->lh,"%-14s %s/%s",
@@ -1405,7 +1406,7 @@ cchar	*envv[] ;
 	    bprintf(&lockfile,"%s!%s\n",pip->nodename,pip->username) ;
 
 	    bprintf(&lockfile,"%s %s\n",
-	        timestr_logz(daytime,timebuf),
+	        strtime_logz(daytime,timebuf),
 	        BANNER) ;
 
 	    bprintf(&lockfile,"%-14s %s/%s\n",
@@ -1529,7 +1530,7 @@ cchar	*envv[] ;
 	            pip->interrupt) ;
 
 	    logfile_printf(&pip->lh,"%s finished initializing",
-	        timestr_logz(daytime,timebuf)) ;
+	        strtime_logz(daytime,timebuf)) ;
 
 	    logfile_flush(&pip->lh) ;
 
@@ -1774,7 +1775,7 @@ badret:
 /* local subroutines */
 
 
-static int usage(pip)
+local int usage(pip)
 PROGINFO	*pip ;
 {
 	int	rs ;
