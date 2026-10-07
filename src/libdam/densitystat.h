@@ -25,7 +25,7 @@ EXTERNC_begin
 extern int densitystati(uint *,int,double *,double *) noex ;
 extern int densitystatl(ulong *,int,double *,double *) noex ;
 
-static inline int densitystat(ulong *a,int n,double *mp,double *vp) noex {
+local inline int densitystat(ulong *a,int n,double *mp,double *vp) noex {
 	return densitystatl(a,n,mp,vp) ;
 }
 
