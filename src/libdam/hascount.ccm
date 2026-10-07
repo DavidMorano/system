@@ -29,7 +29,7 @@
 	that are repeats.
 
 	Synopsis:
-	template(typename T> int hascount(const int *sp,int sl,int n) noex
+	template(typename T> int hascount(cint *sp,int sl,int n) noex
 
 	Arguments:
 	T		type of object that contains the string to search for
