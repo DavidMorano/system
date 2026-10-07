@@ -37,22 +37,22 @@ using namespace	std ;
 
 /* forward references */
 
-static void printa(cint *,int) ;
-static void web1(int *,cint *,int) ;
-static void web2(int *,cint *,int) ;
-static void web3(int *,cint *,int) ;
-static void web4(int *,cint *,int) ;
-static void web5(int *,cint *,int) ;
-static void web6(int *,cint *,int) ;
+local void printa(cint *,int) ;
+local void web1(int *,cint *,int) ;
+local void web2(int *,cint *,int) ;
+local void web3(int *,cint *,int) ;
+local void web4(int *,cint *,int) ;
+local void web5(int *,cint *,int) ;
+local void web6(int *,cint *,int) ;
 
-static int findinc(int *,cint *,int,int) ;
-static int findincer(int *,cint *,int,int) ;
+local int findinc(int *,cint *,int,int) ;
+local int findincer(int *,cint *,int,int) ;
 
-static int web3_recurse(int *,cint *,int) ;
-static int web4_recurse(int *,cint *,int) ;
-static int web4_proc(int *,cint *,int) ;
+local int web3_recurse(int *,cint *,int) ;
+local int web4_recurse(int *,cint *,int) ;
+local int web4_proc(int *,cint *,int) ;
 
-static int web6_recurse(int *,cint *,int) ;
+local int web6_recurse(int *,cint *,int) ;
 
 
 /* external subroutines */
@@ -96,7 +96,7 @@ int main(int,mainv,mainv) {
 
 /* local subroutines */
 
-static void web1(int *out,cint *data,int n) {
+local void web1(int *out,cint *data,int n) {
 	if (n > 0) {
 	    int	i ;
 	    out[n-1] = -1 ;
@@ -115,7 +115,7 @@ static void web1(int *out,cint *data,int n) {
 }
 /* end subroutine (web1) */
 
-static void web2(int *out,cint *data,int n) {
+local void web2(int *out,cint *data,int n) {
 	if (n > 0) {
 	    int 	i ;
 	    out[n-1] = -1 ;
@@ -127,7 +127,7 @@ static void web2(int *out,cint *data,int n) {
 }
 /* end subroutine (web2) */
 
-static int findinc(int *out,cint *data,int n,int v) {
+local int findinc(int *out,cint *data,int n,int v) {
 	int		ans = -1 ;
 	if (n > 0) {
 	    if (v < data[0]) {
@@ -146,7 +146,7 @@ static int findinc(int *out,cint *data,int n,int v) {
 }
 /* end subroutine (findinc) */
 
-static int findincer(int *out,cint *data,int n,int v) {
+local int findincer(int *out,cint *data,int n,int v) {
 	int		ans = -1 ;
 	int		j ;
 	for (j = 0 ; j < n ; j += 1) {
@@ -170,14 +170,14 @@ static int findincer(int *out,cint *data,int n,int v) {
 }
 /* end subroutine (findincer) */
 
-static void web3(int *out,cint *data,int n) {
+local void web3(int *out,cint *data,int n) {
 	if (n > 0) {
 	    web3_recurse(out,data,n) ;
 	}
 }
 /* end subroutine (web3) */
 
-static int web3_recurse(int *out,cint *data,int n) {
+local int web3_recurse(int *out,cint *data,int n) {
 	int		ans = -1 ;
 	if (n > 0) {
 	    out[n-1] = -1 ;
@@ -204,14 +204,14 @@ static int web3_recurse(int *out,cint *data,int n) {
 }
 /* end subroutine (web3_recurse) */
 
-static void web4(int *out,cint *data,int n) {
+local void web4(int *out,cint *data,int n) {
 	if (n > 0) {
 	    web4_recurse(out,data,n) ;
 	}
 }
 /* end subroutine (web4) */
 
-static int web4_recurse(int *out,cint *data,int n) {
+local int web4_recurse(int *out,cint *data,int n) {
 	int		ans = -1 ;
 	if (n > 0) {
 	    out[n-1] = -1 ;
@@ -224,7 +224,7 @@ static int web4_recurse(int *out,cint *data,int n) {
 }
 /* end subroutine (web4_recurse) */
 
-static int web4_proc(int *out,cint *data,int n) {
+local int web4_proc(int *out,cint *data,int n) {
 	cint	v = data[0] ;
 	int		ans = -1 ;
 	if (v < data[1]) {
@@ -243,7 +243,7 @@ static int web4_proc(int *out,cint *data,int n) {
 }
 /* end subroutine (web4_proc) */
 
-static void web5(int *out,cint *data,int n) {
+local void web5(int *out,cint *data,int n) {
 	if (n > 0) {
 	    out[n-1] = -1 ;
 	    if (n > 1) {
@@ -262,14 +262,14 @@ static void web5(int *out,cint *data,int n) {
 }
 /* end subroutine (web5) */
 
-static void web6(int *out,cint *data,int n) {
+local void web6(int *out,cint *data,int n) {
 	if (n > 0) {
 	    web6_recurse(out,data,n) ;
 	}
 }
 /* end subroutine (web6) */
 
-static int web6_recurse(int *out,cint *data,int n) {
+local int web6_recurse(int *out,cint *data,int n) {
 	int		ans = -1 ;
 	if (n > 0) {
 	    out[n-1] = -1 ;
@@ -284,7 +284,7 @@ static int web6_recurse(int *out,cint *data,int n) {
 }
 /* end subroutine (web6_recurse) */
 
-static void printa(cint *a,int n) {
+local void printa(cint *a,int n) {
 	int	i ;
 	for (i = 0 ; i < n ; i += 1) {
 	    cout << " " << setw(2) << a[i] ;
