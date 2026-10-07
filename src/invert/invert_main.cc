@@ -115,7 +115,7 @@ int main(int argc,cchar **argv,cchar **envv) noex {
 	    argl = strlen(argp) ;
 
 	    if ((argl > 0) && (*argp == '-')) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (argl > 1) {
 
