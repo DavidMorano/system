@@ -3,21 +3,21 @@
 
 /* local variables */
 
-static const char	*exts[] = {
+static cchar	*exts[] = {
 	".so",
 	".o",
 	"",
 	NULL
 } ;
 
-static const char	*dirs64[] = {
+static cchar	*dirs64[] = {
 	"lib/dialers/sparcv9",
 	"lib/dialers/sparc",
 	"lib/dialers",
 	NULL
 } ;
 
-static const char	*dirs32[] = {
+static cchar	*dirs32[] = {
 	"lib/dialers/sparcv8",
 	"lib/dialers/sparcv7",
 	"lib/dialers/sparc",
@@ -25,7 +25,7 @@ static const char	*dirs32[] = {
 	NULL
 } ;
 
-static const char	*subs[] = {
+static cchar	*subs[] = {
 	"init",
 	"check",
 	"free",
