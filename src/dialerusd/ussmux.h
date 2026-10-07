@@ -41,14 +41,14 @@ extern "C" {
 #endif
 
 extern int ussmux_open(USSMUX *,SYSDIALER_ARGS *,
-		const char *,const char *,const char **) ;
+		cchar *,cchar *,cchar **) ;
 extern int ussmux_reade(USSMUX *,char *,int,int,int) ;
 extern int ussmux_recve(USSMUX *,char *,int,int,int,int) ;
 extern int ussmux_recvfrome(USSMUX *,char *,int,int,void *,int *,int,int) ;
 extern int ussmux_recvmsge(USSMUX *,struct msghdr *,int,int,int) ;
-extern int ussmux_write(USSMUX *,const char *,int) ;
-extern int ussmux_send(USSMUX *,const char *,int,int) ;
-extern int ussmux_sendto(USSMUX *,const char *,int,int,void *,int) ;
+extern int ussmux_write(USSMUX *,cchar *,int) ;
+extern int ussmux_send(USSMUX *,cchar *,int,int) ;
+extern int ussmux_sendto(USSMUX *,cchar *,int,int,void *,int) ;
 extern int ussmux_sendmsg(USSMUX *,struct msghdr *,int) ;
 extern int ussmux_shutdown(USSMUX *,int) ;
 extern int ussmux_close(USSMUX *) ;
