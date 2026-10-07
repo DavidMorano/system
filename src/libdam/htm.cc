@@ -84,7 +84,7 @@ local int htm_dtor(htm *op) noex {
 } /* end subroutine (htm_dtor) */
 
 template<typename ... Args>
-static inline int htm_magic(htm *op,Args ... args) noex {
+local inline int htm_magic(htm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == HTM_MAGIC) ? SR_OK : SR_NOTOPEN ;
