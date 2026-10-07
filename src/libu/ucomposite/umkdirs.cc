@@ -79,11 +79,17 @@ using libu::umem ;			/* variable */
 /* local structues */
 
 namespace {
+    struct vars {
+	int		maxpath ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
     struct mker {
 	cchar		*dname ;
 	int		maxpath ;
 	mode_t		dm ;
-	mker(cchar *d,mode_t m) noex : dname(d), dm(m) { } ;
+	mker(cchar *d,int pl,mode_t m) noex : dname(d), dm(m) { 
+	    maxpath = pl ;
+	} ; /* end ctor */
 	operator int () noex ;
 	int procdir	(uids *,cchar *) noex ;
 	int mkdirer	(uids *,cchar *) noex ;
@@ -96,7 +102,7 @@ namespace {
 
 /* local variables */
 
-static cint	maxpathlen = ulibval.maxpathlen ;
+static vars		var ;
 
 
 /* external variables */
@@ -111,10 +117,12 @@ int u_mkdirs(cchar *dname,mode_t dm) noex {
 	if (dname) ylikely {
 	    rs = SR_INVALID ;
 	    if (dname[0]) ylikely {
-		if (mker mo(dname,dm) ; (rs = mo) >= 0) {
-		    c = rs ;
-		} /* end if (mker) */
-	    } /* end if (valid) */
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+		    if (mker mo(dname,rs,dm) ; (rs = mo) >= 0) {
+		        c = rs ;
+		    } /* end if (mker) */
+	        } /* end if (valid) */
+	    } /* end if (vars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (u_mkdirs) */
@@ -126,19 +134,16 @@ mker::operator int () noex {
     	int		rs ;
 	int		rs1 ;
 	int		c = 0 ; /* return-value */
-	if ((rs = maxpathlen) >= 0) {
-	    maxpath = rs ;
-	    if (uids id ; (rs = id.load) >= 0) ylikely {
-	        if ((rs = procdir(&id,dname)) >= 0) {
-	            c += rs ;
-	        } else if (rs == SR_NOENT) {
-		    rs = mkdirer(&id,dname) ;
-		    c += rs ;
-	        } /* end if (needed some creations) */
-	        rs1 = id.release ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (ids) */
-	} /* end if (maxpathlen) */
+	if (uids id ; (rs = id.load) >= 0) ylikely {
+	    if ((rs = procdir(&id,dname)) >= 0) {
+	        c += rs ;
+	    } else if (rs == SR_NOENT) {
+		rs = mkdirer(&id,dname) ;
+		c += rs ;
+	    } /* end if (needed some creations) */
+	    rs1 = id.release ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (ids) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (mker::operator) */
 
@@ -193,5 +198,13 @@ int mker::mkdirer(uids *idp,cchar *dn) noex {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (mker::mkdirer) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = ulibval.maxpathlen) >= 0) {
+	    maxpath = rs ;
+	} /* end */
+    	return rs ;
+} /* end method (vars::operator) */
 
 
