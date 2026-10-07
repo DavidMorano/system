@@ -98,12 +98,12 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	specs(PROGINFO *,vecobj *,vecstr *,int,int) ;
-static int	recips(PROGINFO *,int,SOCKADDRESS *,int,vecobj *) ;
-static int	rmtabnodes(PROGINFO *,vecstr *) ;
-static int	report_node(PROGINFO *,cchar *) ;
-static int	report_recip(PROGINFO *,cchar *,int,int,int) ;
-static int	mkcsmsg(char *,int,cchar *,int,uint) ;
+local int	specs(PROGINFO *,vecobj *,vecstr *,int,int) ;
+local int	recips(PROGINFO *,int,SOCKADDRESS *,int,vecobj *) ;
+local int	rmtabnodes(PROGINFO *,vecstr *) ;
+local int	report_node(PROGINFO *,cchar *) ;
+local int	report_recip(PROGINFO *,cchar *,int,int,int) ;
+local int	mkcsmsg(char *,int,cchar *,int,uint) ;
 
 
 /* local variables */
@@ -115,7 +115,7 @@ static int	mkcsmsg(char *,int,cchar *,int,uint) ;
 /* exported subroutines */
 
 int progcomsat(PROGINFO	*pip,vecobj *rsp) {
-	const int	pf = PF_INET4 ;
+	cint	pf = PF_INET4 ;
 	int		rs ;
 	int		rs1 ;
 	int		defport ;
@@ -143,8 +143,8 @@ int progcomsat(PROGINFO	*pip,vecobj *rsp) {
 
 	if ((rs = u_socket(pf,SOCK_DGRAM,IPPROTO_UDP)) >= 0) {
 	    VECSTR	h ;
-	    const int	n = DEFNODES ;
-	    const int	fd = rs ;
+	    cint	n = DEFNODES ;
+	    cint	fd = rs ;
 
 /* get the COMSAT hosts */
 
@@ -193,7 +193,7 @@ int progcomsat(PROGINFO	*pip,vecobj *rsp) {
 #endif
 
 	        if (rs >= 0) {
-	            const int	rsn = SR_NOTFOUND ;
+	            cint	rsn = SR_NOTFOUND ;
 	            cchar	*nn = pip->nodename ;
 	            if ((rs = vecstr_find(&h,nn)) == rsn) {
 	                rs = vecstr_add(&h,nn,-1) ;
@@ -225,7 +225,7 @@ int progcomsat(PROGINFO	*pip,vecobj *rsp) {
 /* private subroutines */
 
 
-static int specs(pip,rsp,nlp,fd,defport)
+local int specs(pip,rsp,nlp,fd,defport)
 PROGINFO	*pip ;
 vecobj		*rsp ;
 vecstr		*nlp ;
@@ -233,7 +233,7 @@ int		fd ;
 int		defport ;
 {
 	struct hostent	he, *hep = &he ;
-	const int	helen = bufsizeget(bufsize_ho) ;
+	cint	helen = bufsizeget(bufsize_ho) ;
 	int		rs ;
 	int		n = 0 ;
 	char		*hebuf ;
@@ -270,7 +270,7 @@ int		defport ;
 	        if (rs == 0) port = defport ;
 
 	        if ((rs >= 0) && (nodename[0] != '\0')) {
-	            const int	af = AF_INET4 ;
+	            cint	af = AF_INET4 ;
 
 /* continue */
 
@@ -293,7 +293,7 @@ int		defport ;
 	            if ((rs = getheour(np,NULL,hep,hebuf,helen)) >= 0) {
 	                if (hep->h_addrtype == af) {
 	                    SOCKADDRESS	sa ;
-			    const int	ps = port ;
+			    cint	ps = port ;
 	                    cchar	*a = (cchar *) hep->h_addr ;
 
 #if	CF_DEBUG
@@ -306,7 +306,7 @@ int		defport ;
 #endif /* CF_DEBUG */
 
 	                    if ((rs = sockaddress_start(&sa,af,a,ps,0)) >= 0) {
-	                        const int	sal = rs ;
+	                        cint	sal = rs ;
 
 	                        rs = recips(pip,fd,&sa,sal,rsp) ;
 	                        n += rs ;
@@ -335,7 +335,7 @@ int		defport ;
 /* end subroutine (specs) */
 
 
-static int recips(pip,fd,sap,sal,rsp)
+local int recips(pip,fd,sap,sal,rsp)
 PROGINFO	*pip ;
 int		fd ;
 SOCKADDRESS	*sap ;
@@ -343,8 +343,8 @@ int		sal ;
 vecobj		*rsp ;
 {
 	RECIP		*rp ;
-	const int	clen = MBUFLEN ;
-	const int	mflags = 0 ;
+	cint	clen = MBUFLEN ;
+	cint	mflags = 0 ;
 	int		rs = SR_OK ;
 	int		j, ul ;
 	int		cl ;
@@ -427,11 +427,11 @@ vecobj		*rsp ;
 /* end subroutine (recips) */
 
 
-static int rmtabnodes(PROGINFO *pip,vecstr *nlp)
+local int rmtabnodes(PROGINFO *pip,vecstr *nlp)
 {
 	KVSFILE		info ;
 	KVSFILE_CUR	cur ;
-	const int	hlen = MAXHOSTNAMELEN ;
+	cint	hlen = MAXHOSTNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		hl ;
@@ -443,7 +443,7 @@ static int rmtabnodes(PROGINFO *pip,vecstr *nlp)
 	if ((rs = kvsfile_open(&info,50,RMTABFNAME)) >= 0) {
 
 	    if ((rs = kvsfile_curbegin(&info,&cur)) >= 0) {
-	        const int	rsn = SR_NOTFOUND ;
+	        cint	rsn = SR_NOTFOUND ;
 
 	        while (rs >= 0) {
 
@@ -473,7 +473,7 @@ static int rmtabnodes(PROGINFO *pip,vecstr *nlp)
 /* end subroutine (rmtabnodes) */
 
 
-static int report_node(PROGINFO *pip,cchar *node)
+local int report_node(PROGINFO *pip,cchar *node)
 {
 	int		rs = SR_OK ;
 
@@ -490,7 +490,7 @@ static int report_node(PROGINFO *pip,cchar *node)
 /* end subroutine (report_node) */
 
 
-static int report_recip(PROGINFO *pip,cchar *up,int ul,int mbo,int mo)
+local int report_recip(PROGINFO *pip,cchar *up,int ul,int mbo,int mo)
 {
 	int		rs = SR_OK ;
 
@@ -508,7 +508,7 @@ static int report_recip(PROGINFO *pip,cchar *up,int ul,int mbo,int mo)
 
 
 /* make (marshall) the COMSAT message itself */
-static int mkcsmsg(char mbuf[],int mlen,cchar *up,int ul,uint val)
+local int mkcsmsg(char mbuf[],int mlen,cchar *up,int ul,uint val)
 {
 	SBUF		b ;
 	int		rs ;
