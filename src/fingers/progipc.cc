@@ -67,7 +67,7 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
 extern int	snddd(char *,int,uint,uint) ;
 extern int	mkpath1(char *,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
@@ -85,7 +85,7 @@ extern int	progreqfile(PROGINFO *) ;
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -96,8 +96,8 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	progipcbeginshared(PROGINFO *,mode_t,char *) ;
-static int	progipcbeginprivate(PROGINFO *,mode_t,char *) ;
+local int	progipcbeginshared(PROGINFO *,mode_t,char *) ;
+local int	progipcbeginprivate(PROGINFO *,mode_t,char *) ;
 
 
 /* local variables */
@@ -155,7 +155,7 @@ int progipcbegin(PROGINFO *pip)
 	} /* end if */
 
 	if (rs >= 0) {
-	    const char	*cp ;
+	    cchar	*cp ;
 
 #if	CF_DEBUG && 0
 	if (DEBUGLEVEL(4))
@@ -230,7 +230,7 @@ int progipcend(PROGINFO *pip)
 /* local subroutines */
 
 
-static int progipcbeginshared(PROGINFO *pip,mode_t om,char *fname)
+local int progipcbeginshared(PROGINFO *pip,mode_t om,char *fname)
 {
 	PROGINFO_IPC	*ipp = &pip->ipc ;
 	SOCKADDR	*sap ;
@@ -238,7 +238,7 @@ static int progipcbeginshared(PROGINFO *pip,mode_t om,char *fname)
 	int		cl ;
 	int		salen ;
 	int		fl = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	fname[0] = '\0' ;
 	ipp = &pip->ipc ;
@@ -339,7 +339,7 @@ ret0:
 /* end subroutine (progipcbeginshared) */
 
 
-static int progipcbeginprivate(PROGINFO *pip,mode_t om,char *fname)
+local int progipcbeginprivate(PROGINFO *pip,mode_t om,char *fname)
 {
 	PROGINFO_IPC	*ipp = &pip->ipc ;
 	int		rs = SR_OK ;
