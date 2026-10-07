@@ -70,7 +70,7 @@
 
 /* external subroutines */
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -111,12 +111,12 @@ char		hbuf[] ;
 int		hlen ;
 {
 	uint		*header ;
-	const int	headsize = hi_overlast * sizeof(uint) ;
-	const int	magicsize = UUNAMEFU_MAGICSIZE ;
+	cint	headsize = hi_overlast * sizeof(uint) ;
+	cint	magicsize = UUNAMEFU_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
 	int		cl ;
-	const char	*magicstr = UUNAMEFU_MAGICSTR ;
+	cchar	*magicstr = UUNAMEFU_MAGICSTR ;
 	char		*bp = hbuf ;
 	char		*tp, *cp ;
 
