@@ -166,7 +166,7 @@ int binchunk::add(int v) noex {
 	return (rs >= 0) ? ql : rs ;
 } /* end method (binchunk::add) */
 
-int binchunk::add(const int8_t *sp,int 탎l) noex {
+int binchunk::add(con int8_t *sp,int 탎l) noex {
     	cchar		*cp = ccharp(sp) ;
     	int		rs = SR_FAULT ;
 	if (int sl ; (sl = getlenstr(cp,탎l)) >= 0) {
@@ -182,7 +182,7 @@ int binchunk::add(const int8_t *sp,int 탎l) noex {
 	return (rs >= 0) ? ql : rs ;
 } /* end method (binchunk::add) */
 
-int binchunk::get(const int8_t **rpp) noex {
+int binchunk::get(con int8_t **rpp) noex {
     	int		rs = SR_NOTOPEN ;
 	if (binbuf) {
 	    rs = SR_OK ;
