@@ -52,8 +52,8 @@
 
 /* forward references */
 
-static int	procdebugouter(PROGINFO *,int,cchar *,cchar *) ;
-static int	procline(struct proginfo *,int,cchar *,int) ;
+local int	procdebugouter(PROGINFO *,int,cchar *,cchar *) ;
+local int	procline(struct proginfo *,int,cchar *,int) ;
 
 
 /* local variables */
@@ -100,7 +100,7 @@ int progdebugout(PROGINFO *pip,cchar *s,cchar *fname) noex {
 /* local subroutines */
 
 
-static int procdebugouter(PROGINFO *pip,int cols,cchar *s,cchar *fn)
+local int procdebugouter(PROGINFO *pip,int cols,cchar *s,cchar *fn)
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -108,7 +108,7 @@ static int procdebugouter(PROGINFO *pip,int cols,cchar *s,cchar *fn)
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
 	if ((rs = bopen(ofp,fn,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		f_title = FALSE ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
@@ -142,10 +142,10 @@ static int procdebugouter(PROGINFO *pip,int cols,cchar *s,cchar *fn)
 /* end subroutine (progdebugouter) */
 
 
-static int procline(PROGINFO *pip,int columns,cchar *lp,int ll)
+local int procline(PROGINFO *pip,int columns,cchar *lp,int ll)
 {
 	SHIO		*efp = pip->efp ;
-	const int	indent = 2 ;
+	cint	indent = 2 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		leadlen ;
