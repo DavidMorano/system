@@ -56,7 +56,42 @@ typedef signed __int128		slonglong ;
 typedef unsigned __int128	ulonglong ;
 #endif /* TYPEDEF_ULONGLONG */
 
+#ifndef	TYPEDEF_SINT8T
+#define	TYPEDEF_SINT8T
+typedef int8_t			sint8_t ;
+typedef int16_t			sint16_t ;
+typedef int32_t			sint32_t ;
+typedef int64_t			sint64_t ;
+#endif /* TYPEDEF_CINT8T */
+
 /* constants */
+
+#ifndef	TYPEDEF_CINT8T
+#define	TYPEDEF_CINT8T
+typedef const int8_t		cint8_t ;
+typedef const int16_t		cint16_t ;
+typedef const int32_t		cint32_t ;
+typedef const int64_t		cint64_t ;
+typedef const int128_t		cint128_t ;
+#endif /* TYPEDEF_CINT8T */
+
+#ifndef	TYPEDEF_CSINT8T
+#define	TYPEDEF_CSINT8T
+typedef const int8_t		csint8_t ;
+typedef const int16_t		csint16_t ;
+typedef const int32_t		csint32_t ;
+typedef const int64_t		csint64_t ;
+typedef const int128_t		csint128_t ;
+#endif /* TYPEDEF_CSINT8T */
+
+#ifndef	TYPEDEF_CUINT8T
+#define	TYPEDEF_CUINT8T
+typedef const uint8_t		cuint8_t ;
+typedef const uint16_t		cuint16_t ;
+typedef const uint32_t		cuint32_t ;
+typedef const uint64_t		cuint64_t ;
+typedef const uint128_t		cuint128_t ;
+#endif /* TYPEDEF_CUINT8T */
 
 #ifndef	TYPEDEF_CLONGLONG
 #define	TYPEDEF_CLONGLONG
