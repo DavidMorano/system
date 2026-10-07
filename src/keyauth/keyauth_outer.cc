@@ -59,7 +59,7 @@
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 #endif
 
 
@@ -71,7 +71,7 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 
 /* forward references */
 
-static int	progout_check(PROGINFO *) ;
+local int	progout_check(PROGINFO *) ;
 
 
 /* local variables */
@@ -128,7 +128,7 @@ int progout_printline(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (progout_printline) */
 
 
-int progout_printf(PROGINFO *pip,const char *fmt,...)
+int progout_printf(PROGINFO *pip,cchar *fmt,...)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -151,7 +151,7 @@ int progout_printf(PROGINFO *pip,const char *fmt,...)
 /* local subroutines */
 
 
-static int progout_check(PROGINFO *pip)
+local int progout_check(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->outfile == NULL) {
