@@ -1,4 +1,4 @@
-/* parsenodespec SUPPORT */
+/* pcsinfo_parsenodespec SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -54,18 +54,19 @@
 #include	<sys/stat.h>
 #include	<netinet/in.h>
 #include	<unistd.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<getportnum.h>
 #include	<strn.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"config.h"
+#include	"pcsinfo_config.h"
 #include	"defs.h"
 
 
@@ -87,14 +88,8 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-#endif
-
 extern char	*strdcpy1(char *,int,cchar *) ;
 extern char	*strdcpy1w(char *,int,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
