@@ -27,7 +27,7 @@ struct matenv_flags {
 } ;
 
 struct matenv_elem {
-	const char	*p ;
+	cchar	*p ;
 	int		len ;
 } ;
 
@@ -45,7 +45,7 @@ struct matenv_head {
 extern "C" {
 #endif
 
-extern int matenv(MATENV *,const char *,int) ;
+extern int matenv(MATENV *,cchar *,int) ;
 
 #ifdef	__cplusplus
 }
