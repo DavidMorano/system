@@ -36,7 +36,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<sbuf.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC |timestr_msg(3uc)| */
+#include	<strtime.h>		/* LIBUC |strtime_msg(3uc)| */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 #include	<shio.h>
 
@@ -155,7 +155,7 @@ int cgi_hdrdate(cgi *op,time_t t) noex {
 	    cchar	*hdr = "date" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
 	    char	hbuf[KBUFLEN +1] ;
-	    timestr_msg(t,tbuf) ;
+	    strtime_msg(t,tbuf) ;
 	    if ((rs = bufprintf(hbuf,hlen,"%s: %s",hdr,tbuf)) >= 0) {
 	        if ((rs = shio_print(ofp,hbuf,rs)) >= 0) {
 	            wlen += rs ;
