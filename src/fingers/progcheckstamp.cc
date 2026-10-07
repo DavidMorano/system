@@ -33,13 +33,14 @@
 #include	<fcntl.h>
 #include	<ctime>
 #include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<bfile.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -64,7 +65,7 @@
 
 /* forward references */
 
-static int	procupdate(struct proginfo *) ;
+local int	procupdate(struct proginfo *) ;
 
 
 /* local variables */
@@ -83,7 +84,7 @@ int progstampcheck(proginfo *pip) noex {
 	    return SR_FAULT ;
 
 	if (pip->stampfname[0] != '\0') {
-	    const char	*sf = pip->stampfname ;
+	    cchar	*sf = pip->stampfname ;
 	    ustat	sb ;
 	    pip->daytime = time(NULL) ;
 	    f_process = TRUE ;
@@ -108,24 +109,24 @@ int progstampcheck(proginfo *pip) noex {
 /* local subroutines */
 
 
-static int procupdate(pip)
+local int procupdate(pip)
 struct proginfo	*pip ;
 {
 	bfile	tsfile, *tfp = &tsfile ;
 	int	rs ;
-	const char	*sf = pip->stampfname ;
+	cchar	*sf = pip->stampfname ;
 
 	if ((rs = bopen(tfp,sf,"wct",0666)) >= 0) {
-	    const int	elen = MAXNAMELEN ;
-	    const char	*nn = pip->nodename ;
-	    const char	*un = pip->username ;
+	    cint	elen = MAXNAMELEN ;
+	    cchar	*nn = pip->nodename ;
+	    cchar	*un = pip->username ;
 	    char	timebuf[TIMEBUFLEN+1] ;
 	    char	ebuf[MAXNAMELEN+1] ;
 
 	    if ((rs = sncpy3(ebuf,elen,nn,"!",un)) >= 0) {
-		const char	*name = pip->name ;
-		const char	*fmt = "%s %s\n" ;
-	        timestr_logz(pip->daytime,timebuf) ;
+		cchar	*name = pip->name ;
+		cchar	*fmt = "%s %s\n" ;
+	        strtime_logz(pip->daytime,timebuf) ;
 		if ((name != NULL) && (name[0] != '\0'))
 	            fmt = "%s %s (%s)\n" ;
 	        rs = bprintf(tfp,fmt,timebuf,ebuf,name) ;
