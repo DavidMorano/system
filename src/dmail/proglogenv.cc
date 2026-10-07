@@ -58,22 +58,22 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -96,8 +96,8 @@ int proglogenv_begin(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->fl.optlogenv) {
-	    const int	nlen = MAXNAMELEN ;
-	    const char	*efn = LOGENVFNAME ;
+	    cint	nlen = MAXNAMELEN ;
+	    cchar	*efn = LOGENVFNAME ;
 	    char	nbuf[MAXNAMELEN+1] ;
 	    if ((rs = snsds(nbuf,nlen,pip->searchname,efn)) >= 0) {
 		cchar	*logcname = LOGCNAME ;
@@ -152,7 +152,7 @@ int proglogenv_print(PROGINFO *pip,cchar *sp,int sl)
 /* vprintf-like thing */
 int proglogenv_vprintf(PROGINFO *pip,cchar *fmt,va_list ap)
 {
-	const int	flen = LINEBUFLEN ;
+	cint	flen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	char		fbuf[LINEBUFLEN+1] ;
@@ -173,7 +173,7 @@ int proglogenv_vprintf(PROGINFO *pip,cchar *fmt,va_list ap)
 
 
 /* PRINTFLIKE2 */
-int proglogenv_printf(PROGINFO *pip,const char fmt[],...)
+int proglogenv_printf(PROGINFO *pip,cchar fmt[],...)
 {
 	int		rs = SR_OK ;
 	if (pip->open.logenv) {
