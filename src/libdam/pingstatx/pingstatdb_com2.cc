@@ -78,7 +78,7 @@ module ;
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<ismisc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 #include	<bfile.h>		/* LIBB */
@@ -306,7 +306,7 @@ local int debugprintt(cchar *str,time_t tval) noex {
 	if_constexpr (f_debug) {
     	    cchar	*fmt = "%s %s\n" ;
 	    char	tbuf[TIMEBUFLEN + 1] ;
-	    timestr_logz(tval,tbuf) ;
+	    strtime_logz(tval,tbuf) ;
 	    rs = DEBUGPRINTF(fmt,str,tbuf) ;
 	} /* end if_constexpr (f_debug) */
     	return rs ; 
