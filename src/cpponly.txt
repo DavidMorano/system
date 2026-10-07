@@ -1,2 +1,2 @@
-#ifdef	__cplusplus /* C++ only! */
+#ifdef	__cplusplus /* (C++ only) */
 #endif /* __cplusplus (C++ only) */
