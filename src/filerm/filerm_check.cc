@@ -79,8 +79,8 @@ extern int	checklink(char *,ustat *,struct proginfo *) ;
 
 /* forward references */
 
-static int	checkad(proginfo *,cchar *,int,cchar *) noex ;
-static int	mkpathadd(char *,cchar *,int,cchar *,int) noex ;
+local int	checkad(proginfo *,cchar *,int,cchar *) noex ;
+local int	mkpathadd(char *,cchar *,int,cchar *,int) noex ;
 
 
 /* exported variables */
@@ -231,7 +231,7 @@ ret0:
 /* local subroutines */
 
 /* check for the proper APPLEDOUBLE file */
-static int checkad(pip,pdirname,pdirlen,dirname)
+local int checkad(pip,pdirname,pdirlen,dirname)
 struct proginfo	*pip ;
 cchar	pdirname[] ;
 cchar	dirname[] ;
@@ -295,14 +295,14 @@ int		pdirlen ;
 }
 /* end subroutine (checkad) */
 
-static int mkpathadd(fbuf,pbuf,plen,np,nl)
+local int mkpathadd(fbuf,pbuf,plen,np,nl)
 char		*fbuf ;
 cchar	*pbuf ;
 int		plen ;
 cchar	*np ;
 int		nl ;
 {
-	const int	flen = MAXPATHLEN ;
+	cint	flen = MAXPATHLEN ;
 
 	int	rs = SR_OK ;
 	int	i = 0 ;
