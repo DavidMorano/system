@@ -28,7 +28,7 @@
 	Synopsis:
 
 	int statvfsdir(fname,sbp)
-	const char	*fname ;
+	cchar	*fname ;
 	STATVFS	*sbp ;
 
 	Arguments:
@@ -68,8 +68,8 @@
 
 extern int	isNotAccess(int) ;
 
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnrchr(const char *,int,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strnrchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -80,7 +80,7 @@ extern char	*strnrchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	trytouch(const char *) ;
+local int	trytouch(cchar *) ;
 
 
 /* local variables */
@@ -126,12 +126,12 @@ int statvfsdir(cchar *fname,STATVFS *sbp)
 /* local subroutines */
 
 
-static int trytouch(cchar *fname)
+local int trytouch(cchar *fname)
 {
 	FSDIR		dir ;
 	FSDIR_ENT	ds ;
 	int		rs ;
-	const char	*np ;
+	cchar	*np ;
 
 	if ((rs = fsdir_open(&dir,fname)) >= 0) {
 
