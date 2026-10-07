@@ -13,10 +13,10 @@ static process(PROGINFO *pip,cchar *un)
 	cchar		*fmt ;
 
 	if ((rs = havenis()) > 0) {
-	    const int	nlen = MAXNETNAMELEN ;
+	    cint	nlen = MAXNETNAMELEN ;
 	    char	nbuf[MAXNETNAMELEN+1] ;
 	    if ((rs = getournetname(nbuf,nlen,un)) > 0) {
-		const int	nrs = SR_NNOTFOUND ;
+		cint	nrs = SR_NNOTFOUND ;
 		if (vl >= 2) {
 	            progout_printf(pip,"netname=%s\n",nbuf) ;
 		}
@@ -76,9 +76,9 @@ static process(PROGINFO *pip,cchar *un)
 /* end subroutine (process) */
 
 
-static int prockeylogin(PROGINFO *pip,cchar *netname)
+local int prockeylogin(PROGINFO *pip,cchar *netname)
 {
-	const int	nrs = SR_NOENT ;
+	cint	nrs = SR_NOENT ;
 	int		rs ;
 
 	if ((rs = prockeylogin_auth(pip,netname)) == nrs) {
@@ -90,7 +90,7 @@ static int prockeylogin(PROGINFO *pip,cchar *netname)
 /* end if (prockeylogin) */
 
 
-static int prockeylogin_auth(PROGINFO *pip,cchar *netname)
+local int prockeylogin_auth(PROGINFO *pip,cchar *netname)
 {
 	int		rs ;
 	int		rs1 ;
@@ -114,7 +114,7 @@ static int prockeylogin_auth(PROGINFO *pip,cchar *netname)
 /* end subroutine (prockeylogin_auth) */
 
 
-static int prockeylogin_netrc(PROGINFO *pip,cchar *netname)
+local int prockeylogin_netrc(PROGINFO *pip,cchar *netname)
 {
 	NETFILE		nfile ;
 	int		rs = SR_OK ;
