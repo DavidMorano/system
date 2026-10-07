@@ -107,16 +107,16 @@ extern int	progexports(PROGINFO *,cchar *) ;
 
 /* forward references */
 
-static int	proglog_extra(PROGINFO *) ;
-static int	procsecurity(PROGINFO *) ;
-static int	procaa(PROGINFO *,ARGINFO *) ;
+local int	proglog_extra(PROGINFO *) ;
+local int	procsecurity(PROGINFO *) ;
+local int	procaa(PROGINFO *,ARGINFO *) ;
 
-static int	loadserial(PROGINFO *) ;
-static int	loadpath(PROGINFO *,vecstr *,cchar *,cchar **,cchar *) ;
-static int	loadpathpr(PROGINFO *,vecstr *,cchar **) ;
-static int	loadpathprdir(PROGINFO *,vecstr *,cchar *) ;
-static int	loadpathcomp(PROGINFO *,vecstr *,cchar *) ;
-static int	loadpather(PROGINFO *,vecstr *,cchar *,int) ;
+local int	loadserial(PROGINFO *) ;
+local int	loadpath(PROGINFO *,vecstr *,cchar *,cchar **,cchar *) ;
+local int	loadpathpr(PROGINFO *,vecstr *,cchar **) ;
+local int	loadpathprdir(PROGINFO *,vecstr *,cchar *) ;
+local int	loadpathcomp(PROGINFO *,vecstr *,cchar *) ;
+local int	loadpather(PROGINFO *,vecstr *,cchar *,int) ;
 
 
 /* local variables */
@@ -193,9 +193,9 @@ int progprocess(PROGINFO *pip,ARGINFO *aip,USERINFO *uip) noex {
 /* local subroutines */
 
 
-static int proglog_extra(PROGINFO *pip)
+local int proglog_extra(PROGINFO *pip)
 {
-	const int	f = (pip->fl.named || pip->fl.passfd) ;
+	cint	f = (pip->fl.named || pip->fl.passfd) ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	    if ((pip->cfname != NULL) && (rs1 >= 0)) {
@@ -209,7 +209,7 @@ static int proglog_extra(PROGINFO *pip)
 /* end subroutine (proglog_extra) */
 
 
-static int procsecurity(PROGINFO *pip)
+local int procsecurity(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		f = TRUE ;
@@ -247,7 +247,7 @@ static int procsecurity(PROGINFO *pip)
 /* end subroutine (procsecurity) */
 
 
-static int procaa(PROGINFO *pip,ARGINFO *aip)
+local int procaa(PROGINFO *pip,ARGINFO *aip)
 {
 	vecstr		snames ;
 	int		rs = SR_OK ;
@@ -414,7 +414,7 @@ ret0:
 /* end subroutine (procaa) */
 
 
-static int loadserial(pip)
+local int loadserial(pip)
 PROGINFO	*pip ;
 {
 	int		rs = SR_OK ;
@@ -453,7 +453,7 @@ PROGINFO	*pip ;
 
 #if	CF_LOGID
 	{
-	    const int	llen = LOGIDLEN ;
+	    cint	llen = LOGIDLEN ;
 	    cchar	*nn = pip->nodename ;
 	    int		serial = pip->serial ;
 	    char	lbuf[LOGIDLEN + 1] ;
@@ -469,7 +469,7 @@ PROGINFO	*pip ;
 /* end subroutine (loadserial) */
 
 
-static int loadpath(pip,plp,varname,prdirs,defpath)
+local int loadpath(pip,plp,varname,prdirs,defpath)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	*varname ;
@@ -538,7 +538,7 @@ cchar	*defpath ;
 /* end subroutine (loadpath) */
 
 
-static int loadpathpr(pip,plp,prdirs)
+local int loadpathpr(pip,plp,prdirs)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	**prdirs ;
@@ -558,7 +558,7 @@ cchar	**prdirs ;
 /* end subroutine (loadpathpr) */
 
 
-static int loadpathprdir(pip,plp,bname)
+local int loadpathprdir(pip,plp,bname)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	bname[] ;
@@ -577,7 +577,7 @@ cchar	bname[] ;
 /* end subroutine (loadpathprdir) */
 
 
-static int loadpathcomp(pip,plp,pp)
+local int loadpathcomp(pip,plp,pp)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	*pp ;
@@ -601,7 +601,7 @@ cchar	*pp ;
 /* end subroutine (loadpathcomp) */
 
 
-static int loadpather(pip,plp,pbuf,plen)
+local int loadpather(pip,plp,pbuf,plen)
 PROGINFO	*pip ;
 vecstr		*plp ;
 cchar	pbuf[] ;
