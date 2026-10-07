@@ -59,7 +59,7 @@
 #include	<getostype.h>		/* LIBUC */
 #include	<userinfo.h>		/* LIBUC */
 #include	<mkui.h>		/* LIBU |mkuiname(3dam)| */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<iserror.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
@@ -174,7 +174,7 @@ int loguser::first() noex {
 	int		wlen = 0 ; /* return-value */
 	char		tbuf[TIMEBUFLEN + 1] ;
 	{
-	    cchar	*ts = timestr_logz(dt,tbuf) ;
+	    cchar	*ts = strtime_logz(dt,tbuf) ;
 	    cchar	*st = "-" ;
 	    cchar	*fmt ;
 	    if (uip->ostype < ostype_overlast) {
