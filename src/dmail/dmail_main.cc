@@ -95,6 +95,7 @@
 #include	<matxstr.h>
 #include	<isnot.h>
 #include	<headkeymat.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -520,7 +521,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    goto baddatestart ;
 	}
 
-	timestr_logz(pip->daytime,pip->stamp) ;
+	strtime_logz(pip->daytime,pip->stamp) ;
 
 	pip->verboselevel = 1 ;
 
@@ -3857,7 +3858,7 @@ local int mkreportout(PI *pip,cchar *fbuf,cchar *id,int ac,
 	int		rs1 ;
 	cchar		*fmt ;
 	char		tbuf[TIMEBUFLEN+1] ;
-	timestr_logz(dt,tbuf) ;
+	strtime_logz(dt,tbuf) ;
 	if ((rs = bopen(rfp,fbuf,"wct",om)) >= 0) {
 	    if ((rs = bminmod(rfp,om)) >= 0) {
 	    cint	al = DISARGLEN ;
