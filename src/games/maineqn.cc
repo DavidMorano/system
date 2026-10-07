@@ -48,7 +48,7 @@ using namespace std ;
 
 /* forward references */
 
-static int around(double e,double v) ;
+local int around(double e,double v) ;
 
 
 /* local variables */
@@ -76,7 +76,7 @@ int main(int argc,mainv,mainv) {
 
 /* local subroutines */
 
-static int around(double e,double v) {
+local int around(double e,double v) {
 	double	epsilon = 0.1 ;
 	return ((e >= (v-epsilon)) && (e < (v+epsilon))) ;
 }
