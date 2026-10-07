@@ -1,12 +1,12 @@
-/* proghandle */
+/* proghandle SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* handle a connect request for a service */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time print-outs */
 #define	CF_DEBUG	0		/* run-time print-outs */
-
 
 /* revision history:
 
@@ -19,23 +19,21 @@
 
 /*******************************************************************************
 
-        This subrotuine processes a new connection that just came in. This
-        connection may have been passed to us by our own daemon or it may have
-        been passed to us by executing us with the connection on standard input.
+  	Description:
+	This subrotuine processes a new connection that just came
+	in.  This connection may have been passed to us by our own
+	daemon or it may have been passed to us by executing us
+	with the connection on standard input.
 
 	We:
-
 	1) read the finer query
 	2) check if it is in our service table
 	3) check if it is a local username
 	4) check if there is a "default" service table entry
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -43,20 +41,21 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<vecstr.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -102,19 +101,18 @@
 
 /* external subroutines */
 
-extern int	sisub(const char *,int,const char *) ;
+extern int	sisub(cchar *,int,cchar *) ;
 extern int	field_svcargs(FIELD *,VECSTR *) ;
 
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
-			const char *,const char **) ;
+			cchar *,cchar **) ;
 
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -122,8 +120,8 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	procsvcspec(struct proginfo *,struct clientinfo *,
-			char *,vecstr *,const char *,int) ;
+local int	procsvcspec(struct proginfo *,struct clientinfo *,
+			char *,vecstr *,cchar *,int) ;
 
 
 /* local variables */
@@ -161,8 +159,8 @@ struct clientinfo	*cip ;
 	int		to ;
 	int		f_socket = FALSE ;
 
-	const char	**sav ;
-	const char	*cp ;
+	cchar	**sav ;
+	cchar	*cp ;
 
 	char		timebuf[TIMEBUFLEN + 1] ;
 	char		svcspec[SVCSPECLEN + 1] ;
@@ -253,12 +251,12 @@ bad0:
 /* local subroutines */
 
 
-static int procsvcspec(pip,cip,svcspec,sap,svcbuf,svcbuflen)
+local int procsvcspec(pip,cip,svcspec,sap,svcbuf,svcbuflen)
 struct proginfo		*pip ;
 struct clientinfo	*cip ;
 char			svcspec[] ;
 vecstr			*sap ;
-const char		svcbuf[] ;
+cchar		svcbuf[] ;
 int			svcbuflen ;
 {
 	FIELD	fsb ;
@@ -267,12 +265,12 @@ int			svcbuflen ;
 	int	si ;
 	int	svclen ;
 
-	const char	*ols = "/w" ;
+	cchar	*ols = "/w" ;
 
 
 	if ((rs = field_start(&fsb,svcbuf,svcbuflen)) >= 0) {
 	    int		fl ;
-	    const char	*fp ;
+	    cchar	*fp ;
 	    char	fbuf[SVCSPECLEN + 1] ;
 
 	fl = field_get(&fsb,sterms,&fp) ;
