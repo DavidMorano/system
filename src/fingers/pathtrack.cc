@@ -86,7 +86,7 @@ constexpr cpcchar	prlibs[] = {
 
 /* static subroutines */
 
-static int loadpath(pip,plp,varname,prdirs,defpath)
+local int loadpath(pip,plp,varname,prdirs,defpath)
 struct proginfo	*pip ;
 vecstr		*plp ;
 cchar	*varname ;
@@ -155,7 +155,7 @@ cchar	*defpath ;
 /* end subroutine (loadpath) */
 
 
-static int loadpathpr(pip,plp,prdirs)
+local int loadpathpr(pip,plp,prdirs)
 struct proginfo	*pip ;
 vecstr		*plp ;
 cchar	**prdirs ;
@@ -176,7 +176,7 @@ cchar	**prdirs ;
 /* end subroutine (loadpathpr) */
 
 
-static int loadpathprdir(pip,plp,bname)
+local int loadpathprdir(pip,plp,bname)
 struct proginfo	*pip ;
 vecstr		*plp ;
 cchar	bname[] ;
@@ -199,7 +199,7 @@ cchar	bname[] ;
 /* end subroutine (loadpathprdir) */
 
 
-static int loadpathcomp(pip,plp,pp)
+local int loadpathcomp(pip,plp,pp)
 struct proginfo	*pip ;
 vecstr		*plp ;
 cchar	*pp ;
@@ -225,7 +225,7 @@ cchar	*pp ;
 /* end subroutine (loadpathcomp) */
 
 
-static int loadpather(pip,plp,pbuf,plen)
+local int loadpather(pip,plp,pbuf,plen)
 struct proginfo	*pip ;
 vecstr		*plp ;
 cchar	pbuf[] ;
