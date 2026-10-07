@@ -78,7 +78,7 @@ module ;
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<ismisc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 #include	<bfile.h>		/* LIBB */
