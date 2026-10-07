@@ -29,6 +29,8 @@ module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<vector>		/* C++STD */
 #include	<list>			/* C++STD */
 #include	<clanguage.h>		/* LIBU */
