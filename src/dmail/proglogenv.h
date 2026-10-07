@@ -30,7 +30,7 @@ extern int proglogenv_begin(PROGINFO *) ;
 extern int proglogenv_end(PROGINFO *) ;
 extern int proglogenv_print(PROGINFO *,cchar *,int) ;
 extern int proglogenv_vprintf(PROGINFO *,cchar *,va_list) ;
-extern int proglogenv_printf(PROGINFO *,const char *,...) ;
+extern int proglogenv_printf(PROGINFO *,cchar *,...) ;
 extern int proglogenv_flush(PROGINFO *) ;
 
 #ifdef	__cplusplus
