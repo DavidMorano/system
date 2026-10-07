@@ -14,19 +14,21 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<ctime>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstdio>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 
 int main(int,mainv,mainv) {
 	time_t		daytime = time(nullptr) ;
 	char		timebuf[TIMEBUFLEN + 1] ;
-	timestr_log(daytime,timebuf) ;
+	strtime_log(daytime,timebuf) ;
 	fprintf(stdout,"%s\n",timebuf) ;
 	return 0 ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
