@@ -70,7 +70,7 @@ extern "C" int	sisub(cchar *,int,cchar *) ;
 
 /* forward references */
 
-static int trailing(long) ;
+local int trailing(long) ;
 
 
 /* local variables */
@@ -91,7 +91,7 @@ int main(int,mainv,mainv) {
 
 /* local subroutines */
 
-static int trailing(long n) {
+local int trailing(long n) {
 	long	v = n ;
 	int		c = 0 ;
 	while (v >= 5) {
