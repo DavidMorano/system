@@ -55,9 +55,9 @@
 #include	<vecstr.h>
 #include	<bitops.h>
 #include	<directory.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
-#include	"misc.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"configfile.h"
@@ -96,10 +96,10 @@ union dirslot {
 
 /* forwards */
 
-static int		dirtest() ;
+local int		dirtest() ;
 
-static void		makejobid() ;
-static void		int_term() ;
+local void		makejobid() ;
+local void		int_term() ;
 
 
 /* local data */
@@ -254,7 +254,7 @@ int		maxjobs ;
 	            gettimeofday(&tod,NULL) ;
 
 	            eprintf("watch: %s inside srvtab if, sfd=%d\n",
-	                timestr_ulog(&tod,timebuf),sfd) ;
+	                strtime_ulog(&tod,timebuf),sfd) ;
 
 	        }
 #endif /* F_DEBUG */
@@ -275,12 +275,12 @@ int		maxjobs ;
 	                if (g.f.srvtab)
 	                    logprintf(&g.lh,
 	                        "%s the service file changed\n",
-	                        timestr_log(ssb.st_mtime,timebuf)) ;
+	                        strtime_log(ssb.st_mtime,timebuf)) ;
 
 	                else
 	                    logprintf(&g.lh,
 	                        "%s the service file has returned\n",
-	                        timestr_log(ssb.st_mtime,timebuf)) ;
+	                        strtime_log(ssb.st_mtime,timebuf)) ;
 
 	                time(&daytime) ;
 
@@ -310,14 +310,14 @@ int		maxjobs ;
 
 	                    logprintf(&g.lh,
 	                        "%s the new service file is %s\n",
-	                        timestr_log(daytime,timebuf),
+	                        strtime_log(daytime,timebuf),
 	                        (g.f.srvtab) ? "OK" : "BAD") ;
 
 	                } else {
 
 	                    logprintf(&g.lh,
 	                        "%s the new service file is not accessible\n",
-	                        timestr_log(ssb.st_mtime,timebuf)) ;
+	                        strtime_log(ssb.st_mtime,timebuf)) ;
 
 	                    close(sfd) ;
 
@@ -334,7 +334,7 @@ int		maxjobs ;
 	                g.f.srvtab = FALSE ;
 	                logprintf(&g.lh,
 	                    "%s service file went away\n",
-	                    timestr_log(ssb.st_mtime,timebuf)) ;
+	                    strtime_log(ssb.st_mtime,timebuf)) ;
 
 	                close(sfd) ;
 
@@ -382,7 +382,7 @@ int		maxjobs ;
 	            f_directory = TRUE ;
 	            logprintf(&g.lh,
 	                "%s directory came back\n",
-	                timestr_log(daytime,timebuf)) ;
+	                strtime_log(daytime,timebuf)) ;
 
 	            sleeptime = g.polltime ;
 
@@ -402,7 +402,7 @@ int		maxjobs ;
 	            f_directory = FALSE ;
 	            logprintf(&g.lh,
 	                "%s directory went away\n",
-	                timestr_log(daytime,timebuf)) ;
+	                strtime_log(daytime,timebuf)) ;
 
 	        }
 
@@ -434,11 +434,11 @@ int		maxjobs ;
 	            if (dsb.st_mtime > t_dir) {
 
 	                eprintf("watch: %s dir changed\n",
-	                    timestr_ulog(&tod,timebuf)) ;
+	                    strtime_ulog(&tod,timebuf)) ;
 
 	                eprintf("watch: dirstat=%s dirtime=%s\n",
-	                    timestr_log(dsb.st_mtime,timebuf),
-	                    timestr_log(t_dir,timebuf2)) ;
+	                    strtime_log(dsb.st_mtime,timebuf),
+	                    strtime_log(t_dir,timebuf2)) ;
 
 	            } else if (nwatch > 0)
 	                eprintf("watch: DIR nwatch=%d\n",nwatch) ;
@@ -546,7 +546,7 @@ int		maxjobs ;
 	                            logsetid(&g.lh,jep->logid) ;
 
 	                            logprintf(&g.lh,"%s processing job\n",
-	                                timestr_log(daytime,timebuf)) ;
+	                                strtime_log(daytime,timebuf)) ;
 
 #if	F_DEBUG
 	                            if (g.debuglevel > 1)
@@ -592,7 +592,7 @@ int		maxjobs ;
 
 	                                logprintf(&g.lh,
 	                                    "%s job has to wait\n",
-	                                timestr_log(daytime,timebuf)) ;
+	                                strtime_log(daytime,timebuf)) ;
 
 			} /* end if (want to start or not) */
 
@@ -614,7 +614,7 @@ int		maxjobs ;
 	                            logsetid(&g.lh,jep->logid) ;
 
 	                            logprintf(&g.lh, "%s processing job\n",
-	                                timestr_log(daytime,timebuf)) ;
+	                                strtime_log(daytime,timebuf)) ;
 
 #if	F_DEBUG
 	                            if (g.debuglevel > 1)
@@ -670,7 +670,7 @@ int		maxjobs ;
 #endif
 
 	                    logprintf(&g.lh, "%s job entering\n",
-	                        timestr_log(daytime,timebuf)) ;
+	                        strtime_log(daytime,timebuf)) ;
 
 #if	F_DEBUG
 	                    if (g.debuglevel > 1)
@@ -765,7 +765,7 @@ int		maxjobs ;
 	                logsetid(&g.lh,jep->logid) ;
 
 	                logprintf(&g.lh, "%s job completed, es=%d\n",
-	                    timestr_log(daytime,timebuf),
+	                    strtime_log(daytime,timebuf),
 	                    child_stat & 255) ;
 
 	                job_end(jep,child_stat) ;
@@ -808,7 +808,7 @@ int		maxjobs ;
 	                            logsetid(&g.lh,jep->logid) ;
 
 	                            logprintf(&g.lh,"%s processing job (2)\n",
-	                                timestr_log(daytime,timebuf)) ;
+	                                strtime_log(daytime,timebuf)) ;
 
 #if	F_DEBUG
 	                            if (g.debuglevel > 1)
@@ -858,7 +858,7 @@ int		maxjobs ;
 	            gettimeofday(&tod,NULL) ;
 
 	            eprintf("watch: %s nstarted=%d nstale=%d nwaiting=%d\n",
-	                timestr_ulog(&tod,timebuf),
+	                strtime_ulog(&tod,timebuf),
 			nstarted,
 			nstale,
 			nwaiting) ;
@@ -897,7 +897,7 @@ int		maxjobs ;
 	                logsetid(&g.lh,jep->logid) ;
 
 	                logprintf(&g.lh, "%s processing old job\n",
-	                    timestr_log(daytime,timebuf)) ;
+	                    strtime_log(daytime,timebuf)) ;
 
 #if	F_DEBUG
 	                if (g.debuglevel > 1)
@@ -936,7 +936,7 @@ int		maxjobs ;
 
 	            logprintf(&g.lh,
 	                "%s lost my lock file, other PID=%d\n",
-	                timestr_log(daytime,timebuf),
+	                strtime_log(daytime,timebuf),
 	                rs) ;
 
 	            goto badlockfile ;
@@ -956,7 +956,7 @@ int		maxjobs ;
 
 	            logprintf(&g.lh,
 	                "%s lost my PID file, other PID=%d\n",
-	                timestr_log(daytime,timebuf),
+	                strtime_log(daytime,timebuf),
 	                rs) ;
 
 	            goto badpidfile ;
@@ -985,7 +985,7 @@ int		maxjobs ;
 	            gettimeofday(&tod,NULL) ;
 
 	            eprintf("watch: %s about to wait, sleeptime=%d\n",
-	                timestr_ulog(&tod,timebuf),sleeptime) ;
+	                strtime_ulog(&tod,timebuf),sleeptime) ;
 	        }
 #endif
 
@@ -1004,7 +1004,7 @@ int		maxjobs ;
 	                gettimeofday(&tod,NULL) ;
 
 	                eprintf("watch: %s got an interrupt\n",
-	                    timestr_ulog(&tod,timebuf)) ;
+	                    strtime_ulog(&tod,timebuf)) ;
 
 	                eprintf("watch: revents %s\n",
 	                    reventstr(fds[0].revents,eventbuf)) ;
@@ -1021,7 +1021,7 @@ int		maxjobs ;
 	                gettimeofday(&tod,NULL) ;
 
 	                eprintf("watch: %s back from read, rs=%d\n",
-	                    timestr_ulog(&tod,timebuf),rs) ;
+	                    strtime_ulog(&tod,timebuf),rs) ;
 
 	            }
 
@@ -1032,7 +1032,7 @@ int		maxjobs ;
 	                gettimeofday(&tod,NULL) ;
 
 	                eprintf("watch: %s back from poll, rs=%d\n",
-	                    timestr_ulog(&tod,timebuf),rs) ;
+	                    strtime_ulog(&tod,timebuf),rs) ;
 
 	            }
 
@@ -1050,7 +1050,7 @@ int		maxjobs ;
 	        gettimeofday(&tod,NULL) ;
 
 	        eprintf("watch: %s we are starting a scan cycle\n",
-	            timestr_ulog(&tod,timebuf)) ;
+	            strtime_ulog(&tod,timebuf)) ;
 	    }
 #endif
 
@@ -1061,7 +1061,7 @@ int		maxjobs ;
 	time(&daytime) ;
 
 	logprintf(&g.lh,"%s program exiting\n",
-	    timestr_log(daytime,timebuf)) ;
+	    strtime_log(daytime,timebuf)) ;
 
 
 	if (g.f.interrupt) close(ifd) ;
@@ -1104,7 +1104,7 @@ char	logid[15] ;
 
 #ifdef	COMMENT
 
-static void internal(filename)
+local void internal(filename)
 char	filename[] ;
 {
 	int	i, srs = FALSE ;
@@ -1138,7 +1138,7 @@ char	filename[] ;
 #endif
 
 
-static int dirtest(dfd,dirname,sbp)
+local int dirtest(dfd,dirname,sbp)
 int		dfd ;
 char		dirname[] ;
 USTAT	*sbp ;
@@ -1164,7 +1164,7 @@ USTAT	*sbp ;
 /* end subroutine (dirtest) */
 
 
-static void int_term(sn)
+local void int_term(sn)
 int	sn ;
 {
 
