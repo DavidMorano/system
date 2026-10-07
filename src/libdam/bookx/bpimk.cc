@@ -213,7 +213,7 @@ local int	vvecmp			(cvoid **,cvoid **) noex ;
 
 constexpr uint		bvcitemask	= bvcitekey_vmask ;
 static vars		var ;
-static int		maxpathlen	(bufsize_mp) ;
+local int		maxpathlen	(bufsize_mp) ;
 cbool			f_debug		= CF_DEBUG ;
 
 
