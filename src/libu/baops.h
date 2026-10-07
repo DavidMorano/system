@@ -117,7 +117,7 @@ constexpr inline bool baset(char *ap,int b) {
 constexpr inline bool baclr(char *ap,int b) {
 	return BACLRB(ap,b) ;
 }
-constexpr inline bool batst(const char *ap,int b) {
+constexpr inline bool batst(cchar *ap,int b) {
 	return BATSTB(ap,b) ;
 }
 
