@@ -65,11 +65,11 @@ typedef set<string>	res_t ;
 
 /* forward references */
 
-static int	anas1(res_t *,cchar *)  ;
-static int	anas2(res_t *,cchar *)  ;
-static int	anas3(res_t *,cchar *)  ;
+local int	anas1(res_t *,cchar *)  ;
+local int	anas2(res_t *,cchar *)  ;
+local int	anas3(res_t *,cchar *)  ;
 
-static void	printres(res_t *) ;
+local void	printres(res_t *) ;
 
 
 /* local variables */
@@ -216,7 +216,7 @@ struct anas1_head {
 	} ;
 } ; /* end struct (anas1_head) */
 
-static int anas1(res_t *resp,cchar *sc)  {
+local int anas1(res_t *resp,cchar *sc)  {
 	cint		n = strlen(sc) ;
 	int		rs = SR_OK ;
 	if (n > 0) {
@@ -348,7 +348,7 @@ struct anas2_head {
 	} ;
 } ; /* end struct (anas2_head) */
 
-static int anas2(res_t *resp,cchar *sc)  {
+local int anas2(res_t *resp,cchar *sc)  {
 	cint		n = strlen(sc) ;
 	int		rs = SR_OK ;
 	if (n > 0) {
@@ -360,7 +360,7 @@ static int anas2(res_t *resp,cchar *sc)  {
 }
 /* end subroutine (anas2) */
 
-static int anas3(res_t *resp,cchar *sc)  {
+local int anas3(res_t *resp,cchar *sc)  {
 	cint		n = strlen(sc) ;
 	int		rs = SR_OK ;
 	if (n > 0) {
@@ -387,7 +387,7 @@ static int anas3(res_t *resp,cchar *sc)  {
 }
 /* end subroutine (anas3) */
 
-static void printres(res_t *rp)  {
+local void printres(res_t *rp)  {
 	res_t::iterator	end = rp->end() ;
 	res_t::iterator	it = rp->begin() ;
 	while (it != end) {
