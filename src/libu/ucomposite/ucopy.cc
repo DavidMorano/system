@@ -72,7 +72,7 @@ import usysconf ;			/* |usysconfval(3u)| */
 
 using std::min ;			/* subroutine */
 using std::max ;			/* subroutine */
-using libu::um ;			/* variable */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -189,12 +189,12 @@ local int copyover(int fd,int dfd) noex {
 	        cint csz = (var.pagesz * PAGEMULT) ;
 		{
 		    cint	clen = min(fsz,csz) ;
-	            if (char *cbuf ; (rs = um.mall(clen,&cbuf)) >= 0) ylikely {
+	            if (char *cbuf ; (rs = umem.vall(clen,&cbuf)) >= 0) {
 		        {
 		            rs = copyovers(cbuf,clen,fd,dfd) ;
 		            tlen = rs ;
 		        }
-		        rs1 = um.free(cbuf) ;
+		        rs1 = umem.free(cbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
 		} /* end block */
