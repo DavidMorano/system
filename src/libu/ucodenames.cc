@@ -249,7 +249,6 @@ constexpr codepair		names_sr[] = {
 	{ SR_ALREADY,		"ALREADY" },
 	{ SR_INPROGRESS,	"INPROGRESS" },
 	{ SR_STALE,		"STALE" },
-	{ SR_BAD,		"BAD" },
 	{ SR_EXIT,		"EXIT" },
 	{ SR_NOENTRY,		"NOENTRY" },
 	{ SR_NOTOPEN,		"NOTOPEN" },
