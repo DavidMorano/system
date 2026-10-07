@@ -79,7 +79,7 @@ extern int	progout_end(PROGINFO *) ;
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
@@ -92,20 +92,20 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
-static int	procafname(PROGINFO *,char *,cchar *) ;
-static int	procuserhome(PROGINFO *,cchar *) ;
-static int	procinfonames(PROGINFO *) ;
-static int	process(PROGINFO *,cchar *) ;
-static int	prockeylogin(PROGINFO *,cchar *,cchar *) ;
-static int	prockeylogin_auth(PROGINFO *,cchar *,cchar *) ;
-static int	prockeylogin_netrc(PROGINFO *,cchar *,cchar *) ;
-static int	procnetrc(PROGINFO *,cchar *,cchar *,cchar *) ;
+local int	usage(PROGINFO *) ;
+local int	procafname(PROGINFO *,char *,cchar *) ;
+local int	procuserhome(PROGINFO *,cchar *) ;
+local int	procinfonames(PROGINFO *) ;
+local int	process(PROGINFO *,cchar *) ;
+local int	prockeylogin(PROGINFO *,cchar *,cchar *) ;
+local int	prockeylogin_auth(PROGINFO *,cchar *,cchar *) ;
+local int	prockeylogin_netrc(PROGINFO *,cchar *,cchar *) ;
+local int	procnetrc(PROGINFO *,cchar *,cchar *,cchar *) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -160,7 +160,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char *netrcfiles[] = {
+static cchar *netrcfiles[] = {
 	".netrc",
 	"etc/netrc",
 	NULL
@@ -187,15 +187,15 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*un = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*un = NULL ;
+	cchar	*cp ;
 	char		unbuf[USERNAMELEN+1] = { 0 } ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -237,7 +237,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -420,7 +420,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -704,7 +704,7 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -724,7 +724,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procafname(PROGINFO *pip,char *unbuf,cchar *afn)
+local int procafname(PROGINFO *pip,char *unbuf,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -738,7 +738,7 @@ static int procafname(PROGINFO *pip,char *unbuf,cchar *afn)
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = breadln(afp,lbuf,llen)) > 0) {
@@ -755,7 +755,7 @@ static int procafname(PROGINFO *pip,char *unbuf,cchar *afn)
 	                }
 
 	                if ((cl = nextfield(lbuf,len,&cp)) > 0) {
-	                    const int	unlen = USERNAMELEN ;
+	                    cint	unlen = USERNAMELEN ;
 	                    rs = sncpy1w(unbuf,unlen,cp,cl) ;
 	                    ul = rs ;
 	                }
@@ -782,9 +782,9 @@ static int procafname(PROGINFO *pip,char *unbuf,cchar *afn)
 /* end subroutine (procafname) */
 
 
-static int procuserhome(PROGINFO *pip,cchar *un)
+local int procuserhome(PROGINFO *pip,cchar *un)
 {
-	const int	hlen = MAXPATHLEN ;
+	cint	hlen = MAXPATHLEN ;
 	int		rs ;
 	char		hbuf[MAXPATHLEN+1] ;
 	if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
@@ -796,7 +796,7 @@ static int procuserhome(PROGINFO *pip,cchar *un)
 /* end subroutine (procuserhome) */
 
 
-static int procinfonames(PROGINFO *pip)
+local int procinfonames(PROGINFO *pip)
 {
 	int		rs ;
 	char		nbuf[NODENAMELEN + 1] ;
@@ -810,7 +810,7 @@ static int procinfonames(PROGINFO *pip)
 	        if ((rs = proginfo_setentry(pip,vpp,dbuf,-1)) >= 0) {
 	            char	hbuf[MAXHOSTNAMELEN+1] ;
 	            if (dbuf[0] != '\0') {
-	                const int	hlen = MAXHOSTNAMELEN ;
+	                cint	hlen = MAXHOSTNAMELEN ;
 	                if ((rs = snsds(hbuf,hlen,nbuf,dbuf)) >= 0) {
 	                    vpp = &pip->hostname ;
 	                    rs = proginfo_setentry(pip,vpp,hbuf,-1) ;
@@ -825,10 +825,10 @@ static int procinfonames(PROGINFO *pip)
 /* end subroutine (procinfonames) */
 
 
-static int process(PROGINFO *pip,cchar *un)
+local int process(PROGINFO *pip,cchar *un)
 {
-	const int	dl = pip->debuglevel ;
-	const int	vl = pip->verboselevel ;
+	cint	dl = pip->debuglevel ;
+	cint	vl = pip->verboselevel ;
 	int		rs ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
@@ -839,7 +839,7 @@ static int process(PROGINFO *pip,cchar *un)
 #endif
 
 	if ((rs = havenis()) > 0) {
-	    const int	nlen = MAXNETNAMELEN ;
+	    cint	nlen = MAXNETNAMELEN ;
 	    char	nbuf[MAXNETNAMELEN+1] ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -953,7 +953,7 @@ static int process(PROGINFO *pip,cchar *un)
 /* end subroutine (process) */
 
 
-static int prockeylogin(PROGINFO *pip,cchar *netname,cchar *un)
+local int prockeylogin(PROGINFO *pip,cchar *netname,cchar *un)
 {
 	int		rs ;
 
@@ -976,7 +976,7 @@ static int prockeylogin(PROGINFO *pip,cchar *netname,cchar *un)
 /* end if (prockeylogin) */
 
 
-static int prockeylogin_auth(PROGINFO *pip,cchar *netname,cchar *un)
+local int prockeylogin_auth(PROGINFO *pip,cchar *netname,cchar *un)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
@@ -1014,7 +1014,7 @@ static int prockeylogin_auth(PROGINFO *pip,cchar *netname,cchar *un)
 /* end subroutine (prockeylogin_auth) */
 
 
-static int prockeylogin_netrc(PROGINFO *pip,cchar *netname,cchar *un)
+local int prockeylogin_netrc(PROGINFO *pip,cchar *netname,cchar *un)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
@@ -1053,7 +1053,7 @@ static int prockeylogin_netrc(PROGINFO *pip,cchar *netname,cchar *un)
 
 
 /* process a NETRC file */
-static int procnetrc(PROGINFO *pip,cchar *un,cchar *netname,cchar *fname)
+local int procnetrc(PROGINFO *pip,cchar *un,cchar *netname,cchar *fname)
 {
 	NETFILE		nfile ;
 	NETFILE_ENT	*nep ;
