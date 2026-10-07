@@ -31,8 +31,8 @@
 extern "C" {
 #endif
 
-extern int fbprint(FILE *,const char *,int) ;
-extern int fbprintf(FILE *,const char *,...) ;
+extern int fbprint(FILE *,cchar *,int) ;
+extern int fbprintf(FILE *,cchar *,...) ;
 extern int fbreadln(FILE *,char *,int) ;
 extern int fbread(FILE *,void *,int) ;
 extern int fbwrite(FILE *,const void *,int) ;
