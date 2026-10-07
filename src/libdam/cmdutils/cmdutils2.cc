@@ -136,7 +136,7 @@ local int liner(int fd,csize ms) noex {
 	int		rs ;
 	int		rs1 ;
 	int		lines = 0 ; /* return-value */
-	if (void *md ; (rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) ylikely {
+	if (void *md ; (rs = u_mmapbeg(np,ms,mp,mf,fd,0z,&md)) >= 0) ylikely {
 	    cint	cmd = MADV_SEQUENTIAL ;
 	    if ((rs = u_madvise(md,ms,cmd)) >= 0) ylikely {
 		size_t	ll = ms ;
