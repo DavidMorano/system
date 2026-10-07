@@ -108,31 +108,31 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfdecti(cchar *,int,int *) ;
 
-extern int	proginfo_setpiv(struct proginfo *,const char *,
+extern int	proginfo_setpiv(struct proginfo *,cchar *,
 			const struct pivars *) ;
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -155,21 +155,21 @@ struct locinfo {
 
 /* forward references */
 
-static void	sighand_int(int) ;
+local void	sighand_int(int) ;
 
-static int	usage(struct proginfo *) ;
+local int	usage(struct proginfo *) ;
 
-static int	procname(struct proginfo *,FILE *,const char *) ;
-static int	getname(struct proginfo *,struct passwd *,char *,int,
-			const char *) ;
+local int	procname(struct proginfo *,FILE *,cchar *) ;
+local int	getname(struct proginfo *,struct passwd *,char *,int,
+			cchar *) ;
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
-static const int	sigblocks[] = {
+static cint	sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -177,7 +177,7 @@ static const int	sigblocks[] = {
 	0
 } ;
 
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 #if	defined(SIGXFSZ)
@@ -186,14 +186,14 @@ static const int	sigignores[] = {
 	0
 } ;
 
-static const int	sigints[] = {
+static cint	sigints[] = {
 	SIGINT,
 	SIGTERM,
 	SIGQUIT,
 	0
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -237,7 +237,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"helloworld",
 	"username",
 	"userdir",
@@ -301,16 +301,16 @@ void	*contextp ;
 	int	f_help = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	usernamebuf[USERNAMELEN + 1] ;
-	const char	*pr = NULL ;
-	const char	*pm = NULL ;
-	const char	*sn = NULL ;
-	const char	*argfname = NULL ;
-	const char	*outfname = NULL ;
-	const char	*tp, *cp ;
+	cchar	*pr = NULL ;
+	cchar	*pm = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*argfname = NULL ;
+	cchar	*outfname = NULL ;
+	cchar	*tp, *cp ;
 
 
 	if_int = 0 ;
@@ -535,7 +535,7 @@ void	*contextp ;
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -748,7 +748,7 @@ void	*contextp ;
 	        int	ml ;
 	        int	fl ;
 
-	        const char	*fp ;
+	        cchar	*fp ;
 
 	        char	linebuf[LINEBUFLEN + 1] ;
 	        char	name[MAXNAMELEN + 1] ;
@@ -920,7 +920,7 @@ badarg:
 /* local subroutines */
 
 
-static void sighand_int(sn)
+local void sighand_int(sn)
 int	sn ;
 {
 
@@ -930,7 +930,7 @@ int	sn ;
 /* end subroutine (sighand_int) */
 
 
-static int usage(pip)
+local int usage(pip)
 struct proginfo	*pip ;
 {
 	int	rs ;
@@ -953,10 +953,10 @@ struct proginfo	*pip ;
 
 
 /* process a name */
-static int procname(pip,ofp,name)
+local int procname(pip,ofp,name)
 struct proginfo	*pip ;
 FILE		*ofp ;
-const char	name[] ;
+cchar	name[] ;
 {
 	struct locinfo	*lip = pip->lip ;
 
