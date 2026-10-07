@@ -5,6 +5,7 @@
 /* Language-Parse (replacement for LANGSTATE) */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -65,6 +66,10 @@ import libutil ;			/* |getlenstr(3u)| */
 import deb ;				/* LIBU |debprintf(3u)| */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* namespaces */
@@ -184,7 +189,8 @@ local int	langparse_add(langparse *,cchar *,int) noex ;
 
 /* local variables */
 
-cint		nstage = LANGPARSE_NSTAGE ;
+cint		nstage		= LANGPARSE_NSTAGE ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
