@@ -93,7 +93,7 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 	if (u_access(cmd_rsh,X_OK) != 0) {
 	    cmd_rsh = "/usr/ucb/rsh" ;
 	    if (u_access(cmd_rsh,X_OK) != 0) {
-	        return SR_BAD ;
+	        return SR_BADE ;
 	    }
 	} /* end if */
 
