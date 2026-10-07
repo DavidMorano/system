@@ -30,18 +30,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<tmtime.hh>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -54,16 +55,16 @@
 /* external subroutines */
 
 extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,void *,int) ;
-extern int	hasprintbad(const char *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,void *,int) ;
+extern int	hasprintbad(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif /* CF_DEBUGS */
 
 
@@ -81,9 +82,9 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int	mkreportfile(PROGINFO *,char *,cchar *) ;
-static int	mkreportout(PROGINFO *,cchar *,cchar *,int,cchar **,int) ;
-static int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
+local int	mkreportfile(PROGINFO *,char *,cchar *) ;
+local int	mkreportout(PROGINFO *,cchar *,cchar *,int,cchar **,int) ;
+local int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
 
 
 /* exported subroutines */
@@ -135,7 +136,7 @@ int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 /* local subroutines */
 
 
-static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
+local int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 {
 	TMTIME		mt ;
 	const time_t	dt = pip->daytime ;
@@ -155,7 +156,7 @@ static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 /* end subroutine (mkreportfile) */
 
 
-static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
+local int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 	int ac,cchar **av,int rv)
 {
 	bfile		rfile, *rfp = &rfile ;
@@ -163,7 +164,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 	int		rs ;
 	cchar		*fmt ;
 	char		tbuf[TIMEBUFLEN+1] ;
-	timestr_logz(dt,tbuf) ;
+	strtime_logz(dt,tbuf) ;
 	if ((rs = bopen(rfp,fbuf,"wct",0666)) >= 0) {
 	    cint	al = DISARGLEN ;
 	    int		v = pip->pid ;
@@ -202,7 +203,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 
 
 /* ARGSUSED */
-static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
+local int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
 {
 	cchar		*rdname = REPORTDNAME ;
 	int		rs ;
