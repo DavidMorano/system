@@ -123,11 +123,11 @@ struct papercase_hash {
 
 /* forward references */
 
-static void	printres(int) noex ;
+local void	printres(int) noex ;
 
-static int	minsquares1(const papercase &) noex ;
-static int	minsquares2(const papercase &) noex ;
-static int	minsquares3(const papercase &) noex ;
+local int	minsquares1(const papercase &) noex ;
+local int	minsquares2(const papercase &) noex ;
+local int	minsquares3(const papercase &) noex ;
 
 
 /* local variables */
@@ -147,7 +147,7 @@ static const papercase	pcases[] = {
 /* exported subroutines */
 
 int main(int,mainv,mainv) {
-	const int	algos[] = { 1, 2, 3 } ;
+	cint	algos[] = { 1, 2, 3 } ;
 	int		ex = 0 ;
 	int		rs = SR_OK ;
 	for (auto pc : pcases) {
@@ -180,20 +180,20 @@ int main(int,mainv,mainv) {
 /* local subroutines */
 
 /* this is a (quite) bad solution! */
-static int minsquares1(const papercase &pc) noex {
-	const int	g = igcd(pc.h,pc.w) ;
+local int minsquares1(const papercase &pc) noex {
+	cint	g = igcd(pc.h,pc.w) ;
 	return (pc.h / g) * (pc.w / g) ;
 }
 /* end subroutine (minsquares1) */
 
 /* standard greedy solution (cutting and rotating remaining paper) */
-static int minsquares2(const papercase &pc) noex {
+local int minsquares2(const papercase &pc) noex {
 	int		ans = 0 ;
 	int		a = pc.h ;
 	int		b = pc.w ;
 	if (b > a) swap(a,b) ; /* get smallest side */
 	while (b > 0) {
-	    const int	r = (a % b) ;
+	    cint	r = (a % b) ;
 	    ans += (a/b) ;
 	    a = b ; /* rotate remaining piece 90 degrees */
 	    b = r ; /* rotate remaining piece 90 degrees */
@@ -255,7 +255,7 @@ struct minsquares3_head {
 	} ;
 } ;
 
-static int minsquares3(const papercase &pc) {
+local int minsquares3(const papercase &pc) {
 	minsquares3_head	obj ;
 	int		res = 0 ;
 	int		h = pc.h ;
@@ -265,7 +265,7 @@ static int minsquares3(const papercase &pc) {
 }
 /* end subroutine (minsquares3) */
 
-static void printres(int r) {
+local void printres(int r) {
 	cout << r << endl ;
 }
 /* end subroutine (printres) */
