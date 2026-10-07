@@ -27,8 +27,8 @@
 	int outhead(pip,ofp,name,v,vlen)
 	PROGINFO	*pip ;
 	bfile		*ofp ;
-	const char	name[] ;
-	const char	v[] ;
+	cchar	name[] ;
+	cchar	v[] ;
 	int		vlen ;
 
 
@@ -38,7 +38,7 @@
 	int outheadema(pip,ofp,name,ap)
 	PROGINFO	*pip ;
 	bfile		*ofp ;
-	const char	name[] ;
+	cchar	name[] ;
 	EMA		*ap ;
 
 
@@ -112,9 +112,9 @@
 
 /* external subroutines */
 
-extern int	nextfield(const char *,int,const char **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -133,17 +133,17 @@ struct outline {
 
 /* forward references */
 
-static int	outct(PROGINFO *,bfile *,MAILMSGATT_ENT *) ;
-static int	outvalue(PROGINFO *,bfile *,struct outline *,
-			const char *,int) ;
-static int	outpartbody(PROGINFO *,bfile *,bfile *,
+local int	outct(PROGINFO *,bfile *,MAILMSGATT_ENT *) ;
+local int	outvalue(PROGINFO *,bfile *,struct outline *,
+			cchar *,int) ;
+local int	outpartbody(PROGINFO *,bfile *,bfile *,
 			MAILMSGATTENT *) ;
-static int	outpartbodybits(PROGINFO *,bfile *,bfile *,
+local int	outpartbodybits(PROGINFO *,bfile *,bfile *,
 			MAILMSGATTENT *) ;
-static int	outbase64(PROGINFO *,bfile *,char *,int) ;
+local int	outbase64(PROGINFO *,bfile *,char *,int) ;
 
-static int	outline_start(struct outline *,int,int) ;
-static int	outline_finish(struct outline *) ;
+local int	outline_start(struct outline *,int,int) ;
+local int	outline_finish(struct outline *) ;
 
 
 /* local variables */
@@ -156,8 +156,8 @@ static int	outline_finish(struct outline *) ;
 int outhead(pip,ofp,name,v,vlen)
 PROGINFO	*pip ;
 bfile		*ofp ;
-const char	name[] ;
-const char	v[] ;
+cchar	name[] ;
+cchar	v[] ;
 int		vlen ;
 {
 	struct outline	ld ;
@@ -203,7 +203,7 @@ int		vlen ;
 int outheadema(pip,ofp,name,ap)
 PROGINFO	*pip ;
 bfile		*ofp ;
-const char	name[] ;
+cchar	name[] ;
 EMA		*ap ;
 {
 	struct outline	ld ;
@@ -213,7 +213,7 @@ EMA		*ap ;
 	int		nlen ;
 	int		wlen = 0 ;
 	int		f_linestart = FALSE ;
-	const char	*fmt ;
+	cchar	*fmt ;
 
 	if (ofp == NULL) return SR_FAULT ;
 	if (name == NULL) return SR_FAULT ;
@@ -439,7 +439,7 @@ ret0:
 
 
 /* output the content type */
-static int outct(pip,ofp,ep)
+local int outct(pip,ofp,ep)
 PROGINFO	*pip ;
 bfile		*ofp ;
 MAILMSGATT_ENT	*ep ;
@@ -500,11 +500,11 @@ ret0:
 
 
 /* output a single value for a header (folding lines as needed) */
-static int outvalue(pip,ofp,ldp,v,vlen)
+local int outvalue(pip,ofp,ldp,v,vlen)
 PROGINFO	*pip ;
 bfile		*ofp ;
 struct outline	*ldp ;
-const char	v[] ;
+cchar	v[] ;
 int		vlen ;
 {
 	int		rs = SR_OK ;
@@ -512,8 +512,8 @@ int		vlen ;
 	int		wlen = 0 ;
 	int		cl, cl2 ;
 	int		f_linestart = FALSE ;
-	const char	*fmt ;
-	const char	*tp, *cp ;
+	cchar	*fmt ;
+	cchar	*tp, *cp ;
 
 	if (ldp == NULL)
 	    return SR_INVALID ;
@@ -565,7 +565,7 @@ int		vlen ;
 /* end subroutine (outvalue) */
 
 
-static int outpartbody(pip,ofp,ifp,ep)
+local int outpartbody(pip,ofp,ifp,ep)
 PROGINFO	*pip ;
 bfile		*ofp ;
 bfile		*ifp ;
@@ -611,7 +611,7 @@ MAILMSGATTENT	*ep ;
 
 	} else if (cte == CE_BASE64) {
 
-	    const int	rlen = MIN(BASE64BUFLEN,BUFLEN) ;
+	    cint	rlen = MIN(BASE64BUFLEN,BUFLEN) ;
 
 	    while ((rs = bread(ifp,buf,rlen)) > 0) {
 
@@ -640,15 +640,15 @@ MAILMSGATTENT	*ep ;
 /* end subroutine (outpartbody) */
 
 
-static int outpartbodybits(pip,ofp,ifp,ep)
+local int outpartbodybits(pip,ofp,ifp,ep)
 PROGINFO	*pip ;
 bfile		*ofp ;
 bfile		*ifp ;
 MAILMSGATTENT	*ep ;
 {
-	const int	cols = MAILTEXTCOLS ;
-	const int	ind = 2 ;
-	const int	blen = BIGLINEBUFLEN ;
+	cint	cols = MAILTEXTCOLS ;
+	cint	ind = 2 ;
+	cint	blen = BIGLINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		size ;
 	int		len ;
@@ -658,7 +658,7 @@ MAILMSGATTENT	*ep ;
 	int		f_bol, f_eol ;
 	int		f_pt = ep->f_plaintext ;
 	int		f_textcrnl ;
-	const char	*lp ;
+	cchar	*lp ;
 	char		*bbuf = NULL ;
 	char		*p ;
 
@@ -731,7 +731,7 @@ ret0:
 
 
 /* write out in BASE64! */
-static int outbase64(pip,ofp,buf,buflen)
+local int outbase64(pip,ofp,buf,buflen)
 PROGINFO	*pip ;
 bfile		*ofp ;
 char		buf[] ;
@@ -767,7 +767,7 @@ int		buflen ;
 /* end subroutine (outbase64) */
 
 
-static int outline_start(op,maxlen,rlen)
+local int outline_start(op,maxlen,rlen)
 struct outline	*op ;
 int		maxlen ;
 int		rlen ;
@@ -784,7 +784,7 @@ int		rlen ;
 /* end subroutine (outline_start) */
 
 
-static int outline_finish(op)
+local int outline_finish(op)
 struct outline	*op ;
 {
 
