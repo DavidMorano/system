@@ -58,13 +58,13 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t, gid_t *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	perm(cchar *,uid_t,gid_t, gid_t *,int) ;
+extern int	mkdirs(cchar *,mode_t) ;
 extern int	getpwd(char *,int) ;
 
 
@@ -76,16 +76,16 @@ extern int	getpwd(char *,int) ;
 
 /* forward references */
 
-static int	dictfiles_setup(DICTFILES *) ;
-static int	dictfiles_setdown(DICTFILES *) ;
-static int	dictfiles_openone(DICTFILES *,int) ;
-static int	dictfiles_closeone(DICTFILES *) ;
-static int	dictfiles_closefile(DICTFILES *,int) ;
+local int	dictfiles_setup(DICTFILES *) ;
+local int	dictfiles_setdown(DICTFILES *) ;
+local int	dictfiles_openone(DICTFILES *,int) ;
+local int	dictfiles_closeone(DICTFILES *) ;
+local int	dictfiles_closefile(DICTFILES *,int) ;
 
-static int	rmdirfiles(const char *) ;
+local int	rmdirfiles(cchar *) ;
 
 #ifdef	COMMENT
-static int	dictfiles_links(DICTFILES *,int) ;
+local int	dictfiles_links(DICTFILES *,int) ;
 #endif
 
 
@@ -98,13 +98,13 @@ static int	dictfiles_links(DICTFILES *,int) ;
 int dictfiles_open(op,maxopen,dname,prefix)
 DICTFILES	*op ;
 int		maxopen ;
-const char	dname[] ;
-const char	prefix[] ;
+cchar	dname[] ;
+cchar	prefix[] ;
 {
 	int	rs = SR_OK ;
 	int	size ;
 
-	const char	*dnp ;
+	cchar	*dnp ;
 
 	char	pwd[MAXPATHLEN + 1] ;
 	char	tmpdname[MAXPATHLEN + 1] ;
@@ -209,7 +209,7 @@ bad0:
 /* write to a dictionary file */
 int dictfiles_write(op,buf,buflen)
 DICTFILES	*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int	rs = SR_OK ;
@@ -378,7 +378,7 @@ DICTFILES	*op ;
 /* local subroutines */
 
 
-static int dictfiles_openone(op,c)
+local int dictfiles_openone(op,c)
 DICTFILES	*op ;
 int		c ;
 {
@@ -450,7 +450,7 @@ int		c ;
 /* end subroutine (dictfiles_openone) */
 
 
-static int dictfiles_closeone(op)
+local int dictfiles_closeone(op)
 DICTFILES	*op ;
 {
 	int	rs = SR_NOTOPEN ;
@@ -486,7 +486,7 @@ DICTFILES	*op ;
 /* end subroutine (dictfiles_closeone) */
 
 
-static int dictfiles_closefile(op,c)
+local int dictfiles_closefile(op,c)
 DICTFILES	*op ;
 int		c ;
 {
@@ -560,7 +560,7 @@ int		c ;
 
 #ifdef	COMMENT
 
-static int dictfiles_links(op,c)
+local int dictfiles_links(op,c)
 DICTFILES	*op ;
 int		c ;
 {
@@ -622,7 +622,7 @@ int		c ;
 #endif /* COMMENT */
 
 
-static int dictfiles_setup(op)
+local int dictfiles_setup(op)
 DICTFILES	*op ;
 {
 	ustat	sb ;
@@ -711,7 +711,7 @@ bad1:
 /* end subroutine (dictfiles_setup) */
 
 
-static int dictfiles_setdown(op)
+local int dictfiles_setdown(op)
 DICTFILES	*op ;
 {
 	int	rs, rs1 ;
@@ -785,8 +785,8 @@ DICTFILES	*op ;
 /* end subroutine (dictfiles_setdown) */
 
 
-static int rmdirfiles(dname)
-const char	dname[] ;
+local int rmdirfiles(dname)
+cchar	dname[] ;
 {
 	FSDIR		d ;
 	FSDIR_ENT	ds ;
