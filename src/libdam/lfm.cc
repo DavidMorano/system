@@ -84,7 +84,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<iserror.h>		/* LIBUC */
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
@@ -745,7 +745,7 @@ local int lfm_lockwriter(lfm *op,lfm_lin *lip,int lfd) noex {
 	        cchar	*bn = (lip->bn) ? lip->bn : "" ;
 	        char	tbuf[TIMEBUFLEN+1] ;
 	        op->odate = woff ;
-	        timestr_logz(lip->dt,tbuf) ;
+	        strtime_logz(lip->dt,tbuf) ;
 	        rs = b.printf("%s %s\n",tbuf,bn) ;
 	        woff += rs ;
 	    }
@@ -783,7 +783,7 @@ local int lfm_lockwritedate(lfm *op,time_t dt) noex {
 	if ((rs = u_seek(op->lfd,op->odate,SEEK_SET)) >= 0) ylikely {
 	    int		tl ;
 	    char	tbuf[TIMEBUFLEN+2] ;
-	    timestr_logz(dt,tbuf) ;
+	    strtime_logz(dt,tbuf) ;
 	    tl = lenstr(tbuf) ;
 	    rs = u_write(op->lfd,tbuf,tl) ;
 	} /* end if (u_seek) */
