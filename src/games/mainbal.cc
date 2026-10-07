@@ -95,7 +95,7 @@ bool StrRecurse::mkstr(res_t &res,string &s,int c,int i,int w) noex {
 
 /* forward references */
 
-static void	printres(const res_t &res) noex ;
+local void	printres(const res_t &res) noex ;
 
 static res_t	bal1(int) noex ;
 static res_t	bal2(int) noex ;
@@ -234,7 +234,7 @@ struct bal2_item {
 	/* do not need 'move' constructor or assignment (too simple) */
 } ; /* end struct (bal2_item) */
 
-static void bal2_push(stack<bal2_item> &s,int c,int i,int w) noex {
+local void bal2_push(stack<bal2_item> &s,int c,int i,int w) noex {
    bal2_item	wi(c,i,w) ;
    s.push(wi) ;
 } /* end subroutine */
@@ -298,7 +298,7 @@ struct bal3_item {
 	/* do not need 'move' constructor or assignment (too simple) */
 } ; /* end struct (bal3_item) */
 
-static void bal3_push(stack<bal3_item> &work,int c,int i) noex {
+local void bal3_push(stack<bal3_item> &work,int c,int i) noex {
 	cint	n = 2 ;
 	for (int w = 0 ; w < n ; w += 1) {
 	    bal3_item	wi(c,i,w) ;
@@ -357,7 +357,7 @@ static res_t bal3(cint N) noex {
 	return res ;
 } /* end subroutine (bal3) */
 
-static void printres(const res_t &res) noex {
+local void printres(const res_t &res) noex {
 	for (auto &s : res) {
 	    cout << s << endl ;
 	}
