@@ -50,10 +50,10 @@
 ULONG		cheaprand(ULONG) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
