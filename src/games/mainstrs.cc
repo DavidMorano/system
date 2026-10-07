@@ -74,7 +74,7 @@ typedef std::set<std::string>	res_t ;
 
 /* forward references */
 
-static void printres(const set<string> &res) ;
+local void printres(const set<string> &res) ;
 
 static set<string> strs1(int) ;
 static set<string> strs2(int) ;
@@ -83,8 +83,8 @@ static set<string> strs2(int) ;
 /* exported subroutines */
 
 int main(int,mainv,mainv) {
-	const int	algos[] = { 1, 2 } ;
-	const int	lengths[] = { 1, 2, 3, 4 } ;
+	cint	algos[] = { 1, 2 } ;
+	cint	lengths[] = { 1, 2, 3, 4 } ;
 	int		ex = 0 ;
 	int		rs = SR_OK ;
 
@@ -194,7 +194,7 @@ struct strs1_head {
 	} ;
 } ;
 
-static res_t strs1(const int N) {
+static res_t strs1(cint N) {
   	set<string>	res ;
 	if (N > 0) {
 	    strs1_item	wi ;
@@ -250,7 +250,7 @@ struct strs2_item {
 	} ;
 } ;
 
-static void strs2_push(stack<strs2_item> &s,struct strs2_item wi,int i) {
+local void strs2_push(stack<strs2_item> &s,struct strs2_item wi,int i) {
 	wi.setindex(i) ;
 	for (int w = 0 ; w < 3 ; w += 1) {
 	    wi.setwhich(w) ;
@@ -258,7 +258,7 @@ static void strs2_push(stack<strs2_item> &s,struct strs2_item wi,int i) {
 	}
 }
 
-static res_t strs2(const int N) {
+static res_t strs2(cint N) {
   	set<string>	res ;
 	int		total = 0 ;
 	if (N > 0) {
@@ -271,8 +271,8 @@ static res_t strs2(const int N) {
       		wi = work.top() ;
       		work.pop() ;
 		if (wi.i < N) {
-	    	    const int	i = wi.i ;
-	    	    const int	w = wi.w ;
+	    	    cint	i = wi.i ;
+	    	    cint	w = wi.w ;
 		    if (wi.canadd(w)) {	/* restriction */
 		        s[i] = strs2_strs[w] ;
 		        wi.inc(w) ;
@@ -291,7 +291,7 @@ static res_t strs2(const int N) {
 }
 /* end subroutine (strs2) */
 
-static void printres(const set<string> &res) {
+local void printres(const set<string> &res) {
 	for (auto &s : res) {
 	    cout << s << endl ;
 	}
