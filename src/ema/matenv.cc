@@ -98,10 +98,10 @@
 
 /* external subroutines */
 
-extern int	sisub(const char *,int,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
+extern int	sisub(cchar *,int,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -112,9 +112,9 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	nextitem(const char *,int,char **) ;
-static int	getday(const char *) ;
-static int	getmonth(const char *) ;
+local int	nextitem(cchar *,int,char **) ;
+local int	getday(cchar *) ;
+local int	getmonth(cchar *) ;
 
 
 /* local variables */
@@ -128,7 +128,7 @@ int matenv(MATENV *mep,cchar *ebuf,int elen)
 	int		i, skip ;
 	int		sl, cl ;
 	int		f ;
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 #if	CF_SAFE
 	if (mep == NULL)
@@ -279,8 +279,8 @@ int matenv(MATENV *mep,cchar *ebuf,int elen)
 /* local subroutines */
 
 
-static int nextitem(sp,sl,spp)
-const char	*sp ;
+local int nextitem(sp,sl,spp)
+cchar	*sp ;
 int		sl ;
 char		**spp ;
 {
@@ -305,8 +305,8 @@ char		**spp ;
 /* end subroutine (nextitem) */
 
 
-static int getday(s)
-const char	s[] ;
+local int getday(s)
+cchar	s[] ;
 {
 	int		rs ;
 
@@ -342,8 +342,8 @@ const char	s[] ;
 /* end subroutine (getday) */
 
 
-static int getmonth(s)
-const char	s[] ;
+local int getmonth(s)
+cchar	s[] ;
 {
 	int		rs = SR_INVALID ;
 
