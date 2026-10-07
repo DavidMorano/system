@@ -22,10 +22,10 @@
 
 
 struct netfile_ent {
-	const char	*machine ;		/* machine name */
-	const char	*login ;		/* login name */
-	const char	*password ;
-	const char	*account ;		/* account name */
+	cchar	*machine ;		/* machine name */
+	cchar	*login ;		/* login name */
+	cchar	*password ;
+	cchar	*account ;		/* account name */
 } ;
 
 
@@ -35,7 +35,7 @@ struct netfile_ent {
 extern "C" {
 #endif
 
-extern int netfile_open(NETFILE *,const char *) ;
+extern int netfile_open(NETFILE *,cchar *) ;
 extern int netfile_get(NETFILE *,int,NETFILE_ENT **) ;
 extern int netfile_close(NETFILE *) ;
 
