@@ -33,7 +33,7 @@ extern bool willaddoveri(int,int) noex ;
 extern bool willaddoverl(long,long) noex ;
 extern bool willaddoverll(longlong,longlong) noex ;
 
-static inline bool willAddOver(int n1,int n2) noex {
+local inline bool willAddOver(int n1,int n2) noex {
 	return willaddoveri(n1,n2) ;
 }
 
