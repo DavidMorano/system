@@ -39,6 +39,7 @@
 #include	<vecstr.h>
 #include	<mailmsgmathdr.h>
 #include	<strn.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -60,7 +61,6 @@ extern int	matcasestr(cchar **,cchar *,int) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -71,8 +71,8 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	fileneed(struct proginfo *,bfile *) ;
-static int	filefix(struct proginfo *,bfile *) ;
+local int	fileneed(struct proginfo *,bfile *) ;
+local int	filefix(struct proginfo *,bfile *) ;
 
 
 /* local variables */
@@ -168,9 +168,9 @@ cchar	fname[] ;
 	        debugprintf("procfile: ageint=%u \n",
 	            pip->ageint) ;
 	        debugprintf("procfile: daytime=%s\n",
-	            timestr_logz(daytime,timebuf)) ;
+	            strtime_logz(daytime,timebuf)) ;
 	        debugprintf("procfile: mtime=%s\n",
-	            timestr_logz(sb.st_mtime,timebuf)) ;
+	            strtime_logz(sb.st_mtime,timebuf)) ;
 	    }
 #endif /* CF_DEBUG */
 
@@ -280,7 +280,7 @@ cchar	fname[] ;
 /* local subroutines */
 
 
-static int fileneed(pip,ifp)
+local int fileneed(pip,ifp)
 struct proginfo	*pip ;
 bfile		*ifp ;
 {
@@ -337,7 +337,7 @@ bfile		*ifp ;
 /* end subroutine (fileneed) */
 
 
-static int filefix(pip,ifp)
+local int filefix(pip,ifp)
 struct proginfo	*pip ;
 bfile		*ifp ;
 {
