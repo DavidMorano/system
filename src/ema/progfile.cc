@@ -86,11 +86,11 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	procinfile(PROGINFO *,paramopt *,bfile *,EMA *,cchar *) ;
-static int	procinfiler(PROGINFO *,bfile *,EMA *,MAILMSG *,cchar *,int) ;
+local int	procinfile(PROGINFO *,paramopt *,bfile *,EMA *,cchar *) ;
+local int	procinfiler(PROGINFO *,bfile *,EMA *,MAILMSG *,cchar *,int) ;
 
-static int	progfile_info(PROGINFO *,bfile *,EMA_ENT *,int) ;
-static int	progfile_addr(PROGINFO *,bfile *,EMA_ENT *,int) ;
+local int	progfile_info(PROGINFO *,bfile *,EMA_ENT *,int) ;
+local int	progfile_addr(PROGINFO *,bfile *,EMA_ENT *,int) ;
 
 
 /* local variables */
@@ -169,7 +169,7 @@ int progfile(PROGINFO *pip,paramopt *pp,bfile *ofp,cchar *fname)
 /* local subroutines */
 
 
-static int procinfile(pip,pp,ofp,emap,fname)
+local int procinfile(pip,pp,ofp,emap,fname)
 PROGINFO	*pip ;
 paramopt	*pp ;
 bfile		*ofp ;
@@ -235,7 +235,7 @@ cchar	fname[] ;
 /* end subroutine (procinfile) */
 
 
-static int procinfiler(PROGINFO *pip,bfile *ofp, EMA *emap, MAILMSG *mmp,
+local int procinfiler(PROGINFO *pip,bfile *ofp, EMA *emap, MAILMSG *mmp,
 		cchar *hp,int hl)
 {
 	NULSTR		n ;
@@ -247,7 +247,7 @@ static int procinfiler(PROGINFO *pip,bfile *ofp, EMA *emap, MAILMSG *mmp,
 	    int		vl ;
 	    cchar	*vp ;
 	    if ((vl = mailmsg_hdrval(mmp,hdr,&vp)) >= 0) {
-		const int	linelen = pip->linelen ;
+		cint	linelen = pip->linelen ;
 
 #if	CF_DEBUG
 			        if (DEBUGLEVEL(4))
@@ -271,7 +271,7 @@ static int procinfiler(PROGINFO *pip,bfile *ofp, EMA *emap, MAILMSG *mmp,
 /* end subroutine (procinfiler) */
 
 
-static int progfile_info(pip,ofp,ep,level)
+local int progfile_info(pip,ofp,ep,level)
 PROGINFO	*pip ;
 bfile		*ofp ;
 EMA_ENT		*ep ;
@@ -312,7 +312,7 @@ int		level ;
 /* end subroutine (progfile_info) */
 
 
-static int progfile_addr(pip,ofp,ep,level)
+local int progfile_addr(pip,ofp,ep,level)
 PROGINFO	*pip ;
 bfile		*ofp ;
 EMA_ENT		*ep ;
