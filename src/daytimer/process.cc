@@ -71,7 +71,7 @@
 #include	<userinfo.h>
 #include	<bfile.h>
 #include	<lfm.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<localmisc.h>
 
 #include	"mailfiles.h"
@@ -91,7 +91,7 @@
 
 /* forward references */
 
-static void	int_all(int) ;
+local void	int_all(int) ;
 
 
 /* local file-scope variables */
@@ -150,7 +150,7 @@ MAILFILES	*mfp ;
 	int	f_baddisplay = FALSE ;
 	int	f ;
 
-	const char	*cp ;
+	cchar	*cp ;
 	char	buf[BUFLEN + 1] ;
 	char	timebuf[TIMEBUFLEN + 1] ;
 	char	timebuf1[TIMEBUFLEN + 1] ;
@@ -302,11 +302,11 @@ MAILFILES	*mfp ;
 		if (pip->fl.log) {
 
 	        logfile_printf(&pip->lh,"%s idle from %s",
-	            timestr_logz(daytime,timebuf),
-	            timestr_logz(ti_access,timebuf1)) ;
+	            strtime_logz(daytime,timebuf),
+	            strtime_logz(ti_access,timebuf1)) ;
 
 	        logfile_printf(&pip->lh,"busy for %s",
-	            timestr_elapsed(elapsed,timebuf2)) ;
+	            strtime_elapsed(elapsed,timebuf2)) ;
 
 		}
 
@@ -322,10 +322,10 @@ MAILFILES	*mfp ;
 		if (pip->fl.log) {
 
 	        logfile_printf(&pip->lh,"%s active",
-	            timestr_logz(daytime,timebuf)) ;
+	            strtime_logz(daytime,timebuf)) ;
 
 	        logfile_printf(&pip->lh,"idle for %s",
-	            timestr_elapsed(elapsed,timebuf2)) ;
+	            strtime_elapsed(elapsed,timebuf2)) ;
 
 		}
 
@@ -517,7 +517,7 @@ badstat:
 	    daytime = time(NULL) ;
 
 	    i = bufprintf(buf,BUFLEN,"%s",
-	        timestr_logz(daytime,timebuf)) ;
+	        strtime_logz(daytime,timebuf)) ;
 
 	    if (f_orphaned)
 	        i += bufprintf((buf + i),BUFLEN," orphaned") ;
@@ -606,7 +606,7 @@ ret0:
 /* local subroutines */
 
 
-static void int_all(sn)
+local void int_all(sn)
 int	sn ;
 {
 
