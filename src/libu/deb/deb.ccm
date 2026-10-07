@@ -24,6 +24,7 @@
 	debon
 	debfd
 	debprintf
+	debprinthex
 
 	Description:
 	These subroutines are a hack for deb-printfs where the normal
@@ -61,10 +62,11 @@ export {
     struct debon_mgr {
 	operator int () noex ;
     } ; /* end struct (debon) */
-    int debopen(cchar *) noex ;
-    int debclose() noex ;
-    int debfd(int) noex ;
-    int debprintf(cchar *,cchar *,...) noex ;
+    int debopen		(cchar *) noex ;
+    int debclose	() noex ;
+    int debfd		(int) noex ;
+    int debprintf	(cchar *,cchar *,...) noex ;
+    int debprinthex	(cchar *,int,cchar *,int) noex ;
 } /* end export */
 
 export {
