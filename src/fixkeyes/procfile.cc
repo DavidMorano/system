@@ -2,45 +2,43 @@
 
 /* process an input file to the output */
 
-
 #define	CF_DEBUG	1
-
 
 /* revistion history :
 
-	= 87/09/10, David A­D­ Morano
-
+	= 1987-09-10, David A­D­ Morano
 	This code was originally written.
-
 
 */
 
+/* Copyright © 1987 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
-/*******************************************************************
+/*******************************************************************************
 
+  	Description:
 	This subroutine processes a file by writing its contents out
 	to an output file with the correct pagination.
 
+*******************************************************************************/
 
-
-*********************************************************************/
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<fcntl.h>
 #include	<ctime>
-#include	<ctype.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<cstdlib>
-
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<baops.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
-
 
 
 /* local defines */
@@ -64,8 +62,7 @@ extern int	expandline() ;
 /* local data */
 
 
-
-
+/* exported variables */
 
 int procfile(gp,infname,fn,f_eject)
 struct global	*gp ;
@@ -222,7 +219,7 @@ int		f_eject ;
 	    if ((line == 0) && gp->fl.headers) {
 
 	        len2 = sprintf(headline,gp->headerstring,
-	            timestr_edate(sb.st_mtime,timebuf),page + 1) ;
+	            strtime_edate(sb.st_mtime,timebuf),page + 1) ;
 
 	        strncpy(headline + len2,gp->blanks,40) ;
 
