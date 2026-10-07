@@ -71,7 +71,7 @@
 #include	<strwcmp.h>
 #include	<nleadstr.h>
 #include	<matxstr.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -291,8 +291,8 @@ local void	main_sighand(int,siginfo_t *,void *) noex ;
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_intr ;
+local volatile int	if_exit ;
+local volatile int	if_intr ;
 
 constexpr int		sigblocks[] = {
 	SIGUSR1,
@@ -4960,7 +4960,7 @@ local int procsyncer_reg(PI *pip,cchar *name,ustat *sbp) noex {
 	                        debugprintf("main/procsyncer_reg: utime()\n") ;
 	                        debugprintf("main/procsyncer_reg: "
 				    "dfn=%s\n",dstfname) ;
-				timestr_log(ut.modtime,tbuf) ;
+				strtime_log(ut.modtime,tbuf) ;
 	                        debugprintf("main/procsyncer_reg: "
 				    "mt=%s\n",tbuf) ;
 			    }
