@@ -78,14 +78,14 @@ extern int	strlinelen(cchar *,int,int) noex ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procsubpart(PROGINFO *,paramopt *,CMD_LOCAL *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procsubpart(PROGINFO *,paramopt *,CMD_LOCAL *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,
 			cchar *,cchar *,cchar *) ;
 
-static int	procmsgfile(PROGINFO *,paramopt *,void *,cchar *,int) ;
+local int	procmsgfile(PROGINFO *,paramopt *,void *,cchar *,int) ;
 
 
 /* local variables */
@@ -282,7 +282,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -505,7 +505,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -930,7 +930,7 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -955,7 +955,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program options */
-static int procopts(PROGINFO *pip,keyopt *akp)
+local int procopts(PROGINFO *pip,keyopt *akp)
 {
 	CMD_LOCAL	*lsp = pip->lsp ;
 	int		rs = SR_OK ;
@@ -1020,7 +1020,7 @@ static int procopts(PROGINFO *pip,keyopt *akp)
 /* end subroutine (procopts) */
 
 
-static int procsubpart(PROGINFO *pip,paramopt *pop,CMD_LOCAL *lsp)
+local int procsubpart(PROGINFO *pip,paramopt *pop,CMD_LOCAL *lsp)
 {
 	paramopt_cur	c ;
 	int		rs ;
@@ -1092,7 +1092,7 @@ static int procsubpart(PROGINFO *pip,paramopt *pop,CMD_LOCAL *lsp)
 /* end subroutine (procsubpart) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
 		cchar *ofn,cchar *ifn,cchar *afn)
 {
 	CMD_LOCAL	*lsp = pip->lsp ;
@@ -1141,7 +1141,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1215,7 +1215,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
 /* end subroutine (procargs) */
 
 
-static int procmsgfile(PROGINFO *pip,paramopt *app,void *ofp,cchar *fp,int fl)
+local int procmsgfile(PROGINFO *pip,paramopt *app,void *ofp,cchar *fp,int fl)
 {
 	NULSTR		f ;
 	int		rs ;
