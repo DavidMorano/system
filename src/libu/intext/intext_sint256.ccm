@@ -85,10 +85,10 @@ export {
 	int256_t(uint a)	noex : uintx(a) { } ;
 	int256_t(ulong a)	noex : uintx(a) { } ;
 	int256_t(ulonglong a)	noex : uintx(a) { } ;
-	int256_t(const int256_t &a) noex : uintx<int245_nbits>() {
+	int256_t(con int256_t &a) noex : uintx<int245_nbits>() {
 	    vcopy(n,v,a.v) ;
 	} ; /* ctor (direct initialization) */
-	int256_t &operator = (const int256_t &a) noex : uintx<int245_nbits>() {
+	int256_t &operator = (con int256_t &a) noex : uintx<int245_nbits>() {
 	    vcopy(n,v,a.v) ;
 	    return *this ;
 	} ; /* end method (assignment) */
