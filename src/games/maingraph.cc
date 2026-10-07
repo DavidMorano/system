@@ -82,12 +82,12 @@ typedef list<edge1_t>::iterator		edgeit_t ;
 
 /* forward references */
 
-static int edgesload(edges_t &) ;
-static int edgesadd(edges_t &,int,int,int) ;
-static int edgesvertices(edges_t &) ;
-static int printgraph(edges_t &) ;
-static int printlist(int,list<edge1_t> &) ;
-static int printresult(res1_t *,int) ;
+local int edgesload(edges_t &) ;
+local int edgesadd(edges_t &,int,int,int) ;
+local int edgesvertices(edges_t &) ;
+local int printgraph(edges_t &) ;
+local int printlist(int,list<edge1_t> &) ;
+local int printresult(res1_t *,int) ;
 
 
 /* local variables */
@@ -96,8 +96,8 @@ static int printresult(res1_t *,int) ;
 /* exported subroutines */
 
 int main(int argc,mainv,mainv) {
-	const int	algos[] = { 1, 2, 3 } ;
-	const int	nv = 6 ;
+	cint	algos[] = { 1, 2, 3 } ;
+	cint	nv = 6 ;
 	edges_t		es ;
 
 	edgesload(es) ;
@@ -142,7 +142,7 @@ int main(int argc,mainv,mainv) {
 
 /* local subroutines */
 
-static int edgesadd(edges_t &e,int u,int v,int w) {
+local int edgesadd(edges_t &e,int u,int v,int w) {
 	edge1_t		tmp(v,w) ;
 	const size_t	vsize = (uint) (u+1) ;
 	if (e.size() < vsize) {
@@ -153,7 +153,7 @@ static int edgesadd(edges_t &e,int u,int v,int w) {
 }
 /* end subroutine (edgesadd) */
 
-static int edgesvertices(edges_t &e) {
+local int edgesvertices(edges_t &e) {
 	int		vmax = 0 ;
 	for (auto &v : e) {
 	    edgeit_t	end = v.end() ;
@@ -169,8 +169,8 @@ static int edgesvertices(edges_t &e) {
 }
 /* end subroutine (edgesadd) */
 
-static int printgraph(edges_t &es) {
-	const int	n = es.size() ;
+local int printgraph(edges_t &es) {
+	cint	n = es.size() ;
 	int		i ;
 	for (i = 0 ; i < n ; i += 1) {
 	    printlist(i,es[i]) ;
@@ -179,7 +179,7 @@ static int printgraph(edges_t &es) {
 }
 /* end subroutine (printgraph) */
 
-static int printlist(int v,list<edge1_t> &ev) {
+local int printlist(int v,list<edge1_t> &ev) {
 	cout << v ;
 	for (auto v : ev) {
 	   cout << " " << v.dst << ":" << v.weight ;
@@ -189,7 +189,7 @@ static int printlist(int v,list<edge1_t> &ev) {
 }
 /* end subroutine (printgraph) */
 
-static int printresult(res1_t *rp,int nr) {
+local int printresult(res1_t *rp,int nr) {
 	cout << "result\n" ;
 	for (int i = 0 ; i < nr ; i += 1) {
 	    cout << setw(2) << i << " " << setw(2) << rp[i].dist ;
@@ -199,7 +199,7 @@ static int printresult(res1_t *rp,int nr) {
 }
 /* end subroutine (printresult) */
 
-static int edgesload(edges_t &es) {
+local int edgesload(edges_t &es) {
 
 	edgesadd(es,0,1,5) ;
 	edgesadd(es,0,2,7) ;
