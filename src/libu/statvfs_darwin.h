@@ -65,7 +65,7 @@ USTATVFS {
 
 __BEGIN_DECLS
 int fstatvfs(int, USTATVFS *);
-int statvfs(const char * __restrict, USTATVFS * __restrict);
+int statvfs(cchar * __restrict, USTATVFS * __restrict);
 __END_DECLS
 
 #endif	/* _SYS_STATVFS_H_ */
