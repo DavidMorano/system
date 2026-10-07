@@ -69,9 +69,9 @@
 
 /* exported subroutines */
 
-const char *trailaddr(cchar addr[],int addrlen) noex {
+cchar *trailaddr(cchar addr[],int addrlen) noex {
 	int		al ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (addr == NULL)
 	    return NULL ;
