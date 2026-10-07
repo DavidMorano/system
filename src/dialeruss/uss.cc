@@ -186,25 +186,25 @@ struct afamily {
 
 /* forward references */
 
-static int	uss_logbegin(USS *op,cchar *,cchar *) ;
-static int	uss_logend(USS *) ;
-static int	uss_logstuff(USS *,SUBINFO *) ;
+local int	uss_logbegin(USS *op,cchar *,cchar *) ;
+local int	uss_logend(USS *) ;
+local int	uss_logstuff(USS *,SUBINFO *) ;
 
-static int	subinfo_start(SUBINFO *,USS *,
+local int	subinfo_start(SUBINFO *,USS *,
 			SYSDIALER_INFO *,
 			SYSDIALER_ARGS *,
 			cchar *,cchar *) ;
-static int	subinfo_procargs(SUBINFO *) ;
-static int	subinfo_procopts(SUBINFO *,keyopt *) ;
-static int	subinfo_defaults(SUBINFO *) ;
-static int	subinfo_userinfo(SUBINFO *) ;
-static int	subinfo_logfile(SUBINFO *) ;
-static int	subinfo_addrparse(SUBINFO *) ;
-static int	subinfo_addrparseunix(SUBINFO *,int) ;
-static int	subinfo_addrparseinet(SUBINFO *) ;
-static int	subinfo_dirok(SUBINFO *,cchar *,int) ;
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
-static int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_procargs(SUBINFO *) ;
+local int	subinfo_procopts(SUBINFO *,keyopt *) ;
+local int	subinfo_defaults(SUBINFO *) ;
+local int	subinfo_userinfo(SUBINFO *) ;
+local int	subinfo_logfile(SUBINFO *) ;
+local int	subinfo_addrparse(SUBINFO *) ;
+local int	subinfo_addrparseunix(SUBINFO *,int) ;
+local int	subinfo_addrparseinet(SUBINFO *) ;
+local int	subinfo_dirok(SUBINFO *,cchar *,int) ;
+local int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
+local int	subinfo_finish(SUBINFO *) ;
 
 
 /* local variables */
@@ -617,7 +617,7 @@ USS		*op ;
 /* private subroutines */
 
 
-static int uss_logbegin(USS *op,cchar *lfname,cchar *logid)
+local int uss_logbegin(USS *op,cchar *lfname,cchar *logid)
 {
 	int	rs = SR_OK ;
 	int	f = op->open.log ;
@@ -635,7 +635,7 @@ static int uss_logbegin(USS *op,cchar *lfname,cchar *logid)
 /* end if (uss_logbegin) */
 
 
-static int uss_logend(USS *op)
+local int uss_logend(USS *op)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -651,7 +651,7 @@ static int uss_logend(USS *op)
 /* end if (uss_logend) */
 
 
-static int uss_logstuff(USS *op,SUBINFO *sip)
+local int uss_logstuff(USS *op,SUBINFO *sip)
 {
 	int		rs ;
 	int		f = false ;
@@ -682,7 +682,7 @@ static int uss_logstuff(USS *op,SUBINFO *sip)
 /* end subroutine (uss_logstuff) */
 
 
-static int subinfo_start(sip,op,dip,ap,hostname,svcname)
+local int subinfo_start(sip,op,dip,ap,hostname,svcname)
 SUBINFO		*sip ;
 USS		*op ;
 SYSDIALER_INFO	*dip ;
@@ -726,7 +726,7 @@ cchar	svcname[] ;
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -780,7 +780,7 @@ static int subinfo_finish(SUBINFO *sip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_procargs(SUBINFO *sip)
+local int subinfo_procargs(SUBINFO *sip)
 {
 	keyopt		akopts ;
 	SYSDIALER_ARGS	*ap = sip->ap ;
@@ -834,7 +834,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -1026,7 +1026,7 @@ static int subinfo_procargs(SUBINFO *sip)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1190,7 +1190,7 @@ badkopts:
 /* end subroutine (subinfo_procargs) */
 
 
-static int subinfo_procopts(SUBINFO *sip,keyopt *kop)
+local int subinfo_procopts(SUBINFO *sip,keyopt *kop)
 {
 	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
@@ -1229,7 +1229,7 @@ static int subinfo_procopts(SUBINFO *sip,keyopt *kop)
 /* end subroutine (subinfo_procopts) */
 
 
-static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *sp,int sl)
+local int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -1266,7 +1266,7 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *sp,int sl)
 /* end subroutine (subinfo_setentry) */
 
 
-static int subinfo_defaults(SUBINFO *sip)
+local int subinfo_defaults(SUBINFO *sip)
 {
 	SYSDIALER_ARGS	*ap = sip->ap ;
 	int		rs = SR_OK ;
@@ -1359,7 +1359,7 @@ static int subinfo_defaults(SUBINFO *sip)
 /* end subroutine (subinfo_defaults) */
 
 
-static int subinfo_userinfo(SUBINFO *sip)
+local int subinfo_userinfo(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 
@@ -1392,7 +1392,7 @@ static int subinfo_userinfo(SUBINFO *sip)
 /* end subroutine (subinfo_userinfo) */
 
 
-static int subinfo_logfile(SUBINFO *sip)
+local int subinfo_logfile(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		f = sip->init.log ;
@@ -1426,7 +1426,7 @@ static int subinfo_logfile(SUBINFO *sip)
 /* end subroutine (subinfo_logfile) */
 
 
-static int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
+local int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
 {
 	ustat	sb ;
 	NULSTR		ss ;
@@ -1456,7 +1456,7 @@ static int subinfo_dirok(SUBINFO *sip,cchar *d,int dlen)
 }
 /* end subroutine (subinfo_dirok) */
 
-static int subinfo_addrparse(SUBINFO *sip) noex {
+local int subinfo_addrparse(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 
 	if ((sip->portspec != nullptr) && (sip->portspec[0] != '\0')) {
@@ -1485,7 +1485,7 @@ static int subinfo_addrparse(SUBINFO *sip) noex {
 /* end subroutine (subinfo_addrparse) */
 
 
-static int subinfo_addrparseunix(SUBINFO *sip,int f)
+local int subinfo_addrparseunix(SUBINFO *sip,int f)
 {
 	int		rs = SR_OK ;
 	int		pslen = -1 ;
@@ -1516,7 +1516,7 @@ static int subinfo_addrparseunix(SUBINFO *sip,int f)
 /* end subroutine (subinfo_addrparseunix) */
 
 
-static int subinfo_addrparseinet(SUBINFO *sip)
+local int subinfo_addrparseinet(SUBINFO *sip)
 {
 	INETADDRPARSE	a ;
 	int		rs ;
