@@ -356,7 +356,7 @@ int progconfigread(PI *pip)
 	    int		size = sizeof(LISTENSPEC) ;
 	    pip->changed.pc = TRUE ;
 	    if ((rs = vecobj_start(&tmplistens,size,6,0)) >= 0) {
-	        const int	plen = PBUFLEN ;
+	        cint	plen = PBUFLEN ;
 	        char		*pbuf ;
 	        size = (plen+1) ;
 	        if ((rs = uc_malloc(size,&pbuf)) >= 0) {
@@ -382,7 +382,7 @@ local int progconfigreader(PI *pip,vecobj *tlp,char *pbuf,int plen)
 	paramfile_cur	cur ;
 	paramfile_ent	pe ;
 	EXPCOOK		*ckp ;
-	const int	elen = EBUFLEN ;
+	cint	elen = EBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 = 0 ;
 	int		pi ;
