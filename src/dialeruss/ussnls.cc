@@ -118,9 +118,9 @@ extern char	**environ ;
 
 /* forward references */
 
-static int ussnls_logbegin(USSNLS *,cchar *,cchar *) ;
-static int ussnls_logend(USSNLS *) ;
-static int ussnls_logstuff(USSNLS *,USSINFO *) ;
+local int ussnls_logbegin(USSNLS *,cchar *,cchar *) ;
+local int ussnls_logend(USSNLS *) ;
+local int ussnls_logstuff(USSNLS *,USSINFO *) ;
 
 
 /* external variables (module information) */
@@ -508,7 +508,7 @@ USSNLS		*op ;
 /* private subroutines */
 
 
-static int ussnls_logbegin(USSNLS *op,cchar *lfname,cchar *logid)
+local int ussnls_logbegin(USSNLS *op,cchar *lfname,cchar *logid)
 {
 	int	rs = SR_OK ;
 	int	f = op->open.log ;
@@ -526,7 +526,7 @@ static int ussnls_logbegin(USSNLS *op,cchar *lfname,cchar *logid)
 /* end if (ussnls_logbegin) */
 
 
-static int ussnls_logend(USSNLS *op)
+local int ussnls_logend(USSNLS *op)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
