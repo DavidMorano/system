@@ -636,8 +636,8 @@ SRVTAB		*sfp ;
 	    fd2 = u_open(efname,O_FLAGS,0600) ;
 
 	    {
-		const char	**eav = (const char **) args.va ;
-		const char	**eev = (const char **) pip->exports.va ;
+		cchar	**eav = (cchar **) args.va ;
+		cchar	**eev = (cchar **) pip->exports.va ;
 	        rs = u_execve(progfname,eav,eev) ;
 	    }
 
@@ -885,7 +885,7 @@ struct jobentry	**jepp ;
 local int processargs(pip,alp,command,sp)
 struct proginfo	*pip ;
 vecstr		*alp ;
-const char		command[] ;
+cchar		command[] ;
 struct argparams	*sp ;
 {
 	FIELD	fsb ;
