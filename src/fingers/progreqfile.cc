@@ -65,25 +65,25 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
 extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath4(char *,cchar *,cchar *,cchar *,
+			cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 extern int	dupup(int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern int	progcheckdir(struct proginfo *,const char *,int,int) ;
+extern int	progcheckdir(struct proginfo *,cchar *,int,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -110,7 +110,7 @@ struct proginfo	*pip ;
 	int	cl ;
 	int	fl = 0 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	fname[MAXPATHLEN + 1] ;
 	char	cname[MAXNAMELEN + 1] ;
