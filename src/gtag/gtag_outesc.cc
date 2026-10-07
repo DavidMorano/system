@@ -61,11 +61,11 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecti(const char *,int,int *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecti(cchar *,int,int *) ;
 extern int	bprintlns(bfile *,int,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -113,11 +113,11 @@ int progoutesc(PROGINFO *pip,TAGTRACK *ttp,cchar *ofname)
 	if ((rs = bopen(ofp,ofname,"wct",0644)) >= 0) {
 	    TAGTRACK_ENT	te ;
 	    TAGTRACK_CUR	cur ;
-	    const int		llen = LINEBUFLEN ;
+	    cint		llen = LINEBUFLEN ;
 	    int			ll ;
 	    cchar		*pn = pip->progname ;
 	    cchar		*fmt ;
-	    const char		*lp ;
+	    cchar		*lp ;
 	    char		lbuf[LINEBUFLEN + 1] ;
 
 	    if ((rs = tagtrack_curbegin(ttp,&cur)) >= 0) {
