@@ -104,7 +104,7 @@
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	pathadd(char *,int,cchar *) ;
-extern int	isOneOf(const int *,int) ;
+extern int	isOneOf(cint *,int) ;
 
 extern int	locinfo_mboxget(LOCINFO *,int,cchar **) ;
 
@@ -113,7 +113,6 @@ extern int	debugprintf(cchar *,...) ;
 #endif
 
 extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -128,18 +127,18 @@ struct opens {
 
 /* forward references */
 
-static int	progboxer_folder(PROGINFO *,cchar *) ;
-static int	boxadd(PROGINFO *,int,RECIP *,cchar *) ;
-static int	openspoolfile(PROGINFO *,OPENS *,cchar *) ;
-static int	createspoolfile(PROGINFO *,OPENS *,cchar *,int) ;
-static int	ourlock(int,int,int) ;
-static int	mkboxdir(PROGINFO *,cchar *) ;
-static int	opens_init(OPENS *) ;
+local int	progboxer_folder(PROGINFO *,cchar *) ;
+local int	boxadd(PROGINFO *,int,RECIP *,cchar *) ;
+local int	openspoolfile(PROGINFO *,OPENS *,cchar *) ;
+local int	createspoolfile(PROGINFO *,OPENS *,cchar *,int) ;
+local int	ourlock(int,int,int) ;
+local int	mkboxdir(PROGINFO *,cchar *) ;
+local int	opens_init(OPENS *) ;
 
 
 /* local variables */
 
-static const int	oursigs[] = {
+static cint	oursigs[] = {
 	    SIGALRM,
 	    SIGPOLL,
 	    SIGHUP,
@@ -151,7 +150,7 @@ static const int	oursigs[] = {
 	    0
 } ;
 
-static const int rslocked[] = {
+static cint rslocked[] = {
 	    SR_ACCES,
 	    SR_AGAIN,
 	    0
@@ -166,7 +165,7 @@ int progboxer(PROGINFO *pip,int tfd,RECIP *rp)
 	struct passwd	pw ;
 	OPENS		os ;
 	LOCINFO		*lip = pip->lip ;
-	const int	pwlen = bufsizeget(bufsize_pw) ;
+	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
@@ -197,7 +196,7 @@ int progboxer(PROGINFO *pip,int tfd,RECIP *rp)
 	        cchar	*folder = pip->boxdname ;
 	        char	mailfname[MAXPATHLEN + 1] ;
 	        if ((rs = mkpath2(mailfname,homedname,folder)) >= 0) {
-	            const int	plen = rs ;
+	            cint	plen = rs ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
 	                debugprintf("progboxer: mid rs=%d mailfname=%s\n",
@@ -236,10 +235,10 @@ int progboxer(PROGINFO *pip,int tfd,RECIP *rp)
 /* local subroutines */
 
 
-static int progboxer_folder(PROGINFO *pip,cchar *mailfname)
+local int progboxer_folder(PROGINFO *pip,cchar *mailfname)
 {
 	USTAT	sb ;
-	const int	nrs = SR_NOTFOUND ;
+	cint	nrs = SR_NOTFOUND ;
 	int		rs ;
 	if ((rs = u_stat(mailfname,&sb)) >= 0) {
 	    if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
@@ -251,7 +250,7 @@ static int progboxer_folder(PROGINFO *pip,cchar *mailfname)
 /* end subroutine (progboxer_folder) */
 
 
-static int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
+local int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
 {
 	OPENS		os ;
 	uid_t		uid_recip = -1 ;
@@ -375,14 +374,14 @@ static int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
 
 
 /* open the spool file (using SUID or SGID as necessary) */
-static int openspoolfile(pip,osp,mailfname)
+local int openspoolfile(pip,osp,mailfname)
 PROGINFO	*pip ;
 OPENS		*osp ;
 cchar		mailfname[] ;
 {
 	uid_t		euid ;
 	gid_t		egid ;
-	const int	oflags = (O_RDWR | O_APPEND) ;
+	cint	oflags = (O_RDWR | O_APPEND) ;
 	int		rs = SR_ACCESS ;
 	int		rs1 ;
 	int		f_suid = FALSE ;
@@ -485,7 +484,7 @@ cchar		mailfname[] ;
 /* end subroutine (openspoolfile) */
 
 
-static int createspoolfile(pip,osp,mailfname,uid_recip)
+local int createspoolfile(pip,osp,mailfname,uid_recip)
 PROGINFO	*pip ;
 OPENS		*osp ;
 cchar		mailfname[] ;
@@ -566,7 +565,7 @@ int		uid_recip ;
 /* end subroutine (createspoolfile) */
 
 
-static int mkboxdir(PROGINFO *pip,cchar boxdname[])
+local int mkboxdir(PROGINFO *pip,cchar boxdname[])
 {
 	uid_t		euid ;
 	gid_t		egid ;
@@ -600,7 +599,7 @@ static int mkboxdir(PROGINFO *pip,cchar boxdname[])
 /* end subroutine (mkboxdir) */
 
 
-static int opens_init(OPENS *op)
+local int opens_init(OPENS *op)
 {
 	memset(op,0,sizeof(OPENS)) ;
 	return SR_OK ;
@@ -609,7 +608,7 @@ static int opens_init(OPENS *op)
 
 
 /* this subroutine both locks and unlocks! (depending on 'cmd') */
-static int ourlock(int fd,int cmd,int timeout)
+local int ourlock(int fd,int cmd,int timeout)
 {
 	int		rs ;
 	int		i ;
