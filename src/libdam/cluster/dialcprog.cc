@@ -264,29 +264,29 @@ struct bestnode {
 
 /* forward references */
 
-static int	getnodenames(cchar *,vecstr *,cchar *) ;
-static int	dialremote(struct dialinfo *,cchar *,cchar **, cchar **,int *) ;
-static int	findsync(FILER *) ;
-static int	getrnode(FILER *,char *) ;
+local int	getnodenames(cchar *,vecstr *,cchar *) ;
+local int	dialremote(struct dialinfo *,cchar *,cchar **, cchar **,int *) ;
+local int	findsync(FILER *) ;
+local int	getrnode(FILER *,char *) ;
 
-static int	sendvars(struct dialinfo *,int,cchar *,cchar **,cchar **) ;
+local int	sendvars(struct dialinfo *,int,cchar *,cchar **,cchar **) ;
 
-static int	getclusters(struct dbinfo *,vecstr *,cchar *) ;
+local int	getclusters(struct dbinfo *,vecstr *,cchar *) ;
 
-static int	mklisten_start(struct dialinfo *, struct dialinfo_si *) ;
-static int	mklisten_finish(struct dialinfo *, struct dialinfo_si *) ;
-static int	mklisten_bind(struct dialinfo *, struct dialinfo_si *,int) ;
+local int	mklisten_start(struct dialinfo *, struct dialinfo_si *) ;
+local int	mklisten_finish(struct dialinfo *, struct dialinfo_si *) ;
+local int	mklisten_bind(struct dialinfo *, struct dialinfo_si *,int) ;
 
 #if	CF_BESTNODE
-static int	bestnode_open(BESTNODE *,DIALINFO *,cchar *,cchar *) ;
-static int	bestnode_close(BESTNODE *) ;
-static int	bestnode_get(BESTNODE *,struct dbinfo *,vecstr *,
+local int	bestnode_open(BESTNODE *,DIALINFO *,cchar *,cchar *) ;
+local int	bestnode_close(BESTNODE *) ;
+local int	bestnode_get(BESTNODE *,struct dbinfo *,vecstr *,
 			char *,double *) ;
 #endif
 
-static int	filer_sendrecord(FILER *,int,cchar *,int) ;
+local int	filer_sendrecord(FILER *,int,cchar *,int) ;
 
-static int	loadlocalnames(cchar *,struct dialinfo *,vecstr *) ;
+local int	loadlocalnames(cchar *,struct dialinfo *,vecstr *) ;
 
 
 /* local variables */
@@ -917,7 +917,7 @@ badnoprog:
 
 /* local subroutines */
 
-static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
+local int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 	FILER		rd ;
 	int		rs = SR_OK ;
 	int		cl ;
@@ -1244,7 +1244,7 @@ badsync:
 
 
 /* find synchronization in the data stream */
-static int findsync(bdp)
+local int findsync(bdp)
 FILER		*bdp ;
 {
 	STREAMSYNC	ps ;
@@ -1322,7 +1322,7 @@ FILER		*bdp ;
 
 
 /* get the remote node name */
-static int getrnode(bdp,rnode)
+local int getrnode(bdp,rnode)
 FILER		*bdp ;
 char		rnode[] ;
 {
@@ -1357,8 +1357,8 @@ char		rnode[] ;
 	        char	hexbuf[100] ;
 	        mkhexstr(hexbuf,20,databuf,MIN(20,len)) ;
 	        debugprintf("getrnode: read= %s\n",hexbuf) ;
-	    }
-#endif
+	    } /* end block */
+#endif /* end if (CF_DEBUG) */
 
 	    if (len == 0) break ;
 
@@ -1370,7 +1370,6 @@ char		rnode[] ;
 #endif
 
 	        switch (state) {
-
 	        case 0:
 	        case 1:
 	            nlenbuf[state] = (databuf[i] & 0xff) ;
@@ -1433,7 +1432,7 @@ char		rnode[] ;
 }
 /* end subroutine (getrnode) */
 
-static int mklisten_start(DIALINFO *dip,DIALINFO_SI *sip) noex {
+local int mklisten_start(DIALINFO *dip,DIALINFO_SI *sip) noex {
 	cint		af = AF_INET4 ;
 	cint		pf = PF_INET4 ;
 	cint		st = SOCK_STREAM ;
@@ -1460,7 +1459,7 @@ static int mklisten_start(DIALINFO *dip,DIALINFO_SI *sip) noex {
 /* end subroutine (mklisten_start) */
 
 
-static int mklisten_finish(DIALINFO *dip,DIALINFO_SI *sip)
+local int mklisten_finish(DIALINFO *dip,DIALINFO_SI *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1473,7 +1472,7 @@ static int mklisten_finish(DIALINFO *dip,DIALINFO_SI *sip)
 /* end subroutine (mklisten_finish) */
 
 
-static int mklisten_bind(DIALINFO *dip,DIALINFO_SI *sip,int s)
+local int mklisten_bind(DIALINFO *dip,DIALINFO_SI *sip,int s)
 {
 	struct sockaddr	*sap ;
 	int		rs ;
@@ -1521,7 +1520,7 @@ static int mklisten_bind(DIALINFO *dip,DIALINFO_SI *sip,int s)
 
 
 /* send the various variables over to the other side */
-static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
+local int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	ENVLIST		vars ;
 	FILER		wr ;
 	cint		envlen = ENVBUFLEN ;
@@ -1703,7 +1702,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	        char	hexbuf[100 + 1] ;
 	        mkhexstr(hexbuf,100,buf,12) ;
 	        debugprintf("dialcprog/sendvars: m5> %s\n",hexbuf) ;
-	    }
+	    } /* end block */
 #endif
 
 	    rs = filer_write(&wr,buf,cl) ;
@@ -1749,7 +1748,7 @@ ret0:
 /* end subroutine (sendvars) */
 
 
-static int filer_sendrecord(FILER *bp,int type,cchar *sp,int sl)
+local int filer_sendrecord(FILER *bp,int type,cchar *sp,int sl)
 {
 	int		rs ;
 	int		tlen = 0 ;
@@ -1789,7 +1788,7 @@ static int filer_sendrecord(FILER *bp,int type,cchar *sp,int sl)
 /* end subroutine (filer_sendrecord) */
 
 
-static int getclusters(dbip,sp,nodename)
+local int getclusters(dbip,sp,nodename)
 struct dbinfo	*dbip ;
 vecstr		*sp ;
 cchar	nodename[] ;
@@ -1898,7 +1897,7 @@ cchar	nodename[] ;
 
 #if	CF_BESTNODE
 
-static int bestnode_open(op,dip,pr,fname)
+local int bestnode_open(op,dip,pr,fname)
 BESTNODE	*op ;
 struct dialinfo	*dip ;
 cchar	pr[] ;
@@ -1941,7 +1940,7 @@ cchar	fname[] ;
 }
 /* end subroutine (bestnode_open) */
 
-static int bestnode_close(op)
+local int bestnode_close(op)
 BESTNODE	*op ;
 {
 	int		rs = SR_NOTOPEN ;
@@ -1957,7 +1956,7 @@ BESTNODE	*op ;
 }
 /* end subroutine (bestnode_close) */
 
-static int bestnode_get(op,dbip,cnp,nodename,ap)
+local int bestnode_get(op,dbip,cnp,nodename,ap)
 BESTNODE	*op ;
 struct dbinfo	*dbip ;
 vecstr		*cnp ;
@@ -2135,7 +2134,7 @@ double		*ap ;
 #endif /* CF_BESTNODE */
 
 
-static int loadlocalnames(pr,dip,lnp)
+local int loadlocalnames(pr,dip,lnp)
 cchar	*pr ;
 DIALINFO	*dip ;
 vecstr		*lnp ;
@@ -2169,7 +2168,7 @@ vecstr		*lnp ;
 /* end subroutine (loadlocalnames) */
 
 
-static int getnodenames(pr,nsp,node)
+local int getnodenames(pr,nsp,node)
 cchar	pr[] ;
 vecstr		*nsp ;
 cchar	node[] ;
