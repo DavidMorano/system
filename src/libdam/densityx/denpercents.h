@@ -25,7 +25,7 @@ EXTERNC_begin
 extern int denpercentsi(uint *,int,double *) noex ;
 extern int denpercentsl(ulong *,int,double *) noex ;
 
-static inline int denpercentsi(ulong *a,int n,double *pp) noex {
+local inline int denpercentsi(ulong *a,int n,double *pp) noex {
 	return denpercentsl(a,n,pp) ;
 }
 
