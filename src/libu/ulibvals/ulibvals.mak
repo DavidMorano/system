@@ -45,11 +45,11 @@ OBJPART=
 OBJPRIME= ulibvals0.o
 
 OBJ0= ulibvals1.o
-OBJ1=
+OBJ1= ulibvals2.o
 OBJ2=
 OBJ3=
 
-OBJA= obj0.o 
+OBJA= obj0.o obj1.o
 OBJB= obj2.o obj3.o
 
 OBJIMPL= obja.o
@@ -154,6 +154,6 @@ ulibvals0.o:		ulibvals.ccm				$(INCS)
 
 # module implementation
 ulibvals1.o:		ulibvals1.cc objprime.o			$(INCS)
-	$(COMPILE.cc) $<
+ulibvals2.o:		ulibvals2.cc objprime.o			$(INCS)
 
 
