@@ -285,7 +285,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -511,7 +511,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -897,7 +897,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -968,7 +968,7 @@ local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 		cchar *ofn,cchar *afn)
 {
 	vecstr		*flp = &pip->filenames ;
-	const int	n = DEFNFILES ;
+	cint	n = DEFNFILES ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1046,7 +1046,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 	    if (afn[0] == '-') afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
