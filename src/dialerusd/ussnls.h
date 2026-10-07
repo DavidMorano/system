@@ -39,14 +39,14 @@ extern "C" {
 #endif
 
 extern int ussnls_open(USSNLS *,SYSDIALER_ARGS *,
-		const char *,const char *,const char **) ;
+		cchar *,cchar *,cchar **) ;
 extern int ussnls_reade(USSNLS *,char *,int,int,int) ;
 extern int ussnls_recve(USSNLS *,char *,int,int,int,int) ;
 extern int ussnls_recvfrome(USSNLS *,char *,int,int,void *,int *,int,int) ;
 extern int ussnls_recvmsge(USSNLS *,struct msghdr *,int,int,int) ;
-extern int ussnls_write(USSNLS *,const char *,int) ;
-extern int ussnls_send(USSNLS *,const char *,int,int) ;
-extern int ussnls_sendto(USSNLS *,const char *,int,int,void *,int) ;
+extern int ussnls_write(USSNLS *,cchar *,int) ;
+extern int ussnls_send(USSNLS *,cchar *,int,int) ;
+extern int ussnls_sendto(USSNLS *,cchar *,int,int,void *,int) ;
 extern int ussnls_sendmsg(USSNLS *,struct msghdr *,int) ;
 extern int ussnls_shutdown(USSNLS *,int) ;
 extern int ussnls_close(USSNLS *) ;
