@@ -70,6 +70,7 @@
 #include	<storebuf.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -118,8 +119,8 @@ struct openstuff {
 
 /* forward references */
 
-static int	getlocalnames(PROGINFO *) ;
-static int	procfile(PROGINFO *,int (*)(char *,char *,vecstr *),
+local int	getlocalnames(PROGINFO *) ;
+local int	procfile(PROGINFO *,int (*)(char *,char *,vecstr *),
 			char *,vecstr *,char *,vecstr *) ;
 
 
@@ -378,7 +379,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    if ((argl > 0) && (f_optminus || f_optplus)) {
 
 	        if (argl > 1) {
-		    const int	ach = MKCHAR(argp[1]) ;
+		    cint	ach = MKCHAR(argp[1]) ;
 
 	            if (isdigitlatin(ach)) {
 
@@ -1636,7 +1637,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	pip->logid = mallocstr(buf) ;
 
-	rs = SR_BAD ;
+	rs = SR_BADE ;
 	if (logfname[0] == '\0') {
 	    logfile_type = 1 ;
 	    strcpy(logfname,LOGFNAME) ;
@@ -1692,7 +1693,7 @@ int main(int argc,mainv argv,mainv envv) {
 #endif
 
 	    logfile_printf(&pip->lh,"%s %s\n",
-	        timestr_log(daytime,timebuf),
+	        strtime_log(daytime,timebuf),
 	        BANNER) ;
 
 	    logfile_printf(&pip->lh,"%-14s %s/%s\n",
@@ -1802,7 +1803,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    bprintf(&pidfile,"%d\n",pip->pid) ;
 
 	    bprintf(&pidfile,"%s %s\n",
-	        BANNER,timestr_log(daytime,timebuf)) ;
+	        BANNER,strtime_log(daytime,timebuf)) ;
 
 	    if (userbuf[0] != '\0')
 	        bprintf(&pidfile,"host=%s.%s user=%s pid=%d\n",
@@ -2074,7 +2075,7 @@ badmore3:
 /* local subroutines */
 
 
-static int procfile(pip,func,pr,svp,fname,elp)
+local int procfile(pip,func,pr,svp,fname,elp)
 PROGINFO	*pip ;
 int		(*func)(char *,char *,vecstr *) ;
 char		pr[] ;
@@ -2114,7 +2115,7 @@ vecstr		*elp ;
 }
 /* end subroutine (procfile) */
 
-static int getlocalnames(PROGINFO *pip) noex {
+local int getlocalnames(PROGINFO *pip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n ;
