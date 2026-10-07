@@ -30,7 +30,7 @@
 	int process(gp,dp,fname)
 	struct proginfo	*pip ;
 	DICTFILES	*dp ;
-	const char	fname[] ;
+	cchar	fname[] ;
 
 	Arguments:
 	- pip		program information pointer
@@ -45,7 +45,7 @@
 ***********************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -68,7 +68,7 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -83,7 +83,7 @@ extern int	mkpath2(char *,const char *,const char *) ;
 int process(pip,dp,fname)
 struct proginfo	*pip ;
 DICTFILES	*dp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile	infile, *ifp = &infile ;
 
@@ -106,7 +106,7 @@ const char	fname[] ;
 	if (fname[0] == '-') fname = BFILE_STDIN ;
 
 	if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	    while ((rs = breadln(ifp,lbuf,llen)) > 0) {
