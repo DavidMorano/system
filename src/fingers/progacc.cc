@@ -39,6 +39,7 @@
 #include	<usysbase.h>
 #include	<vecstr.h>
 #include	<acctab.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -293,7 +294,7 @@ int progacccheck(PROGINFO *pip)
 	        f_changed = TRUE ;
 	        if (pip->open.logprog && f_changed) {
 		    cchar	*fmt = "%s access-permissions changed\n" ;
-	            timestr_logz(pip->daytime,timebuf) ;
+	            strtime_logz(pip->daytime,timebuf) ;
 	            proglog_printf(pip,fmt,timebuf) ;
 	        }
 	    }
