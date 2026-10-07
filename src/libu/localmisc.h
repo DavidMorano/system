@@ -180,7 +180,7 @@ typedef const signed char	cschar ;
 
 #ifndef	TYPEDEF_CCHAR
 #define	TYPEDEF_CCHAR
-typedef const char		cchar ;
+typedef cchar		cchar ;
 #endif /* TYPEDEF_SCHAR */
 
 #ifndef	TYPEDEF_CSHORT
@@ -230,7 +230,7 @@ typedef const time_t		custime ;
 
 #ifndef	TYPEDEF_CC
 #define	TYPEDEF_CC
-typedef const char		cc ;
+typedef cchar		cc ;
 #endif
 
 /* C-language limits */
