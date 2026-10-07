@@ -65,7 +65,7 @@
 #include	<opendial.h>
 #include	<dialopts.h>
 #include	<nistinfo.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -173,14 +173,14 @@ local int	anyformat(bfile *,int,int) noex ;
 local bool	isEnd(int) noex ;
 
 #if	CF_SIGHAND
-static void	main_sighand(int,siginfo_t *,void *) ;
+local void	main_sighand(int,siginfo_t *,void *) ;
 #endif /* CF_SIGHAND */
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
 static cint	sigblocks[] = {
 	SIGUSR1,
@@ -1463,7 +1463,7 @@ local int server(PI *pip) noex {
 	            if (rs >= 0) {
 	                memset(&nist,0,sizeof(struct nistinfo)) ;
 	                sncpy1(nist.org,NISTINFO_ORGLEN,obuf) ;
-	                cp = timestr_nist(pip->daytime,ntbuf,&nist) ;
+	                cp = strtime_nist(pip->daytime,ntbuf,&nist) ;
 	                cl = strlen(ntbuf) ;
 	                ntbuf[cl++] = '\n' ;
 	                if (lip->fl.dgram) {
@@ -1478,7 +1478,7 @@ local int server(PI *pip) noex {
 	    } else {
 	        memset(&nist,0,sizeof(struct nistinfo)) ;
 	        sncpy1(nist.org,NISTINFO_ORGLEN,obuf) ;
-	        cp = timestr_nist(pip->daytime,ntbuf,&nist) ;
+	        cp = strtime_nist(pip->daytime,ntbuf,&nist) ;
 	        cl = strlen(ntbuf) ;
 	        ntbuf[cl++] = '\n' ;
 	        rs = uc_writen(fd_portal,ntbuf,cl) ;
