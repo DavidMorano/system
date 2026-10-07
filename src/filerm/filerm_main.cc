@@ -69,9 +69,9 @@ extern int	printhelp(void *,cchat *,cchat *,cchat *) ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	mkrn(PROGINFO *) ;
+local int	mkrn(PROGINFO *) ;
 
 
 /* external variables */
@@ -228,7 +228,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -447,7 +447,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -733,7 +733,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	    if (strcmp(afname,"-") == 0) afname = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afname,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -864,7 +864,7 @@ badprogstart:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -892,7 +892,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int mkrn(PROGINFO *pip)
+local int mkrn(PROGINFO *pip)
 {
 	EGS		e ;
 	uint		rn = 0 ;
