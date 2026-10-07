@@ -72,12 +72,12 @@ using namespace	std ;
 
 /* forward references */
 
-static int	metas1(vector<int> &) ;
-static int	metas2(vector<int> &) ;
+local int	metas1(vector<int> &) ;
+local int	metas2(vector<int> &) ;
 
 static string	strvec(vector<int>) ;
 
-static void	printres(vector<int> &,int) ;
+local void	printres(vector<int> &,int) ;
 
 
 /* local variables */
@@ -99,7 +99,7 @@ static vector<int>	cases[] = {
 /* exported subroutines */
 
 int main(int argc,mainv,mainv) {
-	const int	algos[] = { 1 } ;
+	cint	algos[] = { 1 } ;
 	int		ex = 0 ;
 	int		rs = SR_OK ;
 
@@ -130,8 +130,8 @@ int main(int argc,mainv,mainv) {
 
 /* local subroutines */
 
-static int metas1(vector<int> &a) {
-	const int	n = a.size() ;
+local int metas1(vector<int> &a) {
+	cint	n = a.size() ;
 	int		f = FALSE ;
 	int		p = 0 ;
 	for (int i = 0 ; i < n ; i += 1) {
@@ -146,8 +146,8 @@ static int metas1(vector<int> &a) {
 }
 /* end subroutine (metas1) */
 
-static int metas2(vector<int> &a) {
-	const int	n = a.size() ;
+local int metas2(vector<int> &a) {
+	cint	n = a.size() ;
 	int		f = FALSE ;
 	{
 	    vector<bool>	visited(n,false) ;
@@ -169,7 +169,7 @@ static int metas2(vector<int> &a) {
 
 static string strvec(vector<int> a) {
 	string		res ;
-	const int	dlen = DIGBUFLEN ;
+	cint	dlen = DIGBUFLEN ;
 	int		c = 0 ;
 	char		dbuf[DIGBUFLEN+1] ;
 	res += '{' ;
@@ -183,8 +183,8 @@ static string strvec(vector<int> a) {
 }
 /* end subroutine (strvec) */
 
-static void printres(vector<int> &a,int f) {
-	const char	*s = (f) ? "true " : "false" ;
+local void printres(vector<int> &a,int f) {
+	cchar	*s = (f) ? "true " : "false" ;
 	cout << s << " " << strvec(a) << endl ;
 }
 /* end subroutine (printres) */
