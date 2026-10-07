@@ -46,10 +46,19 @@
 #define DEBOPEN(fn)	debopen(fn)
 #define DEBCLOSE	debclose()
 
-#define DEBPRINTF(FMT, ...)						\
-    if_constexpr (f_debug) {						\
-        debprintf(__func__, FMT __VA_OPT__(,) __VA_ARGS__) ;		\
-    }
+#define DEBPRINTF(FMT, ...)	({ 					\
+	int rsdebug = 0 ;						\
+        if_constexpr (f_debug) {					\
+            rsdebug = debprintf(__func__, FMT __VA_OPT__(,) __VA_ARGS__) ; \
+        } ; rsdebug ;							\
+    }) /* end macro (DEBPRINTF) */
+
+#define DEBPRINTHEX(cols,sbuf,slen) ({					\
+	int rsdebug = 0 ;						\
+        if_constexpr (f_debug) {					\
+            rsdebug = debprinthex(__func__,cols,sbuf,slen) ;		\
+        } ; rsdebug ;							\
+    }) /* end macro (DEBPRINTHEX) */
 
 
 #endif /* __cplusplus */
