@@ -152,7 +152,7 @@ extern int	isdigitlatin(int) ;
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	strnnlen(cchar *,int,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
