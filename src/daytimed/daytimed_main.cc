@@ -15,7 +15,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<nistinfo.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"config.h"
@@ -41,7 +41,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 
 	sncpy1(ni.org,NISTINFO_ORGSIZE,orgp) ;
 
-	if (cchar *cp = timestr_nist(dt,ntbuf,&ni) ; cp) {
+	if (cchar *cp = strtime_nist(dt,ntbuf,&ni) ; cp) {
 	    fprintf(stdout,"%s\n",ntbuf) ;
 	}
 
