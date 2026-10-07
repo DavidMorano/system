@@ -116,9 +116,9 @@ extern char	**environ ;
 
 /* forward references */
 
-static int ussmux_logbegin(USSMUX *,cchar *,cchar *) ;
-static int ussmux_logend(USSMUX *) ;
-static int ussmux_logstuff(USSMUX *,USSINFO *) ;
+local int ussmux_logbegin(USSMUX *,cchar *,cchar *) ;
+local int ussmux_logend(USSMUX *) ;
+local int ussmux_logstuff(USSMUX *,USSINFO *) ;
 
 
 /* external variables (module information) */
@@ -507,7 +507,7 @@ USSMUX		*op ;
 /* private subroutines */
 
 
-static int ussmux_logbegin(USSMUX *op,cchar *lfname,cchar *logid)
+local int ussmux_logbegin(USSMUX *op,cchar *lfname,cchar *logid)
 {
 	int	rs = SR_OK ;
 	int	f = op->open.log ;
@@ -525,7 +525,7 @@ static int ussmux_logbegin(USSMUX *op,cchar *lfname,cchar *logid)
 /* end if (ussmux_logbegin) */
 
 
-static int ussmux_logend(USSMUX *op)
+local int ussmux_logend(USSMUX *op)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
