@@ -61,7 +61,7 @@ extern "C" LONG	factorial(int) ;
 static LONG	oldway(int,int) ;
 static LONG	diffway(int,int) ;
 
-static int printcoms(vector<int> &,int) ;
+local int printcoms(vector<int> &,int) ;
 
 
 /* local variables */
@@ -75,8 +75,8 @@ int main(int argc,mainv,mainv) {
 	vector<int>	k2s = { 1, 2, 0 } ;
 
 	{
-	    const int	n = 4 ;
-	    const int	k = 2 ;
+	    cint	n = 4 ;
+	    cint	k = 2 ;
 	    LONG	a ;
 	    a = combinations(n,k) ;
 	    cout << "n=" << n << " k=" << k << " a=" << a << endl ;
@@ -88,7 +88,7 @@ int main(int argc,mainv,mainv) {
 
 	for (int k : k10s) {
 	    LONG	a1, a2, a3 ;
-	    const int	n = 10 ;
+	    cint	n = 10 ;
 	    a1 = combinations(n,k) ;
 	    a2 = oldway(n,k) ;
 	    a3 = diffway(n,k) ;
@@ -162,7 +162,7 @@ static LONG diffway(int n,int k)
 /* end if (diffway) */
 
 
-static int printcoms(vector<int> &ks,int n)
+local int printcoms(vector<int> &ks,int n)
 {
 	for (int k : ks) {
 	    LONG	ans = combinations(n,k) ;
