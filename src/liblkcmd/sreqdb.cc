@@ -58,10 +58,10 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	chmods(const char *,mode_t) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	mkdirs(cchar *,mode_t) ;
+extern int	chmods(cchar *,mode_t) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -69,7 +69,7 @@ extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -80,12 +80,12 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	sreqdb_delit(SREQDB *,int,SREQ *) ;
-static int	sreqdb_entfins(SREQDB *) ;
-static int	sreqdb_thrdone(SREQDB *,SREQ **) ;
+local int	sreqdb_delit(SREQDB *,int,SREQ *) ;
+local int	sreqdb_entfins(SREQDB *) ;
+local int	sreqdb_thrdone(SREQDB *,SREQ **) ;
 
 #if	CF_CHECKDIR
-static int	sreqdb_checkdir(SREQDB *) ;
+local int	sreqdb_checkdir(SREQDB *) ;
 #endif /* CF_CHECKDIR */
 
 
@@ -98,7 +98,7 @@ static int	sreqdb_checkdir(SREQDB *) ;
 int sreqdb_start(SREQDB *jlp,cchar *tmpdname,int n)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (jlp == NULL) return SR_FAULT ;
 
@@ -182,7 +182,7 @@ int sreqdb_newjob(SREQDB *jlp,int jsn,cchar *jobid,int ifd,int ofd)
 {
 	int		rs ;
 	int		ji = 0 ;
-	const char	*try = "sreqdbXXXXXXXXX" ;
+	cchar	*try = "sreqdbXXXXXXXXX" ;
 	char		template[MAXPATHLEN + 1] ;
 
 	if (jlp == NULL) return SR_FAULT ;
@@ -194,7 +194,7 @@ int sreqdb_newjob(SREQDB *jlp,int jsn,cchar *jobid,int ifd,int ofd)
 
 	if ((rs = mkpath2(template,jlp->tmpdname,try)) >= 0) {
 	    SREQ	*jep ;
-	    const int	jsize = sizeof(SREQ) ;
+	    cint	jsize = sizeof(SREQ) ;
 	    if ((rs = uc_malloc(jsize,&jep)) >= 0) {
 	        if ((rs = sreq_start(jep,template,jobid,ifd,ofd)) >= 0) {
 	            if ((rs = vechand_add(&jlp->db,jep)) >= 0) {
@@ -341,7 +341,7 @@ int sreqdb_del(SREQDB *jlp,int i)
 
 #if	CF_DEBUGS
 	{
-	    const int	c = vechand_count(&jlp->db) ;
+	    cint	c = vechand_count(&jlp->db) ;
 	    debugprintf("sreqdb_del: ret rs=%d c=%u\n",rs,c) ;
 	}
 #endif /* CF_DEBUGS */
@@ -400,7 +400,7 @@ int sreqdb_builtrelease(SREQDB *op)
 {
 	SREQ		*jep ;
 	vechand		*jlp = &op->db ;
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -455,7 +455,7 @@ int sreqdb_exiting(SREQDB *op,int ji)
 	SREQ		*jep ;
 	int		rs ;
 	if ((rs = vechand_get(&op->db,ji,&jep)) >= 0) {
-	    const int	st = sreqstate_done ;
+	    cint	st = sreqstate_done ;
 	    if ((rs = sreq_setstate(jep,st)) >= 0) {
 		if ((rs = sreq_exiting(jep)) >= 0) {
 		    if (jep->fl.thread) {
@@ -475,7 +475,7 @@ int sreqdb_thrsdone(SREQDB *op,SREQ **rpp)
 {
 	int		rs = SR_NOTFOUND ;
 	if (op->f_threxiting) {
-	    const int	rsn = SR_NOTFOUND ;
+	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = sreqdb_thrdone(op,rpp)) == rsn) {
 	        op->f_threxiting = FALSE ;
 	        rs = sreqdb_thrdone(op,rpp) ;
@@ -489,7 +489,7 @@ int sreqdb_thrsdone(SREQDB *op,SREQ **rpp)
 /* private subroutines */
 
 
-static int sreqdb_thrdone(SREQDB *op,SREQ **rpp)
+local int sreqdb_thrdone(SREQDB *op,SREQ **rpp)
 {
 	INTIQ		*iqp = &op->exits ;
 	int		jid ;
@@ -508,7 +508,7 @@ static int sreqdb_thrdone(SREQDB *op,SREQ **rpp)
 
 
 /* delete stuff associated with this job */
-static int sreqdb_delit(SREQDB *jlp,int ji,SREQ *jep)
+local int sreqdb_delit(SREQDB *jlp,int ji,SREQ *jep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -541,7 +541,7 @@ static int sreqdb_delit(SREQDB *jlp,int ji,SREQ *jep)
 
 /* check if the spool directory is present */
 #if	CF_CHECKDIR
-static int sreqdb_checkdir(SREQDB *jlp)
+local int sreqdb_checkdir(SREQDB *jlp)
 {
 	ustat	sb ;
 	int		rs ;
@@ -561,7 +561,7 @@ static int sreqdb_checkdir(SREQDB *jlp)
 #endif /* CF_CHECKDIR */
 
 
-static int sreqdb_entfins(SREQDB *jlp)
+local int sreqdb_entfins(SREQDB *jlp)
 {
 	SREQ		*jep ;
 	VECHAND		*dbp = &jlp->db ;
