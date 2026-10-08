@@ -81,7 +81,7 @@ extern "C" {
 
 /* forward references */
 
-static int lenstr(cchar *s) noex {
+local int lenstr(cchar *s) noex {
     	return intconv(strlen(s)) ;
 }
 
@@ -315,7 +315,7 @@ kva_t  * _kva_dup(kva_t *old_kva) noex {
 	return (nkva);
 } /* end subroutine (_kva_dup) */
 
-static void strip_spaces(char **valuep) noex {
+local void strip_spaces(char **valuep) noex {
 	char *p, *start;
 
 	/* Find first non-white space character and return pointer to it */
