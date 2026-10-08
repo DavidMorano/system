@@ -67,7 +67,7 @@ userattr *getuserattr() noex {
 	return nullptr ;
 } /* end */
 
-userattr *getusernam(const char *) noex  {
+userattr *getusernam(cchar *) noex  {
 	errno = ENOSYS ;
 	return nullptr ;
 } /* end */
