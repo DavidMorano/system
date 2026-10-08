@@ -8,12 +8,12 @@
 
 /* revision history:
 
-	= 2023-10-08, David A­D­ Morano
+	= 2018-05-23, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2018 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ULOGERROR_INCLUDE
 #define	ULOGERROR_INCLUDE
