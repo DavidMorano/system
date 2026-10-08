@@ -76,6 +76,7 @@ ucfileop
 ucget
 ucgetx
 ucmem
+ucdescutil
 ucdescread
 ucdescwrite
 ucdescsock
@@ -87,7 +88,7 @@ ucsupport
 ucsys
 ucsysconf
 uctermios
-uterm
+ucterm
 utmpxx
 vec
 vstr
@@ -98,3 +99,5 @@ wswcpyx
 dirs
 bufos
 bufslide
+ucinet
+ucproc
