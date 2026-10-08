@@ -123,11 +123,11 @@ struct subinfo {
 
 /* forward references */
 
-static int subinfo_start(SI *,char *,cchar *,cchar *,int) noex ;
-static int subinfo_finish(SI *) noex ;
-static int subinfo_wrline(SI *,cchar *,int) noex ;
-static int subinfo_flushover(SI *,int) noex ;
-static int subinfo_write(SI *,cchar *,int) noex ;
+local int subinfo_start(SI *,char *,cchar *,cchar *,int) noex ;
+local int subinfo_finish(SI *) noex ;
+local int subinfo_wrline(SI *,cchar *,int) noex ;
+local int subinfo_flushover(SI *,int) noex ;
+local int subinfo_write(SI *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -167,8 +167,7 @@ int nprint(cchar *fn,cchar *sp,int µsl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (nprint) */
+} /* end subroutine (nprint) */
 
 int nprintf(cchar *fn,cchar *fmt,...) noex {
 	va_list		ap ;
@@ -190,8 +189,7 @@ int nprintf(cchar *fn,cchar *fmt,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
-}
-/* end subroutine (nprintf) */
+} /* end subroutine (nprintf) */
 
 int nprinthexblock(cchar *fn,cchar *id,int mc,cvoid *vp,int vl) noex {
 	int		rs ;
@@ -217,13 +215,12 @@ int nprinthexblock(cchar *fn,cchar *id,int mc,cvoid *vp,int vl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (nprinthexblock) */
+} /* end subroutine (nprinthexblock) */
 
 
 /* local subroutines */
 
-static int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
+local int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
 	int		rs = SR_FAULT ;
 	if (sip && bp && fn) {
 	    rs = memclear(sip) ;
@@ -237,10 +234,9 @@ static int subinfo_start(SI *sip,char *bp,cchar *fn,cchar *id,int mc) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SI *sip) noex {
+local int subinfo_finish(SI *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->bl > 0) {
 	    if ((rs = nprint(sip->fn,sip->bp,sip->bl)) >= 0) {
@@ -249,10 +245,9 @@ static int subinfo_finish(SI *sip) noex {
 	    }
 	}
 	return (rs >= 0) ? sip->wl : rs ;
-}
-/* end subroutine (subinfo_finish) */
+} /* end subroutine (subinfo_finish) */
 
-static int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
+local int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
 	cint		mlen = MIN((3*sl),(sip->mc-sip->ilen+1)) ;
 	int		rs ;
 	int		ul = 0 ;
@@ -272,10 +267,9 @@ static int subinfo_wrline(SI *sip,cchar *sp,int sl) noex {
 	    }
 	} /* end if (subinfo_flushover) */
 	return (rs >= 0) ? ul : rs ;
-}
-/* end subroutine (subinfo_wrline) */
+} /* end subroutine (subinfo_wrline) */
 
-static int subinfo_flushover(SI *sip,int mlen) noex {
+local int subinfo_flushover(SI *sip,int mlen) noex {
 	int		rs = SR_OK ;
 	if (mlen > (sip->blen-sip->bl)) {
 	    char	*bp = (sip->bp + sip->bl) ;
@@ -285,10 +279,9 @@ static int subinfo_flushover(SI *sip,int mlen) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_flushover) */
+} /* end subroutine (subinfo_flushover) */
 
-static int subinfo_write(SI *sip,cchar *sp,int sl) noex {
+local int subinfo_write(SI *sip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (sl < (sip->blen-sip->bl)) {
 	    char	*bp = (sip->bp + sip->bl) ;
@@ -298,7 +291,6 @@ static int subinfo_write(SI *sip,cchar *sp,int sl) noex {
 	    rs = SR_OVERFLOW ;
 	}
 	return rs ;
-}
-/* end subroutine (subinfo_write) */
+} /* end subroutine (subinfo_write) */
 
 
