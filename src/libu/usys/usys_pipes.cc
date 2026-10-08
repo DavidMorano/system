@@ -65,7 +65,7 @@ local int pipes_closeon(int *pipes,int of) noex {
 	    if ((rs = ucloseonexec(pipes[0],true)) >= 0) {
 		rs = ucloseonexec(pipes[1],true) ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (pipes_closeon) */
     
@@ -75,16 +75,16 @@ local int pipes_nonblock(int *pipes,int of) noex {
 	    if ((rs = unonblock(pipes[0],true)) >= 0) {
 		rs = unonblock(pipes[1],true) ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (pipes_nonblock) */
     
 unixret_t pipe2(int *pipes,int of) noex {
 	unixret_t	rc = 0 ;
-	if (pipes) {
-	    if ((rc = pipe(pipes)) >= 0) {
+	if (pipes) ylikely {
+	    if ((rc = pipe(pipes)) >= 0) ylikely {
 		int	rs ;
-		if ((rs = pipes_closeon(pipes,of)) >= 0) {
+		if ((rs = pipes_closeon(pipes,of)) >= 0) ylikely {
 		    rs = pipes_nonblock(pipes,of) ;
 		} /* end if (pipes_closeone) */
                 if (rs < 0) {
