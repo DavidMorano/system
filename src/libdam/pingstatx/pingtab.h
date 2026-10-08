@@ -38,7 +38,7 @@ typedef	PINGTAB_ENT	pingtab_ent ;
 
 EXTERNC_begin
 
-extern int pingtab_open		(pingtab *,const char *) noex ;
+extern int pingtab_open		(pingtab *,cchar *) noex ;
 extern int pingtab_close	(pingtab *) noex ;
 extern int pingtab_read		(pingtab *,pingtab_ent *,charp,int) noex ;
 extern int pingtab_rewind	(pingtab *) noex ;
