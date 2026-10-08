@@ -98,7 +98,7 @@ int fileliner(cchar *fname,int cn) noex {
 		    {
 		        rs = reader(lbuf,llen,fname,cn) ;
 		        n = rs ;
-		    }
+		    } /* end */
 		    rs1 = lm_free(lbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
@@ -123,11 +123,11 @@ local int reader(char *lbuf,int llen,cc *fn,int cn) noex {
 			    if (ll > si) {
 				if (lbuf[si] != cn) n += 1 ;
 			    }
-			}
+			} /* end */
 		    } /* end if (rmeol) */
 		} else {
 		    n += 1 ;
-		}
+		} /* end */
 	    } /* end while */
 	    rs1 = sf.close ;
 	    if (rs >= 0) rs = rs1 ;
