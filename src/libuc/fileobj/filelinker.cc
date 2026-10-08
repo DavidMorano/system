@@ -164,7 +164,6 @@ local bool isNotDir(int) noex ;
 
 /* local variables */
 
-static cint		maxpathlen = ulibval.maxpathlen ;
 static vars		var ;
 cbool			f_debug = CF_DEBUG ;
 
@@ -184,28 +183,26 @@ int filelinker::istart(mainv tlist) noex {
 	int		rs ;
 	int		c = 0 ; /* return-value */
 	if ((rs = filelinker_ctor(this)) >= 0) {
-	    if ((rs = maxpathlen) >= 0) {
-		if (static cint rsv = var ; (rs = rsv) >= 0) {
-		    cint sz = ((var.maxpath + 1) * 2) ;
-		    int ai = 0 ;
-		    plen = var.maxpath ;
-		    dlen = var.maxpath ;
-		    if ((rs = umem.mall(sz,&a)) >= 0) {
-			pbuf = (a + ((var.maxpath + 1) * ai++)) ;
-			dbuf = (a + ((var.maxpath + 1) * ai++)) ;
-	                if ((rs = istarter()) >= 0) {
-		            if (tlist) {
-		                rs = load(tlist) ;
-		                c = rs ;
-		            }
-	                } /* end if (istarter) */
-		        if (rs < 0) {
-			    umem.free(pbuf) ;
-			    plen = 0 ;
+	    if (static cint rsv = var ; (rs = rsv) >= 0) {
+		cint sz = ((var.maxpath + 1) * 2) ;
+		int ai = 0 ;
+		plen = var.maxpath ;
+		dlen = var.maxpath ;
+		if ((rs = umem.mall(sz,&a)) >= 0) {
+		    pbuf = (a + ((var.maxpath + 1) * ai++)) ;
+		    dbuf = (a + ((var.maxpath + 1) * ai++)) ;
+	            if ((rs = istarter()) >= 0) {
+		        if (tlist) {
+		            rs = load(tlist) ;
+		            c = rs ;
 		        }
-		    } /* end if (memory-acquire) */
-		} /* end if (vars) */
-	    } /* end if (maxpathlen) */
+	            } /* end if (istarter) */
+		    if (rs < 0) {
+			umem.free(pbuf) ;
+			plen = 0 ;
+		    } /* end if (error) */
+		} /* end if (memory-acquire) */
+	    } /* end if (vars) */
 	    if (rs < 0) {
 		filelinker_dtor(this) ;
 	    } /* end if (error) */
@@ -230,7 +227,7 @@ int filelinker::ifinish() noex {
 		tardir *dlp = tardirp(dirp) ;
 		rs1 = dlp->finish ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (a) {
 		rs1 = umem.free(a) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -239,7 +236,7 @@ int filelinker::ifinish() noex {
 		dbuf = nullptr ;
 		plen = 0 ;
 		dlen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = filelinker_dtor(this) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -315,7 +312,7 @@ local int rmother(custat *fsbp,cchar *pbuf) noex {
 	    rs = u_rmdirs(pbuf) ;
 	} else {
 	    rs = u_unlink(pbuf) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (rmother) */
 
@@ -455,7 +452,7 @@ int filelinker_st::operator () (mainv arr) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
     	    rs = op->istart(arr) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (filelinker_st::operator) */
 
@@ -476,9 +473,9 @@ filelinker_co::operator int () noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = maxpathlen) >= 0) {
-	    maxpath = rs ;
-	}
+	if (static cint rsu = ulibval.maxpathlen ; (rs = rsu) >= 0) {
+	    maxpath = rsu ;
+	} /* end if (ulibval) */
     	return rs ;
 } /* end method (vars::operator) */
 
