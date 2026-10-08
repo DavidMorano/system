@@ -128,9 +128,9 @@ export {
 	cbool		v2s = vsignget(n,v2) ;
 	int		rc = 0 ;
 	if (v1s && v2s) {
-	    rc = vcmp(n,v1,v2) ;
+	    rc = neg vcmpu(n,v1,v2) ;
 	} else if ((! v1s) && (! v2s)) {
-	    rc = vcmp(n,v1,v2) ;
+	    rc = pos vcmpu(n,v1,v2) ;
 	} else {
 	    rc = (v1s) ? -1 : +1 ;
 	} /* end if */
@@ -154,12 +154,12 @@ export {
     constexpr int addone(mut Dig &r,con Dig v) noex {
 	r = v + 1 ;
 	return int(r < v) ; /* carry-out */
-    }
+    } /* end subroutine */
     template<integral_unsigned Dig>
     constexpr int subone(mut Dig &r,con Dig v) noex {
 	r = v - 1 ;
 	return int(r > v) ; /* carry-out */
-    }
+    } /* end subroutine */
 } /* end export */
 
 export {
@@ -170,7 +170,7 @@ export {
 	Dig		dci = cast_static<Dig>(ci) ;
 	*r = mach_addc(v0,v1,dci,&co) ;
 	return int(co) ;
-    }
+    } /* end subroutine */
     template<integral_unsigned Dig>
     constexpr int subc(mut Dig *r,con Dig v0,con  Dig v1,
 	    int ci = 0) noex {
@@ -178,7 +178,7 @@ export {
 	Dig		dci = cast_static<Dig>(ci) ;
 	*r = mach_subc(v0,v1,dci,&co) ;
 	return int(co) ;
-    }
+    } /* end subroutine */
 } /* end export */
 
 
