@@ -55,9 +55,9 @@
 /******************************************************************************/
 
 
-unixret_t eaccess(const char *fname,int am) noex {
-    	const int	fdcwd = AT_FDCWD ;
-    	const int	fl = AT_EACCESS ;
+unixret_t eaccess(cchar *fname,int am) noex {
+    	cint	fdcwd = AT_FDCWD ;
+    	cint	fl = AT_EACCESS ;
 	return faccessat(fdcwd,fname,am,fl) ;
 } /* end subroutine (eaccess) */
 
