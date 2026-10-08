@@ -124,7 +124,7 @@ char * _strtok_escape(char *locstr,char *sepset,char **lasts) noex {
  * in the character string `string'; nullptr if none exists.
  */ 
 char * _strpbrk_escape(char *locstr,char *brkset) noex {
-	const char *p;
+	cchar *p;
 
 	do {
 		for (p = brkset; *p != '\0' && *p != *locstr; ++p)
