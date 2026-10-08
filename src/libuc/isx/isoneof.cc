@@ -26,7 +26,7 @@
 	argument).
 
 	Synopsis:
-	int isOneOf(const int *rets,int rs) noex
+	int isOneOf(cint *rets,int rs) noex
 
 	Arguments:
 	rets		array of (constant) integers to check against
