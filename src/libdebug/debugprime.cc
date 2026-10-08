@@ -96,15 +96,13 @@ struct debug_oflags {
 int debuginit() noex {
 	int		rs = SR_OK ;
 	return rs ;
-}
-/* end subroutine (debuginit) */
+} /* end subroutine (debuginit) */
 #endif /* CF_DEBUGS */
 
 char *d_reventstr(int revents,char *bp,int bl) noex {
 	snflagspoll(bp,bl,revents) ;
 	return bp ;
-}
-/* end subroutine (d_reventstr) */
+} /* end subroutine (d_reventstr) */
 
 /* who is open? */
 void d_whoopen(int *s) noex {
@@ -112,15 +110,14 @@ void d_whoopen(int *s) noex {
 	int		i ;
 	if (s != nullptr) {
 	    debugprintf("d_whoopen: %s\n",s) ;
-	}
+	} /* end if */
 	for (i = 0 ; i < 20 ; i += 1) {
 	    if ((rs = u_fcntl(i,F_GETFL,0)) >= 0) {
 	        debugprintf("d_whoopen: open on %d accmod=%08x\n",
 	            i,(rs & O_ACCMODE)) ;
 	    }
 	} /* end for */
-}
-/* end subroutine (d_whoopen) */
+} /* end subroutine (d_whoopen) */
 
 /* return a count of the number of open files */
 int d_openfiles() noex {
@@ -132,8 +129,7 @@ int d_openfiles() noex {
 	    }
 	} /* end for */
 	return count ;
-}
-/* end subroutine (d_openfiles) */
+} /* end subroutine (d_openfiles) */
 
 int d_ispath(cchar *p) noex {
 	if (p == nullptr) return FALSE ;
@@ -144,89 +140,11 @@ int d_ispath(cchar *p) noex {
 #endif
 
 	return ((*p == '/') || (*p == ':')) ;
-}
-/* end subroutine (d_ispath) */
+} /* end subroutine (d_ispath) */
 
 int gdb() noex {
 	return 0 ;
-}
-/* end subroutine (gdb) */
-
-int debugprinthex(cchar *ids,int maxcols,cchar *sp,int sl) noex {
-	cint		plen = PRINTBUFLEN ;
-	int		rs ;
-	int		idlen = 0 ;
-	int		wlen = 0 ;
-	char		pbuf[PRINTBUFLEN + 1] ;
-
-	if (ids != nullptr) idlen = lenstr(ids) ;
-
-	if (maxcols < 0) maxcols = COLUMNS ;
-
-	if (idlen > 0) maxcols -= (idlen + 1) ;
-
-	if ((rs = mkhexnstr(pbuf,plen,maxcols,sp,sl)) >= 0) {
-	    if (idlen > 0) {
-	        rs = debugprintf("%r %s\n",ids,idlen,pbuf) ;
-	    } else {
-	        rs = debugprintf("%s\n",pbuf) ;
-	    }
-	    wlen = rs ;
-	}
-
-	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugprinthex) */
-
-int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
-	int		rs = SR_OK ;
-	int		idlen = 0 ;
-	int		sl = vl ;
-	int		wlen = 0 ;
-	cchar		*sp = (cchar *) vp ;
-	char		printbuf[PRINTBUFLEN + 1] ;
-
-	if (ids != nullptr) idlen = lenstr(ids) ;
-
-	if (maxcols < 0) maxcols = COLUMNS ;
-
-	if (sl < 0) sl = lenstr(sp) ;
-
-	while ((rs >= 0) && (sl > 0)) {
-	    char	*pbp = printbuf ;
-	    int		pbl = PRINTBUFLEN ;
-	    int		cols = maxcols ;
-
-	    if (ids != nullptr) {
-	        if ((idlen+2) < pbl) {
-		    int	i = intconv(strwcpy(pbp,ids,idlen) - pbp) ;
-	            pbp[i++] = ':' ;
-	            pbp[i++] = ' ' ;
-	            pbp += i ;
-	            pbl -= i ;
-	            cols -= i ;
-	        } else {
-	            rs = SR_OVERFLOW ;
-		}
-	    }
-
-	    if (rs >= 0) {
-	        cint	n = (cols / 3) ;
-		int		cslen ;
-	        cslen = MIN(n,sl) ;
-	        if ((rs = mkhexstr(pbp,pbl,sp,cslen)) >= 0) {
-	            sp += cslen ;
-	            sl -= cslen ;
-	            rs = debugprint(printbuf,-1) ;
-	            wlen += rs ;
-		}
-	    } /* end if (ok) */
-
-	} /* end while */
-
-	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (debugprinthexblock) */
+} /* end subroutine (gdb) */
 
 /* audit a HOSTENT structure */
 int heaudit(HOSTENT *hep,cchar *buf,int buflen) noex {
@@ -274,14 +192,12 @@ int heaudit(HOSTENT *hep,cchar *buf,int buflen) noex {
 	} /* end if (ok) */
 
 	return rs ;
-}
-/* end subroutine (heaudit) */
+} /* end subroutine (heaudit) */
 
 char *stroflags(char *buf,int oflags) noex {
 	int		rs = snflagsopen(buf,TIMEBUFLEN,oflags) ;
 	return (rs >= 0) ? buf : nullptr ;
-}
-/* end subroutine (stroflags) */
+} /* end subroutine (stroflags) */
 
 
 /* local subroutines */
@@ -296,7 +212,6 @@ int debugprintfsize(cchar *id,int fd) noex {
 	    debugprintf("debugprintfsize: %s size=%lu\n",id,fs) ;
 	}
 	return rs ;
-}
-/* end subroutine (debugprintstat) */
+} /* end subroutine (debugprintstat) */
 
 
