@@ -31,13 +31,13 @@ extern int	getnodedomain(char *,char *) noex ;
 extern int	getuserdomain(char *,int) noex ;
 extern int	getsysdomain(char *,int) noex ;
 
-static inline int getinetdomain(char *rbuf,int rlen) noex {
+local inline int getinetdomain(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
 }
-static inline int getnetdomain(char *rbuf,int rlen) noex {
+local inline int getnetdomain(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
 }
-static inline int getdomainnamex(char *rbuf,int rlen) noex {
+local inline int getdomainnamex(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
 }
 
