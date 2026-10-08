@@ -45,6 +45,7 @@
 #include	<usupport_matkeystr.hh>
 #include	<usupport_matostr.hh>
 #include	<usupport_matstr.hh>
+#include	<usupport_mkhex.hh>
 #include	<usupport_nleadkeystr.hh>
 #include	<usupport_nleadstr.hh>
 #include	<usupport_prime.h>
