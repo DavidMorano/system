@@ -42,6 +42,7 @@
 #include	<mkpathx.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC |matcasestr(3uc)| */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"pcsunodes.h"
 
@@ -86,6 +87,8 @@ local int	vecpstr_loadnodes(vecpstr *,cchar **,char *) noex ;
 
 
 /* local variables */
+
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -154,7 +157,7 @@ int pcsunodes_get(PN *op,int i,cchar **rpp) noex {
 	    } else {
 	        if (rpp != nullptr) *rpp = nullptr ;
 	        rs = SR_INVALID ;
-	    }
+	    } /* end if */
 	} /* end if (pcsunodes_magic) */
 	return rs ;
 } /* end subroutine (pcsunodes_get) */
@@ -198,7 +201,7 @@ int pcsunodes_curenum(PN *op,PN_CUR *curp,char *rbuf,int rlen) noex {
 	    } else {
 	        rbuf[0] = '\0' ;
 	        rs = SR_NOTFOUND ;
-	    }
+	    } /* end if */
 	} /* end if (pcsunodes_magic) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (pcsunodes_curenum) */
@@ -216,7 +219,8 @@ int pcsunodes_audit(PN *op) noex {
 
 local int pcsunodes_mktab(PN *op,vecpstr *ulp) noex {
 	int		rs ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = vecpstr_count(ulp)) >= 0) {
 	    cint	vsz = ((rs+1) * szof(cchar *)) ;
 	    if ((rs = vecpstr_strsize(ulp)) >= 0) {
@@ -237,18 +241,15 @@ local int pcsunodes_mktab(PN *op,vecpstr *ulp) noex {
 	        } /* end if (m-a) */
 	    } /* end if (vecpstr_strsize) */
 	} /* end if (vecpstr_count) */
-
-#if	CF_DEBUG
-	debugprintf("pcsunodes_mktab: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (pcsunodes_mktab) */
 
 local int vecpstr_loadnodes(vecpstr *ulp,cchar **va,char *st) noex {
 	int		rs ;
 	int		rs1 ;
-	int		c = 0 ;
+	int		c = 0 ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = vecpstr_recsize(ulp)) >= 0) {
 	    cint	rsz = rs ;
 	    if (int *rec ; (rs = lm_mall(rsz,&rec)) >= 0) {
@@ -256,10 +257,7 @@ local int vecpstr_loadnodes(vecpstr *ulp,cchar **va,char *st) noex {
 		    cint	n = rs ;
 		    for (int i = 0 ; (i < n) && (rec[i] >= 0) ; i += 1) {
 		        if (rec[i] > 0) {
-#if	CF_DEBUG
-			    debugprintf("vecpstr_loadnodes: i=%u c=%u v=%s\n",
-				i,c,(st+rec[i])) ;
-#endif
+			    DEBUGPRINTF("i=%u c=%u v=%s\n",i,c,(st+rec[i])) ;
 			    va[c++] = (st + rec[i]) ;
 		        }
 		    } /* end for */
@@ -269,9 +267,7 @@ local int vecpstr_loadnodes(vecpstr *ulp,cchar **va,char *st) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (vecpstr_recsize) */
-#if	CF_DEBUG
-	debugprintf("vecpstr_loadnodes: ret rs=%d c=%u\n",rs,c) ;
-#endif
+	DEBUGPRINTF("ret rs=%d c=%u\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (vecpstr_loadnodes) */
 
