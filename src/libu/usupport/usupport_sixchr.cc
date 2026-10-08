@@ -114,7 +114,7 @@ namespace libu {
 		    if (cchar *tp ; (tp = strchr(sp,sch)) != np) {
 			f = true ;
 			i = intconv(tp - sp) ;
-		    }
+		    } /* end */
 	        } /* end if */
 	    } else {
 	        for (int ch ; sl-- && ((ch = mkchar(sp[i]))) ; i += 1) {
