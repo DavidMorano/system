@@ -37,11 +37,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -65,10 +65,9 @@
 /* exported subroutines */
 
 unixret_t eaccess(cchar *fname,int am) noex {
-    	const int	fdcwd = AT_FDCWD ;
-    	const int	fl = AT_EACCESS ;
+    	cint	fdcwd = AT_FDCWD ;
+    	cint	fl = AT_EACCESS ;
 	return faccessat(fdcwd,fname,am,fl) ;
-}
-/* end subroutine (eaccess) */
+} /* end subroutine (eaccess) */
 
 
