@@ -58,6 +58,7 @@
 #include	<isoneof.h>		/* LIBU */
 #include	<isnot.h>		/* LIBU */
 #include	<vardefs.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libpr.h>		/* LIBPR */
 
@@ -635,10 +636,10 @@ local int confvars_dbopen(CV *sip,cchar *dbname) noex {
 		char	timebuf[TIMEBUFLEN+1] ;
 		time_t	t ;
 		t = (time_t) sip->cmtime ;
-		timestr_logz(t,timebuf) ;
+		strtime_logz(t,timebuf) ;
 		debugprintf("confvars_dbopen: ct=%s\n",timebuf) ;
 		t = (time_t) vi.wtime ;
-		timestr_logz(t,timebuf) ;
+		strtime_logz(t,timebuf) ;
 		debugprintf("confvars_dbopen: wt=%s\n",timebuf) ;
 	}
 #endif
