@@ -109,7 +109,7 @@ namespace libu {
 	if (sp) ylikely {
 	    if (cchar *tp = strnwhtchr(sp,sl,sch) ; tp) {
 	        si = intconv(tp - sp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtchr) */
@@ -118,7 +118,7 @@ namespace libu {
 	if (sp) ylikely {
 	    if (cchar *tp = strnwhtbrk(sp,sl,ss) ; tp) {
 	        si = intconv(tp - sp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtbrk) */
@@ -127,7 +127,7 @@ namespace libu {
 	if (sp) ylikely {
 	    if (cchar *tp = libu::strnwhtbrk(sp,sl,setp) ; tp) {
 	        si = intconv(tp - sp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtbrk) */
