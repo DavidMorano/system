@@ -117,7 +117,7 @@ local int	cfloop(cchar *,int,int *) noex ;
 /* local variables */
 
 constexpr chvalid	tabval ;
-const int		oneday		= 24 * 60 * 60 ;
+cint		oneday		= 24 * 60 * 60 ;
 const bool		f_debug		= CF_DEBUG ;
 
 
