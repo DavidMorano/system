@@ -89,13 +89,13 @@ typedef STATVFS {
 
 #if defined(__STDC__)
 
-int statvfs(const char *, statvfs_t *);
+int statvfs(cchar *, statvfs_t *);
 int fstatvfs(int, statvfs_t *);
 
 /* transitional large file interface versions */
 #if	defined(_LARGEFILE64_SOURCE) && !((_FILE_OFFSET_BITS == 64) && \
 	    !defined(__PRAGMA_REDEFINE_EXTNAME))
-int statvfs64(const char *, statvfs64_t *);
+int statvfs64(cchar *, statvfs64_t *);
 int fstatvfs64(int, statvfs64_t *);
 #endif	/* _LARGEFILE64_SOURCE... */
 #endif	/* defined(__STDC__) */
