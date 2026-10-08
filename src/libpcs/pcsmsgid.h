@@ -26,7 +26,7 @@
 
 EXTERNC_begin
 
-extern int pcsuserfile(cc *,cc *,cc *,cc *,cc *) noex ;
+extern int pcsmsgid(cchar *,char *,int) noex ;
 
 EXTERNC_end
 
