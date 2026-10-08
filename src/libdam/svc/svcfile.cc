@@ -57,7 +57,7 @@
 #include	<mkpathx.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>		/* LIBB */
