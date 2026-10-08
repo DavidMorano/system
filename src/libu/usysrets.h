@@ -55,7 +55,6 @@ enum missingerrnos {
 	missingerrno_l3hlt,
 	missingerrno_l3rst,
 	missingerrno_noano,
-	missingerrno_bad,
 	missingerrno_badr,
 	missingerrno_bade,
 	missingerrno_badrqc,
@@ -130,9 +129,6 @@ enum missingerrnos {
 #endif
 #ifndef	ENOANO
 #define	ENOANO		missingerrno_noano
-#endif
-#ifndef	EBAD
-#define	EBAD		missingerrno_bad
 #endif
 #ifndef	EBADR
 #define	EBADR		missingerrno_badr
@@ -302,7 +298,6 @@ enum missingerrnos {
 #define	SR_NXIO		(- ENXIO)	/* No such device or address */
 #define	SR_2BIG		(- E2BIG)	/* Arg list too long */
 #define	SR_NOEXEC	(- ENOEXEC)	/* Exec format error */
-#define	SR_BAD		(- EBAD)	/* Bad ?? */
 #define	SR_BADF		(- EBADF)	/* Bad file number */
 #define	SR_CHILD	(- ECHILD)	/* No children */
 #define	SR_AGAIN	(- EAGAIN)	/* Resource temporarily unavailable */
@@ -417,11 +412,11 @@ enum missingerrnos {
 #define	SR_STALE	(- ESTALE)	/* Stale NFS file handle */
 #define	SR_LOCKFAIL	(- ELOCKFAIL)	/* failed to acquire lock */
 #define	SR_NOATTR	(- ENOATTR)	/* no (extended) attribute */
-#define SR_BADRPC         (- EBADRPC)	/* RPC struct is bad */
-#define SR_RPCMISMATCH    (- ERPCMISMATCH) /* RPC version wrong */
-#define SR_PROGUNAVAIL    (- EPROGUNAVAIL) /* RPC prog. not avail */
-#define SR_PROGMISMATCH   (- EPROGMISMATCH) /* Program version wrong */
-#define SR_PROCUNAVAIL    (- EPROCUNAVAIL) /* Bad procedure for program */
+#define SR_BADRPC	(- EBADRPC)	/* RPC struct is bad */
+#define SR_RPCMISMATCH	(- ERPCMISMATCH) /* RPC version wrong */
+#define SR_PROGUNAVAIL	(- EPROGUNAVAIL) /* RPC prog. not avail */
+#define SR_PROGMISMATCH	(- EPROGMISMATCH) /* Program version wrong */
+#define SR_PROCUNAVAIL	(- EPROCUNAVAIL) /* Bad procedure for program */
 #define SR_FTYPE	(- EFTYPE)
 #define SR_AUTH		(- EAUTH)
 #define SR_NEEDAUTH	(- ENEEDAUTH)
