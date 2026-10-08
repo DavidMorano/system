@@ -79,8 +79,8 @@ using libu::snvprintf ;			/* subroutine */
 
 /* local variables */
 
-static int	efd = -1 ;
-static int	pl = 0 ;
+local int	efd = -1 ;
+local int	pl = 0 ;
 
 static char	buf[BUFLEN + 1] ;
 
