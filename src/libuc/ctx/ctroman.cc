@@ -66,7 +66,7 @@ local int	ictroman(char *,int,ulonglong) noex ;
 
 /* local variables */
 
-constexpr cchar		*hundreds[] = {
+constexpr cpcchar	hundreds[] = {
 	"",
 	"C",
 	"CC",
@@ -79,7 +79,7 @@ constexpr cchar		*hundreds[] = {
 	"CM"
 } ; /* end array (hundreds) */
 
-constexpr cchar		*tens[] = {
+constexpr cpcchar	tens[] = {
 	"",
 	"X",
 	"XX",
@@ -92,7 +92,7 @@ constexpr cchar		*tens[] = {
 	"XC"
 } ; /* end array (tens) */
 
-constexpr cchar		*ones[] = {
+constexpr cpcchar	ones[] = {
 	"",
 	"I",
 	"II",
@@ -111,35 +111,35 @@ constexpr cchar		*ones[] = {
 
 /* exported subroutines */
 
-int ctromani(char *dbuf,int dlen,int v) noex {
+int ctromani(char *dbuf,int dlen,int v)			noex {
 	ulonglong	ulv = (ulonglong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 } /* end subroutine (ctromani) */
 
-int ctromanl(char *dbuf,int dlen,long v) noex {
+int ctromanl(char *dbuf,int dlen,long v)		noex {
 	ulonglong	ulv = (ulonglong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 } /* end subroutine (ctromanl) */
 
-int ctromanll(char *dbuf,int dlen,longlong v) noex {
+int ctromanll(char *dbuf,int dlen,longlong v)		noex {
 	ulonglong	ulv = (longlong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 } /* end subroutine (ctromanll) */
 
 /* unsigned */
-int ctromanui(char *dbuf,int dlen,uint v) noex {
+int ctromanui(char *dbuf,int dlen,uint v)		noex {
 	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
 } /* end subroutine (ctromanui) */
 
 /* unsigned */
-int ctromanul(char *dbuf,int dlen,ulong v) noex {
+int ctromanul(char *dbuf,int dlen,ulong v)		noex {
 	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
 } /* end subroutine (ctromanul) */
 
 /* unsigned */
-int ctromanull(char *dbuf,int dlen,ulonglong v) noex {
+int ctromanull(char *dbuf,int dlen,ulonglong v)		noex {
 	ulonglong	ulv = ulonglong(v) ;
 	return ictroman(dbuf,dlen,ulv) ;
 } /* end subroutine (ctromanull) */
@@ -147,23 +147,23 @@ int ctromanull(char *dbuf,int dlen,ulonglong v) noex {
 
 /* local subroutines */
 
-local int ictroman(char *dbuf,int dlen,ulonglong v) noex {
+local int ictroman(char *dbuf,int dlen,ulonglong v)	noex {
+	con mainv	tabs[] = { hundreds, tens, ones } ;
 	int		rs ;
 	int		rs1 ;
-	mainv		tabs[] = { hundreds, tens, ones } ;
-	if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) {
+	if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) ylikely {
 	    cint	ntabs = nelem(tabs) ;
 	    ulonglong	n = 1000 ;
 	    if (v >= n) {
-	        cint i = intconv(v / n) ;
-	        rs = b.chrs('M',i) ;
+	        cint in = intconv(v / n) ;
+	        rs = b.chrs('M',in) ;
 	        v = (v%n) ;
 	    } /* end if */
 	    n /= 10 ;
 	    for (int r = 0 ; (rs >= 0) && (r < ntabs) ; r += 1) {
 	        if (v >= n) {
-	            cint i = intconv(v / n) ;
-	            rs = b.strw(tabs[r][i],-1) ;
+	            cint in = intconv(v / n) ;
+	            rs = b.strw(tabs[r][in],-1) ;
 	            v = (v % n) ;
 	        } /* end if */
 	        n /= 10 ;
