@@ -160,8 +160,6 @@ local bool hasallx(isc_f isx,cchar *sp,int sl) noex {
 
 /* local variables */
 
-static cint		maxbase = ulibval.maxbase ;
-
 
 /* exported variables */
 
@@ -218,17 +216,21 @@ bool hasallterm(cchar *sp,int sl) noex {
 
 bool hasallbase(cchar *sp,int sl,int b) noex {
 	bool		f = false ;
-	if (sp && (maxbase >= 0)) ylikely {
-	    if ((b >= 2) && (b <= maxbase)) {
-	        for (int ch ; sl && ((ch = mkchar(*sp))) ; ) {
-	            cint v = CHAR_TOVAL(*sp) ;
-	            f = (v < b) ;
-	            f = f || ((ch == '-') || iswht(ch) || (ch == CH_NBSP)) ;
-	            if (! f) break ;
-	            sp += 1 ;
-	            sl -= 1 ;
-	        } /* end for */
-	    } /* end if (valid base) */
+	if (sp) ylikely {
+            if (static cint maxbase = ulibval.maxbase ; maxbase >= 0) ylikely {
+	        if ((b >= 2) && (b <= maxbase)) {
+	            for (int ch ; sl && ((ch = mkchar(*sp))) ; ) {
+	                cint v = CHAR_TOVAL(*sp) ;
+	                f = (v < b) ;
+	                f = f || (ch == '-') ;
+	                f = f || iswht(ch) ;
+	                f = f || (ch == CH_NBSP) ;
+	                if (! f) break ;
+	                sp += 1 ;
+	                sl -= 1 ;
+	            } /* end for */
+	        } /* end if (valid base) */
+	    } /* end if (ulibval) */
 	} /* end if (non-null) */
 	return f ;
 } /* end subroutine (hasallbase) */
