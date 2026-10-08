@@ -67,7 +67,7 @@
 #include	<mkfnamesuf.h>
 #include	<mklogid.h>
 #include	<ctdecp.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<matxstr.h>		/* |matostr(3uc)| */
 #include	<isnot.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| + |TIEBUFLEN| */
@@ -680,7 +680,7 @@ local int subinfo_logenv(SUB *sip) noex {
 	char		tbuf[TIMEBUFLEN+1] ;
 	if (sip->open.logsub) {
 	    logfile	*lfp = logfilep(sip->lfp) ;
-	    timestr_logz(sip->dt,tbuf) ;
+	    strtime_logz(sip->dt,tbuf) ;
 	    logfile_printf(lfp,"%s %s %s!%s",tbuf,sip->dn,sip->nn,sip->un) ;
 #ifdef	COMMENT
 	    logfile_printf(lfp,"pr=%s",sip->pr) ;
