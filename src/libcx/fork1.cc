@@ -16,23 +16,23 @@
 /* Copyright © 1989 David A-D- Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* exported subroutines */
 
 pid_t fork1() noex {
 	return fork() ;
-}
+} /* end subroutien *
 
 
