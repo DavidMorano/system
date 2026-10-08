@@ -115,7 +115,7 @@ namespace {
 
 /* local variables */
 
-static initer		init ;
+local initer		init ;
 static retriever	tzdata ;
 cbool			f_optimize	= CF_OPTMIZE ;
 
