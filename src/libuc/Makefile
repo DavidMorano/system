@@ -36,9 +36,9 @@ DEFS +=
 INCS += usystem.h
 INCS += uclibsubs.h
 
-MODS += bstree.ccm sview.ccm strfilter.ccm
-MODS += mapblock.ccm memtrack.ccm addrset.ccm
-MODS += sif.ccm
+MODS += bstree.o sview.o strfilter.o
+MODS += mapblock.o memtrack.o addrset.o
+MODS += sif.o
 
 LIBS= -lu -lsecdb -lnss
 
@@ -107,7 +107,7 @@ OBJ21= spawn.o
 OBJ22= user.o
 OBJ23=
 
-OBJ24= ucopen.o nonpath.o ucdescbase.o
+OBJ24= ucopen.o nonpath.o ucdescutil.o
 OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
 OBJ26= ucdescmisc.o ucdesclock.o
 OBJ27= ucproc.o ucdata.o
@@ -379,8 +379,6 @@ uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
 ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
 ucinfo.o:		ucinfo.cc	ucinfo.h		$(INCS)
 
-ucdescbase.o:		ucdescbase.cc	ucdescbase.hh		$(INCS)
-
 # SYSTEM
 ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
 
@@ -483,6 +481,11 @@ ucsysmisc.dir:
 # UCOPEN
 ucopen.o:		ucopen.dir
 ucopen.dir:
+	makesubdir $@
+
+# UCDESCUTIL
+ucdescutil.o:		ucdescutil.dir
+ucdescutil.dir:
 	makesubdir $@
 
 # UCDESCREAD
