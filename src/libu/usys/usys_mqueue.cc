@@ -56,7 +56,7 @@ constexpr mqd_t	mqdbad = mkmqdbad() ;
 #define	MQATTR		struct mq_attr
 #endif
 
-mqd_t mq_open(const char *n,int,mode_t,const MQATTR *) noex {
+mqd_t mq_open(cchar *n,int,mode_t,const MQATTR *) noex {
 	errno_t		ec = EFAULT ;
 	if (n) {
 	    ec = EINVAL ;
@@ -77,7 +77,7 @@ unixret_t mq_close(mqd_t qd) noex {
 	return -1 ;
 } /* end */
 
-unixret_t mq_send(mqd_t qd,const char *sp,int,int) noex {
+unixret_t mq_send(mqd_t qd,cchar *sp,int,int) noex {
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
@@ -137,7 +137,7 @@ unixret_t mq_notify(mqd_t qd,struct sigevent *sep) noex {
 	return -1 ;
 } /* end */
 
-unixret_t mq_unlink(const char *n) noex {/* end */
+unixret_t mq_unlink(cchar *n) noex {/* end */
 	errno_t		ec = EFAULT ;
 	if (n) {
 	    ec = EINVAL ;
