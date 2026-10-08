@@ -93,7 +93,7 @@ void md5_starts( md5_context *ctx) noex {
     ctx->state[3] = 0x10325476;
 } /* end subroutine */
 
-static void md5_process( md5_context *ctx, uint8_t data[64] ) noex {
+local void md5_process( md5_context *ctx, uint8_t data[64] ) noex {
     uint32_t X[16], A, B, C, D;
 
     GET_UINT32( X[0],  data,  0 );
