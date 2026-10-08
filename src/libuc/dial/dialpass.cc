@@ -103,23 +103,23 @@ int dialpass(cchar *fname,int timeout,int) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (fname) {
+	if (fname) ylikely {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
+	    if (fname[0]) ylikely {
 		rs = SR_NOSYS ;
 		if_constexpr (f_streams) {
 	            cint	of = (O_WRONLY | O_NDELAY) ;
 		    cmode	om = 0666 ;
-	            if ((rs = uc_open(fname,of,om)) >= 0) {
+	            if ((rs = uc_open(fname,of,om)) >= 0) ylikely {
 	                cint	fd_pass = rs ;
-	                if (USTAT sb ; (rs = uc_fstat(fd_pass,&sb)) >= 0) {
+	                if (ustat sb ; (rs = uc_fstat(fd_pass,&sb)) >= 0) {
 			    rs = SR_INVALID ;
 	                    if (S_ISFIFO(sb.st_mode) || S_ISCHR(sb.st_mode)) {
 			        rs = SR_OK ;
 	                        if (timeout >= 0) {
 	                            rs = waitready(fd_pass,timeout) ;
 	                        } /* end if (timeout) */
-	                        if (rs >= 0) {
+	                        if (rs >= 0) ylikely {
 	                            int		pipes[2] ;
 	                            if ((rs = uc_pipe(pipes)) >= 0) {
 					cint	cmd = I_SENDFD ;
@@ -129,7 +129,7 @@ int dialpass(cchar *fname,int timeout,int) noex {
 	                                if (rs < 0) {
 	                                    uc_close(fd) ;
 					    fd = -1 ;
-	                                }
+	                                } /* end if (error) */
 	                            } /* end if (uc_pipe) */
 	                        } /* end if (ok) */
 			    } /* end if (type of file) */
@@ -162,7 +162,7 @@ local int waitready(int fd,int timeout) noex {
 	    while (rs >= 0) {
 	        cint	pollto = MIN(timeout,5) * POLL_INTMULT ;
 	        if ((rs = u_poll(polls,1,pollto)) > 0) {
-		    cint	re = polls[0].revents ;
+		    cshort	re = polls[0].revents ;
 	            if (re & POLLHUP) {
 	                rs = SR_HANGUP ;
 	            } else if (re & POLLERR) {
@@ -170,15 +170,15 @@ local int waitready(int fd,int timeout) noex {
 	            } else if (re & POLLNVAL) {
 	                rs = SR_BADF ;
 	            } else if ((re & POLLOUT) || (re & POLLWRBAND)) {
-		        f = TRUE ;
-		    }
+		        f = true ;
+		    } /* end if */
 	        } else if (rs == SR_INTR) {
 		    rs = SR_OK ;
-	        }
+	        } /* end if */
 	        if ((rs >= 0) && (! f)) {
 	            dt = time(nullptr) ;
 		    if (dt >= ti_timeout) rs = SR_TIMEDOUT ;
-	        }
+	        } /* end if */
 	        if ((rs >= 0) && f) break ;
 	    } /* end while */
 	} /* end if (ok) */
