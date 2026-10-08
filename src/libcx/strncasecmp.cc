@@ -26,16 +26,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -69,7 +67,7 @@
 
 int strncasecmp(cchar *s1,cchar *s2,int n) noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    while ((n > 0) && *s1 && *s2 && (rc == 0)) {
 	        rc = int(CHAR_TOLC(*s1) - CHAR_TOLC(*s2)) ;
 	        s1 += 1 ;
@@ -78,7 +76,6 @@ int strncasecmp(cchar *s1,cchar *s2,int n) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return rc ;
-}
-/* end subroutine (strncasecmp) */
+} /* end subroutine (strncasecmp) */
 
 
