@@ -26,9 +26,9 @@
 
 EXTERNC_begin
 
-extern int mkhexstr(char *,int,cvoid *,int) noex ;
-extern int mkhexnstr(char *,int,int,cchar *,int) noex ;
-extern int mkhexblock(cchar *,cchar *,int) noex ;
+extern int mkhexstr	(char *,int,cvoid *,int) noex ;
+extern int mkhexnstr	(char *,int,int,cchar *,int) noex ;
+extern int mkhexblock	(cchar *,cchar *,int) noex ;
 
 EXTERNC_end
 
