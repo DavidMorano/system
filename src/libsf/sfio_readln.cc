@@ -41,15 +41,15 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
 extern int	msleep(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* exported subroutines */
@@ -72,7 +72,7 @@ int	to ;
 
 	int	rl = 0 ;
 
-	const char	*tp ;
+	cchar	*tp ;
 
 
 #if	CF_DEBUGS
@@ -205,7 +205,7 @@ int	to ;
 
 	int	rl = 0 ;
 
-	const char	*tp ;
+	cchar	*tp ;
 
 
 #if	CF_DEBUGS
@@ -344,7 +344,7 @@ int	to ;
 
 #if	CF_SFGETR
 	{
-	    const char	*p = sfgetr(fp,'\n',0) ;
+	    cchar	*p = sfgetr(fp,'\n',0) ;
 	    if (p != NULL) {
 	        rl = sfvalue(fp) ;
 	        if ((rl >= 0) && (snwcpy(rbuf,rlen,p,rl) < 0))
