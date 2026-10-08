@@ -107,7 +107,6 @@ using libu::sncpy ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
 using libu::strwcpy ;			/* subroutine */
 using usysauxinfo::ugetauxinfo ;	/* subroutine */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -133,16 +132,16 @@ namespace {
 	int operator () (utsname *p) noex {
 	    utsp = p ;
 	    return handler() ;
-	} ;
+	} ; /* end */
 	int operator () (ulong *p) noex {
 	    idp = p ;
 	    return handler() ;
-	} ;
+	} ; /* end */
         int callstd() noex override {
             int         rs = SR_BUGCHECK ;
             if (m) {
                 rs = (this->*m)() ;
-            }
+            } /* end */
             return rs ;
         } ; /* end method (callstd) */
 	int std_uname() noex ;
@@ -161,21 +160,24 @@ namespace {
 	    delete mbuf ;
 	    mbuf = nullptr ;
 	    mlen = 0 ;
- 	} ; /* end destruct (memory-release) */
-	int setup() noex ;
+ 	} ; /* end destruct */
+	int setup	(int) noex ;
     private:
-	char		*mbuf ;
+	charp		mbuf ;
 	int		mlen ;
+	int		datlen ;
     } ; /* end struct (umachiner) */
     struct datobj {
 	char		*s[nitems] ;
 	char		*a = nullptr ;
-	int start() noex ;
-	int finish() noex ;
-	int load() noex ;
+	int start	(int) noex ;
+	int finish	() noex ;
+	int load	() noex ;
 	destruct datobj() {
 	    (void) finish() ;
- 	} ;
+ 	} ; /* end */
+    private:
+	int		datlen ;
     } ; /* end struct (datobj) */
 } /* end namespace */
 
@@ -196,7 +198,7 @@ constexpr uname_f	usubs[] = {
 	uname_nodename
 } ; /* end array */
 
-static umachiner	um ;
+static umachiner	umach ;
 
 constexpr int		reqs[] = {
 	SAI_ARCHITECTURE,
@@ -204,8 +206,6 @@ constexpr int		reqs[] = {
 	SAI_PLATFORM,
 	SAI_HWPROVIDER
 } ; /* end array */
-
-static cint		datlen = ulibval.nodenamelen ;
 
 constexpr cchar		defmachine[] = "Intel(R) Core(TM) i7" ;
 
@@ -234,15 +234,16 @@ int u_uname(utsname *up) noex {
 } /* end subroutine (u_uname) */
 
 int u_getnodename(char *rbuf,int rlen) noex {
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf) ylikely {
 	    rs = SR_NOMEM ;
-	    if (utsname *utsp = new(nothrow) utsname ; utsp) ylikely {
+	    if (utsname *utsp = new(nt) utsname) ylikely {
 		if ((rs = u_uname(utsp)) >= 0) {
 	            rs = sncpy(rbuf,rlen,utsp->nodename) ;
 		    len = rs ;
-		}
+		} /* end */
 	        delete utsp ;
 	    } /* end if (utsname) */
 	} /* end if (non-null) */
@@ -289,7 +290,7 @@ namespace libu {
 	if (dp) ylikely {
 	    if (ulong hid ; (rs = ugethostid(&hid)) >= 0) ylikely {	
 		rs = ctdec(dp,dl,hid) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (loadhwserial) */
@@ -307,24 +308,24 @@ local sysret_t usys_uname(utsname *utsp) noex {
 local sysret_t uname_machine(utsname *up) noex {
 	cint		mlen = (szof(up->machine) - 1) ;
 	int		rs = SR_OK ;
-	char		*mbuf = up->machine ;
-	if (strcmp(mbuf,"x86_64") == 0) {
+	if (char *mbuf = up->machine ; strcmp(mbuf,"x86_64") == 0) {
 	    if_constexpr (f_darwin) {
 		cint	req = SAI_MACHINE ;
 	        rs = ugetauxinfo(mbuf,mlen,req) ;
 	    } else {
 	        rs = sncpy(mbuf,mlen,defmachine) ;
-	    }
+	    } /* end if */
 	} /* end if (compared equal) */
 	return rs ;
 } /* end subroutine (uname_machine) */
 
 local sysret_t uname_nodename(utsname *up) noex {
 	int		rs = SR_OK ;
-	char		*nn = up->nodename ;
-	if (char *tp = strchr(nn,'.') ; tp) {
-	    *tp = '\0' ;
-	}
+	if (char *nn = up->nodename) {
+	    if (char *cp = strchr(nn,'.')) {
+	        *cp = '\0' ;
+	    } /* end */
+	} /* end */
 	return rs ;
 } /* end subroutine (uname_nodename) */
 
@@ -336,38 +337,44 @@ local sysret_t local_getauxinfo(char *rbuf,int rlen,int req) noex {
 	    cchar	*valp = nullptr ;
 	    switch (req) {
 	    case usysauxinforeq_architecture:
-		valp = um.architecture ;
+		valp = umach.architecture ;
 		break ;
 	    case usysauxinforeq_machine:
-		valp = um.machine ;
+		valp = umach.machine ;
 		break ;
 	    case usysauxinforeq_platform:
-		valp = um.platform ;
+		valp = umach.platform ;
 		break ;
 	    case usysauxinforeq_hwprovider:
-		valp = um.hwprovider ;
+		valp = umach.hwprovider ;
 		break ;
 	    } /* end switch */
 	    if (valp) {
 		rs = sncpy(rbuf,rlen,valp) ;
 		len = rs ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine */
 
 local sysret_t setup_sysauxinfo() noex {
-	return um.setup() ;
+    	int		rs ;
+	if (static cint rsu = ulibval.nodenamelen ; (rs = rsu) >= 0) {
+	    rs = umach.setup(rs) ;
+	} /* end if (ulibval) */
+	return rs ;
 } /* end subrooutine */
 
-int umachiner::setup() noex {
+int umachiner::setup(int dl) noex {
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs ;
 	int		rs1 ;
-	if (datobj dob ; (rs = dob.start()) >= 0) ylikely {
+	if (datobj dob ; (rs = dob.start(dl)) >= 0) ylikely {
 	    if ((rs = dob.load()) >= 0) ylikely {
 		mlen = rs ;
 		rs = SR_NOMEM ;
-		if ((mbuf = new(nothrow) char[mlen+1]) != nullptr) {
+		if ((mbuf = new(nt) char[mlen+1]) != np) ylikely {
 		    char	*bp = mbuf ;
 		    rs = SR_OK ;
 		    for (int i = 0 ; i < nitems ; i += 1) {
@@ -398,27 +405,31 @@ int umachiner::setup() noex {
 	return rs ;
 } /* end method (umachiner::setup) */
 
-int datobj::start() noex {
+int datobj::start(int dl) noex {
 	cnullptr	np{} ;
-	cint		sz = ((datlen + 1) * nitems) ;
-	int		rs = SR_NOMEM ;
-	if ((a = new(nothrow) char[sz]) != np) ylikely {
-	    cint	n = nitems ;
-	    rs = SR_OK ;
-	    for (int i = 0 ; i < n ; i += 1) {
-	        s[i] = (a + (i * (datlen + 1))) ;
-	    }
-	} /* end if (new-char) */
+	cnothrow	nt{} ;
+	int		rs = SR_BUGCHECK ;
+	if (datlen = dl ; datlen > 0) ylikely {
+	    cint sz = ((datlen + 1) * nitems) ;
+	    rs = SR_NOMEM ;
+	    if ((a = new(nt) char[sz]) != np) ylikely {
+	        cint	n = nitems ;
+	        rs = SR_OK ;
+	        for (int i = 0 ; i < n ; i += 1) {
+	            s[i] = (a + (i * (datlen + 1))) ;
+	        } /* end for */
+	    } /* end if (new-char) */
+	} /* end if (datalen) */
 	return rs ;
 } /* end method (datobj::start) */
 
 int datobj::finish() noex {
 	int		rs = SR_NOTOPEN ;
-	if (a) {
+	if (a) ylikely {
 	    delete [] a ;
 	    a = nullptr ;
 	    rs = SR_OK ;
-	} /* end if (memory-release) */
+	} /* end if (delete-char) */
 	return rs ;
 } /* end method (datobj::finish) */
 
@@ -437,7 +448,7 @@ int syscaller::std_uname() noex {
 	int		rs ;
 	if ((rs = uname(utsp)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (syscaller::std_uname) */
 
@@ -447,7 +458,7 @@ int syscaller::std_gethostid() noex {
 	    *idp = ulong(res) ;
 	} else {
 	    rs = (neg errno) ;
-	}
+	} /* end if */
 	return rs ;
 } /* end method (syscaller::std_gethostid) */
 
