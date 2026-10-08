@@ -70,15 +70,15 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
 extern int	msleep(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* exported subroutines */
@@ -94,7 +94,7 @@ int sfreadlinetimed(Sfio_t *fp,char *rbuf,int rlen,int to)
 	time_t		daytime = time(NULL) ;
 	time_t		stime ;
 	int		rl = 0 ;
-	const char	*tp ;
+	cchar	*tp ;
 
 #if	CF_DEBUGS
 	debugprintf("sfreadline: POLL,PEEK\n") ;
