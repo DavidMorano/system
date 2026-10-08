@@ -85,7 +85,7 @@
 local int	testuucp(cchar *) ;
 
 #if	CF_BDUMP
-static void	bdump(bfile *,bfile *) ;
+local void	bdump(bfile *,bfile *) ;
 #endif
 
 
@@ -328,7 +328,7 @@ local int testuucp(cchar *queue_machine) {
 
 #if	CF_BDUMP
 
-static void bdump(bfile *f1p,bfile *f2p) noex {
+local void bdump(bfile *f1p,bfile *f2p) noex {
 	int	f_done1 = false ;
 	int	f_done2 = false ;
 	char	buf[DUMPLEN + 1] ;
