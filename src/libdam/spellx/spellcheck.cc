@@ -483,7 +483,7 @@ cchar	objname[] ;
 
 	char	symname[SYMNAMELEN + 1] ;
 
-	const void	*snp ;
+	cvoid	*snp ;
 
 
 	for (i = 0 ; subnames[i] != nullptr ; i += 1) {
