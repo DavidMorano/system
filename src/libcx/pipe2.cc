@@ -37,14 +37,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -70,25 +72,24 @@
 int pipe2(int *pipes,int of) noex {
 	int		rs ;
 	if ((rs = u_pipe(pipes)) >= 0) {
-		const int	f = TRUE ;
-		if ((rs >= 0) && (of & O_NONBLOCK)) {
-		    if ((rs = uc_nonblock(pipes[0],f)) >= 0) {
-		        rs = uc_nonblock(pipes[1],f) ;
-		    }
-		}
-		if ((rs >= 0) && (of & O_CLOEXEC)) {
-		    if ((rs = uc_closeonexec(pipes[0],f)) >= 0) {
-		        rs = uc_closeonexec(pipes[1],f) ;
-		    }
-		}
+	    cint	f = true ;
+	    if ((rs >= 0) && (of & O_NONBLOCK)) {
+		if ((rs = uc_nonblock(pipes[0],f)) >= 0) {
+		    rs = uc_nonblock(pipes[1],f) ;
+		} /* end */
+	    } /* end */
+	    if ((rs >= 0) && (of & O_CLOEXEC)) {
+		if ((rs = uc_closeonexec(pipes[0],f)) >= 0) {
+		    rs = uc_closeonexec(pipes[1],f) ;
+		} /* end */
+	    } /* end */
 	    if (rs < 0) {
 		u_close(pippe[0]) ;
 		u_close(pippe[1]) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (u_pipe) */
 	if (rs < 0) errno = (-rs) ;
 	return rs ;
-}
-/* end subroutine (pipe2) */
+} /* end subroutine (pipe2) */
 
 
