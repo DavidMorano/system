@@ -45,7 +45,6 @@ namespace libu {
 	int nn		(char **) noex ;
 	int zn		(char **) noex ;
     } ; /* end struct (umems) */
-    extern umems	um ;
     extern umems	umem ;
 } /* end namespace (libu) */
 
