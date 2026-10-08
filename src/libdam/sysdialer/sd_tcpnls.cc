@@ -211,7 +211,7 @@ cchar	*av[] ;
 	        if ((argl > 0) && (f_optminus || f_optplus)) {
 
 	            if (argl > 1) {
-			const int	ach = MKCHAR(argp[1]) ;
+			cint	ach = MKCHAR(argp[1]) ;
 
 	                if (isdigitlatin(ach)) {
 
