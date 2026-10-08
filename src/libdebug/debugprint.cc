@@ -20,7 +20,21 @@
 /*******************************************************************************
 
   	Name:
-	debugprintf
+	debugopen		
+	debugclose		
+	debugwrite		
+	debugprint		
+	debugprintf		
+	debugprintx		
+	debugvprintf		
+	debugprintfsize		
+	debugsetfd		
+	debuggetfd		
+	debugprinthexblock	
+	debugprinthexs		
+	debugprintdeci		
+	debugprinthexi		
+	debugprintnum		
 
 	Description:
 	This subroutine does a printf-like function but for the
@@ -28,6 +42,23 @@
 	might be expected but besides that it tries to be as simple
 	as possible, so that it depends on as little other stuff
 	as possible.
+
+	Synopsis:
+	debugopen		(cchar *) noex
+	debugclose		(void) noex
+	debugwrite		(cchar *,int) noex
+	debugprint		(cchar *,int) noex
+	debugprintf		(cchar *,...) noex
+	debugprintx		(cchar *fun,cchar *fmt,...) noex 
+	debugvprintf		(cchar *,va_list) noex
+	debugprintfsize		(cchar *,int) noex
+	debugsetfd		(int) noex
+	debuggetfd		(void) noex
+	debugprinthexblock	(cchar *,int,cvoid *,int) noex
+	debugprinthexs		(cchar *,int,cvoid *,int) noex
+	debugprintdeci		(cchar *,int) noex
+	debugprinthexi		(cchar *,int) noex
+	debugprintnum		(cchar *,int) noex
 
 	Notes about recent UNIX® deficiencies:
 
@@ -138,6 +169,8 @@ import ureserve ;			/* |is{x}(3u)| */
 #define	LINEBUFLEN	(2 * 1024)
 #endif
  
+#define	PRINTBUFLEN	(2 * LINEBUFLEN)
+
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
 #endif
@@ -161,6 +194,11 @@ typedef volatile sig_atomic_t	vaflag ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int mkhexnstr(char *,int,int,cvoid *,int) noex ;
+    extern int mkhexstr(char *,int,cvoid *,int) noex ;
+} /* ene extern (C) */
 
 extern "C" {
     int debugmgr_init() noex ;
@@ -242,7 +280,7 @@ int debugmgr_init() noex {
 	        void_f b = debugmgr_atforkbefore ;
 	        void_f a = debugmgr_atforkafter ;
 	        if ((rs = uc_atforkrec(b,a,a)) >= 0) {
-		    const void_f funexit = void_f(debugmgr_fini) ;
+		    con void_f funexit = void_f(debugmgr_fini) ;
 	            if ((rs = uc_atexit(funexit)) >= 0) {
 	                rs = 0 ;
 	                uip->f_initdone = true ;
@@ -366,6 +404,10 @@ int debugvprintf(cchar *fmt,va_list ap) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (debugvprintf) */
 
+int debugprintnum(cchar *s,int v) noex {
+	return debugprintdeci(s,v) ;
+} /* end subroutine (debugprintnum) */
+
 int debugprintdeci(cchar *s,int v) noex {
     	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
@@ -396,9 +438,70 @@ int debugprinthexi(cchar *s,int v) noex {
 	return rs ;
 } /* end subroutine (debugprinthexi) */
 
-int debugprintnum(cchar *s,int v) noex {
-	return debugprintdeci(s,v) ;
-} /* end subroutine (debugprintnum) */
+int debugprinthexs(cchar *ids,int maxcols,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ; /* return-value */
+	if (sp) ylikely {
+	    cint	plen = PRINTBUFLEN ;
+	    int		idlen = 0 ;
+	    char	pbuf[PRINTBUFLEN + 1] ;
+	    if (ids) idlen = lenstr(ids) ;
+	    if (maxcols < 0) maxcols = COLUMNS ;
+	    if (idlen > 0) maxcols -= (idlen + 1) ;
+	    if ((rs = mkhexnstr(pbuf,plen,maxcols,sp,sl)) >= 0) {
+	        if (idlen > 0) {
+	            rs = debugprintf("%r %s\n",ids,idlen,pbuf) ;
+	        } else {
+	            rs = debugprintf("%s\n",pbuf) ;
+	        } /* end if */
+	        wlen = rs ;
+	    } /* end if (mkhexnstr) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (debugprinthex) */
+
+int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
+	int		rs = SR_OK ;
+	int		wlen = 0 ; /* return-value */
+	if (vp) ylikely {
+	    int		idlen = 0 ;
+	    int		sl = vl ;
+	    ccharp	sp = ccharp(vp) ;
+	    char	printbuf[PRINTBUFLEN + 1] ;
+	    if (ids) idlen = lenstr(ids) ;
+	    if (maxcols < 0) maxcols = COLUMNS ;
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while ((rs >= 0) && (sl > 0)) {
+	        char	*pbp = printbuf ;
+	        int	pbl = PRINTBUFLEN ;
+	        int	cols = maxcols ;
+	        if (ids) {
+	            if ((idlen+2) < pbl) {
+		        int	i = intconv(strwcpy(pbp,ids,idlen) - pbp) ;
+	                pbp[i++] = ':' ;
+	                pbp[i++] = ' ' ;
+	                pbp += i ;
+	                pbl -= i ;
+	                cols -= i ;
+	            } else {
+	                rs = SR_OVERFLOW ;
+		    } /* end if */
+	        } /* end if (ids) */
+	        if (rs >= 0) ylikely {
+	            cint	n = (cols / 3) ;
+		    int		cslen ;
+	            cslen = MIN(n,sl) ;
+	            if ((rs = mkhexstr(pbp,pbl,sp,cslen)) >= 0) ylikely {
+	                sp += cslen ;
+	                sl -= cslen ;
+	                rs = debugprint(printbuf,-1) ;
+	                wlen += rs ;
+		    } /* end if (mkhexnstr) */
+	        } /* end if (ok) */
+	    } /* end while */
+	} /* end if (non-null) */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (debugprinthexblock) */
 
 int debugsetfd(int fd) noex {
 	int		rs = SR_NOTOPEN ;
