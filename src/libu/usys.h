@@ -78,6 +78,8 @@
 #include	<usys_sigx.h>
 #include	<usys_stat.h>
 #include	<usys_stime.h>
+#include	<usys_stpcpy.h>
+#include	<usys_stpncpy.h>
 #include	<usys_streams.h>
 #include	<usys_strtox.h>
 #include	<usys_strxbrk.h>
