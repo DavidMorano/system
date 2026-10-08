@@ -71,10 +71,8 @@
 #include	"buffer.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/ulibvals.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
-import ulibvals ;			/* |maxlinelen(3u)| */
 
 /* local defines */
 
@@ -131,7 +129,7 @@ namespace buffer_ns {
 		    op->dlen = nlen ;
 	        } else {
 	            op->clen = rs ;
-	        }
+	        } /* end if */
 	    } else {
 		nlen = op->dlen ;
 	        while ((op->clen + (req + 1)) > nlen) {
@@ -146,7 +144,7 @@ namespace buffer_ns {
 		    op->dlen = nlen ;
 	        } else {
 	            op->clen = rs ;
-		}
+		} /* end if */
 	    } /* end if */
 	} /* end if (extension needed) */
 	return rs ;
