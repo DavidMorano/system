@@ -119,7 +119,7 @@
 #include	<ncol.h>		/* LIBUC |ncolchar(3uc)| */
 #include	<pow.h>			/* LIBUC */
 #include	<permx.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<ischarx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
@@ -340,7 +340,7 @@ int termnote_close(TN *op) noex {
 	    if (op->open.lf) {
 	        custime		dt = getustime ;
 	        char		tbuf[TIMEBUFLEN+1] ;
-	        timestr_logz(dt,tbuf) ;
+	        strtime_logz(dt,tbuf) ;
 	        logfile_printf(op->lfp,"%s done",tbuf) ;
 	    }
 	    {
@@ -458,7 +458,7 @@ int termnote_write(TN *op,cc **rpp,int mw,int o,cc *sbuf,int slen) noex {
 		            cbool	fall	 = !!(o & TERMNOTE_OALL) ;
 		            cchar	*fmt ;
 		            if (dt == 0) dt = getustime ;
-		            timestr_logz(dt,tbuf),
+		            strtime_logz(dt,tbuf),
 		            fmt = "%s bell=%u biff=%u all=%u" ;
 	    	            logfile_printf(op->lfp,fmt,tbuf,fbel,fbiff,fall) ;
 		        }
@@ -818,7 +818,7 @@ local int termnote_lfopener(TN *op,time_t dt,cc *lfname,cc *sn) noex {
                 cchar   *un = op->username ;
                 char    timebuf[TIMEBUFLEN+1] ;
                 if (dt == 0) dt = getustime ;
-                timestr_logz(dt,timebuf) ;
+                strtime_logz(dt,timebuf) ;
                 if ((rs = logfile_printf(lfp,"%s %s",timebuf,sn)) >= 0) {
                     rs = logfile_printf(lfp,"%s!%s",nn,un) ;
 		}
