@@ -30,16 +30,14 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -81,10 +79,9 @@ int strlcpy(char *dst,cchar *src,int maxlen) noex {
 	        }
 	    }
 	    dst[i] = '\0' ;
-	    len = (*src == '\0') ? i : (i + int(strlen(src))) ;
+	    len = (*src == '\0') ? i : (i + intconv(strlen(src))) ;
 	} /* end if (non-null) */
 	return len ;
-}
-/* end subroutine (strlcpy) */
+} /* end subroutine (strlcpy) */
 
 
