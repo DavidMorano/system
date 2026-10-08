@@ -45,6 +45,18 @@
 	1. If necessary (in order to gurantee NUL-termination) a
 	NUL will be written past the end (deterined by a supplied
 	length) of the destination character buffer.
+	2. I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard lirbrary already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might gets optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like). 
+	 ** this note is obsoleted 2011-12-09, see revision above **
 
 *******************************************************************************/
 
@@ -77,6 +89,8 @@
 
 /* forward references */
 
+local bool hasgot(ccp,int) noex ;
+
 
 /* local variables */
 
@@ -86,29 +100,33 @@
 
 /* exported subroutines */
 
-char *strbcpy1w(char *dp,int dl,cc *s1,int sl) noex {
+char *strbcpy1w(char *dp,int dl,
+		cc *s1,int sl) noex {
 	return strbcpyxw(dp,dl,1,s1,sl) ;
 } /* end subroutine (strbcpy1w) */
 
-char *strbcpy2w(char *dp,int dl,cc *s1,cc *s2,int sl) noex {
+char *strbcpy2w(char *dp,int dl,
+		cc *s1,cc *s2,int sl) noex {
 	return strbcpyxw(dp,dl,2,s1,s2,sl) ;
 } /* end subroutine (strbcpy2w) */
 
-char *strbcpy3w(char *dp,int dl,cc *s1,cc *s2,cc *s3,int sl) noex {
+char *strbcpy3w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,int sl) noex {
 	return strbcpyxw(dp,dl,3,s1,s2,s3,sl) ;
 } /* end subroutine (strbcpy3w) */
 
-char *strbcpy4w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
+char *strbcpy4w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
 	return strbcpyxw(dp,dl,4,s1,s2,s3,s4,sl) ;
 } /* end subroutine (strbcpy4w) */
 
-char *strbcpy5w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
-		cc *s5,int sl) noex {
+char *strbcpy5w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
 	return strbcpyxw(dp,dl,5,s1,s2,s3,s4,s5,sl) ;
 } /* end subroutine (strbcpy5w) */
 
-char *strbcpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
-		cc *s5,cc *s6,int sl) noex {
+char *strbcpy6w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl) noex {
 	return strbcpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end subroutine (strbcpy6w) */
 
@@ -122,18 +140,20 @@ char *strbcpyxw(char *dp,int dl,int n,...) noex {
 	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
 	        if (i == (n - 1)) {
 	            int	sl = (int) va_arg(ap,int) ;
-	            while ((dl > 0) && sl && *sp) {
+	            while ((dl > 0) && hasgot(sp,sl)) {
 		        *dp++ = *sp++ ;
-		        dl -= 1 ;
 		        sl -= 1 ;
+		        dl -= 1 ;
 	            } /* end while */
+		    fbad = ((dl == 0) && hasgot(sp,sl)) ;
 	        } else {
 	            while ((dl > 0) && *sp) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
 	            } /* end while */
+		    fbad = ((dl == 0) && *sp) ;
 	        } /* end if */
-		if ((fbad = ((dl == 0) && *sp))) break ;
+		if (fbad) break ;
 	    } /* end for */
 	    *dp = '\0' ;
 	    if (fbad) dp = nullptr ;
@@ -141,5 +161,9 @@ char *strbcpyxw(char *dp,int dl,int n,...) noex {
 	} /* end if (non-null) */
 	return dp ;
 } /* end subroutine (strbcpyxw) */
+
+local bool hasgot(ccp sp,int sl) noex {
+    	return (sl && *sp) ;
+} /* end subroutine (hasgot) */
 
 
