@@ -47,12 +47,10 @@ module ;
 #include	"ustream.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/ulibvals.ccm"
 
 module ustream ;
 
 import libutil ;			/* |memcopy(3u)| */
-import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
 
@@ -105,7 +103,7 @@ using libu::umem ;		/* variable */
 	    if ((rs = snvprintf(lbuf,llen,fmt,ap)) >= 0) {
 		rs = ustream_write(op,lbuf,rs) ;
 		wlen = rs ;
-	    }
+	    } /* end */
 	    rs1 = umem.free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
