@@ -191,6 +191,10 @@ extern int mailbox_msgreadln	(mailbox *,int,char *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+extern const mailboxms 	mailboxm ;
+#endif /* __cplusplus */
+
 
 #endif /* MAILBOX_INCLUDE */
 
