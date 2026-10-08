@@ -56,10 +56,8 @@
 #include	"absfn.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/ulibvals.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
-import ulibvals ;
 
 /* local defines */
 
@@ -113,7 +111,7 @@ int absfn_start(absfn *op,cchar *sp,int µsl,cchar **rpp) noex {
 		    nl = rs ;
 		} else {
 		    nl = sl ;
-		}
+		} /* end */
 	    } /* end if (getlenstr) */
 	    if (rs < 0) *rpp = nullptr ;
 	} /* end if (non-null) */
@@ -143,26 +141,24 @@ local int absfn_loadpwd(absfn *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nl = 0 ; /* return-value */
-	if ((rs = ulibval.maxpathlen) >= 0) ylikely {
-	    cint	plen = rs ;
-	    if (char *pbuf ; (rs = lm_mall((plen + 1),&pbuf)) >= 0) ylikely {
-	        if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
-	 	    if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) ylikely {
-		        if ((nl = rs) > ABSFN_SHORTLEN) {
-	                    if (cc *cp ; (rs = lm_strw(pbuf,nl,&cp)) >= 0) {
-	                        *rpp = cp ;
-	                        op->as = cp ;
-	                    } /* end if (memory-acquire) */
-	                } else {
-	                    *rpp = op->buf ;
-	                    strwcpy(op->buf,pbuf,nl) ;
-	                } /* end if */
-	            } /* end if (pathadd) */
-	        } /* end if (getpwd) */
-	        rs1 = lm_free(pbuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (maxpathlen) */
+	if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) ylikely {
+	    cint plen = rs ;
+	    if ((rs = getpwd(pbuf,plen)) >= 0) ylikely {
+	 	if ((rs = pathaddw(pbuf,rs,sp,sl)) >= 0) ylikely {
+		    if ((nl = rs) > ABSFN_SHORTLEN) {
+	                if (cc *cp ; (rs = lm_strw(pbuf,nl,&cp)) >= 0) {
+	                    *rpp = cp ;
+	                    op->as = cp ;
+	                } /* end if (memory-acquire) */
+	            } else {
+	                *rpp = op->buf ;
+	                strwcpy(op->buf,pbuf,nl) ;
+	            } /* end if */
+	        } /* end if (pathadd) */
+	    } /* end if (getpwd) */
+	    rs1 = lm_free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? nl : rs ;
 } /* end subroutine (absfn_loadpwd) */
 
@@ -190,7 +186,7 @@ int absfn::start(cchar *sp,int sl,cchar **rpp) noex {
 void absfn::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("absfn",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (absfn::dtor) */
 
 absfn_co::operator int () noex {
