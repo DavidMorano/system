@@ -78,7 +78,7 @@ constexpr getpwxuid_f	subuids[] = {
 } ; /* end array */
 
 constexpr uid_t		uidend(-1) ;
-static int		getpwx_state = 1 ; /* <- writable */
+local int		getpwx_state = 1 ; /* <- writable */
 
 
 /* exported variables */
