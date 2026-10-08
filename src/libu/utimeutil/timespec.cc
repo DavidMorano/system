@@ -69,7 +69,7 @@
 
 /* local variables */
 
-const int	onebillion = INTBILLION ;
+cint	onebillion = INTBILLION ;
 
 
 /* exported variables */
