@@ -189,7 +189,7 @@ int getsyslogpri(cchar *sp,int sl) noex {
 	return (rs >= 0) ? val : rs ;
 } /* end subroutine (getlogpri) */
 
-const char *strfacname(int fac) noex {
+cchar *strfacname(int fac) noex {
 	const logitem	*lfs = logfacs ;
 	cchar		*res = nullptr ;
 	if (fac >= 0) ylikely {
