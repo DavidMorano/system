@@ -16,16 +16,14 @@
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<inttypes.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<inttypes.h>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	<strtoxmax.h>
 
@@ -34,21 +32,21 @@
 
 uintmax_t strtoumax(cchar *str,char **endptr,int base)  {
 	return strtoul(str,endptr,base) ;
-}
+} /* end */
 
 uintmax_t strtouintmax(cchar *str,char **endptr,int base)  {
 	return strtoul(str,endptr,base) ;
-}
+} /* end */
 
 #else /* defined(_LP64) */
 
 uintmax_t strtoumax(cchar *str,char **endptr,int base)  {
 	return strtoull(str,endptr,base) ;
-}
+} /* end */
 
 uintmax_t strtouintmax(cchar *str,char **endptr,int base)  {
 	return strtoull(str,endptr,base) ;
-}
+} /* end */
 
 #endif /* defined(_LP64) */
 
