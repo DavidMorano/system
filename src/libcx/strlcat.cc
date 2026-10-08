@@ -29,15 +29,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -50,10 +51,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern size_t strlen(cchar *) noex ;
-}
 
 
 /* external variables */
@@ -75,18 +72,17 @@ extern "C" {
 
 size_t strlcat(char *dst,cchar *src,size_t maxlen) noex {
 	size_t		rsz = 0 ;
-	if (dst && src) {
-	    cint	is = int(strlen(dst)) ;
-	    cint	ml = int(maxlen) ;
+	if (dst && src) ylikely {
+	    cint	is = intconv(strlen(dst)) ;
+	    cint	ml = intconv(maxlen) ;
 	    int		i{} ; /* used-afterwards */
 	    for (i = is ; (i < (ml - 1)) && *src ; i += 1) {
 	        dst[i] = *src++ ;
-	    }
+	    } /* end for */
 	    dst[i] = '\0' ;
-	    rsz = size_t((*src == '\0') ? i : (i+int(strlen(src)))) ;
+	    rsz = size_t((*src == '\0') ? i : (i + intconv(strlen(src)))) ;
 	} /* end if (non-null) */
 	return rsz ;
-}
-/* end subroutine (strlcat) */
+} /* end subroutine (strlcat) */
 
 
