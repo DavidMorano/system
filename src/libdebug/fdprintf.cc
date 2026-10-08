@@ -4,6 +4,7 @@
 /* 'FileDescriptor' printf subroutine */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_EPRINT	1		/* link in '??' support */
 
 /* revision history:
@@ -71,7 +72,7 @@ int fdprintf(int fd,cchar *fmt,...) noex {
 	char	buf[BUFLEN + 1] ;
 
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("fdprintf: fd=%d\n",fd) ;
 #endif
 
@@ -85,11 +86,11 @@ int fdprintf(int fd,cchar *fmt,...) noex {
 
 	} /* end if */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("fdprintf: fd=%d\n",fd) ;
 #endif
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("fdprintf: fmt=%s\n",fmt) ;
 #endif
 
@@ -99,20 +100,18 @@ int fdprintf(int fd,cchar *fmt,...) noex {
 
 	va_end(ap) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("fdprintf: len=%d\n",len) ;
 #endif
 
 	if (len > 0)
 	    rs = uc_writen(fd,buf,len) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("fdprintf: rs=%d\n",rs) ;
 #endif
 
 	return rs ;
-}
-/* end subroutine (fdprintf) */
-
+} /* end subroutine (fdprintf) */
 
 
