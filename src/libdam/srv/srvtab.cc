@@ -86,18 +86,18 @@ import libutil ;			/* |memclear(3u)| */
 
 /* forward references */
 
-static int	srvtab_fileparse(SRVTAB *,time_t,vecitem *) noex ;
-static int	srvtab_filedump(SRVTAB *) noex ;
+local int	srvtab_fileparse(SRVTAB *,time_t,vecitem *) noex ;
+local int	srvtab_filedump(SRVTAB *) noex ;
 
-static int	entry_start(SRVTAB_ENT *) noex ;
-static int	entry_groupsload(SRVTAB_ENT *,cchar *,int) noex ;
-static int	entry_groupadd(SRVTAB_ENT *,cchar *) noex ;
-static int	entry_enough(SRVTAB_ENT *) noex ;
-static int	entry_finish(SRVTAB_ENT *) noex ;
+local int	entry_start(SRVTAB_ENT *) noex ;
+local int	entry_groupsload(SRVTAB_ENT *,cchar *,int) noex ;
+local int	entry_groupadd(SRVTAB_ENT *,cchar *) noex ;
+local int	entry_enough(SRVTAB_ENT *) noex ;
+local int	entry_finish(SRVTAB_ENT *) noex ;
 
-static int	stradd(cchar **,cchar *,int) noex ;
+local int	stradd(cchar **,cchar *,int) noex ;
 
-static void	freeit(cchar **) noex ;
+local void	freeit(cchar **) noex ;
 
 
 /* local variables */
@@ -422,7 +422,7 @@ ret0:
 
 /* private subroutines */
 
-static int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
+local int srvtab_fileparse(srvtab *op,time_t dt,vecitem *eep) noex {
 	USTAT		sb ;
 	vecitem		*slp ;
 	SRVTAB_ENT	se ;
@@ -768,7 +768,7 @@ badopen:
 }
 /* end subroutine (srvtab_fileparse) */
 
-static int srvtab_filedump(SRVTAB *op) noex {
+local int srvtab_filedump(SRVTAB *op) noex {
 	SRVTAB_ENT	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -788,7 +788,7 @@ static int srvtab_filedump(SRVTAB *op) noex {
 }
 /* end subroutine (srvtab_filedump) */
 
-static int entry_start(SRVTAB_ENT *sep) noex {
+local int entry_start(SRVTAB_ENT *sep) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
 	    rs = memclear(sep) ;
@@ -797,7 +797,7 @@ static int entry_start(SRVTAB_ENT *sep) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(SRVTAB_ENT *sep) noex {
+local int entry_finish(SRVTAB_ENT *sep) noex {
 	int	i ;
 
 	if (sep->service == nullptr)
@@ -833,7 +833,7 @@ static int entry_finish(SRVTAB_ENT *sep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_enough(srvtab_ent *sep) noex {
+local int entry_enough(srvtab_ent *sep) noex {
 	if ((sep->service == nullptr) || (sep->service[0] == '\0'))
 	    return FALSE ;
 
@@ -849,7 +849,7 @@ static int entry_enough(srvtab_ent *sep) noex {
 
 
 /* load up some groups into the current entry */
-static int entry_groupsload(ST_ENT *sep,cchar *buf,int buflen) noex {
+local int entry_groupsload(ST_ENT *sep,cchar *buf,int buflen) noex {
 	int	rs ;
 	int	fl ;
 	cchar	*fp ;
@@ -873,7 +873,7 @@ static int entry_groupsload(ST_ENT *sep,cchar *buf,int buflen) noex {
 /* end subroutine (entry_groupsload) */
 
 /* add another (single) group to the current entry */
-static int entry_groupadd(SEVTAB_ENT *sep,cchar *name) noex {
+local int entry_groupadd(SEVTAB_ENT *sep,cchar *name) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	/* enter the raw group name into a group slot */
@@ -901,7 +901,7 @@ static int entry_groupadd(SEVTAB_ENT *sep,cchar *name) noex {
 /* end subroutine (entry_groupadd) */
 
 /* add something to an existing string */
-static int stradd(cchar **spp,cchar *s,int slen) noex {
+local int stradd(cchar **spp,cchar *s,int slen) noex {
 	int	rs = SR_OK ;
 	int	sl ;
 	int	len = 0 ;
@@ -934,7 +934,7 @@ static int stradd(cchar **spp,cchar *s,int slen) noex {
 }
 /* end subroutine (stradd) */
 
-static void freeit(cchar **pp) noex {
+local void freeit(cchar **pp) noex {
 	if (*pp) {
 	    uc_free(*pp) ;
 	    *pp = nullptr ;
