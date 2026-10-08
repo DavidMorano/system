@@ -26,7 +26,7 @@
 
 
 namespace libu {
-    extern int mkhexstr	(char *,int,cvoid *,int) noex ;
+    extern int mkhexstr	(char *,int,cvoid *,int = -1) noex ;
 } /* end namespace (libu) */
 
 
