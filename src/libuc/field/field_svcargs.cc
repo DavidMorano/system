@@ -60,7 +60,7 @@
 
 /* imported namespaces */
 
-using libu::um ;
+using libu::umem ;
 
 
 /* external subroutines */
@@ -92,7 +92,7 @@ int field_svcargs(field *fbp,vecstr *sap) noex {
 	if (fbp && sap) ylikely {
 	    if ((rs = fbp->remaining(np)) >= 0) ylikely {
 	        cint	alen = rs ;
-	        if (char *abuf ; (rs = um.mall((alen+1),&abuf)) >= 0) {
+	        if (char *abuf ; (rs = umem.mall((alen+1),&abuf)) >= 0) {
 	            while ((rs1 = fbp->sharg(np,abuf,alen)) >= 0) {
 			cint	al = rs1 ;
 	                c += 1 ;
@@ -100,7 +100,7 @@ int field_svcargs(field *fbp,vecstr *sap) noex {
 	                if (rs < 0) break ;
 	            } /* end while */
 		    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-	            rs1 = um.free(abuf) ;
+	            rs1 = umem.free(abuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a) */
 	    } /* end if (field_remaining) */
