@@ -299,7 +299,7 @@ USSINFO		*sip ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -808,7 +808,7 @@ int ussinfo_addrparse(USSINFO *sip) noex {
 	    } else if (strchr(sip->portspec,'/') != nullptr) {
 		rs = ussinfo_addrparseunix(sip,0) ;
 	    } else {
-		const int	af = sip->af ;
+		cint	af = sip->af ;
 		if ((af == 0) || (af != AF_UNIX)) {
 		    rs = ussinfo_addrparseinet(sip) ;
 		} else {
