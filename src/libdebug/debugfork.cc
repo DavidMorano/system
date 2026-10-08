@@ -53,7 +53,7 @@
 extern "C" {
     extern int	debugforkprintf(cchar *,...) noex ;
     extern int	debugforkprint(cchar *,int) noex ;
-}
+} /* end extern (C) */
 
 
 /* local structures */
@@ -106,7 +106,6 @@ int debugfork(cchar *s) noex {
 
 	debugprintf("debugfork: ret rs=%d (parent)\n",rs) ;
 	return rs ;
-}
-/* end subroutine (debugfork) */
+} /* end subroutine (debugfork) */
 
 
