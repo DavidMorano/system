@@ -65,8 +65,8 @@ OBJ17_USYS= usys_in4in6addr.o
 OBJ18_USYS= usys_strw.o usys_snx.o
 OBJ19_USYS= usys_execname.o
 
-OBJ20_USYS= usys_strxbrk.o
-OBJ21_USYS=
+OBJ20_USYS= usys_strxbrk.o 
+OBJ21_USYS= usys_stpcpy.o usys_stpncpy.o
 OBJ22_USYS=
 OBJ23_USYS=
 
@@ -77,8 +77,12 @@ OBJD= obj09_usys.o obj10_usys.o obj11_usys.o
 OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
 OBJG= obj18_usys.o obj19_usys.o obj20_usys.o
+OBJH= obj21_usys.o
 
-OBJ_USYS= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
+OBJ_J0= obja.o objb.o objc.o objd.o 
+OBJ_J1= obje.o objf.o objg.o objh.o
+
+OBJ_USYS = obj_j0.o obj_j1.o
 
 
 INCDIRS= -I inc -I /usr/local/include
@@ -245,6 +249,13 @@ objh.o:			$(OBJH)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj_j0.o:		$(OBJ_J0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj_j1.o:		$(OBJ_J1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 # operating-system specific
 usys_xxx.o:		usys_xxx.cc		usys_xxx.h		$(INCS)
 usys_sunos.o:		usys_sunos.cc		usys_sunos.h		$(INCS)
@@ -279,12 +290,14 @@ usys_ttynamerp.o:	usys_ttynamerp.cc	usys_ttynamerp.h	$(INCS)
 usys_resolvepath.o:	usys_resolvepath.cc	usys_resolvepath.h	$(INCS)
 usys_waitid.o:		usys_waitid.cc		usys_waitid.h		$(INCS)
 usys_sigx.o:		usys_sigx.cc		usys_sigx.h		$(INCS)
-usys_streams.o:		usys_streams.cc		usys_streams.h		$(INCS)
 usys_pipes.o:		usys_pipes.cc		usys_pipes.h		$(INCS)
 usys_libstr.o:		usys_libstr.cc		usys_libstr.h		$(INCS)
 usys_getexecname.o:	usys_getexecname.cc	usys_getexecname.h	$(INCS)
 usys_stat.o:		usys_stat.cc		usys_stat.h		$(INCS)
 usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
+usys_stpcpy.o:		usys_stpcpy.cc		usys_stpcpy.h		$(INCS)
+usys_stpncpy.o:		usys_stpncpy.cc		usys_stpncpy.h		$(INCS)
+usys_streams.o:		usys_streams.cc		usys_streams.h		$(INCS)
 usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
 usys_strxbrk.o:		usys_strxbrk.cc		usys_strxbrk.h		$(INCS)
 usys_strxchr.o:		usys_strxchr.cc		usys_strxchr.h		$(INCS)
