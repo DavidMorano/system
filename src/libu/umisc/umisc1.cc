@@ -30,6 +30,19 @@
 	This module provides miscellaneous UNIX® or other
 	common (library oriented) subroutines.
 
+	Notes:
+	I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard lirbrary already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might gets optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like).
+
 *******************************************************************************/
 
 module ;
@@ -74,7 +87,7 @@ local int getrlen(int plen) noex {
     	int		rs = SR_INVALID ;
 	if (plen > 0) ylikely {
 	    rs = plen ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (getrlen) */
 
@@ -131,7 +144,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	                    rlen -= 1 ;
 		        } else {
 	                    rs = SR_NAMETOOLONG ;
-		        }
+		        } /* end */
 	            } /* end if (needed a pathname separator) */
 		    if (rs >= 0) ylikely {
 	                if (int ml ; (ml = cstrlcpy(bp,sp,rlen)) < rlen) {
@@ -139,7 +152,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	        	    rlen -= ml ;
 		        } else {
 	                    rs = SR_NAMETOOLONG ;
-		        }
+		        } /* end */
 		    } /* end if */
 	        } /* end for */
 	        va_end(ap) ;
