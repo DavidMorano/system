@@ -27,15 +27,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscalls.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -68,18 +66,17 @@
 /* exported subroutines */
 
 char *strncpy(char *dst,cchar *src,size_t msz) noex {
-    	if (dst && src) {
-	    cint	n = int(msz) ;
+    	if (dst && src) ylikely {
+	    cint	n = intconv(msz) ;
 	    int		i{} ; /* used-afterwards */
 	    for (i = 0 ; (i < n) && src[i] ; i += 1) {
 	        dst[i] = src[i] ;
-	    }
+	    } /* end for */
 	    while (i < n) {
 	        dst[i] = '\0' ;
-	    }
+	    } /* end while */
 	} /* end if (non-null) */
 	return dst ;
-}
-/* end subroutine (strncpy) */
+} /* end subroutine (strncpy) */
 
 
