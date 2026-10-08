@@ -224,6 +224,9 @@ enum sysconfcmds {
 #ifndef	_SC_PID_MAX
 #define	_SC_PID_MAX		_SC_MAXPID
 #endif
+#ifndef	_SC_LOGINNAME_MAX
+#define	_SC_LOGINNAME_MAX	_SC_LOGIN_NAME_MAX	
+#endif
 #ifndef	_SC_THREAD_DESTRUCTORS
 #define	_SC_THREAD_DESTRUCTORS	_SC_THREAD_DESTRUCTOR_ITERATIONS
 #endif
