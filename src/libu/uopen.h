@@ -67,7 +67,7 @@ extern int u_pipe(int *) noex ;
 extern int u_pipe2(int *,int) noex ;
 extern int u_piper(int *,int,int) noex ;
 
-static inline int u_pipes(int *pipes,int of) noex {
+local inline int u_pipes(int *pipes,int of) noex {
 	return u_pipe2(pipes,of) ;
 }
 
