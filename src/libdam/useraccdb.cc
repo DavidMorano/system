@@ -73,7 +73,7 @@
 #include	<linebuffer.h>		/* LIBUC */
 #include	<initnow.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<ctdec.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC |strnblanks(3uc)| */
@@ -841,7 +841,7 @@ local int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 
 local int mkts(char *tbuf,int tlen,time_t t) noex {
 	int		tl = 0 ;
-	timestr_logz(t,tbuf) ;
+	strtime_logz(t,tbuf) ;
 	if ((tl = lenstr(tbuf)) < tlen) {
 	    char	*bp = (tbuf + tl) ;
 	    cint	bl = (tlen - tl) ;
