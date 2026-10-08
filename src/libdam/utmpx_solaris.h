@@ -133,13 +133,13 @@ extern struct utmpx *pututxline(const struct utmpx *);
 extern void setutxent(void);
 
 #if !defined(_XPG4_2) || defined(__EXTENSIONS__)
-extern int utmpxname(const char *);
+extern int utmpxname(cchar *);
 extern struct utmpx *makeutx(const struct utmpx *);
 extern struct utmpx *modutx(const struct utmpx *);
 extern void getutmp(const struct utmpx *, struct utmp *);
 extern void getutmpx(const struct utmp *, struct utmpx *);
-extern void updwtmp(const char *, struct utmp *);
-extern void updwtmpx(const char *, struct utmpx *);
+extern void updwtmp(cchar *, struct utmp *);
+extern void updwtmpx(cchar *, struct utmpx *);
 #endif /* !defined(_XPG4_2) || defined(__EXTENSIONS__) */
 
 #else /* __STDC__ */
