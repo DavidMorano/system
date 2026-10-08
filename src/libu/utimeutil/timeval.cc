@@ -1,4 +1,4 @@
-/* timeval SUPPORT */
+/* timeval SUPPORT (Time-Value) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -78,7 +78,7 @@ constexpr int		onemillion = INTMILLION ;
 
 int timeval_load(mut TIMEVAL *dst,time_t sec,int usec) noex {
 	int		rs = SR_FAULT ;
-	if (dst) {
+	if (dst) ylikely {
 	    rs = SR_OK ;
 	    while (usec >= onemillion) {
 	        sec += 1 ;
@@ -92,28 +92,28 @@ int timeval_load(mut TIMEVAL *dst,time_t sec,int usec) noex {
 
 int timeval_add(mut TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	int		rs = SR_FAULT ;
-	if (dst && src1 && src2) {
+	if (dst && src1 && src2) ylikely {
 	    rs = SR_OK ;
 	    dst->tv_sec = src1->tv_sec + src2->tv_sec ;
 	    dst->tv_usec = src1->tv_usec + src2->tv_usec ;
 	    if (dst->tv_usec >= onemillion) {
 	        dst->tv_usec -= onemillion ;
 	        dst->tv_sec += 1 ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (timeval_add) */
 
 int timeval_sub(mut TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
 	int		rs = SR_FAULT ;
-	if (dst && src1 && src2) {
+	if (dst && src1 && src2) ylikely {
 	    rs = SR_OK ;
 	    dst->tv_sec = src1->tv_sec - src2->tv_sec ;
 	    dst->tv_usec = src1->tv_usec - src2->tv_usec ;
 	    if (dst->tv_usec < 0) {
 	        dst->tv_usec += onemillion ;
 	        dst->tv_sec -= 1 ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (timeval_sub) */
@@ -122,13 +122,25 @@ timeval operator + (const timeval &t1,const timeval &t2) noex {
 	timeval	r ;
 	timeval_add(&r,&t1,&t2) ;
 	return r ;
-} /* end method (timeval::operator) */
+} /* end subroutine (timeval::operator) */
 
 timeval operator - (const timeval &t1,const timeval &t2) noex {
 	timeval	r ;
 	timeval_sub(&r,&t1,&t2) ;
 	return r ;
-} /* end method (timeval::operator) */
+} /* end subroutine (timeval::operator) */
+
+timeval operator + (const timeval &t1,con time_t t) noex {
+	timeval	r = t1 ;
+	r.tv_sec += t ;
+	return r ;
+} /* end subroutine (timeval::operator) */
+
+timeval operator - (const timeval &t1,con time_t t) noex {
+	timeval	r = t1 ;
+	r.tv_sec -= t ;
+	return r ;
+} /* end subroutine (timeval::operator) */
 
 ordcmp_strong operator <=> (con timeval &v1,con timeval &v2) noex {
     	ord res = ord::equal ;
@@ -142,10 +154,22 @@ ordcmp_strong operator <=> (con timeval &v1,con timeval &v2) noex {
 	return res ;
 } /* end subroutine (timeval::operator) */
 
-ordcmp_strong operator <=> (con timeval &v1,time_t t) noex {
+ordcmp_strong operator <=> (con timeval &v1,con time_t t) noex {
     	ord res = ord::equal ;
 	int rc = 0 ;
 	if ((rc = intconv(v1.tv_sec - t)) == 0L) {
+	    rc = intconv(v1.tv_usec - 0) ;
+	}
+	if (rc) {
+	    res = (rc > 0) ? ord::greater : ord::less ;
+	}
+	return res ;
+} /* end subroutine (timeval::operator) */
+
+ordcmp_strong operator <=> (con timeval &v1,con int v) noex {
+    	ord res = ord::equal ;
+	int rc = 0 ;
+	if ((rc = intconv(v1.tv_sec - v)) == 0L) {
 	    rc = intconv(v1.tv_usec - 0) ;
 	}
 	if (rc) {
@@ -174,7 +198,7 @@ timeval_t &timeval_t::operator += (const timeval_t &o) noex {
 	if (usec >= onemillion) {
 	    usec -= onemillion ;
 	    tv_sec += 1 ;
-	}
+	} /* end */
 	tv_usec = usec ;
 	return *this ;
 } /* end method (timeval::operator) */
@@ -185,7 +209,7 @@ timeval_t &timeval_t::operator -= (const timeval_t &o) noex {
 	if (usec < 0) {
 	    usec += onemillion ;
 	    tv_sec -= 1 ;
-	}
+	} /* end */
 	tv_usec = usec ;
 	return *this ;
 } /* end method (timeval::operator) */
