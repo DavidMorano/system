@@ -20,15 +20,31 @@
   	Group:
 	mkhex{x}
 
+	Names:
+	mkhexstr
+
 	Description:
-	This modeule provides debugging support.
+	This module provides subroutines that create strings of
+	hexadecimal digits.
+
+	Synopsis:
+	int mkhexstr(char *dbuf,int dlen,cvoid *vdp,int vdl) noex
+
+	Arguments:
+	dbuf		destination buffer pointer
+	dlen		destination buffer legnth
+	vdp		source data pointer
+	vdl		source data length
+
+	Returnrs:
+	>=0		number of bytes in result buffer
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
@@ -80,16 +96,16 @@ cint		twodig	= 2 ;
 /* exported subroutines */
 
 namespace libu {
-    int mkhexstr(char *dbuf,int dlen,cvoid *vp,int vl) noex {
+    int mkhexstr(char *dbuf,int dlen,cvoid *vdp,int vdl) noex {
     	int		rs = SR_FAULT ;
 	int		j = 0 ; /* return-value */
-	if (dbuf && vp) ylikely {
-	    ccharp	sp = ccharp(vp) ;
+	if (dbuf && vdp) ylikely {
+	    ccharp	sp = ccharp(vdp) ;
 	    rs = SR_INVALID ;
 	    dbuf[0] = '\0' ;
 	    if (dlen >= 0) ylikely {
 		cint	m = (b16 - 1) ;
-	        cint	sl = (vl < 0) ? lenstr(sp) : vl ;
+	        cint	sl = (vdl < 0) ? lenstr(sp) : vdl ;
 	        rs = SR_OK ;
 	        for (int i = 0 ; (dlen >= twodig) && (i < sl) ; i += 1) {
 	            cint ch = mkchar(sp[i]) ;
@@ -98,6 +114,7 @@ namespace libu {
 	            dlen -= twodig ;
 	        } /* end for */
 	        dbuf[j] = '\0' ;
+		if (j < (sl * twodig)) rs = SR_OVERFLOW ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? j : rs ;
