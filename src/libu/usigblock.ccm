@@ -59,7 +59,7 @@ export {
 	    w = m ;
 	} ; /* end */
 	operator int () noex ;
-	int operator () (const int * = nullptr) noex ;
+	int operator () (cint * = nullptr) noex ;
     } ; /* end struct (usigblock_co) */
 } /* end export (usigblock) */
 
