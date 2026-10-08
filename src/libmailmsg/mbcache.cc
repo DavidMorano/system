@@ -66,7 +66,7 @@
 #include	<snx.h>			/* LIBUC */
 #include	<mkx.h>			/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<intsat.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
@@ -1232,7 +1232,7 @@ local int msgent_procscandate(ME *mep,mbcache *op) noex {
 	        }
 	        if ((rs >= 0) && (t > 0)) {
 	            char	timebuf[TIMEBUFLEN + 1] ;
-	            if (cc *ts ; (ts = timestr_scandate(t,timebuf)) != np) {
+	            if (cc *ts ; (ts = strtime_scandate(t,timebuf)) != np) {
 	                strpack		*psp = op->spp ;
 	                if (cc *cp ; (rs = strpack_store(psp,ts,-1,&cp)) >= 0) {
 	                    cl = rs ;
