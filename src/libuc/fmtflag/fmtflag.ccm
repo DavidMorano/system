@@ -101,7 +101,7 @@ export {
 	    space	(this,fmtflag_space) ;
 	    thousands	(this,fmtflag_thousands) ;
 	} ; /* end ctor */
-	fmtflag(const int a) noex : fg(a) { } ;
+	fmtflag(cint a) noex : fg(a) { } ;
 	operator int () noex {
 	    return fg ;
 	} ;
