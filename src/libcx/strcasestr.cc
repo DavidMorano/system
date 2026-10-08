@@ -42,14 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<nleadstr.h>
-#include	<char.h>		/* |CHAR_{x}(3uc)| */
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<nleadstr.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC |CHAR_{x}(3uc)| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strx.h"
 
@@ -82,7 +82,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 char *strcasestr(cchar *sp,cchar *s2) noex {
     	char		*rp = nullptr ;
-	if (sp && s2) {
+	if (sp && s2) ylikely {
 	    cint	s2len = lenstr(s2) ;
 	    rp = charp(sp) ;
 	    if (s2len > 0) {
@@ -103,11 +103,10 @@ char *strcasestr(cchar *sp,cchar *s2) noex {
 	            rp = (char *) ((f) ? (sp+i) : nullptr) ;
 	        } else {
 	            rp = nullptr ;
-	        }
+	        } /* end */
 	    } /* end if (positive) */
 	} /* end if (non-null) */
 	return rp ;
-}
-/* end subroutine (strcasestr) */
+} /* end subroutine (strcasestr) */
 
 
