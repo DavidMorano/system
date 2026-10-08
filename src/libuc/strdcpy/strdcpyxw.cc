@@ -45,6 +45,18 @@
 	1. If necessary (in order to gurantee NUL-termination) a
 	NUL will be written past the end (deterined by a supplied
 	length) of the destination character buffer.
+	2. I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard lirbrary already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might gets optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like).
+	** this note is obsoleted 2011-12-09, see revision above **
 
 *******************************************************************************/
 
@@ -86,52 +98,56 @@
 
 /* exported subroutines */
 
-char *strdcpy1w(char *dp,int dl,cc *s1,int sl) noex {
+char *strdcpy1w(char *dp,int dl,
+		cc *s1,int sl) noex {
 	return strdcpyxw(dp,dl,1,s1,sl) ;
 } /* end subroutine (strdcpy1w) */
 
-char *strdcpy2w(char *dp,int dl,cc *s1,cc *s2,int sl) noex {
+char *strdcpy2w(char *dp,int dl,
+		cc *s1,cc *s2,int sl) noex {
 	return strdcpyxw(dp,dl,2,s1,s2,sl) ;
 } /* end subroutine (strdcpy2w) */
 
-char *strdcpy3w(char *dp,int dl,cc *s1,cc *s2,cc *s3,int sl) noex {
+char *strdcpy3w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,int sl) noex {
 	return strdcpyxw(dp,dl,3,s1,s2,s3,sl) ;
 } /* end subroutine (strdcpy3w) */
 
-char *strdcpy4w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
+char *strdcpy4w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
 	return strdcpyxw(dp,dl,4,s1,s2,s3,s4,sl) ;
 } /* end subroutine (strdcpy4w) */
 
-char *strdcpy5w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
-		cc *s5,int sl) noex {
+char *strdcpy5w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
 	return strdcpyxw(dp,dl,5,s1,s2,s3,s4,s5,sl) ;
 } /* end subroutine (strdcpy5w) */
 
-char *strdcpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
-		cc *s5,cc *s6,int sl) noex {
+char *strdcpy6w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl) noex {
 	return strdcpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end subroutine (strdcpy6w) */
 
 char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
-	if (dp) {
+	if (dp) ylikely {
 	    va_begin(ap,n) ;
 	    if (dl < 0) dl = INT_MAX ;
 	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
 	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
 	        if (i == (n-1)) {
 	            int	sl = (int) va_arg(ap,int) ;
-	            while ((dl > 0) && sl && (sp[0] != '\0')) {
+	            while ((dl > 0) && sl && *sp) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
 		        sl -= 1 ;
-	            }
+	            } /* end while */
 	        } else {
-	            while ((dl > 0) && (sp[0] != '\0')) {
+	            while ((dl > 0) && *sp) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
-	            }
-	        }
+	            } /* end while */
+	        } /* end if */
 	    } /* end for */
 	    *dp = '\0' ;
 	    va_end(ap) ;
