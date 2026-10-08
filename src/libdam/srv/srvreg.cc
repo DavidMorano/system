@@ -54,7 +54,7 @@
 #include	<serialbuf.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<lockfile.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -935,7 +935,7 @@ time_t		daytime ;
 
 #if	CF_DEBUG
 	DEBUGPRINTF("srvreg_check: %s\n",
-	    timestr_log(daytime,timebuf)) ;
+	    strtime_log(daytime,timebuf)) ;
 #endif
 
 	if (op->fl.readlocked || op->fl.writelocked)
