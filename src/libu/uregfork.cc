@@ -87,7 +87,7 @@ import usysbasic ;
 
 /* imported namespaces */
 
-using libu::um ;			/* variable */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -105,11 +105,11 @@ namespace {
 	void_f		sub_before ;
 	void_f		sub_parent ;
 	void_f		sub_child ;
-    } ;
+    } ; /* end struct */
     struct uregfork_list {
 	uregfork_ent	*head ;
 	uregfork_ent	*tail ;
-    } ;
+    } ; /* end struct */
     struct uregfork {
 	ptm		mx ;		/* data mutex */
 	uregfork_list	hlist ;		/* memory allocated */
@@ -168,20 +168,20 @@ namespace libu {
 	    rs = uregfork_data.record(b,p,c) ;
 	}
 	return rs ;
-    }
+    } /* end subroutine */
     int uregfork_exp(void_f b,void_f p,void_f c) noex {
 	int		rs = SR_INVALID ;
 	if (b || p || c) {
 	    rs = uregfork_data.expunge(b,p,c) ;
 	}
 	return rs ;
-    }
+    } /* end subroutine */
     int uregfork_init() noex {
 	return uregfork_data.init() ;
-    }
+    } /* end subroutine */
     int uregfork_fini() noex {
 	return uregfork_data.fini() ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
@@ -190,7 +190,7 @@ namespace libu {
 int uregfork::init() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
-	if (!fvoid) {
+	if (!fvoid) ylikely {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
@@ -236,11 +236,11 @@ int uregfork::fini() noex {
 	    if (ftrack) {
 	        rs1 = trackend() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mx.destroy() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit = false ;
 	    finitdone = false ;
 	} /* end if (was initialized) */
@@ -250,13 +250,13 @@ int uregfork::fini() noex {
 int uregfork::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
 	int		rs1 ;
-	if (usigblock b ; (rs = b.start) >= 0) {
-	    if ((rs = init()) >= 0) {
-	        if ((rs = mx.lockbegin) >= 0) { /* single */
+	if (usigblock b ; (rs = b.start) >= 0) ylikely {
+	    if ((rs = init()) >= 0) ylikely {
+	        if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
 		    uregfork_ent	*ep{} ;
-	            if ((rs = trackbegin()) >= 0) {
+	            if ((rs = trackbegin()) >= 0) ylikely {
 	                cint	esz = szof(URF_ENT) ;
-	                if ((rs = um.mall(esz,&ep)) >= 0) {
+	                if ((rs = umem.mall(esz,&ep)) >= 0) ylikely {
 			    uregfork_list	*lp = &hlist ;
 			    entry_load(ep,sb,sp,sc) ;
 			    list_add(lp,ep) ;
@@ -276,11 +276,11 @@ int uregfork::expunge(void_f sb,void_f sp,void_f sc) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (usigblock b ; (rs = b.start) >= 0) {
-	    if ((rs = init()) >= 0) {
-                if ((rs = mx.lockbegin) >= 0) { /* single */
+	if (usigblock b ; (rs = b.start) >= 0) ylikely {
+	    if ((rs = init()) >= 0) ylikely {
+                if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
                     uregfork_list   *lp = &hlist ;
-                    if ((rs = trackbegin()) >= 0) {    
+                    if ((rs = trackbegin()) >= 0) ylikely {    
                         URF_ENT     *ep = lp->head ;
                         URF_ENT     *nep ;
                         while (ep) {
@@ -288,7 +288,7 @@ int uregfork::expunge(void_f sb,void_f sp,void_f sc) noex {
                             if (entry_match(ep,sb,sp,sc)) {
                                 c += 1 ;
                                 list_rem(lp,ep) ;
-                                um.free(ep) ;
+                                umem.free(ep) ;
                             } /* end if (memory-release) */
                             ep = nep ;
                         } /* end while (deleting matches) */
@@ -317,7 +317,7 @@ int uregfork::trackend() noex {
 	    ftrack = false ;
 	    while (ep) {
 	        nep = ep->next ;
-	        rs1 = um.free(ep) ;
+	        rs1 = umem.free(ep) ;
 		if (rs >= 0) rs = rs1 ;
 	        ep = nep ;
 	    } /* end while (memory-release) */
@@ -385,8 +385,8 @@ void uregfork::atforkchild() noex {
 	    {
 	        rs1 = mx.lockend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
-	}
+	    } /* end */
+	} /* end */
 	(void) rs ;
 } /* end subroutine (uregfork::atforkchild) */
 
@@ -414,11 +414,11 @@ local int list_add(uregfork_list *lp,uregfork_ent *ep) noex {
 	    ep->prev = lep ;
 	} else {
 	    ep->prev = nullptr ;
-	}
+	} /* end */
 	lp->tail = ep ;
 	if (lp->head == nullptr) {
 	    lp->head = ep ;
-	}
+	} /* end */
 	return SR_OK ;
 } /* end subroutine (list_add) */
 
@@ -430,12 +430,12 @@ local int list_rem(uregfork_list *lp,uregfork_ent *ep) noex {
 	    nep->prev = ep->prev ;
 	} else {
 	    lp->tail = pep ;
-	}
+	} /* end */
 	if (pep) {
 	    pep->next = ep->next ;
 	} else {
 	    lp->head = nep ;
-	}
+	} /* end */
 	return SR_OK ;
 } /* end subroutine (list_rem) */
 
