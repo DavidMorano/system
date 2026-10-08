@@ -88,7 +88,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 int cthexstr(char *dbuf,int dlen,int f,cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (dbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
@@ -98,10 +98,10 @@ int cthexstr(char *dbuf,int dlen,int f,cchar *sp,int µsl) noex {
 	                cint	ch = up[i] ;
 	                if (f && (i > 0)) {
 		            rs = b.chr(' ') ;
-	                }
+	                } /* end */
 		        if (rs >= 0) {
 			    rs = b.hexc(ch) ;
-		        }
+		        } /* end */
 	            } /* end for */
 	            len = b.finish ;
 	            if (rs >= 0) rs = len ;
