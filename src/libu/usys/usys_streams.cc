@@ -95,11 +95,11 @@ unixret_t isastream(int fd) noex {
 	    ec = ENOSYS ;
 	} else {
 	    ec = EBADF ;
-	}
+	} /* end */
 	if (ec) {
 	    errno = ec ;
 	    rc = -1 ;
-	}
+	} /* end if (error) */
 	return rc ;
 } /* end */
 
@@ -122,7 +122,7 @@ unixret_t fattach(int fd,cchar *fname) noex {
 	if (ec) {
 	    errno = ec ;
 	    rc = -1 ;
-	}
+	} /* end if (error) */
 	return rc ;
 } /* end */
 
@@ -141,7 +141,7 @@ unixret_t fdetach(cchar *fname) noex {
 	if (ec) {
 	    errno = ec ;
 	    rc = -1 ;
-	}
+	} /* end if (error) */
 	return rc ;
 } /* end */
 
@@ -160,7 +160,7 @@ unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
 	if (ec) {
 	    errno = ec ;
 	    rc = -1 ;
-	}
+	} /* end if (error) */
 	return rc ;
 } /* end */
 
@@ -179,7 +179,7 @@ unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
 	if (ec) {
 	    errno = ec ;
 	    rc = -1 ;
-	}
+	} /* end if (error) */
 	return rc ;
 } /* end */
 
@@ -199,7 +199,7 @@ unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
 	if (ec) {
 	    errno = ec ;
 	    rc = -1 ;
-	}
+	} /* end if (error) */
 	return rc ;
 } /* end */
 
@@ -220,7 +220,7 @@ unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
 	if (ec) {
 	    errno = ec ;
 	    rc = -1 ;
-	}
+	} /* end if (error) */
 	return rc ;
 } /* end */
 
