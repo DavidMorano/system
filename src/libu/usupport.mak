@@ -46,7 +46,7 @@ OBJ02= usupport_cfdec.o usupport_cfdect.o
 OBJ03= usupport_cfhex.o usupport_cfinet.o
 OBJ04= usupport_toxc.o usupport_snwcpy.o 
 OBJ05= usupport_rmx.o
-OBJ06= usupport_ustrftime.o 
+OBJ06= usupport_ustrftime.o usupport_mkhex.o
 OBJ07= usupport_ctdec.o usupport_cthex.o
 
 OBJ08= usupport_getsign.o usupport_siext.o
@@ -256,11 +256,12 @@ usupport_hasnot.o:	usupport_hasnot.cc	usupport_hasnot.hh	$(INCS)
 usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.hh	$(INCS)
 usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.hh	$(INCS)
 usupport_cthex.o:	usupport_cthex.cc	usupport_cthex.hh	$(INCS)
+usupport_matkeystr.o:	usupport_matkeystr.cc	usupport_matkeystr.hh	$(INCS)
 usupport_matostr.o:	usupport_matostr.cc	usupport_matostr.hh	$(INCS)
 usupport_matstr.o:	usupport_matstr.cc	usupport_matstr.hh	$(INCS)
+usupport_mkhex.o:	usupport_mkhex.cc	usupport_mkhex.hh	$(INCS)
 usupport_nleadkeystr.o:	usupport_nleadkeystr.cc	usupport_nleadkeystr.hh	$(INCS)
 usupport_nleadstr.o:	usupport_nleadstr.cc	usupport_nleadstr.hh	$(INCS)
-usupport_matkeystr.o:	usupport_matkeystr.cc	usupport_matkeystr.hh	$(INCS)
 usupport_prime.o:	usupport_prime.cc	usupport_prime.h	$(INCS)
 usupport_rmx.o:		usupport_rmx.cc		usupport_rmx.hh		$(INCS)
 usupport_sichar.o:	usupport_sichar.cc	usupport_sichar.hh	$(INCS)
