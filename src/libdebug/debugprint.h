@@ -33,7 +33,7 @@
         if_constexpr (f_debug) {				\
             rsdebug = debugprintx(__func__, FMT __VA_OPT__(,) __VA_ARGS__) ; \
         } ; rsdebug ; \
-    })
+    }) /* end macro (DEBUGPRINTF) */
 #else /* __cplusplus */
 #define DEBUGPRINTF(FMT, ...)					\
     debugprintx(__func__,FMT __VA_OPT__(,) __VA_ARGS__)
@@ -57,6 +57,7 @@ extern int debugsetfd		(int) noex ;
 extern int debuggetfd		(void) noex ;
 
 extern int debugprinthexblock	(cchar *,int,cvoid *,int) noex ;
+extern int debugprinthexs	(cchar *,int,cvoid *,int) noex ;
 extern int debugprintdeci	(cchar *,int) noex ;
 extern int debugprinthexi	(cchar *,int) noex ;
 extern int debugprintnum	(cchar *,int) noex ;
@@ -68,10 +69,10 @@ EXTERNC_end
 
 inline int debugwrite(cchar *sp) noex {
     	return debugwrite(sp,-1) ;
-}
+} /* end */
 inline int debugprint(cchar *sp) noex {
     	return debugprint(sp,-1) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
