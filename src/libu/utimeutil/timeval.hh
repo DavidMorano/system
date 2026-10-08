@@ -1,4 +1,4 @@
-/* timeval HEADER */
+/* timeval HEADER (Time-Value) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -85,7 +85,7 @@
 #endif
 
 #ifndef	timevalcmp
-#define timevalcmp(l,r,cmp)   timercmp(l,r,cmp) /* freebsd */
+#define timevalcmp(l,r,cmp)   timercmp(l,r,cmp) /* FreeBsd */
 #endif
 
 
@@ -108,7 +108,18 @@ inline bool operator == (con timeval &v1,con timeval &v2) noex {
 } /* end subroutine (timeval::operator) */
 
 extern ordcmp_strong operator <=> (con timeval &,con timeval &) noex ;
-extern ordcmp_strong operator <=> (con timeval &,time_t) noex ;
+
+inline bool operator == (con timeval &v1,con time_t t) noex {
+    	return (v1.tv_sec == t) && (v1.tv_usec == 0) ;
+} /* end subroutine (timeval::operator) */
+
+extern ordcmp_strong operator <=> (con timeval &,con time_t) noex ;
+
+inline bool operator == (con timeval &v1,con int t) noex {
+    	return (v1.tv_sec == t) && (v1.tv_usec == 0) ;
+} /* end subroutine (timeval::operator) */
+
+extern ordcmp_strong operator <=> (con timeval &,con int) noex ;
 
 struct timeval_t : timeval {
     	timeval_t(time_t ªsec = 0,suseconds_t ªusec = 0) noex {
