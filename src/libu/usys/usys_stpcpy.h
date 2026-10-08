@@ -20,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<string.h>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
