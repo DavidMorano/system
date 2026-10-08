@@ -46,6 +46,19 @@
 	NUL will be written past the end (deterined by a supplied
 	length) of the destination character buffer.
 
+	Notes (obsoleted 2011-12-09):
+	I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard lirbrary already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might gets optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like).
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -108,22 +121,25 @@ namespace libu {
 		cc *s5,cc *s6,int sl) noex {
 	return strdcpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
     } /* end subroutine (strdcpy6w) */
+} /* end namespace (libu) */
+
+namespace libu {
     char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
-	if (dp) {
+	if (dp) ylikely {
 	    va_begin(ap,n) ;
 	    if (dl < 0) dl = INT_MAX ;
 	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
 	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
 	        if (i == (n - 1)) {
 	            int	sl = (int) va_arg(ap,int) ;
-	            while ((dl > 0) && sl && (sp[0] != '\0')) {
+	            while ((dl > 0) && sl && sp[0]) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
 		        sl -= 1 ;
 	            } /* end while */
 	        } else {
-	            while ((dl > 0) && (sp[0] != '\0')) {
+	            while ((dl > 0) && sp[0]) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
 	            } /* end while */
