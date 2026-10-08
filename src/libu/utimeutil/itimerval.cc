@@ -1,4 +1,4 @@
-/* itimerval SUPPORT */
+/* itimerval SUPPORT (Internval-Timer-Value) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -94,14 +94,6 @@ int itimerval_load(ITIMERVAL *tsp,CTIMEVAL *valp,CTIMEVAL *ivp) noex {
 	return rs ;
 } /* end subroutine (itimerval_load) */
 
-bool operator == (con itimerval &v1,con itimerval &v2) noex {
-    	return (v1.it_value == v2.it_value) ;
-} /* end subroutine itimerval::operator) */
-
-ordcmp_strong operator <=> (con itimerval &v1,con itimerval &v2) noex {
-    	return (v1.it_value <=> v2.it_value) ;
-} /* end subroutine (itimerval::operator) */
-
 const itimerval operator - (con itimerval &v1,con itimerval &v2) noex {
     	itimerval res{} ;
 	res.it_value	= v1.it_value - v2.it_value ;
@@ -114,5 +106,29 @@ const itimerval operator - (con itimerval &v1,con time_t t) noex {
 	res.it_value.tv_sec -= t ;
     	return res ;
 } /* end subroutine (itimerval::operator) */
+
+bool operator == (con itimerval &v1,con itimerval &v2) noex {
+    	return (v1.it_value == v2.it_value) ;
+} /* end subroutine itimerval::operator) */
+
+ordcmp_weak operator <=> (con itimerval &v1,con itimerval &v2) noex {
+    	return (v1.it_value <=> v2.it_value) ;
+} /* end subroutine (itimerval::operator) */
+
+bool operator == (con itimerval &itv,int t) noex {
+	return (itv.it_value == t) ;
+} /* end subroutine */
+
+ordcmp_weak operator <=> (con itimerval &itv,int t) noex {
+    	return (itv.it_value <=> t) ;
+} /* end subroutine */
+
+bool operator == (con itimerval &itv,time_t t) noex {
+	return (itv.it_value == t) ;
+} /* end subroutine */
+
+ordcmp_weak operator <=> (con itimerval &itv,time_t t) noex {
+    	return (itv.it_value <=> t) ;
+} /* end subroutine */
 
 
