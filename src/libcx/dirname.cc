@@ -36,9 +36,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| */
 #include	<clanguage.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -50,28 +50,25 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern size_t strlen(const char *) noex ;
-}
-
 
 /* exported subroutines */
 
 char *dirname(char *s) noex {
-	int		si ;
-	int		sl = strlen(s) ;
-/* remove trailing slash characters */
-	while ((sl > 0) && (s[sl - 1] == '/')) {
-	    sl -= 1 ;
-	}
-/* find the next previous slash character */
-	for (si = sl ; si > 0 ; si -= 1) {
-	    if (s[si - 1] == '/') break ;
-	}
-/* nuke it here */
-	s[si - 1] = '\0' ;
+    	if (s) ylikely {
+	    int		si ; /* used-afterwards */
+	    int		sl = intconv(strlen(s)) ;
+	    /* remove trailing slash characters */
+	    while ((sl > 0) && (s[sl - 1] == '/')) {
+	        sl -= 1 ;
+	    } /* end while */
+	    /* find the next previous slash character */
+	    for (si = sl ; si > 0 ; si -= 1) {
+	        if (s[si - 1] == '/') break ;
+	    } /* end for */
+	    /* nuke it here */
+	    s[si - 1] = '\0' ;
+	} /* end if (non-null) */
 	return s ;
-}
-/* end subroutine (dirname) */
+} /* end subroutine (dirname) */
 
 
