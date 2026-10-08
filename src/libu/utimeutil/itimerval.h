@@ -1,4 +1,4 @@
-/* itimerval HEADER */
+/* itimerval HEADER (Internval-Timer-Value) */
 /* charset=ISO8859-1 */
 /* lang=C99 */
 
@@ -42,10 +42,14 @@ extern int itimerval_load(mut ITIMERVAL *,CTIMEVAL *,CTIMEVAL *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-extern bool operator == (con itimerval &,con itimerval &) noex ;
-extern ordcmp_strong operator <=> (con itimerval &,con itimerval &) noex ;
 extern const itimerval operator - (con itimerval &,con itimerval &) noex ;
 extern const itimerval operator - (con itimerval &,con time_t) noex ;
+extern bool operator == (con itimerval &,con itimerval &) noex ;
+extern ordcmp_weak operator <=> (con itimerval &,con itimerval &) noex ;
+extern bool operator == (con itimerval &,int) noex ;
+extern ordcmp_weak operator <=> (con itimerval &,int) noex ;
+extern bool operator == (con itimerval &,time_t) noex ;
+extern ordcmp_weak operator <=> (con itimerval &,time_t) noex ;
 #endif /* __cplusplus */
 
 
