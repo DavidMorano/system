@@ -77,8 +77,6 @@ import ulibvals ;			/* |ulibval(3u)| */
 
 /* local variables */
 
-static cint	maxbase = ulibval.maxbase ;
-
 
 /* exported variables */
 
@@ -86,10 +84,13 @@ static cint	maxbase = ulibval.maxbase ;
 /* exported subroutines */
 
 int checkbase(cchar *sp,int sl,int b) noex {
-	int		rs = SR_INVALID ;
-	if ((b >= 2) && (b <= maxbase)) {
-	    rs = (hasallbase(sp,sl,b)) ? SR_OK : SR_DOM ;
-	}
+    	int		rs ;
+	if (static cint maxbase = ulibval.maxbase ; (rs = maxbase) >= 0) {
+	    rs = SR_INVALID ;
+	    if ((b >= 2) && (b <= maxbase)) {
+	        rs = (hasallbase(sp,sl,b)) ? SR_OK : SR_DOM ;
+	    } /* end if (valid base) */
+	} /* end if (ulibval) */
 	return rs ;
 } /* end subroutine (checkbase) */
 
