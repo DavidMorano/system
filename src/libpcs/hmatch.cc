@@ -122,7 +122,7 @@ int hmatch(cchar *header,cchar *str) noex {
 	        if (fmat) {
 	            while (ISWH(*sp)) {
 		        sp += 1 ;
-	            }
+	            } /* end while */
 	            if (*sp++ == ':')  {
 	                while (ISWH(*sp)) {
 			    sp += 1 ;
