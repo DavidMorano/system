@@ -99,7 +99,7 @@ extern void setuserattr() noex ;
 extern void enduserattr() noex ;
 extern void free_userattr(userattr *) noex ;
 extern userattr *getuserattr() noex ;
-extern userattr *getusernam(const char *) noex ;
+extern userattr *getusernam(cchar *) noex ;
 extern userattr *getuseruid(uid_t) noex ;
 
 EXTERNC_end
