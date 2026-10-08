@@ -99,13 +99,13 @@ extern int	ptm_lockend		(ptm *) noex ;
 extern int	ptm_setprioceiling	(ptm *,int,int *) noex ;
 extern int	ptm_getprioceiling	(ptm *,int *) noex ;
 
-static inline int ptm_lock(ptm *op) noex {
+local inline int ptm_lock(ptm *op) noex {
     	return ptm_lockbegin(op) ;
 }
-static inline int ptm_lockto(ptm *op,int to) noex {
+local inline int ptm_lockto(ptm *op,int to) noex {
     	return ptm_lockbeginto(op,to) ;
 }
-static inline int ptm_unlock(ptm *op) noex {
+local inline int ptm_unlock(ptm *op) noex {
     	return ptm_lockend(op) ;
 }
 
