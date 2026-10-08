@@ -5,6 +5,7 @@
 /* manipulate host entry structures */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_HOSTBYNAME	1		/* use |gethostbyname(3nsl)| */
 #define	CF_FASTADDR	1		/* use fast-addr */
 
@@ -72,12 +73,14 @@
 #include	<isindomain.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"hostinfo.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |elnstr(3u)| + |memclear(3u)| */
+import deb ;
 
 /* local defines */
 
@@ -88,10 +91,12 @@ import libutil ;			/* |elnstr(3u)| + |memclear(3u)| */
 #define	LOCALDOMAINNAME		"local"
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_HOSTBYNAME
 #define	CF_HOSTBYNAME	0		/* backup safety definition */
 #endif
-
 #ifndef	CF_FASTADDR
 #define	CF_FASTADDR	0		/* backup safety definition */
 #endif
@@ -102,7 +107,6 @@ import libutil ;			/* |elnstr(3u)| + |memclear(3u)| */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -142,6 +146,8 @@ struct known {
 
 template<typename ... Args>
 local inline int hostinfo_ctor(hostinfo *op,Args ... args) noex {
+    	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
@@ -152,8 +158,8 @@ local inline int hostinfo_ctor(hostinfo *op,Args ... args) noex {
 	    op->addr = {} ;
 	    op->domainname = nullptr ;
 	    op->a = nullptr ;
-	    if ((op->nlp = new(nothrow) vecobj) != nullptr) ylikely {
-	        if ((op->alp = new(nothrow) vecobj) != nullptr) ylikely {
+	    if ((op->nlp = new(nt) vecobj) != np) ylikely {
+	        if ((op->alp = new(nt) vecobj) != np) ylikely {
 		    rs = SR_OK ;
 		} /* end if (new-vecobj) */
 		if (rs < 0) {
@@ -172,11 +178,11 @@ local inline int hostinfo_dtor(hostinfo *op) noex {
 	    if (op->alp) ylikely {
 		delete op->alp ;
 		op->alp = nullptr ;
-	}
-	if (op->nlp) ylikely {
+	    } /* end if (delete-vecobj) */
+	    if (op->nlp) ylikely {
 		delete op->nlp ;
 		op->nlp = nullptr ;
-	}
+	    } /* end if (delete-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (hostinfo_dtor) */
@@ -185,8 +191,8 @@ template<typename ... Args>
 local int hostinfo_magic(hostinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
-	rs = (op->magval == HOSTINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	    rs = (op->magval == HOSTINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	} /* end */
 	return rs ;
 } /* end subroutine (hostinfo_magic) */
 
@@ -249,8 +255,9 @@ constexpr int		af0 = AF_UNSPEC ;
 constexpr int		af4 = AF_INET4 ;
 constexpr int		af6 = AF_INET6 ;
 
-constexpr bool		f_hostbyname = CF_HOSTBYNAME ;
-constexpr bool		f_fastaddr = CF_FASTADDR ;
+constexpr bool		f_debug		= CF_DEBUG ;
+constexpr bool		f_hostbyname	= CF_HOSTBYNAME ;
+constexpr bool		f_fastaddr	= CF_FASTADDR ;
 
 local inline bool isaf4(int a) noex {
 	return ((a == af0) || (a == af4)) ;
@@ -1251,26 +1258,29 @@ local int vmataddr(cvoid **v1pp,cvoid **v2pp) noex {
 	return (f) ? 0 : 1 ;	/* <- reversed sense */
 } /* end subroutine (vmataddr) */
 
-#if	defined(COMMENT) && defined(CF_DEBUGS) && (CF_DEBUGS > 0)
-local int debugprintaliases(cchar *s,HOSTENT *hep) noex {
+#if	defined(COMMENT) && defined(CF_DEBUG) && (CF_DEBUG > 0)
+local int debprintaliases(cchar *s,HOSTENT *hep) noex {
 	int		i = 0 ;
-	debugprintf("%s: aliases>\n",s) ;
+	debprintf("%s: aliases>\n",s) ;
 	if (hep->h_aliases != nullptr) {
-	    for (i = 0 ; hep->h_aliases[i] != nullptr ; i += 1)
-	        debugprintf("%s: alias[%u]=>%s<\n",
+	    for (i = 0 ; hep->h_aliases[i] != nullptr ; i += 1) {
+	        DEBPRINTF("%s: alias[%u]=>%s<\n",
 	            s,i,hep->h_aliases[i]) ;
+	    } /* end for */
 	}
 	return i ;
 } /* end subroutine */
-local int debugprintinetaddr(cchar *s,int af,cvoid *binaddr) noex {
+local int debprintinetaddr(cchar *s,int af,cvoid *binaddr) noex {
 	cint		slen = INETX_ADDRSTRLEN ;
 	int		rs1 ;
 	char		sbuf[INETX_ADDRSTRLEN + 1] ;
-	rs1 = inetntop(sbuf,slen,af,binaddr) ;
-	if (rs1 < 0) strcpy(sbuf,"BAD") ;
-	debugprintf("%s af=%d addr=%s\n",s,af,sbuf) ;
+	{
+	    rs1 = inetntop(sbuf,slen,af,binaddr) ;
+	    if (rs1 < 0) strcpy(sbuf,"BAD") ;
+	    DEBPRINTF("%s af=%d addr=%s\n",s,af,sbuf) ;
+	}
 	return rs1 ;
 } /* end subroutine */
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 
