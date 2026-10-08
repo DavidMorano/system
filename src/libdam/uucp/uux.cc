@@ -151,16 +151,16 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SI *,UUX *,SYSDIALER_ARGS *,
+local int	subinfo_start(SI *,UUX *,SYSDIALER_ARGS *,
 			cchar *,cchar *,cchar **) ;
-static int	subinfo_procargs(SI *) ;
-static int	subinfo_procspec(SI *,cchar *) ;
-static int	subinfo_procopts(SI *,keyopt *) ;
-static int	subinfo_defaults(SI *) ;
-static int	subinfo_logfile(SI *) ;
-static int	subinfo_mkargs(SI *,cchar **,cchar ***) ;
-static int	subinfo_finish(SI *) ;
-static int	subinfo_dirok(SI *,cchar *,int) ;
+local int	subinfo_procargs(SI *) ;
+local int	subinfo_procspec(SI *,cchar *) ;
+local int	subinfo_procopts(SI *,keyopt *) ;
+local int	subinfo_defaults(SI *) ;
+local int	subinfo_logfile(SI *) ;
+local int	subinfo_mkargs(SI *,cchar **,cchar ***) ;
+local int	subinfo_finish(SI *) ;
+local int	subinfo_dirok(SI *,cchar *,int) ;
 
 
 /* external variables (module information) */
@@ -523,7 +523,7 @@ int		cmd ;
 /* private subroutines */
 
 
-static int subinfo_start(sip,op,ap,hostname,svcname,av)
+local int subinfo_start(sip,op,ap,hostname,svcname,av)
 struct subinfo	*sip ;
 UUX		*op ;
 SYSDIALER_ARGS	*ap ;
@@ -546,7 +546,7 @@ cchar	*av[] ;
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(sip)
+local int subinfo_finish(sip)
 struct subinfo	*sip ;
 {
 	int	rs = SR_OK ;
@@ -590,7 +590,7 @@ struct subinfo	*sip ;
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_procargs(sip)
+local int subinfo_procargs(sip)
 struct subinfo	*sip ;
 {
 	keyopt		akopts ;
@@ -638,7 +638,7 @@ struct subinfo	*sip ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -932,7 +932,7 @@ badarg:
 }
 /* end subroutine (subinfo_procargs) */
 
-static int subinfo_procopts(SI *sip,keyopt *kop) noex {
+local int subinfo_procopts(SI *sip,keyopt *kop) noex {
 	keyopt_cur	kcur ;
 	int		rs ;
 	int		c = 0 ;
@@ -971,7 +971,7 @@ static int subinfo_procopts(SI *sip,keyopt *kop) noex {
 /* end subroutine (subinfo_procopts) */
 
 
-static int subinfo_procspec(sip,spec)
+local int subinfo_procspec(sip,spec)
 struct subinfo	*sip ;
 cchar	spec[] ;
 {
@@ -1011,7 +1011,7 @@ ret0:
 /* end subroutine (subinfo_procspec) */
 
 
-static int subinfo_defaults(sip)
+local int subinfo_defaults(sip)
 struct subinfo	*sip ;
 {
 	SYSDIALER_ARGS	*ap ;
@@ -1090,7 +1090,7 @@ struct subinfo	*sip ;
 /* end subroutine (subinfo_defaults) */
 
 
-static int subinfo_logfile(sip)
+local int subinfo_logfile(sip)
 struct subinfo	*sip ;
 {
 	UUX	*op = sip->op ;
@@ -1163,7 +1163,7 @@ ret0:
 /* end subroutine (subinfo_logfile) */
 
 
-static int subinfo_mkargs(sip,av,davp)
+local int subinfo_mkargs(sip,av,davp)
 struct subinfo	*sip ;
 cchar	*av[] ;
 cchar	***davp ;
@@ -1211,7 +1211,7 @@ cchar	***davp ;
 /* end subroutine (subinfo_mkargs) */
 
 
-static int subinfo_dirok(sip,d,dlen)
+local int subinfo_dirok(sip,d,dlen)
 struct subinfo	*sip ;
 cchar	d[] ;
 int		dlen ;
