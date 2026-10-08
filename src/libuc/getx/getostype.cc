@@ -134,7 +134,7 @@ constexpr typer_m	tries[] = {
 	&typer::other
 } ; /* end array (tries) */
 
-static initer		init_data ;
+local initer		init_data ;
 
 
 /* exported variables */
