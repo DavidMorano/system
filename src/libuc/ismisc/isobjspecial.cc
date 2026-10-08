@@ -93,7 +93,7 @@
 /* local variables */
 
 /* <- cannot do 'constexpr' cast of integer to ptr (f*ck up of C++) */
-static void	*const objs[] = { 
+local void	*const objs[] = { 
 	RTLD_DEFAULT,			/* <- integer cast to pointer-to-void */
 	RTLD_NEXT,			/* <- integer cast to pointer-to-void */
 	RTLD_SELF,			/* <- integer cast to pointer-to-void */
