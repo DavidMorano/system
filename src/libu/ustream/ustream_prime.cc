@@ -92,6 +92,14 @@ using libu::umem ;		/* variable */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int		pagesz ;
+	int		maxlinelen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
@@ -130,11 +138,9 @@ local int	ustream_bufcpy(ustream *,cchar *,int) noex ;
 
 /* local variables */
 
+static vars	var ;
 cint		nfds = 1 ;
 cbool		f_debug		= CF_DEBUG ;
-
-static cint	pagesz		= ulibval.pagesz ;
-static cint	maxlinelen	= ulibval.maxline ;
 
 
 /* exported variables */
@@ -150,20 +156,21 @@ int ustream::open(cchar *fn,int of,mode_t om) noex {
 	if ((rs = ustream_ctor(this,fn)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-		rs = SR_OK ;
-		oflags = (of) ? of : O_RDONLY ;
-		if ((rs = u_open(fn,oflags,om)) >= 0) {
-		    fd = rs ;
-		    rs = ustream_opener(this) ;
-		    if (rs < 0) {
-			u_close(fd) ;
-			fd = -1 ;
-		    }
-		} /* end if (u_open) */
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+		    oflags = (of) ? of : O_RDONLY ;
+		    if ((rs = u_open(fn,oflags,om)) >= 0) {
+		        fd = rs ;
+		        rs = ustream_opener(this) ;
+		        if (rs < 0) {
+			    u_close(fd) ;
+			    fd = -1 ;
+		        } /* end if (error) */
+		    } /* end if (u_open) */
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		ustream_dtor(this) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d \n",rs) ;
     	return rs ;
@@ -583,7 +590,7 @@ local int ustream_adjbuf(ustream *op,int bufsz) noex {
 	        if (S_ISFIFO(sb.st_mode)) {
 	            bufsz = PIPEBUFLEN ;
 	        } else {
-		    if ((rs = pagesz) >= 0) ylikely {
+		    if ((rs = var.pagesz) >= 0) ylikely {
 			coff	ps = off_t(rs) ;
 		        off_t	cs ;
 	        	cint	of = op->oflags ;
@@ -593,7 +600,7 @@ local int ustream_adjbuf(ustream *op,int bufsz) noex {
 	                    bufsz = (int) min(ps,cs) ;
 	                } else {
 		            bufsz = intconv(ps) ;
-		        }
+		        } /* end if */
 		    } /* end if (pagesz) */
 	        } /* end if */
 	    } /* end if (bufsz) */
@@ -609,7 +616,7 @@ local int ustream_bufcpy(ustream *op,cchar *abp,int mlen) noex {
 	if (mlen > MEMCPYLEN) {
 	    memcopy(op->bptr,abp,mlen) ;
 	} else {
-	    char	*bp = op->bptr ;
+	    char *bp = op->bptr ;
 	    for (int i = 0 ; i < mlen ; i += 1) {
 	        *bp++ = *abp++ ;
 	    } /* end for */
@@ -618,4 +625,19 @@ local int ustream_bufcpy(ustream *op,cchar *abp,int mlen) noex {
 	return mlen ;
 } /* end subroutine (ustream_bufcpy) */
 
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = ulibval.pagesz) >= 0) {
+	    pagesz = rs ;
+    	    if ((rs = ulibval.maxline) >= 0) {
+	        maxlinelen = rs ;
+	    } /* end */
+	} /* end */
+    	return rs ;
+} /* end method (vars::operator) */
+
+
+
+static cint	pagesz		= ulibval.pagesz ;
+static cint	maxlinelen	= ulibval.maxline ;
 
