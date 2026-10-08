@@ -17,11 +17,32 @@
 
 /*******************************************************************************
 
-  	Description:[
+  	Group:
+	*c-string manipulation subroutines*
+
+  	Description:
 	This file contains the UNIX® system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
+
+	Notes:
+	1. I provide somme subroutines that are not yet in some standard
+	C-language libraries on some operating systems.  I provide
+	at least (to be standardized, maybe) |strlcpy(3c)| and
+	|strnlen(3c)|.  
+	2. An additional little (funny) note here: I wrote the
+	|strnlen()| subroutine myself long ago.  That is: I invented
+	the API of that myself some decades before some standards
+	committee decided to made the very same subroutine.  My
+	original version took an 'int' as a size, while the
+	standardized version is going to take a 'size_t' type as
+	the size.
+	3. These subroutines below (at least |strlcpy(3c)| and 
+	|strnlen(3c)| are also located in other libraries that I have
+	written.  Some of these other libraries are 'libac' and 
+	'libcx'.  The subroutine implementations might be different
+	in each library.
 
 *******************************************************************************/
 
@@ -64,12 +85,12 @@ size_t strnlen(cchar *s,size_t nsz) noex {
 
 size_t strlcpy(char *dst,cchar *src,size_t msz) noex {
 	size_t		rsz = 0 ;
-	if (dst && src) {
-	    if (msz) {
+	if (dst && src) ylikely {
+	    if (msz) ylikely {
 	        for (rsz = 0 ; (rsz < (msz - 1)) && *src ; msz += 1) {
 	            dst[rsz] = *src++ ;
-	        }
-	    }
+	        } /* end for */
+	    } /* end */
 	    dst[rsz] = '\0' ;
 	    if (*src) rsz += strlen(src) ;
 	} /* end if (non-null) */
