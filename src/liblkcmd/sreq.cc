@@ -91,10 +91,10 @@ extern "C" {
 
 /* forward references */
 
-static int	sreq_fdfins(sreq *) noex ;
-static int	sreq_builtdone(sreq *) noex ;
+local int	sreq_fdfins(sreq *) noex ;
+local int	sreq_builtdone(sreq *) noex ;
 
-static int	mkfile(cchar *,cchar **) noex ;
+local int	mkfile(cchar *,cchar **) noex ;
 
 
 /* local variables */
@@ -718,7 +718,7 @@ int sreq_stderrend(sreq *op) noex {
 
 /* private subroutines */
 
-static int sreq_builtdone(sreq *op) noex {
+local int sreq_builtdone(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->objp != nullptr) {
@@ -734,7 +734,7 @@ static int sreq_builtdone(sreq *op) noex {
 }
 /* end subroutine (sreq_builtdone) */
 
-static int sreq_fdfins(sreq *op) noex {
+local int sreq_fdfins(sreq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
@@ -758,7 +758,7 @@ static int sreq_fdfins(sreq *op) noex {
 }
 /* end subroutine (sreq_fdfins) */
 
-static int mkfile(cchar *tpat,cchar **rpp) noex {
+local int mkfile(cchar *tpat,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tl = 0 ;
