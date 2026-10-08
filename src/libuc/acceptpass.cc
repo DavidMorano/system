@@ -124,7 +124,7 @@ local int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 	    if (rs > 0) {
 		for (int i = 0 ; (rs >= 0) && (i < nfds) ; i += 1) {
 		    cint	fd = pfds[i].fd ;
-		    cint	re = pfds[i].revents ;
+		    cshort	re = pfds[i].revents ;
 		    if (fd == fd_pass) {
 		   	if ((re & POLLIN) || (re & POLLPRI)) {
 			    rs = u_ioctl(fd_pass,I_RECVFD,sp) ;
@@ -138,11 +138,11 @@ local int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 		} /* end for */
 	    } else if (rs == SR_INTR) {
 		rs = SR_OK ;
-	    }
+	    } /* end if */
 	    if ((rs >= 0) && (pfd >= 0)) break ;
 	    if ((rs >= 0) && f_timed && ((ti_now - ti_start) >= to)) {
 		rs = SR_TIMEDOUT ;
-	    }
+	    } /* end if */
 	    if (rs < 0) break ;
 	} /* end while (polling) */
 	return (rs >= 0) ? pfd : rs ;
@@ -157,7 +157,7 @@ local int acceptpass_stall(int fd_pass,STRRECVFD *sp) noex {
 	    if (rs >= 0) break ;
 	    if ((rs == SR_BADMSG) || (rs == SR_INTR)) {
 		rs = SR_OK ;
-	    }
+	    } /* end if */
 	} /* end while */
 	return (rs >= 0) ? pfd : rs ;
 } /* end subroutine (acceptpass_stall) */
