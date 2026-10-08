@@ -103,7 +103,7 @@ int ng_finish(NG *ngp) noex {
 	    {
 	        rs1 = vecitem_finish(ngp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (mg_finish) */
@@ -149,11 +149,11 @@ int ng_add(NG *ngp,cchar *ngbuf,int nglen,cchar *ngdname) noex {
 		    if (ne.dir != nullptr) {
 			void *vp = voidp(ne.dir) ;
 	                lm_free(vp) ;
-		    }
+		    } /* end */
 		    {
 			void *vp = voidp(cp) ;
 		        lm_free(vp) ;
-		    }
+		    } /* end */
 	        } /* end if (error handling) */
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
@@ -222,7 +222,7 @@ int ng_addparse(NG *ngp,cchar *sp,int sl) noex {
 			            if (rs < INT_MAX) n += 1 ;
 			        }
 	                    } /* end if (had something) */
-		        }
+		        } /* end */
 	                if (rs < 0) break ;
 	            } /* end for */
 	        } /* end if (parse) */
