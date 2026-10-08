@@ -66,7 +66,7 @@ import libutil ;			/* |lenstr(3u)| */
 /* local typedefs */
 
 typedef int8_t *	int8p ;
-typedef const int8_t *	cint8p ;
+typedef con int8_t *	cint8p ;
 
 
 /* external subroutines */
@@ -155,7 +155,7 @@ int bufslide::add(cchar *sp,int µsl) noex {
 	    if (fl.open) ylikely {
 	        rs = SR_BUGCHECK ;
 	        if (binchunk *bp = resumelife<binchunk>(chunkp) ; bp) ylikely {
-		    const int8_t *sb = int8p(sp) ;
+		    con int8_t *sb = int8p(sp) ;
 	            rs = bp->add(sb,sl) ;
 	        }
 	    } /* end if (open) */
