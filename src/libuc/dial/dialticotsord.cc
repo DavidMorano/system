@@ -5,6 +5,7 @@
 /* subroutine to dial over to a UNIX® domaiun socket */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_PUSHMOD	0		/* push TIRDWR */
 
 /* revision history:
@@ -71,7 +72,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<cfhexstr.h>		/* LIBUC */
-#include	<localmisc.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 
 #include	"dialticotsord.h"
 
@@ -85,6 +86,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	SUB		subinfo
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 #ifndef	CF_PUSHMOD
 #define	CF_PUSHMOD	0		/* push TIRDWR */
 #endif
@@ -121,7 +125,8 @@ local int	pushmod(int,cchar *) noex ;
 
 /* local variables */
 
-constexpr bool		f_pushmod = CF_PUSHMOD ;
+constexpr bool		f_debug		= CF_DEBUG ;
+constexpr bool		f_pushmod	= CF_PUSHMOD ;
 
 
 /* exported variables */
@@ -134,9 +139,9 @@ int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 	int		rs1 ;
 	int		fd = -1 ; /* return-value */
 	(void) opts ;
-	if (abuf) {
+	if (abuf) ylikely {
 	    rs = SR_NOSYS ;
-	    if (syshas.xti) {
+	    if (syshas.xti) ylikely {
 	        if (char *addrbuf ; (rs = lm_mp(&addrbuf)) >= 0) {
 		    cint	addrlen = rs ;
 	            if (alen < 0) {
@@ -149,16 +154,16 @@ int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 		                alen = rs ;
 	                    } else {
 	                        rs = SR_TOOBIG ;
-		            }
+		            } /* end */
 	                } else {
 	                    alen = lenstr(abuf) ;
-	                }
+	                } /* end */
 	            } /* end if */
 	            /* try to connect to the remote machine */
 	            if (rs >= 0) {
 	                if (SUB g ; (rs = makeconn(&g,abuf,alen,to)) >= 0) {
 	                    fd = rs ;
-	                }
+	                } /* end */
 	            } /* end if (ok) */
 	    	    rs1 = lm_free(addrbuf) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -172,6 +177,7 @@ int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 /* local subroutines */
 
 local int makeconn(SUB *gp,cchar addr[],int alen,int to) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		fd = -1 ;
 	(void) to ;
@@ -179,7 +185,7 @@ local int makeconn(SUB *gp,cchar addr[],int alen,int to) noex {
 	    t_info	info{} ;
 	    if ((rs = ut_open(TPIDEV,O_RDWR,&info)) >= 0) {
 	        fd = rs ;
-	        if ((rs = ut_bind(fd,nullptr,nullptr)) >= 0) {
+	        if ((rs = ut_bind(fd,np,np)) >= 0) {
 	            t_call	*sndcall{} ;
 	            if ((rs = ut_alloc(fd,T_CALL,0,(void **) &sndcall)) >= 0) {
 	                sndcall->addr.maxlen = alen ;
@@ -232,8 +238,8 @@ local int pushmod(int fd,cchar *mods) noex {
 	                    }
 	                } else if (rs == SR_INVALID) {
 	                    rs = SR_OK ;
-	                }
-	                if (rs >= 0) {
+	                } /* end */
+	                if (rs >= 0) ylikely {
 	                    int		cl ; /* used-multiple */
 	                    cchar	*sp = mods ;
 	                    cchar	*cp{} ;
@@ -264,10 +270,11 @@ local int pushmod(int fd,cchar *mods) noex {
 
 #if	COMMENT
 local int shownetbuf(netbuf *p,cchar *s) noex {
-	debugprintf("shownetbuf: id=%s\n",s) ;
-	debugprintf("shownetbuf: maxlen=%d\n",p->maxlen) ;
-	debugprintf("shownetbuf: len=%d\n",p->len) ;
-	debugprinthex("shownetbuf",80,p->buf,p->len) ;
+	cint	cols = COLUMNS ;
+	DEBPRINTF("id=%s\n",s) ;
+	DEBPRINTF("maxlen=%d\n",p->maxlen) ;
+	DEBPRINTF("len=%d\n",p->len) ;
+	DEBPRINTHEX(cols,p->buf,p->len) ;
 	return 0 ;
 } /* end suboroutine (shownetbuf) */
 #endif /* COMMENT */
