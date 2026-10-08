@@ -79,7 +79,7 @@ module ;
 #include	<ucmem.h>		/* LIBUC */
 #include	<vecitem.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<char.h>		/* LIBUC */
@@ -475,7 +475,7 @@ local int debugprintt(cchar *str,time_t tval) noex {
 	if_constexpr (f_debug) {
     	    cchar	*fmt = "%s %s\n" ;
 	    char	tbuf[TIMEBUFLEN + 1] ;
-	    timestr_logz(tval,tbuf) ;
+	    strtime_logz(tval,tbuf) ;
 	    rs = DEBUGPRINTF(fmt,str,tbuf) ;
 	} /* end if_constexpr (f_debug) */
     	return rs ; 
