@@ -26,15 +26,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
-#include	<localmisc.h>		/* |COLUMNS| */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 
 #include	"debugutil.hh"
 #include	"libdebug.h"
@@ -92,14 +92,15 @@ local char	getdig(int v) noex ;
 /* exported subroutines */
 
 int mkhexstr(char *dbuf,int dlen,cvoid *vp,int vl) noex {
-	int		j = 0 ;
-	if (dbuf && vp) {
+    	int		rs = SR_FAULT ;
+	int		j = 0 ; /* return-value */
+	if (dbuf && vp) ylikely {
 	    int		sl = vl ;
-	    int		ch ;
 	    cchar	*sp = ccharp(vp) ;
 	    if (sl < 0) sl = lenstr(sp) ;
+	    rs = SR_OK ;
 	    for (int i = 0 ; (dlen >= 3) && (i < sl) ; i += 1) {
-	        ch = mkchar(sp[i]) ;
+	        cint ch = mkchar(sp[i]) ;
 	        if (i > 0) dbuf[j++] = ' ' ;
 	        dbuf[j++] = getdig((ch>>4)&15) ;
 	        dbuf[j++] = getdig((ch>>0)&15) ;
@@ -107,39 +108,40 @@ int mkhexstr(char *dbuf,int dlen,cvoid *vp,int vl) noex {
 	    } /* end for */
 	    dbuf[j] = '\0' ;
 	} /* end if (non-null) */
-	return j ;
-}
-/* end subroutine (mkhexstr) */
+	return (rs >= 0) ? j : rs ;
+} /* end subroutine (mkhexstr) */
 
 int mkhexnstr(char *hbuf,int hlen,int maxcols,cchar *sbuf,int slen) noex {
     	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	if (hbuf) {
+	if (hbuf) ylikely {
 	    if (maxcols < 0) maxcols = COLUMNS ;
 	    if (slen < 0) slen = lenstr(sbuf) ;
 	    n = min((maxcols / 3),slen) ;
 	    rs =  mkhexstr(hbuf,hlen,sbuf,n) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (mkhexnstr) */
+} /* end subroutine (mkhexnstr) */
 
 int mkhexblock(cchar *ids,cchar *ap,int n) noex {
+    	int		rs = SR_FAULT ;
 	cint		hexlen = HEXBUFLEN ;
 	char		hexbuf[HEXBUFLEN + 3] ;
-	if (ids) {
-	    debugprint(ids,-1) ;
-	}
-	for (int i = 0 ; i < n ; i += 1) {
-	    int sl = mkhexstr(hexbuf,hexlen,ap,4) ;
-	    hexbuf[sl++] = '\n' ;
-	    hexbuf[sl] = '\0' ;
-	    ap += 4 ;
-	    debugprint(hexbuf,-1) ;
-	} /* end for */
-	return n ;
-}
-/* end subroutine (mkhexblock) */
+	if (ap) ylikely {
+	    if (ids) {
+	        debugprint(ids,-1) ;
+	    } /* end if */
+	    rs = SR_OK ;
+	    for (int i = 0 ; i < n ; i += 1) {
+	        int sl = mkhexstr(hexbuf,hexlen,ap,4) ;
+	        hexbuf[sl++] = '\n' ;
+	        hexbuf[sl] = '\0' ;
+	        ap += 4 ;
+	        debugprint(hexbuf,-1) ;
+	    } /* end for */
+	} /* end if (non-null) */
+	return (rs >= 0) ? n : rs ;
+} /* end subroutine (mkhexblock) */
 
 local char getdig(int v) noex {
     	char	c = '¿' ;
@@ -147,7 +149,7 @@ local char getdig(int v) noex {
 	    c = '0' + char(v) ;
 	} else if ((v >= 10) && (v < 16)) {
 	    c = 'a' + char(v) ;
-	}
+	} /* end if */
 	return c ;
 } /* end subroutine (getdig) */
 
