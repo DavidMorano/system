@@ -44,7 +44,7 @@ namespace {
 	consteval void mknames() noex ;
 	consteval bufsizer() noex {
 	    mknames() ;
-	} ;
+	} ; /* end */
     } ; /* end struct (bufsizer) */
     struct initer {
 	initer() noex ;
@@ -92,7 +92,7 @@ consteval void bufsizer::mknames() noex {
 
 cpcchar			*bufsizenames ;
 constexpr bufsizer	bufsize_data ;
-static initer		initer_data ;
+local initer		initer_data ;
 
 
 /* exported subroutines */
