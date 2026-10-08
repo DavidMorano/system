@@ -197,7 +197,7 @@ int entry_startload(ema_ent *ep,ema_ent *oep) noex {
 } /* end subroutine (entry_startload) */
 
 #if	COMMENT
-static int entry_debugprint(ema_ent *ep,cchar *s) noex {
+local int entry_debugprint(ema_ent *ep,cchar *s) noex {
     	int		rs = SR_FAULT ;
 	if (ep) {
 	    rs = SR_OK ;
