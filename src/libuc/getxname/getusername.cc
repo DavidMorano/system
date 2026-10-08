@@ -147,6 +147,7 @@
 #include	<sncpyx.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
@@ -625,7 +626,7 @@ local int logpop(uid_t uid) noex {
 	cchar		*pp = getexecname() ;
 	cchar		*fmt ;
 	char		timebuf[TIMEBUFLEN + 1] ;
-	timestr_logz(dt,timebuf),
+	strtime_logz(dt,timebuf),
 	fmt = "%-23s p=%d u=%u ef=%s\n" ;
 	rs = nprintf(DEBFNAME,fmt,timebuf,pid,uid,pp) ;
 	return rs ;
