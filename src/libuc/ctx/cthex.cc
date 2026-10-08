@@ -69,57 +69,57 @@ constexpr int	b = OURBASE ;
 
 /* exported subroutines */
 
-int cthexsc(char *dp,int dl,schar val) noex {
+int cthexsc(char *dp,int dl,schar val)		noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(char) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexsc) */
 
-int cthexss(char *dp,int dl,sshort val) noex {
+int cthexss(char *dp,int dl,sshort val)		noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(short) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexss) */
 
-int cthexsi(char *dp,int dl,sint val) noex {
+int cthexsi(char *dp,int dl,sint val)		noex {
 	uint		uv = uint(val) ;
 	cint		n = szof(int) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexsi) */
 
-int cthexsl(char *dp,int dl,slong val) noex {
+int cthexsl(char *dp,int dl,slong val)		noex {
 	ulong		uv = ulong(val) ;
 	cint		n = szof(long) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexsl) */
 
-int cthexsll(char *dp,int dl,slonglong val) noex {
+int cthexsll(char *dp,int dl,slonglong val)	noex {
 	ulonglong	uv = ulonglong(val) ;
 	cint		n = szof(longlong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexsll) */
 
-int cthexuc(char *dp,int dl,uchar uv) noex {
+int cthexuc(char *dp,int dl,uchar uv)		noex {
 	cint		n = szof(uchar) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexuc) */
 
-int cthexus(char *dp,int dl,ushort uv) noex {
+int cthexus(char *dp,int dl,ushort uv)		noex {
 	cint		n = szof(ushort) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexus) */
 
-int cthexui(char *dp,int dl,uint uv) noex {
+int cthexui(char *dp,int dl,uint uv)		noex {
 	cint		n = szof(uint) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexui) */
 
-int cthexul(char *dp,int dl,ulong uv) noex {
+int cthexul(char *dp,int dl,ulong uv)		noex {
 	cint		n = szof(ulong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexul) */
 
-int cthexull(char *dp,int dl,ulonglong uv) noex {
+int cthexull(char *dp,int dl,ulonglong uv)	noex {
 	cint		n = szof(ulonglong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 } /* end subroutine (cthexull) */
