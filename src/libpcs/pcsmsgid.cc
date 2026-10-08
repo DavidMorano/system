@@ -156,7 +156,7 @@ local int mkstr(char *rp,int rl,cchar *dn,cchar *nn,int sn) noex {
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return rs ;
-} /* end subroutine (pcsmsgid_join) */
+} /* end subroutine (mkstr) */
 
 variables::operator int () noex {
     	int		rs ;
