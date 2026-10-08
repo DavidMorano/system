@@ -39,19 +39,32 @@
 	==0		OK
 	*errno*		UNIX® ERRNO code
 
+	Notes:
+	I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard lirbrary already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might gets optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like).
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* |ttyname_r(3c)| */
-#include	<cerrno>
-#include	<cstring>		/* |strncpy(3c)| + |strlcpy(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysflag.h>
-#include	<usysrets.h>
-#include	<aflag.hh>		/* mutex-flag */
+#include	<unistd.h>		/* POSIX® |ttyname_r(3c)| */
+#include	<cerrno>		/* CSTD */
+#include	<cstring>		/* CSTD |strncpy(3c)| + |strlcpy(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysflag.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<aflag.hh>		/* LIBU mutex-flag */
 
 #include	"usys_ttynamerp.h"
 #include	"usys_darwin.h"
