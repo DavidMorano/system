@@ -62,7 +62,7 @@ module ;
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/ulibvals.ccm"
+#pragma		GCC dependency		"mod/usysconf.ccm"
 
 module ureserve ;
 
