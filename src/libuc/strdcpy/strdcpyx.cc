@@ -15,7 +15,7 @@
 	This was updated to use |strlcpy(3c)| when it was rumored
 	to be coming as a new standard.  We are currently using our
 	own implementation of that, but when it is supported by
-	vendors this will all seemlessly transistion to using the
+	vendors this will all seemlessly transition to using the
 	vendor version.
 
 	= 2011-12-09, David A­D­ Morano
@@ -43,12 +43,26 @@
 	(even beyond the destination character buffer length if
 	necessary).
 
+	Notes (obsoleted 2011-12-09, see revision above):
+	I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard lirbrary already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might gets optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like).
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -109,18 +123,24 @@ char *strdcpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 
 char *strdcpyx(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
-	if (dp) {
+	if (dp) ylikely {
 	    va_begin(ap,n) ;
-	    if (dl < 0) dl = INT_MAX ;
-	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
-	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
-	        while ((dl > 0) && (sp[0] != '\0')) {
-		    *dp++ = *sp++ ;
-		    dl -= 1 ;
-	        }
-	    } /* end for */
-	    va_end(ap) ;
+	    if (dl >= 0) {
+	        for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
+	            cchar	*sp = (cchar *) va_arg(ap,char *) ;
+	            while ((dl > 0) && *sp) {
+		        *dp++ = *sp++ ;
+		        dl -= 1 ;
+	            } /* end while */
+	        } /* end for */
+	    } else {
+	        for (int i = 0 ; i < n ; i += 1) {
+	            cchar	*sp = (cchar *) va_arg(ap,char *) ;
+		    dp = stpcpy(dp,sp) ;
+	        } /* end for */
+	    } /* end if */
 	    *dp = '\0' ;
+	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
 } /* end subroutine (strdcpyx) */
