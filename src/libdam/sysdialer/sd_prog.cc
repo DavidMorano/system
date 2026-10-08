@@ -1075,7 +1075,7 @@ local int subinfo_procargs(SI *sip)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -1257,7 +1257,7 @@ local int subinfo_procargs(SI *sip)
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1934,7 +1934,7 @@ local int loadarchitecture(SI *sip)
 local int loadhz(SI *sip) noex {
 	int		rs ;
 	if ((rs = gethz(0)) >= 0) {
-	    const int	dlen = DIGBUFLEN ;
+	    cint	dlen = DIGBUFLEN ;
 	    char	dbuf[DIGBUFLEN+1] ;
 	    if ((rs = ctdeci(dbuf,dlen,rs)) >= 0) {
 		cchar	**vpp = &sip->hz ;
@@ -2144,7 +2144,7 @@ local int loadparams(SI *sip)
 	}
 
 	if ((rs1 >= 0) && (paramfile_open(&pf,ev,tmpfname) >= 0)) {
-	    const int	vlen = VBUFLEN ;
+	    cint	vlen = VBUFLEN ;
 
 	    for (i = 0 ; cparams[i] != nullptr ; i += 1) {
 
@@ -2451,7 +2451,7 @@ cchar		sysvardb[] ;
 	int		rs ;
 
 	if ((rs = sysvar_open(&sv,sip->pr,sysvardb)) >= 0) {
-	    const int	vlen = VBUFLEN ;
+	    cint	vlen = VBUFLEN ;
 	    int		vl ;
 	    char	kbuf[KBUFLEN + 1] ;
 	    char	vbuf[VBUFLEN + 1] ;
