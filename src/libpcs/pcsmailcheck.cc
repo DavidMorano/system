@@ -456,10 +456,9 @@ local int subinfo_mailfile(SI *sip) noex {
 	DEBUGPRINTF("ent mfn=%s\n",mfn) ;
 	if (ustat sb ; (rs = u_stat(mfn,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode) && (sb.st_size > 0)) {
-		mailbox		mb ;
-		mailbox_info	mbinfo ;
 		cint	mo = (mailboxm.rdonly | mailboxm.noclen) ;
-		if ((rs = mailbox_open(&mb,mfn,mo)) >= 0) {
+		if (mailbox mb ; (rs = mailbox_open(&mb,mfn,mo)) >= 0) {
+		    mailbox_info mbinfo ;
 	    	    if ((rs = mailbox_getinfo(&mb,&mbinfo)) >= 0) {
 	                if ((c = mbinfo.nmsgs) > 0) {
 			    cint	mi = (c-1) ;
