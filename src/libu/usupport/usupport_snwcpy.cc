@@ -94,13 +94,13 @@ namespace libu {
 	                rs = sncpy1(dp,dl,sp) ;
 	            } else {
 	                rs = intconv(strwcpy(dp,sp,sl) - dp) ;
-		    }
+		    } /* end */
 	        } else {
 	            rs = sncpy1(dp,dl,sp) ;
-	        }
+	        } /* end */
 	    } else {
 	        rs = intconv(strwcpy(dp,sp,sl) - dp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (snwcpy) */
