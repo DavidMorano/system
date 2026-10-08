@@ -72,10 +72,8 @@
 #include	"buffer.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
-#pragma		GCC dependency		"mod/ulibvals.ccm"
 
 import libutil ;			/* |getlenstr(3u)| */
-import ulibvals ;			/* |maxlinelen(3u)| */
 
 /* local defines */
 
@@ -126,7 +124,6 @@ local inline int buffer_ctor(buffer *op,Args ... args) noex {
 
 /* local variables */
 
-static cint		maxlinelen = ulibval.maxline ;
 
 constexpr bool		f_bufstart = CF_BUFSTART ;
 
@@ -246,17 +243,15 @@ int buffer_vprintf(buffer *op,cchar *fmt,va_list ap) noex {
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
 	if (op && fmt) ylikely {
-	    if ((rs = maxlinelen) >= 0) ylikely {
-		cint	llen = rs ;
-	        if (char *lbuf ; (rs = libmem.mall((llen + 1),&lbuf)) >= 0) {
-	            if ((rs = fmtstr(lbuf,llen,0x01,fmt,ap)) >= 0) ylikely {
-	                rs = buffer_strw(op,lbuf,rs) ;
-			rl = rs ;
-	            }
-		    rs1 = libmem.free(lbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a-f) */
-	    } /* end if (maxlinelen) */
+	    if (char *lbuf ; (rs = libmem.ml(&lbuf)) >= 0) {
+		cint llen = rs ;
+	        if ((rs = fmtstr(lbuf,llen,0x01,fmt,ap)) >= 0) ylikely {
+	            rs = buffer_strw(op,lbuf,rs) ;
+		    rl = rs ;
+	        } /* end */
+		rs1 = libmem.free(lbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (buffer_vprintf) */
@@ -269,7 +264,7 @@ int buffer_printf(buffer *op,cchar *fmt,...) noex {
 	    va_begin(ap,fmt) ;
 	    rs = buffer_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (buffer_printf) */
 
@@ -283,7 +278,7 @@ int buffer_get(buffer *op,cchar **spp) noex {
 	        if ((rs = buffer_ext(op,1)) >= 0) ylikely {
 	            *spp = (rs >= 0) ? op->dbuf : nullptr ;
 	        }
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (buffer_get) */
