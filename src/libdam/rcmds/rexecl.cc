@@ -73,11 +73,11 @@ import libutil ;			/* |memclear(3u)| */
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
 extern int	snddd(char *,int,uint,uint) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getserial(const char *) ;
-extern int	getheour(const char *,char *,struct hostent *,char *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	getserial(cchar *) ;
+extern int	getheour(cchar *,char *,struct hostent *,char *,int) ;
 
 
 /* external variables */
@@ -97,7 +97,7 @@ struct global {
 
 /* forward references */
 
-static int	makeconn() ;
+local int	makeconn() ;
 
 
 /* exported subroutines */
@@ -106,9 +106,9 @@ static int	makeconn() ;
 int rexecl(ahost,port,username,password,command,fd2p)
 char		**ahost ;
 int		port ;
-const char	username[] ;
-const char	password[] ;
-const char	command[] ;
+cchar	username[] ;
+cchar	password[] ;
+cchar	command[] ;
 int		*fd2p ;
 {
 	struct protoent	pe, *pep ;
@@ -393,7 +393,7 @@ badret:
 /* local subroutines */
 
 
-static int makeconn(gp,sp,fp,proto,username,password,command,s1p,s2p,f_err)
+local int makeconn(gp,sp,fp,proto,username,password,command,s1p,s2p,f_err)
 struct global		*gp ;
 struct sockaddr_in	*sp ;
 struct sockaddr_in	*fp ;
