@@ -73,7 +73,7 @@ typedef	SYSREALNAME_INFO	sysrealname_info ;
 
 EXTERNC_begin
 
-extern int sysrealname_open(sysrealname *,const char *) noex ;
+extern int sysrealname_open(sysrealname *,cchar *) noex ;
 extern int sysrealname_getinfo(sysrealname *,sysrealname_info *) noex ;
 extern int sysrealname_curbegin(sysrealname *,sysrealname_cur *) noex ;
 extern int sysrealname_curend(sysrealname *,sysrealname_cur *) noex ;
