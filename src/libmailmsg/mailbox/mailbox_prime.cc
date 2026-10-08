@@ -128,7 +128,6 @@ import mailbox_mag ;
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -185,11 +184,13 @@ struct mailboxpi {
 template<typename ... Args>
 local int mailbox_ctor(MB *op,Args ... args) noex {
     	MAILBOX		*hop = op ;
+	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->mlp = new(nothrow) vecobj) != nullptr) ylikely {
+	    if ((op->mlp = new(nt) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
@@ -208,25 +209,25 @@ local int mailbox_dtor(MB *op) noex {
 	return rs ;
 } /* end subroutine (mailbox_dtor) */
 
-local int mailbox_opener(MB *,cc *,int) noex ;
-local int mailbox_parse(MB *) noex ;
-local int mailbox_parsemsg(MB *,fbliner *,int) noex ;
-local int mailbox_parsemsger(MB *,mmenvdat *,MAILBOXPI *) noex ;
-local int mailbox_loadmsghead(MB *,MB_MI *,mailmsghdrval *) noex ;
-local int mailbox_msgfins(MB *) noex ;
-local int mailbox_rewrite(MB *) noex ;
-local int mailbox_rewrites(MB *,cchar *) noex ;
-local int mailbox_rewriter(MB *,int) noex ;
-local int mailbox_msgcopy(MB *,MSGCOPY *,MB_MI *) noex ;
-local int mailbox_msgcopyadd(MB *,MSGCOPY *,MB_MI *) noex ;
+local int mailbox_opener	(MB *,cc *,int) noex ;
+local int mailbox_parse		(MB *) noex ;
+local int mailbox_parsemsg	(MB *,fbliner *,int) noex ;
+local int mailbox_parsemsger	(MB *,mmenvdat *,MAILBOXPI *) noex ;
+local int mailbox_loadmsghead	(MB *,MB_MI *,mailmsghdrval *) noex ;
+local int mailbox_msgfins	(MB *) noex ;
+local int mailbox_rewrite	(MB *) noex ;
+local int mailbox_rewrites	(MB *,cchar *) noex ;
+local int mailbox_rewriter	(MB *,int) noex ;
+local int mailbox_msgcopy	(MB *,MSGCOPY *,MB_MI *) noex ;
+local int mailbox_msgcopyadd	(MB *,MSGCOPY *,MB_MI *) noex ;
 
-local int msginfo_start(MB_MI *,off_t,int) noex ;
-local int msginfo_finish(MB_MI *) noex ;
-local int msginfo_setenv(MB_MI *,mmenvdat *) noex ;
+local int msginfo_start		(MB_MI *,off_t,int) noex ;
+local int msginfo_finish	(MB_MI *) noex ;
+local int msginfo_setenv	(MB_MI *,mmenvdat *) noex ;
 
-local int mailboxpi_start(MAILBOXPI *,fbliner *,int) noex ;
-local int mailboxpi_finish(MAILBOXPI *) noex ;
-local int mailboxpi_havemsg(MAILBOXPI *) noex ;
+local int mailboxpi_start	(MAILBOXPI *,fbliner *,int) noex ;
+local int mailboxpi_finish	(MAILBOXPI *) noex ;
+local int mailboxpi_havemsg	(MAILBOXPI *) noex ;
 
 local int writeblanks(int,int) noex ;
 
