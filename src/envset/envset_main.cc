@@ -83,7 +83,7 @@
 #include	<sysvar.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG */
