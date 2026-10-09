@@ -213,7 +213,7 @@ cchar	*av[] ;
 	            if (argl > 1) {
 			cint	ach = MKCHAR(argp[1]) ;
 
-	                if (isdigitlatin(ach)) {
+	                if (ischdigit(ach)) {
 
 	                    argval = (argp+1) ;
 
