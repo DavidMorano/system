@@ -59,7 +59,7 @@
 #include	<matstr.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<cfnum.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -1196,7 +1196,7 @@ local int listenspec_procargs(LS *op,AI *aip,int ac,mv av) noex {
 	    f_optplus = (fp[0] == '+') ;
 	    if ((fl > 1) && (f_optminus || f_optplus) && (! aip->f_adash)) {
 		cint	ach = mkchar(fp[1]) ;
-	        if (isdigitlatin(ach)) {
+	        if (ischdigit(ach)) {
 	            rs1 = cfdecti((fp + 1),(fl - 1),&v) ;
 	            if (rs1 >= 0) aip->argvalue = v ;
 	        } else if (ach == '-') {
