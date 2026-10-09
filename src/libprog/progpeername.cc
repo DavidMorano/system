@@ -81,7 +81,7 @@
 
 /* forward references */
 
-static int	procsocket(proginfo *,clientinfo *,char *,int) noex ;
+local int	procsocket(proginfo *,clientinfo *,char *,int) noex ;
 
 
 /* local variables */
@@ -146,7 +146,7 @@ int progpeername(proginfo *pip,clientinfo *cip,char *dp,int dl) noex {
 
 /* local subroutines */
 
-static int procsocket(proginfo *pip,clientinfo *cip,char *dp,int dl) noex {
+local int procsocket(proginfo *pip,clientinfo *cip,char *dp,int dl) noex {
 	connection	conn, *cnp = &conn ;
 	int		rs ;
 	int		rs1 ;
