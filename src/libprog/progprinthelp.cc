@@ -87,9 +87,9 @@
 
 /* forward references */
 
-static int	findhelpfile(cchar *,cchar *,char *,cchar *) noex ;
-static int	loadscheds(vecstr *,cchar *,cchar *) noex ;
-static int	printout(void *,char *,int,cchar *) noex ;
+local int	findhelpfile(cchar *,cchar *,char *,cchar *) noex ;
+local int	loadscheds(vecstr *,cchar *,cchar *) noex ;
+local int	printout(void *,char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -149,7 +149,7 @@ int progprinthelp(proginfo *pip,void *fp,cchar *helpfname) noex {
 
 /* local subroutines */
 
-static int findhelpfile(cc *pr,cc *sn,char *tbuf,cc *helpfname) noex {
+local int findhelpfile(cc *pr,cc *sn,char *tbuf,cc *helpfname) noex {
 	vecstr		svars ;
 	vecstr		hs ;
 	int		rs ;
@@ -203,7 +203,7 @@ static int findhelpfile(cc *pr,cc *sn,char *tbuf,cc *helpfname) noex {
 }
 /* end subroutine (findhelpfile) */
 
-static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
+local int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	int	rs = SR_OK ;
 	if (pr != nullptr) {
 	    rs = vecstr_envadd(slp,"r",pr,-1) ;
@@ -218,7 +218,7 @@ static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 }
 /* end subroutine (loadscheds) */
 
-static int printout(void *fp,char *lbuf,int llen,cchar *fname) noex {
+local int printout(void *fp,char *lbuf,int llen,cchar *fname) noex {
 	bfile		outfile ;
 	bfile		helpfile, *hfp = &helpfile ;
 	int		rs = SR_OK ;
