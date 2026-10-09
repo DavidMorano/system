@@ -54,6 +54,7 @@
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
+#include	<isfd.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 
@@ -168,7 +169,7 @@ struct clientinfo	*cip ;
 
 
 	to = TO_READSVC ;
-	f_socket = isasocket(ifd) ;
+	f_socket = isfdsocket(ifd) ;
 
 /* pop off the service name */
 
