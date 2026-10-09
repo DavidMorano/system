@@ -22,34 +22,34 @@
 #define	MKCHAR(ch)	((ch) & UCHAR_MAX)
 #endif
 
-extern int	sfcookkey(const char *,int,const char **) ;
+extern int	sfcookkey(cchar *,int,cchar **) ;
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
 int main(argc,argv,envv)
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 {
-	const int	klen = KBUFLEN ;
-	const int	wch = MKCHAR('¿') ;
+	cint	klen = KBUFLEN ;
+	cint	wch = MKCHAR('¿') ;
 
 	uint	mo_start = 0 ;
 
 	int	rs ;
 	int	cl ;
 
-	const char	*s = "here %R is %{tz} thing %{} %{junker} end" ;
-	const char	*cp ;
-	const char	*ad = "ad" ;
-	const char	*mnt = "mnt" ;
+	cchar	*s = "here %R is %{tz} thing %{} %{junker} end" ;
+	cchar	*cp ;
+	cchar	*ad = "ad" ;
+	cchar	*mnt = "mnt" ;
 
 	char	kbuf[KBUFLEN+1] = { 0 } ;
 
