@@ -2,9 +2,7 @@
 
 /* print out the status of a file */
 
-
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
@@ -21,31 +19,28 @@
 
 	This program will return the various time statusi of a file.
 
-
 *********************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mkdev.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<ctime>
 #include	<csignal>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-#include	<ctime>
-#include	<tzfile.h>
-
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<paramopt.h>
-#include	<bfile.h>
-#include	<tmctimeh>
+#include	<tmtime.hh>
 #include	<sntmctime>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -64,24 +59,21 @@
 
 /* exported subroutines */
 
-
 int progfile(pip,pp,ofp,otype,fname)
 struct proginfo	*pip ;
 int		otype ;
 bfile		*ofp ;
 char		fname[] ;
-PARAMOPT	*pp ;
+paramopt	*pp ;
 {
 	ustat	sb ;
-
-	TMTIME		ts ;
-
-	const int	dlen = DBUFLEN ;
+	tmtime		ts ;
+	cint	dlen = DBUFLEN ;
 
 	int	rs ;
 	int	i ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	dbuf[DBUFLEN+ 1], *bp ;
 	char	*cbuf ;
@@ -89,8 +81,8 @@ PARAMOPT	*pp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
-	    debugprintf("progfile: sizeof(ino)=%u\n",sizeof(sb.st_ino)) ;
-	    debugprintf("progfile: sizeof(dev)=%u\n",sizeof(sb.st_dev)) ;
+	    debugprintf("progfile: szof(ino)=%u\n",szof(sb.st_ino)) ;
+	    debugprintf("progfile: szof(dev)=%u\n",szof(sb.st_dev)) ;
 	}
 #endif
 
@@ -142,7 +134,7 @@ PARAMOPT	*pp ;
 	    case OTYPE_TOUCHT:
 	    case OTYPE_TTOUCH:
 	        rs = bprintf(ofp,"%04u%02u%02u%02u%02u.%02u\n",
-	            (ts.year + TM_YEAR_BASE),
+	            (ts.year + TMTIME_YEARBASE),
 	            (ts.mon + 1),
 	            ts.mday,
 	            ts.hour,
