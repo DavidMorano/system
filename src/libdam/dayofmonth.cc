@@ -41,7 +41,7 @@
 #include	<matstr.h>		/* LIBUC |matcasestr(3uc)| */
 #include	<cfdec.h>		/* LIBUC */
 #include	<ismisc.h>		/* LIBUC |isleapyear(3uc)| */
-#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischdigit(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -264,7 +264,7 @@ int dayofmonth_mkday(dayofmonth *op,int m,cchar *cp,int cl) noex {
 	    }
 	    if (cl > 0) {
 	        cint	ch = mkchar(cp[0]) ;
-	        if (isdigitlatin(ch)) {
+	        if (ischdigit(ch)) {
 	            rs = cfdeci(cp,cl,&mday) ;
 	        } else if (cl >= 3) {
 		    auto	days = calstrs_days ;
