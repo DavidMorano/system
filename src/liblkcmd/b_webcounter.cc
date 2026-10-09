@@ -54,13 +54,13 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<estrings.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -74,8 +74,10 @@
 #include	<prmkfname.h>
 #include	<querystr.h>
 #include	<strn.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -134,8 +136,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
 
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* external variables */
 
@@ -187,49 +187,49 @@ struct countinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procname(PROGINFO *,MAPSTRINT *,cchar *,int) ;
-static int	procdebugdb(PROGINFO *,cchar *) ;
-static int	proclist(PROGINFO *) ;
-static int	procreg(PROGINFO *,MAPSTRINT *) ;
-static int	procreger(PROGINFO *,cchar *,int,int,MAPSTRINT *) ;
-static int	procqs(PROGINFO *,cchar *) ;
-static int	procqsget(PROGINFO *,querystr *,COUNTINFO *) ;
-static int	procqser(PROGINFO *pip,cchar *,cchar *,int,int) ;
+local int	procname(PROGINFO *,MAPSTRINT *,cchar *,int) ;
+local int	procdebugdb(PROGINFO *,cchar *) ;
+local int	proclist(PROGINFO *) ;
+local int	procreg(PROGINFO *,MAPSTRINT *) ;
+local int	procreger(PROGINFO *,cchar *,int,int,MAPSTRINT *) ;
+local int	procqs(PROGINFO *,cchar *) ;
+local int	procqsget(PROGINFO *,querystr *,COUNTINFO *) ;
+local int	procqser(PROGINFO *pip,cchar *,cchar *,int,int) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 
-static int	procourconf_begin(PROGINFO *,PARAMOPT *,cchar *) ;
-static int	procourconf_end(PROGINFO *) ;
+local int	procourconf_begin(PROGINFO *,PARAMOPT *,cchar *) ;
+local int	procourconf_end(PROGINFO *) ;
 
-static int	procout_begin(PROGINFO *,void *,cchar *) ;
-static int	procout_end(PROGINFO *) ;
+local int	procout_begin(PROGINFO *,void *,cchar *) ;
+local int	procout_end(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_basedir(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_basedir(LOCINFO *,cchar *,int) ;
 
-static int	config_start(CONFIG *,PROGINFO *,PARAMOPT *,cchar *) ;
-static int	config_findfile(CONFIG *,char *,cchar *) ;
-static int	config_cookbegin(CONFIG *) ;
-static int	config_cookend(CONFIG *) ;
-static int	config_read(CONFIG *) ;
-static int	config_finish(CONFIG *) ;
+local int	config_start(CONFIG *,PROGINFO *,PARAMOPT *,cchar *) ;
+local int	config_findfile(CONFIG *,char *,cchar *) ;
+local int	config_cookbegin(CONFIG *) ;
+local int	config_cookend(CONFIG *) ;
+local int	config_read(CONFIG *) ;
+local int	config_finish(CONFIG *) ;
 
 #ifdef	COMMENT
-static int	config_check(CONFIG *) ;
+local int	config_check(CONFIG *) ;
 #endif /* COMMENT */
 
-static int	mkourname(char *,cchar *,cchar *,cchar *,int) ;
+local int	mkourname(char *,cchar *,cchar *,cchar *,int) ;
 
 
 /* local variables */
@@ -380,7 +380,7 @@ int p_webcounter(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -477,7 +477,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -714,7 +714,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1174,7 +1174,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1199,7 +1199,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1292,7 +1292,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1313,7 +1313,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
@@ -1332,7 +1332,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1343,19 +1343,19 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
@@ -1370,9 +1370,9 @@ static int procuserinfo_logid(PROGINFO *pip)
 /* end subroutine (procuserinfo_logid) */
 
 
-static int procourconf_begin(PROGINFO *pip,PARAMOPT *app,cchar *cfname)
+local int procourconf_begin(PROGINFO *pip,PARAMOPT *app,cchar *cfname)
 {
-	const int	csize = sizeof(CONFIG) ;
+	cint	csize = sizeof(CONFIG) ;
 	int		rs = SR_OK ;
 	void		*p ;
 
@@ -1409,7 +1409,7 @@ static int procourconf_begin(PROGINFO *pip,PARAMOPT *app,cchar *cfname)
 /* end subroutine (procourconf_begin) */
 
 
-static int procourconf_end(PROGINFO *pip)
+local int procourconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1434,7 +1434,7 @@ static int procourconf_end(PROGINFO *pip)
 /* end subroutine (procourconf_end) */
 
 
-static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofname)
+local int procout_begin(PROGINFO *pip,void *ofp,cchar *ofname)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1465,7 +1465,7 @@ static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofname)
 /* end subroutine (procout_begin) */
 
 
-static int procout_end(PROGINFO *pip)
+local int procout_end(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1482,7 +1482,7 @@ static int procout_end(PROGINFO *pip)
 /* end subroutine (procout_end) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *qs)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *qs)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAPSTRINT	names ;
@@ -1527,7 +1527,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *qs)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1588,7 +1588,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *qs)
 /* end subroutine (procargs) */
 
 
-static int procname(PROGINFO *pip,MAPSTRINT *nlp,cchar *np,int nl)
+local int procname(PROGINFO *pip,MAPSTRINT *nlp,cchar *np,int nl)
 {
 	int		rs = SR_OK ;
 	int		v = -1 ;
@@ -1616,7 +1616,7 @@ static int procname(PROGINFO *pip,MAPSTRINT *nlp,cchar *np,int nl)
 /* end subroutine (procname) */
 
 
-static int procdebugdb(PROGINFO *pip,cchar *qs)
+local int procdebugdb(PROGINFO *pip,cchar *qs)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1649,7 +1649,7 @@ static int procdebugdb(PROGINFO *pip,cchar *qs)
 /* end subroutine (procdebugdb) */
 
 
-static int proclist(PROGINFO *pip)
+local int proclist(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1686,7 +1686,7 @@ static int proclist(PROGINFO *pip)
 	        FILECOUNTS_CUR	cur ;
 	        FILECOUNTS_INFO	fci ;
 	        const mode_t	om = 0664 ;
-	        const int		of = O_RDONLY ;
+	        cint		of = O_RDONLY ;
 	        if ((rs = filecounts_open(&fc,dbfn,of,om)) >= 0) {
 
 #if	CF_DEBUG
@@ -1696,7 +1696,7 @@ static int proclist(PROGINFO *pip)
 
 	            if ((rs = filecounts_curbegin(&fc,&cur)) >= 0) {
 	                if ((rs = filecounts_snap(&fc,&cur)) >= 0) {
-	                    const int	nlen = REALNAMELEN ;
+	                    cint	nlen = REALNAMELEN ;
 	                    int		nfl, tfl ;
 	                    int		nl ;
 	                    char	nbuf[REALNAMELEN + 1] ;
@@ -1711,20 +1711,21 @@ static int proclist(PROGINFO *pip)
 	                        if (DEBUGLEVEL(3)) {
 	                            debugprintf("main/proclist: "
 	                                "filecounts_read() rs=%d\n",nl) ;
-	                            debugprintf("main/proclist: n=%r\n",nbuf,nl) ;
+	                            debugprintf("main/proclist: n=%r\n",
+					    nbuf,nl) ;
 	                        }
 #endif
 
 	                        if (rs >= 0) {
 	                            SHIO	*ofp = lip->ofp ;
-	                            const int	v = fci.value ;
+	                            cint	v = fci.value ;
 	                            cchar	*fmt = "%*u %-*s %r\n" ;
 	                            c += 1 ;
 	                            nfl = FILECOUNTS_NUMDIGITS ;
 	                            tfl = FILECOUNTS_LOGZLEN ;
-	                            timestr_logz(fci.utime,tbuf) ;
-	                            rs = shio_printf(ofp,fmt,nfl,v,tfl,tbuf,nbuf,
-	                                nl) ;
+	                            strtime_logz(fci.utime,tbuf) ;
+	                            rs = shio_printf(ofp,fmt,nfl,v,tfl,
+					    	tbuf,nbuf,nl) ;
 	                        }
 
 	                    } /* end while (reading counters) */
@@ -1754,7 +1755,7 @@ static int proclist(PROGINFO *pip)
 /* end subroutine (proclist) */
 
 
-static int procreg(PROGINFO *pip,MAPSTRINT *nlp)
+local int procreg(PROGINFO *pip,MAPSTRINT *nlp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1818,12 +1819,12 @@ static int procreg(PROGINFO *pip,MAPSTRINT *nlp)
 /* end subroutine (procreg) */
 
 
-static int procreger(PROGINFO *pip,cchar *db,int nc,int ac,MAPSTRINT *nlp)
+local int procreger(PROGINFO *pip,cchar *db,int nc,int ac,MAPSTRINT *nlp)
 {
 	LOCINFO		*lip = pip->lip ;
 	FILECOUNTS	fc ;
 	const mode_t	om = 0664 ;
-	const int	of = (O_RDWR | O_CREAT) ;
+	cint	of = (O_RDWR | O_CREAT) ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = pip->progname ;
@@ -1831,7 +1832,7 @@ static int procreger(PROGINFO *pip,cchar *db,int nc,int ac,MAPSTRINT *nlp)
 	if ((rs = filecounts_open(&fc,db,of,om)) >= 0) {
 	    SHIO		*ofp = lip->ofp ;
 	    FILECOUNTS_N	*namelist = NULL ;
-	    const int		nlsize = (nc + 1) * sizeof(FILECOUNTS_N) ;
+	    cint		nlsize = (nc + 1) * sizeof(FILECOUNTS_N) ;
 	    if ((rs = uc_malloc(nlsize,&namelist)) >= 0) {
 	        MAPSTRINT_CUR	cur ;
 	        int		i = 0 ;
@@ -1894,7 +1895,7 @@ static int procreger(PROGINFO *pip,cchar *db,int nc,int ac,MAPSTRINT *nlp)
 /* end subroutine (procreger) */
 
 
-static int procqs(PROGINFO *pip,cchar *qs)
+local int procqs(PROGINFO *pip,cchar *qs)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1968,7 +1969,7 @@ static int procqs(PROGINFO *pip,cchar *qs)
 /* end subroutine (procqs) */
 
 
-static int procqsget(PROGINFO *pip,querystr *qsp,COUNTINFO *cip)
+local int procqsget(PROGINFO *pip,querystr *qsp,COUNTINFO *cip)
 {
 	querystr_cur	cur ;
 	int		rs ;
@@ -2007,20 +2008,20 @@ static int procqsget(PROGINFO *pip,querystr *qsp,COUNTINFO *cip)
 /* end subroutine (procqsget) */
 
 
-static int procqser(PROGINFO *pip,cchar *dbfname,cchar *cnp,int cnl,int ac)
+local int procqser(PROGINFO *pip,cchar *dbfname,cchar *cnp,int cnl,int ac)
 {
 	LOCINFO		*lip = pip->lip ;
 	FILECOUNTS	fc ;
 	FILECOUNTS_N	*namelist = NULL ;
 	const mode_t	om = 0664 ;
-	const int	of = (O_RDWR | O_CREAT) ;
+	cint	of = (O_RDWR | O_CREAT) ;
 	int		rs ;
 	int		rs1 ;
 	int		nc = 1 ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 	if ((rs = filecounts_open(&fc,dbfname,of,om)) >= 0) {
-	    const int	nlsize = (nc + 1) * sizeof(FILECOUNTS_N) ;
+	    cint	nlsize = (nc + 1) * sizeof(FILECOUNTS_N) ;
 	    if ((rs = uc_malloc(nlsize,&namelist)) >= 0) {
 	        int	n = 0 ;
 	        char	cn[MAXNAMELEN + 1] ;
@@ -2062,7 +2063,7 @@ static int procqser(PROGINFO *pip,cchar *dbfname,cchar *cnp,int cnl,int ac)
 /* end subroutine (procqser) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2078,7 +2079,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2096,7 +2097,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -2132,7 +2133,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_basedir(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_basedir(LOCINFO *lip,cchar *vp,int vl)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2152,7 +2153,7 @@ static int locinfo_basedir(LOCINFO *lip,cchar *vp,int vl)
 /* end subroutine (locinfo_basedir) */
 
 
-static int config_start(CONFIG *csp,PROGINFO *pip,PARAMOPT *app,cchar *cfname)
+local int config_start(CONFIG *csp,PROGINFO *pip,PARAMOPT *app,cchar *cfname)
 {
 	int		rs = SR_OK ;
 	char		tbuf[MAXPATHLEN+1] = { 0 } ;
@@ -2206,7 +2207,7 @@ static int config_start(CONFIG *csp,PROGINFO *pip,PARAMOPT *app,cchar *cfname)
 /* end subroutine (config_start) */
 
 
-static int config_findfile(CONFIG *csp,char *tbuf,cchar *cfname)
+local int config_findfile(CONFIG *csp,char *tbuf,cchar *cfname)
 {
 	PROGINFO	*pip = csp->pip ;
 	VECSTR		sv ;
@@ -2216,7 +2217,7 @@ static int config_findfile(CONFIG *csp,char *tbuf,cchar *cfname)
 
 	tbuf[0] = '\0' ;
 	if ((rs = vecstr_start(&sv,6,0)) >= 0) {
-	    const int	tlen = MAXPATHLEN ;
+	    cint	tlen = MAXPATHLEN ;
 
 	    vecstr_envset(&sv,"p",pip->pr,-1) ;
 
@@ -2236,13 +2237,13 @@ static int config_findfile(CONFIG *csp,char *tbuf,cchar *cfname)
 /* end subroutine (config_findfile) */
 
 
-static int config_cookbegin(CONFIG *csp)
+local int config_cookbegin(CONFIG *csp)
 {
 	PROGINFO	*pip = csp->pip ;
 	int		rs ;
 
 	if ((rs = expcook_start(&csp->cooks)) >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    int		i ;
 	    int		kch ;
 	    int		vl ;
@@ -2303,7 +2304,7 @@ static int config_cookbegin(CONFIG *csp)
 /* end subroutine (config_cookbegin) */
 
 
-static int config_cookend(CONFIG *csp)
+local int config_cookend(CONFIG *csp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2319,7 +2320,7 @@ static int config_cookend(CONFIG *csp)
 /* end subroutine (config_cookend) */
 
 
-static int config_finish(CONFIG *csp)
+local int config_finish(CONFIG *csp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2344,7 +2345,7 @@ static int config_finish(CONFIG *csp)
 
 
 #ifdef	COMMENT
-static int config_check(CONFIG *csp)
+local int config_check(CONFIG *csp)
 {
 	PROGINFO	*pip = csp->pip ;
 	int		rs = SR_OK ;
@@ -2364,14 +2365,14 @@ static int config_check(CONFIG *csp)
 #endif /* COMMENT */
 
 
-static int config_read(CONFIG *csp)
+local int config_read(CONFIG *csp)
 {
 	PROGINFO	*pip = csp->pip ;
 	LOCINFO		*lip ;
 	paramfile	*pfp = &csp->p ;
 	paramfile_cur	cur ;
-	const int	vlen = VBUFLEN ;
-	const int	elen = EBUFLEN ;
+	cint	vlen = VBUFLEN ;
+	cint	elen = EBUFLEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		ml, vl, el ;
@@ -2479,7 +2480,7 @@ static int config_read(CONFIG *csp)
 /* end subroutine (config_read) */
 
 
-static int mkourname(char *rbuf,cchar *pr,cchar *inter,cchar *sp,int sl)
+local int mkourname(char *rbuf,cchar *pr,cchar *inter,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 
