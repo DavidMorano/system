@@ -97,10 +97,10 @@
 #include	<mkchar.h>		/* LIBUC */
 #include	<mailvalues.hh>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<isfiledesc.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<iserror.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |MODP2| */
 #include	<bfile.h>		/* LIBB */
 
@@ -965,7 +965,7 @@ local int mailalias_dbopenwait(MA *op) noex {
 
 local int mailalias_isremote(MA *op) noex {
 	int		rs ;
-	if ((rs = isfsremote(op->fd)) > 0) ylikely {
+	if ((rs = isfdfsremote(op->fd)) > 0) ylikely {
 	    op->fl.remote = true ;
 	}
 	return rs ;
