@@ -58,7 +58,7 @@
 #include	<digval.h>		/* LIBUC |digvalhex(3uc)| */
 #include	<bufos.hh>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -331,7 +331,7 @@ local int qpdecoder_cvt(qpdecoder *op) noex {
 	    cint	ch0 = mkchar(rb[0]) ;
 	    cint	ch1 = mkchar(rb[1]) ;
 	    int		v = 0 ;
-	    if (ishexlatin(ch0) && ishexlatin(ch1)) {
+	    if (ischhex(ch0) && ischhex(ch1)) {
 		v |= (digvalhex(ch0)<<4) ;
 		v |= (digvalhex(ch1)<<0) ;
 	    } else {
