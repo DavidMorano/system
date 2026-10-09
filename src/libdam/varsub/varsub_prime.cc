@@ -51,7 +51,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strnxchr.h>		/* LIBUC */
 #include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -215,9 +215,9 @@ int varsub_addva(VS *op,mainv envv) noex {
 	        if (cchar *tp ; (tp = strchr(esp,'=')) != np) {
 	            cint	kch = mkchar(esp[0]) ;
 	            cchar	*vp = (tp + 1) ;
-	            if (isprintlatin(kch)) {
+	            if (ischprint(kch)) {
 	                cint	vch = mkchar(vp[0]) ;
-	                if ((vch == '\0') || isprintlatin(vch)) {
+	                if ((vch == '\0') || ischprint(vch)) {
 			    cint	tl = intconv(tp - esp) ;
 	                    rs = varsub_iadd(op,esp,tl,vp,-1) ;
 	                    if (rs < INT_MAX)  c += 1 ;
@@ -250,9 +250,9 @@ int varsub_addvaquick(VS *op,cchar **envv) noex {
 	        if (cchar *tp = strchr(esp,'=') ; tp) ylikely {
 	            cint	kch = mkchar(esp[0]) ;
 	            cchar	*vp = (tp + 1) ;
-	            if (isprintlatin(kch)) {
+	            if (ischprint(kch)) {
 	                cint	vch = mkchar(vp[0]) ;
-	                if ((vch == '\0') || isprintlatin(vch)) {
+	                if ((vch == '\0') || ischprint(vch)) {
 			    cint	tl = intconv(tp - esp) ;
 	                    rs = varsub_iaddq(op,esp,tl,vp,-1) ;
 	                    if (rs < INT_MAX)  c += 1 ;
