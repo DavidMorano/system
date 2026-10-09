@@ -161,28 +161,28 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,
+local int	procargs(PROGINFO *,ARGINFO *,bits *,
 			cchar *,cchar *,cchar *,cchar *) ;
-static int	procinput(PROGINFO *,void *,cchar *) ;
-static int	procname(PROGINFO *,void *, cchar *) ;
-static int	proclogline(PROGINFO *,cchar *) ;
-static int	proclog(PROGINFO *,cchar *,int,cchar *,int) ;
+local int	procinput(PROGINFO *,void *,cchar *) ;
+local int	procname(PROGINFO *,void *, cchar *) ;
+local int	proclogline(PROGINFO *,cchar *) ;
+local int	proclog(PROGINFO *,cchar *,int,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
 
@@ -285,7 +285,7 @@ int p_querystring(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -881,7 +881,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -902,7 +902,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -959,7 +959,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(pip,aip,bop,ofn,afn,ifn,qs)
+local int procargs(pip,aip,bop,ofn,afn,ifn,qs)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bits		*bop ;
@@ -1074,7 +1074,7 @@ cchar	*qs ;
 /* end subroutine (procargs) */
 
 
-static int procinput(PROGINFO *pip,void *ofp,cchar *ifn)
+local int procinput(PROGINFO *pip,void *ofp,cchar *ifn)
 {
 	SHIO		ifile, *ifp = &ifile ;
 	int		rs ;
@@ -1125,7 +1125,7 @@ static int procinput(PROGINFO *pip,void *ofp,cchar *ifn)
 
 
 /* process a specification name */
-static int procname(PROGINFO *pip,void *ofp,cchar *qs)
+local int procname(PROGINFO *pip,void *ofp,cchar *qs)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1193,7 +1193,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *qs)
 /* end subroutine (procname) */
 
 
-static int proclogline(PROGINFO *pip,cchar *qs)
+local int proclogline(PROGINFO *pip,cchar *qs)
 {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
@@ -1206,7 +1206,7 @@ static int proclogline(PROGINFO *pip,cchar *qs)
 /* end subroutine (proclogline) */
 
 
-static int proclog(PROGINFO *pip,cchar *kp,int kl,cchar *vp,int vl)
+local int proclog(PROGINFO *pip,cchar *kp,int kl,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
@@ -1222,7 +1222,7 @@ static int proclog(PROGINFO *pip,cchar *kp,int kl,cchar *vp,int vl)
 /* end subroutine (proclog) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1262,7 +1262,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1273,7 +1273,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -1300,7 +1300,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 /* end subroutine (procuserinfo_logid) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	if (lip == NULL) return SR_FAULT ;
@@ -1313,7 +1313,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 
 	if (lip == NULL) return SR_FAULT ;
@@ -1324,7 +1324,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
