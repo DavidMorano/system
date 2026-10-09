@@ -60,7 +60,7 @@
 #include	<strn.h>
 #include	<sfx.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"mailmsgheadkey.h"
