@@ -42,9 +42,9 @@ module ;
 #include	<usysrets.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU |msleep(3u)| */
 #include	<ulogerror.h>		/* LIBU */
+#include	<isch.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<strn.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
 #include	<strnul.hh>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -142,13 +142,13 @@ int argmgr::argopt(cchar **rpp) noex {
 	    if (ai < argc) ylikely { /* valid argument range */
 	        cchar	*ap = argv[ai] ;
 	        DEBPR("arg=>%s<\n",ap) ;
-	        if (ispm(ap[0])) {
+	        if (ischpm(ap[0])) {
 		    fl.plus = (ap[0] == '+') ;
 		    if (cint ch = mkchar(ap[1]) ; ch) {
 		        rs = iargopt(ap,ch,rpp) ;
 			klen = rs ;
 		    } /* end if (have option) */
-	        } /* end if (ispm) */ 
+	        } /* end if (ischpm) */ 
 		/**** debug block begin */
 		if_constexpr (f_debug) {
 	            if (rs >= 0) ylikely {
@@ -176,7 +176,7 @@ int argmgr::iargopt(cchar *ap,int ch,cchar **kpp) noex {
     	int		rs = SR_OK ;
 	int		klen = 0 ; /* return-value ("key-length"?) */
 	DEBPR("ent ai=%d c=%d\n",ai,cntpos) ;
-	if (isalphalatin(ch)) ylikely {
+	if (ischalpha(ch)) ylikely {
 	    DEBPR("latin ch=%02X\n",ch) ;
 	    if ((rs = amap.set[ai]) >= 0) { /* "set" means not pos-arg */
 		if (kpp) *kpp = (ap + 1) ;
@@ -191,9 +191,9 @@ int argmgr::iargopt(cchar *ap,int ch,cchar **kpp) noex {
 		    klen = lenstr(ap + 1) ;
 		} /* end if */
 	    } /* end if (amap.set) */
-	} else if (isdigitlatin(ch)) {
+	} else if (ischdigit(ch)) {
 	    digvalp = (ap + 1) ;
-	} /* end if (isalphalatin) */
+	} /* end if (ischalpha) */
 	DEBPR("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? klen : rs ;
 } /* end method (argmgr::iargopt) */
@@ -206,7 +206,7 @@ int argmgr::argoptlong(cchar **kpp) noex {
 	        cchar	*ap = argv[ai] ;
 	        if ((ap[0] == '-') && (ap[1] == '-')) {
 		    if (cint ch = mkchar(ap[2]) ; ch) {
-		        if (isalphalatin(ch)) ylikely {
+		        if (ischalpha(ch)) ylikely {
 			    if ((rs = amap.set[ai]) >= 0) {
 			        cntpos -= 1 ;
 		                if (kpp) *kpp = (ap + 2) ;
