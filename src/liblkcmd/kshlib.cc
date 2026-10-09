@@ -223,7 +223,8 @@
 #include	<strx.h>
 #include	<dirempty.h>
 #include	<char.h>
-#include	<ischarx.h>
+#include	<isch.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| |TIMEBUFLEN| */
 #include	<libdebug.h>		/* LIBDEBUG */
@@ -1657,7 +1658,7 @@ local int kshlib_workgener(KSHLIB *uip,SESMSG_GEN *mp) noex {
 		char	tbuf[TIMEBUFLEN+1] ;
 	        nprintf(NDF,"kshlib_workgener: m=>%r<\n",
 	            nbuf,strlinelen(nbuf,nl,50)) ;
-	        timestr_logz(st,tbuf) ;
+	        strtime_logz(st,tbuf) ;
 	        nprintf(NDF,"kshlib_workgener: t=%s\n",tbuf) ;
 	    }
 #endif /* CF_DEBUGN */
