@@ -50,7 +50,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import ischx ;				/* character classification */
+import ureserve ;			/* character classifications */
 
 /* local defines */
 
