@@ -84,7 +84,7 @@
 #include	<nleadx.h>
 #include	<mkchar.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<isnot.h>
 #include	<strnul.hh>		/* LIBU */
 #include	<localmisc.h>
