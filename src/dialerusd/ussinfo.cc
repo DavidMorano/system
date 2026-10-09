@@ -301,7 +301,7 @@ USSINFO		*sip ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
 		cint	ach = MKCHAR(argp[1]) ;
 
-	        if (isdigitlatin(ach)) {
+	        if (ischdigit(ach)) {
 
 	            argval = (argp + 1) ;
 
