@@ -92,9 +92,9 @@
 #include	<randlc.h>		/* LIBUC */
 #include	<matxstr.h>		/* LIBUC */
 #include	<mkx.h>			/* LIBUC */
-#include	<isfiledesc.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"ipasswd.h"
@@ -984,7 +984,7 @@ local int ipasswd_mapend(ipasswd *op) noex {
 local int ipasswd_remotefs(ipasswd *op) noex {
 	int		rs ;
 	int		f = false ;
-	if ((rs = isfsremote(op->fd)) > 0) {
+	if ((rs = isfdfsremote(op->fd)) > 0) {
 	    f = true ;
 	    op->fl.remote = !!f ;
 	}
