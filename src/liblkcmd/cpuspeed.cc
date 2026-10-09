@@ -58,13 +58,13 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
 extern int	mkpath5(char *,cchar *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
 
 /* local structures */
@@ -78,14 +78,14 @@ struct loadfile {
 
 /* forward references */
 
-static int	loadfile(struct loadfile *,cchar *,cchar *,cchar **) ;
+local int	loadfile(struct loadfile *,cchar *,cchar *,cchar **) ;
 
 
 /* local variables */
 
 #if	defined(_LP64)
 
-static const char	*subdirs[] = {
+static cchar	*subdirs[] = {
 	"sparcv9",
 	"sparc",
 	"",
@@ -94,7 +94,7 @@ static const char	*subdirs[] = {
 
 #else /* defined(_LP64) */
 
-static const char	*subdirs[] = {
+static cchar	*subdirs[] = {
 	"sparcv8",
 	"sparcv7",
 	"sparc",
@@ -104,12 +104,12 @@ static const char	*subdirs[] = {
 
 #endif /* defined(_LP64) */
 
-static const char	*names[] = {
+static cchar	*names[] = {
 	"dhry",
 	NULL
 } ;
 
-static const char	*exts[] = {
+static cchar	*exts[] = {
 	"",
 	"so",
 	"o",
@@ -188,16 +188,16 @@ int cpuspeed(cchar *pr,cchar *name,int nruns)
 /* local subroutines */
 
 
-static int loadfile(lfp,pr,name,exts)
+local int loadfile(lfp,pr,name,exts)
 struct loadfile	*lfp ;
-const char	pr[] ;
-const char	name[] ;
-const char	*exts[] ;
+cchar	pr[] ;
+cchar	name[] ;
+cchar	*exts[] ;
 {
 	ustat	sb ;
 	int		i, j, k ;
 	int		fl = 0 ;
-	const char	*lp = NULL ;
+	cchar	*lp = NULL ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	if (lfp == NULL)
