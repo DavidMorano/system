@@ -38,6 +38,7 @@
 #include	<cstdarg>
 
 #include	<usystem.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"proglog.h"
@@ -193,7 +194,7 @@ int logmark(PROGINFO *pip,int rem)
 
 	    if (rs >= 0) {
 	        fmt = "%s mark> %s" ;
-	        timestr_logz(pip->daytime,timebuf) ;
+	        strtime_logz(pip->daytime,timebuf) ;
 	        rs = proglog_printf(pip,fmt,timebuf,nn) ;
 	    }
 
@@ -205,7 +206,7 @@ int logmark(PROGINFO *pip,int rem)
 	    }
 
 	    if (rs >= 0) {
-		const int	v = pip->pid ;
+		cint	v = pip->pid ;
 		fmt = "pid=%u" ;
 	        rs = proglog_printf(pip,fmt,v) ;
 	    }
@@ -216,7 +217,7 @@ int logmark(PROGINFO *pip,int rem)
 		if (rem <= 0) {
 		    strcpy(timebuf,"·") ;
 		} else {
-	            timestr_elapsed(rtime,timebuf) ;
+	            strtime_elapsed(rtime,timebuf) ;
 		}
 	        rs = proglog_printf(pip,fmt,timebuf) ;
 	    }
@@ -241,13 +242,13 @@ int logreport(PROGINFO *pip)
 	if (pip->open.logprog) {
 	    char	timebuf[TIMEBUFLEN + 1] ;
 
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    if ((rs = proglog_printf(pip,"%s report",timebuf)) >= 0) {
 	        rs = proglog_printf(pip,"narkint=%u",pip->intmark) ;
 	    }
 
 	    if (rs >= 0) {
-	        timestr_logz(lip->ti_marklog,timebuf) ;
+	        strtime_logz(lip->ti_marklog,timebuf) ;
 	        rs = proglog_printf(pip,"marktime=%s",timebuf) ;
 	    }
 
@@ -263,10 +264,10 @@ int loginvalidcmd(PROGINFO *pip,cchar *cmd)
 	int		rs = SR_OK ;
 
 	if (pip->open.logprog) {
-	    const int	cl = strnlen(cmd,40) ;
-	    const char	*fmt = "%s invalid cmd=%r" ;
+	    cint	cl = strnlen(cmd,40) ;
+	    cchar	*fmt = "%s invalid cmd=%r" ;
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    rs = proglog_printf(pip,fmt,timebuf,cmd,cl) ;
 	}
 
@@ -289,7 +290,7 @@ int loginfo(PROGINFO *pip)
 	    }
 
 	    if (pip->fl.daemon) {
-		const int	v = pip->pid ;
+		cint	v = pip->pid ;
 	        proglog_printf(pip,"daemon pid=%u",v) ;
 	    }
 
@@ -299,7 +300,7 @@ int loginfo(PROGINFO *pip)
 
 	    lw = pip->intrun ;
 	    if ((lw >= 0) && (lw < INT_MAX)) {
-	        timestr_elapsed(lw,timebuf) ;
+	        strtime_elapsed(lw,timebuf) ;
 	    } else {
 	        sncpy1(timebuf,TIMEBUFLEN,"max") ;
 	    }
@@ -320,7 +321,7 @@ int loglock(PROGINFO *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np)
 	int		rs = SR_OK ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
-	timestr_logz(pip->daytime,timebuf) ;
+	strtime_logz(pip->daytime,timebuf) ;
 	proglog_printf(pip, "%s lock %s\n", timebuf, np) ;
 
 	proglog_printf(pip,"lf=%s",lfname) ;
