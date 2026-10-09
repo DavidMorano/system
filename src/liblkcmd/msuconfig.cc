@@ -52,7 +52,7 @@
 
 #ifndef	TYPEDEF_CCHAR
 #define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
+typedef cchar	cchar ;
 #endif
 
 
@@ -328,8 +328,8 @@ local int config_reader(CONFIG *cfp)
 	    int		ml, vl, el ;
 	    int		v ;
 	    cchar	*pr = pip->pr ;
-	    const char	*ccp ;
-	    const char	*kp, *vp ;
+	    cchar	*ccp ;
+	    cchar	*kp, *vp ;
 	    char	pbuf[PBUFLEN + 1] ;
 	    char	ebuf[EBUFLEN + 1] ;
 	    char	tbuf[MAXPATHLEN + 1] ;
@@ -413,7 +413,7 @@ local int config_reader(CONFIG *cfp)
 	                ccp = pip->pidfname ;
 	                if ((ccp == NULL) ||
 	                    (strcmp(ccp,tbuf) != 0)) {
-			    const char	**vpp = &pip->pidfname ;
+			    cchar	**vpp = &pip->pidfname ;
 	                    pip->changed.pidfname = TRUE ;
 	                    rs = proginfo_setentry(pip,vpp,tbuf,rs1) ;
 	                }
@@ -427,7 +427,7 @@ local int config_reader(CONFIG *cfp)
 	                ccp = lip->msfname ;
 	                if ((ccp == NULL) ||
 	                    (strcmp(ccp,tbuf) != 0)) {
-			    const char	**vpp = &lip->msfname ;
+			    cchar	**vpp = &lip->msfname ;
 	                    lip->changed.msfname = TRUE ;
 	                    rs = locinfo_setentry(lip,vpp,tbuf,rs1) ;
 	                }
@@ -441,7 +441,7 @@ local int config_reader(CONFIG *cfp)
 	                ccp = pip->lfname ;
 	                if ((ccp == NULL) ||
 	                    (strcmp(ccp,tbuf) != 0)) {
-			    const char	**vpp = &pip->lfname ;
+			    cchar	**vpp = &pip->lfname ;
 	                    pip->changed.logprog = TRUE ;
 	                    rs = proginfo_setentry(pip,vpp,tbuf,rs1) ;
 	                }
@@ -459,7 +459,7 @@ local int config_reader(CONFIG *cfp)
 	                ccp = lip->reqfname ;
 	                if ((ccp == NULL) ||
 	                    (strcmp(ccp,tbuf) != 0)) {
-			    const char	**vpp = &lip->reqfname ;
+			    cchar	**vpp = &lip->reqfname ;
 	                    lip->changed.reqfname = TRUE ;
 	                    rs = locinfo_setentry(lip,vpp,tbuf,rs1) ;
 	                }
@@ -477,7 +477,7 @@ local int config_reader(CONFIG *cfp)
 	                ccp = lip->speedname ;
 	                if ((ccp == NULL) ||
 	                    (strwcmp(ccp,ebuf,el) != 0)) {
-			    const char	**vpp = &lip->speedname ;
+			    cchar	**vpp = &lip->speedname ;
 	                    lip->changed.speedname = TRUE ;
 	                    rs = locinfo_setentry(lip,vpp,ebuf,el) ;
 	                }
