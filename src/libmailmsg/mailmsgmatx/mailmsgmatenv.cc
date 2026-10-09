@@ -81,7 +81,7 @@
 #include	<six.h>
 #include	<char.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"mailmsgmatenv.h"
