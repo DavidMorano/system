@@ -26,12 +26,12 @@
 *********************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<ctype.h>
 #include	<cstring>
 #include	<cstdlib>
@@ -53,7 +53,7 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,char **) ;
+extern int	sfshrink(cchar *,int,char **) ;
 
 
 /* local structures */
@@ -61,7 +61,7 @@ extern int	sfshrink(const char *,int,char **) ;
 
 /* forward references */
 
-static int	procitem(struct proginfo *,bfile *,const char *) ;
+local int	procitem(struct proginfo *,bfile *,cchar *) ;
 
 
 /* local variables */
@@ -166,10 +166,10 @@ ret0:
 
 
 
-static int procitem(pip,ofp,s)
+local int procitem(pip,ofp,s)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	s[] ;
+cchar	s[] ;
 {
 	int	rs ;
 	int	wlen ;
