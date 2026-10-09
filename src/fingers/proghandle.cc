@@ -55,6 +55,7 @@
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
+#include	<isfd.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>
@@ -105,7 +106,6 @@
 
 extern int	sisub(cchar *,int,cchar *) ;
 extern int	field_svcargs(FIELD *,VECSTR *) ;
-extern int	isasocket(int) ;
 
 extern int	progserve(PROGINFO *,STANDING *,BUILTIN *,
 			CLIENTINFO *,vecstr *,cchar *,cchar **) ;
@@ -164,7 +164,7 @@ CLIENTINFO	*cip ;
 	int		ofd = cip->fd_output ;
 	int		len ;
 	int		opts ;
-	cint	f_socket = isasocket(ifd) ;
+	cint	f_socket = isfdsocket(ifd) ;
 	char		svcspec[SVCSPECLEN + 1] ;
 	char		svcbuf[SVCBUFLEN + 1] ;
 
