@@ -160,7 +160,7 @@
 #include	<entbuf.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
-#include	<isfiledesc.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -1409,7 +1409,7 @@ local int msfile_filesetinfo(MSF *op) noex {
 	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
 	    op->ti_mod = sb.st_mtime ;
 	    op->filesize = sb.st_size ;
-	    if ((rs = isfsremote(op->fd)) > 0) {
+	    if ((rs = isfdfsremote(op->fd)) > 0) {
 	        op->fl.remote = true ;
 	    }
 	} /* end if (stat) */
