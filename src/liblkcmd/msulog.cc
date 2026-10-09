@@ -37,6 +37,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<logfile.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"msumain.h"
@@ -98,7 +99,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	logfind(PROGINFO *) ;
+local int	logfind(PROGINFO *) ;
 
 
 /* local variables */
@@ -194,7 +195,7 @@ int logprogname(PROGINFO *pip) noex {
 	    }
 
 	    fmt = "%s %-14s %s" ;
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    logfile_printf(&pip->lh,fmt,timebuf,pn,pip->version) ;
 
 	    if ((s != nullptr) && (r != nullptr)) {
@@ -232,7 +233,7 @@ int logmark(PROGINFO *pip,int rem) noex {
 
 	    if (rs >= 0) {
 	        fmt = "%s mark> %s" ;
-	        timestr_logz(pip->daytime,timebuf) ;
+	        strtime_logz(pip->daytime,timebuf) ;
 	        rs = logfile_printf(&pip->lh,fmt,timebuf,nn) ;
 	    }
 
@@ -255,7 +256,7 @@ int logmark(PROGINFO *pip,int rem) noex {
 		if (rem <= 0) {
 		    strcpy(timebuf,"·") ;
 		} else {
-	            timestr_elapsed(rtime,timebuf) ;
+	            strtime_elapsed(rtime,timebuf) ;
 		}
 	        rs = logfile_printf(&pip->lh,fmt,timebuf) ;
 	    }
@@ -269,13 +270,13 @@ int logreport(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 	if (pip->open.logprog) {
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    if ((rs = logfile_printf(&pip->lh, "%s report",timebuf)) >= 0) {
 	        rs = logfile_printf(&pip->lh, "narkint=%u",pip->intmark) ;
 	    }
 
 	    if (rs >= 0) {
-	        timestr_logz(lip->ti_marklog,timebuf) ;
+	        strtime_logz(lip->ti_marklog,timebuf) ;
 	        rs = logfile_printf(&pip->lh, "marktime=%s",timebuf) ;
 	    }
 
@@ -291,7 +292,7 @@ int loginvalidcmd(PROGINFO *pip,cchar *cmd) noex {
 	    cint	cl = strnlen(cmd,40) ;
 	    cchar	*fmt = "%s invalid cmd=%r" ;
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    rs = logfile_printf(&pip->lh,fmt,timebuf,cmd,cl) ;
 	}
 
@@ -318,7 +319,7 @@ int loginfo(PROGINFO *pip) noex {
 
 	    lw = pip->intrun ;
 	    if ((lw >= 0) && (lw < INT_MAX)) {
-	        timestr_elapsed(lw,timebuf) ;
+	        strtime_elapsed(lw,timebuf) ;
 	    } else {
 	        sncpy1(timebuf,TIMEBUFLEN,"max") ;
 	    }
@@ -336,7 +337,7 @@ int loglock(PROGINFO *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np) noex {
 	int		rs = SR_OK ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
-	timestr_logz(pip->daytime,timebuf) ;
+	strtime_logz(pip->daytime,timebuf) ;
 	logfile_printf(&pip->lh, "%s lock %s\n",timebuf, np) ;
 
 	logfile_printf(&pip->lh,"lf=%s",lfname) ;
@@ -362,7 +363,7 @@ int loglock(PROGINFO *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np) noex {
 
 /* local subroutines */
 
-static int logfind(PROGINFO *pip) noex {
+local int logfind(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->lfname == nullptr) {
 	    cchar	*sn = pip->searchname ;
