@@ -99,7 +99,7 @@ int proglogfname(PI *pip,char *rbuf,cchar *logcname,cchar *lfname) noex {
 	        if (strchr(lfname,'/') != NULL) {
 	            rs = mkpath2(rbuf,pip->pr,lfname) ;
 	        } else {
-		    const char	*logdname ;
+		    cchar	*logdname ;
 		    char	tmpdname[MAXPATHLEN+1] ;
 	            if (logcname == NULL) logcname = LOGCNAME ;
 		    logdname = logcname ;
