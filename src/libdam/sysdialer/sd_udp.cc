@@ -204,7 +204,7 @@ cchar	*av[] ;
 	        if ((argl > 1) && (f_optminus || f_optplus)) {
 			cint	ach = MKCHAR(argp[1]) ;
 
-	                if (isdigitlatin(ach)) {
+	                if (ischdigit(ach)) {
 
 			    if ((argl - 1) > 0)
 	                        rs = cfdeci((argp + 1),(argl - 1),&argvalue) ;
