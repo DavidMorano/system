@@ -45,7 +45,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"bbspec.h"
