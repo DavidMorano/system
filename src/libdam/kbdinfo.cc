@@ -53,7 +53,7 @@
 #include	<matxstr.h>		/* LIBUC */
 #include	<cfnum.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<termcmd.h>		/* LIBUC */
 #include	<keysymer.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
