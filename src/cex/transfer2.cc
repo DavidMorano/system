@@ -44,6 +44,7 @@
 #include	<usysbase.h>
 #include	<logfile.h>
 #include	<strtime.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -81,7 +82,6 @@
 
 /* external subroutines */
 
-extern int	isasocket(int) ;
 extern int	inetping(cchar *,int) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
@@ -123,7 +123,7 @@ int		mxu ;
 	int		c_already = 0 ;
 	int		f_exit ;
 	int		f_daytime = FALSE ;
-	int		f_issock = isasocket(rfd) ;
+	int		f_issock = isfdsocket(rfd) ;
 	int		f_dgram = FALSE ;
 	int		f ;
 	char		buf[BUFLEN + 1] ;
