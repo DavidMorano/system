@@ -65,7 +65,7 @@ bool isdotdir(cchar *dname) noex {
 	if (dname[0] == '.') {
 	    f = f || (dname[1] == '\0') ;
 	    f = f || ((dname[1] == '.') && (dname[2] == '\0')) ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (isdotdir) */
 

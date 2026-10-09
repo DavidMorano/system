@@ -25,7 +25,6 @@ struct strman_head {
 	int		sl ;
 } ; /* end struct (strman_head) */
 
-
 typedef	STRMAN		strman ;
 
 EXTERNC_begin
@@ -38,10 +37,10 @@ extern int	strman_finish		(strman *) noex ;
 
 local inline int strman_whitecolon(strman *sop) noex {
 	return strman_whitechr(sop,':') ;
-}
+} /* end */
 local inline int strman_whitedash(strman *sop) noex {
 	return strman_whitechr(sop,'-') ;
-}
+} /* end */
 
 EXTERNC_end
 

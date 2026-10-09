@@ -262,7 +262,7 @@ local int getps(int pm) noex {
 
 local int perenc(char *ebuf,int,int ch) noex {
 	char		*ep = ebuf ;
-	if (isprintlatin(ch) && isnotbadchar(ch)) {
+	if (ischprint(ch) && isnotbadchar(ch)) {
 	    *ep++ = char(ch) ;
 	    *ep = '\0' ;
 	} else {

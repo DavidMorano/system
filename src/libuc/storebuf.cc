@@ -33,28 +33,26 @@
 	value of the next available (unused) byte in the buffer.
 
 	Example usage:
-
-	rs = 0 ;
-	i = 0 ;
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_buf(rbuf,rlen,i,bp,bl) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_deci(rbuf,rlen,i,value) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
-	    i += rs ;
-	}
+	{{
+	    rs = 0 ;
+	    i = 0 ;
+	    if (rs >= 0) {
+	        rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_buf(rbuf,rlen,i,bp,bl) ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_deci(rbuf,rlen,i,value) ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
+	        i += rs ;
+	    }
+	}}
 
 *******************************************************************************/
 
@@ -248,18 +246,18 @@ int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	            if (sl < 0) {
 	                while (*sp) {
 	                    *bp++ = *sp++ ;
-		        }
+		        } /* end while */
 	            } else {
 	                while (sl && *sp) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
-	                }
+	                } /* end while */
 	            } /* end if */
 	        } else {
 	            if (sl < 0) {
 	                while ((bp < (rbuf + rlen)) && *sp) {
 	                    *bp++ = *sp++ ;
-		        }
+		        } /* end while */
 		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
 		            rs = SR_OVERFLOW ;
 		        }
@@ -267,7 +265,7 @@ int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	                while ((bp < (rbuf + rlen)) && sl && *sp) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
-	                }
+	                } /* end while */
 		        if ((bp == (rbuf + rlen)) && sl) {
 		            rs = SR_OVERFLOW ;
 		        }
@@ -407,7 +405,7 @@ int storebuf::chr(int ch) noex {
             idx += rs ;
 	} else {
 	    idx = rs ;
-	}
+	} /* end */
     } /* end if (ok) */
     return rs ;
 } /* end method */
@@ -419,7 +417,7 @@ int storebuf::strw(cchar *sp,int sl) noex {
             idx += rs ;
 	} else {
 	    idx = rs ;
-	}
+	} /* end */
     } /* end if (ok) */
     return rs ;
 } /* end method */
@@ -431,7 +429,7 @@ int storebuf::str(cchar *sp) noex {
             idx += rs ;
 	} else {
 	    idx = rs ;
-	}
+	} /* end */
     } /* end if (ok) */
     return rs ;
 } /* end method */
@@ -443,7 +441,7 @@ int storebuf::buf(cchar *sp,int sl) noex {
             idx += rs ;
 	} else {
 	    idx = rs ;
-	}
+	} /* end */
     } /* end if (ok) */
     return rs ;
 } /* end method */
@@ -455,7 +453,7 @@ int storebuf::blanks(int n) noex {
             idx += rs ;
 	} else {
 	    idx = rs ;
-	}
+	} /* end */
     } /* end if (ok) */
     return rs ;
 } /* end method */

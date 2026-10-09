@@ -43,11 +43,11 @@ struct strop_co {
 	void operator () (strop *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (strop_co) */
 struct strop : strop_head {
 	strop_co	remlen ;
@@ -82,7 +82,7 @@ struct strop : strop_head {
 	void dtor() noex ;
 	destruct strop() {
 	    if (sp) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (strop) */
 #else	/* __cplusplus */
 typedef STROP		strop ;
@@ -105,10 +105,10 @@ extern int	strop_finish	(strop *) noex ;
 
 inline int strop_whitedash(strop *op) noex {
 	return strop_whitechr(op,'-') ;
-}
+} /* end */
 inline int strop_whitecolon(strop *op) noex {
 	return strop_whitechr(op,':') ;
-}
+} /* end */
 
 EXTERNC_end
 

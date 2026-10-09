@@ -56,6 +56,9 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -63,6 +66,9 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

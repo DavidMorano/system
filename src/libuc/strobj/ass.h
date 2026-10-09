@@ -47,11 +47,11 @@ struct ass_co {
 	void operator () (ass *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ass_co) */
 struct ass : ass_head {
 	ass_co		start ;
@@ -69,7 +69,7 @@ struct ass : ass_head {
 	void dtor() noex ;
 	destruct ass() {
 	    if (rbuf) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ass) */
 #else	/* __cplusplus */
 typedef ASS		ass ;

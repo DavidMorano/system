@@ -105,13 +105,13 @@ int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	    if (pid >= 0) ylikely {
 		if (rs >= 0) ylikely {
 		    rs = b.chr(dch) ;
-		}
+		} /* end */
 	        if (uint uv = uint(pid) ; rs >= 0) ylikely {
 	            rs = b.dec(uv) ;
-	        }
+	        } /* end */
 	        if (rs >= 0) ylikely {
 	            rs = b.chr(dch) ;
-	        }
+	        } /* end */
 	    } /* end if (PID included) */
 	    if (rs >= 0) ylikely {
 	        rs = b.str(execfname) ;

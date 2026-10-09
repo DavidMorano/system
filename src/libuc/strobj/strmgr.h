@@ -62,11 +62,11 @@ struct strmgr_co {
 	void operator () (strmgr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (strmgr_co) */
 struct strmgr : strmgr_head {
 	strmgr_co	avail ;
@@ -92,7 +92,7 @@ struct strmgr : strmgr_head {
 	operator int () noex ;
 	destruct strmgr() {
 	    if (dbuf) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (strmgr) */
 #else	/* __cplusplus */
 typedef STRMGR		strmgr ;

@@ -63,11 +63,11 @@ struct strtab_co {
 	void operator () (strtab *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = 0) noex ;
 	operator int () noex {
 	    return operator () (0) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (strtab_co) */
 struct strtab : strtab_head {
 	strtab_co	start ;
@@ -99,7 +99,7 @@ struct strtab : strtab_head {
 	void dtor() noex ;
 	destruct strtab() {
 	    if (clp) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (strtab) */
 #else	/* __cplusplus */
 typedef STRTAB		strtab ;
