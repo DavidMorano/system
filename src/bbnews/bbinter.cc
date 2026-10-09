@@ -65,7 +65,7 @@
 #include	<keysymer.h>		/* LIBUC */
 #include	<toxc.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<termdisp.h>
 #include	<instr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
