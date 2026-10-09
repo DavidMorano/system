@@ -49,7 +49,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucmem.h>		/* LIBUC */
 #include	<sysval.hh>		/* LIBUC */
-#include	<isfiledesc.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |MODP2| */
 
@@ -406,7 +406,7 @@ local int lineindex_idxopen(LI *op,time_t dt) noex {
 	int		rs ;
 	if ((rs = lineindex_idxopener(op)) >= 0) ylikely {
 	    cint	fd = op->fd ;
-	    if ((rs = isfsremote(fd)) >= 0) {
+	    if ((rs = isfdfsremote(fd)) >= 0) {
 	  	op->fl.remote = (rs > 0) ;
 		if (ustat *sbp = op->sbp ; (rs = u_fstat(fd,sbp)) >= 0) {
 		    if (sbp->st_size <= maxfoff) {
@@ -418,7 +418,7 @@ local int lineindex_idxopen(LI *op,time_t dt) noex {
 			rs = SR_TOOBIG ;
 		    }
 		} /* end if (fstat) */
-	    } /* end if (isfsremote) */
+	    } /* end if (isfdfsremote) */
 	    if (rs < 0) {
 		u_close(op->fd) ;
 		op->fd = -1 ;
