@@ -44,7 +44,7 @@
 #include	<usupport.h>		/* LIBU */
 #include	<matostr.h>		/* LIBUC */
 #include	<cfnum.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |isnumlatin(3uc) */
+#include	<isch.h>		/* LIBUC |ischnum(3uc) */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -100,7 +100,7 @@ int optval(cchar *sp,int µsl) noex {
 	        } else {
 	            cint	ch = mkchar(sp[0]) ;
 		    rs = SR_INVALID ;
-	            if (isnumlatin(ch)) {
+	            if (ischnum(ch)) {
 	                rs = cfnumi(sp,sl,&v) ;
 		    }
 	        } /* end if */
