@@ -96,7 +96,7 @@ int optval(cchar *sp,int µsl) noex {
 	        } else {
 	            cint	ch = mkchar(sp[0]) ;
 		    rs = SR_INVALID ;
-	            if (isnumlatin(ch)) {
+	            if (ischnum(ch)) {
 	                rs = cfdec(sp,sl,&v) ; /* <- swapped out */
 		    }
 	        } /* end if */
