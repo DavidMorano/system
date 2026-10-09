@@ -45,6 +45,7 @@
 #include	<usysbase.h>
 #include	<logfile.h>
 #include	<strtime.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -82,7 +83,6 @@
 
 /* external subroutines */
 
-extern int	isasocket(int) ;
 extern int	inetping(cchar *,int) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
@@ -163,13 +163,13 @@ int		mxu ;
 
 /* continue */
 
-	f_issock = isasocket(rfd) ;
+	f_issock = isfdsocket(rfd) ;
 
 	if (f_issock) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
-	        debugprintf("transfer: isasocket() rs=%d\n",f_issock) ;
+	        debugprintf("transfer: isfdsocket() rs=%d\n",f_issock) ;
 #endif
 
 	    optlen = sizeof(int) ;
