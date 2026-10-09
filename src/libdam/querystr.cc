@@ -43,7 +43,7 @@
 #include	<strwcmp.h>		/* LIBUC */
 #include	<cfhex.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -469,7 +469,7 @@ local char *strwebhex(char *rp,cchar *tp,int tl) noex {
 	if ((tl >= 3) && (*tp == '%')) {
 	    cint	ch1 = mkchar(tp[1]) ;
 	    cint	ch2 = mkchar(tp[2]) ;
-	    if (ishexlatin(ch1) && ishexlatin(ch2)) {
+	    if (ischhex(ch1) && ischhex(ch2)) {
 	        if (int v ; cfhexi((tp+1),2,&v) >= 0) {
 	            *rp++ = char(v) ;
 	        }
