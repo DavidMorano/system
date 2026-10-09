@@ -38,7 +38,7 @@
 #include	<bfile.h>
 #include	<mktmp.h>
 #include	<prognamevar.hh>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
