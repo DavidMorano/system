@@ -56,6 +56,7 @@
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
+#include	<isfd.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>		/* LIBB */
@@ -106,7 +107,6 @@
 
 extern int	sisub(cchar *,int,cchar *) ;
 extern int	field_svcargs(FIELD *,VECSTR *) ;
-extern int	isasocket(int) ;
 
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
@@ -173,7 +173,7 @@ struct clientinfo	*cip ;
 
 
 	to = TO_READSVC ;
-	f_socket = isasocket(ifd) ;
+	f_socket = isfdsocket(ifd) ;
 
 /* pop off the service name */
 
