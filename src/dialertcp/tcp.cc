@@ -57,7 +57,7 @@
 #include	<matstr.h>		/* |matostr(3uc)| */
 #include	<cfdec.h>
 #include	<baops.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"sysdialer.h"
@@ -218,7 +218,7 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar *hn,cchar *svc,mainv) noex {
 	            if (argl > 1) {
 			cint	ach = MKCHAR(argp[1]) ;
 
-	                if (isdigitlatin(ach)) {
+	                if (ischdigit(ach)) {
 
 	                    if (cfdeci(argp + 1,argl - 1,&argnum))
 	                        goto badargval ;
