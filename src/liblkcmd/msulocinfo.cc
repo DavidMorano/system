@@ -43,21 +43,24 @@
 #include	<sys/msg.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<poll.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bufsizeget.h>
 #include	<vecstr.h>
 #include	<lfm.h>
 #include	<utmpacc.h>
 #include	<getax.h>
 #include	<getpwx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"msumain.h"
 #include	"msumainer.h"
@@ -132,15 +135,7 @@ extern int	isNotPresent(int) ;
 
 extern int	proginfo_rootname(PROGINFO *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -151,7 +146,7 @@ extern char	*timestr_elapsed(time_t,char *) ;
 
 /* forward references */
 
-static int locinfo_lockbeginone(LOCINFO *,LFM *,cchar *) ;
+local int locinfo_lockbeginone(LOCINFO *,LFM *,cchar *) ;
 
 
 /* local variables */
@@ -421,7 +416,7 @@ int locinfo_tmpourdname(LOCINFO *lip)
 	            if ((rs = u_stat(tmpourdname,&sb)) >= 0) {
 	    		int		f_needmode = FALSE ;
 	                if (S_ISDIR(sb.st_mode)) {
-			    const int	am = (R_OK|W_OK|X_OK) ;
+			    cint	am = (R_OK|W_OK|X_OK) ;
 	                    f_needmode = ((sb.st_mode & dm) != dm) ;
 			    if ((rs = u_access(tmpourdname,am)) >= 0) {
 				if (f_needmode && (pip->euid == sb.st_uid)) {
@@ -493,7 +488,7 @@ int locinfo_msfile(LOCINFO *lip)
 	}
 
 	if (rs >= 0) {
-	    const int	am = (R_OK|W_OK) ;
+	    cint	am = (R_OK|W_OK) ;
 	    rs = perm(lip->msfname,-1,-1,NULL,am) ;
 	}
 
@@ -507,12 +502,12 @@ int locinfo_msfile(LOCINFO *lip)
 	    const uid_t	euid = geteuid() ;
 
 	    if ((rs = u_creat(lip->msfname,msmode)) >= 0) {
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 	        if ((rs = uc_fminmod(fd,msmode)) >= 0) {
 	        if (uid == euid) { /* we are not running SUID */
 		    if ((rs = proginfo_rootname(pip)) >= 0) {
 	                struct passwd	pw ;
-			const int	pwlen = bufsizeget(bufsize_pw) ;
+			cint	pwlen = bufsizeget(bufsize_pw) ;
 	                char		*pwbuf ;
 			if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 			    cchar	*rn = pip->rootname ;
@@ -573,7 +568,7 @@ int locinfo_reqfname(LOCINFO *lip)
 int locinfo_ipcpid(LOCINFO *lip,int f)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	of = (O_CREAT | O_WRONLY | O_TRUNC) ;
+	cint	of = (O_CREAT | O_WRONLY | O_TRUNC) ;
 	int		rs = SR_OK ;
 	cchar		*pidcname = PIDCNAME ;
 	cchar		*pf ;
@@ -655,7 +650,7 @@ int locinfo_gidrootname(LOCINFO *lip)
 	if (lip->gid_rootname == 0) {
 	    if ((rs = proginfo_rootname(pip)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = bufsizeget(bufsize_pw) ;
+	        cint	pwlen = bufsizeget(bufsize_pw) ;
 	        char		*pwbuf ;
 	        lip->gid_rootname = 0 ; /* super (unwanted) default */
 		if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
@@ -705,7 +700,7 @@ int locinfo_isreqexit(LOCINFO *lip)
 /* private subroutines */
 
 
-static int locinfo_lockbeginone(LOCINFO *lip,LFM *lfp,cchar *lockfname)
+local int locinfo_lockbeginone(LOCINFO *lip,LFM *lfp,cchar *lockfname)
 {
 	PROGINFO	*pip = lip->pip ;
 	const mode_t	dmode = 0777 ;
@@ -732,8 +727,8 @@ static int locinfo_lockbeginone(LOCINFO *lip,LFM *lfp,cchar *lockfname)
 
 	    if (rs >= 0) {
 		LFM_CHECK	lc ;
-		const int	ltype = LFM_TRECORD ;
-		const int	to_lock = lip->to_lock ;
+		cint	ltype = LFM_TRECORD ;
+		cint	to_lock = lip->to_lock ;
 		cchar		*nn = pip->nodename ;
 		cchar		*un = pip->username ;
 		cchar		*bn = pip->banner ;
