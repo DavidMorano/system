@@ -34,7 +34,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<mkpathx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<isch.h>		/* LIBUC |ischeol(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"cmbuf.h"
@@ -77,7 +77,7 @@ local inline int cmbuf_magic(cmbuf *op,Args ... args) noex {
 
 local bool isend(int ch) noex {
     ch &= UCHAR_MAX ;
-    return iseol(ch) ;
+    return ischeol(ch) ;
 } /* end subroutine (isend) */
 
 
