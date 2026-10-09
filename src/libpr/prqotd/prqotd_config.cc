@@ -67,7 +67,7 @@
 #include	<cfdect.h>
 #include	<ctdec.h>
 #include	<isnot.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 #include	<libdebug.h>		/* LIBDEBUG */
 
