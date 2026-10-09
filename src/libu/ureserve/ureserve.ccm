@@ -49,7 +49,7 @@ export module ureserve ;
 
 export import :isnot ;
 export import :charx ;
-export import :isx ;
+export import :isch ;
 export import :sfx ;
 export import :strop ;
 export import :fieldterm ;
