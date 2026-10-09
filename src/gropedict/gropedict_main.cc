@@ -48,7 +48,7 @@
 #include	<logfile.h>
 #include	<userinfo.h>
 #include	<varsub.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
