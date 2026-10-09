@@ -41,7 +41,7 @@
 #include	<mallocxx.h>
 #include	<bfile.h>
 #include	<cfdec.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<localmisc.h>		/* |TIEBUFLEN| + |DIGBUFLEN| */
 
 #include	"proginfo.hh"
@@ -63,7 +63,7 @@
 
 /* forward references */
 
-static int	progchecker(PI *,bfile *,time_t) noex ;
+local int	progchecker(PI *,bfile *,time_t) noex ;
 
 
 /* local variables */
@@ -107,18 +107,18 @@ int progchecklock(PI *pip,bfile *fp,cc *fn,cc *bn,cc *dt) noex {
 }
 /* end subroutine (progchecklockfile) */
 
-static int progchecker(PI *pip,bfile *fp,time_t dt) noex {
+local int progchecker(PI *pip,bfile *fp,time_t dt) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	if (char *lbuf ; (rs = malloc_ml(&lbuf)) >= 0) {
 	    if ((rs = breadln(fp,lbuf,rs)) >= 0) { /* <- throw away */
 		/* write an updated time at this offset in the file */
 		char	timebuf[TIMEBUFLEN + 1] ;
-		if (timestr_logz(dt,timebuf) != np) {
+		if (strtime_logz(dt,timebuf) != np) {
 		    if ((rs = bprintf(fp,"%s",timebuf)) >= 0) {
 		        rs = bflush(fp) ;
 		    }
-		} /* end if (timestr_logz) */
+		} /* end if (strtime_logz) */
 	    } /* end if (breadln) */
 	    rs = rsfree(rs,lbuf) ;
 	} /* end if (m-a-f) */
