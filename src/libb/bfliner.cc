@@ -39,7 +39,7 @@
 #include	<ucmem.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<libb.h>		/* LIBB */
+#include	<bfile.h>		/* LIBB */
 
 #include	"bfliner.h"
 
