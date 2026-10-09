@@ -48,14 +48,14 @@
 #include	<fcntl.h>
 #include	<netdb.h>
 #include	<grp.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>
 #include	<gethz.h>
 #include	<getax.h>
@@ -66,8 +66,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
-#include	<nulstr.h>
-#include	<bfile.h>
+#include	<nulstr.h>		/* LIBU */
 #include	<ids.h>
 #include	<logfile.h>
 #include	<expcook.h>
@@ -76,9 +75,11 @@
 #include	<snx.h>			/* |snabbrname(3uc)| */
 #include	<mkui.h>		/* |mkuiname(3dam)| */
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<char.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<char.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #if	defined(P_PCSPOLL) && (P_PCSPOLL > 0)
 #include	<pcsconf.h>
@@ -1187,7 +1188,7 @@ int main(int argc,mainv argv,mainv envv) {
 #if	CF_DEBUG && 0
 	if (DEBUGLEVEL(2)) {
 	    for (i = 0 ; i < 3 ; i += 1) {
-	        debugprintf("main: isasocket(%u)=%u\n",i,isasocket(i)) ;
+	        debugprintf("main: isfdsocket(%u)=%u\n",i,isfdsocket(i)) ;
 	        debugprintf("main: fd=%u u_fstat() rs=%d s_issock=%u\n",
 	            i, u_fstat(i,&sb),S_ISSOCK(sb.st_mode)) ;
 	    }
