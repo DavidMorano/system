@@ -67,7 +67,7 @@
 #include	<strn.h>		/* |strnwcpy(3uc)| */
 #include	<strx.h>
 #include	<strwcpy.h>
-#include	<ischarx.h>		/* |ispm(3uc)| */
+#include	<isch.h>		/* |ispm(3uc)| */
 #include	<localmisc.h>
 #include	<libpr.h>		/* LIBPR */
 #include	<libdebug.h>		/* LIBDEBUG */
