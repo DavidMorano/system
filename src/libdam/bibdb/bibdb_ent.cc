@@ -68,7 +68,7 @@
 #include	<buffer.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG */
 
