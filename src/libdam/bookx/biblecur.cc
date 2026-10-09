@@ -38,7 +38,7 @@
 #include	<six.h>			/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -146,7 +146,7 @@ int biblecur_check(biblecur *op,cchar *sqp,int sql) noex {
 	    if (sl > 0) {
 	        /* start of new line */
 	        int	ch = MKCHAR(*sp) ;
-	        if (isdigitlatin(ch)) {
+	        if (ischdigit(ch)) {
 	            int		n_book = -1 ;
 	            int		n_chap = -1 ;
 	            int		n_vers = -1 ;
