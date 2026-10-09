@@ -44,7 +44,7 @@
 #include	<ascii.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<char.h>		/* LIBUC |CHAR_ISWHUTE(3cu)| */
-#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischdigit(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"makedate_get.h"
@@ -90,7 +90,7 @@ int makedate_get(cchar *md,cchar **rpp) noex {
 	        } /* end while */
 		{
 	            cint ch = mkchar(*cp) ;
-	            if (! isdigitlatin(ch)) {
+	            if (! ischdigit(ch)) {
 	                while (*cp && (! ISWHT(*cp))) {
 		            cp += 1 ;
 	                }
