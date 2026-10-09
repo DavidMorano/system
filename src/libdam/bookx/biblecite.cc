@@ -50,7 +50,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<six.h>			/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -62,8 +62,8 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	ISWHT(ch)	iswhitelatin(ch)
-#define	ISDIG(ch)	isdigitlatin(ch)
+#define	ISWHT(ch)	ischwhite(ch)
+#define	ISDIG(ch)	ischdigit(ch)
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
