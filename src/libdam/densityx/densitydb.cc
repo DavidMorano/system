@@ -57,7 +57,7 @@
 #include	<mkx.h>			/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<lockfile.h>		/* LIBUC */
-#include	<isfiledesc.h>		/* LIBUC |isfsremote(3uc)| */
+#include	<isfd.h>		/* LIBUC |isfdfsremote(3uc)| */
 #include	<ismisc.h>		/* LIBUC |isaccmode(3uc)| */
 #include	<isnot.h>		/* LIBUC */
 #include	<iserror.h>		/* LIBUC */
@@ -292,12 +292,12 @@ local int densitydb_opens(DD *op,cc *fname) noex {
 			csize fsize = size_t(sb.st_size) ;
                         op->timod = uint(sb.st_mtime) ;
                         op->filesz = intsat(fsize) ;
-                        if ((rs = isfsremote(op->fd)) >= 0) {
+                        if ((rs = isfdfsremote(op->fd)) >= 0) {
                             op->fl.remote = (rs > 0) ;
                             if ((rs = densitydb_fileinit(op,dt)) >= 0) {
                                 op->magval = DENSITYDB_MAGIC ;
                             }
-                        } /* end if (isfsremote) */
+                        } /* end if (isfdfsremote) */
                     } /* end if (stat) */
                     if (rs < 0) {
                         voidp vp = voidp(op->fname) ;
