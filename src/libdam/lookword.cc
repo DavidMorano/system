@@ -47,7 +47,7 @@
 #include	<vecobj.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |LINEBUFLEN| */
 
@@ -72,7 +72,7 @@ import libutil ;			/* |memclear(3u)| */
  */
 #define NO_COMPARE	(-2)
 
-#define DICT(c)		(isdict(c) ? (c) /* int */ : NO_COMPARE)
+#define DICT(c)		(ischdict(c) ? (c) /* int */ : NO_COMPARE)
 #define FOLD(c)		CHAR_TOFC(c)
 
 #define	LW		lookword
@@ -442,7 +442,7 @@ local int compare(LW *op,cchar *s2,cchar *back,cchar *s1,int *rp) noex {
 	while (s1[i] && ((s2+j) < back) && (s2[j] != '\n')) {
 	    ch1 = mkchar(s1[i]) ;
 	    ch2 = mkchar(s2[j]) ;
-	    if (op->fl.dict && (! isdict(ch2))) {
+	    if (op->fl.dict && (! ischdict(ch2))) {
 	        j += 1 ;		/* ignore character in comparison */
 	        continue ;
 	    }
