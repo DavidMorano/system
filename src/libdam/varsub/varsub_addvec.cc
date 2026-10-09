@@ -60,7 +60,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -101,10 +101,10 @@ int varsub_addvec(varsub *op,vecstr *vsp) noex {
 	        if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
 		    int		ch = mkchar(kp[0]) ;
 	            cchar *vap = (tp + 1) ;
-		    f = isprintlatin(ch) ;
+		    f = ischprint(ch) ;
 	            if (f) {
 		        ch = mkchar(vap[0]) ;
-		        f = ((ch == '\0') || isprintlatin(ch)) ;
+		        f = ((ch == '\0') || ischprint(ch)) ;
 	            }
 	            if (f) {
 			cint	tl = intconv(tp - kp) ;
