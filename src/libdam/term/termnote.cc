@@ -120,7 +120,7 @@
 #include	<pow.h>			/* LIBUC */
 #include	<permx.h>		/* LIBUC */
 #include	<strtime.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |NTABCOLS| + |COLUMNS| */
@@ -944,7 +944,7 @@ local bool isourbad(int ch) noex {
 	    f = false ;
 	    break ;
 	default:
-	    f = (! isprintlatin(ch)) ;
+	    f = (! ischprint(ch)) ;
 	    break ;
 	} /* end switch */
 	return f ;
