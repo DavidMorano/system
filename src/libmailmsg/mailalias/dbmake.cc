@@ -90,7 +90,7 @@
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<iserror.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mailvalues.hh>		/* LIBU |mailaliaslen| */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
