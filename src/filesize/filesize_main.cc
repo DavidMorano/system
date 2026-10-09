@@ -1,17 +1,17 @@
-/* main */
+/* filesize_main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* part of the 'filesize' program */
+/* part of the FILEIZE program */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0
-#define	CF_DEBUG		1
-
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history :
 
 	= 1996-02-01, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -19,33 +19,30 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is a fairly generic front-end subroutine for a program.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<field.h>		/* LIBUC */
+#include	<paramopt.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<csignal>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<baops.h>
-#include	<field.h>
-#include	<paramopt.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
-
-#include	"config.h"
-#include	"defs.h"
+#include	"filesize_config.h"
 
 
 /* local defines */
@@ -57,7 +54,6 @@
 /* external subroutines */
 
 extern int	optmatch3(char *const *,char *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
 
 extern char	*strbasename(char *), *strshrink(char *) ;
 
@@ -193,7 +189,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	        if (argl > 1) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            eprintf("main: got an option\n") ;
 #endif
 
@@ -203,7 +199,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            f_optequal = FALSE ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                eprintf("main: got an option key w/ a value\n") ;
 #endif
 
@@ -222,13 +218,13 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* do we have a keyword match or should we assume only key letters ? */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            eprintf("main: about to check for a key word match\n") ;
 #endif
 
 	            if ((kwi = optmatch3(argopts,aop,aol)) >= 0) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                eprintf("main: got an option keyword, kwi=%d\n",
 	                    kwi) ;
 #endif
@@ -344,13 +340,13 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	            } else {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                eprintf("main: got an option key letter\n") ;
 #endif
 
 	                while (aol--) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                    eprintf("main: option key letters\n") ;
 #endif
 
@@ -364,7 +360,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                            eprintf("main: debugequal avl=%d avp=%s\n",
 	                                avl,avp) ;
 #endif
@@ -373,7 +369,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	                            if (cfdeci(avp,avl, &pip->debuglevel) < 0)
 	                                goto badargval ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                            eprintf("main: debuglevel=%d\n",
 	                                pip->debuglevel) ;
 #endif
@@ -516,7 +512,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* check arguments */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	eprintf("main: finished parsing command line arguments\n") ;
 	eprintf("main: npa=%d\n",npa) ;
 #endif
@@ -828,14 +824,13 @@ badoutopen:
 /* come here for a bad return from the program */
 badret:
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	eprintf("main: exiting program BAD\n") ;
 #endif
 
 	ex = EX_USAGE ;
 	goto retearly ;
 
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
