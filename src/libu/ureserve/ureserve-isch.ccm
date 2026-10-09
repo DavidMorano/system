@@ -1,0 +1,123 @@
+/* ureserve-isch MODULE (primary-module-interface) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* reserved interfaces */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-03-21, David A­D­ Morano
+	This module was originally written.
+
+	= 2020-05-07, David A-D- Morano
+	I converted this (formerly a header-only file) to a module.
+
+*/
+
+/* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	ureserve
+
+	Description:
+	This module provides miscellaneous UNIX® or other
+	common (library oriented) subroutines.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module ureserve:isch ;
+
+export {
+    bool	ischalpha	(int) noex ;
+    bool	ischalnum	(int) noex ;
+    bool	ischdigex	(int) noex ;
+    bool	ischwhite	(int) noex ;
+    bool	ischlower	(int) noex ;
+    bool	ischupper	(int) noex ;
+    bool	ischprint	(int) noex ;
+    bool	ischprintterm	(int) noex ;
+    bool	ischprintbad	(int) noex ;
+    bool	ischdict	(int) noex ;
+    bool	ischcmdstart	(int) noex ;
+    bool	ischhdrkey	(int) noex ;
+    constexpr inline bool	ischdigit(int ch)	noex {
+	    return (ch >= '0') && (ch <= '9') ;
+    } /* end */
+    constexpr inline bool	ischblank(int ch)	noex {
+	    return (ch == ' ') || (ch == '\t') ;
+    } /* end */
+    constexpr inline bool	ischbinar(int ch)	noex {
+	    return (ch >= '0') && (ch <= '1') ;
+    } /* end */
+    constexpr inline bool	ischoctal(int ch)	noex {
+	    return (ch >= '0') && (ch <= '7') ;
+    } /* end */
+    constexpr inline bool	ischdig(int ch)		noex {
+	    return (ch >= '0') && (ch <= '9') ;
+    } /* end */
+    constexpr inline bool	ischbin(int ch)		noex {
+	    return (ch >= '0') && (ch <= '1') ;
+    } /* end */
+    constexpr inline bool	ischoct(int ch)		noex {
+	    return (ch >= '0') && (ch <= '7') ;
+    } /* end */
+    constexpr inline bool	ischdec(int ch)		noex {
+    	    return ischdigit(ch) ;
+    } /* end */
+    constexpr inline bool	ischhex(int ch)		noex {
+    	    return ischdigex(ch) ;
+    } /* end */
+    constexpr inline bool	ischnum(int ch)		noex {
+    	    return ischdigex(ch) || (ch == '\\') || (ch == 'x') ;
+    } /* end */
+    constexpr inline bool	ischwht(int ch)		noex {
+    	    return ischwhite(ch) ;
+    } /* end */
+    constexpr inline bool	ischblk(int ch)		noex {
+    	    return ischblank(ch) ;
+    } /* end */
+    constexpr inline bool	ischeol(int ch)		noex {
+	    return (ch == '\n') || (ch == '\r') ;
+    } /* end */
+    constexpr inline bool	ischzero(int ch)	noex {
+	    return (ch == '0') ;
+    } /* end */
+    constexpr inline bool	ischpl(int ch)		noex {
+	    return (ch == '+') ;
+    } /* end */
+    constexpr inline bool	ischmi(int ch)		noex {
+	    return (ch == '-') ;
+    } /* end */
+    constexpr inline bool	ischpm(int ch)		noex {
+	    return (ch == '+') || (ch == '-') ;
+    } /* end */
+    constexpr inline bool	ischme(int ch)		noex {
+	    return (ch == '+') || (ch == '-') || (ch == '!') ;
+    } /* end */
+    constexpr inline bool	ischabbr(int ch)	noex {
+	    ch &= UCHAR_MAX ;
+	    return (ch == '.') || (ch == ('­' & UCHAR_MAX)) || (ch == '-') ;
+    } /* end */
+    constexpr inline bool	ischspacetab(int ch)	noex {
+	    return ischblank(ch) ;
+    } /* end */
+    constexpr inline bool	ischAbbr(int ch)	noex {
+    	    return ischabbr(ch) ;
+    } /* end */
+} /* end export */
+
+
