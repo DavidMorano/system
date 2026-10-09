@@ -106,13 +106,13 @@
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	getclusters(const char *,vecstr *,const char *) ;
+extern int	getclusters(cchar *,vecstr *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -126,19 +126,19 @@ extern char	**environ ;		/* definition required by AT&T AST */
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procnodes(PROGINFO *,void *,cchar *,int) ;
-static int	procnode(PROGINFO *,void *,cchar *,int) ;
-static int	procall(PROGINFO *,vecstr *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procnodes(PROGINFO *,void *,cchar *,int) ;
+local int	procnode(PROGINFO *,void *,cchar *,int) ;
+local int	procall(PROGINFO *,vecstr *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -206,7 +206,7 @@ int b_clustername(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -230,7 +230,7 @@ int p_clustername(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
@@ -251,14 +251,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -308,7 +308,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -463,7 +463,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -658,8 +658,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,ofn,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -731,12 +731,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [ { [<node(s)>] [-af <afile>] [-l] } | -a ]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -751,7 +751,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -766,7 +766,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    int		pan = 0 ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (! pip->fl.all) {
 	        int	ai ;
@@ -797,7 +797,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	                afn = STDFNIN ;
 
 	            if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                int		len ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
@@ -884,7 +884,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procnodes(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
+local int procnodes(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -907,9 +907,9 @@ static int procnodes(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 /* end subroutine (procnodes) */
 
 
-static int procnode(PROGINFO *pip,void *ofp,cchar *np,int nl)
+local int procnode(PROGINFO *pip,void *ofp,cchar *np,int nl)
 {
-	const int	nlen = NODENAMELEN ;
+	cint	nlen = NODENAMELEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -923,7 +923,7 @@ static int procnode(PROGINFO *pip,void *ofp,cchar *np,int nl)
 	if ((strwcmp(LOCALHOST,np,nl) == 0) || (np[0] == '-')) {
 	    if (pip->nodename == NULL) {
 	        if ((rs = getnodename(nbuf,nlen)) >= 0) {
-	            const char	**vpp = &pip->nodename ;
+	            cchar	**vpp = &pip->nodename ;
 	            rs = proginfo_setentry(pip,vpp,nbuf,rs) ;
 	        }
 	    }
@@ -971,7 +971,7 @@ static int procnode(PROGINFO *pip,void *ofp,cchar *np,int nl)
 	        } /* end if (vecstr) */
 
 	    } else {
-	        const int	clen = NODENAMELEN ;
+	        cint	clen = NODENAMELEN ;
 	        char		cbuf[NODENAMELEN+1] ;
 
 	        rs1 = prgetclustername(pip->pr,cbuf,clen,nbuf) ;
@@ -999,7 +999,7 @@ static int procnode(PROGINFO *pip,void *ofp,cchar *np,int nl)
 
 
 /* get a list of all cluster names in the CLUSTER DB */
-static int procall(PROGINFO *pip,vecstr *sp)
+local int procall(PROGINFO *pip,vecstr *sp)
 {
 	CLUSTERDB	cluster ;
 	CLUSTERDB_CUR	cur ;
@@ -1039,8 +1039,8 @@ static int procall(PROGINFO *pip,vecstr *sp)
 	if (rs >= 0) {
 
 	    if ((rs = clusterdb_curbegin(&cluster,&cur)) >= 0) {
-	        const int	nrs = SR_NOTFOUND ;
-	        const int	nlen = NODENAMELEN ;
+	        cint	nrs = SR_NOTFOUND ;
+	        cint	nlen = NODENAMELEN ;
 
 	        while (rs >= 0) {
 	            rs1 = clusterdb_curenum(&cluster,&cur,cname,nlen) ;
