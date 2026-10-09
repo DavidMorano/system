@@ -42,7 +42,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<six.h>			/* LIBUC |sichr(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
