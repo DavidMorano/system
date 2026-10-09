@@ -79,7 +79,7 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<ismatstar.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
@@ -1220,7 +1220,7 @@ local int parttype(cchar *s) noex {
 	bool		f = false ;
 	for ( ; *s ; s += 1) {
 	    cint	ch = mkchar(*s) ;
-	    f = f || isalnumlatin(ch) ;
+	    f = f || ischalnum(ch) ;
 	    f = f || (*s == '-') ;
 	    f = f || (*s == '_') ;
 	    if ((! f) && (*s == '*')) {
