@@ -56,6 +56,7 @@
 #include	<lockfile.h>		/* LIBUC */
 #include	<strtime.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"srvreg.h"
@@ -273,7 +274,7 @@ int		operm ;
 
 /* local or remote */
 
-	rs = isfsremote(op->fd) ;
+	rs = isfdfsremote(op->fd) ;
 	op->fl.remote = (rs > 0) ;
 	if (rs < 0)
 	    goto bad3 ;
