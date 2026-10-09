@@ -294,8 +294,8 @@ local int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
-	const int	n = nelem(subs) ;
-	const int	vo = VECSTR_OCOMPACT ;
+	cint	n = nelem(subs) ;
+	cint	vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 
@@ -305,7 +305,7 @@ local int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
 #endif
 
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
+	    cint	nlen = SYMNAMELEN ;
 	    int		i ;
 	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
@@ -324,9 +324,9 @@ local int mfsns_objloadbegin(MFSNS *op,cchar *pr,cchar *objname)
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
 	            cchar	*modbname = MFSNS_MODBNAME ;
 #if	CF_LOOKOTHER
-	            const int	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
+	            cint	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 #else
-	            const int	mo = 0 ;
+	            cint	mo = 0 ;
 #endif
 	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
 		    f_modload = (rs >= 0)  ;
@@ -390,12 +390,12 @@ local int mfsns_objloadend(MFSNS *op)
 local int mfsns_loadcalls(MFSNS *op,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+	cint	nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp ;
+	cvoid	*snp ;
 
 	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
