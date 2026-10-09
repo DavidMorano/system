@@ -55,7 +55,7 @@
 
 /* forward references */
 
-static int prognamecache_namecache(proginfo *) ;
+local int prognamecache_namecache(proginfo *) ;
 
 
 /* local variables */
@@ -120,7 +120,7 @@ int prognamecache_lookup(proginfo *pip,cchar *un,cchar **rpp) noex {
 
 /* local subroutines */
 
-static int prognamecache_namecache(proginfo *pip) noex {
+local int prognamecache_namecache(proginfo *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->namecache == nullptr) {
 	    cint	msize = szof(NAMECACHE) ;
