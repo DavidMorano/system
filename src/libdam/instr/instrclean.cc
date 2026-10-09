@@ -61,7 +61,7 @@
 #include	<usysrets.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU |CH_{xx}| */
 #include	<rmx.h>			/* LIBUC |rmeol(3uc)| */
-#include	<ischarx.h>		/* LIBUC |isprintlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischprint(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -146,7 +146,7 @@ local int clean1(mflags *mfp,char *lp,int ll) noex {
 	        cint	ch = mkchar(lp[ili]) ;
 	        if ((ch == 0) && (! mfp->subnul)) break ;
 	        if (! isshift(ch)) {
-	            f = isprintlatin(ch) || ischarok(ch) ;
+	            f = ischprint(ch) || ischarok(ch) ;
 	            if (f) {
 	                if (f_flipped) {
 	                    lp[oli++] = lp[ili] ;
@@ -177,7 +177,7 @@ local int clean2(mflags *mfp,char *lp,int ll) noex {
 	for (int ili = 0 ; ili < ll ; ili += 1) {
 	    cint	ch = mkchar(lp[ili]) ;
 	    if ((ch == 0) && (! mfp->subnul)) break ;
-	    f = isprintlatin(ch) || ischarok(ch) ;
+	    f = ischprint(ch) || ischarok(ch) ;
 	    if (f) {
 	        if (f_flipped) {
 	            lp[oli++] = lp[ili] ;
