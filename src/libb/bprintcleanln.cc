@@ -34,7 +34,7 @@
 #include	<linebuffer.h>
 #include	<rmx.h>
 #include	<mkchar.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
