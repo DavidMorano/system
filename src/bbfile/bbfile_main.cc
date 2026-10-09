@@ -30,7 +30,7 @@
 #include	<cstdio>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 
