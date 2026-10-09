@@ -55,7 +55,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"config.h"
