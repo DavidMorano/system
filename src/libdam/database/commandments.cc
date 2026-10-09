@@ -65,7 +65,7 @@
 #include	<char.h>		/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libpr.h>		/* LIBPR |prmktmpdir(3pr)| */
@@ -1248,7 +1248,7 @@ local bool hasourdig(cchar *sp,int sl) noex {
 	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) ylikely {
 	    f = true ;
 	    for ( ; cl-- && *cp ; cp += 1) {
-	        f = isdigitlatin(*cp) ;
+	        f = ischdigit(*cp) ;
 		if (!f) break ;
 	    } /* end while */
 	} /* end if */
