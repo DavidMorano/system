@@ -63,7 +63,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<msgsub.hh>		/* LIBUC */
 #include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
-#include	<isfiledesc.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -266,12 +266,12 @@ local int msgid_opens(msgid *op,cc *fname,int of,mode_t om) noex {
 	                    if (S_ISREG(sb.st_mode)) {
 	                        op->mtime = sb.st_mtime ;
 	                        op->filesz = intsat(fsize) ;
-	                        if ((rs = isfsremote(op->fd)) >= 0) {
+	                        if ((rs = isfdfsremote(op->fd)) >= 0) {
 	                            op->fl.remote = (rs > 0) ;
 	                            if ((rs = msgid_fileinit(op,dt)) >= 0) {
 	                                op->magval = MSGID_MAGIC ;
 	                            }
-	                        } /* end if (isfsremote) */
+	                        } /* end if (isfdfsremote) */
 	                    } else {
 	                        rs = SR_ISDIR ;
 	                    }
