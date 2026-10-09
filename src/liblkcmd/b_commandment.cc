@@ -99,10 +99,10 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -145,37 +145,37 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,int) ;
-static int	procsome(PROGINFO *,ARGINFO *,bits *,cchar *,int) ;
-static int	procspecs(PROGINFO *,const char *,int) ;
-static int	procspec(PROGINFO *,const char *,int) ;
-static int	procall(PROGINFO *) ;
-static int	procstrings(PROGINFO *,const char *,int) ;
-static int	procout(PROGINFO *,uint,const char *,int) ;
-static int	procoutline(PROGINFO *,int *,uint,const char *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,int) ;
+local int	procsome(PROGINFO *,ARGINFO *,bits *,cchar *,int) ;
+local int	procspecs(PROGINFO *,cchar *,int) ;
+local int	procspec(PROGINFO *,cchar *,int) ;
+local int	procall(PROGINFO *) ;
+local int	procstrings(PROGINFO *,cchar *,int) ;
+local int	procout(PROGINFO *,uint,cchar *,int) ;
+local int	procoutline(PROGINFO *,int *,uint,cchar *,int) ;
 
-static int	loadprecision(PROGINFO *) ;
+local int	loadprecision(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_deflinelen(LOCINFO *) ;
-static int	locinfo_tmtime(LOCINFO *) ;
-static int	locinfo_combegin(LOCINFO *,cchar *) ;
-static int	locinfo_comend(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_deflinelen(LOCINFO *) ;
+local int	locinfo_tmtime(LOCINFO *) ;
+local int	locinfo_combegin(LOCINFO *,cchar *) ;
+local int	locinfo_comend(LOCINFO *) ;
 
-static int	vecstr_have(vecstr *,cchar *,int) ;
+local int	vecstr_have(vecstr *,cchar *,int) ;
 
-static int	isNotGoodCite(int) ;
+local int	isNotGoodCite(int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -221,7 +221,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"audit",
 	"linelen",
 	"indent",
@@ -249,7 +249,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	blanks[] = "                    " ;
+static cchar	blanks[] = "                    " ;
 
 static const uchar	aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
@@ -273,7 +273,7 @@ int b_commandment(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -297,7 +297,7 @@ int p_commandment(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -320,15 +320,15 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 	int		f_apm = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*dbname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*dbname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -891,12 +891,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<number(s)>|<string(s)> ...] [-af <afile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -916,12 +916,12 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1059,12 +1059,12 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int process(pip,aip,bop,ofn,afn,f_apm)
+local int process(pip,aip,bop,ofn,afn,f_apm)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bits		*bop ;
-const char	*ofn;
-const char	*afn;
+cchar	*ofn;
+cchar	*afn;
 int		f_apm ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1102,7 +1102,7 @@ int		f_apm ;
 /* end subroutine (process) */
 
 
-static int procsome(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,int f_apm)
+local int procsome(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,int f_apm)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1110,7 +1110,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,int f_apm)
 	int		pan = 0 ;
 	int		cl ;
 	int		wlen = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (rs >= 0) {
 	    int	ai ;
@@ -1197,7 +1197,7 @@ static int procsome(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,int f_apm)
 /* end subroutine (procsome) */
 
 
-static int procspecs(PROGINFO *pip,cchar *sp,int sl)
+local int procspecs(PROGINFO *pip,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	FIELD		fsb ;
@@ -1208,7 +1208,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	    int		fl ;
-	    const char	*fp ;
+	    cchar	*fp ;
 	    while ((fl = field_get(&fsb,aterms,&fp)) >= 0) {
 	        if (fl > 0) {
 	            rs = procspec(pip,fp,fl) ;
@@ -1225,7 +1225,7 @@ static int procspecs(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (procspecs) */
 
 
-static int procspec(PROGINFO *pip,cchar sp[],int sl)
+local int procspec(PROGINFO *pip,cchar sp[],int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1313,7 +1313,7 @@ static int procspec(PROGINFO *pip,cchar sp[],int sl)
 /* end subroutine (procspec) */
 
 
-static int procstrings(PROGINFO *pip,cchar *sp,int sl)
+local int procstrings(PROGINFO *pip,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	vecstr		ps ;
@@ -1388,7 +1388,7 @@ static int procstrings(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (procstrings) */
 
 
-static int procall(PROGINFO *pip)
+local int procall(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	COMMANDMENT	*cmdp = &lip->cdb ;
@@ -1428,7 +1428,7 @@ static int procall(PROGINFO *pip)
 }
 /* end if (procall) */
 
-static int procout(PROGINFO *pip,uint n,cchar *vp,int vl)
+local int procout(PROGINFO *pip,uint n,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
 	cint	clen = COLBUFLEN ;
@@ -1437,7 +1437,7 @@ static int procout(PROGINFO *pip,uint n,cchar *vp,int vl)
 	int		cbl ;
 	int		line = 0 ;
 	int		wlen = 0 ;
-	const char	*fmt ;
+	cchar	*fmt ;
 
 	if (vl <= 0)
 	    goto ret0 ;
@@ -1504,7 +1504,7 @@ ret0:
 /* end subroutine (procout) */
 
 
-static int procoutline(PROGINFO *pip,int *linep,uint n,cchar *lp,int ll)
+local int procoutline(PROGINFO *pip,int *linep,uint n,cchar *lp,int ll)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1527,7 +1527,7 @@ static int procoutline(PROGINFO *pip,int *linep,uint n,cchar *lp,int ll)
 /* end subroutine (procoutline) */
 
 
-static int loadprecision(PROGINFO *pip)
+local int loadprecision(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1574,7 +1574,7 @@ static int loadprecision(PROGINFO *pip)
 /* end subroutine (loadprecision) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	memset(lip,0,sizeof(LOCINFO)) ;
@@ -1590,7 +1590,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 
 	lip->pip = NULL ;
@@ -1598,7 +1598,7 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-static int locinfo_deflinelen(LOCINFO *lip) noex {
+local int locinfo_deflinelen(LOCINFO *lip) noex {
 	cint		def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
 	if (lip->linelen < def) {
@@ -1626,7 +1626,7 @@ static int locinfo_deflinelen(LOCINFO *lip) noex {
 /* end subroutine (locinfo_deflinelen) */
 
 
-static int locinfo_combegin(LOCINFO *lip,cchar *dbname)
+local int locinfo_combegin(LOCINFO *lip,cchar *dbname)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -1636,7 +1636,7 @@ static int locinfo_combegin(LOCINFO *lip,cchar *dbname)
 /* end subroutine (locinfo_combegin) */
 
 
-static int locinfo_comend(LOCINFO *lip)
+local int locinfo_comend(LOCINFO *lip)
 {
 	int		rs ;
 	rs = commandment_close(&lip->cdb) ;
@@ -1645,7 +1645,7 @@ static int locinfo_comend(LOCINFO *lip)
 /* end subroutine (locinfo_comend) */
 
 
-static int locinfo_tmtime(LOCINFO *lip)
+local int locinfo_tmtime(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1665,7 +1665,7 @@ static int locinfo_tmtime(LOCINFO *lip)
 /* end subroutine (locinfo_tmtime) */
 
 
-static int vecstr_have(vecstr *vlp,cchar *cbuf,int clen)
+local int vecstr_have(vecstr *vlp,cchar *cbuf,int clen)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1686,7 +1686,7 @@ static int vecstr_have(vecstr *vlp,cchar *cbuf,int clen)
 /* end subroutine (vecstr_have) */
 
 
-static int isNotGoodCite(int rs)
+local int isNotGoodCite(int rs)
 {
 	int		f = FALSE ;
 	f = f || (rs == SR_NOTFOUND) ;
