@@ -82,7 +82,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG */
 #include	<bfile.h>		/* LIBB */
@@ -622,7 +622,7 @@ local bool iskey(cchar *lp,int ll) noex {
 	    f = (lp[0] == '%') ;
 	    if (f) {
 	        cint ch = lp[1] & UCHAR_MAX ;
-	        f = isalphalatin(ch) ;
+	        f = ischalpha(ch) ;
 	    }
 	} /* end if */
 	return f ;
