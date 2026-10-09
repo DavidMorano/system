@@ -75,22 +75,22 @@ using libu::siwhtbrk ;			/* subroutine */
 
 /* forward references */
 
-local bool iswhiteand(strop *sop,int tch) noex {
+local bool strop_iswhtand(strop *sop,int tch) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return ISWHT(ch) && (ch != tch) ;
 } /* end subroutine */
 
-local bool isnotchr(strop *sop,int tch) noex {
+local bool strop_isnotchr(strop *sop,int tch) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return (ch != tch) ;
 } /* end subroutine */
 
-local bool isnotterm(strop *sop,cchar *terms) noex {
+local bool strop_isnotterm(strop *sop,cchar *terms) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return (! batst(terms,ch)) ;
 } /* end subroutine */
 
-local bool isterm(strop *sop,cchar *terms) noex {
+local bool strop_isterm(strop *sop,cchar *terms) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
 	return  batst(terms,ch) ;
 } /* end subroutine */
@@ -150,7 +150,7 @@ int strop_white(strop *sop) noex {
 
 int strop_whitechr(strop *sop,int tch) noex {
     	int		rl = 0 ; /* return-value */
-	while ((sop->sl > 0) && iswhiteand(sop,tch)) {
+	while ((sop->sl > 0) && strop_iswhtand(sop,tch)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	} /* end while */
@@ -186,7 +186,7 @@ int strop_fieldbrk(strop *sop,cchar *ss,cchar **rpp) noex {
 			cint tch = mkchar(sop->sp[si]) ; 
 			rl = si ;
 			if (strchr(ss,tch) != np) {
-			    while ((rl > 0) && iswht(sop->sp[rl - 1])) {
+			    while ((rl > 0) && ischwht(sop->sp[rl - 1])) {
 				rl -= 1 ;
 			    }
 			}
@@ -204,7 +204,7 @@ int strop_fieldbrk(strop *sop,cchar *ss,cchar **rpp) noex {
 
 int strop_findchr(strop *sop,int tch) noex {
     	int		rl = 0 ; /* return-value */
-	while ((sop->sl > 0) && isnotchr(sop,tch)) {
+	while ((sop->sl > 0) && strop_isnotchr(sop,tch)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	} /* end while */
@@ -214,7 +214,7 @@ int strop_findchr(strop *sop,int tch) noex {
 
 int strop_findterm(strop *sop,cchar *terms) noex {
     	int		rl = 0 ; /* return-value */
-	while ((sop->sl > 0) && isnotterm(sop,terms)) {
+	while ((sop->sl > 0) && strop_isnotterm(sop,terms)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	} /* end while */
@@ -224,7 +224,7 @@ int strop_findterm(strop *sop,cchar *terms) noex {
 
 int strop_spanterm(strop *sop,cchar *terms) noex {
     	int		rl = 0 ; /* return-value */
-	while ((sop->sl > 0) && isterm(sop,terms)) {
+	while ((sop->sl > 0) && strop_isterm(sop,terms)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	} /* end while */
