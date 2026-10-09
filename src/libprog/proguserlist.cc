@@ -81,7 +81,7 @@ struct userlist {
 
 /* forward references */
 
-static int	proguserlist_worker(proginfo *) noex ;
+local int	proguserlist_worker(proginfo *) noex ;
 
 
 /* local variables */
@@ -149,7 +149,7 @@ int proguserlist_end(proginfo *pip) noex {
 
 /* local subroutines */
 
-static int proguserlist_worker(proginfo *pip) noex {
+local int proguserlist_worker(proginfo *pip) noex {
 	cint		blen = REALNAMELEN ;
 	int		rs ;
 	int		rs1 ;
