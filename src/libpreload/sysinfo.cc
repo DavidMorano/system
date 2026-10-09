@@ -130,19 +130,19 @@ static unixret_t	sysinfo_hwserial(char *,long) noex ;
 static unixret_t	sysinfo_setdomain(int,char *,long) noex ;
 static unixret_t	sysinfo_next(int,char *,long) noex ;
 
-static int	sysinfo_setdomainlog(int,char *,long,long) noex ;
+local int	sysinfo_setdomainlog(int,char *,long,long) noex ;
 
-static int	sysinfo_varhwserial(BUFFER *) noex ;
-static int	sysinfo_varhostid(BUFFER *) noex ;
-static int	sysinfo_var(BUFFER *,cchar *) noex ;
-static int	sysinfo_file(BUFFER *) noex ;
-static int	sysinfo_def(BUFFER *) noex ;
+local int	sysinfo_varhwserial(BUFFER *) noex ;
+local int	sysinfo_varhostid(BUFFER *) noex ;
+local int	sysinfo_var(BUFFER *,cchar *) noex ;
+local int	sysinfo_file(BUFFER *) noex ;
+local int	sysinfo_def(BUFFER *) noex ;
 
 #ifdef	COMMENT
-static int	sysinfo_defer(BUFFER *,int,cchar *) noex ;
+local int	sysinfo_defer(BUFFER *,int,cchar *) noex ;
 #endif /* COMMENT */
 
-static int	uload_hwserial(char *,cchar *,long) noex ;
+local int	uload_hwserial(char *,cchar *,long) noex ;
 
 
 /* local variables */
@@ -192,7 +192,7 @@ static unixret_t sysinfo_next(int name,char *rbuf,long len) noex {
 }
 /* end subroutine (sysinfo_next) */
 
-static int sysinfo_setdomain(int name,char *rbuf,long len) noex {
+local int sysinfo_setdomain(int name,char *rbuf,long len) noex {
 	long		rc ;
 	rc = sysinfo_next(name,rbuf,len) ;
 	sysinfo_setdomainlog(name,rbuf,len,rc) ;
@@ -239,19 +239,19 @@ static unixret_t sysinfo_hwserial(char *ubuf,long len) noex {
 }
 /* end subroutine (sysinfo_hwserial) */
 
-static int sysinfo_varhwserial(BUFFER *bdp) noex {
+local int sysinfo_varhwserial(BUFFER *bdp) noex {
 	cchar		*var = VARHWSERIAL ;
 	return sysinfo_var(bdp,var) ;
 }
 /* end subroutine (sysinfo_varhwserial) */
 
-static int sysinfo_varhostid(BUFFER *bdp) noex {
+local int sysinfo_varhostid(BUFFER *bdp) noex {
 	cchar		*var = VARHOSTID ;
 	return sysinfo_var(bdp,var) ;
 }
 /* end subroutine (sysinfo_varhostid) */
 
-static int sysinfo_var(BUFFER *bdp,cchar *var) noex {
+local int sysinfo_var(BUFFER *bdp,cchar *var) noex {
 	int		rs = SR_OK ;
 	cchar		*vp ;
 	if ((vp = getenv(var)) != nullptr) {
@@ -263,7 +263,7 @@ static int sysinfo_var(BUFFER *bdp,cchar *var) noex {
 }
 /* end subroutine (sysinfo_var) */
 
-static int sysinfo_file(BUFFER *bdp) noex {
+local int sysinfo_file(BUFFER *bdp) noex {
 	vecstr		env ;
 	int		rs ;
 	int		rs1 ;
@@ -291,7 +291,7 @@ static int sysinfo_file(BUFFER *bdp) noex {
 }
 /* end subroutine (sysinfo_file) */
 
-static int sysinfo_def(BUFFER *bdp) noex {
+local int sysinfo_def(BUFFER *bdp) noex {
 	cint		name = SI_HW_SERIAL ;
 	cint		dlen = DIGBUFLEN ;
 	int		rs = SR_OK ;
@@ -314,7 +314,7 @@ static int sysinfo_def(BUFFER *bdp) noex {
 }
 /* end subroutine (sysinfo_def) */
 
-static int sysinfo_setdomainlog(int name,char *rbuf,long len,long rc) noex {
+local int sysinfo_setdomainlog(int name,char *rbuf,long len,long rc) noex {
 	cint		of = (O_WRONLY|O_APPEND) ;
 	int		rs ;
 	int		rs1 ;
@@ -336,7 +336,7 @@ static int sysinfo_setdomainlog(int name,char *rbuf,long len,long rc) noex {
 }
 /* end subroutine (sysinfo_setdomainlog) */
 
-static int uload_hwserial(char *ubuf,cchar *rbuf,long len) noex {
+local int uload_hwserial(char *ubuf,cchar *rbuf,long len) noex {
 	uint	uv ;
 	int	rs ;
 	int	rl = 0 ;
