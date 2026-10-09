@@ -172,83 +172,83 @@ constexpr charmgr	ischarx_data ;
 
 /* exported subroutines */
 
-bool isalphalatin(int ch) noex {
+bool ischalpha(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isalpha[ch] ;
 	}
 	return f ;
-} /* end subroutine (isalphalatin) */
+} /* end subroutine (ischalpha) */
 
-bool isalnumlatin(int ch) noex {
+bool ischalnum(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isalnum[ch] ;
 	}
 	return f ;
-} /* end subroutine (isalnumlatin) */
+} /* end subroutine (ischalnum) */
 
-bool isdigexlatin(int ch) noex {
+bool ischdigex(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isdigex[ch] ;
 	}
 	return f ;
-} /* end subroutine (isdigexlatin) */
+} /* end subroutine (ischdigex) */
 
-bool iswhitelatin(int ch) noex {
+bool ischwhite(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = char_iswhite(ch) ;
 	}
 	return f ;
-} /* end subroutine (iswhitelatin) */
+} /* end subroutine (ischwhite) */
 
-bool islowerlatin(int ch) noex {
+bool ischlower(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = char_islc(ch) ;
 	}
 	return f ;
-} /* end subroutine (islowerlatin) */
+} /* end subroutine (ischlower) */
 
-bool isupperlatin(int ch) noex {
+bool ischupper(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = char_isuc(ch) ;
 	}
 	return f ;
-} /* end subroutine (isupperlatin) */
+} /* end subroutine (ischupper) */
 
-bool isprintlatin(int ch) noex {
+bool ischprint(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isprint[ch] ;
 	}
 	return f ;
-} /* end subroutine (isprintlatin) */
+} /* end subroutine (ischprint) */
 
-bool isprintterm(int ch) noex {
+bool ischprintterm(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isterm[ch] ;
 	}
 	return f ;
-} /* end subroutine (isprintterm) */
+} /* end subroutine (ischprintterm) */
 
-bool isprintbad(int ch) noex {
-	return (! isprintlatin(ch)) ;
-} /* end subroutine (isprintbad) */
+bool ischprintbad(int ch) noex {
+	return (! ischprint(ch)) ;
+} /* end subroutine (ischprintbad) */
 
-bool isdict(int ch) noex {
+bool ischdict(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isalnum[ch] || (ch == CH_SP) ;
 	}
 	return f ;
-} /* end subroutine (isdict) */
+} /* end subroutine (ischdict) */
 
-bool iscmdstart(int ch) noex {
+bool ischcmdstart(int ch) noex {
 	bool		f = false ;
 	f = f || (ch == CH_ESC) ;
 	f = f || (ch == CH_CSI) ;
@@ -256,10 +256,10 @@ bool iscmdstart(int ch) noex {
 	f = f || (ch == CH_SS2) ;
 	f = f || (ch == CH_SS3) ;
 	return f ;
-} /* end subroutine (iscmdstart) */
+} /* end subroutine (ischcmdstart) */
 
-bool ishdrkey(int ch) noex {
-	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
-} /* end subroutine (ishdrkey) */
+bool ischhdrkey(int ch) noex {
+	return (ischalnum(ch) || (ch == '-') || (ch == '_')) ;
+} /* end subroutine (ischhdrkey) */
 
 
