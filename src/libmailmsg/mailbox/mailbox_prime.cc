@@ -67,7 +67,7 @@
 #include	<strwcpy.h>		/* LIBUC |strwblanks(3uc)| */
 #include	<char.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC |hasEOH(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<mailmsghdrval.h>	/* LIBMAILMSG */
 #include	<mailmsghdrfold.h>	/* LIBMAILMSG */
