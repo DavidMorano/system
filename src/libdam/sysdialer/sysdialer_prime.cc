@@ -56,7 +56,7 @@
 #include	<mkfname.h>		/* LIBUC */
 #include	<pathclean.h>		/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC |isNotPresent(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
