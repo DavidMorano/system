@@ -72,7 +72,7 @@
 #include	<ncol.h>
 #include	<mkchar.h>
 #include	<char.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"mailmsghdrfold.h"
