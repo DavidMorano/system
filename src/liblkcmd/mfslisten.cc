@@ -98,9 +98,9 @@ int mfslisten_begin(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (! lip->open.listens) {
 	    VECOBJ	*llp = &lip->listens ;
-	    const int	esize = sizeof(LISTENSPEC) ;
-	    const int	n = 4 ;
-	    const int	vo = 0 ;
+	    cint	esize = sizeof(LISTENSPEC) ;
+	    cint	n = 4 ;
+	    cint	vo = 0 ;
 	    if ((rs = vecobj_start(llp,esize,n,vo)) >= 0) {
 	        lip->open.listens = TRUE ;
 	    }
@@ -141,9 +141,9 @@ int mfslisten_acqbegin(PI *pip,MFSLISTEN_ACQ *acp)
 	int		rs = SR_OK ;
 	if (pip->fl.daemon) {
 	    VECOBJ	*tlp = &acp->tmps ;
-	    const int	esize = sizeof(LISTENSPEC) ;
-	    const int	n = 4 ;
-	    const int	vo = 0 ;
+	    cint	esize = sizeof(LISTENSPEC) ;
+	    cint	n = 4 ;
+	    cint	vo = 0 ;
 	    rs = vecobj_start(tlp,esize,n,vo) ;
 	}
 #if	CF_DEBUG
@@ -279,7 +279,7 @@ int mfslisten_maint(PI *pip,POLLER *pmp)
 	    LISTENSPEC_INFO	li ;
 	    POLLER_SPEC		ps ;
 	    vecobj		*llp = &lip->listens ;
-	    const int		events = (POLLIN | POLLPRI) ;
+	    cint		events = (POLLIN | POLLPRI) ;
 	    int			i ;
 	    int			f_active ;
 	    int			f_broken ;
@@ -290,7 +290,7 @@ int mfslisten_maint(PI *pip,POLLER *pmp)
 	                f_active = (li.state & LISTENSPEC_MACTIVE) ;
 	                f_broken = (li.state & LISTENSPEC_MBROKEN) ;
 	                if ((! f_active) && (! f_broken)) {
-			    const int	f = TRUE ;
+			    cint	f = TRUE ;
 		            int		lo = 0 ;
 		            if (pip->fl.reuseaddr) {
 				lo |= LISTENSPEC_MREUSE ;
@@ -344,11 +344,11 @@ int mfslisten_poll(PI *pip,POLLER *pmp,int fd,int re)
 	    int			salen = sizeof(SOCKADDRESS) ;
 	    f = TRUE ;
 	    if ((rs = locinfo_getaccto(lip)) >= 0) { /* "accept" timeout */
-	        const int	to = rs ;
+	        cint	to = rs ;
 	        if ((rs = listenspec_accept(lsp,&sa,&salen,to)) >= 0) {
-	            const int	cfd = rs ;
+	            cint	cfd = rs ;
 		    if ((rs = listenspec_gettype(lsp)) >= 0) {
-			const int	stype = rs ; /* sub-type */
+			cint	stype = rs ; /* sub-type */
 		        if ((rs = mfslisten_new(pip,stype,cfd)) >= 0) {
 			    POLLER_SPEC	ps ;
 			    ps.fd = fd ;
@@ -610,7 +610,7 @@ local int mfslisten_new(PI *pip,int stype,int fd)
 #endif
 
 	if (pip->watch != NULL) {
-	    const int	jtype = jobtype_listen ;
+	    cint	jtype = jobtype_listen ;
 	    rs = mfswatch_newjob(pip,jtype,stype,fd,-1) ;
 	} else {
 	    u_close(fd) ;
