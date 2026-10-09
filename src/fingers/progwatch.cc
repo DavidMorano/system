@@ -58,13 +58,13 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<opendefstds.h>
 #include	<varsub.h>
 #include	<vecstr.h>
@@ -72,18 +72,19 @@
 #include	<connection.h>
 #include	<strx.h>
 #include	<rmdirfiles.h>
+#include	<isfd.h>		/* LIBUC */
 #include	<strtime.h>		/* LIBUC */
-#include	<exitcodes.h>
-#include	<localmisc.h>
-#include	<bfile.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
+#include	"finders_config.h"
 #include	"standing.h"
 #include	"builtin.h"
 #include	"jobdb.h"
 #include	"poller.h"
 #include	"listenspec.h"
 #include	"defs.h"
-#include	"config.h"
 #include	"proglog.h"
 #include	"clientinfo.h"
 #include	"sysmisc.h"
@@ -1676,7 +1677,7 @@ local int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("procwatchnew: ent isascoket=%u\n",
-	        isasocket(cip->fd_input)) ;
+	        isfdsocket(cip->fd_input)) ;
 #endif
 
 /* enter this job into the database */
