@@ -82,8 +82,8 @@
 #include	<getpf.h>
 #include	<inetaddrx.h>		/* |inet4int(3uc)| */
 #include	<hasx.h>
-#include	<ischarx.h>
-#include	<isfiledesc.h>
+#include	<isch.h>
+#include	<isfd.h>
 #include	<isnot.h>
 #include	<mapex.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -1792,7 +1792,7 @@ local int procreg(PI *pip) noex {
 	int		rs1 ;
 	int		c = 0 ;
 
-	if (isasocket(pip->fd_msg)) {
+	if (isfdsocket(pip->fd_msg)) {
 	    pip->fl.issocket = TRUE ;
 	    if ((rs = uc_getsocktype(pip->fd_msg)) >= 0) {
 		pip->fl.isstream = (rs == SOCK_STREAM) ;
