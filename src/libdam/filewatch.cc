@@ -46,7 +46,7 @@
 #include	<linefold.h>		/* LIBUC */
 #include	<lineclean.h>		/* CSTD line-cleaning options */
 #include	<linecleanopt.h>	/* CSTD line-cleaning options */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
