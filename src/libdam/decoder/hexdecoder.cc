@@ -42,7 +42,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<digval.h>		/* LIBUC */
 #include	<bufos.hh>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -170,7 +170,7 @@ int hexdecoder_load(hexdecoder *op,cchar *sp,int µsl) noex {
 	        if (bufos *obp = bufosp(op->outbuf) ; obp) ylikely {
 	            while ((rs >= 0) && (sl > 0) && *sp) {
 		        cint	ch = mkchar(*sp) ;
-		        if (ishexlatin(ch)) {
+		        if (ischhex(ch)) {
 		            if (op->rl == 0) {
 			        op->rb[0] = charconv(ch) ;
 			        op->rl = 1 ;
@@ -180,7 +180,7 @@ int hexdecoder_load(hexdecoder *op,cchar *sp,int µsl) noex {
 			        c += rs ;
 			        op->rl = 0 ;
 		            }
-		        } /* end if (ishexlatin) */
+		        } /* end if (ischhex) */
 		        sp += 1 ;
 		        sl -= 1 ;
 	            } /* end while */
