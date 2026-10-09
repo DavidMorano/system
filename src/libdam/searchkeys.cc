@@ -49,7 +49,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strx.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<xwords.h>		/* LIBDAM */
 #include	<naturalwords.h>	/* LIBDAM |NATURALWORDLEN| */
 #include	<localmisc.h>		/* LIBU */
