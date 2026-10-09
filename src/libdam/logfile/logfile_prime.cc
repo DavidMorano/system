@@ -74,7 +74,7 @@
 #include	<ncol.h>		/* |ncolchar(3uc)| */
 #include	<mkx.h>			/* LIBUC */
 #include	<mklogid.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |NTABCOLS| + |TIMEBUFLEN| */
 
@@ -459,7 +459,7 @@ local int logfile_loadid(logfile *op,cchar *logstr) noex {
 	int		len = 0 ;
 	for (int i = 0 ; (i < outlen) && logstr[i] ; i += 1) {
 	    cint	ch = mkchar(logstr[i]) ;
-	    if (isprintlatin(ch)) {
+	    if (ischprint(ch)) {
 	        op->logid[len++] = logstr[i] ;
 	    }
 	} /* end for */
@@ -667,7 +667,7 @@ local bool isourbad(int ch) noex {
 	    f = false ;
 	    break ;
 	default:
-	    f = (! isprintlatin(ch)) ;
+	    f = (! ischprint(ch)) ;
 	    break ;
 	} /* end switch */
 	return f ;
