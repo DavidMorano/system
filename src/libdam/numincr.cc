@@ -35,7 +35,7 @@
 #include	<ctdec.h>		/* LIBUC */
 #include	<ctdecp.h>		/* LIBUC */
 #include	<cta26.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |isupperlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischupper(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"numincr.h"
@@ -94,13 +94,13 @@ int numincr_load(numincr *op,cchar *sp,int sl) noex {
 	        op->prec = sl ;
 	    }
 	    ch = sp[0] ;
-	    if (isdigitlatin(ch)) {
+	    if (ischdigit(ch)) {
 	        if (int v ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 	            op->v = v ;
 		}
-	    } else if (isalphalatin(ch)) {
+	    } else if (ischalpha(ch)) {
 	        op->fl.alpha = true ;
-	        op->fl.uc = isupperlatin(ch) ;
+	        op->fl.uc = ischupper(ch) ;
 	        if (int v ; (rs = cfa26(sp,sl,&v)) >= 0) {
 	            op->v = v ;
 	        }
