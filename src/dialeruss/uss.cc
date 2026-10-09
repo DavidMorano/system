@@ -51,7 +51,7 @@
 #include	<nulstr.h>
 #include	<expcook.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 #include	<libdebug.h>
 
@@ -836,7 +836,7 @@ local int subinfo_procargs(SUBINFO *sip)
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
 	        cint	ach = MKCHAR(argp[1]) ;
 
-	        if (isdigitlatin(ach)) {
+	        if (ischdigit(ach)) {
 
 	            argval = (argp + 1) ;
 
