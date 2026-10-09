@@ -20,32 +20,31 @@
 
 	This program will return the various time statusi of a file.
 
-
 *********************************************************************/
 
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<tzfile.h>		/* |TM_YEAR_BASE| */
 #include	<ctime>
-#include	<tzfile.h>
 #include	<csignal>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<paramopt.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
 
 
-
 /* local defines */
-
 
 
 /* external subroutines */
@@ -54,10 +53,10 @@
 /* external variables */
 
 
+/* exported variables */
 
 
-
-
+/* exported subroutines */
 
 int procfile(pip,pp,ofp,otype,fname)
 struct proginfo	*pip ;
@@ -67,15 +66,12 @@ char		fname[] ;
 PARAMOPT	*pp ;
 {
 	ustat	sb ;
-
-	struct tm	*ftsp ;
-
-	int	rs, i ;
-
+	TM	*ftsp ;
+	int	rs ;
+	int	i ;
 	char	dbuf[MAXPATHLEN + 1], *bp ;
 	char	*cbuf ;
 	char	*cp ;
-
 
 	if (fname == NULL)
 	    return SR_FAULT ;
