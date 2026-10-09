@@ -404,7 +404,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -592,7 +592,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -641,7 +641,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        if (f_optequal) {
 	                            f_optequal = FALSE ;
 	                            if (avl) {
-					const int	ch = MKCHAR(avp[0]) ;
+					cint	ch = MKCHAR(avp[0]) ;
 	                		if (isdigitlatin(ach)) {
 					    pip->finval.intrun = TRUE ;
 	                                    rs = cfdecti(avp,avl,&v) ;
@@ -948,7 +948,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if (strcmp(afname,"-") == 0) afname = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afname,"r",0666)) >= 0) {
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1430,7 +1430,7 @@ CONFIG	*op ;
 	            continue ;
 
 	        if ((rs = paramfile_curbegin(&op->p,&cur)) >= 0) {
-		    const int	vlen = VBUFLEN ;
+		    cint	vlen = VBUFLEN ;
 
 	        while (rs >= 0) {
 
