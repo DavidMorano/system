@@ -37,7 +37,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
 #include	<six.h>			/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"xwords.h"
