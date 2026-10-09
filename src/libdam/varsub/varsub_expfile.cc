@@ -51,7 +51,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strnxchr.h>		/* LIBUC */
 #include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<varsub.h>		/* LIBDAM */
