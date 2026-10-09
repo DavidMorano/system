@@ -50,7 +50,7 @@
 #include	<six.h>			/* |sileader(3uc)| */
 #include	<char.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"config.h"
