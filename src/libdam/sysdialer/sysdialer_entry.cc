@@ -52,7 +52,7 @@
 #include	<mkpathx.h>
 #include	<mkshlibname.h>
 #include	<isoneof.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<isnot.h>		/* |isNotPresent(3uc)| */
 #include	<localmisc.h>
 
