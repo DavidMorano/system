@@ -44,7 +44,9 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<logfile.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"config.h"
 #include	"defs.h"
@@ -78,8 +80,7 @@
 
 /* external subroutines */
 
-extern int	isasocket(int) ;
-extern int	inetping(const char *,int) ;
+extern int	inetping(cchar *,int) ;
 
 
 /* external variables */
@@ -96,7 +97,7 @@ extern int	inetping(const char *,int) ;
 
 int transfer(pip,hostname,rfd,r2fd,ifd,ofd,efd,mxu)
 struct proginfo	*pip ;
-const char	hostname[] ;
+cchar	hostname[] ;
 int		rfd, r2fd ;
 int		ifd, ofd, efd ;
 int		mxu ;
@@ -159,13 +160,13 @@ int		mxu ;
 
 /* continue */
 
-	f_issock = isasocket(rfd) ;
+	f_issock = isfdsocket(rfd) ;
 
 	if (f_issock) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("transfer: isasocket() rs=%d\n",f_issock) ;
+	    debugprintf("transfer: isfdsocket() rs=%d\n",f_issock) ;
 #endif
 
 		optlen = sizeof(int) ;
@@ -292,7 +293,7 @@ int		mxu ;
 	            rs) ;
 		uc_gettimeofday(&tv,NULL) ;
 	        debugprintf("transfer: %s.%ld\n",
-			timestr_log(((time_t) tv.tv_sec),timebuf),
+			strtime_log(((time_t) tv.tv_sec),timebuf),
 			(tv.tv_usec/1000)) ;
 	}
 #endif
