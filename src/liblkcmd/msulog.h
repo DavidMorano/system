@@ -35,11 +35,11 @@ extern int	logbegin(PROGINFO *) ;
 extern int	logend(PROGINFO *) ;
 extern int	logflush(PROGINFO *) ;
 extern int	logcheck(PROGINFO *) ;
-extern int	logprintf(PROGINFO *,const char *,...) ;
+extern int	logprintf(PROGINFO *,cchar *,...) ;
 extern int	logprogname(PROGINFO *) ;
 extern int	logmark(PROGINFO *,int) ;
 extern int	logreport(PROGINFO *) ;
-extern int	loginvalidcmd(PROGINFO *,const char *) ;
+extern int	loginvalidcmd(PROGINFO *,cchar *) ;
 extern int	loginfo(PROGINFO *) ;
 extern int	loglock(PROGINFO *,LFM_CHECK *,cchar *,cchar *) ;
 
