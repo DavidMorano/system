@@ -63,7 +63,7 @@
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |isalphalatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischalpha(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -118,7 +118,7 @@ int findinline_esc(findinline *fip,cchar *lp,int ll) noex {
 		        int	ch = mkchar(cp[0]) ;
 		        if (ch == '_') {
 	        	    skiplen = getdash(fip,cp,cl) ;
-		        } else if (isalphalatin(ch)) {
+		        } else if (ischalpha(ch)) {
 	        	    skiplen = getpair(fip,cp,cl) ;
 		        }
 	      	        if (skiplen > 0) break ;
@@ -146,7 +146,7 @@ local int getdash(findinline *fip,cchar *sp,int sl) noex {
 	    fip->vp = sp ;
 	    for (bool f ; sl ; ) {
 		cint	ch = mkchar(sp[0]) ;
-		f = isalphalatin(ch) ;
+		f = ischalpha(ch) ;
 		if (!f) break ;
 		sp += 1 ;
 		sl -= 1 ;
