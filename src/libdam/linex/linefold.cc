@@ -53,7 +53,7 @@
 #include	<ncol.h>		/* LIBUC |ncolchar(3uc)| */
 #include	<rmx.h>			/* LIBUC |rmeol(3uc)| */
 #include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
-#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<isch.h>		/* LIBUC |ischeol(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |NTABCOLS| + |COLUMNS| */
 
