@@ -105,8 +105,8 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<ctdec.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<isfiledesc.h>		/* LIBUC |isfsremote(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC |isfdfsremote(3uc)| */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
@@ -431,7 +431,7 @@ local int logzones_opener(LZ *op,cc *fname,int of,mode_t om) noex {
 	                    cint	entlen = LZ_ENTLEN ;
 	                    op->timod = sb.st_mtime ;
 	                    op->fsize = sb.st_size ;
-	                    if ((rs = isfsremote(op->fd)) >= 0) {
+	                    if ((rs = isfdfsremote(op->fd)) >= 0) {
 	                        cint	sz = (ne * entlen) ;
 	                        char	*bp{} ;
 	                        op->fl.remote = (rs > 0) ;
@@ -440,7 +440,7 @@ local int logzones_opener(LZ *op,cc *fname,int of,mode_t om) noex {
 	                            op->buf = bp ;
 	                            op->magval = LOGZONES_MAGIC ;
 	                        } /* end if (memory-acquire) */
-	                    } /* end if (isfsremote) */
+	                    } /* end if (isfdfsremote) */
 			} /* end if (filesize) */
 	            } /* end if (uc_fstat) */
 	        } /* end if (uc_closeonexec) */
@@ -719,7 +719,7 @@ local int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 		        int	i = 0 ; /* used afterwards */
 	                for (i = 0 ; i < 4 ; i += 1) {
 	                    cint	ch = mkchar(bp[i]) ;
-	                    if (! isdigitlatin(ch)) break ;
+	                    if (! ischdigit(ch)) break ;
 	                } /* end for */
 	                if (i >= 4) {
 	                    hours = ((mkchar(*bp++) - '0') * 10) ;
