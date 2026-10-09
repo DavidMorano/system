@@ -58,6 +58,7 @@
 #include	<vecstr.h>
 #include	<lfm.h>
 #include	<utmpacc.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -124,25 +125,25 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	locinfo_cmdsbegin(LOCINFO *) ;
-static int	locinfo_cmdsend(LOCINFO *) ;
+local int	locinfo_cmdsbegin(LOCINFO *) ;
+local int	locinfo_cmdsend(LOCINFO *) ;
 
-static int	locinfo_pidlockbegin(LOCINFO *) ;
-static int	locinfo_pidlockend(LOCINFO *) ;
+local int	locinfo_pidlockbegin(LOCINFO *) ;
+local int	locinfo_pidlockend(LOCINFO *) ;
 
-static int	locinfo_tmplockbegin(LOCINFO *) ;
-static int	locinfo_tmplockend(LOCINFO *) ;
+local int	locinfo_tmplockbegin(LOCINFO *) ;
+local int	locinfo_tmplockend(LOCINFO *) ;
 
-static int	locinfo_genlockbegin(LOCINFO *,LFM *,cchar *) ;
-static int	locinfo_genlockend(LOCINFO *,LFM *) ;
-static int	locinfo_genlockdir(LOCINFO *,cchar *) ;
-static int	locinfo_genlockprint(LOCINFO *,cchar *,LFM_CHECK *) ;
-static int	locinfo_tmpourdname(LOCINFO *) ;
-static int	locinfo_runas(LOCINFO *) ;
-static int	locinfo_chids(LOCINFO *,cchar *) ;
+local int	locinfo_genlockbegin(LOCINFO *,LFM *,cchar *) ;
+local int	locinfo_genlockend(LOCINFO *,LFM *) ;
+local int	locinfo_genlockdir(LOCINFO *,cchar *) ;
+local int	locinfo_genlockprint(LOCINFO *,cchar *,LFM_CHECK *) ;
+local int	locinfo_tmpourdname(LOCINFO *) ;
+local int	locinfo_runas(LOCINFO *) ;
+local int	locinfo_chids(LOCINFO *,cchar *) ;
 
 #if	CF_DEBUGS && CF_DEBUGDUMP
-static int vecstr_dump(vecstr *,cchar *) ;
+local int vecstr_dump(vecstr *,cchar *) ;
 #endif
 
 
@@ -371,7 +372,7 @@ int locinfo_tmpourdir(LOCINFO *lip)
 		cchar		*ourtmp = lip->tmpourdname ;
 	            if ((rs = u_stat(ourtmp,&usb)) >= 0) {
 	                if (S_ISDIR(usb.st_mode)) {
-	                    const int	am = (R_OK|W_OK|X_OK) ;
+	                    cint	am = (R_OK|W_OK|X_OK) ;
 	                    rs = u_access(ourtmp,am) ;
 	                } else {
 	                    rs = SR_NOTDIR ;
@@ -424,7 +425,7 @@ int locinfo_msfile(LOCINFO *lip)
 	}
 
 	if (rs >= 0) {
-	    const int	am = (R_OK|W_OK) ;
+	    cint	am = (R_OK|W_OK) ;
 	    rs = perm(lip->msfname,-1,-1,NULL,am) ;
 	}
 
@@ -437,7 +438,7 @@ int locinfo_msfile(LOCINFO *lip)
 	    const uid_t	uid = getuid() ;
 	    const uid_t	euid = geteuid() ;
 	    if ((rs = u_creat(lip->msfname,msmode)) >= 0) {
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 	        if ((rs = uc_fminmod(fd,msmode)) >= 0) {
 	            if (uid == euid) { /* we are not running SUID */
 	    	        if ((rs = locinfo_rootids(lip)) >= 0) {
@@ -519,7 +520,7 @@ int locinfo_rootids(LOCINFO *lip)
 	if (lip->gid_rootname < 0) {
 	    if ((rs = proginfo_rootname(pip)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = bufsizeget(bufsize_pw) ;
+	        cint	pwlen = bufsizeget(bufsize_pw) ;
 	        char		*pwbuf ;
 		if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 		    cchar	*rn = pip->rootname ;
@@ -556,7 +557,7 @@ int locinfo_nsbegin(LOCINFO *lip)
 	    PCSNS	*nop = &lip->ns ;
 	    cchar	*pr = pip->pr ;
 	    if ((rs = pcsns_open(nop,pr)) >= 0) {
-	        const int	no = PCSNS_ONOSERV ;
+	        cint	no = PCSNS_ONOSERV ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("locinfo_nsbegin: pcsns_open() rs=%d\n",rs) ;
@@ -630,7 +631,7 @@ int locinfo_nslook(LOCINFO *lip,char *rbuf,int rlen,cchar *un,int w)
 int locinfo_dirmaint(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	to = lip->intdirmaint ;
+	cint	to = lip->intdirmaint ;
 	int		rs = SR_OK ;
 	int		f ;
 	f = ((to > 0) && ((pip->daytime - lip->ti_tmpmaint) >= to)) ;
@@ -645,13 +646,13 @@ int locinfo_dirmaint(LOCINFO *lip)
 	if (f || lip->fl.maint) {
 	    lip->ti_tmpmaint = pip->daytime ;
 	    if (lip->tmpourdname != NULL) {
-		const int	to_client = lip->intclient ;
+		cint	to_client = lip->intclient ;
 		if (to_client > 0) {
 		    cchar	*dir = lip->tmpourdname ;
 		    cchar	*pat = "client" ;
 	            if ((rs = rmdirfiles(dir,pat,to_client)) >= 0) {
 		        char	tbuf[TIMEBUFLEN+1] ;
-		        timestr_logz(pip->daytime,tbuf) ;
+		        strtime_logz(pip->daytime,tbuf) ;
 		        logprintf(pip,"%s dirmaint (%d)",tbuf,rs) ;
 			if (pip->debuglevel > 0) {
 			    cchar	*pn = pip->progname ;
@@ -734,7 +735,7 @@ int locinfo_getreqs(LOCINFO *lip)
 /* private subroutines */
 
 
-static int locinfo_cmdsbegin(LOCINFO *lip)
+local int locinfo_cmdsbegin(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.cmds) {
@@ -748,7 +749,7 @@ static int locinfo_cmdsbegin(LOCINFO *lip)
 /* end subroutine (locinfo_cmdsbegin) */
 
 
-static int locinfo_cmdsend(LOCINFO *lip)
+local int locinfo_cmdsend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -763,7 +764,7 @@ static int locinfo_cmdsend(LOCINFO *lip)
 /* end subroutine (locinfo_cmdsend) */
 
 
-static int locinfo_pidlockbegin(LOCINFO *lip)
+local int locinfo_pidlockbegin(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -785,7 +786,7 @@ static int locinfo_pidlockbegin(LOCINFO *lip)
 /* end subroutine (locinfo_pidlockbegin) */
 
 
-static int locinfo_pidlockend(LOCINFO *lip)
+local int locinfo_pidlockend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -800,7 +801,7 @@ static int locinfo_pidlockend(LOCINFO *lip)
 /* end subroutine (locinfo_pidlockend) */
 
 
-static int locinfo_tmplockbegin(LOCINFO *lip)
+local int locinfo_tmplockbegin(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -837,7 +838,7 @@ static int locinfo_tmplockbegin(LOCINFO *lip)
 /* end subroutine (tmplockbegin) */
 
 
-static int locinfo_tmplockend(LOCINFO *lip)
+local int locinfo_tmplockend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -852,15 +853,15 @@ static int locinfo_tmplockend(LOCINFO *lip)
 /* end subroutine (locinfo_tmplockend) */
 
 
-static int locinfo_genlockbegin(LOCINFO *lip,LFM *lfp,cchar *lfn)
+local int locinfo_genlockbegin(LOCINFO *lip,LFM *lfp,cchar *lfn)
 {
 	int		rs ;
 	int		f = FALSE ;
 	if ((rs = locinfo_genlockdir(lip,lfn)) >= 0) {
 	    PROGINFO	*pip = lip->pip ;
 	    LFM_CHECK	lc ;
-	    const int	ltype = LFM_TRECORD ;
-	    const int	to_lock = lip->to_lock ;
+	    cint	ltype = LFM_TRECORD ;
+	    cint	to_lock = lip->to_lock ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*un = pip->username ;
 	    cchar	*bn = pip->banner ;
@@ -875,7 +876,7 @@ static int locinfo_genlockbegin(LOCINFO *lip,LFM *lfp,cchar *lfn)
 /* end subroutine (locinfo_genlockbegin) */
 
 
-static int locinfo_genlockend(LOCINFO *lip,LFM *lfp)
+local int locinfo_genlockend(LOCINFO *lip,LFM *lfp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -887,7 +888,7 @@ static int locinfo_genlockend(LOCINFO *lip,LFM *lfp)
 /* end subroutine (locinfo_genlockend) */
 
 
-static int locinfo_genlockdir(LOCINFO *lip,cchar *lfn)
+local int locinfo_genlockdir(LOCINFO *lip,cchar *lfn)
 {
 	int		rs = SR_OK ;
 	if (lip == NULL) return SR_FAULT ;
@@ -898,7 +899,7 @@ static int locinfo_genlockdir(LOCINFO *lip,cchar *lfn)
 	        char	tbuf[MAXPATHLEN+1] ;
 	        if ((rs = mkpath1w(tbuf,cp,cl)) >= 0) {
 		    USTAT	usb ;
-		    const int	rsn = SR_NOENT ;
+		    cint	rsn = SR_NOENT ;
 		    if ((rs = u_stat(tbuf,&usb)) == rsn) {
 			const mode_t	dm = 0777 ;
 		        rs = mkdirs(tbuf,dm) ;
@@ -913,7 +914,7 @@ static int locinfo_genlockdir(LOCINFO *lip,cchar *lfn)
 /* end subroutine (locinfo_genlockdir) */
 
 
-static int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
+local int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -941,7 +942,7 @@ static int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
 	    cchar	*fmt ;
 
 	    fmt = "%s: %s lock %s\n" ;
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    shio_printf(pip->efp,fmt,pn,timebuf,np) ;
 
 	    fmt = "%s: other_pid=%d\n" ;
@@ -969,7 +970,7 @@ static int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
 /* end subroutine (locinfo_genlockprint) */
 
 
-static int locinfo_tmpourdname(LOCINFO *lip)
+local int locinfo_tmpourdname(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1001,7 +1002,7 @@ static int locinfo_tmpourdname(LOCINFO *lip)
 /* end subroutine (locinfo_tmpourdname) */
 
 
-static int locinfo_runas(LOCINFO *lip)
+local int locinfo_runas(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		f = lip->fl.runasprn ;
@@ -1020,7 +1021,7 @@ static int locinfo_runas(LOCINFO *lip)
 /* end subroutine (locinfo_runas) */
 
 
-static int locinfo_chids(LOCINFO *lip,cchar *dname)
+local int locinfo_chids(LOCINFO *lip,cchar *dname)
 {
 	int		rs ;
 	if ((rs = locinfo_rootids(lip)) >= 0) {
@@ -1038,7 +1039,7 @@ static int locinfo_chids(LOCINFO *lip,cchar *dname)
 
 
 #if	CF_DEBUGS && CF_DEBUGDUMP
-static int vecstr_dump(vecstr *dlp,cchar *id)
+local int vecstr_dump(vecstr *dlp,cchar *id)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
