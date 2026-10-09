@@ -54,7 +54,7 @@
 #include	<sbuf.h>
 #include	<randomvar.h>
 #include	<intceil.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
