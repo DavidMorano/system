@@ -37,7 +37,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<sockaddress.h>		/* LIBUC */
 #include	<conmsghdr.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -249,7 +249,7 @@ int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
 int msgdata_rmeol(msgdata *mip) noex {
 	while (mip->ml > 0) {
 	    cint	ch = mkchar(mip->mbuf[mip->ml - 1]) ;
- 	    if (! iseol(ch)) break ;
+ 	    if (! ischeol(ch)) break ;
 	    mip->ml -= 1 ;
 	} /* end while */
 	return mip->ml ;
