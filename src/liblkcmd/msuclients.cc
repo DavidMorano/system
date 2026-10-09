@@ -136,26 +136,26 @@ struct envmgr {
 
 /* forward references */
 
-static int	msuclients_setbegin(MSUCLIENTS *,cchar *,cchar *) ;
-static int	msuclients_setend(MSUCLIENTS *) ;
-static int	msuclients_pr(MSUCLIENTS *,cchar *) ;
-static int	msuclients_reqfname(MSUCLIENTS *,cchar *) ;
-static int	msuclients_tmpourdname(MSUCLIENTS *) ;
-static int	msuclients_bind(MSUCLIENTS *,int) ;
-static int	msuclients_connect(MSUCLIENTS *) ;
-static int	msuclients_disconnect(MSUCLIENTS *) ;
-static int	msuclients_istatus(MSUCLIENTS *) ;
-static int	msuclients_spawn(MSUCLIENTS *) ;
+local int	msuclients_setbegin(MSUCLIENTS *,cchar *,cchar *) ;
+local int	msuclients_setend(MSUCLIENTS *) ;
+local int	msuclients_pr(MSUCLIENTS *,cchar *) ;
+local int	msuclients_reqfname(MSUCLIENTS *,cchar *) ;
+local int	msuclients_tmpourdname(MSUCLIENTS *) ;
+local int	msuclients_bind(MSUCLIENTS *,int) ;
+local int	msuclients_connect(MSUCLIENTS *) ;
+local int	msuclients_disconnect(MSUCLIENTS *) ;
+local int	msuclients_istatus(MSUCLIENTS *) ;
+local int	msuclients_spawn(MSUCLIENTS *) ;
 
-static int	envmgr_start(ENVMGR *) ;
-static int	envmgr_set(ENVMGR *,cchar *,cchar *,int) ;
-static int	envmgr_getvec(ENVMGR *,cchar ***) ;
-static int	envmgr_finish(ENVMGR *) ;
+local int	envmgr_start(ENVMGR *) ;
+local int	envmgr_set(ENVMGR *,cchar *,cchar *,int) ;
+local int	envmgr_getvec(ENVMGR *,cchar ***) ;
+local int	envmgr_finish(ENVMGR *) ;
 
-static int	ipcmsginfo_init(struct ipcmsginfo *,struct sockaddr *,int) ;
+local int	ipcmsginfo_init(struct ipcmsginfo *,struct sockaddr *,int) ;
 
 #ifdef	COMMENT
-static int	venvcmp(cvoid **,cvoid **) ;
+local int	venvcmp(cvoid **,cvoid **) ;
 #endif
 
 
@@ -282,7 +282,7 @@ int msuclients_get(MSUCLIENTS *op,time_t dt,MSUCLIENTS_DATA *dp)
 /* local subroutines */
 
 
-static int msuclients_setbegin(MSUCLIENTS *op,cchar *pr,cchar *reqfname)
+local int msuclients_setbegin(MSUCLIENTS *op,cchar *pr,cchar *reqfname)
 {
 	int		rs ;
 
@@ -308,7 +308,7 @@ static int msuclients_setbegin(MSUCLIENTS *op,cchar *pr,cchar *reqfname)
 /* end subroutine (msuclients_setbegin) */
 
 
-static int msuclients_setend(MSUCLIENTS *op)
+local int msuclients_setend(MSUCLIENTS *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -334,9 +334,9 @@ static int msuclients_setend(MSUCLIENTS *op)
 /* end subroutine (msuclients_setend) */
 
 
-static int msuclients_pr(MSUCLIENTS *op,cchar *pr)
+local int msuclients_pr(MSUCLIENTS *op,cchar *pr)
 {
-	const int	prlen = MAXPATHLEN ;
+	cint	prlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		prl = -1 ;
 	char		prbuf[MAXPATHLEN + 1] ;
@@ -367,7 +367,7 @@ static int msuclients_pr(MSUCLIENTS *op,cchar *pr)
 /* end subroutine (msuclients_pr) */
 
 
-static int msuclients_reqfname(MSUCLIENTS *op,cchar *reqfname)
+local int msuclients_reqfname(MSUCLIENTS *op,cchar *reqfname)
 {
 	int		rs = SR_OK ;
 	int		pl = -1 ;
@@ -414,9 +414,9 @@ static int msuclients_reqfname(MSUCLIENTS *op,cchar *reqfname)
 /* end subroutine (msuclients_reqfname) */
 
 
-static int msuclients_tmpourdname(MSUCLIENTS *op)
+local int msuclients_tmpourdname(MSUCLIENTS *op)
 {
-	const int	pathlen = MAXPATHLEN ;
+	cint	pathlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		i = 0 ;
@@ -488,7 +488,7 @@ ret0:
 /* end subroutine (msuclients_tmpourdname) */
 
 
-static int msuclients_bind(MSUCLIENTS *op,int f)
+local int msuclients_bind(MSUCLIENTS *op,int f)
 {
 	int		rs = SR_OK ;
 	int		f_err = FALSE ;
@@ -499,7 +499,7 @@ static int msuclients_bind(MSUCLIENTS *op,int f)
 
 	if (f) {
 	    const mode_t	operms = (S_IFSOCK | 0666) ;
-	    const int		oflags = O_RDWR ;
+	    cint		oflags = O_RDWR ;
 	    char		template[MAXPATHLEN + 1] ;
 	    char		fname[MAXPATHLEN + 1] ;
 
@@ -551,7 +551,7 @@ static int msuclients_bind(MSUCLIENTS *op,int f)
 /* end subroutine (msuclients_bind) */
 
 
-static int msuclients_connect(MSUCLIENTS *op)
+local int msuclients_connect(MSUCLIENTS *op)
 {
 	ustat	sb ;
 	int		rs = SR_OK ;
@@ -618,7 +618,7 @@ bad0:
 /* end subroutine (msuclients_connect) */
 
 
-static int msuclients_disconnect(MSUCLIENTS *op)
+local int msuclients_disconnect(MSUCLIENTS *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -634,13 +634,13 @@ static int msuclients_disconnect(MSUCLIENTS *op)
 /* end subroutine (msuclients_disconnect) */
 
 
-static int msuclients_istatus(MSUCLIENTS *op)
+local int msuclients_istatus(MSUCLIENTS *op)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_getstatus	m1 ;
 	struct ipcmsginfo	mi, *mip = &mi ;
 	struct sockaddr		*sap ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs ;
 	int		to = op->to ;
 	int		pid = 0 ;
@@ -656,7 +656,7 @@ static int msuclients_istatus(MSUCLIENTS *op)
 	m1.tag = 0 ;
 
 	if ((rs = msumsg_getstatus(&m1,0,mip->ipcbuf,ipclen)) >= 0) {
-	    const int	blen = rs ;
+	    cint	blen = rs ;
 
 	    mip->ipcmsg.msg_control = NULL ;
 	    mip->ipcmsg.msg_controllen = 0 ;
@@ -688,7 +688,7 @@ static int msuclients_istatus(MSUCLIENTS *op)
 /* end subroutine (msuclients_istatus) */
 
 
-static int msuclients_spawn(MSUCLIENTS *op)
+local int msuclients_spawn(MSUCLIENTS *op)
 {
 	SPAWNPROC	ps ;
 	ENVMGR		em ;
@@ -763,9 +763,9 @@ ret0:
 /* end subroutine (msuclients_spawn) */
 
 
-static int envmgr_start(ENVMGR *emp)
+local int envmgr_start(ENVMGR *emp)
 {
-	const int	vo = (VECHAND_OCOMPACT | VECHAND_OSORTED) ;
+	cint	vo = (VECHAND_OCOMPACT | VECHAND_OSORTED) ;
 	int		rs ;
 	int		i ;
 
@@ -796,7 +796,7 @@ bad0:
 /* end subroutine (envmgr_start) */
 
 
-static int envmgr_finish(ENVMGR *emp)
+local int envmgr_finish(ENVMGR *emp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -812,16 +812,16 @@ static int envmgr_finish(ENVMGR *emp)
 /* end subroutine (envmgr_finish) */
 
 
-static int envmgr_set(ENVMGR *emp,cchar *kp,cchar *vp,int vl)
+local int envmgr_set(ENVMGR *emp,cchar *kp,cchar *vp,int vl)
 {
 	vecstr		*esp = &emp->envstrs ;
 	vechand		*elp = &emp->envlist ;
 	int		rs ;
 	if ((rs = vecstr_envset(esp,kp,vp,vl)) >= 0) {
-	    const int	i = rs ;
+	    cint	i = rs ;
 	    cchar	*ep ;
 	    if ((rs = vecstr_get(esp,i,&ep)) >= 0) {
-		const int	nrs = SR_NOTFOUND ;
+		cint	nrs = SR_NOTFOUND ;
 	        int (*venvcmp)(cvoid **,cvoid **) ;
 	        venvcmp = (int (*)(cvoid **,cvoid **)) vstrkeycmp ;
 	        if ((rs = vechand_search(elp,kp,venvcmp,NULL)) >= 0) {
@@ -840,7 +840,7 @@ static int envmgr_set(ENVMGR *emp,cchar *kp,cchar *vp,int vl)
 /* end subroutine (envmgr_set) */
 
 
-static int envmgr_getvec(ENVMGR *emp,cchar ***rppp)
+local int envmgr_getvec(ENVMGR *emp,cchar ***rppp)
 {
 	int		rs ;
 
@@ -851,7 +851,7 @@ static int envmgr_getvec(ENVMGR *emp,cchar ***rppp)
 /* end subroutine (envmgr_getvec) */
 
 
-static int ipcmsginfo_init(IPCMSGINFO *mip,SOCKADDR *sap,int sal)
+local int ipcmsginfo_init(IPCMSGINFO *mip,SOCKADDR *sap,int sal)
 {
 	int		size ;
 
@@ -890,7 +890,7 @@ static int ipcmsginfo_init(IPCMSGINFO *mip,SOCKADDR *sap,int sal)
 
 
 #ifdef	COMMENT
-static int venvcmp(e1pp,e2pp)
+local int venvcmp(e1pp,e2pp)
 cvoid	**e1pp, **e2pp ;
 {
 	cchar	*e1p ;
