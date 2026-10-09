@@ -52,7 +52,7 @@
 #include	<estrings.h>
 #include	<modload.h>
 #include	<nistinfo.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"mfserve.h"
@@ -286,7 +286,7 @@ local int daytime_worker(DT *op) noex {
 	                custime		dt = getustime ;
 	                char		ntbuf[NISTINFO_BUFLEN+1+1] ;
 	                strdcpy1(ni.org,NISTINFO_ORGLEN,obuf) ;
-	                timestr_nist(dt,ntbuf,&ni) ;
+	                strtime_nist(dt,ntbuf,&ni) ;
 	                {
 	                    int		tl = strlen(ntbuf) ;
 			    ntbuf[tl++] = '\n' ;
