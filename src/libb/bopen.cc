@@ -69,7 +69,7 @@
 #include	<intsat.h>		/* LIBU */
 #include	<intceil.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
