@@ -59,7 +59,7 @@
 #include	<ema.h>
 #include	<emainfo.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>
