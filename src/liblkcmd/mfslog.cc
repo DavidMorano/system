@@ -1,19 +1,19 @@
-/* mfs-log */
+/* mfs-log SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* utility to support logging */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
 	= 2011-01-25, David A­D­ Morano
-        This code was seperated out for for more modularity. This was in turn
-        needed to fix the AST-code sockets library definition problems (see
-        notes elsewhere).
+	This code was seperated out for for more modularity. This
+	was in turn needed to fix the AST-code sockets library
+	definition problems (see notes elsewhere).
 
 	= 2017-08-10, David A­D­ Morano
 	This subroutine was borrowed to code MFSERVE.
@@ -24,23 +24,23 @@
 
 /*******************************************************************************
 
-        This modeule contains code to support logging of various bit of
-        information.
-
+  	Description:
+	This modeule contains code to support logging of various
+	bit of information.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
 #include	<cstdarg>
-
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"proglog.h"
@@ -75,8 +75,8 @@
 extern int	proglogout(PROGINFO *,cchar *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -227,7 +227,7 @@ int logmark(PROGINFO *pip,int rem)
 
 	    if (rs >= 0) {
 	        fmt = "%s mark> %s" ;
-	        timestr_logz(pip->daytime,timebuf) ;
+	        strtime_logz(pip->daytime,timebuf) ;
 	        rs = proglog_printf(pip,fmt,timebuf,nn) ;
 	    }
 
@@ -239,7 +239,7 @@ int logmark(PROGINFO *pip,int rem)
 	    }
 
 	    if (rs >= 0) {
-		const int	v = pip->pid ;
+		cint	v = pip->pid ;
 		fmt = "pid=%u" ;
 	        rs = proglog_printf(pip,fmt,v) ;
 	    }
@@ -250,7 +250,7 @@ int logmark(PROGINFO *pip,int rem)
 		if (rem <= 0) {
 		    strcpy(timebuf,"·") ;
 		} else {
-	            timestr_elapsed(rtime,timebuf) ;
+	            strtime_elapsed(rtime,timebuf) ;
 		}
 	        rs = proglog_printf(pip,fmt,timebuf) ;
 	    }
@@ -277,7 +277,7 @@ int loglisteners(PROGINFO *pip)
 	    MFSLISTEN_INST	*lp = &inst ;
 	    cchar		*fmt ;
 	    if (lp->type[0] != '\0') {
-	        const int	ls = lp->state ;
+	        cint	ls = lp->state ;
 	        cchar		*sn ;
 	        if (ls & LISTENSPEC_MDELPEND) {
 	            sn = "D" ;
@@ -313,13 +313,13 @@ int logreport(PROGINFO *pip)
 	if (pip->open.logprog) {
 	    char	timebuf[TIMEBUFLEN + 1] ;
 
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    if ((rs = proglog_printf(pip,"%s report",timebuf)) >= 0) {
 	        rs = proglog_printf(pip,"narkint=%u",pip->intmark) ;
 	    }
 
 	    if (rs >= 0) {
-	        timestr_logz(lip->ti_marklog,timebuf) ;
+	        strtime_logz(lip->ti_marklog,timebuf) ;
 	        rs = proglog_printf(pip,"marktime=%s",timebuf) ;
 	    }
 
@@ -335,10 +335,10 @@ int loginvalidcmd(PROGINFO *pip,cchar *cmd)
 	int		rs = SR_OK ;
 
 	if (pip->open.logprog) {
-	    const int	cl = strnlen(cmd,40) ;
+	    cint	cl = strnlen(cmd,40) ;
 	    cchar	*fmt = "%s invalid cmd=%r" ;
 	    char	timebuf[TIMEBUFLEN + 1] ;
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    rs = proglog_printf(pip,fmt,timebuf,cmd,cl) ;
 	}
 
@@ -361,7 +361,7 @@ int loginfo(PROGINFO *pip)
 	    }
 
 	    if (pip->fl.daemon) {
-		const int	v = pip->pid ;
+		cint	v = pip->pid ;
 	        proglog_printf(pip,"daemon pid=%u",v) ;
 	    }
 
@@ -371,7 +371,7 @@ int loginfo(PROGINFO *pip)
 
 	    lw = pip->intrun ;
 	    if ((lw >= 0) && (lw < INT_MAX)) {
-	        timestr_elapsed(lw,timebuf) ;
+	        strtime_elapsed(lw,timebuf) ;
 	    } else {
 	        sncpy1(timebuf,TIMEBUFLEN,"max") ;
 	    }
@@ -419,7 +419,7 @@ int loglock(PROGINFO *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np)
 	int		rs = SR_OK ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
-	timestr_logz(pip->daytime,timebuf) ;
+	strtime_logz(pip->daytime,timebuf) ;
 	proglog_printf(pip,"%s lock %s\n", timebuf, np) ;
 
 	proglog_printf(pip,"lf=%s",lfname) ;
