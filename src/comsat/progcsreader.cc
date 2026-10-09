@@ -38,21 +38,22 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdarg>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bfile.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<vecstr.h>
 #include	<vecobj.h>
 #include	<ids.h>
 #include	<psem.h>
 #include	<hdrdecode.h>
 #include	<char.h>
-#include	<localmisc.h>
+#include	<isfd.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -169,7 +170,7 @@ int progcsreader(PROGINFO *pip) noex {
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
 
-	if (isasocket(pip->fd_msg)) pip->fl.issocket = TRUE ;
+	if (isfdsocket(pip->fd_msg)) pip->fl.issocket = TRUE ;
 
 #if	CF_DEBUGN
 	nprintf(NDF,"progcsreader: f_issocket=%u fd_msg=%d\n",
