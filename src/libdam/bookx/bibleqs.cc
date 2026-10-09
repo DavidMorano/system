@@ -93,7 +93,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<strongeigens.h>	/* LIBDAM */
@@ -1762,7 +1762,7 @@ local int mkfieldterms(char *terms) noex {
 	        terms[i] = char(UCHAR_MAX) ;
 	    } /* end for */
 	    for (int i = 0 ; i < nchars ; i += 1) {
-	        if (isalnumlatin(i)) {
+	        if (ischalnum(i)) {
 	            BACLR(terms,i) ;
 	        }
 	    } /* end for */
