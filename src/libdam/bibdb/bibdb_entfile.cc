@@ -80,7 +80,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG */
 #include	<bfile.h>		/* LIBB */
