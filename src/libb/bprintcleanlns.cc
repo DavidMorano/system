@@ -34,7 +34,7 @@
 #include	<usysbase.h>
 #include	<linefold.h>
 #include	<rmx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>		/* |COLUMNS| */
 
 #include	"bfile.h"
