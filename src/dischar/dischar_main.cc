@@ -43,7 +43,7 @@
 #include	<logfile.h>
 #include	<ascii.h>
 #include	<uterm.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
