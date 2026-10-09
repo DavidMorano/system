@@ -67,7 +67,7 @@
 #include	<strn.h>
 #include	<snx.h>
 #include	<mkpathx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<isnot.h>
 #include	<localmisc.h>		/* |COLUMNS| */
 #include	<libdebug.h>		/* LIBDEBUG */
