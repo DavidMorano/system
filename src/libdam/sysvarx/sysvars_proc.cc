@@ -59,7 +59,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -295,7 +295,7 @@ local bool hasweird(cchar *sp,int sl) noex {
 	bool		f = false ;
 	for (int i = 0 ; (i != sl) && (sp[i] != '\0') ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
-	    f = ((! isalnumlatin(ch)) && (ch != '_')) ;
+	    f = ((! ischalnum(ch)) && (ch != '_')) ;
 	    if (f) break ;
 	} /* end if */
 	return f ;
