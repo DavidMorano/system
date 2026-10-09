@@ -2,67 +2,55 @@
 
 /* print out the status of a file */
 
+#define	CF_DEBUG		1
 
-#define	F_DEBUG		1
+/* revision history:
 
-
-/* revision history :
-
-	= 87/09/01, David A­D­ Morano
-
+	= 1987-09-01, David A­D­ Morano
 	This code was originally written.
-
 
 */
 
-
-
-/*******************************************************************
+/*******************************************************************************
 
 	This program will return the various time statusi of a file.
 
+*******************************************************************************/
 
-*********************************************************************/
-
-
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<tzfile.h>		/* |TM_YEAR_BASE| */
 #include	<ctime>
 #include	<csignal>
-#include	<tzfile.h>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<bfile.h>
 #include	<paramopt.h>
+#include	<bfile.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"misc.h"
 #include	"config.h"
 #include	"defs.h"
 
 
-
 /* local defines */
 
 
-
 /* external subroutines */
-
-extern int	u_stat() ;
 
 
 /* external variables */
 
 
+/* exported variables */
 
 
-
-
+/* exported subroutines */
 
 int process(pip,otype,ofp,filename,pp)
 struct proginfo	*pip ;
@@ -72,19 +60,15 @@ char		filename[] ;
 PARAMOPT	*pp ;
 {
 	ustat	ss, *sp = &ss ;
-
-	struct tm	*ftsp ;
-
-	int	rs, i ;
-
+	TM	*ftsp ;
+	int	rs ;
+	int	i ;
 	char	dbuf[MAXPATHLEN + 1], *bp ;
 	char	tbuf[40] ;
 	char	*cbuf ;
 	char	*cp ;
 
-
-/* do it */
-
+	/* do it */
 	if ((rs = u_stat(filename,sp)) < 0)
 	    goto badstat ;
 
@@ -93,7 +77,7 @@ PARAMOPT	*pp ;
 	    bprintf(ofp,"\\o%08o\n",sp->st_mode) ;
 
 
-#if	F_DEBUG
+#if	CF_DEBUG
 	if (pip->debuglevel >= 3)
 	eprintf("process: about to get time\n") ;
 #endif
@@ -174,16 +158,13 @@ PARAMOPT	*pp ;
 
 badstat:
 
-#if	F_DEBUG
+#if	CF_DEBUG
 	if (pip->debuglevel >= 3)
 	eprintf("process: exiting rs=%d\n",rs) ;
 #endif
 
 
 	return rs ;
-}
-/* end subroutine (process) */
-
-
+} /* end subroutine (process) */
 
 
