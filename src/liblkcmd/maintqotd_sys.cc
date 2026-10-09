@@ -250,8 +250,8 @@ cchar	*ap ;
 	struct locinfo	*lip = pip->lip ;
 	struct query	q ;
 	CM		con ;
-	const int	llen = LINEBUFLEN ;
-	const int	clen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
+	cint	clen = LINEBUFLEN ;
 	int		rs ;
 	int		to ;
 	int		ll ;
@@ -658,7 +658,7 @@ local int checker_progrun(CHECKER *chp,cchar *qfname) noex {
 	    cchar	*zp ;
 	    if ((zl = sfbasename(pf,-1,&zp)) > 0) {
 		const mode_t	om = 0664 ;
-		const int	of = (O_RDWR|O_CREAT|O_TRUNC) ;
+		cint	of = (O_RDWR|O_CREAT|O_TRUNC) ;
 	        cchar	*ap = av[0] ;
 	        char		argz[MAXNAMELEN+1] ;
 	        if (ap != nullptr) {
