@@ -66,7 +66,7 @@
 #include	<char.h>		/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<biblecite.h>		/* LIBDAM */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -98,8 +98,8 @@ import uconstants ;			/* |varname(3u)| + |sysword(3u)| */
 #define	INDNAME		"bibleverses"
 #define	INDSUF		"vi"
 
-#define	ISWHT(ch)	iswhitelatin(ch)
-#define	ISDIG(ch)	isdigitlatin(ch)
+#define	ISWHT(ch)	ischwhite(ch)
+#define	ISDIG(ch)	ischdigit(ch)
 
 #define	DS		dirseen
 #define	DS_C		dirseen_cur
