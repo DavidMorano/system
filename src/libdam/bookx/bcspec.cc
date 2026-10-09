@@ -49,7 +49,7 @@
 #include	<estrings.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -96,7 +96,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	    op->c = 1 ;
 	    op->v = 1 ;
 	    if (int v, si, sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
-	        if (int	ch = mkchar(sp[0]) ; isalphalatin(ch)) {
+	        if (int	ch = mkchar(sp[0]) ; ischalpha(ch)) {
 		    op->namp = sp ;
 	  	    op->naml = sl ;
 	            if ((si = siourbrk(sp,sl,true)) > 0) {
@@ -112,7 +112,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	            } else {
 		        sl = 0 ;
 		    }
-	        } else if (isdigitlatin(ch)) {
+	        } else if (ischdigit(ch)) {
 	            if ((si = siourbrk(sp,sl,true)) > 0) {
 		        rs = cfdeci(sp,si,&v) ;
 		        op->b = uchar(v) ;
@@ -153,9 +153,9 @@ local int siourbrk(cchar *sp,int sl,int f_dig) noex {
 	for (i = 0 ; i < sl ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
 	    if (f_dig) {
-		f = isdigitlatin(ch) ;
+		f = ischdigit(ch) ;
 	    } else {
-		f = isalphalatin(ch) ;
+		f = ischalpha(ch) ;
 	    }
 	    f = f || (ch == ':') ;
 	    if (f) break ;
