@@ -97,7 +97,7 @@ import libutil ;			/* |memclear(3u)| */
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 #endif
 
 
@@ -109,23 +109,23 @@ extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 
 /* forward references */
 
-static int	mfsc_setbegin(MFSC *,cchar *) noex ;
-static int	mfsc_setend(MFSC *) noex ;
-static int	mfsc_srvdname(MFSC *,char *) noex ;
-static int	mfsc_srvfname(MFSC *,cchar *) noex ;
-static int	mfsc_bind(MFSC *,int,cchar *) noex ;
-static int	mfsc_bufbegin(MFSC *) noex ;
-static int	mfsc_bufend(MFSC *) noex ;
-static int	mfsc_connect(MFSC *) noex ;
-static int	mfsc_istatus(MFSC *,MFSC_STATUS *) noex ;
-static int	mfsc_listenerfmt(MFSC *,char *,int,int,MFSMSG_LISTENER *) noex ;
+local int	mfsc_setbegin(MFSC *,cchar *) noex ;
+local int	mfsc_setend(MFSC *) noex ;
+local int	mfsc_srvdname(MFSC *,char *) noex ;
+local int	mfsc_srvfname(MFSC *,cchar *) noex ;
+local int	mfsc_bind(MFSC *,int,cchar *) noex ;
+local int	mfsc_bufbegin(MFSC *) noex ;
+local int	mfsc_bufend(MFSC *) noex ;
+local int	mfsc_connect(MFSC *) noex ;
+local int	mfsc_istatus(MFSC *,MFSC_STATUS *) noex ;
+local int	mfsc_listenerfmt(MFSC *,char *,int,int,MFSMSG_LISTENER *) noex ;
 
 #ifdef	COMMENT
-static int	mfsc_spawn(MFSC *) noex ;
-static int	mfsc_envload(MFSC *,ENVMGR *) noex ;
+local int	mfsc_spawn(MFSC *) noex ;
+local int	mfsc_envload(MFSC *,ENVMGR *) noex ;
 #endif
 
-static int	mksrvdname(char *,cchar *,cchar *,cchar *) noex ;
+local int	mksrvdname(char *,cchar *,cchar *,cchar *) noex ;
 
 
 /* local variables */
@@ -530,7 +530,7 @@ int mfsc_getname(MFSC *op,char *rbuf,int rlen,cchar *un) noex {
 
 /* local subroutines */
 
-static int mfsc_setbegin(MFSC *op,cchar *pr) noex {
+local int mfsc_setbegin(MFSC *op,cchar *pr) noex {
 	int		rs ;
 	int		f = FALSE ;
 	cchar		*cp ;
@@ -563,7 +563,7 @@ static int mfsc_setbegin(MFSC *op,cchar *pr) noex {
 }
 /* end subroutine (mfsc_setbegin) */
 
-static int mfsc_setend(MFSC *op) noex {
+local int mfsc_setend(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -589,7 +589,7 @@ static int mfsc_setend(MFSC *op) noex {
 }
 /* end subroutine (mfsc_setend) */
 
-static int mfsc_srvdname(MFSC *op,char *rbuf) noex {
+local int mfsc_srvdname(MFSC *op,char *rbuf) noex {
 	int		rs ;
 	int		rl = 0 ;
 	cchar		*td = TMPDNAME ;
@@ -614,7 +614,7 @@ static int mfsc_srvdname(MFSC *op,char *rbuf) noex {
 }
 /* end subroutine (mfsc_srvdname) */
 
-static int mfsc_srvfname(MFSC *op,cchar *srvdname) noex {
+local int mfsc_srvfname(MFSC *op,cchar *srvdname) noex {
 	int		rs ;
 	int		rl = 0 ;
 	cchar	*reqname = MFSC_REQNAME ;
@@ -647,7 +647,7 @@ static int mfsc_srvfname(MFSC *op,cchar *srvdname) noex {
 }
 /* end subroutine (mfsc_srvfname) */
 
-static int mfsc_bind(MFSC *op,int f,cchar *srvdname) noex {
+local int mfsc_bind(MFSC *op,int f,cchar *srvdname) noex {
 	int		rs = SR_OK ;
 	int		f_err = FALSE ;
 
@@ -702,7 +702,7 @@ static int mfsc_bind(MFSC *op,int f,cchar *srvdname) noex {
 }
 /* end subroutine (mfsc_bind) */
 
-static int mfsc_bufbegin(MFSC *op) noex {
+local int mfsc_bufbegin(MFSC *op) noex {
 	cint	blen = MSGBUFLEN ;
 	int		rs ;
 	char		*bp ;
@@ -714,7 +714,7 @@ static int mfsc_bufbegin(MFSC *op) noex {
 }
 /* end subroutine (mfsc_bufbegin) */
 
-static int mfsc_bufend(MFSC *op) noex {
+local int mfsc_bufend(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mbuf != NULL) {
@@ -727,7 +727,7 @@ static int mfsc_bufend(MFSC *op) noex {
 }
 /* end subroutine (mfsc_bufend) */
 
-static int mfsc_connect(MFSC *op) noex {
+local int mfsc_connect(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;
@@ -762,7 +762,7 @@ static int mfsc_connect(MFSC *op) noex {
 }
 /* end subroutine (mfsc_connect) */
 
-static int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
+local int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
 	int		rs = SR_OK ;
 	int		rc = 0 ;
 
@@ -830,7 +830,7 @@ static int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
 }
 /* end subroutine (mfsc_istatus) */
 
-static int mfsc_listenerfmt(MFSC *op,char *rbuf,int rlen,int idx,
+local int mfsc_listenerfmt(MFSC *op,char *rbuf,int rlen,int idx,
 		MFSMSG_LISTENER *lp) noex {
 	uint		rc = lp->rc ;
 	int		rs = SR_OK ;
@@ -865,7 +865,7 @@ static int mfsc_listenerfmt(MFSC *op,char *rbuf,int rlen,int idx,
 
 #ifdef	COMMENT
 
-static int mfsc_spawn(MFSC *op) noex {
+local int mfsc_spawn(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cs ;
@@ -922,7 +922,7 @@ static int mfsc_spawn(MFSC *op) noex {
 }
 /* end subroutine (mfsc_spawn) */
 
-static int mfsc_envload(MFSC *op,ENVMGR *emp) noex {
+local int mfsc_envload(MFSC *op,ENVMGR *emp) noex {
 	int		rs ;
 	if ((rs = envmgr_set(emp,VARMFSQUIET,"1",1)) >= 0) {
 	    rs = envmgr_set(emp,VARMFSPR,op->pr,-1) ;
@@ -933,7 +933,7 @@ static int mfsc_envload(MFSC *op,ENVMGR *emp) noex {
 
 #endif /* COMMENT */
 
-static int mksrvdname(char *rbuf,cchar *td,cchar *pr,cchar *fn) noex {
+local int mksrvdname(char *rbuf,cchar *td,cchar *pr,cchar *fn) noex {
 	cint	rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
