@@ -57,7 +57,6 @@
 #include	<sighand.h>
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<char.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
 #include	<userinfo.h>
@@ -66,6 +65,8 @@
 #include	<dialopts.h>
 #include	<nistinfo.h>		/* LIBUC */
 #include	<strtime.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -1425,7 +1426,7 @@ local int server(PI *pip) noex {
 
 /* handle case of data-gram transports */
 
-	    if (isasocket(fd_portal)) {
+	    if (isfdsocket(fd_portal)) {
 	        cint	sol = SOL_SOCKET ;
 	        cint	cmd = SO_TYPE ;
 	        int		optv = 0 ;
