@@ -43,7 +43,7 @@
 #include	<intsat.h>		/* LIBU */
 #include	<intceil.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>		/* LIBU */
 
 #include	"bfile.h"
