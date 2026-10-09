@@ -69,7 +69,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<mkx.h>			/* LIBUC */
 #include	<mklogid.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |COLUMNS| */
 
