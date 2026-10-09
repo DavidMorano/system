@@ -70,7 +70,7 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<six.h>			/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<vardefs.h>		/* LIBU */
@@ -661,7 +661,7 @@ int calyears_havestart(CYS *op,CYS_Q *qp,int y,cchar *lp,int ll) noex {
 	    int		ch = MKCHAR(lp[0]) ;
 	if (! CHAR_ISWHITE(ch)) {
 	    if ((si = sibrk(lp,ll," \t")) >= 3) {
-		if (isdigitlatin(ch)) {
+		if (ischdigit(ch)) {
 		    if (cchar *tp = strnchr(lp,ll,'/') ; tp) {
 		    	int	cl ;
 		    	cchar	*cp ;
@@ -687,7 +687,7 @@ int calyears_havestart(CYS *op,CYS_Q *qp,int y,cchar *lp,int ll) noex {
 	           } else {
 	        	rs = SR_ILSEQ ;
 		   }
-		} else if (isalphalatin(ch)) {
+		} else if (ischalpha(ch)) {
 		    if_constexpr (f_transhol) {
 	    	        if ((rs = calyears_transhol(op,qp,y,lp,si)) == 0) {
 		            si = 0 ;
