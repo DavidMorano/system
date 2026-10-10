@@ -69,7 +69,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"hasclass.h"
@@ -122,47 +122,47 @@ local bool hasx(ischar_f isx,cchar *sp,int sl) noex {
 /* exported subroutines */
 
 bool hasalpha(cchar *sp,int sl) noex {
-    	return hasx(isalphalatin,sp,sl) ;
+    	return hasx(ischalpha,sp,sl) ;
 } /* end subroutine (hasalpha) */
 
 bool hasalnum(cchar *sp,int sl) noex {
-    	return hasx(isalnumlatin,sp,sl) ;
+    	return hasx(ischalnum,sp,sl) ;
 } /* end subroutine (hasalnum) */
 
 bool hasdigit(cchar *sp,int sl) noex {
-    	return hasx(isdigitlatin,sp,sl) ;
+    	return hasx(ischdigit,sp,sl) ;
 } /* end subroutine (hasdigit) */
 
 bool hasdigex(cchar *sp,int sl) noex {
-    	return hasx(isdigexlatin,sp,sl) ;
+    	return hasx(ischdigex,sp,sl) ;
 } /* end subroutine (hasdigex) */
 
 bool hasoctal(cchar *sp,int sl) noex {
-    	return hasx(isoctallatin,sp,sl) ;
+    	return hasx(ischoctal,sp,sl) ;
 } /* end subroutine (hasoctal) */
 
 bool haswhite(cchar *sp,int sl) noex {
-    	return hasx(iswhitelatin,sp,sl) ;
+    	return hasx(ischwhite,sp,sl) ;
 } /* end subroutine (haswhite) */
 
 bool hasblank(cchar *sp,int sl) noex {
-    	return hasx(isblanklatin,sp,sl) ;
+    	return hasx(ischblank,sp,sl) ;
 } /* end subroutine (hasblank) */
 
 bool hasprint(cchar *sp,int sl) noex {
-    	return hasx(isprintlatin,sp,sl) ;
+    	return hasx(ischprint,sp,sl) ;
 } /* end subroutine (hasprint) */
 
 bool hasterm(cchar *sp,int sl) noex {
-    	return hasx(istermlatin,sp,sl) ;
+    	return hasx(ischterm,sp,sl) ;
 } /* end subroutine (hasterm) */
 
 bool haslc(cchar *sp,int sl) noex {
-    	return hasx(islowerlatin,sp,sl) ;
+    	return hasx(ischlower,sp,sl) ;
 } /* end subroutine (haslc) */
 
 bool hasuc(cchar *sp,int sl) noex {
-    	return hasx(isupperlatin,sp,sl) ;
+    	return hasx(ischupper,sp,sl) ;
 } /* end subroutine (hasuc) */
 
 
