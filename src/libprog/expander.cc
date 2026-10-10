@@ -63,7 +63,7 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -74,7 +74,7 @@ extern int	snsds(char *,int,const char *,const char *) ;
 
 int expander(app,sbuf,slen,rbuf,rlen)
 PROGINFO	*app ;
-const char	sbuf[] ;
+cchar	sbuf[] ;
 char		rbuf[] ;
 int		slen ;
 int		rlen ;
@@ -84,8 +84,8 @@ int		rlen ;
 	int		cl ;
 	int		ch ;
 	int		elen = 0 ;
-	const char	*bp = sbuf ;
-	const char	*cp ;
+	cchar	*bp = sbuf ;
+	cchar	*cp ;
 	char		hostname[MAXHOSTNAMELEN + 1] ;
 	char		*rbp = rbuf ;
 
