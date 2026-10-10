@@ -79,10 +79,9 @@
 
 /* local variables */
 
-constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
-
-constexpr int		addrlen = INETX_ADDRSTRLEN ;
-constexpr bool		f_inet6 = CF_INET6 ;
+constexpr in_addr_t	inaddrbad	=  mkinaddrbad() ;
+constexpr int		addrlen		= INETX_ADDRSTRLEN ;
+constexpr bool		f_inet6		= CF_INET6 ;
 
 
 /* exported variables */
