@@ -48,7 +48,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<digval.h>		/* LIBUC |digvalhex(3uc)| */
 #include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
-#include	<ischarx.h>		/* LIBUC |ishexlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischhex(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -89,7 +89,7 @@ int cfhexstr(cchar *sp,int sl,uchar *rp) noex {
 	        while ((rs >= 0) && (cl >= 2) && cp[0]) {
 	            cint ch0 = mkchar(cp[0]) ;
 	            cint ch1 = mkchar(cp[1]) ;
-	            if (ishexlatin(ch0) && ishexlatin(ch1)) {
+	            if (ischhex(ch0) && ischhex(ch1)) {
 		        int	v = 0 ;
 	                v |= (digvalhex(ch0) << 4) ;
 	                v |= (digvalhex(ch1) << 0) ;
