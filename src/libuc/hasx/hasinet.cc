@@ -50,7 +50,7 @@
 #include	<mkchar.h>		/* LIBU */
 #include	<strnul.hh>		/* LIBU */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |UC(3u)| */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
@@ -196,7 +196,7 @@ local bool hasINET4num(cchar *sp,int sl) noex {
 local bool hasINET6num(cchar *sp,int sl) noex {
     	bool f = false ;
     	while (sl-- && sp[0]) {
-	    f = ishexlatin(sp[0]) ;
+	    f = ischhex(sp[0]) ;
 	    if (! f) break ;
 	} /* end while */
 	return f ;
