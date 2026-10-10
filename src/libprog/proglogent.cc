@@ -72,9 +72,9 @@
 
 /* forward references */
 
-static int	checkstar(proginfo *,cchar *,int) noex ;
-static int	checkdir(proginfo *,cchar *,int) noex ;
-static int	checkfile(proginfo *,cchar *,int) noex ;
+local int	checkstar(proginfo *,cchar *,int) noex ;
+local int	checkdir(proginfo *,cchar *,int) noex ;
+local int	checkfile(proginfo *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -177,7 +177,7 @@ ret0:
 
 /* local subroutines */
 
-static int checkstar(proginfo *pip,cchar *name,int logsize) noex {
+local int checkstar(proginfo *pip,cchar *name,int logsize) noex {
 	FSDIR		d ;
 	FSDIR_ENT	ds ;
 	int		rs, rs1 ;
@@ -231,7 +231,7 @@ ret0:
 /* end subroutine (checkstar) */
 
 
-static int checkdir(pip,dname,logsize)
+local int checkdir(pip,dname,logsize)
 struct proginfo	*pip ;
 cchar	dname[] ;
 int		logsize ;
@@ -270,7 +270,7 @@ ret0:
 /* end subroutine (checkdir) */
 
 
-static int checkfile(pip,fname,logsize)
+local int checkfile(pip,fname,logsize)
 struct proginfo	*pip ;
 cchar	fname[] ;
 int		logsize ;
