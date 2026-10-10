@@ -37,7 +37,7 @@ extern bool isIOError	(int) noex ;
 
 local inline bool isFailIO(int rs) noex {
     	return isIOError(rs) ;
-}
+} /* end */
 
 EXTERNC_end
 
