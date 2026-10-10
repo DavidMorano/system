@@ -29,13 +29,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>		/* |MAX_ACL_ENTRIES| */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<matxstr.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® |MAX_ACL_ENTRIES| */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<matxstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"acltypes.h"
 
@@ -73,7 +74,7 @@ constexpr cpcchar	acltypes[] = {
 	"dother",
 	"dmask",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -83,7 +84,6 @@ constexpr cpcchar	acltypes[] = {
 
 int getacltype(cchar *tp,int tl) noex {
 	return matostr(acltypes,1,tp,tl) ;
-}
-/* end subroutine (getacltype) */
+} /* end subroutine (getacltype) */
 
 
