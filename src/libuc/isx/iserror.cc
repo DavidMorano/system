@@ -157,7 +157,7 @@ bool isFailOpen(int rs) noex {
 	if (rs < 0) {
 	    f = f || isNotPresent(rs) ;
 	    f = f || isonebad(rfailopen,rs) ;
-	}
+	} /* end if (possible) */
 	return f ;
 } /* end subroutine (isFailOpen) */
 
