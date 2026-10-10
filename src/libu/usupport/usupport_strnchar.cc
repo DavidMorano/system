@@ -102,22 +102,22 @@ local char *strnxx(xchr_f xchr,cchar *sp,int sl) noex {
 
 namespace libu {
     char *strnalpha(cchar *sp,int sl) noex {
-    	return strnxx(isalphalatin,sp,sl) ;
+    	return strnxx(ischalpha,sp,sl) ;
     }
     char *strnalnum(cchar *sp,int sl) noex {
-    	return strnxx(isalnumlatin,sp,sl) ;
+    	return strnxx(ischalnum,sp,sl) ;
     }
     char *strndigit(cchar *sp,int sl) noex {
-    	return strnxx(isdigitlatin,sp,sl) ;
+    	return strnxx(ischdigit,sp,sl) ;
     }
     char *strndigex(cchar *sp,int sl) noex {
-    	return strnxx(isdigexlatin,sp,sl) ;
+    	return strnxx(ischdigex,sp,sl) ;
     }
     char *strnoctal(cchar *sp,int sl) noex {
-    	return strnxx(isoctallatin,sp,sl) ;
+    	return strnxx(ischoctal,sp,sl) ;
     }
     char *strnblank(cchar *sp,int sl) noex {
-    	return strnxx(isblanklatin,sp,sl) ;
+    	return strnxx(ischblank,sp,sl) ;
     }
 } /* end namespace (libu) */
 
