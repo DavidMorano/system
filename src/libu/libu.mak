@@ -51,7 +51,7 @@ OBJ02= clanguage.o
 OBJ03= libutil.o usysconf.o umods.o utimezone.o
 
 OBJ04= utimeutil.o
-OBJ05= ulogerror.o ischx.o ulimits.o
+OBJ05= ulogerror.o ulimits.o
 OBJ06= ulibvals.o uconstants.o usupport.o
 OBJ07= umem.o usigsets.o usigblock.o umisc.o
 
@@ -196,7 +196,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat ischx findbit typecodes bitmanip bitgrp chrset
+	rmsubpat findbit typecodes bitmanip bitgrp chrset
 	rmobj
 
 control:
@@ -496,7 +496,7 @@ ureserve.dir:
 	makesubdir $@
 
 # USUPPORT
-usupport.o:		usupport.dir ischx.o
+usupport.o:		usupport.dir
 usupport.dir:
 	makesubdir $@
 
@@ -631,15 +631,6 @@ dprint.o:		dprint.cc	dprint.hh			$(INCS)
 # ARITHMETIC
 muldigs.o:		muldigs.ccm
 loadvals.o:		loadvals.ccm
-
-ischx.o:		ischx0.o ischx1.o
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-ischx0.o:		ischx.ccm	ischx.hh			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-ischx1.o:		ischx1.cc	ischx0.o			$(INCS)
-	$(COMPILE.cc) $<
 
 udiv.o:			udiv.ccm	udiv.hh				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
