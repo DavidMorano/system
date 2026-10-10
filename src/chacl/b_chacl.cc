@@ -48,13 +48,13 @@
 #include	<sys/acl.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<getpwx.h>
 #include	<getax.h>
 #include	<bits.h>
@@ -66,9 +66,9 @@
 #include	<fsdirtree.h>
 #include	<fsdirtreestat.h>
 #include	<strn.h>
-#include	<mkchar.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<mkchar.h>		/* LIBU */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"shio.h"
@@ -135,9 +135,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	PI		proginfo
 
-#define	LOCINFO		locinfo
-#define	LOCINFO_FT	locinfo_ftypes
-#define	LOCINFO_FL	locinfo_flags
+#define	LI		locinfo
+#define	LI_FL		locinfo_flags
+#define	LI_FT		locinfo_ftypes
 
 
 /* external subroutines */
@@ -163,7 +163,7 @@ struct locinfo_ftypes {
 	uint		l:1 ;		/* symbolic link */
 	uint		s:1 ;		/* socket */
 	uint		D:1 ;		/* door */
-} ;
+} ; /* end struct */
 
 struct locinfo_flags {
 	uint		ftypes:1 ;
@@ -173,13 +173,13 @@ struct locinfo_flags {
 	uint		recurse:1 ;
 	uint		nostop:1 ;
 	uint		follow:1 ;
-	uint		min:1 ;
-	uint		max:1 ;
+	uint		minval:1 ;
+	uint		maxval:1 ;
 	uint		maskcalc:1 ;
 	uint		acls:1 ;
 	uint		suid:1 ;
 	uint		sgid:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
 	keyopt		akopts ;
@@ -187,56 +187,56 @@ struct locinfo {
 	vecobj		acls ;
 	aclent_t	*aclbuf ;	/* new ACLs being applied */
 	PROGINFO	*pip ;
-	LOCINFO_FL	have, f, finval ;
-	LOCINFO_FT	ft ;
+	LI_FL	have, f, finval ;
+	LI_FT	ft ;
 	gid_t		gid_owner, gid_new ;
 	uid_t		uid_owner, uid_new ;
 	int		naclbuf ;	/* number of new ACLs */
 	int		entries ;	/* total count */
 	int		changed ;	/* total count */
 	int		errored ;	/* total count */
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-local int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,con mainv,con mainv,void *) noex ;
 
-local int	usage(PI *) ;
+local int	usage(PI *) noex ;
 
-local int	process(PI *,ARGINFO *,bits *,cchar *) ;
-local int	procacls(PI *,cchar *) ;
-local int	procacl(PI *,cchar *,int) ;
-local int	procname(PI *,cchar *) ;
-local int	procnamer(PI *,cchar *) ;
-local int	checkname(PI *,cchar *,ustat *) ;
-local int	checkowner(PI *,ustat *,cchar *) ;
-local int	procoutverbose(PI *,LOCINFO *,cchar *,int) ;
+local int	process(PI *,ARGINFO *,bits *,cchar *) noex ;
+local int	procacls(PI *,cchar *) noex ;
+local int	procacl(PI *,cchar *,int) noex ;
+local int	procname(PI *,cchar *) noex ;
+local int	procnamer(PI *,cchar *) noex ;
+local int	checkname(PI *,cchar *,ustat *) noex ;
+local int	checkowner(PI *,ustat *,cchar *) noex ;
+local int	procoutverbose(PI *,LI *,cchar *,int) noex ;
 
-local int	locinfo_start(LOCINFO *,PI *) ;
-local int	locinfo_procopts(LOCINFO *) ;
-local int	locinfo_ftypes(LOCINFO *) ;
-local int	locinfo_isfsuffix(LOCINFO *,cchar *) ;
-local int	locinfo_isftype(LOCINFO *,cchar *,ustat *) ;
-local int	locinfo_finish(LOCINFO *) ;
-local int	locinfo_addacl(LOCINFO *,aclinfo *) ;
-local int	locinfo_mksol(LOCINFO *) ;
+local int	locinfo_start(LI *,PI *) noex ;
+local int	locinfo_procopts(LI *) noex ;
+local int	locinfo_ftypes(LI *) noex ;
+local int	locinfo_isfsuffix(LI *,cchar *) noex ;
+local int	locinfo_isftype(LI *,cchar *,ustat *) noex ;
+local int	locinfo_finish(LI *) noex ;
+local int	locinfo_addacl(LI *,aclinfo *) noex ;
+local int	locinfo_mksol(LI *) noex ;
 
-local int	aclents_match(aclent_t *,int,aclinfo *) ;
-local int	aclents_minmax(aclent_t *,int,int *,int *) ;
-local int	aclents_compact(aclent_t *,int) ;
-local int	aclents_maskmat(aclent_t *,int) ;
-local int	aclents_maskneed(aclent_t *,int) ;
-local int	aclents_defmaskneed(aclent_t *,int) ;
+local int	aclents_match(aclent_t *,int,aclinfo *) noex ;
+local int	aclents_minmax(aclent_t *,int,int *,int *) noex ;
+local int	aclents_compact(aclent_t *,int) noex ;
+local int	aclents_maskmat(aclent_t *,int) noex ;
+local int	aclents_maskneed(aclent_t *,int) noex ;
+local int	aclents_defmaskneed(aclent_t *,int) noex ;
 
 #if	CF_DEBUG || CF_DEBUGS
-local int aclents_print(aclent_t *,int) ;
+local int aclents_print(aclent_t *,int) noex ;
 #endif
 
-local int	aclent_empty(aclent_t *) ;
-local int	aclent_idtype(aclent_t *) ;
+local int	aclent_empty(aclent_t *) noex ;
+local int	aclent_idtype(aclent_t *) noex ;
 
-local int	parseperms(cchar *,int) ;
+local int	parseperms(cchar *,int) noex ;
 
 
 /* local variables */
@@ -259,7 +259,7 @@ enum argopts {
 	argopt_cu,
 	argopt_cg,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	argopts[] = {
 	"ROOT",
@@ -279,7 +279,7 @@ constexpr cpcchar	argopts[] = {
 	"cu",
 	"cg",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
@@ -287,7 +287,7 @@ constexpr PIVARS	initvars = {
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
 constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -301,21 +301,21 @@ constexpr MAPEX		mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 enum progopts {
 	progopt_nhf,
 	progopt_suid,
 	progopt_sgid,
 	progopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	progopts[] = {
 	"nhf",
 	"suid",
 	"sgid",
 	nullptr
-} ;
+} ; /* end array */
 
 enum ftypes {
 	ftype_file,
@@ -329,7 +329,7 @@ enum ftypes {
 	ftype_door,
 	ftype_regular,
 	ftype_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	ftypes[] = {
 	"file",
@@ -343,7 +343,7 @@ constexpr cpcchar	ftypes[] = {
 	"door",
 	"regular",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr char		aclterms[] = {
 	0x00, 0x3E, 0x00, 0x00,
@@ -354,13 +354,13 @@ constexpr char		aclterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 enum aclops {
 	aclop_add,
 	aclop_subtract,
 	aclop_overlast
-} ;
+} ; /* end enum */
 
 
 /* exported variables */
@@ -400,7 +400,7 @@ int p_chacl(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PI		pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+	LI		li, *lip = &li ;
 	ARGINFO		ainfo{} ;
 	bits		pargs ;
 	SHIO		errfile ;
@@ -463,12 +463,10 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    goto badlocstart ;
 	}
 
-	lip->fl.min = DEFMINMAX ;
-	lip->fl.max = DEFMINMAX ;
+	lip->fl.minval = DEFMINMAX ;
+	lip->fl.maxval = DEFMINMAX ;
 	lip->fl.maskcalc = DEFMASKCALC ;
-
-/* argumuments */
-
+	/* argumuments */
 	if (rs >= 0) rs = bits_start(&pargs,0) ;
 	if (rs < 0) goto badpargs ;
 
@@ -632,12 +630,12 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                    break ;
 
 	                case argopt_min:
-	                    lip->fl.min = true ;
+	                    lip->fl.minval = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->fl.min = (rs > 0) ;
+	                            lip->fl.minval = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -654,14 +652,14 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                    break ;
 
 	                case argopt_mm:
-	                    lip->fl.min = true ;
-	                    lip->fl.max = true ;
+	                    lip->fl.minval = true ;
+	                    lip->fl.maxval = true ;
 	                    if (f_optequal) {
 	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
-	                            lip->fl.min = (rs > 0) ;
-	                            lip->fl.max = (rs > 0) ;
+	                            lip->fl.minval = (rs > 0) ;
+	                            lip->fl.maxval = (rs > 0) ;
 	                        }
 	                    }
 	                    break ;
@@ -1242,7 +1240,7 @@ local int procacls(PI *pip,cchar *aclspec)
 
 local int procacl(PI *pip,cchar *abuf,int alen)
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	cchar		*tp ;
 
@@ -1370,7 +1368,7 @@ local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *afn)
 	    cint	size = (pip->n * sizeof(aclent_t)) ;
 	    char	*bp ;
 	    if ((rs = uc_malloc(size,&bp)) >= 0) {
-	        LOCINFO		*lip = pip->lip ;
+	        LI		*lip = pip->lip ;
 	        int		pan = 0 ;
 	        int		cl ;
 	        cchar		*cp ;
@@ -1456,7 +1454,7 @@ local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *afn)
 
 local int procname(PI *pip,cchar *fname)
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	int		rs ;
 	int		c = 0 ;
 
@@ -1555,7 +1553,7 @@ local int procname(PI *pip,cchar *fname)
 /* end subroutine (procname) */
 
 local int procnamer(PI *pip,cchar *fname) noex {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	fsdirtree	dt ;
 	int		rs ;
 	int		rs1 ;
@@ -1618,7 +1616,7 @@ local int procnamer(PI *pip,cchar *fname) noex {
 
 local int checkname(PI *pip,cchar *fname,ustat *sbp)
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	aclinfo	*ap ;
 	aclent_t	*aclbuf = (aclent_t *) pip->buffer ;
 	int		rs = SR_OK ;
@@ -1731,7 +1729,7 @@ local int checkname(PI *pip,cchar *fname,ustat *sbp)
 
 /* find the minimum and the maximum perms */
 
-	    if (lip->fl.min || lip->fl.max) {
+	    if (lip->fl.minval || lip->fl.maxval) {
 	        aclents_minmax(aclbuf,nacls,&perm_min,&perm_max) ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
@@ -1773,10 +1771,10 @@ local int checkname(PI *pip,cchar *fname,ustat *sbp)
 	                perm_new = aclbuf[j].a_perm & (~ ap->perm) ;
 	            }
 
-	            if ((lip->fl.min || lip->fl.max) &&
+	            if ((lip->fl.minval || lip->fl.maxval) &&
 	                (aclent_idtype(aclbuf + j) > 0)) {
 
-	                if (lip->fl.min && (perm_min >= 0)) {
+	                if (lip->fl.minval && (perm_min >= 0)) {
 	                    perm_new |= perm_min ;
 			}
 
@@ -1842,11 +1840,11 @@ local int checkname(PI *pip,cchar *fname,ustat *sbp)
 	                }
 #endif /* CF_DEBUG */
 
-	                if ((lip->fl.min || lip->fl.max) && f_idtype) {
-	                    if (lip->fl.min && (perm_min >= 0)) {
+	                if ((lip->fl.minval || lip->fl.maxval) && f_idtype) {
+	                    if (lip->fl.minval && (perm_min >= 0)) {
 	                        perm_new |= perm_min ;
 			    }
-	                    if (lip->fl.max && (perm_max >= 0)) {
+	                    if (lip->fl.maxval && (perm_max >= 0)) {
 	                        perm_new &= perm_max ;
 			    }
 	                }
@@ -1858,7 +1856,7 @@ local int checkname(PI *pip,cchar *fname,ustat *sbp)
 	                        debugprintf("checkname: perm_new greater\n") ;
 #endif
 
-	                    if (lip->fl.min && f_idtype) {
+	                    if (lip->fl.minval && f_idtype) {
 
 #if	CF_DEBUG
 	                        if (DEBUGLEVEL(4))
@@ -1898,7 +1896,7 @@ local int checkname(PI *pip,cchar *fname,ustat *sbp)
 	    }
 #endif
 
-	    if (lip->fl.min && f_minus) {
+	    if (lip->fl.minval && f_minus) {
 	        int	f_gotone = false ;
 
 #if	CF_DEBUG
@@ -2218,7 +2216,7 @@ local int checkowner(PI *pip,ustat *sbp,cchar fname[])
 
 
 /* output verbose information */
-local int procoutverbose(PI *pip,LOCINFO *lip,cchar *ofn,int c)
+local int procoutverbose(PI *pip,LI *lip,cchar *ofn,int c)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs = SR_OK ;
@@ -2256,10 +2254,10 @@ local int procoutverbose(PI *pip,LOCINFO *lip,cchar *ofn,int c)
 }
 /* end subroutine (procoutverbose) */
 
-local int locinfo_start(LOCINFO *lip,PI *pip) noex {
+local int locinfo_start(LI *lip,PI *pip) noex {
 	int		rs ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 	lip->pip = pip ;
 	lip->uid_owner = -1 ;
 	lip->uid_new = -1 ;
@@ -2289,7 +2287,7 @@ local int locinfo_start(LOCINFO *lip,PI *pip) noex {
 /* end subroutine (locinfo_start) */
 
 
-local int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LI *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2319,7 +2317,7 @@ local int locinfo_finish(LOCINFO *lip)
 
 
 /* process the program options */
-local int locinfo_procopts(LOCINFO *lip)
+local int locinfo_procopts(LI *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	keyopt		*kop = &lip->akopts ;
@@ -2394,7 +2392,7 @@ local int locinfo_procopts(LOCINFO *lip)
 }
 /* end subroutine (locinfo_procopts) */
 
-local int locinfo_ftypes(LOCINFO *lip) noex {
+local int locinfo_ftypes(LI *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
 	int		rs1 ;
@@ -2465,7 +2463,7 @@ local int locinfo_ftypes(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_ftypes) */
 
-local int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
+local int locinfo_isfsuffix(LI *lip,cchar *fname) noex {
 	PROGINFO	*pip = lip->pip ;
 	paramopt	*pp = &lip->aparams ;
 	paramopt_cur	cur ;
@@ -2539,7 +2537,7 @@ local int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 }
 /* end subroutine (locinfo_isfsuffix) */
 
-local int locinfo_isftype(LOCINFO *lip,cc *fn,ustat *sbp) noex {
+local int locinfo_isftype(LI *lip,cc *fn,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (fn) {
@@ -2569,12 +2567,12 @@ local int locinfo_isftype(LOCINFO *lip,cc *fn,ustat *sbp) noex {
 }
 /* end subroutine (locinfo_isftype) */
 
-local int locinfo_addacl(LOCINFO *lip,aclinfo *aip) noex {
+local int locinfo_addacl(LI *lip,aclinfo *aip) noex {
 	return vecobj_add(&lip->acls,aip) ;
 }
 /* end subroutine (locinfo_addacl) */
 
-local int locinfo_mksol(LOCINFO *lip) noex {
+local int locinfo_mksol(LI *lip) noex {
 	vecobj		*alp = &lip->acls ;
 	aclinfo		*ap ;
 	for (int i = 0 ; vecobj_get(alp,i,&ap) >= 0 ; i += 1) {
