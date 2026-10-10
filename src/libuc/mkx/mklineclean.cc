@@ -59,7 +59,7 @@
 #include	<ascii.h>		/* LIBU |CH_{xx}| */
 #include	<strmgr.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* |iseol(3uc)| + |isprintlatin(3uc)| */
+#include	<isch.h>		/* |ischeol(3uc)| + |ischprint(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 #include	<linecleanopt.h>	/* cleaning options */
 
@@ -130,7 +130,7 @@ int mklineclean(char *rbuf,int rlen,int m,cchar *lp,int ll) noex {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) ylikely {
 	        if (ll < 0) ll = lenstr(lp) ;
-	        while ((ll > 0) && iseol(lp[ll - 1])) {
+	        while ((ll > 0) && ischeol(lp[ll - 1])) {
 	            ll -= 1 ;
 	        } /* end while */
 	        {
@@ -167,7 +167,7 @@ int cleaner::clean1(cchar *lp,int ll) noex {
 	    if (! frem) {
 	        if (cint ch = mkchar(lp[i]) ; ch) {
 	            if (! isshift(ch)) {
-	                if (isprintlatin(ch) || ischarok(ch)) {
+	                if (ischprint(ch) || ischarok(ch)) {
 	                    rs = res.chr(ch) ;
 	                } else if (mf.nonsub) {
 	                    rs = res.chr(ch_sub) ;
@@ -191,7 +191,7 @@ int cleaner::clean2(cchar *lp,int ll) noex {
     	int		rs = SR_OK ;
 	for (int i = 0 ; (rs >= 0) && (i < ll) ; i += 1) {
 	    if (cint ch = mkchar(lp[i]) ; ch) {
-	        if (isprintlatin(ch) || ischarok(ch)) {
+	        if (ischprint(ch) || ischarok(ch)) {
 		    rs = res.chr(ch) ;
 	        } else if (mf.nonsub) {
 		    rs = res.chr(ch_sub) ;
