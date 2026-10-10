@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJPART0= ureserve-isnot.o ureserve-charx.o 
-OBJPART1= ureserve-isx.o ureserve-sfx.o 
+OBJPART1= ureserve-isch.o ureserve-sfx.o 
 OBJPART2= ureserve-strop.o ureserve-fieldterm.o 
 OBJPART3= ureserve-field.o ureserve-vecstr.o 
 
@@ -208,7 +208,7 @@ objimpl.o:		$(OBJIMPL)
 # module partitions
 ureserve-isnot.o:	ureserve-isnot.ccm
 ureserve-charx.o:	ureserve-charx.ccm
-ureserve-isx.o:		ureserve-isx.ccm
+ureserve-isch.o:	ureserve-isch.ccm
 ureserve-sfx.o:		ureserve-sfx.ccm
 ureserve-strop.o:	ureserve-strop.ccm
 ureserve-fieldterm.o:	ureserve-fieldterm.ccm
