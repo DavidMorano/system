@@ -83,7 +83,7 @@
 #include	<matxstr.h>		/* LIBUC |matpcasestr(3uc)| */
 #include	<char.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -226,7 +226,7 @@ local int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 		}
 		if (sl > 0) {
 		    cint	ch = mkchar(sp[0]) ;
-		    f_dig = isalphalatin(ch) ;
+		    f_dig = ischalpha(ch) ;
 	        }
 	        if ((ti = siourbrk(sp,sl,f_dig)) >= 0) {
 		    {
@@ -288,7 +288,7 @@ local int parsemonth(cchar *mp,int ml) noex {
 	cchar		*cp ;
 	if (int cl ; (cl = sfshrink(mp,ml,&cp)) > 0) ylikely {
 	    cint	ch = mkchar(cp[0]) ;
-	    if (isalphalatin(ch)) {
+	    if (ischalpha(ch)) {
 	        mi = matpcasestr(calstrs_months,2,cp,cl) ;
 	        rs = (mi >= 0) ? mi : SR_INVALID ;
 	    } else {
@@ -305,9 +305,9 @@ local int siourbrk(cchar *sp,int sl,int f_dig) noex {
 	for (i = 0 ; i < sl ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
 	    if (f_dig) {
-		f = isdigitlatin(ch) ;
+		f = ischdigit(ch) ;
 	    } else {
-		f = isalphalatin(ch) ;
+		f = ischalpha(ch) ;
 	    }
 	    f = f || ((ch == '-') || (ch == '/') || (ch == ':')) ;
 	    f = f || CHAR_ISWHITE(ch) ;
