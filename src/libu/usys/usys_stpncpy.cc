@@ -24,11 +24,15 @@
 	Description:
 	This subroutine concatenates c-strings into a single resulting
 	destination c-string.  It will not overflow the destiantion
-	character buffer length.¹  
-	
-	Notes:
-	1. The result is always NUL-terminated (even beyond the
-	destination character buffer length if necessary).
+	character buffer length.¹  Also, if the number of bytes
+	copied ito the destination buffer is less than the given
+	length of the destination buffer, the destiantion buffer
+	is zero-filled.
+
+	Notes: 
+	1. The result is **not** NUL-terminated if the given source
+	c-strings amount to more bytes than the given destiantion
+	buffer length.
 
 *******************************************************************************/
 
