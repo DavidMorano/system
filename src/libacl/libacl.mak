@@ -39,12 +39,9 @@ LIBS +=
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
-
 LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
@@ -66,7 +63,7 @@ OBJA_LIBACL= obj0_libacl.o
 OBJ_LIBACL= $(OBJA_LIBACL)
 
 
-.SUFFIXES:		.hh .ii
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).o
@@ -80,6 +77,9 @@ all:			$(ALL)
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
+
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
@@ -91,6 +91,9 @@ all:			$(ALL)
 
 .cc.o:
 	$(COMPILE.cc) $<
+
+.ccm.o:
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
 $(T).o:			$(OBJ_LIBACL)
@@ -114,23 +117,23 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_libacl.o:	$(OBJ0_LIBACL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBACL)
+obj0_libacl.o:		$(OBJ0_LIBACL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_libacl.o:	$(OBJ1_LIBACL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBACL)
+obj1_libacl.o:		$(OBJ1_LIBACL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_libacl.o:	$(OBJ2_LIBACL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBACL)
+obj2_libacl.o:		$(OBJ2_LIBACL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_libacl.o:	$(OBJ3_LIBACL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBACL)
+obj3_libacl.o:		$(OBJ3_LIBACL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj4_libacl.o:	$(OBJ4_LIBACL)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_LIBACL)
+obj4_libacl.o:		$(OBJ4_LIBACL)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-aclinfo.o:		aclinfo.cc	$(INCS)
-acltypes.o:		acltypes.cc	$(INCS)
+aclinfo.o:		aclinfo.cc	aclinfo.h		$(INCS)
+acltypes.o:		acltypes.cc	acltypes.h		$(INCS)
 
 
