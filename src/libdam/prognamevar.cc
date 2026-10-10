@@ -86,10 +86,10 @@ prognamevar::prognamevar(int argc,cmv argv,cmv envv) noex {
 	if ((argc > 0) && argv[0]) {
 	    if (proc(argv[0]) == false) {
 		procenv(envv) ;
-	    }
+	    } /* end */
 	} else {
 	    procenv(envv) ;
-	}
+	} /* end */
 } /* end ctor (prognamevar) */
 
 prognamevar::prognamevar(cchar *ap,int al) noex {
@@ -146,11 +146,11 @@ prognamevar::operator ccharp () noex {
 			cint rsnomem = SR_NOMEM ;
 			ulogerror("prognamevar",rsnomem,"mem-alloc failure") ;
 			rp = "«mem-alloc-failure»" ;
-		    }
+		    } /* end */
 	        } else {
 		    strwcpy(buf,sp,sl) ;
 		    rp = buf ;
-	        }
+	        } /* end */
 	    } /* end if (possibly required) */
 	} /* end if (need calculation) */
 	return rp ;
@@ -172,7 +172,7 @@ bool prognamevar::proc(cchar *pp,int pl) noex {
 	    } else if (si < 0) {
 		sl = pl ;
 		f = true ;
-	    }
+	    } /* end */
         } /* end if (sfbasename) */
 	return f ;
 } /* end method (prognamevar::proc) */
@@ -187,7 +187,7 @@ bool prognamevar::procenv(con mainv envv) noex {
 		    f = proc(d.execname) ;
 		} else if (rs < 0) {
 		    ulogerror("prognamevar",rs,"shellunder") ;
-		}
+		} /* end */
 	    } /* end if (getourenv) */
 	} /* end if (non-null) */
 	return f ;
