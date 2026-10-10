@@ -740,6 +740,11 @@ ismisc.o:		ismisc.dir
 ismisc.dir:
 	makesubdir $@
 
+# ISFD
+isfd.o:			isfd.dir
+isfd.dir:
+	makesubdir $@
+
 # ISFILEDESC
 isfiledesc.o:		isfiledesc.dir
 isfiledesc.dir:
