@@ -86,7 +86,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC |hasalldig(3uc)| */
-#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischdigit(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
