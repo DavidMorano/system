@@ -54,21 +54,21 @@
 /* local variables */
 
 constexpr mapex_map	def[] = {
-    	{ SR_INVALID,	EX_USAGE },
-	{ SR_NOENT,	EX_NOUSER },
-	{ SR_AGAIN,	EX_TEMPFAIL },
-	{ SR_DEADLK,	EX_TEMPFAIL },
-	{ SR_NOLCK,	EX_TEMPFAIL },
-	{ SR_TXTBSY,	EX_TEMPFAIL },
-	{ SR_ACCESS,	EX_NOPERM },
-	{ SR_PERM,	EX_NOPERM },
-	{ SR_REMOTE,	EX_PROTOCOL },
-	{ SR_NOSPC,	EX_TEMPFAIL },
-	{ SR_INTR,	EX_INTR },
-	{ SR_EXIT,	EX_TERM },
-	{ SR_NOMSG,	EX_OSERR },
-	{ SR_NOSYS,	EX_OSFILE },
-	{ 0, 0 }
+    	{ SR_INVALID,	EX_USAGE	},
+	{ SR_NOENT,	EX_NOUSER	},
+	{ SR_AGAIN,	EX_TEMPFAIL	},
+	{ SR_DEADLK,	EX_TEMPFAIL	},
+	{ SR_NOLCK,	EX_TEMPFAIL	},
+	{ SR_TXTBSY,	EX_TEMPFAIL	},
+	{ SR_ACCESS,	EX_NOPERM	},
+	{ SR_PERM,	EX_NOPERM	},
+	{ SR_REMOTE,	EX_PROTOCOL	},
+	{ SR_NOSPC,	EX_TEMPFAIL	},
+	{ SR_INTR,	EX_INTR		},
+	{ SR_EXIT,	EX_TERM		},
+	{ SR_NOMSG,	EX_OSERR	},
+	{ SR_NOSYS,	EX_OSFILE	},
+	{ 0, 		0		}
 } ; /* end array (mapex) */
 
 cbool		f_debug		= CF_DEBUG ;
