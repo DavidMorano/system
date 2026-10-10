@@ -75,7 +75,7 @@
 #include	<snx.h>			/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<permx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<opensysdbs.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
