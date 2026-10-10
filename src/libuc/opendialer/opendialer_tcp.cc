@@ -135,16 +135,8 @@ local int argparse_finish(struct argparse *) noex ;
 
 /* exported subroutines */
 
-int opendialer_tcp(pr,prn,svc,of,om,argv,envv,to)
-cchar	*pr ;
-cchar	*prn ;
-cchar	*svc ;
-int		of ;
-mode_t		om ;
-cchar	**argv ;
-cchar	**envv ;
-int		to ;
-{
+int opendialer_tcp(cc *pr,cc *prn,cc *svc,
+		int of,mode_t om,con mainv argv,con mainv envv,int to) noex {
 	ARGPARSE	ai ;
 	int		rs = SR_OK ;
 	int		rs1 ;
