@@ -90,7 +90,7 @@
 #include	<strn.h>		/* LIBUC |strnwcpyxc(3uc)| */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC |hasalldig(3uc)| */
-#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischdigit(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
@@ -903,11 +903,11 @@ local int dater_ldname(dater *op,cchar *zstrp,int zstrl) noex {
 	    znwcpy(dnp,znl,zstrp,zstrl) ;
 	    if ((! op->fl.zoff) || (op->b.dstflag < 0)) {
 	        cint	ch = mkchar(dnp[0]) ;
-	        if (ispm(ch) || isdigitlatin(ch)) {
+	        if (ischpm(ch) || ischdigit(ch)) {
 	            rs = dater_pnum(op) ;
 	        } else {
 	            rs = dater_pname(op) ;
-	        }
+	        } /* end if */
 	    } /* end if (needed zone offset from name) */
 	} /* end if (znlen) */
 	return rs ;
@@ -916,12 +916,12 @@ local int dater_ldname(dater *op,cchar *zstrp,int zstrl) noex {
 /* parse a time zone-name */
 
 #ifdef	COMMENT
-TIMEB {
+struct timeb {
 	time_t	time ;		/* time, seconds since the epoch */
 	ushort	millitm ;	/* 1000 msec of additional accuracy */
 	short	timezone ;	/* timezone, minutes west of GMT */
 	short	dstflag ;	/* daylight savings when appropriate? */
-} ;
+} ; /* end struct (timeb) */
 #endif /* COMMENT */
 
 local int dater_pname(dater *op) noex {
