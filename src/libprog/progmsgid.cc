@@ -75,7 +75,7 @@ struct vars {
 
 /* forward references */
 
-static int	mkvars() noex ;
+local int	mkvars() noex ;
 
 
 /* local variables */
@@ -144,7 +144,7 @@ int progmsgid(proginfo *pip,char *mbuf,int mlen,int serial) noex {
 
 /* local subroutines */
 
-static int mkvars() noex {
+local int mkvars() noex {
 	int		rs ;
 	if ((rs = bufsizeget(bufsize_un)) >= 0) {
 	    var.usernamelen = rs ;
