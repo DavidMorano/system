@@ -25,10 +25,14 @@
 
 
 EXTERNC_begin
-
 extern int mkhexstr	(char *,int,cvoid *,int) noex ;
-
 EXTERNC_end
+
+#ifdef	__cplusplus
+local inline int mkhexstr(char *dp,int dl,cvoid *sp) noex {
+    	return mkhexstr(dp,dl,sp,-1) ;
+} /* end */
+#endif /* __cplusplus */
 
 
 #endif /* MKHEX_INCLUDE */
