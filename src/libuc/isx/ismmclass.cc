@@ -55,7 +55,7 @@
 #include	<ascii.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"ischarx.h"		/* |isprintlatin(3uc)| */
+#include	"isch.h"		/* |ischprint(3uc)| */
 #include	"ismmclass.h"
 
 
@@ -93,7 +93,7 @@ bool ismmclass_7bit(int ch) noex {
 	bool		f = false ;
 	ch &= UCHAR_MAX ;
 	if (ch < 0x80) {
-	    f = f || isprintlatin(ch) ;
+	    f = f || ischprint(ch) ;
 	    f = f || (ch == '\n') ;
 	    f = f || (ch == '\r') ;
 	    f = f || (ch == CH_TAB) ;
