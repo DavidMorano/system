@@ -37,7 +37,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<iserror.h>
 #include	<isindomain.h>
 #include	<isinetaddr.h>
