@@ -39,7 +39,7 @@
 #define	STRUCT_MAPEXMAP
 struct mapex_map {
 	int	rs, ex ;
-} ;
+} ; /* end struct (mapex_map) */
 #endif /* STRUCT_MAPEXMAP */
 
 #ifndef	EXTERN_MAXEX
