@@ -28,7 +28,7 @@
 
 #pragma		GCC dependency		"mod/ureserve.ccm"
 
-import ureserve ;			/* |is{x}(3u)| */
+import ureserve ;			/* |isch(3u)| */
 
 /* local defines */
 
@@ -60,7 +60,7 @@ import ureserve ;			/* |is{x}(3u)| */
 /* exported subroutines */
 
 bool iswhite(int ch) noex attrpure {
-    	return iswhitelatin(ch) ;
+    	return ischwhite(ch) ;
 } /* end subroutine (iswhite) */
 
 bool isbinar(int ch) noex attrconst {
@@ -72,7 +72,7 @@ bool isoctal(int ch) noex attrconst {
 } /* end subroutine (isoctal) */
 
 bool isdigex(int ch) noex attrpure {
-    	return isdigexlatin(ch) ;
+    	return ischdigex(ch) ;
 } /* end subroutine (isdigex) */
 
 
