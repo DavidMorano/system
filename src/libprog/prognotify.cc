@@ -118,13 +118,13 @@ struct reportinfo {
 
 /* forward references */
 
-static int	prognotifyrecip(proginfo *,vecobj *,
+local int	prognotifyrecip(proginfo *,vecobj *,
 			REPORTINFO *,paramfile *,RECIP *) noex ;
-static int	prognotifyrecipnode(proginfo *,vecobj *,
+local int	prognotifyrecipnode(proginfo *,vecobj *,
 			REPORTINFO *,RECIP *,cchar *,int) noex ;
-static int	report(proginfo *,REPORTINFO *) noex ;
+local int	report(proginfo *,REPORTINFO *) noex ;
 
-static int	searchfunc() noex ;
+local int	searchfunc() noex ;
 
 
 /* local variables */
@@ -228,7 +228,7 @@ int prognotify(proginfo *pip,vecobj *mip,vecobj *rsp) noex {
 
 /* local subroutines */
 
-static int prognotifyrecip(proginfo *pip,vecobj *mip,REPORTINFO *rip,
+local int prognotifyrecip(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 		paramfile *mbp,RECIP *rp) noex {
 	paramfile_cur	cur ;
 	int		rs = SR_OK ;
@@ -280,7 +280,7 @@ static int prognotifyrecip(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 }
 /* end subroutine (prognotifyrecip) */
 
-static int prognotifyrecipnode(proginfo *pip,vecobj *mip,REPORTINFO *rip,
+local int prognotifyrecipnode(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 		RECIP *rp,cc *nn,int port) noex {
 	HOSTENT		he, *hep = &he ;
 	MSGINFO		mi, *iep = &mi ;
@@ -348,7 +348,7 @@ static int prognotifyrecipnode(proginfo *pip,vecobj *mip,REPORTINFO *rip,
 }
 /* end subroutine (prognotifyrecipnode) */
 
-static int report(proginfo *pip,REPORTINFO *rip) noex {
+local int report(proginfo *pip,REPORTINFO *rip) noex {
 	SOCKADDR	*sap = (SOCKADDR *) &rip->sa ;
 	cint		mlen = MSGBUFLEN ;
 	cint		to = pip->to_msgread ;
@@ -379,7 +379,7 @@ static int report(proginfo *pip,REPORTINFO *rip) noex {
 }
 /* end subroutine (report) */
 
-static int searchfunc(MSGINFO **e1pp,MSGINFO **e2pp) noex {
+local int searchfunc(MSGINFO **e1pp,MSGINFO **e2pp) noex {
 	int		rc = 0 ;
 	if (*e1pp || *e2pp) {
 	    if (*e1pp) {
