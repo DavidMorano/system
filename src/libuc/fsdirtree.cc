@@ -71,7 +71,7 @@
 #include	<matstr.h>		/* LIBUC */
 #include	<filetypes.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
