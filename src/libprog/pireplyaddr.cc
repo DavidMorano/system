@@ -80,7 +80,7 @@ extern "C" {
 
 /* forward references */
 
-static int	piloadreply(PROGINFO *) noex ;
+local int	piloadreply(PROGINFO *) noex ;
 
 
 /* local variables */
@@ -124,7 +124,7 @@ int pimkreplyaddr(PROGINFO *pip) noex {
 
 /* local subroutines */
 
-static int piloadreply(PROGINFO *pip) noex {
+local int piloadreply(PROGINFO *pip) noex {
 	buffer		b ;
 	int		rs ;
 	int		rs1 ;
