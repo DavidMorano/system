@@ -26,8 +26,8 @@
 
 EXTERNC_begin
 
-extern int mkpr(char *,int,cchar *,cchar *) noex ;
-extern int getrootdname(char *,int,cchar *,cchar *) noex ;
+extern int mkpr		(char *,int,cchar *,cchar *) noex ;
+extern int getrootdname	(char *,int,cchar *,cchar *) noex ;
 
 EXTERNC_end
 
