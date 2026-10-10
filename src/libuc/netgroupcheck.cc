@@ -46,7 +46,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<vecstr.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -87,7 +87,7 @@ int netgroupcheck(cchar *dname,vecstr *glp,vecstr *nlp) noex {
 	                for (int j = 0 ; nlp->get(j,&mnp) >= 0 ; j += 1) {
 	                    if (mnp) {
 			        cint	ch = mkchar(mnp[0]) ;
-	                        if (! isdigitlatin(ch)) {
+	                        if (! ischdigit(ch)) {
 	                            f = innetgr(ngp,mnp,nullptr,dname) ;
 	 	                    if (f) break ;
 			        }
