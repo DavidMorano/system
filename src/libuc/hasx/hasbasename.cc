@@ -51,7 +51,7 @@
 #include	<usupport.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<strwcmp.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |isalphalatin(3u)| */
+#include	<isch.h>		/* LIBUC |ischalpha(3u)| */
 #include	<localmisc.h>		/* LIBU |UC(3u)| */
 
 #include	"hasbasename.h"
