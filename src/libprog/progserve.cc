@@ -65,6 +65,7 @@
 #include	<procse.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -268,7 +269,7 @@ cchar	*sav[] ;
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: %s svc=%s\n",pip->progname,
-	        timestr_logz(pip->daytime,timebuf), cip->service) ;
+	        strtime_logz(pip->daytime,timebuf), cip->service) ;
 	    if (cip->subservice != nullptr)
 	        bprintf(pip->efp,"%s: subsvc=%s\n", pip->progname,
 	            cip->subservice) ;
@@ -276,7 +277,7 @@ cchar	*sav[] ;
 
 	if (pip->open.logprog) {
 	    proglog_printf(pip,"%s svc=%s\n",
-	        timestr_logz(pip->daytime,timebuf), cip->service) ;
+	        strtime_logz(pip->daytime,timebuf), cip->service) ;
 	    if (cip->subservice != nullptr)
 	        proglog_printf(pip,"subsvc=%s\n", cip->subservice) ;
 	}
@@ -330,7 +331,7 @@ cchar	*sav[] ;
 	if ((rs >= 0) && (! f_served) && pip->fl.loginsvc) {
 	    if (pip->fl.useracct && (strcmp(cip->service,"help") != 0)) {
 	        struct passwd	pw ;
-	        const int	pwlen = bufsizeget(bufsize_pw) ;
+	        cint	pwlen = bufsizeget(bufsize_pw) ;
 	        char		*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            cchar	*svc = cip->service ;
@@ -644,7 +645,7 @@ PROCSE		*sep ;
 VECSTR		*alp ;
 cchar	*argz ;
 {
-	const int	nlen = MAXNAMELEN ;
+	cint	nlen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		pnl ;
 	int		enl = 0 ;
@@ -1138,8 +1139,8 @@ local int loadcooks(PROGINFO *pip,CLIENTINFO *cip,cchar **sav)
 
 	if ((rs >= 0) && (cip->salen > 0)) {
 	    SOCKADDRESS	*sap = &cip->sa ;
-	    const int	alen = MAXPATHLEN ;
-	    const int	vlen = INETX_ADDRSTRLEN ;
+	    cint	alen = MAXPATHLEN ;
+	    cint	vlen = INETX_ADDRSTRLEN ;
 	    int		af = sockaddress_getaf(&cip->sa) ;
 	    cchar	*name = "ipaddr" ;
 	    char	abuf[MAXPATHLEN+1] ;
