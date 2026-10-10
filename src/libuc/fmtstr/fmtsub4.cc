@@ -49,7 +49,7 @@ module ;
 #include	<ascii.h>		/* LIBU |CH_{x}| */
 #include	<strn.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
