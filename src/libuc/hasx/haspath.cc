@@ -170,7 +170,7 @@ bool haspathmulti(cchar *sp,int sl) noex {
 local bool hasmulti(cchar *cp,int cl) noex {
     	bool f = false ;
 	if (cl > 1) {
-	    f = (cp[0] == chx_multi) && isalphalatin(cp[1]) ;
+	    f = (cp[0] == chx_multi) && ischalpha(cp[1]) ;
 	}
     	return f ;
 } /* end subroutine (hasmulti) */
