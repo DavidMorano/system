@@ -20,11 +20,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 
 #define	ACLTYPES	enum acltypes
@@ -40,7 +40,7 @@ enum acltypes {
 	acltype_defother,
 	acltype_defmask,
 	acltype_overlast
-} ;
+} ; /* end enum */
 
 
 EXTERNC_begin
