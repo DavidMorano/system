@@ -84,6 +84,7 @@
 #include	<strx.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU */
 
 #include	"opendialer_finger.h"
 #include	"defs.h"
@@ -91,6 +92,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import deb ;
 
 /* local defines */
 
@@ -102,10 +104,14 @@ import libutil ;			/* |lenstr(3u)| */
 #define	PORTSPEC_FINGER	"finger"
 #endif
 
-#define	ARGPARSE	struct argparse
+#define	ARGPARSE	argparse
 
 #ifndef	SVCLEN
 #define	SVCLEN		MAXNAMELEN
+#endif
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #endif
 
 
@@ -151,21 +157,18 @@ local int argparse_start(struct argparse *,cchar *) noex ;
 local int argparse_finish(struct argparse *) noex ;
 
 
+/* local variables */
+
+cbool		f_debug		= CF_DEBUG ;
+
+
 /* exported variables */
 
 
 /* exported subroutines */
 
-int opendialer_finger(pr,prn,svc,of,om,argv,envv,to)
-cchar	*pr ;
-cchar	*prn ;
-cchar	*svc ;
-int		of ;
-mode_t		om ;
-cchar	**argv ;
-cchar	**envv ;
-int		to ;
-{
+int opendialer_finger(cc *pr,cc *prn,cc *svc,
+		int of,mode_t om,con mainv argv,con mainv envv,int to) noex {
 	ARGPARSE	ai ;
 	int		rs = SR_OK ;
 	int		argc = 0 ;
@@ -179,10 +182,10 @@ int		to ;
 #if	CF_DEBUG
 	{
 	    int	i ;
-	    debugprintf("opendialer_finger: svc=%s\n",svc) ;
+	    DEBPRINTF("svc=%s\n",svc) ;
 	    if (argv != nullptr) {
 	        for (i = 0 ; argv[i] != nullptr ; i += 1) {
-	            debugprintf("opendialer_finger: a[%u]=%s\n",i,argv[i]) ;
+	            DEBPRINTF("a[%u]=%s\n",i,argv[i]) ;
 	        }
 	    }
 	}
@@ -206,19 +209,19 @@ int		to ;
 */
 
 #if	CF_DEBUG
-	debugprintf("opendialer_finger: argz=%s\n",argz) ;
+	DEBPRINTF("argz=%s\n",argz) ;
 #endif
 
 	if ((rs = argparse_start(&ai,argz)) >= 0) {
 
 #if	CF_DEBUG
-	    debugprintf("opendialer_finger: svc=%s\n",svc) ;
-	    debugprintf("opendialer_finger: ai.s1=%s\n",ai.s1) ;
-	    debugprintf("opendialer_finger: ai.s2=%s\n",ai.s2) ;
-	    debugprintf("opendialer_finger: ai.s3=%s\n",ai.s3) ;
-	    debugprintf("opendialer_finger: ai.to=%d\n",ai.to) ;
-	    debugprintf("opendialer_finger: ai.af=%d\n",ai.af) ;
-	    debugprintf("opendialer_finger: ai.f_long=%u\n",ai.f_long) ;
+	    DEBPRINTF("svc=%s\n",svc) ;
+	    DEBPRINTF("ai.s1=%s\n",ai.s1) ;
+	    DEBPRINTF("ai.s2=%s\n",ai.s2) ;
+	    DEBPRINTF("ai.s3=%s\n",ai.s3) ;
+	    DEBPRINTF("ai.to=%d\n",ai.to) ;
+	    DEBPRINTF("ai.af=%d\n",ai.af) ;
+	    DEBPRINTF("ai.f_long=%u\n",ai.f_long) ;
 #endif /* CF_DEBUG */
 
 	    if (ai.to >= 0) to = ai.to ;
@@ -245,8 +248,8 @@ int		to ;
 	    }
 
 #if	CF_DEBUG
-	debugprintf("opendialer_finger: args rs=%d \n",rs) ;
-	debugprintf("opendialer_finger: hn=%s ps=%s svc=%s\n",
+	DEBPRINTF("args rs=%d \n",rs) ;
+	DEBPRINTF("hn=%s ps=%s svc=%s\n",
 		hostname,portspec,svc) ;
 #endif
 
@@ -260,7 +263,7 @@ int		to ;
 		    cchar	**av = (cchar **) bp ;
 
 #if	CF_DEBUG
-		    debugprintf("opendialer_finger: svc=%s\n",
+		    DEBPRINTF("svc=%s\n",
 			svc) ;
 #endif
 
@@ -274,18 +277,18 @@ int		to ;
 
 #if	CF_DEBUG
 	            for (n = 0 ; av[n] != nullptr ; n += 1) {
-	                debugprintf("opendialer_finger: a[%u]=%s\n",n,av[n]) ;
+	                DEBPRINTF("a[%u]=%s\n",n,av[n]) ;
 		    }
 #endif
 
 /* continue */
 
 #if	CF_DEBUG
-		    debugprintf("opendialer_finger: mid rs=%d f_long=%u\n",
+		    DEBPRINTF("mid rs=%d f_long=%u\n",
 			rs,ai.f_long) ;
-		    debugprintf("opendialer_finger: hostname=%s\n",hostname) ;
-		    debugprintf("opendialer_finger: portspec=%s\n",portspec) ;
-		    debugprintf("opendialer_finger: svc=%s\n",svc) ;
+		    DEBPRINTF("hostname=%s\n",hostname) ;
+		    DEBPRINTF("portspec=%s\n",portspec) ;
+		    DEBPRINTF("svc=%s\n",svc) ;
 #endif
 
 	    	    if (rs >= 0) {
@@ -305,7 +308,7 @@ int		to ;
 ret0:
 
 #if	CF_DEBUG
-	debugprintf("opendialer_finger: ret rs=%d fd=%u\n",rs,fd) ;
+	DEBPRINTF("ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
@@ -337,7 +340,7 @@ local int argparse_start(struct argparse *app,cchar *args)
 	app->af = -1 ;
 
 #if	CF_DEBUG
-	    debugprintf("opendialer_finger/argparse_start: args=%s\n",args) ;
+	    DEBPRINTF("argparse_start: args=%s\n",args) ;
 #endif
 
 	if ((args == nullptr) || (args[0] == '\0')) goto ret0 ;
@@ -356,7 +359,7 @@ local int argparse_start(struct argparse *app,cchar *args)
 	        s2p = sp ;
 	        s2l = -1 ;
 #if	CF_DEBUG
-	    debugprintf("opendialer_finger/argparse_start: s=%s\n",sp) ;
+	    DEBPRINTF("argparse_start: s=%s\n",sp) ;
 #endif
 	        if ((tp = strbrk(sp,":,")) != nullptr) {
 		    s2l = (tp-sp) ;
@@ -372,13 +375,13 @@ local int argparse_start(struct argparse *app,cchar *args)
 		}
 	    }
 #if	CF_DEBUG
-	    debugprintf("opendialer_finger/argparse_start: s1=>%r<\n",
+	    DEBPRINTF("s1=>%r<\n",
 		s1p,s1l) ;
-	    debugprintf("opendialer_finger/argparse_start: s2=>%r<\n",
+	    DEBPRINTF("s2=>%r<\n",
 		s2p,s2l) ;
-	    debugprintf("opendialer_finger/argparse_start: s3=>%r<\n",
+	    DEBPRINTF("s3=>%r<\n",
 		s3p,s3l) ;
-	    debugprintf("opendialer_finger/argparse_start: s=>%s<\n",sp) ;
+	    DEBPRINTF("s=>%s<\n",sp) ;
 #endif
 	    ch = (sp[0] & 0xff) ;
 	    while (ch) {
@@ -392,7 +395,7 @@ local int argparse_start(struct argparse *app,cchar *args)
 		    nsp = (sp+opl) ;
 	        }
 #if	CF_DEBUG
-	    debugprintf("opendialer_finger/argparse_start: op=>%r<\n",opp,opl) ;
+	    DEBPRINTF("op=>%r<\n",opp,opl) ;
 #endif
 		kp = opp ;
 		kl = opl ;
@@ -404,9 +407,9 @@ local int argparse_start(struct argparse *app,cchar *args)
 		    vl = (opp+opl) - (tp+1) ;
 		}
 #if	CF_DEBUG
-	        debugprintf("opendialer_finger/argparse_start: k=%r\n",kp,kl) ;
+	        DEBPRINTF("k=%r\n",kp,kl) ;
 		if (vp != nullptr) 
-	            debugprintf("opendialer_finger/argparse_start: v=%r\n",
+	            DEBPRINTF("v=%r\n",
 			vp,vl) ;
 #endif
 	        if ((oi = matstr(ops,kp,kl)) >= 0) {
@@ -434,8 +437,7 @@ local int argparse_start(struct argparse *app,cchar *args)
 		} /* end if */
 	        sp = nsp ;
 #if	CF_DEBUG
-	        debugprintf("opendialer_finger/argparse_start: "
-		    "while-bot rs=%d\n",rs) ;
+	        DEBPRINTF("while-bot rs=%d\n",rs) ;
 #endif
 		if (rs < 0) break ;
 	        ch = (sp[0] & 0xff) ;
