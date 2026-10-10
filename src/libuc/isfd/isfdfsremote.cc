@@ -1,0 +1,95 @@
+/* isfdfsremote SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* is the file on a local or remote filesystem? */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2000-05-14, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	isfdfsremote
+
+	Description:
+	This subroutine checks if the specified file-descriptor
+	(FD) points to a file on a remote file-system.
+
+	Synopsis:
+	int isfdfsremote(int fd) noex
+
+	Arguments:
+	fd		file-descriptor to check
+
+	Returns:
+	>0		Yes, on a remote file-system
+	==0		not on remote file-system
+	<0		error (system-return)
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<matxstr.h>		/* LIBUC |matlocalfs(3uc)| */
+#include	<getfstype.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"isfd.h"
+
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward refernces */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int isfdfsremote(int fd) noex {
+	int		rs ;
+	int		f = false ;
+	if ((rs = bufsizeget(bufsize_un)) >= 0) {
+	    cint	fslen = rs ;
+	    char	fstype[fslen+ 1] ;	/* <- VLA (yeh!) */
+	    if ((rs = getfstype(fstype,fslen,fd)) >= 0) {
+	        f = (matlocalfs(fstype,rs) < 0) ;
+	    } /* end if */
+	} /* end if (bufsizeget) */
+	return (rs >= 0) ? f : rs ;
+} /* end subroutine (isfdfsremote) */
+
+
