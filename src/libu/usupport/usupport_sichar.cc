@@ -116,28 +116,28 @@ local int sichar(ischr_f ischr,cchar *sp,int sl) noex {
 
 namespace libu {
     int sialpha(cchar *sp,int sl) noex {
-    	return sichar(isalphalatin,sp,sl) ;
+    	return sichar(ischalpha,sp,sl) ;
     } /* end subroutine (sialpha) */
     int sialnum(cchar *sp,int sl) noex {
-    	return sichar(isalnumlatin,sp,sl) ;
+    	return sichar(ischalnum,sp,sl) ;
     } /* end subroutine (sialnum) */
     int sidigit(cchar *sp,int sl) noex {
-    	return sichar(isdigitlatin,sp,sl) ;
+    	return sichar(ischdigit,sp,sl) ;
     } /* end subroutine (sidigit) */
     int sidigex(cchar *sp,int sl) noex {
-    	return sichar(isdigexlatin,sp,sl) ;
+    	return sichar(ischdigex,sp,sl) ;
     } /* end subroutine (sidigex) */
     int sibinar(cchar *sp,int sl) noex {
-    	return sichar(isbinarlatin,sp,sl) ;
+    	return sichar(ischbinar,sp,sl) ;
     } /* end subroutine (sioctal) */
     int sioctal(cchar *sp,int sl) noex {
-    	return sichar(isoctallatin,sp,sl) ;
+    	return sichar(ischoctal,sp,sl) ;
     } /* end subroutine (sioctal) */
     int siwhite(cchar *sp,int sl) noex {
-    	return sichar(iswhitelatin,sp,sl) ;
+    	return sichar(ischwhite,sp,sl) ;
     } /* end subroutine (siwhite) */
     int siblank(cchar *sp,int sl) noex {
-    	return sichar(isblanklatin,sp,sl) ;
+    	return sichar(ischblank,sp,sl) ;
     } /* end subroutine (siblank) */
 } /* end namespace (libu) */
 
