@@ -159,15 +159,15 @@ namespace libu {
 
 namespace libu {
     int rmeol(cchar *sp,int sl) noex {
-    	rmtrailer to(iseol) ;
+    	rmtrailer to(ischeol) ;
 	return to(sp,sl) ;
     } /* end subroutine (rmeol) */
     int rmwht(cchar *sp,int sl) noex {
-    	rmtrailer to(iswht) ;
+    	rmtrailer to(ischwht) ;
 	return to(sp,sl) ;
     } /* end subroutine (rmwht) */
     int rmblk(cchar *sp,int sl) noex {
-    	rmtrailer to(isblk) ;
+    	rmtrailer to(ischblk) ;
 	return to(sp,sl) ;
     } /* end subroutine (rmblk) */
     int rmtrailclass(cchar *sp,int sl,cchar *ss) noex {
