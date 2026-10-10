@@ -73,7 +73,7 @@ module ;
 #include	<conintx.hh>		/* LIBU concept |stdintx| */
 #include	<cfutil.hh>		/* LIBUC namespace |cfx| */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |isplusminus(3uc)| */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
 
