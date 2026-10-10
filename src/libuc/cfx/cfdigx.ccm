@@ -96,7 +96,7 @@ module ;
 #include	<checkbase.h>		/* LIBUC */
 #include	<cfutil.hh>		/* namespace |cfx| */
 #include	<char.h>		/* LIBUC |CHAR_TOVAL(3uc)| */
-#include	<ischarx.h>		/* LIBUC |isplusminus(3uc)| */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 export module cfdigx ;
