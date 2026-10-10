@@ -1,12 +1,12 @@
-/* progpid */
+/* libprog_progpid SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* PID lock management */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
@@ -19,25 +19,25 @@
 
 /*******************************************************************************
 
+  	Description:
 	These subroutines manage the main process PID lock.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<lfm.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"config.h"
 #include	"defs.h"
@@ -56,18 +56,17 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	cfdecti(const char *,int,int *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	cfdecti(cchar *,int,int *) ;
 
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* forward references */
@@ -76,11 +75,12 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progpidbegin(PROGINFO *pip,int to)
-{
+int progpidbegin(PROGINFO *pip,int to) noex {
 	int		rs = SR_OK ;
 	int		f ;
 
@@ -113,11 +113,11 @@ int progpidbegin(PROGINFO *pip,int to)
 
 	        if (rs >= 0) {
 	            LFM		*lmp = &pip->pidlock ;
-	            const int	lt = LFM_TRECORD ;
-	            const char	*pf = pip->pidfname ;
-	            const char	*nn = pip->nodename ;
-	            const char	*un = pip->username ;
-	            const char	*bn = pip->banner ;
+	            cint	lt = LFM_TRECORD ;
+	            cchar	*pf = pip->pidfname ;
+	            cchar	*nn = pip->nodename ;
+	            cchar	*un = pip->username ;
+	            cchar	*bn = pip->banner ;
 	            if ((rs = lfm_start(lmp,pf,lt,to,NULL,nn,un,bn)) >= 0) {
 	                pip->open.pidlock = TRUE ;
 	            }
@@ -144,7 +144,7 @@ int progpidcheck(PROGINFO *pip)
 	    if (rs < 0) {
 	        cchar	*fmt ;
 	        char	tbuf[TIMEBUFLEN + 1] ;
-	        timestr_logz(dt,tbuf) ;
+	        strtime_logz(dt,tbuf) ;
 	        if (pip->open.logprog) {
 	            fmt = "%s lost PIDLOCK other PID=%d\n" ;
 	            proglog_printf(pip,fmt,tbuf,lc.pid) ;
