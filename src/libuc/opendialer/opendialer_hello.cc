@@ -110,16 +110,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* exported subroutines */
 
-int opendialer_hello(pr,prn,svc,of,om,argv,envv,to)
-char	*pr ;
-char	*prn ;
-char	*svc ;
-int		of ;
-mode_t		om ;
-char	**argv ;
-char	**envv ;
-int		to ;
-{
+int opendialer_hello(cc *pr,cc *prn,cc *svc,
+		int of,mode_t om,con mainv argv,con mainv envv,int to) noex {
 	int		rs = SR_OK ;
 	int		pipes[2] ;
 	int		fd = -1 ;
@@ -127,7 +119,7 @@ int		to ;
 	char	*sp = "hello world!\n" ;
 
 	if ((rs = u_pipe(pipes)) >= 0) {
-	    const int	wfd = pipes[1] ;
+	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
 
 	    if (sl < 0) sl = lenstr(sp) ;
