@@ -58,7 +58,7 @@ namespace libu {
 	    if (char ***ptr = _NSGetEnviron() ; ptr) {
 	        *rp = mainv(*ptr) ;
 	        rs = nenv(*rp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
  	return rs ;
     } /* end subroutine (usys_environ) */
@@ -74,7 +74,7 @@ namespace libu {
 	    if (environ) {
 	        *rp = mainv(environ) ;
 	        rs = nenv(*rp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
  	return rs ;
     } /* end subroutine (usys_environ) */
