@@ -42,7 +42,7 @@ LIBS=
 
 OBJ0_ISMISC= isdotdir.o isaccmode.o
 OBJ1_ISMISC= isleapyear.o
-OBJ2_ISMISC= isprime.o
+OBJ2_ISMISC= isprime.o isinteractive.o
 OBJ3_ISMISC= isobjspecial.o issamehostname.o
 
 OBJA_ISMISC= obj0_ismisc.o obj1_ismisc.o
@@ -127,11 +127,12 @@ obj3_ismisc.o:	$(OBJ3_ISMISC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-isdotdir.o:		isdotdir.cc				$(INCS)
-isleapyear.o:		isleapyear.cc				$(INCS)
-isobjspecial.o:		isobjspecial.cc				$(INCS)
-isprime.o:		isprime.cc				$(INCS)
-issamehostname.o:	issamehostname.cc			$(INCS)
-isaccmode.o:		isaccmode.cc		isaccmode.h	$(INCS)
+isdotdir.o:		isdotdir.cc					$(INCS)
+isleapyear.o:		isleapyear.cc					$(INCS)
+isobjspecial.o:		isobjspecial.cc					$(INCS)
+isprime.o:		isprime.cc					$(INCS)
+issamehostname.o:	issamehostname.cc				$(INCS)
+isaccmode.o:		isaccmode.cc		isaccmode.h		$(INCS)
+isinteractive.o:	isinteractive.cc	isinteractive.hh	$(INCS)
 
 
