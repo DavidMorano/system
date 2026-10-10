@@ -75,6 +75,7 @@
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
+#include	<deb.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"opendialer_prog.h"
 #include	"defs.h"
@@ -82,6 +83,7 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import deb ;
 
 /* local defines */
 
@@ -92,6 +94,10 @@ import libutil ;			/* |lenstr(3u)| */
 #define	EXTRABIN	"/usr/extra/bin"
 
 #define	NDF		"opendialer_prog.nd"
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
 
 
 /* external subroutines */
@@ -117,28 +123,21 @@ constexpr cpcchar	bins[] = {
 	nullptr
 } ; /* end array */
 
+cbool		f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-/* ARGSUSED */
-int opendialer_prog(pr,prn,svc,of,om,argv,envv,to)
-cchar	*pr ;
-cchar	*prn ;
-cchar	*svc ;
-int		of ;
-mode_t		om ;
-cchar	**argv ;
-cchar	**envv ;
-int		to ;
-{
+int opendialer_prog(cc *pr,cc *prn,cc *svc,
+		int of,mode_t om,con mainv argv,con mainv envv,int to) noex {
 	int		rs = SR_OK ;
 	char		pbuf[MAXPATHLEN+1] = { 0 } ;
 
 #if	CF_DEBUG
-	debugprintf("opendialer_prog: svc=%s\n",svc) ;
+	DEBPRINTF("svc=%s\n",svc) ;
 #endif
 
 	if (svc[0] == '\0') return SR_INVALID ;
