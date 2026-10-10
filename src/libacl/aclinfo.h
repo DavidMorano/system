@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* ACL information */
+/* Access-Control-List (ACL) information */
 /* version %I% last-modified %G% */
 
 
@@ -14,11 +14,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 
 #include	"acltypes.h"
 
@@ -27,13 +27,13 @@
 
 
 struct aclinfo_head {
-	uid		uid ;
-	gid		gid ;
+	uid_t		uid ;
+	gid_t		gid ;
 	int		type ;
 	int		soltype ;
 	int		op ;		/* add or subtract */
 	int		perm ;		/* permission bits */
-} ;
+} ; /* end struct */
 
 typedef ACLINFO		aclinfo ;
 
