@@ -101,10 +101,12 @@
 /* exported subroutines */
 
 namespace libu {
-    char *strdcpy1w(char *dp,int dl,cc *s1,int sl) noex {
+    char *strdcpy1w(char *dp,int dl,
+	    	cc *s1,int sl) noex {
 	return strdcpyxw(dp,dl,1,s1,sl) ;
     } /* end subroutine (strdcpy1w) */
-    char *strdcpy2w(char *dp,int dl,cc *s1,cc *s2,int sl) noex {
+    char *strdcpy2w(char *dp,int dl,
+	    	cc *s1,cc *s2,int sl) noex {
 	return strdcpyxw(dp,dl,2,s1,s2,sl) ;
     } /* end subroutine (strdcpy2w) */
     char *strdcpy3w(char *dp,int dl,cc *s1,cc *s2,cc *s3,int sl) noex {
