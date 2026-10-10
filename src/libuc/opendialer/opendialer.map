@@ -2,15 +2,16 @@
 
 DAMopendialer {
 	global:
+		opendialer_finger ;
 		opendialer_hello ;
 		opendialer_prog ;
 		opendialer_tcp ;
 		opendialer_tcpnls ;
 		opendialer_tcpmux ;
+		opendialer_ticotsord ;
 		opendialer_uss ;
 		opendialer_ussnls ;
 		opendialer_ussmux ;
-		opendialer_finger ;
 	local:
 		* ;
 } ;
