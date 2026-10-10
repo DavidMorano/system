@@ -205,6 +205,7 @@
 #include	<strstore.h>
 #include	<strtab.h>
 #include	<strtabfind.h>
+#include	<strtime.h>
 #include	<strval.h>
 #include	<strw.h>
 #include	<strwcpy.h>
@@ -229,7 +230,6 @@
 #include	<thrbase.h>
 #include	<thrcomm.h>
 #include	<timeout.h>
-#include	<timestr.h>
 #include	<tmpx.h>
 #include	<toxc.h>
 #include	<ucaddrinfo.h>
