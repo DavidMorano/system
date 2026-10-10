@@ -35,7 +35,7 @@
 #include	<ascii.h>		/* LIBU */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<libb.h>		/* LIBB */
+#include	<bfile.h>		/* LIBB */
 
 #include	"cci_config.h"
 #include	"defs.h"
