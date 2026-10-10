@@ -68,17 +68,16 @@ extern "C" {
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	msleep(int) ;
 extern int	isNotPresent(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* external variables */
@@ -101,7 +100,7 @@ extern "C" {
 
 /* forward references */
 
-static int pretime_loadsyms(PRETIME *) noex ;
+local int pretime_loadsyms(PRETIME *) noex ;
 
 
 /* local variables */
@@ -268,7 +267,7 @@ int pretime_modtimeb(TIMEB *tbp) noex {
 
 /* private subroutines */
 
-static int pretime_loadsyms(PRETIME *op) noex {
+local int pretime_loadsyms(PRETIME *op) noex {
 	int		rs = SR_OK ;
 	void		*sp ;
 	for (int i = 0 ; (rs >= 0) && (syms[i] != nullptr) ; i += 1) {
