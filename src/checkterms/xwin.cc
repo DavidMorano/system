@@ -44,7 +44,7 @@ int numpts;
 #define BUFSIZ 1024
 
 
-static void add_pts(pt)
+local void add_pts(pt)
 char *pt;
 {
 	if( numpts >=  MAX_PTS) {
@@ -54,7 +54,7 @@ char *pt;
 	sprintf(pts[numpts++],"/dev/%s",pt);
 }
 
-static void get_pts()
+local void get_pts()
 {
 	char cmd[BUFSIZ];
 	char buf[BUFSIZ];
@@ -147,7 +147,7 @@ int numttys;
 }
 
 /* dummy for the csignalandling stuff */
-static void touch_int_handler(arg)
+local void touch_int_handler(arg)
 int arg;
 {
 #if TEST
@@ -155,7 +155,7 @@ int arg;
 #endif
 }
 
-static void alarm_int_handler(arg)
+local void alarm_int_handler(arg)
 int arg;
 {
 	char cmd[BUFSIZ];
