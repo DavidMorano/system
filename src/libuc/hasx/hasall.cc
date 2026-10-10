@@ -111,7 +111,7 @@
 #include	<ascii.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<char.h>		/* LIBUC |CHAR_TOVAL(3uc)| */
-#include	<ischarx.h>		/* LIBUC |ishdrkey(3uc)| */
+#include	<isch.h>		/* LIBUC |ischhdrkey(3uc)| */
 #include	<localmisc.h>		/* LIBU |UC(3u)| */
 
 #include	"hasall.h"
@@ -167,51 +167,51 @@ local bool hasallx(isc_f isx,cchar *sp,int sl) noex {
 /* exported subroutines */
 
 bool hasallalpha(cchar *sp,int sl) noex {
-    	return hasallx(isalphalatin,sp,sl) ;
+    	return hasallx(ischalpha,sp,sl) ;
 } /* end subroutine (hasallalpha) */
 
 bool hasallalnum(cchar *sp,int sl) noex {
-    	return hasallx(isalnumlatin,sp,sl) ;
+    	return hasallx(ischalnum,sp,sl) ;
 } /* end subroutine (hasallalnum) */
 
 bool hasalldigit(cchar *sp,int sl) noex {
-    	return hasallx(isdigitlatin,sp,sl) ;
+    	return hasallx(ischdigit,sp,sl) ;
 } /* end subroutine (hasalldigit) */
 
 bool hasalldigex(cchar *sp,int sl) noex {
-    	return hasallx(isdigexlatin,sp,sl) ;
+    	return hasallx(ischdigex,sp,sl) ;
 } /* end subroutine (hasalldigex) */
 
 bool hasalloctal(cchar *sp,int sl) noex {
-    	return hasallx(isoctallatin,sp,sl) ;
+    	return hasallx(ischoctal,sp,sl) ;
 } /* end subroutine (hasalloctal) */
 
 bool hasallwhite(cchar *sp,int sl) noex {
-    	return hasallx(iswhitelatin,sp,sl) ;
+    	return hasallx(ischwhite,sp,sl) ;
 } /* end subroutine (hasallwhite) */
 
 bool hasallblank(cchar *sp,int sl) noex {
-    	return hasallx(isblanklatin,sp,sl) ;
+    	return hasallx(ischblank,sp,sl) ;
 } /* end subroutine (hasallwhite) */
 
 bool hasallprint(cchar *sp,int sl) noex {
-    	return hasallx(isprintlatin,sp,sl) ;
+    	return hasallx(ischprint,sp,sl) ;
 } /* end subroutine (hasallprint) */
 
 bool hasalllc(cchar *sp,int sl) noex {
-    	return hasallx(islowerlatin,sp,sl) ;
+    	return hasallx(ischlower,sp,sl) ;
 } /* end subroutine (hasalllc) */
 
 bool hasalluc(cchar *sp,int sl) noex {
-    	return hasallx(isupperlatin,sp,sl) ;
+    	return hasallx(ischupper,sp,sl) ;
 } /* end subroutine (hasalluc) */
 
 bool hasallhdrkey(cchar *sp,int sl) noex {
-    	return hasallx(ishdrkey,sp,sl) ;
+    	return hasallx(ischhdrkey,sp,sl) ;
 } /* end subroutine (hasallhdrkey) */
 
 bool hasallterm(cchar *sp,int sl) noex {
-    	return hasallx(istermlatin,sp,sl) ;
+    	return hasallx(ischterm,sp,sl) ;
 } /* end subroutine (hasallterm) */
 
 bool hasallbase(cchar *sp,int sl,int b) noex {
@@ -223,7 +223,7 @@ bool hasallbase(cchar *sp,int sl,int b) noex {
 	                cint v = CHAR_TOVAL(*sp) ;
 	                f = (v < b) ;
 	                f = f || (ch == '-') ;
-	                f = f || iswht(ch) ;
+	                f = f || ischwht(ch) ;
 	                f = f || (ch == CH_NBSP) ;
 	                if (! f) break ;
 	                sp += 1 ;
