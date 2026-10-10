@@ -62,8 +62,8 @@ import ureserve ;			/* |is{x}latin(3u)| */
 
 /* local defines */
 
-#define	ISUPP(ch)	isupperlatin(ch)
-#define	ISDIG(ch)	isdigitlatin(ch)
+#define	ISUPP(ch)	ischupper(ch)
+#define	ISDIG(ch)	ischdigit(ch)
 
 
 /* imported namespaces */
