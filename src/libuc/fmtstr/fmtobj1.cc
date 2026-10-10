@@ -102,7 +102,7 @@ module ;
 #include	<usyscalls.h>		/* LIBU */
 #include	<stdintx.h>		/* LIBU extended integer types */
 #include	<strnul.hh>		/* LIBU */
-#include	<snwcpyx.h>		/* LIBUC |snwcpyexpesc(3uc)| */
+#include	<snwcpy.h>		/* LIBUC |snwcpyexpesc(3uc)| */
 #include	<strdcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
