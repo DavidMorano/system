@@ -1,0 +1,3 @@
+isasocket
+isterminal
+isfsremote
