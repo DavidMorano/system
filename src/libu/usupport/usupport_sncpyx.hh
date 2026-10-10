@@ -28,26 +28,34 @@
 
 namespace libu {
     extern int sncpyx(char *,int,int,...) noex ;
-    inline int sncpy1(char *dp,int dl,cc *s1) noex {
+    inline int sncpy1(char *dp,int dl,
+	    	cc *s1) noex {
 	return libu::sncpyx(dp,dl,1,s1) ;
     } /* end subroutine */
-    inline int sncpy2(char *dp,int dl,cc *s1,cc *s2) noex {
+    inline int sncpy2(char *dp,int dl,
+	    	cc *s1,cc *s2) noex {
 	return libu::sncpyx(dp,dl,2,s1,s2) ;
     } /* end subroutine */
-    inline int sncpy3(char *dp,int dl,cc *s1,cc *s2,cc *s3) noex {
+    inline int sncpy3(char *dp,int dl,
+	    	cc *s1,cc *s2,cc *s3) noex {
 	return libu::sncpyx(dp,dl,3,s1,s2,s3) ;
     } /* end subroutine */
-    inline int sncpy4(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4) noex {
+    inline int sncpy4(char *dp,int dl,
+	    	cc *s1,cc *s2,cc *s3,cc *s4) noex {
 	return libu::sncpyx(dp,dl,4,s1,s2,s3,s4) ;
     } /* end subroutine */
-    inline int sncpy5(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
+    inline int sncpy5(char *dp,int dl,
+	    	cc *s1,cc *s2,cc *s3,cc *s4,
 	    cc *s5) noex {
 	return libu::sncpyx(dp,dl,5,s1,s2,s3,s4,s5) ;
     } /* end subroutine */
-    inline int sncpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,
-	    cc *s6) noex {
+    inline int sncpy6(char *dp,int dl,
+	    	cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return libu::sncpyx(dp,dl,6,s1,s2,s3,s4,s5,s6) ;
     } /* end subroutine */
+} /* end namespace (libu) */
+
+namespace libu {
     template<typename ... Args>
     inline int sncpy(char *dp,int dl,Args ... args) noex {
         cint	na = npack(Args) ;
