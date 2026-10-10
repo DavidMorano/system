@@ -136,7 +136,7 @@ constexpr void charmgr::mkisprint() noex {
 	    f = f || (ch == CH_TAB) ;
 	    if (f) {
 	        isprint.set(ch,true) ;
-	    }
+	    } /* end */
 	} /* end for */
 } /* end method (charmgr::mkisprint) */
 
@@ -156,7 +156,7 @@ constexpr void charmgr::mkisterm() noex {
 	        f = f || (ch == CH_SS2) || (ch == CH_SS3) ;
 		if (f) {
 		    isterm.set(ch,true) ;
-		}
+		} /* end */
 	    } /* end if */
 	} /* end for */
 } /* end method (charmgr::mkisterm) */
@@ -176,7 +176,7 @@ bool ischalpha(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isalpha[ch] ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischalpha) */
 
@@ -184,7 +184,7 @@ bool ischalnum(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isalnum[ch] ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischalnum) */
 
@@ -192,7 +192,7 @@ bool ischdigex(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isdigex[ch] ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischdigex) */
 
@@ -200,7 +200,7 @@ bool ischwhite(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = char_iswhite(ch) ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischwhite) */
 
@@ -208,7 +208,7 @@ bool ischlower(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = char_islc(ch) ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischlower) */
 
@@ -216,7 +216,7 @@ bool ischupper(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = char_isuc(ch) ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischupper) */
 
@@ -224,7 +224,7 @@ bool ischprint(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isprint[ch] ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischprint) */
 
@@ -232,7 +232,7 @@ bool ischprintterm(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isterm[ch] ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischprintterm) */
 
@@ -244,7 +244,7 @@ bool ischdict(int ch) noex {
 	bool		f = false ;
 	if ((ch >= 0) && (ch < chtablen)) {
 	    f = ischarx_data.isalnum[ch] || (ch == CH_SP) ;
-	}
+	} /* end */
 	return f ;
 } /* end subroutine (ischdict) */
 
