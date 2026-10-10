@@ -68,7 +68,7 @@ OBJ23_MKX= mkpathmulti.o
 OBJ24_MKX= mklineclean.o linecleanopt.o
 OBJ25_MKX= mksoname.o
 OBJ26_MKX= mknpathexp.o mknpathuser.o mknpathvar.o
-OBJ27_MKX=
+OBJ27_MKX= mkhex.o
 
 OBJA_MKX= obj00.o obj01.o obj02.o obj03.o
 OBJB_MKX= obj04.o obj05.o obj06.o obj07.o
@@ -76,7 +76,7 @@ OBJC_MKX= obj08.o obj09.o obj10.o obj11.o
 OBJD_MKX= obj12.o obj13.o obj14.o obj15.o
 OBJE_MKX= obj16.o obj17.o obj18.o obj19.o
 OBJF_MKX= obj20.o obj21.o obj22.o obj23.o
-OBJG_MKX= obj24.o obj25.o obj26.o
+OBJG_MKX= obj24.o obj25.o obj26.o obj27.o
 #OBJG_MKX= obj24.o obj25.o obj26.o obj27.o
 
 OBJ_MKX= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
@@ -303,6 +303,7 @@ mkuuid.o:		mkuuid.cc	mkuuid.h		$(INCS)
 
 mkpr.o:			mkpr.cc		mkpr.h			$(INCS)
 mkxdisp.o:		mkxdisp.cc	mkxdisp.h		$(INCS)
+mkhex.o:		mkhex.cc	mkhex.h			$(INCS)
 
 linelceanopt.o:		linecleanopt.cc	linecleanopt.h		$(INCS)
 
