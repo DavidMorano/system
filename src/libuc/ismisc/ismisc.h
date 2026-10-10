@@ -26,6 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 #include	<isaccmode.h>		/* LIBUC */
+#include	<isinteractive.hh>	/* LIBUC */
 
 
 EXTERNC_begin
@@ -39,10 +40,10 @@ extern bool	isfnamespecial	(cchar *,int) noex ;
 
 local inline bool isDotDir(cchar *dp) noex {
 	return isdotdir(dp) ;
-}
+} /* end */
 local inline bool isSpecialObject(void *op) noex {
 	return isobjspecial(op) ;
-}
+} /* end */
 
 EXTERNC_end
 
