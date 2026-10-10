@@ -46,7 +46,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |iszero(3uc)| */
+#include	<isch.h>		/* LIBUC |ischzero(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"cfutil.hh"
@@ -71,7 +71,7 @@ import libutil ;			/* |getlenstr(3u)| */
 
 local bool isourlead(int ch) noex {
    	ch &= UCHAR_MAX ;
-    	return iswht(ch) || iszero(ch) ;
+    	return ischwht(ch) || ischzero(ch) ;
 } /* end subroutine (isourlead) */
 
 
@@ -136,7 +136,7 @@ namespace cfx {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    if ((sl > 0) && ispm(*sp)) {
+	    if ((sl > 0) && ischpm(*sp)) {
 	        *fnegp = (*sp == '-') ;
 	        sp += 1 ;
 	        sl -= 1 ;
@@ -146,7 +146,7 @@ namespace cfx {
 	        sl -= 1 ;
 	    } /* end while */
 	    if (sl > 1) {
-		if (iszero(*sp)) {
+		if (ischzero(*sp)) {
 		    sp += 1 ;
 		    sl -= 1 ;
 		}
