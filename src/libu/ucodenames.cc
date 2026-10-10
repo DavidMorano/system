@@ -55,6 +55,7 @@
 #include	<algorithm>		/* C++STD |sort(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |DECBUFLEN| */
 
 #include	"ucodenames.h"
@@ -85,7 +86,7 @@ using std::partition_point ;		/* subroutine-template */
 
 struct codepair {
 	int		n ;
-	cchar		*s ;
+	ccharp		s ;
 } ; /* end struct */
 
 namespace {
@@ -348,20 +349,54 @@ constexpr codepair		names_sig[] = {
 	{ SIGRTMAX,		"RTMAX" }
 } ; /* end array (names_sig) */
 
+constexpr codepair		names_exit[] = {
+	{ EX_USAGE,		"USAGE"		},
+	{ EX_DATAERR,		"DATAERR"	},
+	{ EX_NOINPUT,		"NOINPUT"	},
+	{ EX_NOUSER,		"NOUSER"	},
+	{ EX_NOHOST,		"HOHOST"	},
+	{ EX_UNAVAILABLE,	"UNAVAILABLE"	},
+	{ EX_SOFTWARE,		"SOFTWARE"	},
+	{ EX_OSERR,		"OSERR"		},
+	{ EX_OSFILE,		"OSFILE"	},
+	{ EX_CANTCREAT,		"CANTCREAT"	},
+	{ EX_IOERR,		"IOERR"		},
+	{ EX_TEMPFAIL,		"TEMPFAIL"	},
+	{ EX_PROTOCOL,		"PROTOCOL"	},
+	{ EX_NOPERM,		"NOPERM"	},
+	{ EX_CONFIG,		"CONFIG"	},
+	{ EX_NOTFOUND,		"NOTFOUND"	},
+	{ EX_CONFIG,		"CONFIG"	},
+	{ EX_OK,		"OK"		},
+	{ EX_SUCCESS,		"SUCCESS"	},
+	{ EX_FAILURE,		"FAILURE"	},
+	{ EX_UNKNOWN,		"UNKNOWN"	},
+	{ EX_INTR,		"INTR"		},
+	{ EX_MUTEX,		"MUTEX"		},
+	{ EX_INFO,		"INFO"		},
+	{ EX_NOEXEC,		"NOEXEC"	},
+	{ EX_NOPROG,		"NOPROG"	},
+	{ EX_TERM,		"TERM"		}
+} ; /* end array (names_exit) */
+
 constexpr int	ne_sr	= nelem(names_sr) ;
 constexpr int	ne_sig	= nelem(names_sig) ;
+constexpr int	ne_exit	= nelem(names_exit) ;
 
 namespace {
     enum whichs {
 	w_sr,
 	w_sig,
+	w_exit,
 	w_overlast
     } ; /* end enum */
     struct codemgr {
-	uchar		tab_sr	[ne_sr] ;
-	uchar		tab_sig	[ne_sig] ;
-	uchar		len_sr	[ne_sr] ;
-	uchar		len_sig	[ne_sig] ;
+	uchar		tab_sr		[ne_sr] ;
+	uchar		tab_sig		[ne_sig] ;
+	uchar		tab_exit	[ne_exit] ;
+	uchar		len_sr		[ne_sr] ;
+	uchar		len_sig		[ne_sig] ;
+	uchar		len_exit	[ne_exit] ;
 	consteval void tabload_x(mut uchar *tab,int n) noex {
 	    for (int i = 0 ; i < n ; i += 1) {
 		tab[i] = uchar(i) ;
@@ -379,6 +414,10 @@ namespace {
 		tab = tab_sig ;
 		len = len_sig ;
 		break ;
+	    case w_exit:
+		tab = tab_exit ;
+		len = len_exit ;
+		break ;
 	    } /* end switch */
 	    cauto cmpf = [pairs] (con uchar &ia,con uchar &ib) noex -> bool {
     		return (pairs[ia].n < pairs[ib].n) ;
@@ -392,6 +431,7 @@ namespace {
 	consteval codemgr() noex {
 	    tabinit(w_sr,	names_sr,	ne_sr) ;
 	    tabinit(w_sig,	names_sig,	ne_sig) ;
+	    tabinit(w_exit,	names_exit,	ne_exit) ;
 	} /* end ctor (codemgr) */
     } ; /* end struct (codemgr) */
 } /* end namespace */
@@ -411,6 +451,11 @@ int ucodename_sr(int n,ccharpp rpp) noex {
 
 int ucodename_sig(int n,ccharpp rpp) noex {
     	getter go(names_sig,tabcode.tab_sig,tabcode.len_sig,ne_sig) ;
+    	return go(n,rpp) ;
+} /* end subroutine */
+
+int ucodename_exit(int n,ccharpp rpp) noex {
+    	getter go(names_exit,tabcode.tab_exit,tabcode.len_exit,ne_exit) ;
     	return go(n,rpp) ;
 } /* end subroutine */
 
