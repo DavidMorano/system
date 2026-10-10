@@ -42,7 +42,7 @@ EXTERNC_end
 
 local inline int mkuuid(uuid_dat *udp) noex {
     	return mkuuid(udp,0) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
