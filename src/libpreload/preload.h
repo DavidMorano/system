@@ -31,7 +31,7 @@
 EXTERNC_begin
 
 extern int preload_init() ;
-extern int preload_set(int,const char *,int,int) ;
+extern int preload_set(int,cchar *,int,int) ;
 extern int preload_get(int,char *,int) ;
 extern void preload_fini() ;
 
