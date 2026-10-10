@@ -31,7 +31,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 local inline int mkmagic(char *dbuf,int dsz,cchar *ms) noex {
 	return mkmagic(dbuf,dsz,ms,-1) ;
-}
+} /* end */
 #endif /* __cplusplus */
 
 
