@@ -94,12 +94,12 @@ import ureserve ;			/* |ix{x}(3u)| */
 bool hasmodname(cchar *sp,int µsl) noex {
         bool            f = false ;
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) {
-            if (int ch = mkchar(*sp) ; isalphalatin(ch)) {
+            if (int ch = mkchar(*sp) ; ischalpha(ch)) {
                 cint	ch_d = CH_DOT ;
                 cint	ch_u = CH_UNDER ;
                 while (sl-- && *sp) {
                     ch = mkchar(*sp++) ;
-                    f = isalnumlatin(ch) || (ch == ch_d) || (ch == ch_u) ;
+                    f = ischalnum(ch) || (ch == ch_d) || (ch == ch_u) ;
                     if (! f) break ;
                 } /* end while */
             } /* end if (correct leading character) */
