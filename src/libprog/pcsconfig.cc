@@ -86,8 +86,8 @@
 
 /* forward references */
 
-static int	config_addcooks(PC *) noex ;
-static int	config_reader(PC *,char *,char *,char *) noex ;
+local int	config_addcooks(PC *) noex ;
+local int	config_reader(PC *,char *,char *,char *) noex ;
 
 
 /* local variables */
@@ -431,7 +431,7 @@ int config_reader(PC *cfp,char *pbuf,char *ebuf,char *tbuf)
 }
 /* end subroutine (config_readrer) */
 
-static int config_addcooks(PC *cfp) noex {
+local int config_addcooks(PC *cfp) noex {
 	proginfo	*pip = cfp->pip ;
 	expcook		*ckp = &cfp->cooks ;
 	int		rs = SR_OK ;
