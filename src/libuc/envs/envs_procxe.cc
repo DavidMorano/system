@@ -78,7 +78,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
