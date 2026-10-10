@@ -87,7 +87,7 @@ int isfsremote(int fd) noex {
 	    char	fstype[fslen+ 1] ;	/* <- VLA (yeh!) */
 	    if ((rs = getfstype(fstype,fslen,fd)) >= 0) {
 	        f = (matlocalfs(fstype,rs) < 0) ;
-	    }
+	    } /* end if */
 	} /* end if (bufsizeget) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (isfsremote) */
