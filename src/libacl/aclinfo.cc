@@ -33,11 +33,12 @@
 #include	<sys/param.h>
 #include	<sys/acl.h>
 #include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"aclinfo.h"
 
@@ -104,8 +105,7 @@ int aclinfo_mksol(aclinfo *ap) noex {
 	} /* end switch */
 	ap->soltype = soltype ;
 	return soltype ;
-}
-/* end subroutine (aclinfo_mksol) */
+} /* end subroutine (aclinfo_mksol) */
 
 int aclinfo_isdeftype(aclinfo *ap) noex {
 	int		f = false ;
@@ -118,8 +118,7 @@ int aclinfo_isdeftype(aclinfo *ap) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (aclinfo_isdeftype) */
+} /* end subroutine (aclinfo_isdeftype) */
 
 int aclinfo_isidtype(aclinfo *ap) noex {
 	int		f = false ;
@@ -134,7 +133,6 @@ int aclinfo_isidtype(aclinfo *ap) noex {
 	    break ;
 	} /* end switch */
 	return f ;
-}
-/* end subroutine (aclinfo_isidtype) */
+} /* end subroutine (aclinfo_isidtype) */
 
 
