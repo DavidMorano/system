@@ -29,22 +29,22 @@
 
 
 namespace libu {
-    inline int tobc(int ch) noex {
+    inline int tobc	(int ch) noex {
 	return (ch & UCHAR_MAX) ;
     } /* end subroutine */
-    extern int tolc(int ch) noex ;
-    extern int touc(int ch) noex ;
-    extern int tofc(int ch) noex ;
-    inline char chtobc(int ch) noex {
+    extern int tolc	(int ch) noex ;
+    extern int touc	(int ch) noex ;
+    extern int tofc	(int ch) noex ;
+    inline char chtobc	(int ch) noex {
 	return char(libu::tobc(ch)) ;
     } /* end subroutine */
-    inline char chtolc(int ch) noex {
+    inline char chtolc	(int ch) noex {
 	return char(libu::tolc(ch)) ;
     } /* end subroutine */
-    inline char chtouc(int ch) noex {
+    inline char chtouc	(int ch) noex {
 	return char(libu::touc(ch)) ;
     } /* end subroutine */
-    inline char chtofc(int ch) noex {
+    inline char chtofc	(int ch) noex {
 	return char(libu::tofc(ch)) ;
     } /* end subroutine */
 } /* end namespace (libu) */
