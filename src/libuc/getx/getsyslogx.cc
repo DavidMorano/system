@@ -49,7 +49,7 @@
 #include	<nleadstr.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -164,11 +164,11 @@ int getsyslogpri(cchar *sp,int sl) noex {
 	}
 	if (int nlen ; (nlen = intconv(strwcpylc(nbuf,sp,sl) - nbuf)) > 0) {
 	    cint	ch = mkchar(nbuf[0]) ;
-	    if (isdigitlatin(ch)) {
+	    if (ischdigit(ch)) {
 	        if ((rs = cfdeci(nbuf,nlen,&val)) >= 0) {
 		    if ((val < 0) || (val > 7)) rs = SR_DOM ;
 	        }
-	    } else if (isalphalatin(ch)) {
+	    } else if (ischalpha(ch)) {
 	        int		i ; /* used-afterwards */
 	        int		m ;
 	        bool		f = false ;
