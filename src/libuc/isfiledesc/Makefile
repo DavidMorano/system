@@ -40,9 +40,10 @@ MODS=
 LIBS=
 
 
-OBJ0_ISFILEDESC= isasocket.o isterminal.o
+OBJ0_ISFILEDESC= isasocket.o 
 OBJ1_ISFILEDESC= isfsremote.o
-OBJ2_ISFILEDESC= isinteractive.o
+OBJ2_ISFILEDESC= isterminal.o
+OBJ3_ISFILEDESC=
 
 OBJA_ISFILEDESC= obj0_isfiledesc.o obj1_isfiledesc.o
 OBJB_ISFILEDESC= obj2_isfiledesc.o
@@ -129,6 +130,5 @@ obj3_isfiledesc.o:	$(OBJ3_ISFILEDESC)
 isasocket.o:		isasocket.cc		$(INCS)
 isterminal.o:		isterminal.cc		$(INCS)
 isfsremote.o:		isfsremote.cc		$(INCS)
-isinteractive.o:	isinteractive.cc	$(INCS)
 
 
