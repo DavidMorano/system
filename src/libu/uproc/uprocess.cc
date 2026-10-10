@@ -511,7 +511,7 @@ int uprocer::ivfork() noex {
 	    rs = int(pid) ;
 	} else {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (uprocer::ivfork) */
 
@@ -519,7 +519,7 @@ int uprocer::isetuid() noex {
 	int		rs ;
 	if ((rs = setuid(id1)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (uprocer::isetuid) */
 
@@ -527,7 +527,7 @@ int uprocer::isetreuid() noex {
 	int		rs ;
 	if ((rs = setreuid(id1,id2)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (uprocer::isetreuid) */
 
@@ -543,7 +543,7 @@ int uprocer::isetgid() noex {
 	int		rs ;
 	if ((rs = setgid(id1)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (uprocer::isetgid) */
 
@@ -551,7 +551,7 @@ int uprocer::isetregid() noex {
 	int		rs ;
 	if ((rs = setregid(id1,id2)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (uprocer::isetregid) */
 
@@ -559,7 +559,7 @@ int uprocer::isetegid() noex {
 	int		rs ;
 	if ((rs = setegid(id1)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (uprocer::isetegid) */
 
@@ -567,7 +567,7 @@ int uprocer::isetpgid() noex {
 	int		rs ;
 	if ((rs = setpgid(id1,id2)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (uprocer::isetpgid) */
 
@@ -586,7 +586,7 @@ int uprocer::isetgroups() noex {
 	int		rs ;
 	if ((rs = setgroups(n,glist)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (uprocer::isetgroups) */
 
@@ -663,7 +663,7 @@ namespace libu {
 	if ((rs = ng) == 0) {
 	    rs = u_getgroups(0,np) ;
 	    ng = rs ;
-	}
+	} /* end */
 	return rs ;
     } /* end method (ungroper::operator) */
 } /* end namespace (libu) */
