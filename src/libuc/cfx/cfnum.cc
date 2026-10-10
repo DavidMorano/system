@@ -28,8 +28,8 @@
 	specifically with our use of:
 
 		tolc(3uc)
-		isdigitlatin(3uc)
-		isalphalatin(3uc)
+		ischdigit(3uc)
+		ischalpha(3uc)
 
 	instead of:
 
@@ -57,7 +57,7 @@
 #include	<char.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<toxc.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"cfnum.h"
@@ -117,10 +117,10 @@ int cfnumx(cchar *sp,int sl,UT *rp) noex {
 	        } else {
 	            rs = SR_INVALID ;
 		}
-	    } else if (isdigitlatin(ch)) {
+	    } else if (ischdigit(ch)) {
 	        if (bl > 1) {
 	            ch = tolc(bp[1]) ;
-	            if (isalphalatin(ch)) {
+	            if (ischalpha(ch)) {
 	                bp += 2 ;
 	                bl -= 2 ;
 	                switch (ch) {
