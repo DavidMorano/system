@@ -5,7 +5,7 @@
 /* open-dialer (tcpnls) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -75,6 +75,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"opendialer_tcpnls.h"
 #include	"defs.h"
@@ -82,10 +83,15 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import deb ;
 
 /* local defines */
 
-#define	ARGPARSE	struct argparse
+#define	ARGPARSE	argparse
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
 
 
 /* external subroutines */
@@ -108,6 +114,9 @@ struct argparse {
 
 /* forward references */
 
+local int argparse_start(struct argparse *,cchar *) noex ;
+local int argparse_finish(struct argparse *) noex ;
+
 
 /* local variables */
 
@@ -123,11 +132,7 @@ constexpr cpcchar	ops[] = {
 	nullptr
 } ; /* end array (ops) */
 
-
-/* forward references */
-
-local int argparse_start(struct argparse *,cchar *) noex ;
-local int argparse_finish(struct argparse *) noex ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -135,16 +140,8 @@ local int argparse_finish(struct argparse *) noex ;
 
 /* exported subroutines */
 
-int opendialer_tcpnls(pr,prn,svc,of,om,argv,envv,to)
-cchar	*pr ;
-cchar	*prn ;
-cchar	*svc ;
-int		of ;
-mode_t		om ;
-cchar	**argv ;
-cchar	**envv ;
-int		to ;
-{
+int opendialer_tcpnls(cc *pr,cc *prn,cc *svc,
+		int of,mode_t om,con mainv argv,con mainv envv,int to) noex {
 	ARGPARSE	ai ;
 	cint	opts = 0 ;
 	int		rs = SR_OK ;
@@ -155,18 +152,16 @@ int		to ;
 	cchar	*hostname = nullptr ;
 	cchar	*portspec = nullptr ;
 
-
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
-	    int	i ;
-	    debugprintf("opendialer_tcpnls: svc=%s\n",svc) ;
+	    DEBPRINTF("svc=%s\n",svc) ;
 	    if (argv != nullptr) {
-	        for (i = 0 ; argv[i] != nullptr ; i += 1) {
-	            debugprintf("opendialer_tcpnls: a[%u]=%s\n",i,argv[i]) ;
+	        for (int i = 0 ; argv[i] != nullptr ; i += 1) {
+	            DEBPRINTF("a[%u]=%s\n",i,argv[i]) ;
 	        }
 	    }
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	if (svc[0] == '\0') return SR_INVALID ;
 
@@ -187,12 +182,12 @@ int		to ;
 
 	if ((rs = argparse_start(&ai,argz)) >= 0) {
 
-#if	CF_DEBUGS
-	debugprintf("opendialer_tcpnls: ai.to=%d\n",ai.to) ;
-	debugprintf("opendialer_tcpnls: ai.af=%d\n",ai.af) ;
-	debugprintf("opendialer_tcpnls: ai.hostname=%s\n",ai.hostname) ;
-	debugprintf("opendialer_tcpnls: ai.portspec=%s\n",ai.portspec) ;
-	debugprintf("opendialer_tcpnls: ai.svcspec=%s\n",ai.svcspec) ;
+#if	CF_DEBUG
+	DEBPRINTF("ai.to=%d\n",ai.to) ;
+	DEBPRINTF("ai.af=%d\n",ai.af) ;
+	DEBPRINTF("ai.hostname=%s\n",ai.hostname) ;
+	DEBPRINTF("ai.portspec=%s\n",ai.portspec) ;
+	DEBPRINTF("ai.svcspec=%s\n",ai.svcspec) ;
 #endif
 
 	    if (ai.to >= 0) to = ai.to ;
@@ -217,8 +212,8 @@ int		to ;
 		    int		n = 0 ;
 		    cchar	**av = (cchar **) bp ;
 
-#if	CF_DEBUGS
-		    debugprintf("opendialer_tcpnls: svc=%s\n",
+#if	CF_DEBUG
+		    DEBPRINTF("svc=%s\n",
 			svc) ;
 #endif
 
@@ -239,8 +234,8 @@ int		to ;
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("opendialer_tcpnls: ret rs=%d fd=%u\n",rs,fd) ;
+#if	CF_DEBUG
+	DEBPRINTF("ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
@@ -290,8 +285,8 @@ local int argparse_start(struct argparse *app,cchar *args)
 	        portl = -1 ;
 	        svcp = (tp+1) ;
 	        svcl = -1 ;
-#if	CF_DEBUGS
-	    debugprintf("opendialer_tcpnls/argparse_start: s=%s\n",sp) ;
+#if	CF_DEBUG
+	    DEBPRINTF("s=%s\n",sp) ;
 #endif
 	        if ((tp = strbrk(sp,":,")) != nullptr) {
 		    portl = (tp-sp) ;
@@ -319,11 +314,11 @@ local int argparse_start(struct argparse *app,cchar *args)
 	        svcp = args ;
 	        svcl = (tp-args) ;
 	    }
-#if	CF_DEBUGS
-	    debugprintf("opendialer_tcpnls/argparse_start: ss=>%r<\n",
+#if	CF_DEBUG
+	    DEBPRINTF("ss=>%r<\n",
 		svcp,svcl) ;
-	    debugprintf("opendialer_tcpnls/argparse_start: s=>%s<\n",sp) ;
-	    debugprintf("opendialer_tcpnls/argparse_start: p=>%r<\n",
+	    DEBPRINTF("s=>%s<\n",sp) ;
+	    DEBPRINTF("p=>%r<\n",
 		portp,portl) ;
 #endif
 	    ch = (sp[0] & 0xff) ;
@@ -337,8 +332,8 @@ local int argparse_start(struct argparse *app,cchar *args)
 	            opl = lenstr(sp) ;
 		    nsp = (sp+opl) ;
 	        }
-#if	CF_DEBUGS
-	    debugprintf("opendialer_tcpnls/argparse_start: o=>%r<\n",
+#if	CF_DEBUG
+	    DEBPRINTF("o=>%r<\n",
 		opp,opl) ;
 #endif
 		kp = opp ;
@@ -350,10 +345,10 @@ local int argparse_start(struct argparse *app,cchar *args)
 		    vp = (tp+1) ;
 		    vl = (opp+opl) - (tp+1) ;
 		}
-#if	CF_DEBUGS
-	    debugprintf("opendialer_tcpnls/argparse_start: k=%r\n",kp,kl) ;
+#if	CF_DEBUG
+	    DEBPRINTF("k=%r\n",kp,kl) ;
 		if (vp != nullptr) 
-	    debugprintf("opendialer_tcpnls/argparse_start: v=%r\n",vp,vl) ;
+	    DEBPRINTF("v=%r\n",vp,vl) ;
 #endif
 	        if ((oi = matstr(ops,kp,kl)) >= 0) {
 	            switch (oi) {
@@ -372,9 +367,8 @@ local int argparse_start(struct argparse *app,cchar *args)
 	            } /* end switch */
 		} /* end if (had valid option) */
 	        sp = nsp ;
-#if	CF_DEBUGS
-	        debugprintf("opendialer_tcpnls/argparse_start: "
-		    "while-bot rs=%d\n",rs) ;
+#if	CF_DEBUG
+	        DEBPRINTF("while-bot rs=%d\n",rs) ;
 #endif
 		if (rs < 0) break ;
 	        ch = (sp[0] & 0xff) ;
