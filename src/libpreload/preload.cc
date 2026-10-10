@@ -105,18 +105,18 @@ extern "C" {
     static void	preload_atforkafter() noex ;
 }
 
-static int	preload_struct(preload *) noex ;
-static int	preload_begin(preload *) noex ;
-static int	preload_end(preload *) noex ;
-static int	preload_entryntfins(preload *) noex ;
-static int	preload_capbegin(preload *,int) noex ;
-static int	preload_capend(preload *) noex ;
-static int	preload_seter(preload *,int,cchar *,int,int) noex ;
-static int	preload_geter(preload *,int,char *,int) noex ;
+local int	preload_struct(preload *) noex ;
+local int	preload_begin(preload *) noex ;
+local int	preload_end(preload *) noex ;
+local int	preload_entryntfins(preload *) noex ;
+local int	preload_capbegin(preload *,int) noex ;
+local int	preload_capend(preload *) noex ;
+local int	preload_seter(preload *,int,cchar *,int,int) noex ;
+local int	preload_geter(preload *,int,char *,int) noex ;
 
-static int	entry_start(preload_ent *,cchar *,int,int) noex ;
-static int	entry_reload(preload_ent *,cchar *,int,int) noex ;
-static int	entry_finish(preload_ent *) noex ;
+local int	entry_start(preload_ent *,cchar *,int,int) noex ;
+local int	entry_reload(preload_ent *,cchar *,int,int) noex ;
+local int	entry_finish(preload_ent *) noex ;
 
 
 /* local variables */
@@ -268,7 +268,7 @@ int preload_get(int di,char *rbuf,int rlen) noex {
 
 /* local subroutines */
 
-static int preload_struct(preload *uip) noex {
+local int preload_struct(preload *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
 	    rs = preload_begin(uip) ;
@@ -277,7 +277,7 @@ static int preload_struct(preload *uip) noex {
 }
 /* end subroutine (preload_struct) */
 
-static int preload_begin(preload *uip) noex {
+local int preload_begin(preload *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
 	    cint	osize = sizeof(varray) ;
@@ -298,7 +298,7 @@ static int preload_begin(preload *uip) noex {
 }
 /* end subroutine (preload_begin) */
 
-static int preload_end(preload *uip) noex {
+local int preload_end(preload *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (uip->ents != nullptr) {
@@ -321,7 +321,7 @@ static int preload_end(preload *uip) noex {
 }
 /* end subroutine (preload_end) */
 
-static int preload_entryntfins(preload *uip) noex {
+local int preload_entryntfins(preload *uip) noex {
 	varray		*vap = (varray *) uip->ents ;
 	preload_ent	*ep ;
 	int		rs = SR_OK ;
@@ -336,7 +336,7 @@ static int preload_entryntfins(preload *uip) noex {
 }
 /* end subroutine (preload_entryntfins) */
 
-static int preload_capbegin(preload *uip,int to) noex {
+local int preload_capbegin(preload *uip,int to) noex {
 	ptm		*mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
@@ -359,7 +359,7 @@ static int preload_capbegin(preload *uip,int to) noex {
 }
 /* end subroutine (preload_capbegin) */
 
-static int preload_capend(preload *uip) noex {
+local int preload_capend(preload *uip) noex {
 	ptm		*mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
@@ -378,7 +378,7 @@ static int preload_capend(preload *uip) noex {
 }
 /* end subroutine (preload_capend) */
 
-static int preload_seter(preload *uip,int di,cc *cbuf,int clen,int ttl) noex {
+local int preload_seter(preload *uip,int di,cc *cbuf,int clen,int ttl) noex {
 	varray		*vap = (varray *) uip->ents ;
 	preload_ent	*ep ;
 	int		rs ;
@@ -393,7 +393,7 @@ static int preload_seter(preload *uip,int di,cc *cbuf,int clen,int ttl) noex {
 }
 /* end subroutine (preload_seter) */
 
-static int preload_geter(preload *uip,int di,char *rbuf,int rlen) noex {
+local int preload_geter(preload *uip,int di,char *rbuf,int rlen) noex {
 	varray		*vap = (varray *) uip->ents ;
 	preload_ent	*ep ;
 	int		rs ;
@@ -409,19 +409,19 @@ static int preload_geter(preload *uip,int di,char *rbuf,int rlen) noex {
 }
 /* end subroutine (preload_geter) */
 
-static void preload_atforkbefore() noex {
+local void preload_atforkbefore() noex {
 	preload		*uip = &preload_data ;
 	preload_capbegin(uip,-1) ;
 }
 /* end subroutine (preload_atforkbefore) */
 
-static void preload_atforkafter() noex {
+local void preload_atforkafter() noex {
 	preload		*uip = &preload_data ;
 	preload_capend(uip) ;
 }
 /* end subroutine (preload_atforkafter) */
 
-static int entry_start(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
+local int entry_start(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
 	custime		dt = time(nullptr) ;
 	int		rs ;
 	char		*bp{} ;
@@ -437,7 +437,7 @@ static int entry_start(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(preload_ent *ep) noex {
+local int entry_finish(preload_ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->vp != nullptr) {
@@ -449,7 +449,7 @@ static int entry_finish(preload_ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_reload(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
+local int entry_reload(preload_ent *ep,cchar *vp,int vl,int ttl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->vp != nullptr) {
