@@ -87,10 +87,18 @@ extern "C" {
 
 local char *strncpyxc(chtoxc_f chtoxc,char *dst,cchar *src,int n) noex {
 	if (dst && src) ylikely {
+	    char *ep = (dst + n) ;
 	    dst[0] = '\0' ;
 	    while (n-- && *src) {
 	        *dst++ = chtoxc(*src++) ;
 	    } /* end while */
+	    if ((ep - dst) > 0) {
+		for (char *zp = dst ; zp < ep ; zp += 1) {
+		    *zp = *src++ ;
+		} /* end while */
+	    } /* end if (zero-fill) */
+	} else {
+	    dst = nullptr ;
 	} /* end if (non-null) */
 	return dst ;
 } /* end subroutine (strncpyxc) */
