@@ -89,16 +89,16 @@
 static size_t	confstr_cspath(char *,size_t) ;
 static size_t	confstr_next(int,char *,size_t) ;
 
-static int	confstr_var(buffer *) ;
-static int	confstr_file(buffer *) ;
-static int	confstr_def(buffer *) ;
-static int	confstr_defsbin(buffer *) ;
-static int	confstr_defer(buffer *,int,cchar *) ;
+local int	confstr_var(buffer *) ;
+local int	confstr_file(buffer *) ;
+local int	confstr_def(buffer *) ;
+local int	confstr_defsbin(buffer *) ;
+local int	confstr_defer(buffer *,int,cchar *) ;
 
 
 /* local variables */
 
-static int	(*confstrs[])(buffer *) = {
+local int	(*confstrs[])(buffer *) = {
 	confstr_var,
 	confstr_file,
 	confstr_def,
@@ -192,7 +192,7 @@ static size_t confstr_cspath(char *ubuf,size_t len) noex {
 }
 /* end subroutine (confstr_cspath) */
 
-static int confstr_var(buffer *bdp) noex {
+local int confstr_var(buffer *bdp) noex {
 	int		rs = SR_OK ;
 	cchar		*vp ;
 	if ((vp = getenv(VARCSPATH)) != nullptr) {
@@ -204,7 +204,7 @@ static int confstr_var(buffer *bdp) noex {
 }
 /* end subroutine (confstr_var) */
 
-static int confstr_file(buffer *bdp) noex {
+local int confstr_file(buffer *bdp) noex {
 	vecstr		env ;
 	int		rs ;
 	int		rs1 ;
@@ -232,7 +232,7 @@ static int confstr_file(buffer *bdp) noex {
 }
 /* end subroutine (confstr_file) */
 
-static int confstr_def(buffer *bdp) noex {
+local int confstr_def(buffer *bdp) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	for (int i = 0 ; (rs >= 0) && comps[i] ; i += 1) {
@@ -251,7 +251,7 @@ static int confstr_def(buffer *bdp) noex {
 /* end subroutine (confstr_def) */
 
 /* super El-Cheapo (but correct) way to append a path-component to the end! */
-static int confstr_defsbin(buffer *bdp) noex {
+local int confstr_defsbin(buffer *bdp) noex {
 	const uid_t	uid = getuid() ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
@@ -281,7 +281,7 @@ static int confstr_defsbin(buffer *bdp) noex {
 }
 /* end subroutine (confstr_defsbin) */
 
-static int confstr_defer(buffer *bdp,int i,cchar *dname) noex {
+local int confstr_defer(buffer *bdp,int i,cchar *dname) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 	if (i > 0) {
