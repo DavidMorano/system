@@ -1,4 +1,9 @@
-/* config */
+/* config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* change file ACL permissions */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,16 @@
 */
 
 /* Copyright © 2005 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	CHACLCONFIG_INCLUDE
+#define	CHACLCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 
 
 #define	VERSION		"0"
@@ -77,5 +92,8 @@
 /* default option switch settings */
 #define	DEFMINMAX	1			/* MIN-MAX mode */
 #define	DEFMASKCALC	1			/* re-calculate the "mask" */
+
+
+#endif /* CHACLCONFIG_INCLUDE */
 
 
