@@ -40,7 +40,7 @@
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<uctc.h>		/* LIBUC terminal-conrol */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"getpassword.h"
@@ -104,7 +104,7 @@ int getpassword(cchar *prompt,char *passbuf,int passlen) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (open) */
 	    if ((rs >= 0) && (rlen > 0)) {
-	        if (iseol(passbuf[rlen - 1])) {
+	        if (ischeol(passbuf[rlen - 1])) {
 	            rlen -= 1 ;
 	        }
 	        passbuf[rlen] = '\0' ;
