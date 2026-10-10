@@ -15,7 +15,7 @@
 	I changed the object-struct below ('printinfo´) from
 	initalizing at load-time to initializing at first use.  I
 	atempted to have it initialized at compile time (using C++11
-	'constexpr') but the subroutine |iscmdstart(3uc)| is not a
+	'constexpr') but the subroutine |ischcmdstart(3uc)| is not a
 	constant-expression evaluated subroutine.  Sigh.  Yes, I
 	could have circumvented the use of that subroutine.  So
 	instead of settling for load-time initialization, I changed
@@ -73,7 +73,7 @@
 #include	<aflag.hh>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC |isprintbad(3uc)| */
+#include	<isch.h>		/* LIBUC |ischprintbad(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"hasprint.h"
@@ -150,7 +150,7 @@ consteval void printinfo::mkiscmd1() noex {
 
 void printinfo::mkiscmd2() noex {
     	for (int ch = 0 ; ch < nch ; ch += 1) {
-	    if (iscmdstart(ch)) {
+	    if (ischcmdstart(ch)) {
 		iscmd.set(ch) ;
 	    }
 	} /* end for */
@@ -182,7 +182,7 @@ bool hasprintcmd(cchar *sp,int sl) noex {
 } /* end subroutine (hasprintcmd) */
 
 bool hasprintbad(cchar *sp,int sl) noex {
-	return hasx(isprintbad,sp,sl) ;
+	return hasx(ischprintbad,sp,sl) ;
 } /* end subroutine (hasprintbad) */
 
 
