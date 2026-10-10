@@ -15,6 +15,37 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Group:
+	stpncpy
+
+	Description:
+	These are extensions to the standard C-lamguage library
+	subroutine |stpncpy(3c)|.  The destination buffer is
+	zero-filled.
+
+	Synopsis:
+	char *stpncpy(char *dbuf,cchar *sp ...,size_t n) noex
+
+	Arguments:
+	dbuf		destination buffer pointer
+	sp		source c-string pointer
+	n		size of destination buffer in bytes
+
+	Returns:
+	-		pointer to the last byte in the destination buffer
+
+	Notes:
+	I hate these stupid interfaces that feature the 'size_t' type.
+	That type is:
+	a) bigger than necessary (how many c-strings are over 4G-Bytes?)
+	b) is unsigned, so given a special value (as negative) is not
+	possible.
+	Gag!
+
+*******************************************************************************/
+
 #ifndef	USYSSTPNCPY_INCLUDE
 #define	USYSSTPNCPY_INCLUDE
 
