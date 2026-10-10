@@ -68,7 +68,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<sncpyx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |iszero(3uc)| */
+#include	<isch.h>		/* LIBUC |ischzero(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"ctdec.h"
@@ -143,7 +143,7 @@ local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
 		    *--rp = getdig_hi(di) ;
 	        } /* end for (regular) */
 	    } /* end if (constexpr) */
-	    if (((rl = intconv(dbuf + dlen - rp)) > 1) && iszero(*rp)) {
+	    if (((rl = intconv(dbuf + dlen - rp)) > 1) && ischzero(*rp)) {
                 rp += 1 ;
                 rl -= 1 ;
             } /* end if */
