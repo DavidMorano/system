@@ -53,11 +53,15 @@
 #include	<sys/types.h>
 #include	<dlfcn.h>
 #include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+
 #include	"prectime"
 
 
@@ -83,21 +87,20 @@ typedef	int (*func_clock)(clockid_t,struct timespec *) ;
 
 /* external subroutines */
 
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfnumui(const char *,int,uint *) ;
-extern int	cfhexui(const char *,int,uint *) ;
-extern int	cfhexul(const char *,int,ulong *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfnumui(cchar *,int,uint *) ;
+extern int	cfhexui(cchar *,int,uint *) ;
+extern int	cfhexul(cchar *,int,ulong *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* local structures */
@@ -109,17 +112,17 @@ struct clock_head {
 #if	CF_DEBUGN
 struct clockstr {
 	int		cid ;
-	const char	*name ;
+	cchar	*name ;
 } ;
 #endif /* CF_DEBUGN */
 
 
 /* forward references */
 
-static int	clock_next(clockid_t,struct timespec *) ;
+local int	clock_next(clockid_t,struct timespec *) ;
 
 #if	CF_DEBUGN
-static const char	*strclock(int) ;
+static cchar	*strclock(int) ;
 #endif /* CF_DEBUGN */
 
 
@@ -174,7 +177,7 @@ int clock_gettime(clockid_t cid,struct timespec *tsp)
 #if	CF_DEBUGN
 	{
 	    char	tbuf[TIMEBUFLEN+1] ;
-	    timestr_logz(tsp->tv_sec,tbuf) ;
+	    strtime_logz(tsp->tv_sec,tbuf) ;
 	    nprintf(NDF,"libpretime/clock_gettime: time=%s\n",tbuf) ;
 	    nprintf(NDF,"libpretime/clock_gettime: ret rc=%d\n",rc) ;
 	}
@@ -187,7 +190,7 @@ int clock_gettime(clockid_t cid,struct timespec *tsp)
 /* local subroutines */
 
 
-static int clock_next(clockid_t cid,struct timespec *tsp)
+local int clock_next(clockid_t cid,struct timespec *tsp)
 {
 	CLOCK		*sip = &clock_data ;
 	int		rc = -1 ;
@@ -210,7 +213,7 @@ static int clock_next(clockid_t cid,struct timespec *tsp)
 
 
 #if	CF_DEBUGN
-static const char	*strclock(int cid) {
+static cchar	*strclock(int cid) {
 	int	i ;
 	int	f = FALSE ;
 	cchar	*rp = "unknown" ;
