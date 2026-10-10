@@ -49,7 +49,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU |CH_{xx}| */
 #include	<sbuf.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |isprintlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischprint(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -99,7 +99,7 @@ int mkdisplayable(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	                pch = ch ;
 		        break ;
 	            default:
-	                if (isprintlatin(ch)) {
+	                if (ischprint(ch)) {
 		            if (fshift) {
 			        fshift = false ;
 	    		        rs = s.chr(pch) ;
