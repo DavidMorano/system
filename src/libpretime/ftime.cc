@@ -58,21 +58,21 @@
 
 /* external subroutines */
 
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfnumui(const char *,int,uint *) ;
-extern int	cfhexui(const char *,int,uint *) ;
-extern int	cfhexul(const char *,int,ulong *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfnumui(cchar *,int,uint *) ;
+extern int	cfhexui(cchar *,int,uint *) ;
+extern int	cfhexul(cchar *,int,ulong *) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* local structures */
