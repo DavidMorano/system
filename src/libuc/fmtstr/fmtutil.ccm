@@ -43,7 +43,7 @@ module ;
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBU */
+#include	<isch.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"fmtstr.h"
@@ -60,7 +60,7 @@ export {
 export {
     bool hasourbad(cchar *,int) noex ;
     inline bool isourbad(int ch) noex {
-    	return (! isprintterm(ch)) ;
+    	return (! ischprintterm(ch)) ;
     } /* end subroutine */
 } /* end export */
 
