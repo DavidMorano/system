@@ -33,19 +33,19 @@
 
 EXTERNC_begin
 
-extern int	mkrealname(char *,int,cchar *,int) noex ;
-extern int	mknoise(uint *a,int n) noex ;
-extern int	mkintfname(char *,cchar *,cchar *,cchar *) noex ;
-extern int	mktagfname(char *,cchar *,cchar *,int) noex ;
-extern int	mkonefrom(char *,int,cchar *,int) noex ;
-extern int	mkmailname(char *,int,cchar *,int) noex ;
-extern int	mkshlibname(char *,cchar *,int) noex ;
-extern int	mkshmname(char *,cchar *,int,cchar *,int) noex ;
-extern int	mksofname(char *,cchar *,cchar *,cchar *) noex ;
-extern int	mkaltext(char *,cchar *,cchar *) noex ;
-extern int	mkmaildirtest(char *,cchar *,int) noex ;
-extern int	mkfmtphone(char *,int,cchar *,int) noex ;
-extern int	mkfingerquery(char *,int,int,cchar *,mainv) noex ;
+extern int	mkrealname	(char *,int,cchar *,int) noex ;
+extern int	mknoise		(uint *a,int n) noex ;
+extern int	mkintfname	(char *,cchar *,cchar *,cchar *) noex ;
+extern int	mktagfname	(char *,cchar *,cchar *,int) noex ;
+extern int	mkonefrom	(char *,int,cchar *,int) noex ;
+extern int	mkmailname	(char *,int,cchar *,int) noex ;
+extern int	mkshlibname	(char *,cchar *,int) noex ;
+extern int	mkshmname	(char *,cchar *,int,cchar *,int) noex ;
+extern int	mksofname	(char *,cchar *,cchar *,cchar *) noex ;
+extern int	mkaltext	(char *,cchar *,cchar *) noex ;
+extern int	mkmaildirtest	(char *,cchar *,int) noex ;
+extern int	mkfmtphone	(char *,int,cchar *,int) noex ;
+extern int	mkfingerquery	(char *,int,int,cchar *,mainv) noex ;
 
 EXTERNC_end
 
@@ -53,7 +53,7 @@ EXTERNC_end
 
 inline int mkshmname(char *rbuf,cchar *ip,int il,cchar *sp) noex {
 	return mkshmname(rbuf,ip,il,sp,-1) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
