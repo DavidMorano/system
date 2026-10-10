@@ -55,7 +55,7 @@ module ;
 #include	<cfutil.hh>		/* LIBUC namespace |cfx| */
 #include	<checkbase.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |isplusminus(3uc)| */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 export module cfpowx ;
