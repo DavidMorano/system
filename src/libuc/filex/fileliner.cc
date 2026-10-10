@@ -52,7 +52,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<six.h>			/* LIBUC */
 #include	<rmx.h>			/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"fileliner.h"
