@@ -106,7 +106,7 @@ int snkeyval(char *dbuf,int dlen,cchar *kp,int kl,cchar *vp,int vl) noex {
 	            if ((rs = sb.chr(mch)) >= 0) ylikely {
 	                if (vp) rs = sb.strw(vp,vl) ;
 	                if (rs >= 0) rs = sb.idx ;
-		    }
+		    } /* end */
 		} /* end if (storebuf) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
