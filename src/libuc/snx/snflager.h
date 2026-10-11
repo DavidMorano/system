@@ -58,11 +58,11 @@ struct snflager_co {
 	void operator () (snflager *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (snflager_co) */
 struct snflager : snflager_head {
 	snflager_co	count ;
