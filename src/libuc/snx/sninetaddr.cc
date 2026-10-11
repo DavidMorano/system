@@ -170,7 +170,7 @@ local int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	    cint	n = INET6ADDRLEN ;
 	    char	digbuf[diglen + 1] ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-		uint	uch = mkchar(addr[i]) ;
+		uchar	uch = ucharconv(addr[i]) ;
 		if_constexpr (f_cthexuc) {
 	            rs = cthexuc(digbuf,diglen,uch) ; /* cannot fail! */
 	            if ((i > 0) && ((i & 1) == 0)) dbuf[pl++] = ':' ;
@@ -185,7 +185,7 @@ local int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	    } /* end for */
 	} else {
 	    rs = SR_OVERFLOW ;
-	}
+	} /* end if */
 	dbuf[pl] = '\0' ;
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (sninet6) */
