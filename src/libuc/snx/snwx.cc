@@ -112,7 +112,7 @@ int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 		    len = min(rs,rlen) ;
 		} else {
 		    rs = SR_BADFMT ;
-		}
+		} /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
