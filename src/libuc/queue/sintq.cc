@@ -55,9 +55,9 @@ import deb ;				/* LIBU |debprintf(3u)| */
 
 /* imported namespaces */
 
-using libu::um ;			/* variable */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -95,7 +95,7 @@ int sintq_start(sintq *op,int ne) noex {
 	    cint sz = (ne * esz) ;
 	    rs = SR_INVALID ;
 	    if (sz > 1) ylikely {
-		if (void *vp ; (rs = um.mall(sz,&vp)) >= 0) ylikely {
+		if (void *vp ; (rs = umem.mall(sz,&vp)) >= 0) ylikely {
 		    op->qbuf = shortp(vp) ;
 	            op->qlen = ne ;
 	            op->cnt = 0 ;
@@ -113,7 +113,7 @@ int sintq_finish(sintq *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->qbuf) ylikely {
-	        rs1 = um.free(op->qbuf) ;
+	        rs1 = umem.free(op->qbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->qbuf = nullptr ;
 	    } /* end if (memory-deallocation) */
@@ -269,7 +269,7 @@ local int sinq_ext(sintq *op) noex {
 	    DEBPRINTF(fmt,op->qlen,op->cnt,op->ri,op->wi) ;
 	}
 	if (op->cnt == op->qlen) ylikely {
-	    if (short *na ; (rs = um.mall((nlen * esz),&na)) >= 0) {
+	    if (short *na ; (rs = umem.mall((nlen * esz),&na)) >= 0) {
 		short *dp ; /* used-muliple */
 		int ni ; /* used-afterwards */
 		if ((ni = (op->qlen - op->ri)) > 0) {
@@ -284,7 +284,7 @@ local int sinq_ext(sintq *op) noex {
 		    dp = (na + ni) ;
 		    memcopy(dp,sp,sz) ;
 		} /* end if (write-index) */
-		if ((rs = um.free(op->qbuf)) >= 0) {
+		if ((rs = umem.free(op->qbuf)) >= 0) {
 		    op->ri = 0 ;
 		    op->wi = op->qlen ;
 		    op->qbuf = na ;
