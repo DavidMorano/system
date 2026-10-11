@@ -75,6 +75,7 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"opendialer_ticotsord.h"
 #include	"defs.h"
@@ -82,10 +83,15 @@
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import deb ;
 
 /* local defines */
 
-#define	ARGPARSE	struct argparse
+#define	ARGPARSE	argparse
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
 
 
 /* external subroutines */
@@ -105,6 +111,12 @@ struct argparse {
 } ; /* end struct */
 
 
+/* foward references */
+
+local int argparse_start(struct argparse *,cchar *) noex ;
+local int argparse_finish(struct argparse *) noex ;
+
+
 /* local variables */
 
 enum ops {
@@ -119,11 +131,7 @@ constexpr cpcchar	ops[] = {
 	nullptr
 } ; /* end array (ops) */
 
-
-/* forward references */
-
-local int argparse_start(struct argparse *,cchar *) ;
-local int argparse_finish(struct argparse *) ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -131,16 +139,8 @@ local int argparse_finish(struct argparse *) ;
 
 /* exported subroutines */
 
-int opendialer_ticotsord(pr,prn,svc,of,om,argv,envv,to)
-cchar	*pr ;
-cchar	*prn ;
-cchar	*svc ;
-int		of ;
-mode_t		om ;
-cchar	**argv ;
-cchar	**envv ;
-int		to ;
-{
+int opendialer_ticotsord(cc *pr,cc *prn,cc *svc,
+		int of,mode_t om,con mainv argv,con mainv envv,int to) noex {
 	ARGPARSE	ai ;
 	int		rs = SR_OK ;
 	int		argc = 0 ;
@@ -150,11 +150,10 @@ int		to ;
 
 #if	CF_DEBUG
 	{
-	    int	i ;
-	    debugprintf("opendialer_ticotsord: svc=%s\n",svc) ;
+	    DEBPRINTF("svc=%s\n",svc) ;
 	    if (argv != nullptr) {
-	        for (i = 0 ; argv[i] != nullptr ; i += 1) {
-	            debugprintf("opendialer_ticotsord: a[%u]=%s\n",i,argv[i]) ;
+	        for (int i = 0 ; argv[i] != nullptr ; i += 1) {
+	            DEBPRINTF("a[%u]=%s\n",i,argv[i]) ;
 	        }
 	    }
 	}
@@ -180,10 +179,10 @@ int		to ;
 	if ((rs = argparse_start(&ai,argz)) >= 0) {
 
 #if	CF_DEBUG
-	debugprintf("opendialer_ticotsord: ai.to=%d\n",ai.to) ;
-	debugprintf("opendialer_ticotsord: ai.af=%d\n",ai.af) ;
-	debugprintf("opendialer_ticotsord: ai.hostname=%s\n",ai.hostname) ;
-	debugprintf("opendialer_ticotsord: ai.portspec=%s\n",ai.portspec) ;
+	DEBPRINTF("ai.to=%d\n",ai.to) ;
+	DEBPRINTF("ai.af=%d\n",ai.af) ;
+	DEBPRINTF("ai.hostname=%s\n",ai.hostname) ;
+	DEBPRINTF("ai.portspec=%s\n",ai.portspec) ;
 #endif
 
 	    if (ai.to >= 0) to = ai.to ;
@@ -210,7 +209,7 @@ int		to ;
 ret0:
 
 #if	CF_DEBUG
-	debugprintf("opendialer_ticotsord: ret rs=%d fd=%u\n",rs,fd) ;
+	DEBPRINTF("ret rs=%d fd=%u\n",rs,fd) ;
 #endif
 
 	return (rs >= 0) ? fd : rs ;
@@ -252,13 +251,13 @@ local int argparse_start(struct argparse *app,cchar *argz) noex {
 	        portp = (tp+1) ;
 	        portl = -1 ;
 #if	CF_DEBUG
-	    debugprintf("opendialer_ticotsord/argparse_start: s=%s\n",sp) ;
+	    DEBPRINTF("s=%s\n",sp) ;
 #endif
 	        if ((tp = strchr(sp,',')) != nullptr) {
 	            portl = (tp-sp) ;
 	            sp = (tp+1) ;
 #if	CF_DEBUG
-	    debugprintf("opendialer_ticotsord/argparse_start: pl=%d\n",portl) ;
+	    DEBPRINTF("pl=%d\n",portl) ;
 #endif
 	        }
 	    } else {
@@ -266,8 +265,8 @@ local int argparse_start(struct argparse *app,cchar *argz) noex {
 	        portl = (tp-argz) ;
 	    }
 #if	CF_DEBUG
-	    debugprintf("opendialer_ticotsord/argparse_start: s=>%s<\n",sp) ;
-	    debugprintf("opendialer_ticotsord/argparse_start: p=>%r<\n",
+	    DEBPRINTF("s=>%s<\n",sp) ;
+	    DEBPRINTF("p=>%r<\n",
 		portp,portl) ;
 #endif
 	    while (sp[0]) {
@@ -281,7 +280,7 @@ local int argparse_start(struct argparse *app,cchar *argz) noex {
 		    nsp = (sp+opl) ;
 	        }
 #if	CF_DEBUG
-	    debugprintf("opendialer_ticotsord/argparse_start: o=>%r<\n",
+	    DEBPRINTF("o=>%r<\n",
 		opp,opl) ;
 #endif
 		kp = opp ;
@@ -294,9 +293,9 @@ local int argparse_start(struct argparse *app,cchar *argz) noex {
 		    vl = (opp+opl) - (tp+1) ;
 		}
 #if	CF_DEBUG
-	    debugprintf("opendialer_ticotsord/argparse_start: k=%r\n",kp,kl) ;
+	    DEBPRINTF("k=%r\n",kp,kl) ;
 		if (vp != nullptr) 
-	    debugprintf("opendialer_ticotsord/argparse_start: v=%r\n",vp,vl) ;
+	    DEBPRINTF("v=%r\n",vp,vl) ;
 #endif
 	        oi = matstr(ops,kp,kl) ;
 		if (oi >= 0) {
@@ -317,8 +316,7 @@ local int argparse_start(struct argparse *app,cchar *argz) noex {
 		} /* end if (had valid option) */
 	        sp = nsp ;
 #if	CF_DEBUG
-	        debugprintf("opendialer_ticotsord/argparse_start: "
-		    "while-bot rs=%d\n",rs) ;
+	        DEBPRINTF("while-bot rs=%d\n",rs) ;
 #endif
 		if (rs < 0) break ;
 	    } /* end while */
