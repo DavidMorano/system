@@ -149,7 +149,7 @@ local int	isNotGoodCite(int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -197,7 +197,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"audit",
 	"interactive",
 	NULL
@@ -344,7 +344,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -506,7 +506,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1029,7 +1029,7 @@ local int procsome(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1120,8 +1120,8 @@ local int procspec(PROGINFO *pip,cchar *sp,int sl)
 /* ok, two cases: decimal-digit or string */
 
 	if (lip->nitems > 0) {
-	    const int	blen = BIBLEBOOK_LEN ;
-	    const int	ch = MKCHAR(sp[0]) ;
+	    cint	blen = BIBLEBOOK_LEN ;
+	    cint	ch = MKCHAR(sp[0]) ;
 	    int		i ;
 	    int		bl ;
 	    char	bbuf[BIBLEBOOK_LEN+ 1] ;
@@ -1152,7 +1152,7 @@ local int procspec(PROGINFO *pip,cchar *sp,int sl)
 	    }
 #else /* CF_BBMATCH */
 	    {
-		const int	slen = SPECLEN ;
+		cint	slen = SPECLEN ;
 	        int		ml, tl ;
 	        int		f_match = FALSE ;
 	        char		sbuf[SPECLEN + 1] ;
@@ -1212,7 +1212,7 @@ local int procall(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	BIBLEBOOK	*dbp ;
-	const int	blen = BIBLEBOOK_LEN ;
+	cint	blen = BIBLEBOOK_LEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		bl ;
@@ -1242,7 +1242,7 @@ local int procout(PROGINFO *pip,int n,cchar *sp,int sl)
 
 	if (pip->verboselevel > 0) {
 	    LOCINFO	*lip = pip->lip ;
-	    const int	prec = MIN(lip->precision,NBLANKS) ;
+	    cint	prec = MIN(lip->precision,NBLANKS) ;
 	    rs = shio_printf(lip->ofp,"%*u %r\n",prec,n,sp,sl) ;
 	    wlen += rs ;
 	}
@@ -1259,8 +1259,8 @@ local int procoutextra(PROGINFO *pip,int bi)
 	int		wlen = 0 ;
 	if (lip->nitems > 1) {
 	    BIBLEBOOK	*dbp = lip->dbp ;
-	    const int	blen = BIBLEBOOK_LEN ;
-	    const int	n = (lip->nitems-1) ;
+	    cint	blen = BIBLEBOOK_LEN ;
+	    cint	n = (lip->nitems-1) ;
 	    int		i ;
 	    char	bbuf[BIBLEBOOK_LEN+ 1] ;
 #if	CF_DEBUG
