@@ -22,6 +22,13 @@
 	strnwcpy
 	strnwcpy{x}c
 
+	Description:
+	This subroutine(s) copies a counted source c-string to a
+	counted destination buffer, but with zero-fill of the
+	destination buffer.  It is similar to |strncpy(3c)| in that
+	regard.  The case conversion variants also convert the
+	case of the copied characters.
+
 	Synopsis:
 	char *strnwcpy(char *dp,int dl,cchar *sp,int sl) noex
 	char *strnwcpy{x}c(char *dp,int dl,cchar *sp,int sl) noex
