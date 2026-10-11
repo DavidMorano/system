@@ -46,7 +46,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -81,7 +81,7 @@ int sileadzero(cchar *sp,int sl) noex {
 	if (sp) ylikely {
 	    for (i = 0 ; (i < (sl - 1)) ; i += 1) {
 		cint ch = mkchar(sp[i]) ;
-		if (iszero(ch) || iswhitelatin(ch)) break ;
+		if (ischzero(ch) || ischwhite(ch)) break ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
