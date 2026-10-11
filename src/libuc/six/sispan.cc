@@ -79,7 +79,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC |is{x}(3uc)| */
+#include	<isch.h>		/* LIBUC |is{x}(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"sispan.h"
@@ -141,31 +141,31 @@ int sispan(cchar *sp,int sl,cchar *strclass) noex {
 } /* end subroutine (sispan) */
 
 int sispanalpha(cchar *sp,int sl) noex {
-    	return sispanclass(isalphalatin,sp,sl) ;
+    	return sispanclass(ischalpha,sp,sl) ;
 } /* end subroutine (sispanalpha) */
 
 int sispanalnum(cchar *sp,int sl) noex {
-    	return sispanclass(isalnumlatin,sp,sl) ;
+    	return sispanclass(ischalnum,sp,sl) ;
 } /* end subroutine (sispanalnum) */
 
 int sispandigit(cchar *sp,int sl) noex {
-    	return sispanclass(isdigitlatin,sp,sl) ;
+    	return sispanclass(ischdigit,sp,sl) ;
 } /* end subroutine (sispandigit) */
 
 int sispandigex(cchar *sp,int sl) noex {
-    	return sispanclass(isdigexlatin,sp,sl) ;
+    	return sispanclass(ischdigex,sp,sl) ;
 } /* end subroutine (sispandigex) */
 
 int sispanoctal(cchar *sp,int sl) noex {
-    	return sispanclass(isoctallatin,sp,sl) ;
+    	return sispanclass(ischoctal,sp,sl) ;
 } /* end subroutine (sispanoctal) */
 
 int sispanwhite(cchar *sp,int sl) noex {
-    	return sispanclass(iswhitelatin,sp,sl) ;
+    	return sispanclass(ischwhite,sp,sl) ;
 } /* end subroutine (sispanwhite) */
 
 int sispanblank(cchar *sp,int sl) noex {
-    	return sispanclass(isblanklatin,sp,sl) ;
+    	return sispanclass(ischblank,sp,sl) ;
 } /* end subroutine (sispanblank) */
 
 
