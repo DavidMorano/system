@@ -112,7 +112,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef const void	cv ;
+typedef cvoid	cv ;
 
 
 /* external subroutines */
