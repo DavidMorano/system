@@ -83,7 +83,7 @@ int sbuf_hexpx(sbuf *op,int n,UT v) noex {
 	        cchar	*dp = dbuf ;
 	        if (n == 6) {
 		    dp += ((8 - n) * 2) ;
-		}
+		} /* end */
 	        rs = op->strw(dp,(n * 2)) ;
 	    } /* end if (cthex) */
 	} /* end if (non-null) */
