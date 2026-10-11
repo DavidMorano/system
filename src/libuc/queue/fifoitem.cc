@@ -57,7 +57,7 @@ using libuc::libmem ;			/* variable */
 
 /* local typedefs */
 
-typedef const void	cv ;
+typedef cvoid	cv ;
 typedef fifoitem_ent *	entp ;
 
 
