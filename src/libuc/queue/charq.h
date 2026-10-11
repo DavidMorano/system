@@ -84,8 +84,8 @@ struct charq : charq_head {
 	    finish	(this,charqmem_finish) ;
 	    qbuf = nullptr ;
 	} ; /* end ctor */
-	charq(const charq &) = delete ;
-	charq &operator = (const charq &) = delete ;
+	charq(con charq &) = delete ;
+	charq &operator = (con charq &) = delete ;
 	int ins		(int) noex ;
 	int rem		(char *) noex ;
 	void dtor	() noex ;
