@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0_SNX= snadd.o snaddw.o sncpyarray.o
+OBJ0_SNX= snadd.o snaddw.o sncpyarr.o
 OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o
 OBJ2_SNX= snfilemode.o snflags.o snflager.o sninetaddr.o
 OBJ3_SNX= snkeyval.o snloadavg.o
@@ -160,15 +160,17 @@ objd.o:			$(OBJD_SNX)
 
 snuuid.o:		snuuid.cc			$(INCS)
 sntid.o:		sntid.cc			$(INCS)
-sntmtime.o:		sntmtime.cc sntmtime.h		$(INCS)
-snadd.o:		snadd.cc snadd.h		$(INCS)
-snaddw.o:		snaddw.cc snaddw.h		$(INCS)
-snaddslash.o:		snaddslash.cc snaddslash.h	$(INCS)
-snwx.o:			snwx.cc snwx.h			$(INCS)
-snclean.o:		snclean.cc snclean.h		$(INCS)
-sncpyx.o:		sncpyx.cc sncpyx.h		$(INCS)
-sncpyxw.o:		sncpyxw.cc sncpyxw.h		$(INCS)
-sncpyxc.o:		sncpyxc.cc sncpyxc.h		$(INCS)
+sntmtime.o:		sntmtime.cc	sntmtime.h	$(INCS)
+snadd.o:		snadd.cc	snadd.h		$(INCS)
+snaddw.o:		snaddw.cc	snaddw.h	$(INCS)
+snaddslash.o:		snaddslash.cc	snaddslash.h	$(INCS)
+snwx.o:			snwx.cc		snwx.h		$(INCS)
+snclean.o:		snclean.cc	snclean.h	$(INCS)
+
+sncpyarr.o:		sncpyarr.cc	sncpyarr.h	$(INCS)
+sncpyx.o:		sncpyx.cc	sncpyx.h	$(INCS)
+sncpyxw.o:		sncpyxw.cc	sncpyxw.h	$(INCS)
+sncpyxc.o:		sncpyxc.cc	sncpyxc.h	$(INCS)
 
 snabbrname.o:		snabbrname.cc	snabbr.h	$(INCS)
 snabbrnum.o:		snabbrnum.cc	snabbr.h	$(INCS)
