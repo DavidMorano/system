@@ -63,6 +63,7 @@
 #include	<ids.h>
 #include	<getax.h>
 #include	<filereadln.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -145,7 +146,7 @@ local int	procfile(PROGINFO *,cchar *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -195,7 +196,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"quiet",
 	"intage",
 	NULL
@@ -207,7 +208,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"isproc",
 	"isnotrunning",
 	"isNotRunning",
@@ -221,7 +222,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*qopts[] = {
+static cchar	*qopts[] = {
 	"running",
 	"notrunning",
 	NULL
@@ -242,7 +243,7 @@ int b_isproc(int argc,cchar *argv[],void *contextp) noex {
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -303,16 +304,16 @@ local int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	int		f_help = FALSE ;
 	int		f_early = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pm = NULL ;
-	const char	*sn = NULL ;
-	const char	*pr = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*intagespec = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pm = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*intagespec = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -370,7 +371,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -550,7 +551,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -756,7 +757,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	if ((rs = locinfo_procopts(lip)) >= 0) {
 	    if ((rs = locinfo_intage(lip,argval,intagespec)) >= 0) {
 		if ((rs = locinfo_queries(lip)) >= 0) {
-		    const int	f_notrun = (! lip->have.run) ;
+		    cint	f_notrun = (! lip->have.run) ;
 		    switch (pip->progmode) {
 		    case progmode_isproc:
 			if (f_notrun) lip->fl.running = TRUE ;
@@ -774,7 +775,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	if (DEBUGLEVEL(2)) {
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    debugprintf("b_isproc: daytime=%s\n",
-	        timestr_logz(pip->daytime,timebuf)) ;
+	        strtime_logz(pip->daytime,timebuf)) ;
 	    debugprintf("b_isproc: intage=%d\n",
 	        lip->intage) ;
 	}
@@ -788,8 +789,8 @@ local int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*afn = afname ;
 	    if ((rs = procargs(pip,&ainfo,&pargs,ofn,afn)) == 0) {
 		rs = procfiles(pip) ;
 	        f_early = rs ;
@@ -824,7 +825,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *) noex {
 	} /* end if */
 
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
-	    const char	*fmt = "%s: f_early=%u\n" ;
+	    cchar	*fmt = "%s: f_early=%u\n" ;
 	    shio_printf(pip->efp,fmt,pip->progname,f_early) ;
 	}
 
@@ -909,8 +910,8 @@ local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-q <query(s)>] [<pid(s)>] [-pid <file(s)>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -939,7 +940,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	int		f_early = FALSE ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
@@ -976,7 +977,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 		int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1121,7 +1122,7 @@ local int procfile(PROGINFO *pip,cchar *fname)
 
 	if ((rs = u_stat(fname,&usb)) >= 0) {
 	    if ((rs = locinfo_procage(lip,&usb)) > 0) {
-		const int	rlen = LINEBUFLEN ;
+		cint	rlen = LINEBUFLEN ;
 		char		rbuf[LINEBUFLEN+1] ;
 		if ((rs = filereadln(fname,rbuf,rlen)) >= 0) {
 		    rs = procpid(pip,rbuf) ;
@@ -1194,7 +1195,7 @@ local int locinfo_pidfile(LOCINFO *lip,cchar *vp,int vl)
 {
 	paramopt	*pop = &lip->aparams ;
 	int		rs ;
-	const char	*po = PO_PIDFILE ;
+	cchar	*po = PO_PIDFILE ;
 	if ((rs = paramopt_loads(pop,po,vp,vl)) >= 0) {
 	     lip->fl.pidfile = TRUE ;
 	}
@@ -1207,7 +1208,7 @@ local int locinfo_query(LOCINFO *lip,cchar *vp,int vl)
 {
 	paramopt	*pop = &lip->aparams ;
 	int		rs ;
-	const char	*po = PO_QUERY ;
+	cchar	*po = PO_QUERY ;
 	if ((rs = paramopt_loads(pop,po,vp,vl)) >= 0) {
 	     lip->fl.query = TRUE ;
 	}
@@ -1224,7 +1225,7 @@ local int locinfo_procopts(LOCINFO *lip)
 	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
