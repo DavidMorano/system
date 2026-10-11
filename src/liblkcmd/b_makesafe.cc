@@ -92,6 +92,7 @@
 #include	<upt.h>
 #include	<spawnproc.h>
 #include	<opentmp.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1496,11 +1497,11 @@ local int proctouchfile(proginfo *pip,cchar *touchfname)
 
 #if	CF_ALWAYS
 	    bprintf(&touchfile,"%s\n",
-	        timestr_logz(pip->daytime,timebuf)) ;
+	        strtime_logz(pip->daytime,timebuf)) ;
 #else
 	    if (f_write || (lip->c_updated > 0)) {
 	        bprintf(&touchfile,"%s\n",
-	            timestr_logz(pip->daytime,timebuf)) ;
+	            strtime_logz(pip->daytime,timebuf)) ;
 	    }
 #endif /* CF_ALWAYS */
 
@@ -1918,7 +1919,7 @@ local int procdeps_checker(proginfo *pip,char *rbuf,time_t mo,
 	                    char	timebuf[TIMEBUFLEN + 1] ;
 	                    debugprintf("b_makesafe/procdeps_check: "
 	                        "stat rs=%d mtime=%s\n",
-	                        rs,timestr_log(mtime,timebuf)) ;
+	                        rs,strtime_log(mtime,timebuf)) ;
 	                }
 #endif
 	                if ((rs >= 0) && (mtime > mo)) {
@@ -3092,7 +3093,7 @@ local int locinfo_tmpmaint(LOCINFO *lip) noex {
 	                if (f_need) {
 	                    int		tl ;
 	                    char	timebuf[TIMEBUFLEN + 3] ;
-	                    timestr_log(dt,timebuf) ;
+	                    strtime_log(dt,timebuf) ;
 	                    tl = strlen(timebuf) ;
 	                    timebuf[tl++] = '\n' ;
 	                    rs = u_write(fd,timebuf,tl) ;
