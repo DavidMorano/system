@@ -22,10 +22,10 @@
 
 	Description:
 	This subroutine determines if the parameter string (argument
-	's2') is or is not in the buffer specified by the first two
-	arguments.  This subroutine either returns (-1) or it returns
-	the character position in the buffer of where the string
-	starts.
+	's2') is or is not in the counted string specified by the
+	first two arguments.  This subroutine either returns (-1)
+	or it returns the character position in the string buffer
+	of where the string starts.
 
 	Synopsis:
 	int substring(cchar *s1,int len,cchar *s2) noex
