@@ -146,28 +146,28 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) noex ;
+local int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-static int	usage(PROGINFO *) noex ;
+local int	usage(PROGINFO *) noex ;
 
-static int	procopts(PROGINFO *,keyopt *) noex ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) noex ;
-static int	procnames(PROGINFO *,void *,cchar *,int) noex ;
-static int	procname(PROGINFO *,void *,cchar *,int) noex ;
+local int	procopts(PROGINFO *,keyopt *) noex ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) noex ;
+local int	procnames(PROGINFO *,void *,cchar *,int) noex ;
+local int	procname(PROGINFO *,void *,cchar *,int) noex ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) noex ;
-static int	procuserinfo_end(PROGINFO *) noex ;
-static int	procuserinfo_logid(PROGINFO *) noex ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) noex ;
+local int	procuserinfo_end(PROGINFO *) noex ;
+local int	procuserinfo_logid(PROGINFO *) noex ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
-static int	locinfo_pwi(LOCINFO *,cchar *) noex ;
-static int	locinfo_loadnames(LOCINFO *,cchar *) noex ;
-static int	locinfo_loadone(LOCINFO *,cchar *,int) noex ;
-static int	locinfo_pwilookup(LOCINFO *,cchar *) noex ;
-static int	locinfo_finish(LOCINFO *) noex ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+local int	locinfo_pwi(LOCINFO *,cchar *) noex ;
+local int	locinfo_loadnames(LOCINFO *,cchar *) noex ;
+local int	locinfo_loadone(LOCINFO *,cchar *,int) noex ;
+local int	locinfo_pwilookup(LOCINFO *,cchar *) noex ;
+local int	locinfo_finish(LOCINFO *) noex ;
 
-static int	initdomain(PROGINFO *) noex ;
-static int	addrcompact(char *,int,cchar *,int) noex ;
+local int	initdomain(PROGINFO *) noex ;
+local int	addrcompact(char *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -280,7 +280,7 @@ int p_ismailaddr(int argc,mainv argv[],mainv envv,void *contextp) noex {
 
 /* local subroutines */
 
-static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -902,7 +902,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-static int usage(PROGINFO *pip) noex {
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -924,7 +924,7 @@ static int usage(PROGINFO *pip) noex {
 }
 /* end subroutine (usage) */
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs ;
 	int		opts ;
 
@@ -940,7 +940,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 }
 /* end subroutine (locinfo_start) */
 
-static int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (lip->fl.rndb) {
@@ -962,7 +962,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_finish) */
 
-static int locinfo_pwi(LOCINFO *lip,cchar *rndbfname) noex {
+local int locinfo_pwi(LOCINFO *lip,cchar *rndbfname) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
@@ -978,7 +978,7 @@ static int locinfo_pwi(LOCINFO *lip,cchar *rndbfname) noex {
 }
 /* end subroutine (locinfo_pwi) */
 
-static int locinfo_pwilookup(LOCINFO *lip,cchar *name) noex {
+local int locinfo_pwilookup(LOCINFO *lip,cchar *name) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1020,7 +1020,7 @@ static int locinfo_pwilookup(LOCINFO *lip,cchar *name) noex {
 }
 /* end subroutine (locinfo_pwilookup) */
 
-static int locinfo_loadnames(LOCINFO *lip,cchar *lnfname) noex {
+local int locinfo_loadnames(LOCINFO *lip,cchar *lnfname) noex {
 	PROGINFO	*pip = lip->pip ;
 	KVSFILE		kv ;
 	KVSFILE_CUR	cur ;
@@ -1145,7 +1145,7 @@ static int locinfo_loadnames(LOCINFO *lip,cchar *lnfname) noex {
 }
 /* end subroutine (locinfo_loadnames) */
 
-static int locinfo_loadone(LOCINFO *lip,cchar *namep,int namel) noex {
+local int locinfo_loadone(LOCINFO *lip,cchar *namep,int namel) noex {
 	PROGINFO	*pip = lip->pip ;
 	NULSTR		s ;
 	int		rs ;
@@ -1189,7 +1189,7 @@ static int locinfo_loadone(LOCINFO *lip,cchar *namep,int namel) noex {
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1244,7 +1244,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1284,7 +1284,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1295,7 +1295,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -1326,7 +1326,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 /* end subroutine (procuserinfo_logid) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1419,7 +1419,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procnames(PROGINFO *pip,void *ofp,cchar *sp,int sl)
+local int procnames(PROGINFO *pip,void *ofp,cchar *sp,int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1446,7 +1446,7 @@ static int procnames(PROGINFO *pip,void *ofp,cchar *sp,int sl)
 }
 /* end subroutine (procnames) */
 
-static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel) noex {
+local int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		type = 0 ;
@@ -1581,7 +1581,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel) noex {
 /* end subroutine (procname) */
 
 
-static int initdomain(PROGINFO *pip)
+local int initdomain(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		f = TRUE ;
@@ -1613,7 +1613,7 @@ static int initdomain(PROGINFO *pip)
 
 
 /* optionally compact (remove white-space) a mail-address as needed */
-static int addrcompact(char *rbuf,int rlen,cchar *np,int nl)
+local int addrcompact(char *rbuf,int rlen,cchar *np,int nl)
 {
 	int		rs = SR_OK ;
 	int		i = 0 ;
