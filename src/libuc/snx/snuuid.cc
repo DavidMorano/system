@@ -120,7 +120,7 @@ int snuuid(char *dbuf,int dlen,uuid_dat *up) noex {
 	        } /* end if (ok) */
 	        if (rs >= 0) rs = b.chr('-') ;
 	        v = (up->clk & UINT_MAX) ;
-	        v &= (~ (3 << 14)) ;
+	        v &= (compl (3 << 14)) ;
 	        v |= (2 << 14) ;		/* standardized variant */
 	        if (rs >= 0) rs = b.hexp(2,v) ;
 	        if (rs >= 0) rs = b.chr('-') ;
