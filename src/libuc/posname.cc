@@ -51,6 +51,8 @@ import ulibvals ;			/* |maxpathlen(3u)| */
 
 /* imported namespaces */
 
+using libu::umem ;
+
 
 /* local typedefs */
 
@@ -92,7 +94,7 @@ int posname_start(posname *op,cchar *sp,int µsl,cchar **rpp) noex {
 		    rl = rs ;
 		} else {
 		    rl = sl ;
-		}
+		} /* end if */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
@@ -109,7 +111,7 @@ int posname_finish(posname *op) noex {
 	        rs1 = lm_free(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->as = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->buf[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
@@ -122,24 +124,22 @@ local int posname_loadslash(posname *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		nl = 0 ; /* return-value */
-	if ((rs = ulibval.maxpathlen) >= 0) ylikely {
-	    cint	nlen = rs ;
-	    if (char *nbuf ; (rs = lm_mall((nlen + 1),&nbuf)) >= 0) ylikely {
-	        if ((rs = sncpy2w(nbuf,nlen,"/",sp,sl)) >= 0) ylikely {
-		    if ((nl = rs) > POSNAME_SHORTLEN) {
-		        if (cc *cp ; (rs = lm_strw(nbuf,nl,&cp)) >= 0) ylikely {
-	                    op->as = cp ;
-	                    *rpp = cp ;
-	                } /* end if (memory-acquire) */
-	            } else {
-	                *rpp = op->buf ;
-	                strwcpy(op->buf,nbuf,nl) ;
-	            } /* end if */
-	        } /* end if (pathadd) */
-	        rs1 = lm_free(nbuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (ulibval.maxpathlen) */
+	if (char *nbuf ; (rs = lm_mp(&nbuf)) >= 0) ylikely {
+	    cint nlen = rs ;
+	    if ((rs = sncpy2w(nbuf,nlen,"/",sp,sl)) >= 0) ylikely {
+		if ((nl = rs) > POSNAME_SHORTLEN) {
+		    if (cc *cp ; (rs = lm_strw(nbuf,nl,&cp)) >= 0) ylikely {
+	                op->as = cp ;
+	                *rpp = cp ;
+	            } /* end if (memory-acquire) */
+	        } else {
+	            *rpp = op->buf ;
+	            strwcpy(op->buf,nbuf,nl) ;
+	        } /* end if */
+	    } /* end if (pathadd) */
+	    rs1 = lm_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? nl : rs ;
 } /* end subroutine (posname_loadslash) */
 
