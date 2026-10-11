@@ -111,12 +111,12 @@ int snflager_addstrw(snflager *op,cchar *sp,int sl) noex {
 	            rs = storebuf_chr(op->bp,op->bl,op->bi,ch_comma) ;
 	            op->bi += rs ;
 		    rl += rs ;
-	        }
+	        } /* end */
 	        if (rs >= 0) {
 	            rs = storebuf_strw(op->bp,op->bl,op->bi,sp,sl) ;
 	            op->bi += rs ;
 		    rl += rs ;
-	        }
+	        } /* end */
 	    } /* end if (non-empty) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
@@ -126,7 +126,7 @@ int snflager_count(snflager *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = op->c ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (snflager_count) */
 
@@ -134,7 +134,7 @@ int snflager_len(snflager *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = op->bi ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (snflager_count) */
 
@@ -166,7 +166,7 @@ int snflager::addstrw(cchar *sp,int sl) noex {
 void snflager::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("snflager",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (snflager::dtor) */
 
 snflager_co::operator int () noex {
