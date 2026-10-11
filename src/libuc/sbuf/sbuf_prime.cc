@@ -107,7 +107,7 @@ template<typename T> using ctxxx_f = int (*)(char *,int,T) noex ;
 
 namespace {
     struct blanker {
-	cchar	*p	= sysword.w_blanks ;
+	ccharp	p	= sysword.w_blanks ;
 	cint	l	= clenstr(sysword.w_blanks) ;
     } ; /* end struct (blanker) */
 } /* end namespace */
@@ -128,12 +128,12 @@ local inline int sbuf_xxxx(sbuf *op,int dlen,ctxxx_f<T> ctxxx,T v) noex {
 	            if ((rs = ctxxx(bp,bl,v)) >= 0) {
 		        SBUF_INDEX += rs ;
 		        len = rs ;
-	            }
+	            } /* end */
 	        } else {
 	            if (char dbuf[dlen+1] ; (rs = ctxxx(dbuf,dlen,v)) >= 0) {
 	                len = rs ;
 	                rs = sbuf_addstrw(op,dbuf,len) ;
-	            }
+	            } /* end */
 	        } /* end if */
 	    } /* end if (not in error mode) */
 	} /* end if (non-null) */
@@ -226,23 +226,23 @@ int sbuf_buf(sbuf *op,cchar *sp,int sl) noex {
 	            if (sl < 0) {
 	                while (*sp) {
 	                    *bp++ = *sp++ ;
-		        }
+		        } /* end */
 	            } else {
 	                while (sl > 0) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
-	                }
+	                } /* end */
 	            } /* end if */
 	        } else {
 	            if (sl < 0) {
 	                while (*sp && (bp < (SBUF_RBUF + SBUF_RLEN))) {
 	                    *bp++ = *sp++ ;
-		        }
+		        } /* end */
 	            } else {
 	                while ((sl > 0) && (bp < (SBUF_RBUF + SBUF_RLEN))) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
-	                }
+	                } /* end */
 	            } /* end if */
 	            if (*sp && (sl > 0)) rs = SR_OVERFLOW ;
 	        } /* end if */
@@ -259,7 +259,7 @@ int sbuf_strw(sbuf *op,cchar *sp,int sl) noex {
 	if (op && sp) ylikely {
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 		rs = sbuf_addstrw(op,sp,sl) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sbuf_strw) */
@@ -275,11 +275,11 @@ int sbuf_strs(sbuf *bp,int sch,mainv sv) noex {
 	            if (sch && (i > 0)) {
 			rs = sbuf_chr(bp,sch) ;
 			len += rs ;
-		    }
+		    } /* end */
 	            if (rs >= 0) {
 			rs = sbuf_strw(bp,sp,-1) ;
 			len += rs ;
-		    }
+		    } /* end */
 		} /* end if */
 	        if (rs < 0) break ;
 	    } /* end for */
@@ -394,7 +394,7 @@ int sbuf_hexuc(sbuf *op,uchar v) noex {
 		        len = rs ;
 	            } else {
 	                SBUF_INDEX = rs ;
-	            }
+	            } /* end */
 	        } /* end if */
 	    } /* end if (not in error mode) */
 	} /* end if (non-null) */
@@ -428,7 +428,7 @@ int sbuf_chr(sbuf *op,int ch) noex {
 	            rs = SR_OK ;
 	        } else {
 	            SBUF_INDEX = rs ;
-	        }
+	        } /* end */
 	    } /* end if (not in error mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -453,7 +453,7 @@ int sbuf_chrs(sbuf *op,int ch,int n) noex {
 	                *bp = '\0' ;
 	            } else {
 	                SBUF_INDEX = rs ;
-	            }
+	            } /* end */
 		} /* end if (valid) */
 	   } /* end if (not in error-mode) */
 	} /* end if (non-null) */
@@ -492,7 +492,7 @@ int sbuf_vprintf(sbuf *op,cchar *fmt,va_list ap) noex {
 		        SBUF_INDEX += len ;
 	            } else {
 		        SBUF_INDEX = rs ;
-	            }
+	            } /* end */
 	        } /* end if (not error mode) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -523,7 +523,7 @@ int sbuf_adv(sbuf *op,int adv,char **dpp) noex {
 		    SBUF_INDEX += adv ;
 	        } else {
 		    rs = SR_TOOBIG ;
-	        }
+	        } /* end */
 	    } /* end if (not error mode) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? adv : rs ;
@@ -535,7 +535,7 @@ int sbuf_rem(sbuf *op) noex {
 	if (op) ylikely {
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        rs = (SBUF_RLEN - SBUF_INDEX) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sbuf_rem) */
@@ -545,7 +545,7 @@ int sbuf_getlen(sbuf *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SBUF_INDEX ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sbuf_getlen) */
 
@@ -566,7 +566,7 @@ int sbuf_getpoint(sbuf *op,cchar **rpp) noex {
 	    rs = SBUF_INDEX ;
 	    if (rpp) {
 	        *rpp = (SBUF_RBUF + SBUF_INDEX) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sbuf_getpoint) */
@@ -577,7 +577,7 @@ int sbuf_getprev(sbuf *op) noex {
 	if (op) ylikely {
 	    if ((rs = SBUF_INDEX) >= 0) ylikely {
 	        rs = mkchar(SBUF_RBUF[SBUF_INDEX - 1]) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sbuf_getprev) */
@@ -624,7 +624,7 @@ int sbuf::decl(long v) noex {
 void sbuf::dtor() noex {
 	if (cint rs = sbuf_finish(this) ; rs < 0) {
 	   ulogerror("sbuf",rs,"dtor-finish") ;
-	}
+	} /* end */
 } /* end method (sbuf::dtor) */
 
 
@@ -638,24 +638,24 @@ local int sbuf_addstrw(sbuf *op,cchar *sp,int sl) noex {
 	    if (sl < 0) {
 	        while (*sp) {
 	            *bp++ = *sp++ ;
-		}
+		} /* end */
 	    } else {
 	        while (sl && *sp) {
 	            *bp++ = *sp++ ;
 	            sl -= 1 ;
-	        }
+	        } /* end */
 	    } /* end if */
 	} else {
 	    if (sl < 0) {
 	        while (*sp && (bp < (SBUF_RBUF + SBUF_RLEN))) {
 	            *bp++ = *sp++ ;
-		}
+		} /* end */
 	        if (*sp) rs = SR_OVERFLOW ;
 	    } else {
 	        while (sl && *sp && (bp < (SBUF_RBUF + SBUF_RLEN))) {
 	            *bp++ = *sp++ ;
 	            sl -= 1 ;
-	        }
+	        } /* end */
 	        if (*sp && (sl > 0)) rs = SR_OVERFLOW ;
 	    } /* end if */
 	} /* end if */
