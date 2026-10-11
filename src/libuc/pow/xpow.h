@@ -33,7 +33,7 @@ extern int	ipow	(int,int) noex ;
 extern long	lpow	(long,int) noex ;
 extern longlong	llpow	(longlong,int) noex ;
 
-static inline int ipowell(int b,int e) noex {
+local inline int ipowell(int b,int e) noex {
 	return ipow(b,e) ;
 }
 
@@ -41,13 +41,13 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-static inline int	pow(int b,int e) noex {
+local inline int	pow(int b,int e) noex {
 	return ipow(b,e) ;
 }
-static inline long	pow(long b,int e) noex {
+local inline long	pow(long b,int e) noex {
 	return lpow(b,e) ;
 }
-static inline longlong	pow(longlong b,int e) noex {
+local inline longlong	pow(longlong b,int e) noex {
 	return llpow(b,e) ;
 }
 
