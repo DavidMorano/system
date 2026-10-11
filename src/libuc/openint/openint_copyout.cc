@@ -62,19 +62,35 @@
 #include	<sys/stat.h>		/* POSIX® */
 #include	<unistd.h>		/* POSIX® */
 #include	<fcntl.h>		/* POSIX® */
-#include	<ctime>			/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
 
 #include	"openint_copyout.h"
-#include	"defs.h"
 
+#pragma		GCC dependency		"mod/deb.ccm"
+
+import deb ;
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
+
+
+/* imported namespaces */
+
+using libuc::libmem ;			/* variable */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -91,39 +107,37 @@
 
 /* local variables */
 
+cbool		f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int openint_copyout(pr,dn,bn,prn,of,om,argv,envv,to)
-cchar	*pr ;
-cchar	*dn ;
-cchar	*bn ;
-cchar	*prn ;
-int		of ;
-mode_t		om ;
-cchar	**argv ;
-cchar	**envv ;
-int		to ;
-{
-	int		rs = SR_OK ;
+int openint_copyout(cc *pr,cc *dn,cc *bn,cc *prn,
+		int of,mode_t om,con mainv argv,con mainv envv,int to) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		fd = -1 ;
-	cchar	*inter = "copyout" ;
-	char		fname[MAXPATHLEN+1] ;
-
-#if	CF_DEBUG
-	debugprintf("openint_copyout: pr=%s\n",pr) ;
-	debugprintf("openint_copyout: dn=%s\n",dn) ;
-	debugprintf("openint_copyout: prn=%s\n",prn) ;
-#endif
-
-	if ((rs = mkpath2(fname,dn,bn)) >= 0) {
-	    rs = u_open(fname,of,om) ;
-	    fd = rs ;
-	}
-
+	[[maybe_unused]]
+	cchar		*inter = "copyout" ;
+	DEBPRINTF("pr=%s\n",pr) ;
+	DEBPRINTF("dn=%s\n",dn) ;
+	DEBPRINTF("prn=%s\n",prn) ;
+	(void) argv ;
+	(void) envv ;
+	(void) to ;
+	if (pr && dn && dn && prn) ylikely {
+	    if (char *fbuf ; (rs = libmem.mp(&fbuf)) >= 0) {
+	        if ((rs = mkpath2(fbuf,dn,bn)) >= 0) {
+	            rs = u_open(fbuf,of,om) ;
+	            fd = rs ;
+	        } /* end */
+	        rs1 = libmem.free(fbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (openint_copyout) */
 
