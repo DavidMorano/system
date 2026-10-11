@@ -116,8 +116,9 @@
 #include	<lfm.h>
 #include	<getusername.h>
 #include	<getutmpent.h>
-#include	<exitcodes.h>
 #include	<mallocstuff.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -146,12 +147,12 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	getrootdname(char *,int,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
+extern int	getrootdname(char *,int,cchar *,cchar *) ;
 extern int	batch(struct proginfo *,void *,vecstr *) ;
 
 #if	CF_CPUSPEED
-extern int	cpuspeed(const char *,const char *,int) ;
+extern int	cpuspeed(cchar *,cchar *,int) ;
 #endif
 
 
@@ -176,32 +177,32 @@ struct errormap {
 
 /* forward references */
 
-int	setfname(struct proginfo *,char *,const char *,int,
-			int,const char *,const char *,const char *) ;
+int	setfname(struct proginfo *,char *,cchar *,int,
+			int,cchar *,cchar *,cchar *) ;
 
-static void	sighand_int(int) ;
+local void	sighand_int(int) ;
 
-static int	usage(struct proginfo *) ;
-static int	msupdate(struct proginfo *,LFM *) ;
+local int	usage(struct proginfo *) ;
+local int	msupdate(struct proginfo *,LFM *) ;
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
-static const int	sigblocks[] = {
+static cint	sigblocks[] = {
 	SIGHUP,
 	SIGCHLD,
 	0
 } ;
 
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGPIPE,
 	0
 } ;
 
-static const int	sigints[] = {
+static cint	sigints[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGINT,
@@ -210,7 +211,7 @@ static const int	sigints[] = {
 	0
 } ;
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"VERSION",
 	"VERBOSE",
 	"ROOT",
@@ -246,7 +247,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*sched1[] = {
+static cchar	*sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -254,7 +255,7 @@ static const char	*sched1[] = {
 	NULL
 } ;
 
-static const char	*params[] = {
+static cchar	*params[] = {
 	"cmd",
 	"loglen",
 	"msfile",
@@ -1109,7 +1110,7 @@ int main(int argc,mainv argv,mainv envv)
 	            logfile_checksize(&pip->lh,pip->loglen) ;
 
 	        logfile_printf(&pip->lh,"%s %s",
-	            timestr_logz(pip->daytime,timebuf),
+	            strtime_logz(pip->daytime,timebuf),
 	            pip->banner) ;
 
 	        logfile_printf(&pip->lh,"%-14s %s",
@@ -1249,8 +1250,8 @@ int main(int argc,mainv argv,mainv envv)
 		    }
 
 		    if (pip->have.logfile) {
-			const char	*lf = pip->logfname ;
-			const char	*lid = pip->logid ;
+			cchar	*lf = pip->logfname ;
+			cchar	*lid = pip->logid ;
 	    	        rs1 = logfile_open(&pip->lh,lf,0,0666,lod) ;
 			pip->open.logfile = (rs1 >= 0) ;
 		    }
@@ -1318,7 +1319,7 @@ int main(int argc,mainv argv,mainv envv)
 	                    lw = pip->runint ;
 	                    logfile_printf(&pip->lh,
 	                        "runint=%s pollint=%u",
-	                        timestr_elapsed(lw,timebuf),
+	                        strtime_elapsed(lw,timebuf),
 	                        pip->pollint) ;
 
 	                    logfile_printf(&pip->lh,
@@ -1546,8 +1547,8 @@ badqueue:
 int setfname(pip,fname,ebuf,el,f_def,dname,name,suf)
 struct proginfo	*pip ;
 char		fname[] ;
-const char	ebuf[] ;
-const char	dname[], name[], suf[] ;
+cchar	ebuf[] ;
+cchar	dname[], name[], suf[] ;
 int		el ;
 int		f_def ;
 {
@@ -1624,7 +1625,7 @@ int		f_def ;
 
 
 
-static void sighand_int(sn)
+local void sighand_int(sn)
 int	sn ;
 {
 
@@ -1634,7 +1635,7 @@ int	sn ;
 /* end subroutine (sighand_int) */
 
 
-static int usage(pip)
+local int usage(pip)
 struct proginfo	*pip ;
 {
 	int	rs ;
@@ -1652,7 +1653,7 @@ struct proginfo	*pip ;
 /* end subroutine (usage) */
 
 
-static int msupdate(pip,lp)
+local int msupdate(pip,lp)
 struct proginfo	*pip ;
 LFM		*lp ;
 {
@@ -1684,7 +1685,7 @@ LFM		*lp ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("b_msu/msupdate: runint=%s\n",
-	        timestr_elapsed((time_t) pip->runint,timebuf)) ;
+	        strtime_elapsed((time_t) pip->runint,timebuf)) ;
 #endif
 
 	nfds = 0 ;
@@ -1928,12 +1929,12 @@ LFM		*lp ;
 
 	                logfile_printf(&pip->lh,
 	                    "%s mark> %s",
-	                    timestr_logz(pip->daytime,timebuf),
+	                    strtime_logz(pip->daytime,timebuf),
 	                    pip->nodename) ;
 
 	                logfile_printf(&pip->lh,
 	                    "remaining=%s",
-	                    timestr_elapsed(lw,timebuf)) ;
+	                    strtime_elapsed(lw,timebuf)) ;
 
 	                logfile_flush(&pip->lh) ;
 
@@ -1952,8 +1953,8 @@ LFM		*lp ;
 		    }
 
 		    if (pip->have.logfile) {
-			const char	*lf = pip->logfname ;
-			const char	*lid = pip->logid ;
+			cchar	*lf = pip->logfname ;
+			cchar	*lid = pip->logid ;
 	                rs1 = logfile_open(&pip->lh,lf,0,0666,lid) ;
 	                pip->open.logfile = (rs1 >= 0) ;
 		    }
@@ -1990,9 +1991,9 @@ LFM		*lp ;
 	        debugprintf("b_msu/msupdate: white-out if_int=%u\n",
 	            if_int) ;
 	        debugprintf("b_msu/msupdate: start=%s\n",
-	            timestr_log(ti_start,timebuf)) ;
+	            strtime_log(ti_start,timebuf)) ;
 	        debugprintf("b_msu/msupdate: now=%s\n",
-	            timestr_log(pip->daytime,timebuf)) ;
+	            strtime_log(pip->daytime,timebuf)) ;
 	    }
 #endif
 
