@@ -49,8 +49,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
-#include	<ischarx.h>		/* LIBUC |ispm(3uc)| */
+#include	<isch.h>		/* LIBUC |ischpm(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"
@@ -86,16 +85,16 @@ int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex {
 	bool		fneg = false ;
     	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	    while ((sl > 0) && ischwht(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    if ((sl > 0) && ispm(*sp)) {
+	    if ((sl > 0) && ischpm(*sp)) {
 	        fneg = (*sp == '-') ;
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end if */
-	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	    while ((sl > 0) && ischwht(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
