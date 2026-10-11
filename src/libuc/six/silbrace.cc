@@ -41,7 +41,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU |CH_{x}(3uc)| */
 #include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"six.h"
