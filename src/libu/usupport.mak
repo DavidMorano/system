@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ00= usupport_prime.o usupport_sncpyx.o
-OBJ01= usupport_itimer.o 
+OBJ01= usupport_itimer.o usupport_snadd.o
 OBJ02= usupport_cfdec.o usupport_cfdect.o
 OBJ03= usupport_cfhex.o usupport_cfinet.o
 OBJ04= usupport_toxc.o usupport_snwcpy.o 
@@ -269,6 +269,7 @@ usupport_siext.o:	usupport_siext.cc	usupport_siext.hh	$(INCS)
 usupport_sispan.o:	usupport_sispan.cc	usupport_sispan.hh	$(INCS)
 usupport_siwhtx.o:	usupport_siwhtx.cc	usupport_siwhtx.hh	$(INCS)
 usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.hh	$(INCS)
+usupport_snadd.o:	usupport_snadd.cc	usupport_snadd.hh	$(INCS)
 usupport_sncpyx.o:	usupport_sncpyx.cc	usupport_sncpyx.hh	$(INCS)
 usupport_snwcpy.o:	usupport_snwcpy.cc	usupport_snwcpy.hh	$(INCS)
 usupport_strdcpyx.o:	usupport_strdcpyx.cc	usupport_strdcpyx.hh	$(INCS)
