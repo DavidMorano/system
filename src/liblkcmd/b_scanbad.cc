@@ -144,7 +144,7 @@ local int	procfile(PROGINFO *,PROCDATA *,void *,cchar *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -196,7 +196,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"nice",
 	"scanoff",
 	"scanlen",
@@ -339,7 +339,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -546,7 +546,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -957,7 +957,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,PROCDATA *pdp,
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1132,7 +1132,7 @@ local int procfile(PROGINFO *pip,PROCDATA *pdp,void *ofp,cchar *ifname)
 	    return SR_INVALID ;
 
 	if ((rs = u_open(ifname,O_RDONLY,0666)) >= 0) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -1323,8 +1323,8 @@ local int locinfo_allocbegin(LOCINFO *lip,int blocklen)
 	    if (rs >= 0) lip->rdata = p ;
 	} else {
 	    size_t	ms = uceil(blocklen,lip->pagesize) ;
-	    const int	mp = (PROT_READ|PROT_WRITE) ;
-	    const int	mf = (MAP_PRIVATE|MAP_ANON) ;
+	    cint	mp = (PROT_READ|PROT_WRITE) ;
+	    cint	mf = (MAP_PRIVATE|MAP_ANON) ;
 	    void	*md ;
 	    if ((rs = u_mmap(NULL,ms,mp,mf,-1,0L,&md)) >= 0) {
 	        lip->rdata = md ;
