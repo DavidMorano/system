@@ -190,7 +190,7 @@ int parts::round(int prec) noex {
 	if (partf >= 1000) {
 	    partf = (partf % 1000) ;
 	    parti += 1 ;
-	}
+	} /* end */
 	return 0 ;
 } /* end method (parts::round) */
 
