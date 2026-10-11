@@ -32,7 +32,7 @@ extern int sifoldsub(cchar *sp,int sl,cchar *ss) noex ;
 
 local inline int sisub(cchar *sp,int sl,cchar *ss) noex {
 	return sibasesub(sp,sl,ss) ;
-}
+} /* end */
 
 EXTERNC_end
 
