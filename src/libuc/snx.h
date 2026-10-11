@@ -29,6 +29,7 @@
 #include	<snadd.h>
 #include	<snclean.h>
 #include	<sncpy.h>
+#include	<sncpyarr.h>
 #include	<sncpyx.h>		/* repeat? */
 #include	<sncpyxc.h>		/* repeat? */
 #include	<sncpyxw.h>		/* repeat? */
