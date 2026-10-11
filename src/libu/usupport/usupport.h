@@ -55,6 +55,7 @@
 #include	<usupport_sispan.hh>
 #include	<usupport_siwhtx.hh>
 #include	<usupport_sixchr.hh>
+#include	<usupport_snadd.hh>
 #include	<usupport_sncpyx.hh>
 #include	<usupport_snwcpy.hh>
 #include	<usupport_strdcpyx.hh>
