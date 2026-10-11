@@ -83,7 +83,7 @@ local int snflx(const flent *ftab,char *dbuf,int dlen,ulong fl) noex {
 	        for (int i = 0 ; (rs >= 0) && ftab[i].s ; i += 1) {
 	            if (fl & ftab[i].fl) {
 	                rs = fr.addstr(ftab[i].s) ;
-		    }
+		    } /* end */
 	        } /* end for */
 	        rs1 = fr.finish ;
 	        if (rs >= 0) rs = rs1 ;
@@ -219,7 +219,7 @@ int snflagsopen(char *dbuf,int dlen,ulong fl) noex {
 	        } /* end switch */
 	        if (ms) {
 		    rs = fr.addstr(ms) ;
-	        }
+	        } /* end */
 	        for (int i = 0 ; (rs >= 0) && fl_open[i].s ; i += 1) {
 	            if (fl & fl_open[i].fl) {
 	                rs = fr.addstr(fl_open[i].s) ;
