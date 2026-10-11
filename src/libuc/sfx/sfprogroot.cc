@@ -40,12 +40,12 @@
 
 	Example:
 	{
-		const char	*execname = "/usr/bin/sleep" ;
-		const char	*dp ;
+		cchar	*execname = "/usr/bin/sleep" ;
+		cchar	*dp ;
 		int		dl ;
 		if ((dl = sfdirname(execname,-1,&dp)) > 0) {
 		    int		rl ;
-		    const char	*rp ;
+		    cchar	*rp ;
 		    if ((rl = sfprogroot(dp,dl,&rp)) > 0) {
 		        fprintf(stdout,"pr=%s\n",rp) ;
 		    }
