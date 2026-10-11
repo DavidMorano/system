@@ -15,7 +15,7 @@
 	This was updated to use |strlcpy(3c)| when it was rumored
 	to be coming as a new standard.  We are currently using our
 	own implementation of that, but when it is supported by
-	vendors this will all seemlessly transistion to using the
+	vendors this will all seemlessly transition to using the
 	vendor version.
 
 */
@@ -37,6 +37,19 @@
 	overflow and segfaults as well as leaving the destination
 	buffer NUL-terminated.  Please observe and be careful with
 	any possible modifications.
+
+	Notes:
+	I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard lirbrary already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might gets optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like).
 
 	See-also:
 	snxtilook(3uc)
@@ -83,6 +96,8 @@
 
 /* forward references */
 
+local bool hasgot(ccp,int) noex ;
+
 
 /* local variables */
 
@@ -92,28 +107,33 @@
 
 /* exported subroutines */
 
-int sncpy1w(char *dp,int dl,cc *s1,int sl) noex {
+int sncpy1w(char *dp,int dl,
+		cc *s1,int sl) noex {
 	return sncpyxw(dp,dl,1,s1,sl) ;
 } /* end subroutine (sncpy1w) */
 
-int sncpy2w(char *dp,int dl,cc *s1,cc *s2,int sl) noex {
+int sncpy2w(char *dp,int dl,
+		cc *s1,cc *s2,int sl) noex {
 	return sncpyxw(dp,dl,2,s1,s2,sl) ;
 } /* end subroutine (sncpy2w) */
 
-int sncpy3w(char *dp,int dl,cc *s1,cc *s2,cc *s3,int sl) noex {
+int sncpy3w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,int sl) noex {
 	return sncpyxw(dp,dl,3,s1,s2,s3,sl) ;
 } /* end subroutine (sncpy3w) */
 
-int sncpy4w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
+int sncpy4w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
 	return sncpyxw(dp,dl,4,s1,s2,s3,s4,sl) ;
 } /* end subroutine (sncpy4w) */
 
-int sncpy5w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
+int sncpy5w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
 	return sncpyxw(dp,dl,5,s1,s2,s3,s4,s5,sl) ;
 } /* end subroutine (sncpy5w) */
 
-int sncpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,
-		cc *s6,int sl) noex {
+int sncpy6w(char *dp,int dl,
+		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl) noex {
 	return sncpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end subroutine (sncpy6w) */
 
@@ -121,7 +141,7 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (dl < 0) dl = (INT_MAX - 1) ;
+	if (dl < 0) dl = INT_MAX ;
 	if (dp) ylikely {
 	    size_t	rmlen = (dl + 1) ;
 	    char	*bp = dp ;
@@ -131,29 +151,34 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 		size_t	ml ;
 	        cc	*sp = (cchar *) va_arg(ap,char *) ;
-	        if (i < (n-1)) {
+	        if (i < (n - 1)) {
 	            ml = strlcpy(bp,sp,rmlen) ;
 	            if (ml < rmlen) bp += ml ;
 	        } else { /* emulate |strlcpy(3c)| but w/ given length */
-	            int		sl = (int) va_arg(ap,int) ;
+	            int	sl = (int) va_arg(ap,int) ;
 		    ml = 0 ;
-		    while ((ml < (rmlen - 1)) && sl-- && *sp) {
+		    while ((ml < (rmlen - 1)) && hasgot(sp,sl)) {
 		        *bp++ = *sp++ ;
+			sl -= 1 ;
 		        ml += 1 ;
 		    } /* end while */
 		    *bp = '\0' ;
-		    if ((sl != 0) && *sp) ml += 1 ; /* error condition */
+		    if (hasgot(sp,sl)) ml += 1 ; /* error condition */
 	        } /* end if */
 	        if (ml < rmlen) {
 		    rmlen -= ml ;
 		} else {
 		    rs = SR_OVERFLOW ;
-		}
+		} /* end if */
 	    } /* end for */
 	    rl = intconv(bp - dp) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (sncpyxw) */
+
+local bool hasgot(ccp sp,int sl) noex {
+    	return (sl && *sp) ;
+} /* end subroutine (hasgot) */
 
 
