@@ -70,7 +70,7 @@ local int	setstr_finents(setstr *) noex ;
 
 /* local variables */
 
-const int	rsn = SR_NOTFOUND ;
+cint	rsn = SR_NOTFOUND ;
 
 
 /* exported variables */
