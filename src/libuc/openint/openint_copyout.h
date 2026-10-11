@@ -1,4 +1,12 @@
-/* config */
+/* openintcopyout_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* test program */
+/* version %I% last-modified %G% */
+
+#ifndef	OPENINTCOPYOUTCONFIG_INCLUDE
+#define OPENINTCOPYOUTCONFIG_INCLUDE
 
 
 #define	VERSION		"0"
@@ -69,5 +77,7 @@
 
 #define	USAGECOLS	4
 
+
+#endif /* OPENINTCOPYOUTCONFIG_INCLUDE */
 
 
