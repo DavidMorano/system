@@ -81,10 +81,10 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -116,27 +116,27 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,void *,const char *,int) ;
-static int	procname(PROGINFO *,void *, cchar *,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(PROGINFO *,void *,cchar *,int) ;
+local int	procname(PROGINFO *,void *, cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_loadusername(LOCINFO *,const char *,int) ;
-static int	locinfo_username(LOCINFO *) ;
-static int	locinfo_outbegin(LOCINFO *,const char *) ;
-static int	locinfo_outend(LOCINFO *) ;
-static int	locinfo_pjbuf(LOCINFO *) ;
-static int	locinfo_inproj(LOCINFO *,cchar *,int) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_loadusername(LOCINFO *,cchar *,int) ;
+local int	locinfo_username(LOCINFO *) ;
+local int	locinfo_outbegin(LOCINFO *,cchar *) ;
+local int	locinfo_outend(LOCINFO *) ;
+local int	locinfo_pjbuf(LOCINFO *) ;
+local int	locinfo_inproj(LOCINFO *,cchar *,int) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -206,7 +206,7 @@ int b_inproject(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -230,7 +230,7 @@ int p_inproject(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -252,14 +252,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -317,7 +317,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -486,7 +486,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -777,12 +777,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<projname(s)> ...] [-af <afile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -801,7 +801,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -849,7 +849,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -890,7 +890,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procspecs(PROGINFO *pip,void *ofp,const char *lbuf,int llen)
+local int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -914,7 +914,7 @@ static int procspecs(PROGINFO *pip,void *ofp,const char *lbuf,int llen)
 
 
 /* process a specification name */
-static int procname(PROGINFO *pip,void *ofp,cchar *np,int nl)
+local int procname(PROGINFO *pip,void *ofp,cchar *np,int nl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -945,7 +945,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *np,int nl)
 /* end subroutine (procname) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -957,7 +957,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -976,7 +976,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_loadusername(LOCINFO *lip,cchar sp[],int sl)
+local int locinfo_loadusername(LOCINFO *lip,cchar sp[],int sl)
 {
 	int		rs = SR_OK ;
 	int		ml = USERNAMELEN ;
@@ -993,7 +993,7 @@ static int locinfo_loadusername(LOCINFO *lip,cchar sp[],int sl)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_username(LOCINFO *lip)
+local int locinfo_username(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1011,13 +1011,13 @@ static int locinfo_username(LOCINFO *lip)
 /* end subroutine (locinfo_username) */
 
 
-static int locinfo_outbegin(LOCINFO *lip,const char *ofname)
+local int locinfo_outbegin(LOCINFO *lip,cchar *ofname)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
 	if (pip->verboselevel > 1) {
-	    const int	size = sizeof(SHIO) ;
+	    cint	size = sizeof(SHIO) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 	        lip->ofp = p ;
@@ -1034,7 +1034,7 @@ static int locinfo_outbegin(LOCINFO *lip,const char *ofname)
 /* end subroutine (locinfo_outbegin) */
 
 
-static int locinfo_outend(LOCINFO *lip)
+local int locinfo_outend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1052,12 +1052,12 @@ static int locinfo_outend(LOCINFO *lip)
 /* end subroutine (locinfo_outend) */
 
 
-static int locinfo_pjbuf(LOCINFO *lip)
+local int locinfo_pjbuf(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (lip->pjbuf == NULL) {
 	    if ((rs = bufsizeget(bufsize_pj)) >= 0) {
-	        const int	pjlen = rs ;
+	        cint	pjlen = rs ;
 	        char		*pjbuf ;
 	        if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
 	            lip->pjbuf = pjbuf ;
@@ -1070,7 +1070,7 @@ static int locinfo_pjbuf(LOCINFO *lip)
 /* end subroutine (locinfo_pjbuf) */
 
 
-static int locinfo_inproj(LOCINFO *lip,cchar *np,int nl)
+local int locinfo_inproj(LOCINFO *lip,cchar *np,int nl)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1079,7 +1079,7 @@ static int locinfo_inproj(LOCINFO *lip,cchar *np,int nl)
 	    NULSTR	ns ;
 	    cchar	*name ;
 	    if ((rs = nulstr_start(&ns,np,nl,&name)) >= 0) {
-	        const int	pjlen = lip->pjlen ;
+	        cint	pjlen = lip->pjlen ;
 	        cchar		*un = lip->username ;
 	        char		*pjbuf = lip->pjbuf ;
 	        if ((rs = uc_inproj(un,name,pjbuf,pjlen)) >= 0) {
