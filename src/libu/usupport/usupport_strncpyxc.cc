@@ -24,9 +24,9 @@
 	strncpyfc
 
 	Description:
-	This subroutine is like |strncpy(3c)| (with its non-NUL
-	terminating behavior) except that the case of the characters
-	are converted as desired.
+	These subroutines are rather like |strncpy(3c)| (with its
+	non-NUL terminating behavior) except that the case of the
+	characters are converted as desired.
 
 	Synopsis:
 	char *strncpy{x}c(char *dst,cchar *src,int n) noex
