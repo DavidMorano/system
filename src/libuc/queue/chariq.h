@@ -77,8 +77,8 @@ struct chariq : chariq_head {
 	    finish	(this,chariqmem_finish) ;
 	    cqp = nullptr ;
 	} ; /* end ctor */
-	chariq(const chariq &) = delete ;
-	chariq &operator = (const chariq &) = delete ;
+	chariq(con chariq &) = delete ;
+	chariq &operator = (con chariq &) = delete ;
 	int start	(int) noex ;
 	int ins		(int) noex ;
 	int rem		(char *) noex ;
