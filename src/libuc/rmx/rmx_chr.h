@@ -33,7 +33,7 @@ extern int	rmrchr(cchar *,int,int) noex ;
 
 local inline int rmchr(cchar *sp,int sl,int sch) noex {
 	return rmochr(sp,sl,sch) ;
-}
+} /* end */
 
 EXTERNC_end
 
