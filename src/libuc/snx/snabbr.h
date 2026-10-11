@@ -28,6 +28,7 @@ EXTERNC_begin
 
 extern int snabbrerr	(char *,int,int) noex ;
 extern int snabbrsig	(char *,int,int) noex ;
+extern int snabbrexi	(char *,int,int) noex ;
 extern int snabbrname	(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
