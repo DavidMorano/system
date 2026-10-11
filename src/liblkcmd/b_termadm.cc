@@ -119,36 +119,36 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,void *,cchar *,int) ;
-static int	procspec(PROGINFO *,void *, cchar *,int) ;
-static int	procget(PROGINFO *,void *,int) ;
-static int	procset(PROGINFO *,void *,int,cchar *,int) ;
-static int	procout(PROGINFO *,SHIO *,cchar *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(PROGINFO *,void *,cchar *,int) ;
+local int	procspec(PROGINFO *,void *, cchar *,int) ;
+local int	procget(PROGINFO *,void *,int) ;
+local int	procset(PROGINFO *,void *,int,cchar *,int) ;
+local int	procout(PROGINFO *,SHIO *,cchar *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_termbegin(LOCINFO *) ;
-static int	locinfo_termend(LOCINFO *) ;
-static int	locinfo_ws(LOCINFO *) ;
-static int	locinfo_setline(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_termbegin(LOCINFO *) ;
+local int	locinfo_termend(LOCINFO *) ;
+local int	locinfo_ws(LOCINFO *) ;
+local int	locinfo_setline(LOCINFO *,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -204,7 +204,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"poll",
 	"pollint",
 	"intpoll",
@@ -221,7 +221,7 @@ enum progopts {
 } ;
 
 /* define the configuration keywords */
-static const char	*qopts[] = {
+static cchar	*qopts[] = {
 	"rows",
 	"lines",
 	"cols",
@@ -287,7 +287,7 @@ int p_termadm(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -379,7 +379,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -599,7 +599,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -947,7 +947,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -971,7 +971,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1041,7 +1041,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	int		rs ;
 
@@ -1052,7 +1052,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1070,7 +1070,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	    cchar	*cp ;
 
 	    if (rs >= 0) {
-	        const int	ai_continue = aip->ai_continue ;
+	        cint	ai_continue = aip->ai_continue ;
 	        int		ai ;
 	        int		f ;
 	        for (ai = ai_continue ; ai < aip->argc ; ai += 1) {
@@ -1097,7 +1097,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1148,7 +1148,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procspecs(PROGINFO *pip,void *ofp,cchar *sp,int sl)
+local int procspecs(PROGINFO *pip,void *ofp,cchar *sp,int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1176,7 +1176,7 @@ static int procspecs(PROGINFO *pip,void *ofp,cchar *sp,int sl)
 
 
 /* process a specification name */
-static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
+local int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1231,7 +1231,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar *rp,int rl)
 
 
 /* process a specification name */
-static int procget(PROGINFO *pip,void *ofp,int ri)
+local int procget(PROGINFO *pip,void *ofp,int ri)
 {
 	LOCINFO		*lip = pip->lip ;
 	uint		uv ;
@@ -1313,7 +1313,7 @@ static int procget(PROGINFO *pip,void *ofp,int ri)
 /* end subroutine (procget) */
 
 
-static int procset(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
+local int procset(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
 	uint		uv ;
@@ -1376,7 +1376,7 @@ static int procset(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 /* end subroutine (procset) */
 
 
-static int procout(PROGINFO *pip,SHIO *ofp,cchar *buf)
+local int procout(PROGINFO *pip,SHIO *ofp,cchar *buf)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1392,7 +1392,7 @@ static int procout(PROGINFO *pip,SHIO *ofp,cchar *buf)
 /* end subroutine (procout) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1413,7 +1413,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1432,7 +1432,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1443,7 +1443,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -1453,13 +1453,13 @@ static int procuserinfo_logid(PROGINFO *pip)
 #endif
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
@@ -1474,7 +1474,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 /* end subroutine (procuserinfo_logid) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	if (lip == NULL) return SR_FAULT ;
@@ -1493,7 +1493,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 
 	if (lip == NULL)
@@ -1504,7 +1504,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1540,11 +1540,11 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_termbegin(LOCINFO *lip)
+local int locinfo_termbegin(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	const mode_t	om = 0666 ;
-	const int	of = (O_RDWR|O_NOCTTY) ;
+	cint	of = (O_RDWR|O_NOCTTY) ;
 	int		rs = SR_OK ;
 	if (lip->termfname != NULL) {
 	    cchar	*fn = lip->termfname ;
@@ -1553,7 +1553,7 @@ static int locinfo_termbegin(LOCINFO *lip)
 	        lip->fl.opened = TRUE ;
 	    }
 	} else {
-	    const int	rlen = MAXPATHLEN ;
+	    cint	rlen = MAXPATHLEN ;
 	    char	rbuf[MAXPATHLEN+1] ;
 	    if ((rs = getutmpterm(rbuf,rlen,0)) >= 0) {
 		int	rl = rs ;
@@ -1575,7 +1575,7 @@ static int locinfo_termbegin(LOCINFO *lip)
 /* end subroutine (locinfo_termbegin) */
 
 
-static int locinfo_termend(LOCINFO *lip)
+local int locinfo_termend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1590,7 +1590,7 @@ static int locinfo_termend(LOCINFO *lip)
 /* end subroutine (locinfo_termend) */
 
 
-static int locinfo_ws(LOCINFO *lip)
+local int locinfo_ws(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1620,7 +1620,7 @@ static int locinfo_ws(LOCINFO *lip)
 /* end subroutine (locinfo_ws) */
 
 
-static int locinfo_setline(LOCINFO *lip,cchar *argp,int argl)
+local int locinfo_setline(LOCINFO *lip,cchar *argp,int argl)
 {
 	int		rs = SR_OK ;
 	if (argp != NULL) {
