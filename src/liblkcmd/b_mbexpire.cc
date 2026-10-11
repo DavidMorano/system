@@ -56,6 +56,7 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<mailbox.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -129,28 +130,28 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procmailbox(PROGINFO *,void *,cchar *) ;
-static int	procmailmsg(PROGINFO *,MBCACHE *,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procmailbox(PROGINFO *,void *,cchar *) ;
+local int	procmailmsg(PROGINFO *,MBCACHE *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCSETET
-static int	locinfo_sententry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_sententry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 #if	CF_LOCPRINTF
-static int	locinfo_eprintf(LOCINFO *,cchar *,...) ;
+local int	locinfo_eprintf(LOCINFO *,cchar *,...) ;
 #endif
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"VERSION",
 	"VERBOSE",
 	"HELP",
@@ -233,7 +234,7 @@ int p_mbexpire(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -323,7 +324,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -506,7 +507,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -805,7 +806,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -825,7 +826,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -868,7 +869,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -922,7 +923,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procmailbox(PROGINFO *pip,void *ofp,cchar *msfname)
+local int procmailbox(PROGINFO *pip,void *ofp,cchar *msfname)
 {
 	ustat	sb ;
 	int		rs ;
@@ -937,7 +938,7 @@ static int procmailbox(PROGINFO *pip,void *ofp,cchar *msfname)
 	if ((rs = uc_stat(msfname,&sb)) >= 0) {
 	    if (S_ISREG(sb.st_mode)) {
 	        MAILBOX		mb ;
-	        const int	mbo = MAILBOX_ORDWR ;
+	        cint	mbo = MAILBOX_ORDWR ;
 
 	        if (pip->debuglevel > 0) {
 	            cchar	*pn = pip->progname ;
@@ -947,10 +948,10 @@ static int procmailbox(PROGINFO *pip,void *ofp,cchar *msfname)
 
 	        if ((rs = mailbox_open(&mb,msfname,mbo)) >= 0) {
 	            MBCACHE	mc ;
-	            const int	mbf = MBCACHE_ORDWR ;
+	            cint	mbf = MBCACHE_ORDWR ;
 	            if ((rs = mbcache_start(&mc,msfname,mbf,&mb)) >= 0) {
 	                if ((rs = mbcache_count(&mc)) > 0) {
-	                    const int	mn = rs ;
+	                    cint	mn = rs ;
 	                    int		mi ;
 
 #if	CF_DEBUG
@@ -1006,7 +1007,7 @@ static int procmailbox(PROGINFO *pip,void *ofp,cchar *msfname)
 /* end subroutine (procmailbox) */
 
 
-static int procmailmsg(PROGINFO *pip,MBCACHE *mcp,int mi)
+local int procmailmsg(PROGINFO *pip,MBCACHE *mcp,int mi)
 {
 	LOCINFO		*lip = pip->lip ;
 	time_t		times[2] ;
@@ -1029,7 +1030,7 @@ static int procmailmsg(PROGINFO *pip,MBCACHE *mcp,int mi)
 	        if ((rs = mbcache_msgdel(mcp,mi,TRUE)) >= 0) {
 	            if (pip->debuglevel > 0) {
 	                char	tbuf[TIMEBUFLEN+1] ;
-	                timestr_logz(t,tbuf) ;
+	                strtime_logz(t,tbuf) ;
 	                shio_printf(pip->efp,"%s: expired=%s\n",pn,tbuf) ;
 	            }
 	        }
@@ -1046,7 +1047,7 @@ static int procmailmsg(PROGINFO *pip,MBCACHE *mcp,int mi)
 /* end subroutine (procmailmsg) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1058,7 +1059,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1075,7 +1076,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETET
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1113,7 +1114,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 
 
 #if	CF_LOCPRINTF
-static int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
+local int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
