@@ -184,17 +184,17 @@ int snxxx::operator () (char *dbuf,int dlen) noex {
 	            rs = sb.str(s1) ;
 	        } else {
 	            rs = sb.dec(d1) ;
-	        }
+	        } /* end */
 	    } /* end if (ok) */
 	    if ((rs >= 0) && mch) ylikely {
 	        rs = sb.chr(mch) ;
-	    }
+	    } /* end */
 	    if (rs >= 0) ylikely {
 	        if (s2) {
 	            rs = sb.str(s2) ;
 	        } else {
 	            rs = sb.dec(d2) ;
-	        }
+	        } /* end */
 	    } /* end if (ok) */
 	    rl = sb.idx ;
 	} /* end if (non-null) */
