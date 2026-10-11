@@ -22,14 +22,27 @@
 	strwcpy
 
 	Description:
-	This subroutine sleeps for some number of milliseconds.
+	This subroutine copies a counted source c-string to an
+	uncounted destination buffer.  This was first introduced
+	in other lbraries, but was brought here for some particular
+	need (in this library).  In general, this is a famous utility
+	subroutine.
 
 	Synopsis:
 	char *strwcpy(char *dp,cchar *sp,int sl = -1) noex
 
 	Arguments:
+	dp		destination buffer pointer
+	sp		source c-string pointer
+	sl		source c-string length
 
 	Returns:
+	-		pointer to the terminating NUL character in the
+			detination buffer
+
+	Notes:
+	1. This ia rather famous subroutine (in general) and was
+	brought into this library for some particular need.
 
 *******************************************************************************/
 
