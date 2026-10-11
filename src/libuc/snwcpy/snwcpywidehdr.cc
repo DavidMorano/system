@@ -66,7 +66,7 @@
 #include	<straltwchar.h>		/* LIBUC */
 #include	<wsfx.h>		/* LIBUC */
 #include	<wsnx.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -109,8 +109,8 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int µwsl) noex {
 	            if (dl > 0) {
 	                rs = m.chr(' ') ;
 	                if (rs >= 0) dl += 1 ;
-	            }
-	            if (rs >= 0) {
+	            } /* end */
+	            if (rs >= 0) ylikely {
 		        int	i ; /* used-afterwards */
 	                for (i = 0 ; (rs >= 0) && (i < wl) && wp[i] ; i += 1) {
 	                    if (uint wch ; (wch = (uint) wp[i]) > UCHAR_MAX) {
@@ -120,7 +120,7 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int µwsl) noex {
 	                            rs = m.chr(ch_sub) ;
 			        }
 			    } else {
-			        if (isprintbad(wch)) {
+			        if (ischprintbad(wch)) {
 				    wch = ch_sub ;
 			        }
 	                        rs = m.chr(wch) ;
