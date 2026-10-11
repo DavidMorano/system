@@ -28,7 +28,6 @@
 #include	<usysrets.h>		/* LIBU */
 
 #include	<snwcpyxc.h>
-#include	<snwcpyexpesc.h>
 
 
 EXTERNC_begin
