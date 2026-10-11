@@ -98,7 +98,7 @@ local int snabbrx(char *dbuf,int dlen,ucode_f get,int n) noex {
 	        rs = snwcpy(dbuf,dlen,rp,rs) ;
 	    } else if (rs == SR_NOTFOUND) {
 	        rs = ctdec(dbuf,dlen,n) ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (snabbrx) */
@@ -119,5 +119,9 @@ int snabbrerr(char *dbuf,int dlen,int n) noex {
 int snabbrsig(char *dbuf,int dlen,int n) noex {
     	return snabbrx(dbuf,dlen,ucodename_sig,n) ;
 } /* end subroutine (snabbrsig) */
+
+int snabbrexi(char *dbuf,int dlen,int n) noex {
+    	return snabbrx(dbuf,dlen,ucodename_exit,n) ;
+} /* end subroutine (snabbrexi) */
 
 
