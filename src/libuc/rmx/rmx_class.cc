@@ -58,7 +58,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<strn.h>		/* LIBUC |strn{x}chr(3uc)| */
-#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<isch.h>		/* LIBUC |ischeol(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"rmx.h"
@@ -133,17 +133,17 @@ namespace {
 /* exported subroutines */
 
 int rmeol(cchar *sp,int sl) noex {
-    	rmtrailer to(iseol) ;
+    	rmtrailer to(ischeol) ;
 	return to(sp,sl) ;
 } /* end subroutine (rmeol) */
 
 int rmwht(cchar *sp,int sl) noex {
-    	rmtrailer to(iswht) ;
+    	rmtrailer to(ischwht) ;
 	return to(sp,sl) ;
 } /* end subroutine (rmwht) */
 
 int rmblk(cchar *sp,int sl) noex {
-    	rmtrailer to(isblk) ;
+    	rmtrailer to(ischblk) ;
 	return to(sp,sl) ;
 } /* end subroutine (rmblk) */
 
