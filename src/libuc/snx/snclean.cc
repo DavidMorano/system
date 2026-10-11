@@ -59,7 +59,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC |isprintlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischprint(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -120,7 +120,7 @@ int snclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 /* local subroutines */
 
 local bool ischarok(int ch) noex {
-    	bool	f = isprintlatin(ch) ;
+    	bool	f = ischprint(ch) ;
 	f = f || (ch == '\t') || (ch == '\n') ;
 	return f ;
 } /* end subroutine (ischarok) */
