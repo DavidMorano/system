@@ -39,16 +39,16 @@ EXTERNC_end
 
 inline int	rmext		(cchar *sp) noex {
     	return rmext(sp,-1) ;
-}
+} /* end */
 inline int	rmcomment	(cchar *sp) noex {
     	return rmcomment(sp,-1) ;
-}
+} /* end */
 inline int	rmslashes	(cchar *sp) noex {
     	return rmslashes(sp,-1) ;
-}
+} /* end */
 inline int	rmdot		(cchar *sp) noex {
     	return rmdot(sp,-1) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
