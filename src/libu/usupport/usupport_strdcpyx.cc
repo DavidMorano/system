@@ -39,9 +39,9 @@
 	Description:
 	This subroutine concatenates c-strings into a single resulting
 	destination c-string.  It will not overflow the destiantion
-	character buffer length.¹  1. The result is always
-	NUL-terminated (even beyond the destination character buffer
-	length if necessary).
+	character buffer length.  The result is always NUL-terminated
+	(even beyond the destination character buffer length if
+	necessary).
 
 	Notes (obsoleted 2011-12-09):
 	I am using the new (rumored to be coming as a standard)
