@@ -200,57 +200,57 @@ struct config {
 
 /* forward references */
 
-static int	mainsub(int,cchar *[],cchar *[],void *) ;
+local int	mainsub(int,cchar *[],cchar *[],void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procuser_begin(PROGINFO *) ;
-static int	procuser_end(PROGINFO *) ;
-static int	procourconf_begin(PROGINFO *,paramopt *,cchar *) ;
-static int	procourconf_end(PROGINFO *) ;
-static int	procout_begin(PROGINFO *,cchar *) ;
-static int	procout_end(PROGINFO *) ;
-static int	procout_beginer(PROGINFO *) ;
-static int	procout_printf(PROGINFO *,cchar *,...) ;
+local int	procuser_begin(PROGINFO *) ;
+local int	procuser_end(PROGINFO *) ;
+local int	procourconf_begin(PROGINFO *,paramopt *,cchar *) ;
+local int	procourconf_end(PROGINFO *) ;
+local int	procout_begin(PROGINFO *,cchar *) ;
+local int	procout_end(PROGINFO *) ;
+local int	procout_beginer(PROGINFO *) ;
+local int	procout_printf(PROGINFO *,cchar *,...) ;
 
-static int	procopts(PROGINFO *,keyopt *,paramopt *) ;
-static int	procmailusers(PROGINFO *,paramopt *) ;
-static int	procmailusers_all(PROGINFO *) ;
-static int	procmailusers_env(PROGINFO *,cchar *) ;
-static int	procmailusers_arg(PROGINFO *,paramopt *) ;
-static int	procmailusers_def(PROGINFO *) ;
-static int	procmailusers_add(PROGINFO *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *,paramopt *) ;
+local int	procmailusers(PROGINFO *,paramopt *) ;
+local int	procmailusers_all(PROGINFO *) ;
+local int	procmailusers_env(PROGINFO *,cchar *) ;
+local int	procmailusers_arg(PROGINFO *,paramopt *) ;
+local int	procmailusers_def(PROGINFO *) ;
+local int	procmailusers_add(PROGINFO *,cchar *,int) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procmailbox(PROGINFO *,cchar *,int) ;
-static int	procmailboxes(PROGINFO *,cchar *,int) ;
-static int	procmailboxone(PROGINFO *,cchar *,cchar *,int) ;
-static int	procmailmsg(PROGINFO *,MBCACHE *,int,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procmailbox(PROGINFO *,cchar *,int) ;
+local int	procmailboxes(PROGINFO *,cchar *,int) ;
+local int	procmailboxone(PROGINFO *,cchar *,cchar *,int) ;
+local int	procmailmsg(PROGINFO *,MBCACHE *,int,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #if	CF_LOCPRINTF
-static int	locinfo_eprintf(LOCINFO *,cchar *,...) ;
+local int	locinfo_eprintf(LOCINFO *,cchar *,...) ;
 #endif
 
-static int	config_start(CONFIG *,PROGINFO *,paramopt *,cchar *) ;
-static int	config_findfile(CONFIG *,char *,cchar *) ;
-static int	config_cookbegin(CONFIG *) ;
-static int	config_cookend(CONFIG *) ;
-static int	config_read(CONFIG *) ;
-static int	config_reader(CONFIG *) ;
-static int	config_finish(CONFIG *) ;
-static int	config_setlfname(CONFIG *,cchar *,int) ;
+local int	config_start(CONFIG *,PROGINFO *,paramopt *,cchar *) ;
+local int	config_findfile(CONFIG *,char *,cchar *) ;
+local int	config_cookbegin(CONFIG *) ;
+local int	config_cookend(CONFIG *) ;
+local int	config_read(CONFIG *) ;
+local int	config_reader(CONFIG *) ;
+local int	config_finish(CONFIG *) ;
+local int	config_setlfname(CONFIG *,cchar *,int) ;
 
 #if	CF_CONFIGCHECK
-static int	config_check(CONFIG *) ;
+local int	config_check(CONFIG *) ;
 #endif /* CF_CONFIGCHECK */
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"VERSION",
 	"VERBOSE",
 	"HELP",
@@ -302,7 +302,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"md",
 	"sort",
 	"nshow",
@@ -322,7 +322,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*sched1[] = {
+static cchar	*sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -330,7 +330,7 @@ static const char	*sched1[] = {
 	NULL
 } ;
 
-static const char	*cparams[] = {
+static cchar	*cparams[] = {
 	"maildir",
 	"logsize",
 	"logfile",
@@ -344,7 +344,7 @@ enum cparams {
 	cparam_overlast
 } ;
 
-static const char	*varmailusers[] = {
+static cchar	*varmailusers[] = {
 	VARMAILUSERSP,
 	VARMAILUSERS,
 	NULL
@@ -396,7 +396,7 @@ int p_mailexpire(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -494,7 +494,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -732,7 +732,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1119,7 +1119,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1144,7 +1144,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop,paramopt *app)
+local int procopts(PROGINFO *pip,keyopt *kop,paramopt *app)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1266,9 +1266,9 @@ static int procopts(PROGINFO *pip,keyopt *kop,paramopt *app)
 /* end subroutine (procopts) */
 
 
-static int procuser_begin(PROGINFO *pip)
+local int procuser_begin(PROGINFO *pip)
 {
-	const int	ulen = USERNAMELEN ;
+	cint	ulen = USERNAMELEN ;
 	int		rs = SR_OK ;
 	char		ubuf[USERNAMELEN+1] ;
 
@@ -1283,7 +1283,7 @@ static int procuser_begin(PROGINFO *pip)
 	            char	nn[NODENAMELEN+1] ;
 	            char	dn[MAXHOSTNAMELEN+1] ;
 	            if ((rs = getnodedomain(nn,dn)) >= 0) {
-	                const int	hlen = MAXHOSTNAMELEN ;
+	                cint	hlen = MAXHOSTNAMELEN ;
 	                char		hbuf[MAXHOSTNAMELEN+1] ;
 	                if ((rs = snsds(hbuf,hlen,nn,dn)) >= 0) {
 	                    int		vl = rs ;
@@ -1320,7 +1320,7 @@ static int procuser_begin(PROGINFO *pip)
 /* end subroutine (procuser_begin) */
 
 
-static int procuser_end(PROGINFO *pip)
+local int procuser_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1335,9 +1335,9 @@ static int procuser_end(PROGINFO *pip)
 /* end subroutine (procuser_end) */
 
 
-static int procourconf_begin(PROGINFO *pip,paramopt *app,cchar cfname[])
+local int procourconf_begin(PROGINFO *pip,paramopt *app,cchar cfname[])
 {
-	const int	csize = sizeof(CONFIG) ;
+	cint	csize = sizeof(CONFIG) ;
 	int		rs = SR_OK ;
 	void		*p ;
 
@@ -1372,7 +1372,7 @@ static int procourconf_begin(PROGINFO *pip,paramopt *app,cchar cfname[])
 /* end subroutine (procourconf_begin) */
 
 
-static int procourconf_end(PROGINFO *pip)
+local int procourconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1402,7 +1402,7 @@ static int procourconf_end(PROGINFO *pip)
 /* end subroutine (procourconf_end) */
 
 
-static int procout_begin(PROGINFO *pip,cchar *ofn)
+local int procout_begin(PROGINFO *pip,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1422,7 +1422,7 @@ static int procout_begin(PROGINFO *pip,cchar *ofn)
 /* end subroutine (procout_begin) */
 
 
-static int procout_end(PROGINFO *pip)
+local int procout_end(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1439,7 +1439,7 @@ static int procout_end(PROGINFO *pip)
 /* end subroutine (procout_end) */
 
 
-static int procout_beginer(PROGINFO *pip)
+local int procout_beginer(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1456,7 +1456,7 @@ static int procout_beginer(PROGINFO *pip)
 /* end subroutine (procout_beginner) */
 
 
-static int procout_printf(PROGINFO *pip,cchar *fmt,...)
+local int procout_printf(PROGINFO *pip,cchar *fmt,...)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1475,7 +1475,7 @@ static int procout_printf(PROGINFO *pip,cchar *fmt,...)
 /* end subroutine (procout_printf) */
 
 
-static int procmailusers(PROGINFO *pip,paramopt *app)
+local int procmailusers(PROGINFO *pip,paramopt *app)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1536,7 +1536,7 @@ static int procmailusers(PROGINFO *pip,paramopt *app)
 /* end subroutine (procmailusers) */
 
 
-static int procmailusers_all(PROGINFO *pip)
+local int procmailusers_all(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	SYSUSERNAMES	su ;
@@ -1546,7 +1546,7 @@ static int procmailusers_all(PROGINFO *pip)
 
 	if ((rs = sysusernames_open(&su,NULL)) >= 0) {
 	    vecstr	*mlp = &lip->mailusers ;
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    while ((rs = sysusernames_readent(&su,ubuf,ulen)) > 0) {
 	        c += 1 ;
@@ -1562,7 +1562,7 @@ static int procmailusers_all(PROGINFO *pip)
 /* end subroutine (procmailusers_all) */
 
 
-static int procmailusers_env(PROGINFO *pip,cchar *var)
+local int procmailusers_env(PROGINFO *pip,cchar *var)
 {
 	LOCINFO		*lip = pip->lip ;
 	VECSTR		*vlp ;
@@ -1612,7 +1612,7 @@ static int procmailusers_env(PROGINFO *pip,cchar *var)
 /* end subroutine (procmailusers_env) */
 
 
-static int procmailusers_arg(PROGINFO *pip,paramopt *app)
+local int procmailusers_arg(PROGINFO *pip,paramopt *app)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -1647,7 +1647,7 @@ static int procmailusers_arg(PROGINFO *pip,paramopt *app)
 /* end subroutine (procmailusers_arg) */
 
 
-static int procmailusers_def(PROGINFO *pip)
+local int procmailusers_def(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	vecstr		*mlp ;
@@ -1705,7 +1705,7 @@ static int procmailusers_def(PROGINFO *pip)
 /* end subroutine (procmailusers_def) */
 
 
-static int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
+local int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
 {
 	LOCINFO		*lip = pip->lip ;
 	vecstr		*mlp = &lip->mailusers ;
@@ -1728,7 +1728,7 @@ static int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
 /* end subroutine (procmailusers_add) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	int		rs ;
 	int		rs1 ;
@@ -1769,7 +1769,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1829,7 +1829,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procmailboxes(PROGINFO *pip,cchar *sp,int sl)
+local int procmailboxes(PROGINFO *pip,cchar *sp,int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1856,7 +1856,7 @@ static int procmailboxes(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (procmailboxes) */
 
 
-static int procmailbox(PROGINFO *pip,cchar *mbp,int mbl)
+local int procmailbox(PROGINFO *pip,cchar *mbp,int mbl)
 {
 	LOCINFO		*lip = pip->lip ;
 	IDS		*idp = &pip->id ;
@@ -1885,8 +1885,8 @@ static int procmailbox(PROGINFO *pip,cchar *mbp,int mbl)
 
 	if (rs >= 0) {
 	    VECSTR	*ulp = &lip->mailusers ;
-	    const int	am = (R_OK|W_OK) ;
-	    const int	hlen = MAXPATHLEN ;
+	    cint	am = (R_OK|W_OK) ;
+	    cint	hlen = MAXPATHLEN ;
 	    int		i ;
 	    cchar	*mup ;
 	    char	hbuf[MAXPATHLEN+1] ;
@@ -1920,7 +1920,7 @@ static int procmailbox(PROGINFO *pip,cchar *mbp,int mbl)
 /* end subroutine (procmailbox) */
 
 
-static int procmailboxone(PROGINFO *pip,cchar *un,cchar *mfname,int to)
+local int procmailboxone(PROGINFO *pip,cchar *un,cchar *mfname,int to)
 {
 	MAILBOX		mb ;
 	int		rs ;
@@ -1938,10 +1938,10 @@ static int procmailboxone(PROGINFO *pip,cchar *un,cchar *mfname,int to)
 	mbopts = MAILBOX_ORDWR ;
 	if ((rs = mailbox_open(&mb,mfname,mbopts)) >= 0) {
 	    MBCACHE	mc ;
-	    const int	mbflags = MBCACHE_ORDWR ;
+	    cint	mbflags = MBCACHE_ORDWR ;
 	    if ((rs = mbcache_start(&mc,mfname,mbflags,&mb)) >= 0) {
 	        if ((rs = mbcache_count(&mc)) > 0) {
-	            const int	mn = rs ;
+	            cint	mn = rs ;
 	            int		mi ;
 
 #if	CF_DEBUG
@@ -1998,7 +1998,7 @@ static int procmailboxone(PROGINFO *pip,cchar *un,cchar *mfname,int to)
 /* end subroutine (procmailboxone) */
 
 
-static int procmailmsg(PROGINFO *pip,MBCACHE *mcp,int mi,int to)
+local int procmailmsg(PROGINFO *pip,MBCACHE *mcp,int mi,int to)
 {
 	LOCINFO		*lip = pip->lip ;
 	time_t		times[2] ;
@@ -2035,7 +2035,7 @@ static int procmailmsg(PROGINFO *pip,MBCACHE *mcp,int mi,int to)
 /* end subroutine (procmailmsg) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2051,7 +2051,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2073,7 +2073,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -2110,7 +2110,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 
 
 #if	CF_LOCPRINTF
-static int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
+local int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2127,7 +2127,7 @@ static int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
 
 
 /* configuration maintenance */
-static int config_start(CONFIG *csp,PROGINFO *pip,paramopt *app,cchar *cfn)
+local int config_start(CONFIG *csp,PROGINFO *pip,paramopt *app,cchar *cfn)
 {
 	int		rs = SR_OK ;
 	char		tmpfname[MAXPATHLEN+1] = { 0 } ;
@@ -2177,7 +2177,7 @@ static int config_start(CONFIG *csp,PROGINFO *pip,paramopt *app,cchar *cfn)
 /* end subroutine (config_start) */
 
 
-static int config_findfile(CONFIG *op,char tbuf[],cchar cfname[])
+local int config_findfile(CONFIG *op,char tbuf[],cchar cfname[])
 {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
@@ -2187,7 +2187,7 @@ static int config_findfile(CONFIG *op,char tbuf[],cchar cfname[])
 	if ((cfname != NULL) && (cfname[0] != '\0')) {
 	    VECSTR	sv ;
 	    if ((rs = vecstr_start(&sv,6,0)) >= 0) {
-	        const int	tlen = MAXPATHLEN ;
+	        cint	tlen = MAXPATHLEN ;
 	        int		i ;
 	        int		vl ;
 	        int		kch ;
@@ -2228,13 +2228,13 @@ static int config_findfile(CONFIG *op,char tbuf[],cchar cfname[])
 /* end subroutine (config_findfile) */
 
 
-static int config_cookbegin(CONFIG *op)
+local int config_cookbegin(CONFIG *op)
 {
 	PROGINFO	*pip = op->pip ;
 	int		rs ;
 
 	if ((rs = expcook_start(&op->cooks)) >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    int		i ;
 	    int		kch ;
 	    int		vl ;
@@ -2294,7 +2294,7 @@ static int config_cookbegin(CONFIG *op)
 /* end subroutine (config_cookbegin) */
 
 
-static int config_cookend(CONFIG *op)
+local int config_cookend(CONFIG *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2310,7 +2310,7 @@ static int config_cookend(CONFIG *op)
 /* end subroutine (config_cookend) */
 
 
-static int config_finish(CONFIG *csp)
+local int config_finish(CONFIG *csp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2334,7 +2334,7 @@ static int config_finish(CONFIG *csp)
 
 
 #if	CF_CONFIGCHECK
-static int config_check(CONFIG *op)
+local int config_check(CONFIG *op)
 {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
@@ -2351,7 +2351,7 @@ static int config_check(CONFIG *op)
 #endif /* CF_CONFIGCHECK */
 
 
-static int config_read(CONFIG *op)
+local int config_read(CONFIG *op)
 {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
@@ -2372,15 +2372,15 @@ static int config_read(CONFIG *op)
 /* end subroutine (config_read) */
 
 
-static int config_reader(CONFIG *op)
+local int config_reader(CONFIG *op)
 {
 	PROGINFO	*pip = op->pip ;
 	LOCINFO		*lip ;
 	paramfile	*pfp ;
 	paramfile_cur	cur ;
 	paramopt	*pop = op->app ;
-	const int	vlen = VBUFLEN ;
-	const int	elen = EBUFLEN ;
+	cint	vlen = VBUFLEN ;
+	cint	elen = EBUFLEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		vl, el ;
@@ -2465,7 +2465,7 @@ static int config_reader(CONFIG *op)
 /* end subroutine (config_reader) */
 
 
-static int config_setlfname(CONFIG *cfp,cchar *vp,int vl)
+local int config_setlfname(CONFIG *cfp,cchar *vp,int vl)
 {
 	PROGINFO	*pip = cfp->pip ;
 	cchar		*pr ;
