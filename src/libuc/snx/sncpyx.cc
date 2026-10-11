@@ -15,7 +15,7 @@
 	This was updated to use |strlcpy(3c)| when it was rumored
 	to be coming as a new standard.  We are currently using our
 	own implementation of that, but when it is supported by
-	vendors this will all seemlessly (pretty much) transistion
+	vendors this will all seemlessly (pretty much) transition
 	to using the vendor version. My |strlcpy(3uc)| uses an
 	|int| for the buffer size while the new |strlcpy(3c)| is
 	suppoed to use |size_t|.
@@ -30,8 +30,35 @@
 	sncpy{x}
 
 	Description:
-	This subroutine concatenates c-strings into a single resulting
-	c-string.
+	These subroutines concatenate source c-strings into a single
+	resulting counted destination character buffer (forming
+	a resulting c-string).
+
+	Synopsis:
+	int sncpy{x}(charp dbuf,int dlen,cchar *sp ...) noex
+
+	Arguments:
+	{x}		one of: 1, 2, 3, 4, 5, 6
+	dbuf		destiantion character buffer pointer
+	dlen		destiantion character buffer length
+	sp		source c-sring (NUL-terminated)
+
+	Returns:
+	>=0		number of bytes copied into the destination buffer
+	<0		error (system-return)
+
+	Notes:
+	I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard lirbrary already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might gets optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like).
 
 	Observation 2015-09-29, David A­D­ Morano:
 	Just some musing here: was the choice of changing to use
@@ -135,11 +162,11 @@ int sncpyx(char *dp,int dl,int n,...) noex {
 	    dp[0] = '\0' ;
 	    for (int i = 0 ; i < n ; i += 1) {
 		size_t	ml ;
-	        cc	*sp = (cc *) va_arg(ap,cc *) ;
+	        ccharp	sp = (cc *) va_arg(ap,cc *) ;
 	        if ((ml = strlcpy(bp,sp,rlen)) >= rlen) {
 	            rs = SR_OVERFLOW ;
 		    break ;
-	        }
+	        } /* end */
 	        bp += ml ;
 	        rlen -= ml ;
 	    } /* end for */
