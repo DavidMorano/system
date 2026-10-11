@@ -93,6 +93,7 @@
 #include	<sysproject.h>
 #include	<tmpx.h>
 #include	<vardefs.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -2138,7 +2139,7 @@ local int procquery(PI *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	                break ;
 	            case qopt_logdate:
 	                sp = cbuf ;
-	                timestr_log(pdp->du.ue.date,cbuf) ;
+	                strtime_log(pdp->du.ue.date,cbuf) ;
 	                break ;
 	            } /* end switch */
 	            if (cp != nullptr) {
@@ -2181,8 +2182,8 @@ local int procquery(PI *pip,PROGDATA *pdp,void *ofp,cchar rp[],int rl)
 	            fmt = "%-23s %-8s %16s" ;
 	        }
 	        sp = cbuf ;
-	        timestr_logz(t,timebuf1) ;
-	        timestr_elapsed((pip->daytime - t),timebuf2) ;
+	        strtime_logz(t,timebuf1) ;
+	        strtime_elapsed((pip->daytime - t),timebuf2) ;
 	        rs = bufprintf(cbuf,clen,fmt,timebuf1,ll,lh,timebuf2) ;
 	        sl = rs ;
 	    }
