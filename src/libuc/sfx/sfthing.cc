@@ -47,7 +47,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
-#include	<ischarx.h>		/* |isalnumlatin(3uc)| */
+#include	<isch.h>		/* |ischalnum(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -152,7 +152,7 @@ local bool hasgood(cchar *sp,int sl) noex {
 } /* end subroutine (hasgood) */
 
 local bool isour(int ch) noex {
-	bool		f = isalnumlatin(ch) ;
+	bool		f = ischalnum(ch) ;
 	f = f || (ch == '_') || (ch == '-') || (ch == '=') || (ch == '/') ;
 	return f ;
 } /* end subroutine (isour) */
