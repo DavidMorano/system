@@ -101,6 +101,7 @@
 #include	<sfx.h>			/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<rmdirfiles.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -609,7 +610,7 @@ enum cparams {
 	cparam_overlast
 } ; /* end enum */
 
-static const char	*cparams[] = {
+static cchar	*cparams[] = {
 	"workdir",
 	"basedir",
 	"basedb",
@@ -2781,7 +2782,7 @@ local int procdaemon(PI *pip) noex {
 	}
 	if (pip->open.logprog) {
 	    char	tbuf[TIMEBUFLEN+1] ;
-	    timestr_logz(pip->daytime,tbuf) ;
+	    strtime_logz(pip->daytime,tbuf) ;
 	    proglog_printf(pip,"%s exiting (%d)",tbuf,rs) ;
 	}
 
@@ -2888,7 +2889,7 @@ local int procdaemoner(PI *pip) noex {
 	}
 	{
 	    char	tbuf[TIMEBUFLEN+1] ;
-	    timestr_logz(pip->daytime,tbuf) ;
+	    strtime_logz(pip->daytime,tbuf) ;
 	    proglog_printf(pip,"%s making",tbuf) ;
 	}
 	if ((rs = mkpath2(dbuf,dname,dcn)) >= 0) {
@@ -3765,7 +3766,7 @@ local int proclockprint(PI *pip,cchar *lfname,lfm_check *lcp) noex {
 	        cchar	*pn = pip->progname ;
 	        char	tbuf[TIMEBUFLEN + 1] ;
 
-	        timestr_logz(pip->daytime,tbuf) ;
+	        strtime_logz(pip->daytime,tbuf) ;
 	        shio_printf(pip->efp,"%s: %s lock %s\n",pn,tbuf,namp) ;
 
 	        shio_printf(pip->efp,"%s: other_pid=%d\n",pn,lcp->pid) ;
@@ -3796,7 +3797,7 @@ local int proclocklog(PI *pip,cchar *lfname,lfm_check *lcp,cchar *namp) noex {
 	int		rs = SR_OK ;
 	char		tbuf[TIMEBUFLEN + 1] ;
 
-	timestr_logz(pip->daytime,tbuf) ;
+	strtime_logz(pip->daytime,tbuf) ;
 	proglog_printf(pip, "%s lock %s\n",tbuf,namp) ;
 
 	proglog_printf(pip, "pid=%s",lfname) ;
