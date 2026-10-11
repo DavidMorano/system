@@ -151,7 +151,7 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	        } /* end switch */
 	        if (ms) ylikely {
 		    rs = fr.addstr(ms) ;
-	        }
+	        } /* end */
 	        for (int i = 0 ; (rs >= 0) && fl_mode[i].s ; i += 1) {
 	            if (fm & fl_mode[i].fl) {
 	                rs = fr.addstr(fl_mode[i].s) ;
