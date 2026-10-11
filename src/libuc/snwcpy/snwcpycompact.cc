@@ -107,11 +107,11 @@ int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	            if (dl > 0) {
 	                rs = m.chr(' ') ;
 	                if (rs >= 0) dl += 1 ;
-	            }
+	            } /* end if */
 	            if (rs >= 0) {
 	                rs = m.str(cp,cl) ;
 	                if (rs >= 0) dl += cl ;
-	            }
+	            } /* end if (ok) */
 	            sl -= intconv((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
