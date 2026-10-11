@@ -54,7 +54,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"strdcpy.h"
@@ -102,7 +102,7 @@ char *strdcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 
 local bool isour(int ch) noex {
 	bool		f = false ;
-	f = f || isprintlatin(ch) ;
+	f = f || ischprint(ch) ;
 	f = f || (ch == CH_NL) ;
 	f = f || (ch == CH_BS) ;
 	f = f || (ch == CH_BEL) ;
