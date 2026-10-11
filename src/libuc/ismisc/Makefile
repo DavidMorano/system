@@ -43,12 +43,19 @@ LIBS=
 OBJ0_ISMISC= isdotdir.o isaccmode.o
 OBJ1_ISMISC= isleapyear.o
 OBJ2_ISMISC= isprime.o isinteractive.o
-OBJ3_ISMISC= isobjspecial.o issamehostname.o
+OBJ3_ISMISC= isobjspecial.o 
+
+OBJ4_ISMISC= isindomain.o isinetaddr.o
+OBJ5_ISMISC= issamehostname.o
+OBJ6_ISMISC=
+OBJ7_ISMISC=
 
 OBJA_ISMISC= obj0_ismisc.o obj1_ismisc.o
 OBJB_ISMISC= obj2_ismisc.o obj3_ismisc.o
+OBJC_ISMISC= obj4_ismisc.o obj5_ismisc.o
+OBJD_ISMISC=
 
-OBJ_ISMISC= $(OBJA_ISMISC) $(OBJB_ISMISC)
+OBJ_ISMISC= $(OBJA_ISMISC) $(OBJB_ISMISC) $(OBJC_ISMISC)
 
 
 INCDIRS=
@@ -114,16 +121,42 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_ismisc.o:	$(OBJ0_ISMISC)
+obj0_ismisc.o:		$(OBJ0_ISMISC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_ismisc.o:	$(OBJ1_ISMISC)
+obj1_ismisc.o:		$(OBJ1_ISMISC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_ismisc.o:	$(OBJ2_ISMISC)
+obj2_ismisc.o:		$(OBJ2_ISMISC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_ismisc.o:	$(OBJ3_ISMISC)
+obj3_ismisc.o:		$(OBJ3_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj4_ismisc.o:		$(OBJ4_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5_ismisc.o:		$(OBJ5_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6_ismisc.o:		$(OBJ6_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7_ismisc.o:		$(OBJ7_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obja_ismisc.o:		$(OBJA_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objb_ismisc.o:		$(OBJB_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objc_ismisc.o:		$(OBJC_ISMISC)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objd_ismisc.o:		$(OBJD_ISMISC)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -131,8 +164,11 @@ isdotdir.o:		isdotdir.cc					$(INCS)
 isleapyear.o:		isleapyear.cc					$(INCS)
 isobjspecial.o:		isobjspecial.cc					$(INCS)
 isprime.o:		isprime.cc					$(INCS)
-issamehostname.o:	issamehostname.cc				$(INCS)
 isaccmode.o:		isaccmode.cc		isaccmode.h		$(INCS)
 isinteractive.o:	isinteractive.cc	isinteractive.hh	$(INCS)
+
+isindomain.o:		isindomain.cc		isindomain.h		$(INCS)
+isinetaddr.o:		isinetaddr.cc		isinetaddr.h		$(INCS)
+issamehostname.o:	issamehostname.cc				$(INCS)
 
 
