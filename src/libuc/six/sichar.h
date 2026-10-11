@@ -36,25 +36,25 @@ extern int	siblank(cchar *,int) noex ;
 
 local inline int sidig(cchar *sp,int sl) noex {
     	return sidigit(sp,sl) ;
-}
+} /* end */
 local inline int sioct(cchar *sp,int sl) noex {
     	return sioctal(sp,sl) ;
-}
+} /* end */
 local inline int sidec(cchar *sp,int sl) noex {
     	return sidigit(sp,sl) ;
-}
+} /* end */
 local inline int sihex(cchar *sp,int sl) noex {
     	return sidigex(sp,sl) ;
-}
+} /* end */
 #ifdef	COMMENT
 local inline int siwht(cchar *sp,int sl) noex {
     	return siwhite(sp,sl) ;
-}
+} /* end */
 #endif /* COMMENT */
 
 local inline int siblk(cchar *sp,int sl) noex {
 	return siblank(sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
 
