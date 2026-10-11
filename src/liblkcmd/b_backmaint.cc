@@ -251,7 +251,7 @@ local int	parseperms(cchar *,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -309,7 +309,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"nhf",
 	"suid",
 	"sgid",
@@ -329,7 +329,7 @@ enum aclops {
 	aclop_overlast
 } ;
 
-static const char	*ftypes[] = {
+static cchar	*ftypes[] = {
 	"file",
 	"directory",
 	"block",
