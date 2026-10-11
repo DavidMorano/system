@@ -181,47 +181,47 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procpcsdump(PROGINFO *,cchar *) ;
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	proclist(PROGINFO *,SHIO *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *) ;
-static int	procqueries(PROGINFO *,void *,cchar *,int) ;
-static int	procquery(PROGINFO *,void *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procpcsdump(PROGINFO *,cchar *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	proclist(PROGINFO *,SHIO *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *) ;
+local int	procqueries(PROGINFO *,void *,cchar *,int) ;
+local int	procquery(PROGINFO *,void *,cchar *,int) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 
-static int	procpcsconf_begin(PROGINFO *,PCSCONF *) ;
-static int	procpcsconf_end(PROGINFO *) ;
+local int	procpcsconf_begin(PROGINFO *,PCSCONF *) ;
+local int	procpcsconf_end(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_prlocal(LOCINFO *) ;
-static int	locinfo_nisdomain(LOCINFO *) ;
-static int	locinfo_systemname(LOCINFO *) ;
-static int	locinfo_clustername(LOCINFO *) ;
-static int	locinfo_nodename(LOCINFO *) ;
-static int	locinfo_org(LOCINFO *) ;
-static int	locinfo_pcsorg(LOCINFO *) ;
-static int	locinfo_pcsdeforg(LOCINFO *) ;
-static int	locinfo_name(LOCINFO *) ;
-static int	locinfo_fullname(LOCINFO *) ;
-static int	locinfo_ema(LOCINFO *) ;
-static int	locinfo_pcsids(LOCINFO *) ;
-static int	locinfo_pcsusername(LOCINFO *) ;
-static int	locinfo_facility(LOCINFO *) ;
-static int	locinfo_prpcs(LOCINFO *) ;
-static int	locinfo_pcsns(LOCINFO *) ;
-static int	locinfo_pcsnsget(LOCINFO *,char *,int,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_prlocal(LOCINFO *) ;
+local int	locinfo_nisdomain(LOCINFO *) ;
+local int	locinfo_systemname(LOCINFO *) ;
+local int	locinfo_clustername(LOCINFO *) ;
+local int	locinfo_nodename(LOCINFO *) ;
+local int	locinfo_org(LOCINFO *) ;
+local int	locinfo_pcsorg(LOCINFO *) ;
+local int	locinfo_pcsdeforg(LOCINFO *) ;
+local int	locinfo_name(LOCINFO *) ;
+local int	locinfo_fullname(LOCINFO *) ;
+local int	locinfo_ema(LOCINFO *) ;
+local int	locinfo_pcsids(LOCINFO *) ;
+local int	locinfo_pcsusername(LOCINFO *) ;
+local int	locinfo_facility(LOCINFO *) ;
+local int	locinfo_prpcs(LOCINFO *) ;
+local int	locinfo_pcsns(LOCINFO *) ;
+local int	locinfo_pcsnsget(LOCINFO *,char *,int,cchar *,int) ;
 
-static int	mkpresent(char *,int,int,int,int) ;
+local int	mkpresent(char *,int,int,int,int) ;
 
 
 /* local variables */
@@ -396,7 +396,7 @@ int p_pcsconf(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* local subroutines */
 
 /* ARGSUSED */
-static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -1183,7 +1183,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-static int usage(PROGINFO *pip) noex {
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		wlen = 0 ;
@@ -1238,7 +1238,7 @@ static int usage(PROGINFO *pip) noex {
 /* end subroutine (usage) */
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop) noex {
+local int procopts(PROGINFO *pip,keyopt *kop) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1294,7 +1294,7 @@ static int procopts(PROGINFO *pip,keyopt *kop) noex {
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -1336,7 +1336,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 }
 /* end subroutine (process) */
 
-static int proclist(PROGINFO *pip,SHIO *ofp) noex {
+local int proclist(PROGINFO *pip,SHIO *ofp) noex {
 	PCSCONF		*pcp = pip->pcsconf ;
 	PCSCONF_CUR	cur ;
 	int		rs ;
@@ -1371,7 +1371,7 @@ static int proclist(PROGINFO *pip,SHIO *ofp) noex {
 /* end subroutine (proclist) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1442,7 +1442,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
 /* end subroutine (proargs) */
 
 
-static int procqueries(PROGINFO *pip,void *ofp,cchar *ap,int al)
+local int procqueries(PROGINFO *pip,void *ofp,cchar *ap,int al)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1465,7 +1465,7 @@ static int procqueries(PROGINFO *pip,void *ofp,cchar *ap,int al)
 /* end subroutine (procqueries) */
 
 
-static int procquery(PROGINFO *pip,void *ofp,cchar *qp,int ql)
+local int procquery(PROGINFO *pip,void *ofp,cchar *qp,int ql)
 {
 	LOCINFO		*lip = pip->lip ;
 	PCSCONF		*pcp = pip->pcsconf ;
@@ -1665,7 +1665,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar *qp,int ql)
 /* end subroutine (procquery) */
 
 
-static int procpcsdump(PROGINFO *pip,cchar *dfname)
+local int procpcsdump(PROGINFO *pip,cchar *dfname)
 {
 	SHIO		dfile, *dfp = &dfile ;
 	int		rs = SR_OK ;
@@ -1718,7 +1718,7 @@ static int procpcsdump(PROGINFO *pip,cchar *dfname)
 /* end subroutine (procpcsdump) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1764,7 +1764,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1775,7 +1775,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -1802,7 +1802,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 /* end subroutine (procuserinfo_logid) */
 
 
-static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
+local int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 {
 	int		rs = SR_OK ;
 
@@ -1836,7 +1836,7 @@ static int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 /* end subroutine (procpcsconf_begin) */
 
 
-static int procpcsconf_end(PROGINFO *pip)
+local int procpcsconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1847,7 +1847,7 @@ static int procpcsconf_end(PROGINFO *pip)
 /* end subroutine (procpcsconf_end) */
 
 
-static int mkpresent(char *vbuf,int vlen,int vl,int sch,int sn)
+local int mkpresent(char *vbuf,int vlen,int vl,int sch,int sn)
 {
 	cint	tlen = (vlen+(3*sn)) ;
 	int		rs ;
@@ -1883,7 +1883,7 @@ static int mkpresent(char *vbuf,int vlen,int vl,int sch,int sn)
 /* end subroutine (mkpresent) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1900,7 +1900,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1924,7 +1924,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1960,7 +1960,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_prlocal(LOCINFO *lip)
+local int locinfo_prlocal(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1983,7 +1983,7 @@ static int locinfo_prlocal(LOCINFO *lip)
 /* end subroutine (locinfo_prlocal) */
 
 
-static int locinfo_nisdomain(LOCINFO *lip)
+local int locinfo_nisdomain(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2024,7 +2024,7 @@ static int locinfo_nisdomain(LOCINFO *lip)
 /* end subroutine (locinfo_nisdomain) */
 
 
-static int locinfo_systemname(LOCINFO *lip)
+local int locinfo_systemname(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2075,7 +2075,7 @@ static int locinfo_systemname(LOCINFO *lip)
 /* end subroutine (locinfo_systemname) */
 
 
-static int locinfo_clustername(LOCINFO *lip)
+local int locinfo_clustername(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2124,7 +2124,7 @@ static int locinfo_clustername(LOCINFO *lip)
 /* end subroutine (locinfo_clustername) */
 
 
-static int locinfo_nodename(LOCINFO *lip)
+local int locinfo_nodename(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -2139,7 +2139,7 @@ static int locinfo_nodename(LOCINFO *lip)
 /* end subroutine (locinfo_nodename) */
 
 
-static int locinfo_org(LOCINFO *lip)
+local int locinfo_org(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2198,7 +2198,7 @@ static int locinfo_org(LOCINFO *lip)
 /* end subroutine (locinfo_org) */
 
 
-static int locinfo_pcsorg(LOCINFO *lip)
+local int locinfo_pcsorg(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2242,7 +2242,7 @@ static int locinfo_pcsorg(LOCINFO *lip)
 /* end subroutine (locinfo_pcsorg) */
 
 
-static int locinfo_pcsdeforg(LOCINFO *lip)
+local int locinfo_pcsdeforg(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2292,7 +2292,7 @@ static int locinfo_pcsdeforg(LOCINFO *lip)
 /* end subroutine (locinfo_pcsdeforg) */
 
 
-static int locinfo_name(LOCINFO *lip)
+local int locinfo_name(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2342,7 +2342,7 @@ static int locinfo_name(LOCINFO *lip)
 /* end subroutine (locinfo_name) */
 
 
-static int locinfo_fullname(LOCINFO *lip)
+local int locinfo_fullname(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2386,7 +2386,7 @@ static int locinfo_fullname(LOCINFO *lip)
 /* end subroutine (locinfo_fullname) */
 
 
-static int locinfo_ema(LOCINFO *lip)
+local int locinfo_ema(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2432,7 +2432,7 @@ static int locinfo_ema(LOCINFO *lip)
 /* end subroutine (locinfo_ema) */
 
 
-static int locinfo_pcsids(LOCINFO *lip)
+local int locinfo_pcsids(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2452,7 +2452,7 @@ static int locinfo_pcsids(LOCINFO *lip)
 /* end subroutine (locinfo_pcsids) */
 
 
-static int locinfo_pcsusername(LOCINFO *lip)
+local int locinfo_pcsusername(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2475,7 +2475,7 @@ static int locinfo_pcsusername(LOCINFO *lip)
 /* end subroutine (locinfo_pcsusername) */
 
 
-static int locinfo_facility(LOCINFO *lip)
+local int locinfo_facility(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -2497,7 +2497,7 @@ static int locinfo_facility(LOCINFO *lip)
 /* end subsubroutine (locinfo_facility) */
 
 
-static int locinfo_prpcs(LOCINFO *lip)
+local int locinfo_prpcs(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -2519,7 +2519,7 @@ static int locinfo_prpcs(LOCINFO *lip)
 /* end subroutine (locinfo_prpcs) */
 
 
-static int locinfo_pcsns(LOCINFO *lip)
+local int locinfo_pcsns(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.ns) {
@@ -2535,7 +2535,7 @@ static int locinfo_pcsns(LOCINFO *lip)
 /* end subroutine (locinfo_pcsns) */
 
 
-static int locinfo_pcsnsget(LOCINFO *lip,char *rbuf,int rlen,cchar *un,int w)
+local int locinfo_pcsnsget(LOCINFO *lip,char *rbuf,int rlen,cchar *un,int w)
 {
 	int		rs ;
 	if ((rs = locinfo_pcsns(lip)) >= 0) {
