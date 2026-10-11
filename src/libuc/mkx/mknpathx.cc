@@ -144,7 +144,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	                    rlen -= 1 ;
 		        } else {
 	                    rs = SR_NAMETOOLONG ;
-		        }
+		        } /* end */
 	            } /* end if (needed a pathname separator) */
 		    if (rs >= 0) {
 	                if (int ml ; (ml = cstrlcpy(bp,sp,rlen)) < rlen) {
@@ -152,8 +152,8 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	        	    rlen -= ml ;
 		        } else {
 	                    rs = SR_NAMETOOLONG ;
-		        }
-		    } /* end if */
+		        } /* end */
+		    } /* end if (ok) */
 	        } /* end for */
 	        va_end(ap) ;
 	    } /* end if (getrlen) */
@@ -170,7 +170,7 @@ int maxpather::operator () (int plen) noex {
     	int		rs ;
 	if ((rs = plen) < 0) ylikely {
 	    rs = maxpathlen ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (maxpather::operator) */
 
