@@ -188,7 +188,7 @@ local int	randomvar_initreal(randomvar *,uint) noex ;
 local int	randomvar_maint(randomvar *) noex ;
 local int	randomvar_swapone(randomvar *) noex ;
 
-static void	addtime(ulong *,TIMEVAL *tvp) noex ;
+local void	addtime(ulong *,TIMEVAL *tvp) noex ;
 
 local int	rdulong(cchar *,int,ulong *) noex ;
 local int	wrulong(char *,int,ulong) noex ;
@@ -496,7 +496,7 @@ local int randomvar_swapone(randomvar *op) noex {
 	return rs ;
 } /* end subroutine (randomvar_swapone) */
 
-static void addtime(ulong *lp,TIMEVAL *tvp) noex {
+local void addtime(ulong *lp,TIMEVAL *tvp) noex {
 	const ulong	cur = *lp ;
 	const uint	t0 = uint(tvp->tv_sec) ;
 	const uint	t1 = uint(tvp->tv_usec) ;
