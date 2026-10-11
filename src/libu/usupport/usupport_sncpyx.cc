@@ -98,7 +98,7 @@ namespace libu {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (dl < 0) dl = (INT_MAX - 1) ;
+	if (dl < 0) dl = INT_MAX ;
 	if (dp) ylikely {
 	    char	*bp = dp ;
 	    size_t	rlen = (dl + 1) ;
@@ -106,7 +106,7 @@ namespace libu {
 	    rs = SR_OK ;
 	    dp[0] = '\0' ;
 	    for (int i = 0 ; i < n ; i += 1) {
-	        cc	*sp = (cc *) va_arg(ap,cc *) ;
+	        ccharp	sp = (cc *) va_arg(ap,cc *) ;
 	        if (size_t ml ; (ml = strlcpy(bp,sp,rlen)) >= rlen) {
 	            rs = SR_OVERFLOW ;
 		    break ;
