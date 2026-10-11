@@ -112,7 +112,7 @@ int snrealname(char *dbuf,int dlen,mainv a,int n) noex {
 		    if (rs >= 0) {
 	    	        rs = sb.strw(a[i]) ;
 	            }
-	        }
+	        } /* end */
 	    } /* end for */
 	    len = sb.idx ;
 	} /* end if (non-null) */
