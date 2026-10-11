@@ -60,7 +60,7 @@
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<cfx.h>			/* LIBUC |cf{xxx}(3uc)| */
 #include	<six.h>			/* LIBUC |isnon{xxx}(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -123,7 +123,7 @@ local int siourx(sinonx_f sio,cchar *sp,int sl) noex {
 	    si = rs ;
 	} else {
 	    si = sl ;
-	}
+	} /* end */
 	return (rs >= 0) ? si : rs ;
 } /* end subroutine (siourx) */
 
@@ -166,10 +166,10 @@ expmgr::operator int () noex {
 	} /* end for */
 	if ((rs >= 0) && (sl > 0)) {
 	    rs = sb.strw(sp,sl) ;
-	}
-	if (rs >= 0) {
+	} /* end */
+	if (rs >= 0) ylikely {
 	    rs = sb.idx ;
-	}
+	} /* end */
     	return rs ;
 } /* end method (expmgr::operator) */
 
@@ -232,7 +232,7 @@ int expmgr::handle() noex {
 	    } /* end switch */
 	    if ((rs >= 0) && chs) {
 		rs = sb.chr(chs) ;
-	    }
+	    } /* end */
 	} /* end if (has another character) */
     	return rs ;
 } /* end method (expmgr::handle) */
@@ -243,7 +243,7 @@ int expmgr::handle_octal() noex {
 	    if (cint n = (rs + 1) ; (rs = storeval(cfoct,(sp - 1),n)) >= 0) {
 	        sp += (n - 1) ;
 	        sl -= (n - 1) ;
-	    }
+	    } /* end */
 	} /* end if (sioutx) */
 	return rs ;
 } /* end method (expmgr::handle_octal) */
@@ -254,21 +254,21 @@ int expmgr::handle_o() noex {
 	if (sl > 0) {
 	    if (*sp == CH_LBRACE) {
 		( sp += 1 , sl - 1 ) ;
-		if (cc *tp ; (tp = strnchr(sp,sl,CH_RBRACE)) != np) {
+		if (cc *tp = strnchr(sp,sl,CH_RBRACE)) {
 		    cint tl = intconv(tp - sp) ;
 		    if ((rs = storeval(cfoct,sp,tl)) >= 0) {
 			sl -= (tl + 1) ;
 			sp += (tl + 1) ;
-		    }
+		    } /* end */
 		} else {
 	            rs = sb.chr(chx_sub) ;
-		}
+		} /* end */
 	    } else {
 	        rs = sb.chr(chx_sub) ;
-	    }
+	    } /* end */
 	} else {
 	    rs = sb.chr(chx_sub) ;
-	}
+	} /* end */
     	return rs ;
 } /* end method (expmgr::handle_o) */
 
@@ -278,28 +278,28 @@ int expmgr::handle_x() noex {
 	if (sl > 0) {
 	    if (*sp == CH_LBRACE) {
 		( sp += 1 , sl - 1 ) ;
-		if (cc *tp ; (tp = strnchr(sp,sl,CH_RBRACE)) != np) {
+		if (cc *tp = strnchr(sp,sl,CH_RBRACE)) {
 		    cint tl = intconv(tp - sp) ;
 		    if ((rs = storeval(cfhex,sp,tl)) >= 0) {
 			sl -= (tl + 1) ;
 			sp += (tl + 1) ;
-		    }
+		    } /* end */
 		} else {
 	            rs = sb.chr(chx_sub) ;
-		}
+		} /* end */
 	    } else {
 		if ((rs = siourx(sinonhex,sp,sl)) > 0) {
 		    if (cint si = rs ; (rs = storeval(cfhex,sp,si)) >= 0) {
 			sl -= si ;
 			sp += si ;
-		    }
+		    } /* end */
 		} else {
 	            rs = sb.chr(chx_sub) ;
-		}
+		} /* end */
 	    } /* end if (braces or not) */
 	} else {
 	    rs = sb.chr(chx_sub) ;
-	}
+	} /* end */
     	return rs ;
 } /* end method (expmgr::handle_x) */
 
@@ -319,7 +319,7 @@ int expmgr::storeval(cfx_f cfx,cc *op,int ol) noex {
     	int		rs ;
 	if (int v ; (rs = cfx(op,ol,&v)) >= 0) ylikely {
 	    rs = sb.chr(v) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (expmgr::storeval) */
 
