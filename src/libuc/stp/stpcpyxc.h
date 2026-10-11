@@ -24,25 +24,46 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<strcpyxc.h>		/* LIBUC */
 
 
 EXTERNC_begin
 
-local inline char * stpcpybc (char *dp,cchar *sp) noex {
-	return strcpybc(dp,sp) ;
-}
-local inline char * stpcpylc (char *dp,cchar *sp) noex {
-	return strcpylc(dp,sp) ;
-}
-local inline char * stpcpyuc (char *dp,cchar *sp) noex {
-	return strcpyuc(dp,sp) ;
-}
-local inline char * stpcpyfc (char *dp,cchar *sp) noex {
-	return strcpyfc(dp,sp) ;
-}
+extern char	* stpcpybcx(char *,int,...) noex ;
+extern char	* stpcpylcx(char *,int,...) noex ;
+extern char	* stpcpyucx(char *,int,...) noex ;
+extern char	* stpcpyfcx(char *,int,...) noex ;
+
+extern char	* stpcpybc (char *,cchar *) noex ;
+extern char	* stpcpylc (char *,cchar *) noex ;
+extern char	* stpcpyuc (char *,cchar *) noex ;
+extern char	* stpcpyfc (char *,cchar *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline char *stpcpybc(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return stpcpybcx(dp,na,args ...) ;
+} /* end subroutine */
+template<typename ... Args>
+inline char *stpcpylc(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return stpcpylcx(dp,na,args ...) ;
+} /* end subroutine */
+template<typename ... Args>
+inline char *stpcpyuc(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return stpcpyucx(dp,na,args ...) ;
+} /* end subroutine */
+template<typename ... Args>
+inline char *stpcpyfc(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return stpcpyfcx(dp,na,args ...) ;
+} /* end subroutine */
+
+#endif /* __cplusplus */
 
 
 #endif /* STPCPYXC_INCLUDE */
