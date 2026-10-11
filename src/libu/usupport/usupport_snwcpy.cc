@@ -22,6 +22,11 @@
 	snwcpy
 
 	Description:
+	This subroutine copies a counted source c-string into a
+	counted destination buffer.  This is a rather famous
+	subroutine that was first introduced in other libraries.
+	There was some particular reason to being it here into this
+	library.
 
 	Synopsis:
     	int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
