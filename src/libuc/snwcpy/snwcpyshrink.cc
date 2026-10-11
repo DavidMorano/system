@@ -53,7 +53,7 @@
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"snwcpy.h"		/* also for |snwcpy(3uc)| */
+#include	"snwcpyx.h"		/* also for |snwcpy(3uc)| */
 
 
 /* local defines */
@@ -90,12 +90,12 @@ int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	if (dbuf && sp) ylikely {
 	    cchar	*cp ;
 	    rs = SR_OK ;
-	    if (cchar *tp = strnchr(sp,sl,CH_NL) ; tp) {
+	    if (cchar *tp = strnchr(sp,sl,CH_NL)) {
 	        sl = intconv(tp - sp) ;
-	    }
+	    } /* end */
 	    if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
 	        rs = snwcpy(dbuf,dlen,cp,cl) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (snwcpyshrink) */
