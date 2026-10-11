@@ -120,7 +120,7 @@ int sfdirname(cchar *sp,int µsl,cchar **rpp) noex {
 	        rl = 0 ;
 	    } else {
 	        rl = (i - 1) ;
-	    }
+	    } /* end */
 	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
 	return rl ;
