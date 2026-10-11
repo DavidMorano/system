@@ -64,6 +64,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -128,27 +129,50 @@ char *strdcpy6w(char *dp,int dl,
 	return strdcpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end subroutine (strdcpy6w) */
 
+local char *strdcpyxw_pos(char *dp,int dl,int n,va_list ap) noex {
+	for (int i = 0 ; (dl > 0) && (i < (n - 1)) ; i += 1) {
+	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    while ((dl > 0) && *sp) {
+		*dp++ = *sp++ ;
+		dl -= 1 ;
+	    } /* end while */
+	} /* end for */
+	if (n > 0) {
+	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    int sl = (int)	va_arg(ap,int) ;
+	    while ((dl > 0) && sl && *sp) {
+		*dp++ = *sp++ ;
+		sl -= 1 ;
+		dl -= 1 ;
+	    } /* end while */
+	} /* end if */
+    	return dp ;
+} /* end subroutine (strdcpyxw_pos) */
+
+local char *strdcpyxw_neg(char *dp,int,int n,va_list ap) noex {
+	for (int i = 0 ; i < (n - 1) ; i += 1) {
+	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    dp = stpcpy(dp,sp) ;
+	} /* end for */
+	if (n > 0) {
+	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    int sl = (int)	va_arg(ap,int) ;
+	    while (sl-- && *sp) {
+		*dp++ = *sp++ ;
+	    } /* end while */
+	} /* end if */
+    	return dp ;
+} /* end subroutine (strdcpyxw_neg) */
+
 char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
 	    va_begin(ap,n) ;
-	    if (dl < 0) dl = INT_MAX ;
-	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
-	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
-	        if (i == (n-1)) {
-	            int	sl = (int) va_arg(ap,int) ;
-	            while ((dl > 0) && sl && *sp) {
-		        *dp++ = *sp++ ;
-		        dl -= 1 ;
-		        sl -= 1 ;
-	            } /* end while */
-	        } else {
-	            while ((dl > 0) && *sp) {
-		        *dp++ = *sp++ ;
-		        dl -= 1 ;
-	            } /* end while */
-	        } /* end if */
-	    } /* end for */
+	    if (dl >= 0) {
+		dp = strdcpyxw_pos(dp,dl,n,ap) ;
+	    } else {
+		dp = strdcpyxw_neg(dp,dl,n,ap) ;
+	    } /* end if */
 	    *dp = '\0' ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
