@@ -32,7 +32,7 @@ extern int	sfobrk	(cchar *,int,cchar *,cchar **) noex ;
 extern int	sfrbrk	(cchar *,int,cchar *,cchar **) noex ;
 local inline int sfbrk(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	return sfobrk(sp,sl,ss,rpp) ;
-}
+} /* end */
 
 EXTERNC_end
 
