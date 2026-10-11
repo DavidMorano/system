@@ -44,7 +44,7 @@
 #include	<ismmclass.h>
 #include	<isnot.h>
 #include	<isoneof.h>
-#include	<iswchar.h>
+#include	<iswc.h>
 
 
 #endif /* ISX_INCLUDE */
