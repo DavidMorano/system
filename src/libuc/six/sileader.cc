@@ -58,7 +58,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC |isdigitlatin(3uc)| */
+#include	<isch.h>		/* LIBUC |ischdigit(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"six.h"			/* |sibrk(3uc)| + |siskipwht(3uc)| */
@@ -102,7 +102,7 @@ int sileader(cchar *sp,int sl) noex {
 	            sl -= si ;
 	        } /* end if (skipped) */
 		if (sl > 0) {
-	            if (cint ch = mkchar(sp[0]) ; isdigitlatin(ch)) {
+	            if (cint ch = mkchar(sp[0]) ; ischdigit(ch)) {
 		        if (int ci ; (ci = sibrk(sp,sl," \t")) >= 0) {
 	                    si += (ci + 1) ;
 			    {
