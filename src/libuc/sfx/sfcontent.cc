@@ -46,7 +46,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<six.h>			/* LIBUC |sichr(3uc)| */
 #include	<strwcmp.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<isch.h>		/* LIBUC |ischeol(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"			/* |sfshrink(3uc)| + |sfnext(3uc)| */
@@ -88,7 +88,7 @@ int sfcontent(cchar *sp,int µsl,cchar **rpp) noex {
 	        if (int si = sichr(sp,sl,'#') ; si >= 0) {
 		    sl = si ;
 	        } else {
-		    while (sl && iseol(sp[sl - 1])) {
+		    while (sl && ischeol(sp[sl - 1])) {
 			sl -= 1 ;
 		    } /* end while */
 	        } /* end if (comment or EOL) */
