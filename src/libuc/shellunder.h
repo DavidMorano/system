@@ -34,7 +34,7 @@ extern int	shellunder_load(shellunder_dat *,cchar *) noex ;
 
 local inline int shellunder_wr(shellunder_dat *sup,cchar *sp) noex {
 	return shellunder_load(sup,sp) ;
-}
+} /* end */
 
 EXTERNC_end
 
