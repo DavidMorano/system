@@ -64,6 +64,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -130,33 +131,58 @@ char *strbcpy6w(char *dp,int dl,
 	return strbcpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end subroutine (strbcpy6w) */
 
+local char *strbcpyxw_pos(char *dp,int dl,int n,va_list ap) noex {
+    	bool fbad = false ;
+	for (int i = 0 ; (dl > 0) && (i < (n - 1)) ; i += 1) {
+	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    while ((dl > 0) && *sp) {
+		*dp++ = *sp++ ;
+		dl -= 1 ;
+	    } /* end while */
+	    fbad = ((dl == 0) && *sp) ;
+	    if (fbad) break ;
+	} /* end for */
+	if ((! fbad) && (n > 0)) {
+	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    int	sl = (int)	va_arg(ap,int) ;
+	    while ((dl > 0) && hasgot(sp,sl)) {
+		*dp++ = *sp++ ;
+		sl -= 1 ;
+		dl -= 1 ;
+	    } /* end while */
+	    fbad = ((dl == 0) && hasgot(sp,sl)) ;
+	} /* end if */
+	*dp = '\0' ;
+	if (fbad) dp = nullptr ;
+	return dp ;
+} /* end subroutine (strbcpyxw_pos) */
+
+local char *strbcpyxw_neg(char *dp,int,int n,va_list ap) noex {
+	for (int i = 0 ; i < (n - 1) ; i += 1) {
+	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    dp = stpcpy(dp,sp) ;
+	} /* end for */
+	if (n > 0) {
+	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    int	sl = (int)	va_arg(ap,int) ;
+	    while (hasgot(sp,sl)) {
+		*dp++ = *sp++ ;
+		sl -= 1 ;
+	    } /* end while */
+	} /* end if */
+	*dp = '\0' ;
+	return dp ;
+} /* end subroutine (strbcpyxw_neg) */
+
 char *strbcpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
 	    va_begin(ap,n) ;
-	    bool fbad = false ;
-	    if (dl < 0) dl = INT_MAX ;
-	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
-	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
-	        if (i == (n - 1)) {
-	            int	sl = (int) va_arg(ap,int) ;
-	            while ((dl > 0) && hasgot(sp,sl)) {
-		        *dp++ = *sp++ ;
-		        sl -= 1 ;
-		        dl -= 1 ;
-	            } /* end while */
-		    fbad = ((dl == 0) && hasgot(sp,sl)) ;
-	        } else {
-	            while ((dl > 0) && *sp) {
-		        *dp++ = *sp++ ;
-		        dl -= 1 ;
-	            } /* end while */
-		    fbad = ((dl == 0) && *sp) ;
-	        } /* end if */
-		if (fbad) break ;
-	    } /* end for */
-	    *dp = '\0' ;
-	    if (fbad) dp = nullptr ;
+	    if (dl >= 0) {
+		dp = strbcpyxw_pos(dp,dl,n,ap) ;
+	    } else {
+		dp = strbcpyxw_neg(dp,dl,n,ap) ;
+	    } /* end if */
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
