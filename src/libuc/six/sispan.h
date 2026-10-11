@@ -37,25 +37,25 @@ extern int	sispanblank(cchar *,int) noex ;
 
 local inline int sispandig(cchar *sp,int sl) noex {
     	return sispandigit(sp,sl) ;
-}
+} /* end */
 local inline int sispanoct(cchar *sp,int sl) noex {
     	return sispanoctal(sp,sl) ;
-}
+} /* end */
 local inline int sispandec(cchar *sp,int sl) noex {
     	return sispandigit(sp,sl) ;
-}
+} /* end */
 local inline int sispanhex(cchar *sp,int sl) noex {
     	return sispandigex(sp,sl) ;
-}
+} /* end */
 local inline int sispanwht(cchar *sp,int sl) noex {
     	return sispanwhite(sp,sl) ;
-}
+} /* end */
 local inline int sispanblk(cchar *sp,int sl) noex {
     	return sispanblank(sp,sl) ;
-}
+} /* end */
 local inline int siskipwhite(cchar *sp,int sl) noex {
     	return sispanwhite(sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
 
