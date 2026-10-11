@@ -71,6 +71,13 @@ extern char *stpncpy6(char *,cc *,cc *,cc *,cc *,cc *,cc *,size_t) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
+#ifdef	COMMENT /* already defined in the standard library */
+inline char *stpncpy(char *dp,
+		cc *s1,size_t n) noex {
+    	cint dl = intconv(n) ;
+	return stpncpyx(dp,dl,1,s1) ;
+} /* end */
+#endif /* COMMENT */
 inline char *stpncpy(char *dp,
 		cc *s1,cc *s2,size_t n) noex {
     	cint dl = intconv(n) ;
