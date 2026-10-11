@@ -36,10 +36,10 @@ extern int snchrs	(char *,int,int,int) noex ;
 
 local inline int snchr(char *dp,int dl,int ch) noex {
     return snchrs(dp,dl,ch,1) ;
-}
+} /* end */
 local inline int snblanks(char *dp,int dl,int n) noex {
     return snchrs(dp,dl,' ',n) ;
-}
+} /* end */
 
 EXTERNC_end
 
