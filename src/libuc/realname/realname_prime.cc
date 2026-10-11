@@ -46,7 +46,7 @@
 #include	<snwcpyx.h>		/* LIBUC */
 #include	<toxc.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
@@ -252,7 +252,7 @@ int realname_loadpieces(realname *op,cchar **sa,int sn) noex {
 	                int	len = 0 ;
 	                if ((rs = s.strw(pieces[--c],-1,&cp)) >= 0) {
 	                    bool	f_abv = false ;
-	                    if (isAbbr(cp[rs-1])) {
+	                    if (ischAbbr(cp[rs-1])) {
 	                        f_abv = true ;
 	                        rs -= 1 ;
 	                    }
@@ -264,7 +264,7 @@ int realname_loadpieces(realname *op,cchar **sa,int sn) noex {
 	                        for (int i = 0 ; i < c ; i += 1) {
 	                            f_abv = false ;
 	                            if ((rs = s.strw(pieces[i],-1,&cp)) > 0) {
-	                                if (isAbbr(cp[rs-1])) {
+	                                if (ischAbbr(cp[rs-1])) {
 	                                    f_abv = true ;
 	                                    rs -= 1 ;
 	                                }
@@ -410,7 +410,7 @@ int realname_name(realname *op,char *rbuf,int rlen) noex {
 	                sp = (op->first + 1) ;
 	                sl = (op->len.first - 1) ;
 	                ch = mkchar(*sp) ;
-	                if (isupperlatin(ch)) {
+	                if (ischupper(ch)) {
 	                    if ((rs1 = snwcpylc(nbuf,nlen,sp,sl)) > 0) {
 	                        sp = nbuf ;
 	                        sl = rs1 ;
@@ -430,7 +430,7 @@ int realname_name(realname *op,char *rbuf,int rlen) noex {
 	            ch = mkchar(op->m1[0]) ;
 	            nch = (op->m1[1] != '\0') ? touc(ch) : ch ;
 	            s.chr(nch) ;
-	            if (op->abv.m1 || isupperlatin(ch)) {
+	            if (op->abv.m1 || ischupper(ch)) {
 	                s.chr('.') ;
 		    }
 	        } /* end if (middle name) */
@@ -444,7 +444,7 @@ int realname_name(realname *op,char *rbuf,int rlen) noex {
 	                sp = (op->last + 1) ;
 	                sl = (op->len.last - 1) ;
 	                ch = mkchar(*sp) ;
-	                if (f && isupperlatin(ch)) {
+	                if (f && ischupper(ch)) {
 	                    if ((rs1 = snwcpylc(nbuf,nlen,sp,sl)) > 0) {
 	                        sp = nbuf ;
 	                        sl = rs1 ;
