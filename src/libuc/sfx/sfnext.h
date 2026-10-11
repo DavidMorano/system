@@ -35,7 +35,7 @@ extern int sfnextterm	(cchar *,int,cchar *,cchar **) noex ;
 extern int sfnextqtok	(cchar *,int,cchar **) noex ;
 local inline int nextfield(cchar *sp,int sl,cchar **rpp) noex {
 	return sfnext(sp,sl,rpp) ;
-}
+} /* end */
 
 EXTERNC_end
 
