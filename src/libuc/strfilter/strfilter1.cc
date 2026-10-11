@@ -88,8 +88,7 @@ using std::min ;			/* subroutine */
 using std::max ;			/* subroutine */
 using std::sort ;			/* subroutine (niebloid) */
 using std::binary_search ;		/* subroutine */
-using libu::um ;			/* variable */
-using std::nothrow ;			/* constant */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -120,8 +119,7 @@ local ulong mksw(cchar *sp,int sl) noex {
 
 /* local variables */
 
-constexpr int		defents = STRFILTER_DEFENTS ;	/* defualt entries */
-
+constexpr int		defents		= STRFILTER_DEFENTS ;
 constexpr bool		f_debug		= CF_DEBUG ;
 
 
@@ -135,7 +133,7 @@ int strfilter::istart() noex {
 	nents = defents ;
 	if ((rs = vecstr::start) >= 0) ylikely {
 	    magic = STRFILTER_MAGIC ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (strfilter::istartadd) */
 
@@ -145,7 +143,7 @@ int strfilter::ifinish() noex {
 	if (magic == STRFILTER_MAGIC) {
 	    rs = SR_OK ;
 	    if (filtarr) {
-		rs1 = um.free(filtarr) ;
+		rs1 = umem.free(filtarr) ;
 		if (rs >= 0) rs = rs1 ;
 		filtarr = nullptr ;
 	    }
@@ -191,7 +189,7 @@ int strfilter::have(cchar *sp,int µsl) noex {
 	    rs = SR_INVALID ;
 	    if (sl > 0) ylikely {
 	        rs = ihave(sp,sl) ;
-	    }
+	    } /* end */
 	} /* end if (getlenstr) */
 	return rs ;
 } /* end method (strfilter::have) */
@@ -298,16 +296,16 @@ int strfilter::extend(int n) noex {
 	    if (filtarr == nullptr) {
 	        ne = max((n + 1),defents) ;
 	        sz = (ne + 1) * szof(ulong) ;
-	        rs = um.mall(sz,&na) ;
+	        rs = umem.mall(sz,&na) ;
 	    } else {
 	        ne = (ext * 2) ;
 	        sz = (ne + 1) * szof(ulong) ;
-	        rs = um.rall(filtarr,sz,&na) ;
-	    }
+	        rs = umem.rall(filtarr,sz,&na) ;
+	    } /* end if */
 	    if (rs >= 0) {
 	        filtarr = ulongp(na) ;
 	        ext = ne ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (extension needed) */
 	return rs ;
 } /* end method (strfilter::extend) */
@@ -315,7 +313,7 @@ int strfilter::extend(int n) noex {
 void strfilter::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("strfilter",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (strfilter::dtor) */
 
 strfilter::operator int () const noex {
