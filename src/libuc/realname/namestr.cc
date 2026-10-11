@@ -34,7 +34,7 @@
 #include	<six.h>			/* LIBUC */
 #include	<snwcpyx.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |REALNAME| */
 
 #include	"namestr.h"
@@ -97,13 +97,13 @@ int namestr_skipwhite(namestr *op) noex {
 	int		len = 0 ; /* return-value */
 	if (op) ylikely {
 	    rs = SR_OK ;
-	    cauto iswht = [&op] () noex {
+	    cauto isourwht = [&op] () noex {
 		bool f = true ;
 	        f = f && (op->strl > 0) ;
 		f = f && CHAR_ISWHITE(op->strp[0]) ;
 		return f ;
-	    } ; /* end lambda (iswht) */
-	    while (iswht()) {
+	    } ; /* end lambda (isourwht) */
+	    while (isourwht()) {
 	        op->strp += 1 ;
 	        op->strl -= 1 ;
 	    } /* end while */
@@ -144,9 +144,9 @@ int namestr_next(namestr *op,cchar **npp,int *fap,int *flp) noex {
 	            namestr_skipwhite(op) ;
 	            bool	f = true ;
 	            f = f && (op->strl > 0) ;
-	            f = f && ((op->strp[0] == ',') || isAbbr(op->strp[0])) ;
+	            f = f && ((op->strp[0] == ',') || ischAbbr(op->strp[0])) ;
 	            if (f) {
-	                if (isAbbr(op->strp[0])) {
+	                if (ischAbbr(op->strp[0])) {
 	                    *fap = true ;
 	                } else {
 	                    *flp = true ;
