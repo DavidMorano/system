@@ -89,7 +89,7 @@ int sfbasename(cchar *sp,int µsl,cchar **rpp) noex {
 	if (int sl ; (sl = getlenstr(sp,µsl)) > 0) ylikely {
 	    while ((sl > 1) && (sp[sl - 1] == '/')) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    {
 	        int	si ; /* used-afterwards */
 	        for (si = sl ; si > 0 ; si -= 1) {
@@ -97,7 +97,7 @@ int sfbasename(cchar *sp,int µsl,cchar **rpp) noex {
 	        } /* end for */
 	        if ((sl == 1) && (si == 1) && (sp[0] == '/')) {
 	            si -= 1 ;
-	        }
+	        } /* end if */
 	        rp = (sp + si) ;
 	        rl = (sl - si) ;
 	    } /* end block */
