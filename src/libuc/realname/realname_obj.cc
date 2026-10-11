@@ -44,7 +44,7 @@
 #include	<six.h>			/* LIBUC */
 #include	<snwcpyx.h>		/* LIBUC */
 #include	<toxc.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* |REALNAME| */
 
