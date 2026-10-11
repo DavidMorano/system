@@ -107,12 +107,12 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	    if (under[0] != '\0') ylikely {
 	        if (under[0] == '*') {
 	            cchar *dp = (under + 1) ;
-	            if (cchar *tp = strchr(dp,'*') ; tp) {
+	            if (cchar *tp = strchr(dp,'*')) {
 	                cint dl = intconv(tp - dp) ;
 	                under = (tp+1) ;
 	                if (int v ; (rs = cfdec(dp,dl,&v)) >= 0) {
 	                    op->pid = pid_t(v) ;
-	                }
+	                } /* end if (cfdec) */
 	            } else {
 	                rs = SR_INVALID ;
 		    } /* end */
@@ -120,7 +120,7 @@ int shellunder_load(shellunder_dat *op,cchar *under) noex {
 	        if ((rs >= 0) && (under[0] != '\0')) {
 	            while (ISWHT(*under)) {
 			under += 1 ;
-		    }
+		    } /* end while */
 	            op->execname = under ;
 	            pl = lenstr(under) ;
 	        } /* end */
