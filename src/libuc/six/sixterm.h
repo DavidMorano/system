@@ -31,7 +31,7 @@ extern int	sirterm(cchar *,int,cchar *) noex ;
 
 local inline int siterm(cchar *sp,int sl,cchar *ss) noex {
     	return sioterm(sp,sl,ss) ;
-}
+} /* end */
 
 EXTERNC_end
 
