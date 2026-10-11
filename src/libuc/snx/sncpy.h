@@ -23,16 +23,10 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
+#include	<sncpyarr.h>
 #include	<sncpyx.h>
 #include	<sncpyxw.h>
 #include	<sncpyxc.h>
-
-
-EXTERNC_begin
-
-extern int sncpyarray(char *,int,con mainv,int) noex ;
-
-EXTERNC_end
 
 
 #endif /* SNCPY_INCLUDE */
