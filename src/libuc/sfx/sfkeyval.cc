@@ -48,7 +48,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<six.h>			/* LIBUC |sichr(3uc)| */
 #include	<strwcmp.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<isch.h>		/* LIBUC |ischeol(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"sfx.h"			/* |sfshrink(3uc)| + |sfnext(3uc)| */
