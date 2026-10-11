@@ -44,7 +44,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"sinon.h"
@@ -98,19 +98,19 @@ local int sinon(isnon_f isx,cchar *sp,int sl) noex {
 /* exported subroutines */
 
 int sinonoct(cchar *sp,int sl) noex {
-    	return sinon(isoctlatin,sp,sl) ;
+    	return sinon(ischoct,sp,sl) ;
 } /* end subroutine */
 
 int sinondec(cchar *sp,int sl) noex {
-    	return sinon(isdeclatin,sp,sl) ;
+    	return sinon(ischdec,sp,sl) ;
 } /* end subroutine */
 
 int sinonhex(cchar *sp,int sl) noex {
-    	return sinon(ishexlatin,sp,sl) ;
+    	return sinon(ischhex,sp,sl) ;
 } /* end subroutine */
 
 int sinonwht(cchar *sp,int sl) noex {
-    	return sinon(iswhtlatin,sp,sl) ;
+    	return sinon(ischwht,sp,sl) ;
 } /* end subroutine */
 
 
