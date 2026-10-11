@@ -40,12 +40,12 @@ MODS +=
 LIBS +=
 
 
-OBJ0= isindomain.o isinetaddr.o
-OBJ1= isoneof.o isnot.o iserror.o
-OBJ2= isch.o iswchar.o
-OBJ3= ismmclass.o
+OBJ0= isch.o iswc.o
+OBJ1= ismmclass.o
+OBJ2= isoneof.o isnot.o iserror.o
+OBJ3= 
 
-OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB=
 
 OBJ= obja.o
@@ -134,10 +134,8 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-isindomain.o:	isindomain.cc	isindomain.h			$(INCS)
-isinetaddr.o:	isinetaddr.cc	isinetaddr.h			$(INCS)
 isch.o:		isch.cc		isch.h				$(INCS)
-iswchar.o:	iswchar.cc	iswchar.h			$(INCS)
+iswc.o:		iswc.cc		iswc.h				$(INCS)
 isoneof.o:	isoneof.cc	isoneof.h			$(INCS)
 isnot.o:	isnot.cc	isnot.h				$(INCS)
 iserror.o:	iserror.cc	iserror.h			$(INCS)
