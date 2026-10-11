@@ -31,14 +31,14 @@ extern int	sirchr(cchar *,int,int) noex ;
 
 local inline int sichr(cchar *sp,int sl,int sch) noex {
 	return siochr(sp,sl,sch) ;
-}
+} /* end */
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 inline int sichr(cchar *sp,int sch) noex {
 	return siochr(sp,-1,sch) ;
-}
+} /* end */
 #endif /* __cplusplus */
 
 
