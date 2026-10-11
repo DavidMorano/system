@@ -28,12 +28,42 @@
 
 EXTERNC_begin
 
+extern char	* strcpybcx(char *,int,...) noex ;
+extern char	* strcpylcx(char *,int,...) noex ;
+extern char	* strcpyucx(char *,int,...) noex ;
+extern char	* strcpyfcx(char *,int,...) noex ;
+
 extern char	* strcpybc (char *,cchar *) noex ;
 extern char	* strcpylc (char *,cchar *) noex ;
 extern char	* strcpyuc (char *,cchar *) noex ;
 extern char	* strcpyfc (char *,cchar *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline char *strcpybc(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return strcpybcx(dp,na,args ...) ;
+} /* end subroutine */
+template<typename ... Args>
+inline char *strcpylc(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return strcpylcx(dp,na,args ...) ;
+} /* end subroutine */
+template<typename ... Args>
+inline char *strcpyuc(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return strcpyucx(dp,na,args ...) ;
+} /* end subroutine */
+template<typename ... Args>
+inline char *strcpyfc(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return strcpyfcx(dp,na,args ...) ;
+} /* end subroutine */
+
+#endif /* __cplusplus */
 
 
 #endif /* STRCPYXC_INCLUDE */
