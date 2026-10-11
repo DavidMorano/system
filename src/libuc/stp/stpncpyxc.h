@@ -31,16 +31,16 @@ EXTERNC_begin
 
 local inline char * stpncpybc (char *dp,cchar *sp,int n) noex {
 	return strncpybc (dp,sp,n) ;
-}
+} /* end */
 local inline char * stpncpylc (char *dp,cchar *sp,int n) noex {
 	return strncpylc (dp,sp,n) ;
-}
+} /* end */
 local inline char * stpncpyuc (char *dp,cchar *sp,int n) noex {
 	return strncpyuc (dp,sp,n) ;
-}
+} /* end */
 local inline char * stpncpyfc (char *dp,cchar *sp,int n) noex {
 	return strncpyfc (dp,sp,n) ;
-}
+} /* end */
 
 EXTERNC_end
 
