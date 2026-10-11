@@ -51,7 +51,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<strn.h>		/* LIBUC |strn{x}chr(3uc)| */
 #include	<six.h>			/* LIBUC |siext(3uc)| */
-#include	<ischarx.h>		/* LIBUC |iseol(3uc)| */
+#include	<isch.h>		/* LIBUC |ischeol(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"rmx.h"
