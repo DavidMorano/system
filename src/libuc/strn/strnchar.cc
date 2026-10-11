@@ -48,7 +48,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<ischarx.h>		/* LIBUC <- money shot! */
+#include	<isch.h>		/* LIBUC <- money shot! */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"strnchar.h"
@@ -103,27 +103,27 @@ local char *strnxx(xchr_f xchr,cchar *sp,int sl) noex {
 /* exported subroutines */
 
 char *strnalpha(cchar *sp,int sl) noex {
-    	return strnxx(isalphalatin,sp,sl) ;
+    	return strnxx(ischalpha,sp,sl) ;
 } /* end subroutine */
 
 char *strnalnum(cchar *sp,int sl) noex {
-    	return strnxx(isalnumlatin,sp,sl) ;
+    	return strnxx(ischalnum,sp,sl) ;
 } /* end subroutine */
 
 char *strndigit(cchar *sp,int sl) noex {
-    	return strnxx(isdigitlatin,sp,sl) ;
+    	return strnxx(ischdigit,sp,sl) ;
 } /* end subroutine */
 
 char *strndigex(cchar *sp,int sl) noex {
-    	return strnxx(isdigexlatin,sp,sl) ;
+    	return strnxx(ischdigex,sp,sl) ;
 } /* end subroutine */
 
 char *strnoctal(cchar *sp,int sl) noex {
-    	return strnxx(isoctallatin,sp,sl) ;
+    	return strnxx(ischoctal,sp,sl) ;
 } /* end subroutine */
 
 char *strnblank(cchar *sp,int sl) noex {
-    	return strnxx(isblanklatin,sp,sl) ;
+    	return strnxx(ischblank,sp,sl) ;
 } /* end subroutine */
 
 
