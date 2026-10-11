@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0=
+OBJ0= openint_copyout.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -49,10 +49,10 @@ OBJ5=
 OBJ6=
 OBJ7= 
 
-OBJA= obj0.o obj1.o obj2.o obj3.o 
+OBJA= obj0.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
-OBJ= obja.o objb.o
+OBJ= obja.o
 
 
 INCDIRS +=
