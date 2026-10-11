@@ -40,10 +40,10 @@ MODS +=
 LIBS +=
 
 
-OBJ0_SNWCPYX= snwcpyxc.o snwcpyopaque.o
+OBJ0_SNWCPYX= snwcpyx.o snwcpyxc.o 
 OBJ1_SNWCPYX= snwcpyclean.o snwcpylatin.o
 OBJ2_SNWCPYX= snwcpyshrink.o snwcpycompact.o
-OBJ3_SNWCPYX= snwcpyer.o snwcpyrev.o
+OBJ3_SNWCPYX= snwcpyopaque.o snwcpyrev.o
 OBJ4_SNWCPYX= snwcpyhyphen.o snwcpywidehdr.o
 OBJ5_SNWCPYX= snwcpyexpesc.o
 OBJ6_SNWCPYX=
@@ -150,14 +150,14 @@ objc.o:			$(OBJC_SNWCPYX)
 
 snwcpyclean.o:		snwcpyclean.cc		$(INCS)
 snwcpycompact.o:	snwcpycompact.cc	$(INCS)
-snwcpyer.o:		snwcpyer.cc		$(INCS)
+snwcpyexpesc.o:		snwcpyexpesc.cc		$(INCS)
 snwcpyhyphen.o:		snwcpyhyphen.cc		$(INCS)
 snwcpylatin.o:		snwcpylatin.cc		$(INCS)
 snwcpyopaque.o:		snwcpyopaque.cc		$(INCS)
 snwcpyrev.o:		snwcpyrev.cc		$(INCS)
 snwcpyshrink.o:		snwcpyshrink.cc		$(INCS)
 snwcpywidehdr.o:	snwcpywidehdr.cc	$(INCS)
+snwcpyx.o:		snwcpyx.cc		$(INCS)
 snwcpyxc.o:		snwcpyxc.cc		$(INCS)
-snwcpyexpesc.o:		snwcpyexpesc.cc		$(INCS)
 
 
