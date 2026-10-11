@@ -97,13 +97,13 @@ local int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
 	    if (dlen < 0) dlen = INT_MAX ;
 	    while ((i < dlen) && sp[i]) {
 	        *dp++ = charconv(toxc(sp[i++])) ;
-	    }
+	    } /* end while */
 	    *dp = '\0' ;
 	    if (sp[i] == '\0') {
 	        rl = intconv(dp - dbuf) ;
 	    } else {
 		rs = SR_OVERFLOW ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine-template (sncpyxc) */
