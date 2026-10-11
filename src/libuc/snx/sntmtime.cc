@@ -345,7 +345,7 @@ local int sbuf_fmtstrs(sbuf *ssp,tmtime *tmp,cchar *fmt) noex {
 	            } /* end switch */
 	        } else {
 	            rs = sbuf_chr(ssp,ch) ;
-	        }
+	        } /* end */
 	    } /* end while */
 	} /* end if (non-null) */
 	return rs ;
@@ -383,7 +383,7 @@ local int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 	} /* end switch */
 	if (rs >= 0) ylikely {
 	    rs = sbuf_strw(ssp,dbuf,n) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sbuf_digs) */
 
@@ -394,7 +394,7 @@ local int sbuf_year(sbuf *ssp,tmtime *tmp) noex {
 	int		rs ;
 	if (char dbuf[dlen +1] ; (rs = ctdecpi(dbuf,dlen,prec,y)) >= 0) {
 	    rs = sbuf_strw(ssp,dbuf,rs) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sbuf_year) */
 
@@ -410,7 +410,7 @@ local int sbuf_coder(sbuf *ssp,tmtime *tmp,int f_sec) noex {
 		    }
 		}
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sbuf_coder) */
 
@@ -426,7 +426,7 @@ local int sbuf_zoff(sbuf *ssp,tmtime *tmp) noex {
 	    	    rs = sbuf_twodig(ssp,zm) ;
 		}
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sbuf_zoff) */
 
@@ -441,7 +441,7 @@ local int sbuf_dated(sbuf *ssp,tmtime *tmp) noex {
 		    }
 		}
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sbuf_dated) */
 
@@ -455,7 +455,7 @@ local int sbuf_dater(sbuf *ssp,tmtime *tmp) noex {
 		    }
 		}
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sbuf_dater) */
 
@@ -470,7 +470,7 @@ local int sbuf_datex(sbuf *ssp,tmtime *tmp) noex {
 		    }
 		}
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sbuf_datex) */
 
