@@ -55,6 +55,7 @@
 #include	<baops.h>
 #include	<keyopt.h>
 #include	<field.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -113,7 +114,7 @@ struct locinfo {
 
 /* forward references */
 
-static void	sighand_int(int) ;
+local void	sighand_int(int) ;
 
 local int	usage(struct proginfo *) ;
 
@@ -131,10 +132,10 @@ local int	locinfo_finish(struct locinfo *) ;
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
-static const int	sigblocks[] = {
+static cint	sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -142,13 +143,13 @@ static const int	sigblocks[] = {
 	0
 } ;
 
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 	0
 } ;
 
-static const int	sigints[] = {
+static cint	sigints[] = {
 	SIGINT,
 	SIGTERM,
 	SIGQUIT,
@@ -938,7 +939,7 @@ badarg:
 /* local subroutines */
 
 
-static void sighand_int(sn)
+local void sighand_int(sn)
 int	sn ;
 {
 
@@ -1080,13 +1081,13 @@ void		*ofp ;
 	    if (rs >= 0) {
 	        ti = bi.wtime ;
 	        t = (t & (~ UINT_MAX)) | (((time_t) ti) & UINT_MAX) ;
-	        rs = shio_printf(ofp,"wtime=%s\n",timestr_log(t,timebuf)) ;
+	        rs = shio_printf(ofp,"wtime=%s\n",strtime_log(t,timebuf)) ;
 	        wlen += rs ;
 	    }
 	    if (rs >= 0) {
 	        ti = bi.atime ;
 	        t = (t & (~ UINT_MAX)) | (((time_t) ti) & UINT_MAX) ;
-	        rs = shio_printf(ofp,"atime=%s\n",timestr_log(t,timebuf)) ;
+	        rs = shio_printf(ofp,"atime=%s\n",strtime_log(t,timebuf)) ;
 	        wlen += rs ;
 	    }
 	    if (rs >= 0) {
