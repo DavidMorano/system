@@ -73,6 +73,7 @@
 #include	<sigblocker.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<fsdirtreestat.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG */
@@ -1602,11 +1603,11 @@ local int proctouchfile(PROGINFO *pip,cchar *touchfname)
 
 #if	CF_ALWAYS
 	    shio_printf(tfp,"%s\n",
-	        timestr_logz(pip->daytime,timebuf)) ;
+	        strtime_logz(pip->daytime,timebuf)) ;
 #else
 	    if (f_write || (c_updated > 0)) {
 	        shio_printf(tfp,"%s\n",
-	            timestr_logz(pip->daytime,timebuf)) ;
+	            strtime_logz(pip->daytime,timebuf)) ;
 	    }
 #endif /* CF_ALWAYS */
 
