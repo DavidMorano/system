@@ -35,7 +35,8 @@
 	Arguments:
 	dst	destination result buffer (pointer)
 	src	source c-string pointer
-	rp	result pointer (pointing to resulting NUL character in 'dst'
+	rp	result pointer (pointing to resulting NUL character 
+		in 'dst'
 
 	Returns:
 	-	a pointer to the NUL character in the destination buffer
@@ -96,6 +97,17 @@ local char *strcpyxc(toxc_f toxc,char *dp,cchar *sp) noex {
 	return dp ;
 } /* end subroutine (strcpyxc) */
 
+local char *strcpyxcx(toxc_f toxc,char *dp,int na,va_list ap) noex {
+	for (int i = 0 ; i < na ; i += 1) {
+	    ccp sp = (charp) va_arg(ap,charp) ;
+	    while (*sp) {
+	        *dp++ = char(toxc(*sp++)) ;
+	    } /* end while */
+	} /* end for */
+	*dp = '\0' ;
+	return dp ;
+} /* end subroutine (strcpyxcx) */
+
 
 /* local variables */
 
@@ -114,9 +126,7 @@ char *strcpybc(char *dp,cchar *sp) noex {
 	        rp = stpcpy(dp,sp) ;
 	    } else {
 	        rp = strcpyxc(tobc,dp,sp) ;
-	    }
-	} else {
-	    dp = nullptr ;
+	    } /* end */
 	} /* end if (non-null) */
 	return rp ;
 } /* end subroutine (strcpybc) */
@@ -131,6 +141,46 @@ char *strcpyuc(char *dp,cchar *sp) noex {
 
 char *strcpyfc(char *dp,cchar *sp) noex {
 	return strcpyxc(tofc,dp,sp) ;
+} /* end subroutine */
+
+char *strcpybcx(char *dp,int na,...) noex {
+    	va_list ap ;
+	if (dp) ylikely {
+	    va_begin(ap,na) ;
+	    dp = strcpyxcx(tobc,dp,na,ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
+    	return dp ;
+} /* end subroutine */
+
+char *strcpylcx(char *dp,int na,...) noex {
+    	va_list ap ;
+	if (dp) ylikely {
+	    va_begin(ap,na) ;
+	    dp = strcpyxcx(tolc,dp,na,ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
+    	return dp ;
+} /* end subroutine */
+
+char *strcpyucx(char *dp,int na,...) noex {
+    	va_list ap ;
+	if (dp) ylikely {
+	    va_begin(ap,na) ;
+	    dp = strcpyxcx(touc,dp,na,ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
+    	return dp ;
+} /* end subroutine */
+
+char *strcpyfcx(char *dp,int na,...) noex {
+    	va_list ap ;
+	if (dp) ylikely {
+	    va_begin(ap,na) ;
+	    dp = strcpyxcx(tofc,dp,na,ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
+    	return dp ;
 } /* end subroutine */
 
 
