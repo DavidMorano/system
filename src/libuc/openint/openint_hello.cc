@@ -114,7 +114,7 @@ int		to ;
 	cchar	*sp = "hello world!\n" ;
 
 	if ((rs = u_pipe(pipes)) >= 0) {
-	    const int	wfd = pipes[1] ;
+	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
 
 	    if (sl < 0) sl = strlen(sp) ;
