@@ -81,8 +81,8 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
 
@@ -107,24 +107,24 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procspec(PROGINFO *,void *, const char *) ;
-static int	procout(PROGINFO *,SHIO *,const char *) ;
+local int	procspec(PROGINFO *,void *, cchar *) ;
+local int	procout(PROGINFO *,SHIO *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_utfname(LOCINFO *,const char *) ;
-static int	locinfo_flags(LOCINFO *,int,int) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_utfname(LOCINFO *,cchar *) ;
+local int	locinfo_flags(LOCINFO *,int,int) ;
+local int	locinfo_finish(LOCINFO *) ;
 
-static int	matextra(const char **,int,const char *,int) ;
+local int	matextra(cchar **,int,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -177,7 +177,7 @@ static const MAPEX	mapexs[] = {
 } ;
 
 /* define the configuration keywords */
-static const char	*qopts[] = {
+static cchar	*qopts[] = {
 	"fsbs",
 	"fspbs",
 	"fstotal",
@@ -229,7 +229,7 @@ int b_terminit(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -250,7 +250,7 @@ int p_terminit(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -279,15 +279,15 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_nocache = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*statfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*statfname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -345,7 +345,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -501,7 +501,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -731,7 +731,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	    if ((rs = shio_open(afp,afname,"r",0666)) >= 0) {
 	        FIELD		fsb ;
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 	        char		name[MAXNAMELEN + 1] ;
 
@@ -744,7 +744,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
 	        	int		ml ;
 	        	int		fl ;
-	        	const char	*fp ;
+	        	cchar	*fp ;
 
 	                while ((fl = field_get(&fsb,aterms,&fp)) >= 0) {
 	                    if (fl > 0) {
@@ -875,13 +875,13 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		i ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<spec(s)> ...] [-af <afile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -924,7 +924,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process a specification name */
-static int procspec(PROGINFO *pip,void *ofp,cchar req[])
+local int procspec(PROGINFO *pip,void *ofp,cchar req[])
 {
 	STATVFS	*fssp = &lip->fss ;
 	LOCINFO		*lip = pip->lip ;
@@ -1035,10 +1035,10 @@ static int procspec(PROGINFO *pip,void *ofp,cchar req[])
 /* end subroutine (procspec) */
 
 
-static int procout(pip,ofp,buf)
+local int procout(pip,ofp,buf)
 PROGINFO	*pip ;
 SHIO		*ofp ;
-const char	*buf ;
+cchar	*buf ;
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1054,7 +1054,7 @@ const char	*buf ;
 /* end subroutine (procout) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	if (lip == NULL)
@@ -1068,7 +1068,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 
 	if (lip == NULL)
@@ -1080,14 +1080,14 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 /* this is our extra little surprise */
-static int matextra(cchar **a,int n,cchar *s,int slen)
+local int matextra(cchar **a,int n,cchar *s,int slen)
 {
-	const int	lc = s[0] ;
-	const int	shift = 2 ;
+	cint	lc = s[0] ;
+	cint	shift = 2 ;
 	int		i ;
 	int		m ;
 	int		al ;
-	const char	*asp ;
+	cchar	*asp ;
 
 	if (slen < 0)
 	    slen = strlen(s) ;
