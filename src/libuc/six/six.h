@@ -42,11 +42,11 @@
 
 EXTERNC_begin
 
-extern int sidquote(cchar *,int) noex ;
-extern int sibasename(cchar *,int) noex ;
-extern int silbrace(cchar *,int) noex ;
-extern int sihyphen(cchar *,int) noex ;
-extern int sicite(cchar *,int,cchar *,int) noex ;
+extern int sidquote	(cchar *,int) noex ;
+extern int sibasename	(cchar *,int) noex ;
+extern int silbrace	(cchar *,int) noex ;
+extern int sihyphen	(cchar *,int) noex ;
+extern int sicite	(cchar *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
