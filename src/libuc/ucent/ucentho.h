@@ -37,7 +37,7 @@ struct ucentho : hostent {
 	int getadd(char *,int,int,cvoid *,int) noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucentho) */
 
 #else /* __cplusplus */
