@@ -108,7 +108,7 @@ char *strnset(char *bp,int ch,int n) noex {
     	if (bp) ylikely {
 	    while (n-- > 0) {
 	        *bp++ = char(ch) ;
-	    }
+	    } /* end while */
 	} /* end if (non-null) */
 	return bp ;
 } /* end subroutine (strnset) */
