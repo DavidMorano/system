@@ -44,10 +44,10 @@
 	Notes:
 	1. Massaging the result:
 	In the old days, before header fields could be encoded in
-	wacko ways, the result here was the final result. It could
+	wacko ways, the result here was the final result.  It could
 	therefore be massaged to get rid of some cruft that certain
 	mailers (who will remain nameless -- for now) would add to
-	the field string value. But now-a-days, the result here
+	the field string value.  But now-a-days, the result here
 	could still be wackily encoded, so massaging will at best
 	do nothing, and at worst break the encoded format.
 
@@ -58,7 +58,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<sfx.h>			/* LIBUC |shshrink(3uc)| */
+#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<ema.h>			/* LIBUC */
 #include	<isoneof.h>		/* LIBUC */
@@ -94,13 +94,6 @@ extern "C" {
 
 
 /* local structures */
-
-enum atypes {
-	atype_comment,
-	atype_address,
-	atype_route,
-	atype_overlast
-} ; /* end enum */
 
 
 /* forward references */
@@ -161,58 +154,64 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 /* local subroutines */
 
 local int emaentry_addrname(ema_ent *ep,char *fbuf,int flen) noex {
+    	emaparts	atype = emapart_overlast ;
 	int		rs = SR_OK ;
 	int		nl = 0 ;
-	int		atype = -1 ;
 	int		len = 0 ; /* return-value */
 	cchar		*sp = nullptr ;
 	if ((sp == nullptr) || (nl == 0)) {
 	    if (ep->cp != nullptr) {
-	        atype = atype_comment ;
+	        atype = emapart_comment ;
 	        nl = sfshrink(ep->cp,ep->cl,&sp) ;
 	    }
-	}
+	} /* end */
 	if ((sp == nullptr) || (nl == 0)) {
 	    if (ep->ap != nullptr) {
-	        atype = atype_address ;
+	        atype = emapart_address ;
 	        nl = sfshrink(ep->ap,ep->al,&sp) ;
 	    }
-	}
+	} /* end */
 	if ((sp == nullptr) || (nl == 0)) {
 	    if (ep->rp != nullptr) {
-	        atype = atype_route ;
+	        atype = emapart_route ;
 	        nl = sfshrink(ep->rp,ep->rl,&sp) ;
 	    }
-	}
+	} /* end */
 	if_constexpr (f_massage) {
 	    if ((sp != nullptr) && (nl > 0)) {
 	        int	cl ;
 	        cchar	*cp ;
 	        switch (atype) {
-	        case atype_comment:
+	        case emapart_comment:
 	            if ((cl = sfsubstance(sp,nl,&cp)) > 0) {
 	                rs = snwcpy(fbuf,flen,cp,cl) ;
 	                len = rs ;
-	            }
+	            } /* end */
 	            break ;
-	        case atype_address:
+	        case emapart_address:
 	            rs = mkaddrdisp(fbuf,flen,sp,nl) ;
 	            len = rs ;
 	            break ;
-	        case atype_route:
+	        case emapart_route:
 	            rs = snwcpy(fbuf,flen,sp,nl) ;
 	            len = rs ;
+		    break ;
+		default:
+		    rs = SR_BUGCHECK ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (positive) */
 	} else {
 	    if ((sp != nullptr) && (nl > 0)) {
 	        switch (atype) {
-	        case atype_comment:
-	        case atype_address:
-	        case atype_route:
+	        case emapart_comment:
+	        case emapart_address:
+	        case emapart_route:
 	            rs = snwcpy(fbuf,flen,sp,nl) ;
 	            len = rs ;
+		    break ;
+		default:
+		    rs = SR_BUGCHECK ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (positive) */
