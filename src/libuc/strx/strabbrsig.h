@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRABBTSIG_INCLUDE
-#define	STRABBTSIG_INCLUDE
+#ifndef	STRABBRSIG_INCLUDE
+#define	STRABBRSIG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -33,6 +33,6 @@ extern cchar	*strabbrsig(int) noex ;
 EXTERNC_end
 
 
-#endif /* STRABBTSIG_INCLUDE */
+#endif /* STRABBRSIG_INCLUDE */
 
 
