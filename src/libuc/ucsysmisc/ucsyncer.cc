@@ -254,7 +254,7 @@ local int ucsyncer_sendsync(US *uip) noex {
 	    if (sigblocker b ; (rs = b.start(np)) >= 0) {
 	        if ((rs = ucsyncer_init()) >= 0) {
 		    if ((rs = ucsyncer_run(uip)) >= 0) {
-		        const int	cmd = cmd_sync ;
+		        cint	cmd = cmd_sync ;
 		        rs = ucsyncer_cmdsend(uip,cmd) ;
 		        c = uip->count ;
 		    }
@@ -319,7 +319,7 @@ local int ucsyncer_runner(US *uip) noex {
 	int		rs1 ;
 	int		f = false ;
 	if (pta ta ; (rs = pta_create(&ta)) >= 0) {
-	    const int	scope = US_SCOPE ;
+	    cint	scope = US_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 		pthread_t	tid ;
 		uptsub_f	tsub = uptsub_f(ucsyncer_worker) ;
@@ -421,7 +421,7 @@ local int ucsyncer_waitdone(US *uip) noex {
 	if (uip->f_running) {
 	    const pid_t	pid = getpid() ;
 	    if (pid == uip->pid) {
-	        const int	cmd = cmd_exit ;
+	        cint	cmd = cmd_exit ;
 	        if ((rs = ucsyncer_cmdsend(uip,cmd)) >= 0) {
 	 	    pthread_t	tid = uip->tid ;
 		    int		trs ;
