@@ -1,4 +1,4 @@
-UCSOCK
+UCDESCSOCK
 
 This directory contains some miscellaneous socket operations.
 
