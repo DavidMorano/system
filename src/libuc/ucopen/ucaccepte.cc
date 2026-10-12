@@ -97,7 +97,7 @@ int uc_accepte(int fd,SOCKADDR *sap,int *salp,int to) noex {
 	            while (rs >= 0) {
 	                if ((rs = u_poll(fds,nfd,mto)) >= 0) {
 	                    if (rs > 0) {
-	                        cint	re = fds[0].revents ;
+	                        cshort	re = fds[0].revents ;
 	                        if (re & POLLIN) {
 	                            rs = u_accept(fd,sap,salp) ;
 	                            s = rs ;
@@ -107,17 +107,17 @@ int uc_accepte(int fd,SOCKADDR *sap,int *salp,int to) noex {
 	                            rs = SR_POLLERR ;
 	                        } else if (re & POLLNVAL) {
 	                            rs = SR_NOTOPEN ;
-	                        }
+	                        } /* end if */
 	                    } else {
 	                        to -= 1 ;
-        		    }
+        		    } /* end if */
 	                    if (to <= 0) break ;
 	                    if (s >= 0) break ;
 	                } else if (rs == SR_INTR) rs = SR_OK ;
 	            } /* end while */
 	            if ((rs == 0) && (s < 0) && (to <= 0)) {
 	                rs = SR_TIMEDOUT ;
-	            }
+	            } /* end if */
 	        } else {
 	            rs = u_accept(fd,sap,salp) ;
 	            s = rs ;
