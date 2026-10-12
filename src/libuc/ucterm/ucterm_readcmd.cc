@@ -51,7 +51,7 @@
 #include	<ucdescread.h>		/* LIBUC */
 #include	<ndigit.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |DIGBUFLEN| + |UC()| */
 
 #include	"ucterm.h"
@@ -323,7 +323,7 @@ local int sub_procCSI(sub *sip) noex {
 	        ch = rs ;
 	    }
 	    while ((rs >= 0) && isparam(ch)) {
-	        if (isdigitlatin(ch)) {
+	        if (ischdigit(ch)) {
 	            if ((ch != '0') || (! f_leadingzero)) {
 	                if (ch != '0') f_leadingzero = false ;
 	                if (dl < dlen) {
@@ -411,7 +411,7 @@ local int sub_proc_dcs(sub *sip) noex {
 	        ch = rs ;
 	    }
 	    while ((rs >= 0) && isparam(ch)) {
-	        if (isdigitlatin(ch)) {
+	        if (ischdigit(ch)) {
 	            if ((ch != '0') || (! f_leadingzero)) {
 	                if (ch != '0') f_leadingzero = false ;
 	                if (dl < dlen) {
