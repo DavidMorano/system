@@ -38,7 +38,7 @@ struct ucentnw : netent {
 	int getnum(char *,int,int,uint32_t) noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucentnw) */
 
 #else /* __cplusplus */
