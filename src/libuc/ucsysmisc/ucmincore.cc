@@ -84,7 +84,7 @@ local size_t		getnpages(int ps,void *ca,size_t cs) noex ;
 
 /* local variables */
 
-static int		pagesz(sysval_ps) ;
+local int		pagesz(sysval_ps) ;
 
 
 /* exported variables */
