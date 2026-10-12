@@ -37,7 +37,7 @@ struct ucentua : userattr {
 	int getuid(char *,int,uid_t) noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucentua) */
 
 #else /* __cplusplus */
