@@ -37,7 +37,7 @@ struct ucentpw : passwd {
 	int getuid(char *,int,uid_t) noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucentpw) */
 
 #else /* __cplusplus */
