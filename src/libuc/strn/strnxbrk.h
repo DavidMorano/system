@@ -35,10 +35,6 @@ local inline char *strnbrk(cchar *sp,int sl,cchar *ss) noex {
 	return strnobrk(sp,sl,ss) ;
 } /* end */
 
-local inline char *strnpbrk(cchar *sp,int sl,cchar *ss) noex {
-	return strnobrk(sp,sl,ss) ;
-} /* end */
-
 EXTERNC_end
 
 
