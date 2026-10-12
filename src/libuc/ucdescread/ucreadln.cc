@@ -85,6 +85,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<six.h>			/* LIBUC */
 #include	<strn.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -116,10 +117,6 @@ import libutil ;			/* |memclear(3u)| */
 
 extern "C" {
     extern int	uc_recve(int,void *,int,int,int,int) noex ;
-} /* end extern (C) */
-
-extern "C" {
-    extern int	isasocket(int) noex ;
 } /* end extern (C) */
 
 
@@ -155,7 +152,7 @@ int uc_readlnto(int fd,char *lbuf,int llen,int to) noex {
 	        rs = SR_INVALID ;
 	        if (llen > 0) ylikely {
 	            off_t	fo{} ;
-	            if (isasocket(fd)) {
+	            if (isfdsocket(fd)) {
 	               rs = readln_socket(fd,lbuf,llen,to) ;
 	            } else if (isastream(fd)) {
 	                rs = readln_stream(fd,lbuf,llen,to) ;
@@ -217,13 +214,13 @@ local int readln_stream(int fd,char *lbuf,int llen,int to) noex {
 	time_t		ti_start ;
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	int		events = POLLEVENTS ;
 	int		rlen ;
 	int		len ;
 	int		ch ;
 	int		tlen = 0 ;
-	int		f_eof = false ;
-	int		f_to = false ;
+	short		events = POLLEVENTS ;
+	bool		f_eof = false ;
+	bool		f_to = false ;
 	char		cbuf[BUFLEN + 1] ;
 
 	if (to < 0) to = INT_MAX ;
