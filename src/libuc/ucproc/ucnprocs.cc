@@ -73,7 +73,7 @@
 #include	<mkpathx.h>		/* LIBUC */
 #include	<pathadd.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -214,7 +214,7 @@ int procer::fsdent() noex {
                 {
                     while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
                         cint    ch = mkchar(de.name[0]) ;
-                        if (isdigitlatin(ch)) {
+                        if (ischdigit(ch)) {
                             n += 1 ;
                         }
                     } /* end while */
@@ -246,7 +246,7 @@ int procer::selection() noex {
 		cint    pl = rs ;
 		while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
 		    cint        ch = mkchar(nbuf[0]) ;
-		    if (isdigitlatin(ch)) {
+		    if (ischdigit(ch)) {
 		        cchar   *dp = nbuf ;
                         if ((rs = pathadd(pbuf,pl,dp)) >= 0) {
                             if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
