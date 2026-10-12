@@ -187,8 +187,8 @@ int sysdbmgr::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
-	            const void_f	b = sysdbmgr_atforkbefore ;
-	            const void_f	a = sysdbmgr_atforkafter ;
+	            con void_f	b = sysdbmgr_atforkbefore ;
+	            con void_f	a = sysdbmgr_atforkafter ;
 	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) ylikely {
 	                    finitdone = true ;
@@ -237,8 +237,8 @@ int sysdbmgr::fini() noex {
 		} /* end for */
 	    }
 	    {
-	        const void_f	b = sysdbmgr_atforkbefore ;
-	        const void_f	a = sysdbmgr_atforkafter ;
+	        con void_f	b = sysdbmgr_atforkbefore ;
+	        con void_f	a = sysdbmgr_atforkafter ;
 	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
