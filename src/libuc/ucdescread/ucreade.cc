@@ -371,7 +371,7 @@ local int subinfo_readreg(SI *sip) noex {
 
 local int subinfo_readslow(SI *sip) noex {
 	int		rs = SR_OK ;
-	int		events = POLLEVENTS ;
+	short		events = POLLEVENTS ;
 
 	sip->maxeof = MAXEOF ;
 
@@ -393,7 +393,7 @@ local int subinfo_readslow(SI *sip) noex {
 	while ((rs >= 0) && ((sip->ulen - sip->tlen) > 0)) {
 	    int	f_break = false ;
 	    if ((rs = u_poll(fds,1,POLL_INTMULT)) > 0) {
-	        cint	re = fds[0].revents ;
+	        cshort	re = fds[0].revents ;
 	        if ((re & POLLIN) || (re & POLLPRI)) {
 	            rs = subinfo_readpoll(sip) ;
 	            f_break = (rs > 0) ;
