@@ -54,11 +54,13 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
-#include	<bufprintf.h>		/* LIBUC */
+#include	<ucdescutil.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
 
 #include	"ucrecvmsge.h"
 
+import deb ;				/* debugging (LIBU) */
 
 /* local defines */
 
@@ -68,15 +70,45 @@
 
 #define	POLLEVENTS	(POLLIN | POLLPRI)
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug printo-outs */
+#endif
+
 
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local structures */
+
+namespace {
+    struct recvmsger {
+	MSGHDR		*msgp ;
+	int		fd ;
+	int		flags ;
+	int		timeout ;
+	int		opts ;
+        recvmsger(int ªfd,MSGHDR *ªmsgp,int ªfl,int ªto,int ªoo) noex {
+	    msgp	= ªmsgp ;
+	    fd		= ªfd ;
+	    fd		= ªfl ;
+	    timeout	= ªto ;
+	    opts	= ªoo ;
+	} ; /* end ctor */
+	operator int() noex ;
+    } ; /* end struct (recvmsger) */
+} /* end namespace */
+
+
 /* forward references */
 
-#if	CF_DEBUG
-local char	*d_reventstr() ;
-#endif
+
+/* local variables */
+
+cint		intmult		= POLL_INTMULT ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -84,42 +116,49 @@ local char	*d_reventstr() ;
 
 /* exported subroutines */
 
-int uc_recvmsge(int fd,MSGHDR *msgp,int flags,int timeout,int opts) noex {
+int uc_recvmsge(int fd,MSGHDR *msgp,int flags,int to,int opts) noex {
+    	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
+	DEBPRINTF("ent fd=%d\n",fd) ;
+	if (msgp) ylikely {
+	    rs = SR_BADF ;
+	    if (fd >= 0) ylikely {
+    		recvmsger ro(fd,msgp,flags,to,opts) ;
+		rs = ro ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
+	return (rs >= 0) ? len : rs ;
+}  /* end subroutine (uc_recvmsge) */
+
+
+/* local subroutines */
+
+recvmsger::operator int () noex {
+	int		rs = SR_OK ;
 	POLLFD		fds[2] = {} ;
 	time_t		previous = time(nullptr) ;
 	time_t		current ;
-	int		rs = SR_OK ;
-	int		nfds ;
+	int		nfds = 0 ;
 	int		to = timeout ;
 	short		events = POLLEVENTS ;
 	int		pollint ;
-	int		len = 0 ;
-	int		f_first = true ;
-
-#if	CF_DEBUG
-	char		ebuf[EBUFLEN + 1] ;
-#endif
-
-	(void) opts ;
-	if (msgp == nullptr) return SR_FAULT ;
-
+	int		len = 0 ; /* return-value */
+	bool		f_first = true ;
+	DEBPRINTF("ent fd=%d\n",fd) ;
 	if (timeout < 0) {
 	    timeout = INT_MAX ;
 	}
-
 	pollint = TO_POLL ;
 	if (timeout >= 0) {
 	    pollint = MIN(timeout,TO_POLL) ;
 	}
-
 #if	defined(POLLRDNORM)
 	events |= POLLRDNORM ;
 #endif
 #if	defined(POLLRDBAND)
 	events |= POLLRDBAND ;
 #endif
-
-	nfds = 0 ;
 	fds[nfds].fd = fd ;
 	fds[nfds].events = events ;
 	nfds += 1 ;
@@ -130,7 +169,7 @@ int uc_recvmsge(int fd,MSGHDR *msgp,int flags,int timeout,int opts) noex {
 	    f_first = false ;
 
 	    if ((rs = u_poll(fds,nfds,(pollint * POLL_INTMULT))) > 0) {
-		cint	re = fds[0].revents ;
+		cshort	re = fds[0].revents ;
 		if ((re & POLLIN) || (re & POLLPRI)) {
 	            rs = u_recvmsg(fd,msgp,flags) ;
 	            len = rs ;
@@ -148,43 +187,20 @@ int uc_recvmsge(int fd,MSGHDR *msgp,int flags,int timeout,int opts) noex {
 	        previous = current ;
 	        if (to < TO_POLL) {
 	            pollint = to ;
-		}
+		} /* end if */
 	        if (to <= 0) {
 	            rs = SR_TIMEDOUT ;
-		}
+		} /* end if */
 	    } else if (rs == SR_INTR) {
 		rs = SR_OK ;
-	    }
+	    } /* end if */
 	    if (f_break) break ;
 	} /* end while */
-
 	if ((rs >= 0) && (timeout >= 0) && (to <= 0)) {
 	    rs = SR_TIMEDOUT ;
-	}
-
-#if	CF_DEBUG
-	debugprintf("uc_recvmsge: ret rs=%d len=%d\n",
-	    rs,len) ;
-#endif
-
+	} /* end if */
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (uc_recvmsge) */
-
-#if	CF_DEBUG
-local char *d_reventstr(int revents,char *buf,int buflen) noex {
-	buf[0] = '\0' ;
-	bufprintf(buf,buflen,"%s %s %s %s %s %s %s %s %s",
-	    (revents & POLLIN) ? "I " : "  ",
-	    (revents & POLLRDNORM) ? "IN" : "  ",
-	    (revents & POLLRDBAND) ? "IB" : "  ",
-	    (revents & POLLPRI) ? "PR" : "  ",
-	    (revents & POLLWRNORM) ? "WN" : "  ",
-	    (revents & POLLWRBAND) ? "WB" : "  ",
-	    (revents & POLLERR) ? "ER" : "  ",
-	    (revents & POLLHUP) ? "HU" : "  ",
-	    (revents & POLLNVAL) ? "NV" : "  ") ;
-	return buf ;
-} /* end subroutine (d_reventstr) */
-#endif /* CF_DEBUG */
+} /* end method (recvmsger::operator) */
 
 
