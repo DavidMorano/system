@@ -37,7 +37,7 @@ struct ucentsv : servent {
 	int getnum(char *,int,int,cchar *) noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucentsv) */
 
 #else /* __cplusplus */
