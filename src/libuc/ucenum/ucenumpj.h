@@ -62,7 +62,7 @@ struct ucenumpj_op {
 	int operator () (cchar *) noex ;
 	operator int () noex {
 	    return operator () (nullptr) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumpj_op) */
 struct ucenumpj_co {
 	ucenumpj	*op = nullptr ;
@@ -70,11 +70,11 @@ struct ucenumpj_co {
 	void operator () (ucenumpj *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumpj_co) */
 struct ucenumpj : ucenumxx {
 	ucenumpj_op	open ;
@@ -92,7 +92,7 @@ struct ucenumpj : ucenumxx {
 	void dtor() noex ;
 	destruct ucenumpj() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumpj) */
 #else	/* __cplusplus */
 typedef UCENUMXX	ucenumpj ;
