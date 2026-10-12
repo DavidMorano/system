@@ -81,8 +81,7 @@ using libu::snvprintf ;			/* subroutine */
 
 local int	efd = -1 ;
 local int	pl = 0 ;
-
-static char	buf[BUFLEN + 1] ;
+local char	buf[BUFLEN + 1] ;
 
 
 /* exported variables */
@@ -99,7 +98,7 @@ int erropen(cchar *errfname,cchar *logid) noex {
 		efd = rs ;
 		if ((rs = fchmod(efd,om)) >= 0) {
 		    rs = snprintf(buf,BUFLEN,"%-13s ",logid) ;
-		}
+		} /* end */
 		if (rs < 0) {
 		    u_close(efd) ;
 		    efd = -1 ;
@@ -114,7 +113,7 @@ int errclose() noex {
 	if (efd >= 0) {
 	    rs = u_close(efd) ;
 	    efd = -1 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (errclose) */
 
