@@ -112,8 +112,8 @@ int uc_recvfrome(int fd,void *rbuf,int rlen,int flags,
 	int	rs = SR_OK ;
 	int	pollint ;
 	int	len = 0 ;
-	int	f_first ;
-	short events = POLLEVENTS ;
+	short	events = POLLEVENTS ;
+	bool	f_first ;
 
 #if	CF_DEBUG
 	char	ebuf[EBUFLEN + 1] ;
