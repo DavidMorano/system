@@ -105,7 +105,7 @@ int uc_writable(int fd,int timeout) noex {
 	int		rs = SR_OK ;
 	int		pollto = (INTPOLL * POLL_INTMULT) ;
 	int		nfds = 0 ;
-	int		f = false ;
+	bool		f = false ;
 	if (timeout >= 0) {
 	    dt = time(nullptr) ;
 	    ti_timeout = (dt + timeout) ;
@@ -117,7 +117,7 @@ int uc_writable(int fd,int timeout) noex {
 	nfds += 1 ;
 	while (rs >= 0) {
 	    if ((rs = u_poll(polls,nfds,pollto)) > 0) {
-		cint	re = polls[0].revents ;
+		cshort	re = polls[0].revents ;
 	        if (re & POLLHUP) {
 	            rs = SR_HANGUP ;
 	        } else if (re & POLLERR) {
@@ -126,14 +126,14 @@ int uc_writable(int fd,int timeout) noex {
 	            rs = SR_BADF ;
 	        } else if ((re & POLLOUT) || (re & POLLWRBAND)) {
 		    f = true ;
-		}
+		} /* end if */
 	    } else if (rs == SR_INTR) {
 		rs = SR_OK ;
-	    }
+	    } /* end if */
 	    if ((rs >= 0) && (! f) && (timeout >= 0)) {
 	        dt = time(nullptr) ;
 		if (dt >= ti_timeout) rs = SR_TIMEDOUT ;
-	    }
+	    } /* end if */
 	    if ((rs >= 0) && f) break ;
 	} /* end while */
 	return (rs >= 0) ? f : rs ;
