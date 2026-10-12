@@ -164,11 +164,11 @@ int loader::loads(ema_ent *ep) noex {
 int loader::loadparts(ema_ent *ep) noex {
     	int		rs = SR_OK ;
 	cchar		*cp ; /* used-multiple */
-        for (int i = 0 ; (rs >= 0) && (i < si_overlast) ; i += 1) {
+        for (int i = 0 ; (rs >= 0) && (i < emapart_overlast) ; i += 1) {
             if (cc *sp ; (rs = pbp->get(i,&sp)) > 0) {
 		int sl = rs ;
                 switch (i) {
-                case si_address:
+                case emapart_address:
                     if ((sl >= 1) && ispcs(*sp)) {
                         sp += 1 ;
                         sl -= 1 ;
@@ -179,18 +179,21 @@ int loader::loadparts(ema_ent *ep) noex {
                         ep->al = sl ;
                     }
                     break ;
-                case si_route:
+                case emapart_route:
                     if ((rs = libmem.strw(sp,sl,&cp)) >= 0) {
                         ep->rp = cp ;
                         ep->rl = sl ;
                     }
                     break ;
-                case si_comment:
+                case emapart_comment:
                     if ((rs = libmem.strw(sp,sl,&cp)) >= 0) {
                         ep->cp = cp ;
                         ep->cl = sl ;
                     }
                     break ;
+		case emapart_overlast:
+		    rs = SR_BUGCHECK ;
+		    break ;
                 } /* end switch */
             } /* end if (parts_get) */
         } /* end for */
@@ -215,7 +218,7 @@ int loader::loadgroup(ema_ent *ep) noex {
         if (nlp) ylikely {
             ep->listp = nlp ;
             ep->type = ematype_group ;
-        }
+        } /* end */
 	return rs ;
 } /* end method (loader::loadgroup) */
 
