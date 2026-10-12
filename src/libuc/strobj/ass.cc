@@ -21,9 +21,10 @@
 	ass
 
 	Description:
-	This object manages a dynamically allocated string.  It is
-	very limited in what it can do.  It was created for a very
-	specialed purpose (which might be lost now).
+	This object manages a dynamically allocated string.  It
+	provides for creating a string inside that allocated bufer.
+	It is very limited in what it can do.  It was created for
+	a very specialized purpose (which might be lost now).
 
 *******************************************************************************/
 
@@ -96,11 +97,11 @@ int ass_addchr(ass *asp,int ch) noex {
 	        asp->ext += ASS_ADDLEN ;
 	        sz = asp->ext ;
 	        rs = lm_rall(asp->rbuf,sz,&p) ;
-	    }
+	    } /* end if */
 	    if (rs >= 0) {
 	        asp->rbuf = p ;
 	        asp->rbuf[(asp->rlen)++] = char(ch) ;
-	    }
+	    } /* end if (ok) */
 	    len = asp->rlen ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
