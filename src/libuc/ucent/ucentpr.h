@@ -37,7 +37,7 @@ struct ucentpr : protoent {
 	int getnum(char *,int,int) noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucentpr) */
 
 #else /* __cplusplus */
