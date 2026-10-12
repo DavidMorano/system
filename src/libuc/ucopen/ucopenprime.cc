@@ -33,8 +33,8 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<ucopen.h>		/* LIBYC */
-#include	<ucdesc.h>		/* LIBYC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"ucopeninfo.h"
