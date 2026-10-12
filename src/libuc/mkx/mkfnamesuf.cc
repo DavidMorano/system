@@ -109,14 +109,14 @@ int mkfnamesufx(char *rbuf,int n,cc *p1,...) noex {
 	        if (storebuf sb(rbuf,rs) ; (rs = sb.str(p1)) >= 0) ylikely {
 	            if (n > 0) {
 	                rs = sb.chr('.') ;
-		    }
+		    } /* end */
 	            if (rs >= 0) ylikely {
 	                va_begin(ap,p1) ;
 	                for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	                    cc	*sp = (cc *) va_arg(ap,cc *) ;
 		            if (sp) {
 	                        rs = sb.str(sp) ;
-		            }
+		            } /* end */
 	                } /* end for */
 	                va_end(ap) ;
 	            } /* end if (ok) */
