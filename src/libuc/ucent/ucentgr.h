@@ -37,7 +37,7 @@ struct ucentgr : group {
 	int getgid(char *,int,gid_t) noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucentgr) */
 
 #else /* __cplusplus */
