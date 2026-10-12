@@ -21,7 +21,7 @@
 	strabbrerr
 
 	Description:
-	We take a system-error return number and we return a
+	I take a system-error return number and we return a
 	corresponding abbreviation string.
 
 	Synopsis:
