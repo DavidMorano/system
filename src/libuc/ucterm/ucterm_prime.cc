@@ -62,7 +62,7 @@
 #include	<sbuf.h>		/* LIBUC */
 #include	<sigign.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -509,7 +509,7 @@ int ucterm_reade(ucterm *op,char *rbuf,int rlen,int timeout,int fc,
 	    } /* end if (filtering) */
 
 	    if ((rs >= 0) && (ch >= 0)) {
-	        if ((! (fc & fm_noecho)) && isprintlatin(ch)) {
+	        if ((! (fc & fm_noecho)) && ischprint(ch)) {
 		    char	ebuf[2] ;
 		    ebuf[0] = charconv(ch) ;
 	            rs = tty_echo(op,ebuf,1) ;
@@ -828,7 +828,7 @@ local int tty_loadchar(ucterm *op,cchar *pbuf,int pbuflen) noex {
 	int		c = 0 ;
 	for (int i = 0 ; (rs >= 0) && (i < pbuflen) ; i += 1) {
 	    cint	ch = mkchar(pbuf[i]) ;
-	    if (isprintlatin(ch)) {
+	    if (ischprint(ch)) {
 	        c += 1 ;
 	        rs = charq_ins(&op->taq,ch) ;
 	    }
@@ -1034,7 +1034,7 @@ local int sinotprint(cchar *sp,int sl) noex {
 	bool		f = false ;
 	for (i = 0 ; (i < sl) && sp[0] ; i += 1) {
 	    cint	ch = mkchar(sp[0]) ;
-	    f = isprintlatin(ch) ;
+	    f = ischprint(ch) ;
 	    f = f || (ch == CH_SI) || (ch == CH_SO) ;
 	    if (! f) break ;
 	} /* end for */
