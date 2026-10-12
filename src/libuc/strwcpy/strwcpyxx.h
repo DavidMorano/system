@@ -38,7 +38,7 @@ extern char *strwcpywide	(char *,const wchar_t *,int) noex ;
 
 local inline char *strwcpyblanks(char *dp,int n) noex {
     	return strwcpychrs(dp,' ',n) ;
-}
+} /* end */
 
 EXTERNC_end
 
