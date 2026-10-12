@@ -60,3 +60,4 @@ ktag
 funmode
 entbuf
 msgbuf
+msgidx
