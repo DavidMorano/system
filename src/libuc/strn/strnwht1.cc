@@ -61,8 +61,7 @@ module ;
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<char.h>		/* LIBYC |CHAR_ISWHT(3uc)| */
-#include	<ischarx.h>		/* LIBYC |iswht(3uc)| */
+#include	<char.h>		/* LIBUC |CHAR_ISWHT(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -126,7 +125,7 @@ extern "C" {
 	if (sp && ss) ylikely {
     	    chrset	sset(ss) ;
 	    rsp = strnwhtbrk(sp,sl,&sset) ;
-	}
+	} /* end if (non-null) */
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
     char *strnwhtchr(cchar *sp,int sl,int sch) noex {
@@ -137,7 +136,7 @@ extern "C" {
 	        rsp = strnwhtbrk(sp,sl,&sset) ;
 	    } else {
 		rsp = strnwht(sp,sl) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rsp ;
     } /* end subroutine (strnwhtchr) */
@@ -154,7 +153,7 @@ extern "C++" {
 		if (((fwht = ISWHT(ch))) || setp->tst(ch)) {
 		    rsp = charp(sp) ;
 		    break ;
-		}
+		} /* end */
 	        sp += 1 ;
 	    } /* end while */
 	    if (fwht) {
