@@ -1,4 +1,4 @@
-/* uctim HEADER interval timer) */
+/* uctim HEADER (interval timer) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -70,11 +70,11 @@ EXTERNC_begin
 
 extern int uctimnote_load	(uctimnote *,void *,psem *,uctim_f,int) noex ;
 
-extern int uc_timxcreate	(con uctimnote *) noex ;
-extern int uc_timxdestroy	(int) noex ;
-extern int uc_timxset		(int,mut ITIMERVAL *,CITIMERVAL *) noex ;
-extern int uc_timxget		(int,mut ITIMERVAL *) noex ;
-extern int uc_timxover		(int) noex ;
+extern int uc_timcreate		(con uctimnote *) noex ;
+extern int uc_timdestroy	(int) noex ;
+extern int uc_timset		(int,mut ITIMERVAL *,CITIMERVAL *) noex ;
+extern int uc_timget		(int,mut ITIMERVAL *) noex ;
+extern int uc_timover		(int) noex ;
 
 EXTERNC_end
 
