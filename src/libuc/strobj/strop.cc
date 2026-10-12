@@ -49,6 +49,8 @@ import libutil ;			/* |getlenstr(3u)| */
 
 /* local defines */
 
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
+
 
 /* external subroutines */
 
@@ -60,10 +62,6 @@ import libutil ;			/* |getlenstr(3u)| */
 
 
 /* forward references */
-
-local inline bool iswht(int ch) noex {
-    	return CHAR_ISWHITE(ch) ;
-} /* end */
 
 local bool iswhiteand(strop *sop,int tch) noex {
 	cint	ch = mkchar(sop->sp[0]) ;
@@ -102,7 +100,7 @@ int strop_start(strop *sop,cchar *sp,int µsl) noex {
 	        sop->sp = sp ;
 	        sop->sl = sl ;
 	        rs = sop->sl ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (strop_start) */
@@ -113,7 +111,7 @@ int strop_finish(strop *sop) noex {
 	    rs = sop->sl ;
 	    sop->sp = nullptr ;
 	    sop->sl = 0 ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (strop_finish) */
 
@@ -122,7 +120,7 @@ int strop_shrink(strop *sop) noex {
     	if ((rl = strop_white(sop)) >= 0) {
 	    if (int si ; (si = siwht(sop->sp,sop->sl)) > 0) {
 	        sop->sl -= si ;
-	    }
+	    } /* end if */
 	    rl = sop->sl ;
 	} /* end if */
 	return rl ;
@@ -133,7 +131,7 @@ int strop_white(strop *sop) noex {
 	if (int si ; (si = siskipwhite(sop->sp,sop->sl)) > 0) {
 	    sop->sp += si ;
 	    sop->sl -= si ;
-	}
+	} /* end if */
 	rl = sop->sl ;
 	return rl ;
 } /* end subroutine (strop_white) */
@@ -143,7 +141,7 @@ int strop_whitechr(strop *sop,int tch) noex {
 	while ((sop->sl > 0) && iswhiteand(sop,tch)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
-	}
+	} /* end while */
 	rl = sop->sl ;
 	return rl ;
 } /* end subroutine (strop_whitechr) */
@@ -169,23 +167,23 @@ int strop_fieldbrk(strop *sop,cchar *ss,cchar **rpp) noex {
 	        if (int si ; (si = siskipwhite(sop->sp,sop->sl)) > 0) {
 	            sop->sp += si ;
 	            sop->sl -= si ;
-	        }
+	        } /* end if */
 	        if (sop->sl > 0) {
 	            *rpp = sop->sp ;
 	            if (int si ; (si = siwhtbrk(sop->sp,sop->sl,ss)) >= 0) {
 			cint tch = mkchar(sop->sp[si]) ; 
 			rl = si ;
 			if (strchr(ss,tch) != np) {
-			    while ((rl > 0) && iswht(sop->sp[rl - 1])) {
+			    while ((rl > 0) && ISWHT(sop->sp[rl - 1])) {
 				rl -= 1 ;
-			    }
-			}
+			    } /* end while */
+			} /* end if */
 	                sop->sp += (si + 1) ; /* step over found character */
 	                sop->sl -= (si + 1) ; /* step over found character */
 	            } else {
 	                rl = sop->sl ;
 	                sop->sl = 0 ;
-	            }
+	            } /* end if */
 	        } /* end if (non-zero) */
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
@@ -197,7 +195,7 @@ int strop_findchr(strop *sop,int tch) noex {
 	while ((sop->sl > 0) && isnotchr(sop,tch)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
-	}
+	} /* end while */
 	rl = sop->sl ;
 	return rl ;
 } /* end subroutine (strop_findchr) */
@@ -207,7 +205,7 @@ int strop_findterm(strop *sop,cchar *terms) noex {
 	while ((sop->sl > 0) && isnotterm(sop,terms)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
-	}
+	} /* end while */
 	rl = sop->sl ;
 	return rl ;
 } /* end subroutine (strop_findterm) */
@@ -217,7 +215,7 @@ int strop_spanterm(strop *sop,cchar *terms) noex {
 	while ((sop->sl > 0) && isterm(sop,terms)) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
-	}
+	} /* end while */
 	rl = sop->sl ;
 	return rl ;
 } /* end subroutine (strop_spanterm) */
