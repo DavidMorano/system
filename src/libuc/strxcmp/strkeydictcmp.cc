@@ -52,7 +52,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<dictdiff.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
@@ -96,11 +96,11 @@ int strkeydictcmp(cchar *s1,cchar *s2) noex {
 	if (s1 && s2) ylikely {
             while (*s1 && *s2) {
                 if ((*s1 == '=') || (*s2 == '=')) break ;
-                if (! isdict(*s1)) {
+                if (! ischdict(*s1)) {
                     s1 += 1 ;
                     continue ;
                 }
-                if (! isdict(*s2)) {
+                if (! ischdict(*s2)) {
                     s2 += 1 ;
                     continue ;
                 }
