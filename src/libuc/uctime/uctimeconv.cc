@@ -107,7 +107,7 @@ namespace {
 
 /* local variables */
 
-static initer		init ;
+local initer		init ;
 
 
 /* exported variables */
