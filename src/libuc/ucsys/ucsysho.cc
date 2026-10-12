@@ -75,7 +75,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local typedefs */
 
-typedef const void	cv ;
+typedef cvoid	cv ;
 
 
 /* external variables */
