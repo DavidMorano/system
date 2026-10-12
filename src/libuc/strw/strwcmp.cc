@@ -97,35 +97,35 @@ namespace {
    struct basecmpx : cmpx {
 	int tox(int ch)				const noex override final {
 	    return (ch & UCHAR_MAX) ;
-	} ;
+	} ; /* end */
 	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strnbasecmp(bs,sp,sl) ;
-	} ;
+	} ; /* end */
 	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
 	    return nleadbasestr(s1,s2,sl) ;
-	} ;
+	} ; /* end */
    } ; /* end struct */
    struct casecmpx : cmpx {
 	int tox(int ch)				const noex override final {
 	    return touc(ch & UCHAR_MAX) ;
-	} ;
+	} ; /* end */
 	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strncasecmp(bs,sp,sl) ;
-	} ;
+	} ; /* end */
 	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
 	    return nleadcasestr(s1,s2,sl) ;
-	} ;
+	} ; /* end */
    } ; /* end struct */
    struct foldcmpx : cmpx {
 	int tox(int ch)				const noex override final {
 	    return tofc(ch & UCHAR_MAX) ;
-	} ;
+	} ; /* end */
 	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strnfoldcmp(bs,sp,sl) ;
-	} ;
+	} ; /* end */
 	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
 	    return nleadfoldstr(s1,s2,sl) ;
-	} ;
+	} ; /* end */
    } ; /* end struct */
 } /* end namespace */
 
@@ -161,9 +161,9 @@ int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
 
 int cmpx::x(cchar *s1,cchar *s2,int 탎2len) const noex {
 	int		rc = 0 ;
-	if (s1 && s2) {
+	if (s1 && s2) ylikely {
 	    rc = tox(s1[0]) ;
-	    if (cint s2len = getlenstr(s2,탎2len) ; s2len > 0) {
+	    if (cint s2len = getlenstr(s2,탎2len) ; s2len > 0) ylikely {
 	        cint	ch1 = tox(*s1) ;
 	        cint	ch2 = tox(*s2) ;
 	        if ((rc = (ch1 - ch2)) == 0) {
@@ -174,7 +174,7 @@ int cmpx::x(cchar *s1,cchar *s2,int 탎2len) const noex {
 		            rc = (m1 - m2) ;
 		        } else {
 		            rc = tox(s1[m]) ;
-		        }
+		        } /* end */
 		    } /* end if (strnxcmp) */
 	        } /* end if (first characters were equal) */
 	    } /* end if (getlenstr) */
