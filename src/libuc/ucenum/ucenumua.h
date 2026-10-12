@@ -59,11 +59,11 @@ struct ucenumua_op {
 	void operator () (ucenumua *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (cchar *) noex ;
 	operator int () noex {
 	    return operator () (nullptr) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumua_op) */
 struct ucenumua_co {
 	ucenumua	*op = nullptr ;
@@ -71,11 +71,11 @@ struct ucenumua_co {
 	void operator () (ucenumua *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumua_co) */
 struct ucenumua : ucenumxx {
 	ucenumua_op	open ;
@@ -93,7 +93,7 @@ struct ucenumua : ucenumxx {
 	void dtor() noex ;
 	destruct ucenumua() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumua) */
 #else	/* __cplusplus */
 typedef UCENUMXX	ucenumua ;
