@@ -230,8 +230,7 @@ hmatch.o:		hmatch.cc	hmatch.h	$(DEPS)		$(INCS)
 mheader.o:		mheader.cc	mheader.h	$(DEPS)		$(INCS)
 
 # modules
-pcsutil.o:		pcsutil.ccm					$(INCS)
+pcsutil.o:		pcsutil.ccm	pcsutil.hh			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-	touchr $(*).h $<
 
 
