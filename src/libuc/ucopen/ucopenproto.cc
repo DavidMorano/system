@@ -123,7 +123,7 @@
 #include	<strdcpy.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<dial.h>		/* ?? */
@@ -1303,7 +1303,7 @@ local bool hasdirty(cchar *lp,int ll) noex {
 
 local bool isdirty(int ch) noex {
 	bool		f = false ;
-	f = f || isprintlatin(ch) ;
+	f = f || ischprint(ch) ;
 	f = f || (ch == CH_BEL) ;
 	f = f || (ch == CH_BS) ;
 	f = f || (ch == CH_TAB) ;
