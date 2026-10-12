@@ -157,7 +157,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* external subroutines */
 
-extern char * strwcpy(char *,cchar *,int = -1) noex ;
+extern "C" {
+    extern char * strwcpy(char *,cchar *,int = -1) noex ;
+} /* end extern (C) */
 
 
 /* external variables */
@@ -181,7 +183,7 @@ char *strwcpychrs(char *dp,int ch,int n) noex {
     	if (dp) ylikely {
 	    while (n-- > 0) {
 	        *dp++ = char(ch) ;
-	    }
+	    } /* end while */
 	    *dp = '\0' ;
 	} /* end if (non-null) */
 	return dp ;
@@ -194,7 +196,7 @@ char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
 	    for (int cl, c = 0 ; (cl = sfnext(sp,sl,&cp)) > 0 ; ) {
 	        if (c++ > 0) {
 	            *dp++ =  ' ' ;
-	        }
+	        } /* end */
 	        dp = strwcpy(dp,cp,cl) ;
 	        sl -= intconv((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
@@ -209,34 +211,34 @@ char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
 char *strwcpyopaque(char *dp,cchar *sp,int sl) noex {
     	if (dp && sp) ylikely {
 	    if (sl >= 0) {
-	        while (sl && (*sp != '\0')) {
+	        while (sl && *sp) {
 		    if (! ISWHT(*sp)) *dp++ = *sp ;
 		    sp += 1 ;
 		    sl -= 1 ;
-	        }
+	        } /* end while */
 	    } else {
-	        while (*sp != '\0') {
+	        while (*sp) {
 		    if (! ISWHT(*sp)) *dp++ = *sp ;
 		    sp += 1 ;
-	        }
+	        } /* end while */
 	    } /* end if */
 	    *dp = '\0' ;
 	} else {
 	    dp = nullptr ;
-	}
+	} /* end */
 	return dp ;
 } /* end subroutine (strwcpyopaque) */
 
 char *strwcpyrev(char *dp,cchar *sp,int sl) noex {
     	if (dp && sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    for (int i = (sl-1) ; i >= 0 ; i += 1) {
+	    for (int i = (sl - 1) ; i >= 0 ; i += 1) {
 	        *dp++ = sp[i] ;
 	    } /* end for */
 	    *dp = '\0' ;
 	} else {
 	    dp = nullptr ;
-	}
+	} /* end */
 	return dp ;
 } /* end subroutine (strwcpyrev) */
 
@@ -247,17 +249,17 @@ char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex {
 	        while (sl-- && *sp) {
 		    if ((ch = *sp++) > UCHAR_MAX) ch = '¿' ;
 	            *dp++ = char(ch) ;
-	        }
+	        } /* end while */
 	    } else {
 	        while (*sp) {
 		    if ((ch = *sp++) > UCHAR_MAX) ch = '¿' ;
 	            *dp++ = char(ch) ;
-	        }
+	        } /* end while */
 	    } /* end if */
 	    *dp = '\0' ;
 	} else {
 	    dp = nullptr ;
-	}
+	} /* end */
 	return dp ;
 } /* end subroutine (strwcpywide) */
 
