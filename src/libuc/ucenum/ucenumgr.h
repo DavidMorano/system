@@ -58,11 +58,11 @@ struct ucenumgr_op {
 	void operator () (ucenumgr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (cchar *) noex ;
 	operator int () noex {
 	    return operator () (nullptr) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumgr_op) */
 struct ucenumgr_co {
 	ucenumgr	*op = nullptr ;
@@ -70,11 +70,11 @@ struct ucenumgr_co {
 	void operator () (ucenumgr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumgr_co) */
 struct ucenumgr : ucenumxx {
 	ucenumgr_op	open ;
@@ -85,14 +85,14 @@ struct ucenumgr : ucenumxx {
 	    reset(this,ucenumgrmem_reset) ;
 	    close(this,ucenumgrmem_close) ;
 	    magval = 0 ;
-	} ;
+	} ; /* end */
 	ucenumgr(const ucenumgr &) = delete ;
 	ucenumgr &operator = (const ucenumgr &) = delete ;
 	int readent(ucenumgr_ent *,char *,int) noex ;
 	void dtor() noex ;
 	destruct ucenumgr() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumgr) */
 #else	/* __cplusplus */
 typedef UCENUMXX	ucenumgr ;
