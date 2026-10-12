@@ -9,7 +9,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-static int tty_wait(uterm *op,int timeout) noex {
+local int tty_wait(uterm *op,int timeout) noex {
 	POLLFD		fds[2] ;
 	time_t		daytime = getustime ;
 	time_t		lasttime ;
