@@ -40,7 +40,7 @@ MODS += strnwht.o
 LIBS +=
 
 
-OBJ0_STRN= strncpyxc.o strnwcpyxc.o 
+OBJ0_STRN= strncpyxc.o strnwcpyx.o strnwcpyxc.o
 OBJ1_STRN= strnnlen.o strnset.o
 OBJ2_STRN= strnxchr.o strnxbrk.o strnxsub.o 
 OBJ3_STRN= strnxterm.o strnwht.o strnchar.o
@@ -153,6 +153,7 @@ strnchar.o:		strnchar.cc	strnchar.h	$(INCS)
 strnnlen.o:		strnnlen.cc			$(INCS)
 strnset.o:		strnset.cc			$(INCS)
 strncpyxc.o:		strncpyxc.cc	strncpyxc.h	$(INCS)
+strnwcpyx.o:		strnwcpyx.cc	strnwcpyx.h	$(INCS)
 strnwcpyxc.o:		strnwcpyxc.cc	strnwcpyxc.h	$(INCS)
 
 mods.o:			$(MODS)
