@@ -47,7 +47,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<toxc.h>		/* LIBUC */
+#include	<usupport.h>		/* LIBU |chtoxc(3u)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"strwcpyxc.h"
@@ -58,11 +58,16 @@
 
 /* imported namespaces */
 
+using libu::chtobc ;
+using libu::chtolc ;
+using libu::chtouc ;
+using libu::chtofc ;
+
 
 /* local typedefs */
 
 extern "C" {
-    typedef int (*toxc_f)(int) noex ;
+    typedef char (*chtoxc_f)(int) noex ;
 } /* end extern (C) */
 
 
@@ -77,17 +82,17 @@ extern "C" {
 
 /* forward references */
 
-template<toxc_f toxc>
+template<chtoxc_f chtoxc>
 local char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
     	if (dp && sp) ylikely {
 	    if (sl >= 0) {
 	        while (sl-- && *sp) {
-	            *dp++ = char(toxc(*sp++)) ;
-	        }
+	            *dp++ = chtoxc(*sp++) ;
+	        } /* end while */
 	    } else {
 	        while (*sp) {
-		    *dp++ = char(toxc(*sp++)) ;
-	        }
+		    *dp++ = chtoxc(*sp++) ;
+	        } /* end while */
 	    } /* end if */
 	    *dp = '\0' ;
 	} else {
@@ -106,19 +111,19 @@ local char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
 /* exported subroutines */
 
 char *strwcpybc(char *dp,cchar *sp,int sl) noex {
-	return strwcpyxc<tobc>(dp,sp,sl) ;
+	return strwcpyxc<chtobc>(dp,sp,sl) ;
 } /* end subroutine */
 
 char *strwcpylc(char *dp,cchar *sp,int sl) noex {
-	return strwcpyxc<tolc>(dp,sp,sl) ;
+	return strwcpyxc<chtolc>(dp,sp,sl) ;
 } /* end subroutine */
 
 char *strwcpyuc(char *dp,cchar *sp,int sl) noex {
-	return strwcpyxc<touc>(dp,sp,sl) ;
+	return strwcpyxc<chtouc>(dp,sp,sl) ;
 } /* end subroutine */
 
 char *strwcpyfc(char *dp,cchar *sp,int sl) noex {
-	return strwcpyxc<tofc>(dp,sp,sl) ;
+	return strwcpyxc<chtofc>(dp,sp,sl) ;
 } /* end subroutine */
 
 
