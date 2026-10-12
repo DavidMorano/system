@@ -39,16 +39,16 @@ EXTERNC_end
 
 inline char	* strwcpybc (char *dp,cchar *sp) noex {
 	return strwcpybc(dp,sp,-1) ;
-}
+} /* end */
 inline char	* strwcpylc (char *dp,cchar *sp) noex {
 	return strwcpylc(dp,sp,-1) ;
-}
+} /* end */
 inline char	* strwcpyuc (char *dp,cchar *sp) noex {
 	return strwcpyuc(dp,sp,-1) ;
-}
+} /* end */
 inline char	* strwcpyfc (char *dp,cchar *sp) noex {
 	return strwcpyfc(dp,sp,-1) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
