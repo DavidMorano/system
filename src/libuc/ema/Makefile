@@ -146,21 +146,21 @@ ema_haveaddr.o:		ema_haveaddr.cc			$(DEPS)	$(INCS)
 ema_first.o:		ema_first.cc			$(DEPS)	$(INCS)
 
 # EMA_PARTS
-ema_parts.o:		ema_parts.ccm				$(INCS)
+ema_parts.o:		ema_parts.ccm ema_parts.hh		$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # EMA_ENTRY
-ema_entry.o:		ema_entry.ccm				$(INCS)
+ema_entry.o:		ema_entry.ccm ema_entry.hh		$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # EMA_ASSTR
 ema_asstr.o:		ema_asstr0.o ema_asstr1.o
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-ema_asstr0.o:		ema_asstr.ccm				$(INCS)
+ema_asstr0.o:		ema_asstr.ccm ema_asstr.hh		$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-ema_asstr1.o:		ema_asstr1.cc ema_asstr0.o		$(INCS)
+ema_asstr1.o:		ema_asstr1.cc ema_asstr0.o ema_asstr.hh	$(INCS)
 	$(COMPILE.cc) $<
 
 ema_mag.o:		ema_mag0.o ema_mag1.o
