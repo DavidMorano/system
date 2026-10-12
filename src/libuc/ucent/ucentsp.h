@@ -35,7 +35,7 @@ struct ucentsp : spwd {
 	int size() noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 	int getent(char *,int) noex ;
 	int getnam(char *,int,cchar *) noex ;
 } ; /* end struct (ucentsp) */
