@@ -1,0 +1,1227 @@
+/* emailaddr_main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* general program front end */
+/* version %I% last-modified %G% */
+
+#define	CF_DEBUG	0		/* run-time debug print-outs */
+#define	CF_DEBUGMALL	1		/* debug memory-allocations */
+
+/* revision history:
+
+	= 1998-03-01, David A­D­ Morano
+	The program was written from scratch to do what the previous
+	program by the same name did.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Name:
+	ema_main
+
+  	Description:
+	This subroutine is the front-end of the EMA program.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<csignal>
+#include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<usystem.h>
+#include	<bits.h>
+#include	<keyopt.h>
+#include	<paramopt.h>
+#include	<bfile.h>
+#include	<nulstr.h>
+#include	<exitcodes.h>
+#include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+
+#include	"emailaddr_config.h"
+#include	"emailªddr_local.h"
+#include	"defs.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
+
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PROGINFO *,cchar *,const pivars *) noex ;
+extern int	progfile(PROGINFO *,paramopt *,bfile *,cchar *) noex ;
+
+
+/* external variables */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+local int	usage(PROGINFO *) ;
+
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procsubpart(PROGINFO *,paramopt *,CMD_LOCAL *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,
+			cchar *,cchar *,cchar *) ;
+
+local int	procmsgfile(PROGINFO *,paramopt *,void *,cchar *,int) ;
+
+
+/* local variables */
+
+static cchar	*aknames[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"option",
+	"info",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"if",
+	nullptr
+} ;
+
+enum aknames {
+	akname_root,
+	akname_version,
+	akname_verbose,
+	akname_tmpdir,
+	akname_help,
+	akname_option,
+	akname_info,
+	akname_sn,
+	akname_af,
+	akname_ef,
+	akname_of,
+	akname_if,
+	akname_overlast
+} ;
+
+static const struct pivars	initvars = {
+	VARPROGRAMROOT1,
+	VARPROGRAMROOT2,
+	VARPROGRAMROOT3,
+	PROGRAMROOT,
+	VARPRLOCAL
+} ;
+
+static const struct mapex	mapexs[] = {
+	{ SR_NOENT, EX_NOUSER },
+	{ SR_AGAIN, EX_TEMPFAIL },
+	{ SR_DEADLK, EX_TEMPFAIL },
+	{ SR_NOLCK, EX_TEMPFAIL },
+	{ SR_TXTBSY, EX_TEMPFAIL },
+	{ SR_ACCESS, EX_NOPERM },
+	{ SR_REMOTE, EX_PROTOCOL },
+	{ SR_NOSPC, EX_TEMPFAIL },
+	{ SR_INTR, EX_INTR },
+	{ SR_EXIT, EX_TERM },
+	{ 0, 0 }
+} ;
+
+static cchar	*akonames[] = {
+	"expand",
+	"noexpand",
+	"flat",
+	"list",
+	"info",
+	nullptr
+} ;
+
+enum akonames {
+	akoname_expand,
+	akoname_noexpand,
+	akoname_flat,
+	akoname_list,
+	akoname_info,
+	akoname_overlast
+} ;
+
+static cchar	*subparts[] = {
+	"address",
+	"route",
+	"comment",
+	"original",
+	"best",
+	"any",
+	nullptr
+} ;
+
+enum subparts {
+	subpart_address,
+	subpart_route,
+	subpart_comment,
+	subpart_original,
+	subpart_best,
+	subpart_any,
+	subpart_overlast
+} ;
+
+
+/* exported subroutines */
+
+
+int main(int argc,cchar *argv[],cchar *envv[])
+{
+	PROGINFO	pi, *pip = &pi ;
+	ARGINFO		ainfo ;
+	CMD_LOCAL	localstate, *lsp = &localstate ;
+	bits		pargs ;
+	keyopt		akopts ;
+	paramopt	aparams ;
+	bfile		errfile ;
+
+#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+	uint		mo_start = 0 ;
+#endif
+
+	int		argr, argl, aol, akl, avl, kwi ;
+	int		ai, ai_max, ai_pos ;
+	int		rs, rs1 ;
+	int		cl ;
+	int		ex = EX_INFO ;
+	int		f_optminus, f_optplus, f_optequal ;
+	int		f_usage = false ;
+	int		f_version = false ;
+	int		f_help = false ;
+	int		f_recipients = false ;
+
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*ifname = nullptr ;
+	cchar	*cp ;
+
+
+#if	CF_DEBUGS || CF_DEBUG
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
+	    rs = debugopen(cp) ;
+	    debugprintf("main: starting DFD=%d\n",rs) ;
+	}
+
+#endif /* CF_DEBUG */
+
+#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+	uc_mallset(1) ;
+	uc_mallout(&mo_start) ;
+#endif
+
+	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
+	if (rs < 0) {
+	    ex = EX_OSERR ;
+	    goto badprogstart ;
+	}
+
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
+	proginfo_setbanner(pip,cp) ;
+
+	pip->lsp = lsp ;
+	memset(lsp,0,sizeof(CMD_LOCAL)) ;
+
+/* early things to initialize */
+
+	pip->verboselevel = 1 ;
+
+	lsp->fl.expand = trueg ;		/* default is to expand mail-groups */
+
+/* process program arguments */
+
+	if (rs >= 0) rs = bits_start(&pargs,1) ;
+	if (rs < 0) goto badpargs ;
+
+	if (rs >= 0) {
+	    rs = keyopt_start(&akopts) ;
+	    pip->open.akopts = (rs >= 0) ;
+	}
+
+	if (rs >= 0) {
+	    rs = paramopt_start(&aparams) ;
+	    pip->open.aparams = (rs >= 0) ;
+	}
+
+	ai_max = 0 ;
+	ai_pos = 0 ;
+	argr = argc ;
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
+	    if (rs < 0) break ;
+	    argr -= 1 ;
+	    if (ai == 0) continue ;
+
+	    argp = argv[ai] ;
+	    argl = strlen(argp) ;
+
+	    f_optminus = (*argp == '-') ;
+	    f_optplus = (*argp == '+') ;
+	    if ((argl > 1) && (f_optminus || f_optplus)) {
+	        cint ach = MKCHAR(argp[1]) ;
+
+	        if (isdigitlatin(ach)) {
+
+	            argval = (argp + 1) ;
+
+	        } else if (ach == '-') {
+
+	            ai_pos = ai ;
+	            break ;
+
+	        } else {
+
+	            aop = argp + 1 ;
+	            akp = aop ;
+	            aol = argl - 1 ;
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
+	                f_optequal = trueg ;
+	                akl = avp - aop ;
+	                avp += 1 ;
+	                avl = aop + argl - 1 - avp ;
+	                aol = akl ;
+	            } else {
+	                avp = nullptr ;
+	                avl = 0 ;
+	                akl = aol ;
+	            }
+
+	            if ((kwi = matostr(aknames,2,akp,akl)) >= 0) {
+
+	                switch (kwi) {
+
+/* version */
+	                case akname_version:
+	                    f_version = trueg ;
+	                    break ;
+
+/* verbose */
+	                case akname_verbose:
+	                    pip->verboselevel = 2 ;
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl) {
+	                            rs = optvalue(avp,avl) ;
+	                            pip->verboselevel = rs ;
+	                        }
+	                    }
+	                    break ;
+
+/* temporary directory */
+	                case akname_tmpdir:
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl)
+	                            pip->tmpdname = avp ;
+	                    } else {
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl)
+	                                pip->tmpdname = argp ;
+	                        } else
+	                            rs = SR_INVALID ;
+	                    }
+	                    break ;
+
+/* get a program root */
+	                case akname_root:
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl)
+	                            pr = avp ;
+	                    } else {
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl)
+	                                pr = argp ;
+	                        } else
+	                            rs = SR_INVALID ;
+	                    }
+	                    break ;
+
+/* want help ! file */
+	                case akname_help:
+	                    f_help = trueg ;
+	                    break ;
+
+/* program search-name */
+	                case akname_sn:
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl)
+	                            sn = avp ;
+	                    } else {
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl)
+	                                sn = argp ;
+	                        } else
+	                            rs = SR_INVALID ;
+	                    }
+	                    break ;
+
+/* argument file-file */
+	                case akname_af:
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl)
+	                            afname = avp ;
+	                    } else {
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl)
+	                                afname = argp ;
+	                        } else
+	                            rs = SR_INVALID ;
+	                    }
+	                    break ;
+
+/* error file */
+	                case akname_ef:
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl)
+	                            efname = avp ;
+	                    } else {
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl)
+	                                efname = argp ;
+	                        } else
+	                            rs = SR_INVALID ;
+	                    }
+	                    break ;
+
+/* output file */
+	                case akname_of:
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl)
+	                            ofname = avp ;
+	                    } else {
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl)
+	                                ofname = argp ;
+	                        } else
+	                            rs = SR_INVALID ;
+	                    }
+	                    break ;
+
+/* input file */
+	                case akname_if:
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl)
+	                            ifname = avp ;
+	                    } else {
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl)
+	                                ifname = argp ;
+	                        } else
+	                            rs = SR_INVALID ;
+	                    }
+	                    break ;
+
+/* the user specified some options */
+	                case akname_option:
+	                    cp = nullptr ;
+	                    cl = -1 ;
+	                    if (f_optequal) {
+	                        f_optequal = false ;
+	                        if (avl) {
+	                            cp = avp ;
+	                            cl = avl ;
+	                        }
+	                    } else {
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl) {
+	                                cp = argp ;
+	                                cl = argl ;
+	                            }
+	                        } else
+	                            rs = SR_INVALID ;
+	                    }
+	                    if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
+				paramopt	*pop = &aparams ;
+	                        rs = paramopt_loadu(pop,cp,cl) ;
+	                    }
+	                    break ;
+
+	                case akname_info:
+	                    lsp->fl.info = trueg ;
+	                    break ;
+
+/* default action and user specified help */
+	                default:
+	                    rs = SR_INVALID ;
+	                    break ;
+
+	                } /* end switch (key words) */
+
+	            } else {
+
+	                while (akl--) {
+			    cint	kc = MKCHAR(*akp) ;
+
+	                    switch (kc) {
+
+/* get a program root */
+	                    case 'R':
+	                        if (f_optequal) {
+	                            f_optequal = false ;
+	                            if (avl)
+	                                pr = avp ;
+	                        } else {
+	                            if (argr > 0) {
+	                                argp = argv[++ai] ;
+	                                argr -= 1 ;
+	                                argl = strlen(argp) ;
+	                                if (argl)
+	                                    pr = argp ;
+	                            } else
+	                                rs = SR_INVALID ;
+	                        }
+	                        break ;
+
+	                    case 'D':
+	                        pip->debuglevel = 1 ;
+	                        if (f_optequal) {
+	                            f_optequal = false ;
+	                            if (avl) {
+	                                rs = optvalue(avp,avl) ;
+	                                pip->debuglevel = rs ;
+	                            }
+	                        }
+	                        break ;
+
+	                    case 'Q':
+	                        pip->fl.quiet = trueg ;
+	                        break ;
+
+	                    case 'V':
+	                        f_version = trueg ;
+	                        break ;
+
+	                    case 'h':
+	                        cp = nullptr ;
+	                        cl = -1 ;
+	                        if (f_optequal) {
+	                            f_optequal = false ;
+	                            if (avl) {
+	                                cp = avp ;
+	                                cl = avl ;
+	                            }
+	                        } else {
+	                            if (argr > 0) {
+	                                argp = argv[++ai] ;
+	                                argr -= 1 ;
+	                                argl = strlen(argp) ;
+	                                if (argl) {
+	                                    cp = argp ;
+	                                    cl = argl ;
+	                                }
+	                            } else
+	                                rs = SR_INVALID ;
+	                        }
+	                        if ((rs >= 0) && (cp != nullptr) && (cl > 0)) {
+				    paramopt	*pop = &aparams ;
+	                            cchar	*po = PO_HEADER ;
+	                            rs = paramopt_loads(pop,po,cp,cl) ;
+	                        }
+	                        break ;
+
+/* options */
+	                    case 'o':
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl)
+	                                rs = keyopt_loads(&akopts,argp,argl) ;
+	                        } else
+	                            rs = SR_INVALID ;
+	                        break ;
+
+	                    case 'n':
+	                        lsp->fl.count = trueg ;
+	                        break ;
+
+/* specify all recipient headers */
+	                    case 'r':
+	                        f_recipients = trueg ;
+	                        if (f_optequal) {
+	                            f_optequal = false ;
+	                            if (avl) {
+	                                rs = optbool(avp,avl) ;
+	                                f_recipients = (rs > 0) ;
+	                            }
+	                        }
+	                        break ;
+
+/* specifiy a subpart of the address to extract */
+	                    case 's':
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl) {
+	                                paramopt	*pop = &aparams ;
+	                                cchar	*po = PO_SUBPART ;
+	                                rs = paramopt_loads(pop,po,argp,argl) ;
+	                            }
+	                        } else
+	                            rs = SR_INVALID ;
+	                        break ;
+
+/* verbose output */
+	                    case 'v':
+	                        pip->verboselevel = 2 ;
+	                        if (f_optequal) {
+	                            f_optequal = false ;
+	                            if (avl) {
+	                                rs = optvalue(avp,avl) ;
+	                                pip->verboselevel = rs ;
+	                            }
+	                        }
+	                        break ;
+
+	                    case 'w':
+	                        if (argr > 0) {
+	                            argp = argv[++ai] ;
+	                            argr -= 1 ;
+	                            argl = strlen(argp) ;
+	                            if (argl) {
+	                                rs = optvalue(argp,argl) ;
+	                                pip->linelen = rs ;
+	                            }
+	                        } else
+	                            rs = SR_INVALID ;
+	                        break ;
+
+	                    case '?':
+	                        f_usage = trueg ;
+	                        break ;
+
+	                    default:
+	                        rs = SR_INVALID ;
+	                        break ;
+
+	                    } /* end switch */
+	                    akp += 1 ;
+
+	                    if (rs < 0) break ;
+	                } /* end while */
+
+	            } /* end if (individual option key letters) */
+
+	        } /* end if */
+
+	    } else {
+
+	        rs = bits_set(&pargs,ai) ;
+	        ai_max = ai ;
+
+	    } /* end if (key letter/word or positional) */
+
+	    ai_pos = ai ;
+
+	} /* end while (all command line argument processing) */
+
+#if	CF_DEBUGS
+	debugprintf("main: after args rs=%d\n",rs) ;
+#endif
+
+	if (efname == nullptr) efname = getenv(VARERRORFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
+	if ((rs1 = bopen(&errfile,efname,"dwca",0666)) >= 0) {
+	    pip->efp = &errfile ;
+	    pip->open.errfile = trueg ;
+	    bcontrol(&errfile,BC_LINEBUF,0) ;
+	} else if (! isFailOpen(rs1)) {
+	    if (rs >= 0) rs = rs1 ;
+	}
+
+	if (rs < 0)
+	    goto badarg ;
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(2))
+	    debugprintf("main: debuglevel=%u\n",pip->debuglevel) ;
+#endif
+
+	if (f_version) {
+	    bprintf(pip->efp,"%s: version %s\n",
+	        pip->progname,VERSION) ;
+	}
+
+/* check a few more things */
+
+	if (rs >= 0) {
+	    if ((rs = proginfo_setpiv(pip,pr,&initvars)) >= 0) {
+	        rs = proginfo_setsearchname(pip,VARSEARCHNAME,sn) ;
+	    }
+	}
+
+	if (rs < 0) {
+	    ex = EX_OSERR ;
+	    goto retearly ;
+	}
+
+	if (pip->debuglevel > 0) {
+	    bprintf(pip->efp,"%s: pr=%s\n",pip->progname,pip->pr) ;
+	    bprintf(pip->efp,"%s: sn=%s\n",pip->progname,pip->searchname) ;
+	} /* end if */
+
+	if (f_usage)
+	    usage(pip) ;
+
+/* user specified help only */
+
+	if (f_help)
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
+
+	if (f_version || f_help || f_usage)
+	    goto retearly ;
+
+
+	ex = EX_OK ;
+
+/* other initialization */
+
+	if ((rs >= 0) && (pip->n == 0) && (argval != nullptr)) {
+	    rs = optvalue(argval,-1) ;
+	    pip->n = rs ;
+	}
+
+	if (pip->tmpdname == nullptr) pip->tmpdname = getenv(VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
+
+	if ((rs >= 0) && f_recipients) {
+	    int		i ;
+	    cchar	*po = PO_HEADER ;
+	    cchar	*types[4] = { "to", "cc", "bcc", nullptr } ;
+	    for (i = 0 ; i < 3 ; i += 1) {
+	        rs = paramopt_loaduniq(&aparams,po,types[i],-1) ;
+		if (rs < 0) break ;
+	    } /* end for */
+	} /* end if */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(2))
+	    debugprintf("main: procopts() \n") ;
+#endif
+
+	if (rs >= 0) {
+	    if ((rs = procopts(pip,&akopts)) >= 0) {
+	        rs = procsubpart(pip,&aparams,lsp) ;
+	    }
+	}
+
+	if ((rs >= 0) && (pip->linelen == 0)) {
+	    if ((cp = getourenv(envv,VARLINELEN)) == nullptr) {
+	        cp = getourenv(envv,VARCOLUMNS) ;
+	    }
+	    if (cp != nullptr) {
+	        if ((rs = optvalue(cp,-1)) >= 0) {
+	            pip->linelen = rs ;
+	        }
+	    }
+	}
+
+	if (pip->linelen == 0) pip->linelen = COLUMNS ;
+
+	if (pip->debuglevel > 0) {
+	    bprintf(pip->efp,"%s: linelen=%u\n",pip->progname,pip->linelen) ;
+	}
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(2) && (rs >= 0))
+	    debugprintf("main: AKO expand=%u\n",lsp->fl.expand) ;
+#endif /* CF_DEBUG */
+
+/* check arguments */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(2)) {
+	    paramopt_cur	c ;
+	    cchar	*ccp ;
+	    debugprintf("main: parameter keys are:\n") ;
+	    paramopt_curbegin(&aparams,&c) ;
+	    while (paramopt_curenumkey(&aparams,&c,&ccp) >= 0) {
+	        debugprintf("main: key=%s\n",ccp) ;
+	    }
+	    paramopt_curend(&aparams,&c) ;
+	    debugprintf("main: headers are:\n") ;
+	    paramopt_curbegin(&aparams,&c) ;
+	    while (paramopt_curenumval(&aparams,PO_HEADER,&c,&ccp) >= 0)
+	        debugprintf("main: header=%s\n",ccp) ;
+	    paramopt_curend(&aparams,&c) ;
+	    debugprintf("main: subparts are:\n") ;
+	    paramopt_curbegin(&aparams,&c) ;
+	    while (paramopt_curenumval(&aparams,PO_SUBPART,&c,&ccp) >= 0)
+	        debugprintf("main: header=%s\n",ccp) ;
+	    paramopt_curend(&aparams,&c) ;
+	} /* end block */
+#endif /* CF_DEBUG */
+
+/* set the default header to choose if one has not been selected */
+
+	if (rs >= 0) {
+	    if ((rs = paramopt_havekey(&aparams,PO_HEADER)) == 0) {
+	        rs = paramopt_load(&aparams,PO_HEADER,"to",2) ;
+	    }
+	}
+
+/* what about the address subpart selection criteria */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(2))
+	    debugprintf("main: about to set subpart criteria\n") ;
+#endif
+
+/* continue */
+
+	memset(&ainfo,0,sizeof(ARGINFO)) ;
+	ainfo.argc = argc ;
+	ainfo.ai = ai ;
+	ainfo.argv = argv ;
+	ainfo.ai_max = ai_max ;
+	ainfo.ai_pos = ai_pos ;
+
+	if (rs >= 0) {
+	    cchar	*ofn = ofname ;
+	    cchar	*ifn = ifname ;
+	    cchar	*afn = afname ;
+	    rs = procargs(pip,&ainfo,&pargs,&aparams,ofn,ifn,afn) ;
+	} else if (ex == EX_OK) {
+	    cchar	*pn = pip->progname ;
+	    ex = EX_USAGE ;
+	    bprintf(pip->efp,"%s: usage (%d)\n",pn,rs) ;
+	    usage(pip) ;
+	} /* end if (ok) */
+
+/* done */
+	if ((rs < 0) && (ex == EX_OK)) {
+	    switch (rs) {
+	    case SR_INVALID:
+	        ex = EX_USAGE ;
+	        if (! pip->fl.quiet) {
+	            bprintf(pip->efp,"%s: invalid usage (%d)\n",
+	                pip->progname,rs) ;
+	        }
+	        break ;
+	    case SR_NOENT:
+	        ex = EX_CANTCREAT ;
+	        break ;
+	    case SR_AGAIN:
+	        ex = EX_TEMPFAIL ;
+	        break ;
+	    default:
+	        ex = mapex(mapexs,rs) ;
+	        break ;
+	    } /* end switch */
+	} /* end if */
+
+retearly:
+	if (pip->debuglevel > 0) {
+	    bprintf(pip->efp,"%s: exiting ex=%u (%d)\n",
+	        pip->progname,ex,rs) ;
+	}
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(2))
+	    debugprintf("main: exiting rs=%d ex=%u\n",rs,ex) ;
+#endif
+
+	if (pip->efp != nullptr) {
+	    pip->open.errfile = false ;
+	    bclose(pip->efp) ;
+	    pip->efp = nullptr ;
+	}
+
+	if (pip->open.aparams) {
+	    pip->open.aparams = nullptr ;
+	    paramopt_finish(&aparams) ;
+	}
+
+	if (pip->open.akopts) {
+	    pip->open.akopts = nullptr ;
+	    keyopt_finish(&akopts) ;
+	}
+
+	bits_finish(&pargs) ;
+
+badpargs:
+	proginfo_finish(pip) ;
+
+badprogstart:
+
+#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+	{
+	    uint	mo ;
+	    uc_mallout(&mo) ;
+	    debugprintf("main: final mallout=%u\n",(mo-mo_start)) ;
+	    uc_mallset(0) ;
+	}
+#endif
+
+#if	(CF_DEBUGS || CF_DEBUG)
+	debugclose() ;
+#endif
+
+	return ex ;
+
+/* bad stuff */
+badarg:
+	ex = EX_USAGE ;
+	bprintf(pip->efp,"%s: invalid argument specified (%d)\n",
+	    pip->progname,rs) ;
+	usage(pip) ;
+	goto retearly ;
+
+}
+/* end subroutine (main) */
+
+
+/* local subroutines */
+
+
+local int usage(PROGINFO *pip)
+{
+	int		rs = SR_OK ;
+	int		wlen = 0 ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
+
+	fmt = "%s: USAGE> %s [<msgfile(s)>] [-af <afile>] [-h <header(s)>]\n" ;
+	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
+	wlen += rs ;
+
+	fmt = "%s:  [-info] [-s <subpart(s)>] [-o <opt(s)>]\n" ;
+	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn) ;
+	wlen += rs ;
+
+	fmt = "%s:  [-Q] [-D] [-v[=<n>]] [-HELP] [-V]\n" ;
+	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn) ;
+	wlen += rs ;
+
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (usage) */
+
+
+/* process the program options */
+local int procopts(PROGINFO *pip,keyopt *akp)
+{
+	CMD_LOCAL	*lsp = pip->lsp ;
+	int		rs = SR_OK ;
+	int		c = 0 ;
+	cchar	*cp ;
+
+	if ((cp = getenv(VAROPTS)) != nullptr) {
+	    rs = keyopt_loads(akp,cp,-1) ;
+	}
+
+	if (rs >= 0) {
+	    keyopt_cur	cur ;
+	    if ((rs = keyopt_curbegin(akp,&cur)) >= 0) {
+	        int	oi ;
+	        int	kl, vl ;
+	        cchar	*kp, *vp ;
+
+	        while ((kl = keyopt_curenumkeys(akp,&cur,&kp)) >= 0) {
+
+	            if ((oi = matostr(akonames,1,kp,kl)) >= 0) {
+
+	                vl = keyopt_fetch(akp,kp,nullptr,&vp) ;
+
+	                switch (oi) {
+	                case akoname_noexpand:
+	                case akoname_list:
+	                    lsp->fl.expand = false ;
+	                    if (vl > 0) {
+	                        rs = optbool(vp,vl) ;
+	                        lsp->fl.expand = (rs > 0) ;
+	                    }
+	                    break ;
+	                case akoname_expand:
+	                case akoname_flat:
+	                    lsp->fl.expand = trueg ;
+	                    if (vl > 0) {
+	                        rs = optbool(vp,vl) ;
+	                        lsp->fl.expand = (rs > 0) ;
+	                    }
+	                    break ;
+	                case akoname_info:
+	                    lsp->fl.info = trueg ;
+	                    if (vl > 0) {
+	                        rs = optbool(vp,vl) ;
+	                        lsp->fl.info = (rs > 0) ;
+	                    }
+	                    break ;
+	                } /* end switch */
+
+	                c += 1 ;
+	            } /* end if (matostr) */
+
+	            if (rs < 0) break ;
+	        } /* end while */
+
+	        keyopt_curend(akp,&cur) ;
+	    } /* end if (keyopt-cur) */
+	} /* end if (ok) */
+
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (procopts) */
+
+
+local int procsubpart(PROGINFO *pip,paramopt *pop,CMD_LOCAL *lsp)
+{
+	paramopt_cur	c ;
+	int		rs ;
+	int		spc = 0 ;
+
+	if ((rs = paramopt_curbegin(pop,&c)) >= 0) {
+	    int		i ;
+	    int		vl ;
+	    cchar	*po = PO_SUBPART ;
+	    cchar	*vp ;
+	    while (rs >= 0) {
+
+	            vl = paramopt_curenumval(pop,po,&c,&vp) ;
+	            if (vl == SR_NOTFOUND) break ;
+	            rs = vl ;
+	            if (rs < 0) break ;
+
+#if	CF_DEBUG
+	        if (DEBUGLEVEL(4))
+	            debugprintf("main/procsubpart: lookup subpart=%s\n",vp) ;
+#endif
+
+	            if ((i = matostr(subparts,1,vp,vl)) >= 0) {
+	                switch (i) {
+	                case subpart_address:
+	                    lsp->afl.address = trueg ;
+	                    spc += 1 ;
+	                    break ;
+	                case subpart_route:
+	                    lsp->afl.route = trueg ;
+	                    spc += 1 ;
+	                    break ;
+	                case subpart_comment:
+	                    lsp->afl.comment = trueg ;
+	                    spc += 1 ;
+	                    break ;
+	                case subpart_original:
+	                    lsp->afl.original = trueg ;
+	                    spc += 1 ;
+	                    break ;
+	                case subpart_best:
+	                    lsp->afl.best = trueg ;
+	                    spc += 1 ;
+	                    break ;
+	                case subpart_any:
+	                    lsp->afl.anyone = trueg ;
+	                    spc += 1 ;
+	                    break ;
+	                } /* end switch */
+	            } else {
+			cchar	*pn = pip->progname ;
+			cchar	*fmt = "%s: unrecognized EMA subpart=%s\n" ;
+	                rs = SR_INVALID ;
+	                bprintf(pip->efp,fmt,pn,vp) ;
+	            } /* end if */
+	    } /* end while */
+	    paramopt_curend(pop,&c) ;
+	} /* end if (paramopt_curbegin) */
+	lsp->spc = spc ;
+	if (spc <= 0) {
+	    lsp->afl.best = trueg ;
+	}
+#if	CF_DEBUG
+	if (DEBUGLEVEL(4))
+	    debugprintf("main/procsubpart: ret rs=%d spc=%u\n",rs,spc) ;
+#endif
+	return rs ;
+} 
+/* end subroutine (procsubpart) */
+
+
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
+		cchar *ofn,cchar *ifn,cchar *afn)
+{
+	CMD_LOCAL	*lsp = pip->lsp ;
+	bfile		ofile, *ofp = &ofile ;
+	int		rs ;
+	int		rs1 ;
+	int		count = 0 ;
+	cchar		*pn = pip->progname ;
+	cchar		*fmt ;
+
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	    ofn = BFILE_STDOUT ;
+
+	if ((rs = bopen(ofp,ofn,"wct",0666)) >= 0) {
+	    int		pan = 0 ;
+	    int		f_input = trueg ;
+	    int		cl ;
+	    cchar	*cp ;
+	    pip->ofp = ofp ;
+
+	    if (rs >= 0) {
+	        int	ai ;
+	        int	f ;
+	        for (ai = 1 ; ai < aip->argc ; ai += 1) {
+
+	            f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
+	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
+	            if (f) {
+	                f_input = false ;
+	                cp = aip->argv[ai] ;
+	                if (cp[0] != '\0') {
+	                    pan += 1 ;
+	                    rs = procmsgfile(pip,app,ofp,cp,-1) ;
+	                    count += rs ;
+	                }
+	            }
+
+	            if (rs < 0) break ;
+	        } /* end for (looping through mail message files) */
+	    } /* end if (ok) */
+
+	    if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
+	        bfile	afile, *afp = &afile ;
+
+	        f_input = false ;
+	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
+
+	        if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
+	            cint	llen = LINEBUFLEN ;
+	            int		len ;
+	            char	lbuf[LINEBUFLEN + 1] ;
+
+	            while ((rs = breadln(afp,lbuf,llen)) > 0) {
+	                len = rs ;
+
+	                if (lbuf[len - 1] == '\n') len -= 1 ;
+	                lbuf[len] = '\0' ;
+
+	                if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
+	                    if (cp[0] != '#') {
+	                        pan += 1 ;
+	                        rs = procmsgfile(pip,app,ofp,cp,cl) ;
+	                        count += rs ;
+	                    }
+	                }
+
+	                if (rs < 0) break ;
+	            } /* end while (reading lines) */
+
+	            rs1 = bclose(afp) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } else {
+	            if (! pip->fl.quiet) {
+			fmt = "%s: inaccessible arglist (%d)\n" ;
+	                bprintf(pip->efp,fmt,pn,rs) ;
+	                bprintf(pip->efp,"%s: afile=%s\n",afn) ;
+	            }
+	        } /* end if */
+
+	    } /* end if (processing file argument file list) */
+
+	    if ((rs >= 0) && f_input) {
+
+	        if ((ifn == nullptr) || (ifn[0] == '\0')) ifn = "-" ;
+
+	        cp = ifn ;
+	        pan += 1 ;
+	        rs = progfile(pip,app,ofp,cp) ;
+	        count += rs ;
+
+	        if (rs < 0) {
+	            if (strcmp(cp,"-") == 0) cp = "*STDIN*" ;
+	            if (! pip->fl.quiet) {
+	                bprintf(pip->efp,
+	                    "%s: problem (%d) file=%s\n",
+	                    pip->progname,rs,cp) ;
+	            }
+	        }
+
+	    } /* end if */
+
+	    if ((rs >= 0) && lsp->fl.count)
+	        bprintf(ofp,"%u\n",count) ;
+
+	    pip->ofp = nullptr ;
+	    rs1 = bclose(ofp) ;
+	    if (rs >= 0) rs = rs1 ;
+	} else {
+	    bprintf(pip->efp,"%s: inaccessible output (%d)\n",
+	        pip->progname,rs) ;
+	}
+
+	if ((rs >= 0) && (pip->debuglevel > 0)) {
+	    bprintf(pip->efp,"%s: count=%u\n",
+	        pip->progname,count) ;
+	}
+
+	return (rs >= 0) ? count : rs ;
+}
+/* end subroutine (procargs) */
+
+
+local int procmsgfile(PROGINFO *pip,paramopt *app,void *ofp,cchar *fp,int fl)
+{
+	NULSTR		f ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	cchar		*fname ;
+	if ((rs = nulstr_start(&f,fp,fl,&fname)) >= 0) {
+	    rs = progfile(pip,app,ofp,fname) ;
+	    c = rs ;
+	    rs1 = nulstr_finish(&f) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (nulstr) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (procmsgfile) */
+
+
