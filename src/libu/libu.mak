@@ -67,7 +67,7 @@ OBJ15= usysop.o uchartype.o
 
 OBJ16= syswords.o varnames.o
 OBJ17= ptx.o sigblocker.o
-OBJ18= stdclib.o
+OBJ18= stdclib.o strbcpy.o
 OBJ19= stdfnames.o stdfiles.o
 
 OBJ20= uinet.o ustream.o
@@ -76,7 +76,7 @@ OBJ22= ugetloadavg.o uiconv.o bitgrp.o
 OBJ23= syscontain.o 
 
 OBJ24= posixdir.o nulstr.o vecbool.o
-OBJ25= fonce.o filerec.o
+OBJ25= fonce.o filerec.o 
 OBJ26= ustd.o ugetx.o
 OBJ27= ucomposite.o upt.o ucmpx.o
 
@@ -631,6 +631,11 @@ dprint.o:		dprint.cc	dprint.hh			$(INCS)
 # ARITHMETIC
 muldigs.o:		muldigs.ccm
 loadvals.o:		loadvals.ccm
+
+# STRBCPY
+strbcpy.o:		strbcpy.dir
+strbcpy.dir:
+	makesubdir $@
 
 udiv.o:			udiv.ccm	udiv.hh				$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
