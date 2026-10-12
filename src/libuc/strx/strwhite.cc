@@ -108,11 +108,11 @@ char *strwht(cchar *sp,int sl) noex {
 		    rsp = strbrk(sp,whites) ;
 		} else {
 		    rsp = strnbrk(sp,sl,whites) ;
-		}
+		} /* end */
 	    } else {
 	        for (int ch ; sl-- && ((ch = mkchar(*sp))) ; sp += 1) {
 		    if (ISW(ch) || (ch == CH_NL)) break ;
-	        }
+	        } /* end for */
 	    } /* end if_constexpr (f_strbrk) */
 	    rsp = charp(sp) ;
 	} /* end if (non-null) */
