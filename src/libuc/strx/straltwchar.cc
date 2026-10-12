@@ -285,12 +285,12 @@ cchar *straltwchar(int sch) noex {
 		    back = i ;
 	        } else {
 		    break ;
-	        }
+	        } /* end */
 	        i = (front + ((back - front) / 2)) ;
 	    } /* end while */
 	    if (front < back) {
 	       ss = specials[i].ss ;
-	    }
+	    } /* end */
 	} /* end block */
 	return ss ;
 } /* end subroutine (straltwchar) */
