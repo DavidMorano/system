@@ -39,7 +39,7 @@ struct ucentpj : project {
 	int getdef(char *,int,cchar *) noex ;
 	operator int () noex {
 	    return size() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucentpj) */
 
 #else /* __cplusplus */
