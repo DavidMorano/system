@@ -25,7 +25,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2025 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -75,7 +75,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<toxc.h>		/* LIBUC */
+#include	<usupport.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"strnwcpyxc.h"
@@ -89,11 +89,16 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
+using libu::chtobc ;
+using libu::chtolc ;
+using libu::chtouc ;
+using libu::chtofc ;
+
 
 /* local typedefs */
 
 extern "C" {
-    typedef int (*toxc_f)(int) noex ;
+    typedef char (*chtoxc_f)(int) noex ;
 } /* end extern (C) */
 
 
@@ -108,15 +113,17 @@ extern "C" {
 
 /* forward references */
 
-local char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
+local char *strnwcpyxc(chtoxc_f chtoxc,char *dp,int dl,cchar *sp,int sl) noex {
 	if (dp && sp) ylikely {
     	    while (dl && sl-- && *sp) {
-	        *dp++ = char(toxc(*sp++)) ;
+	        *dp++ = chtoxc(*sp++) ;
 		dl -= 1 ;
-	    }
+	    } /* end while */
 	    if (dl > 0) {
 	        memclear(dp,dl) ;
-	    }
+	    } /* end if (zero-fill) */
+	} else {
+	    dp = nullptr ;
 	} /* end if (non-null) */
 	return dp ;
 } /* end subroutine (strnwcpyxc) */
@@ -131,19 +138,19 @@ local char *strnwcpyxc(toxc_f toxc,char *dp,int dl,cchar *sp,int sl) noex {
 /* exported subroutines */
 
 char *strnwcpybc(char *dp,int dl,cchar *sp,int sl) noex {
-    	return strnwcpyxc(tobc,dp,dl,sp,sl) ;
+    	return strnwcpyxc(chtobc,dp,dl,sp,sl) ;
 } /* end subroutine */
 
 char *strnwcpylc(char *dp,int dl,cchar *sp,int sl) noex {
-    	return strnwcpyxc(tolc,dp,dl,sp,sl) ;
+    	return strnwcpyxc(chtolc,dp,dl,sp,sl) ;
 } /* end subroutine */
 
 char *strnwcpyuc(char *dp,int dl,cchar *sp,int sl) noex {
-    	return strnwcpyxc(touc,dp,dl,sp,sl) ;
+    	return strnwcpyxc(chtouc,dp,dl,sp,sl) ;
 } /* end subroutine */
 
 char *strnwcpyfc(char *dp,int dl,cchar *sp,int sl) noex {
-    	return strnwcpyxc(tofc,dp,dl,sp,sl) ;
+    	return strnwcpyxc(chtofc,dp,dl,sp,sl) ;
 } /* end subroutine */
 
 
