@@ -76,7 +76,7 @@
 #include	<ulogerror.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
 
@@ -158,10 +158,10 @@ int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	                rc = strdocmp(s1,s2,i) ; /* break ties so far */
 		    }
 	            if (rc == 0) {
-	                while (s1len && (! isdict(s1[s1len-1]))) {
+	                while (s1len && (! ischdict(s1[s1len-1]))) {
 			    s1len -= 1 ;
 		        }
-	                while (s2len && (! isdict(s2[s2len-1]))) {
+	                while (s2len && (! ischdict(s2[s2len-1]))) {
 			    s2len -= 1 ;
 		        }
 	                rc = (s1len - s2len) ; /* more determinism */
@@ -205,7 +205,7 @@ local int dch_get(DCH *dcp) noex {
 	    if (doch == 0) break ;
 	    dcp->sp += 1 ;
 	    dcp->sl -= 1 ;
-	    if (isdict(doch)) break ;
+	    if (ischdict(doch)) break ;
 	} /* end forever */
 	return doch ;
 } /* end subroutine (dch_get) */
