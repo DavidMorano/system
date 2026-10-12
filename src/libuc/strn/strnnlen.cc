@@ -98,7 +98,7 @@ int strnnlen(cchar *sp,int sl,int mlen) noex {
 		    }
 	        } else {
 	            sl = mlen ;
-	        }
+	        } /* end if */
 	        len = lenstr(sp,sl) ; /* (sl < 0) is allowed */
 	    } /* end if */
 	} /* end if (non-null) */
