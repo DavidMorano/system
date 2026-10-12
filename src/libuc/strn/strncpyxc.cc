@@ -32,7 +32,7 @@
 	char *strncpy{x}c(char *dst,cchar *src,int n) noex
 
 	Arguments:
-	{x}		l, u, f
+	{x}		one of: b, l, u, f
 	dst		destination buffer
 	src		source string
 	n		length to copy
@@ -95,10 +95,12 @@ local char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 	        } /* end while */
 	        if (n > 0) {
 	            memclear(dst,n) ;
-		}
+		} /* end */
 	    } else {
 	        dst = scxc(dst,src) ;
-	    }
+	    } /* end */
+	} else {
+	    dst = nullptr ;
 	} /* end if (non-null) */
 	return dst ;
 } /* end subroutine-template (strncpyxc) */
