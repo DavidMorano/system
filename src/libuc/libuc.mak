@@ -79,7 +79,7 @@ OBJ07_INIT=
 
 OBJ00= matxstr.o toxc.o char.o 
 OBJ01= strn.o strnxcmp.o
-OBJ02= snwcpy.o strcpyx.o strdcpy.o strbcpy.o
+OBJ02= snwcpy.o strcpyx.o strdcpy.o
 OBJ03= strw.o strx.o strtime.o mnw.o
 
 OBJ04= isx.o
@@ -581,11 +581,6 @@ strw.dir:
 # STRDCPY
 strdcpy.o:		strdcpy.dir
 strdcpy.dir:
-	makesubdir $@
-
-# STRBCPY
-strbcpy.o:		strbcpy.dir
-strbcpy.dir:
 	makesubdir $@
 
 open.o:			open.dir
