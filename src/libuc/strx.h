@@ -33,6 +33,7 @@
 #include	<strxcmp.h>
 #include	<strabbrerr.h>
 #include	<strabbrsig.h>
+#include	<strabbrrxi.h>
 #include	<straltwchar.h>
 #include	<strcpyxc.h>
 #include	<strlinelen.h>
