@@ -104,7 +104,7 @@
 #include	<ucdesc.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getnodedomain.h>	/* LIBUC |getinetdomain(3uc)| */
-#include	<getuserhome.h>		/* LIBYC |getuserhome(3uc)| */
+#include	<getuserhome.h>		/* LIBUC |getuserhome(3uc)| */
 #include	<getax.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<nonpath.h>		/* LIBUC |nonpathchs(3uc)| */
@@ -868,12 +868,12 @@ local int waitready(int fd,int oflags,int timeout) noex {
 	                    f = !!(re & POLLIN) ;
 	                } else {
 	                    f = !!(re & POLLOUT) ;
-	                }
+	                } /* end if */
 	            } /* end if (pollok) */
 		} else {
 	            if (rs == SR_INTR) {
 			rs = SR_OK ;
-		    }
+		    } /* end if */
 		    if (rs >= 0) {
 			daytime = time(nullptr) ;
 	                if (daytime >= ti_timeout) {
@@ -895,7 +895,7 @@ local int pollok(int re) noex {
 	    rs = SR_POLLERR ;
 	} else if (re & POLLNVAL) {
 	    rs = SR_NOTOPEN ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (pollok) */
 
@@ -912,7 +912,7 @@ local int getnormalfs(cchar *fname,cchar **rpp) noex {
 		cint	tl = intconv(tp - pp) ;
 	        if (int mi = matstr(normalfs,pp,tl) ; mi > 0) {
 		    pi = mi ;
-		}
+		} /* end if */
 	        *rpp = (pi > 0) ? tp : nullptr ;
 	    } /* end if (found) */
 	} /* end if (suitable file-name) */
@@ -929,7 +929,7 @@ local int getprefixfs(cchar *fname,cchar **rpp) noex {
 	    int		pl = -1 ;
 	    while (*pp && (pp[0] == '/')) {
 		pp += 1 ;
-	    }
+	    } /* end while */
 	    if ((tp = strchr(pp,'/')) != nullptr) {
 	        pl = intconv(tp - pp) ;
 	    } else {
@@ -969,10 +969,10 @@ local int noexist(cchar *pp,int pl) noex {
 	        if (ustat sb ; (rs = FUNSTAT(nbuf,&sb)) >= 0) {
 	            if (! S_ISDIR(sb.st_mode)) {
 	                rs = SR_EXIST ;
-	            }
+	            } /* end if */
 	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
-	        }
+	        } /* end if */
 	    } /* end if (snwcpy) */
 	    rs1 = lm_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1058,7 +1058,7 @@ int vars::finish() noex {
 	{
 	    rs1 = mx.destroy ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vars::finish) */
 
