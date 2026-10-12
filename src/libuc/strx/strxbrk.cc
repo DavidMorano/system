@@ -88,19 +88,25 @@ import libutil ;			/* |lenstr(3u)| */
 /* exported subroutines */
 
 char *strobrk(cchar *s,cchar *ss) noex {
-    	return strbrk(s,ss) ;
+    	char		*rsp = nullptr ;
+	if (s && ss) ylikely {
+	    rsp = strbrk(s,ss) ;
+	} /* end if (non-null) */
+    	return rsp ;
 } /* end subroutine (strobrk) */
 
 char *strrbrk(cchar *s,cchar *ss) noex {
-	cint		n = lenstr(s) ;
 	bool		f = false ;
-	char		*rsp ;
-	rsp = charp(s + n) ;
-	while (--rsp >= s) {
-	    cint	ch = mkchar(*rsp) ;
-	    f = (strchr(ss,ch) != nullptr) ;
-	    if (f) break ;
-	} /* end while */
+	char		*rsp = nullptr ;
+	if (s && ss) ylikely {
+	    cint n = lenstr(s) ;
+	    rsp = charp(s + n) ;
+	    while (--rsp >= s) {
+	        cint ch = mkchar(*rsp) ;
+	        f = (strchr(ss,ch) != nullptr) ;
+	        if (f) break ;
+	    } /* end while */
+	} /* end if (non-null) */
 	return (f) ? rsp : nullptr ;
 } /* end subroutine (strrbrk) */
 
