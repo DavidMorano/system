@@ -46,6 +46,7 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucgetx.h>		/* LIBUC |uc_gethostid(3uc)| */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getnodedomain.h>	/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
@@ -74,6 +75,7 @@ namespace {
 	int	nodenamelen ;
 	int	hostnamelen ;
 	int	usernamelen ;
+	uint	hostid ;
 	operator int () noex ;
     } ; /* end struct (variables) */
 } /* end namespace */
@@ -136,14 +138,12 @@ local int mkstr(char *rp,int rl,cchar *dn,cchar *nn,int sn) noex {
 	    cint	nl = lenstr(nn) ;
 	    int		len ;
 	    {
-	        clong	hid = gethostid() ;
-	        if (nl > var.usernamelen) {
-	            cint iid = int(hid) ;
-	            sb.hex(iid) ;
+	        if (cint hid = conv<int>(var.hostid) ; nl > var.usernamelen) {
+	            sb.hex(hid) ;
 	            sb.chr('-') ;
 	        } else {
 	            sb.strw(nn,nl) ;
-	        }
+	        } /* end */
 	        sb.dec(pid) ;
 	        sb.chr('.') ;
 	        sb.hex(tv) ;
@@ -166,6 +166,9 @@ variables::operator int () noex {
 	        hostnamelen = rs ;
 	        if ((rs = bufsizeget(bufsize_un)) >= 0) ylikely {
 		    usernamelen = rs ;
+	            if (ulong hi ; (rs = uc_gethostid(&hi)) >= 0) ylikely {
+			hostid = conv<uint>(hi) ;
+		    } /* end if (uc_gethostid) */
 		}
 	    }
 	} /* end if */
