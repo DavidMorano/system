@@ -58,11 +58,11 @@ struct ucenumsv_op {
 	void operator () (ucenumsv *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (cchar *) noex ;
 	operator int () noex {
 	    return operator () (nullptr) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumsv_op) */
 struct ucenumsv_co {
 	ucenumsv	*op = nullptr ;
@@ -70,11 +70,11 @@ struct ucenumsv_co {
 	void operator () (ucenumsv *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumsv_co) */
 struct ucenumsv : ucenumxx {
 	ucenumsv_op	open ;
@@ -92,7 +92,7 @@ struct ucenumsv : ucenumxx {
 	void dtor() noex ;
 	destruct ucenumsv() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ucenumsv) */
 #else	/* __cplusplus */
 typedef UCENUMXX	ucenumsv ;
