@@ -94,9 +94,9 @@ namespace {
 	int		rwi{} ;
 	mkuu(uuid_dat *p) noex : up(p) { } ;
 	int operator () (int) noex ;
-	int mkuutime() noex ;
-	int mkuuclk() noex ;
-	int mkuunode() noex ;
+	int mkuutime	() noex ;
+	int mkuuclk	() noex ;
+	int mkuunode	() noex ;
     } ; /* end struct (mkuu) */
     typedef int (mkuu::*mkuu_m)() noex ;
 } /* end namespace */
@@ -156,13 +156,13 @@ int mkuu::mkuutime() noex {
 	    {
 	        v = tv.tv_sec ;
 	        rt |= (v << 32) ;
-	    }
+	    } /* end */
 	    {
 		v = (rwords[rwi++] >> 12) ; /* mask off high end */
 	        rt |= (v << 20) ;
 	        v = tv.tv_usec ;
 		rt |= v ;
-	    }
+	    } /* end */
 	    up->time = rt ;
 	} /* end if (uc_gettimeofday) */
 	return rs ;
@@ -173,7 +173,7 @@ int mkuu::mkuuclk() noex {
 	{
 	    v = rwords[rwi++] ;
 	    v >>= 16 ;
-	}
+	} /* end */
 	up->clk = ushort(v) ;
 	return 0 ;
 } /* end method (mkuu::mkuuclk) */
@@ -190,11 +190,11 @@ int mkuu::mkuunode() noex {
 	            v = rwords[rwi++] ;
 	            v &= USHORT_MAX ;
 	            nv |= (v << 32) ;
-	        }
+	        } /* end */
 	        {
 	            v = rwords[rwi++] ;
 	            nv |= v ;
-	        }
+	        } /* end */
 	        up->node = nv ;
 	    } /* end if (getnodename) */
 	    rs1 = lm_free(nbuf) ;
@@ -213,7 +213,7 @@ local ulong loadbytes(cc *nbuf,int nl) noex {
 	    v = ulong(ch) ;
 	    v <<= ((i % six) * CHAR_BIT) ;
 	    rv |= v ;
-	}
+	} /* end for */
 	return rv ;
 } /* end subroutine (loadbytes) */
 
