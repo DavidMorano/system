@@ -93,7 +93,7 @@ int mkmid(char *rbuf,int rlen,cchar *dn,cchar *nn,pid_t pid,int serial) noex {
 	                mb.dec(uv) ;
 	                mb.chr('.') ;
 	                {
-		            uv = uint(dt) ;
+		            uv = conv<uint>(dt) ;
 	                    mb.hex(uv) ;
 	                }
 	                mb.chr('.') ;
