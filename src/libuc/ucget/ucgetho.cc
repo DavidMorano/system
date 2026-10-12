@@ -91,7 +91,7 @@ using ucget::ucgeter ;			/* UCGET subgroup UC library type */
 
 /* local typedefs */
 
-typedef const void	cv ;
+typedef cvoid	cv ;
 
 
 /* external subroutines */
