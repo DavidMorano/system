@@ -119,7 +119,7 @@ int uc_writeto(int fd,cvoid *ubuf,int ulen,int to) noex {
 	        if (to >= 0) {
 	            ti_now = time(nullptr) ;
 	            ti_start = ti_now ;
-	        }
+	        } /* end if */
 	        fds[nfds].fd = fd ;
 	        fds[nfds].events = POLLOUT ;
 	        fds[nfds].revents = 0 ;
@@ -127,7 +127,7 @@ int uc_writeto(int fd,cvoid *ubuf,int ulen,int to) noex {
 	        while (rs >= 0) {
 	            if ((rs = u_poll(fds,nfds,500)) >= 0) {
 	                if (rs > 0) {
-	                    cint 	re = fds[0].revents ;
+	                    cshort	re = fds[0].revents ;
 	                    if (re & POLLHUP) {
 	                        rs = SR_HANGUP ;
 	                    } else if (re & POLLERR) {
@@ -142,7 +142,7 @@ int uc_writeto(int fd,cvoid *ubuf,int ulen,int to) noex {
 	                } /* end if (got something) */
 	            } else if (rs == SR_INTR) {
 		        rs = SR_OK ;
-	            }
+	            } /* end if */
 	            if (rs >= 0) {
 		        if (fexit) break ;
 		        if (to >= 0) {
@@ -166,9 +166,9 @@ int uc_write(int fd,cvoid *wbuf,int wlen) noex {
 int uc_writen(int fd,cvoid *abuf,int µalen) noex {
 	int		rs = SR_FAULT ;
 	int		tlen = 0 ; /* return-value */
-	if (abuf) {
+	if (abuf) ylikely {
             rs = SR_BADF ;
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 	        cchar	*abp = charp(abuf) ;
 		rs = SR_OK ;
 		if (int alen ; (alen = getlenstr(abp,µalen)) > 0) {
