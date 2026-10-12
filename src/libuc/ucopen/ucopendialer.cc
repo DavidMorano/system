@@ -6,7 +6,7 @@
 /* open a dialer */
 /* version %I% last-modified %G% */
 
-#define	CF_GETEXECNAME	1		/* use 'getexecname(3c)' */
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -104,6 +104,10 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	SVCDNAME	"lib/opendialers"
 #define	SVCSYMPREFIX	"opendialer_"
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -235,6 +239,7 @@ constexpr cpcchar	soexts[] = {
 } ; /* end array (soexts) */
 
 static vars		var ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
