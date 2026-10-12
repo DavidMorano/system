@@ -26,14 +26,14 @@
 	This subroutine opens a file-system (what does this mean?).
 
 	Synopsis:
-	int uc_openfs(passfname,oflags,timeout,opts)
-	char	passfname[] ;
+	int uc_openfs(passfn,oflags,timeout,opts)
+	char	passfn[] ;
 	int		oflags ;
 	int		timeout ;
 	int		opts ;
 
 	Arguments:
-	passfname	the pass filename
+	passfn	the pass filename
 	oflags		options to specify read-only or write-only
 	timeout		time-out
 	opts		options
@@ -45,47 +45,30 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<permx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU (DPRINT(3u)| */
 
 #include	"ucopeninfo.h"
 
+import deb ;				/* debugging */
+
 /* local defines */
-
-#define	NENVS		100
-
-#ifndef	SHMNAMELEN
-#define	SHMNAMELEN	MAXNAMELEN
-#endif
-
-#ifndef	DEBFNAME
-#define	DEBFNAME	"child.deb"
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
-#ifndef	VARPWD
-#define	VARPWD		"PWD"
-#endif
-
-#define	DEFPATH		"/usr/bin:/bin"
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* compile-time debugging */
@@ -127,34 +110,32 @@ local int	accmode(int) noex ;
 
 /* local variables */
 
+cbool		f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int uc_openfs(cchar *passfname,int oflags,int to,int opts) noex {
-	int		rs ;
-
-#if	CF_DEBUG
-	debugprintf("uc_openfs: passfname=%s\n",passfname) ;
-#endif
-
-	if (passfname == NULL) return SR_FAULT ;
-
-	if (passfname[0] == '\0') return SR_INVALID ;
-
-/* argument check */
-
-	if ((rs = accmode(oflags)) >= 0) {
-	    while ((passfname[0] == '/') && (passfname[1] == '/')) {
-	        passfname += 1 ;
-	    }
-	    if ((rs = perm(passfname,-1,-1,NULL,(W_OK))) >= 0) {
-	        rs = dialpass(passfname,to,opts) ;
-	    }
-	}
-
+int uc_openfs(cchar *passfn,int oflags,int to,int opts) noex {
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
+	DEBPRINTF("ent passfn=%s\n",passfn) ;
+	if (passfn) ylikely {
+	    rs = SR_INVALID ;
+	    if (passfn[0]) ylikely {
+	        /* argument check */
+	        if ((rs = accmode(oflags)) >= 0) {
+	            while ((passfn[0] == '/') && (passfn[1] == '/')) {
+	                passfn += 1 ;
+	            } /* end while */
+	            if ((rs = perm(passfn,-1,-1,np,(W_OK))) >= 0) {
+	                rs = dialpass(passfn,to,opts) ;
+	            } /* end if (perm) */
+	        } /* end if (accmode) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (uc_openfs) */
 
