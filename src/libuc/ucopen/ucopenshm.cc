@@ -88,7 +88,7 @@ local int	ucopenshm(cc *,int,mode_t) noex ;
 
 /* local variables */
 
-const int	onethousand = 1000 ;	/* One-Thousand */
+cint	onethousand = 1000 ;	/* One-Thousand */
 
 
 /* exported variables */
