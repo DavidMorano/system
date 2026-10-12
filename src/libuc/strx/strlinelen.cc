@@ -78,7 +78,6 @@ using std::max ;			/* subroutine-template */
 
 /* local variables */
 
-static cint		maxline = ulibval.maxline ;
 
 
 /* exported variables */
@@ -90,14 +89,16 @@ int strlinelen(cchar *sp,int sl,int mlen) noex {
 	int		len = 0 ; /* return-value */
 	if (mlen < 0) mlen = COLUMNS ;
 	if (sp && (sl != 0) && (mlen > 0)) ylikely {
-	    if (sl < 0) sl = lenstr(sp,maxline) ;
-	    len = min(sl,mlen) ;
-	    if (cchar *tp = strnchr(sp,len,'\n') ; tp) {
-	        len = intconv(tp - sp) ;
-  	        while ((len > 0) && (sp[len-1] == '\r')) {
-		    len -= 1 ;
-		}
-	    } /* end if (strnchr) */
+	    if (static cint maxline = ulibval.maxline ; maxline >= 0) {
+	         if (sl < 0) sl = lenstr(sp,maxline) ;
+	         len = min(sl,mlen) ;
+	         if (cchar *tp = strnchr(sp,len,'\n')) {
+	             len = intconv(tp - sp) ;
+  	             while ((len > 0) && (sp[len-1] == '\r')) {
+		         len -= 1 ;
+		     } /* end while */
+	         } /* end if (strnchr) */
+	    } /* end if (ulibval) */
 	} /* end if (have stuff) */
 	return len ;
 } /* end subroutine (strlinelen) */
