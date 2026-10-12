@@ -7,3 +7,55 @@ TIMEVAL
      } ;
 
 
+= addition
+
+Addition is simple.
+
+int timeval_add(mut TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
+	int		rs = SR_FAULT ;
+	if (dst && src1 && src2) ylikely {
+	    rs = SR_OK ;
+	    dst->tv_sec = src1->tv_sec + src2->tv_sec ;
+	    dst->tv_usec = src1->tv_usec + src2->tv_usec ;
+	    if (dst->tv_usec >= onemillion) {
+	        dst->tv_usec -= onemillion ;
+	        dst->tv_sec += 1 ;
+	    } /* end */
+	} /* end if (non-null) */
+	return rs ;
+
+
+= subtraction
+
+Subtraction is more complicated.  What happens to the sign bit on
+the two contained values?
+
+Normal subtraction (as advocated by the gods):
+
+int timeval_sub(mut TIMEVAL *dst,CTIMEVAL *src1,CTIMEVAL *src2) noex {
+	int		rs = SR_FAULT ;
+	if (dst && src1 && src2) ylikely {
+	    rs = SR_OK ;
+	    dst->tv_sec = src1->tv_sec - src2->tv_sec ;
+	    dst->tv_usec = src1->tv_usec - src2->tv_usec ;
+	    if (dst->tv_usec < 0) {
+	        dst->tv_usec += onemillion ;
+	        dst->tv_sec -= 1 ;
+	    } /* end */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (timeval_sub) */
+
+
+Sample exercise:
+
+Consider »  r = v1 - v2  «
+
+v1	v2	r
+--------------------------------------------------------------------------------
+-2	1	-3
+3	1	2
+-2.4	1	-1.4
+0.4	1	-0.6
+
+
