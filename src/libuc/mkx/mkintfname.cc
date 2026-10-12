@@ -92,7 +92,7 @@ int mkintfname(char *rbuf,cchar *dn,cchar *prn,cchar *inter) noex {
 		    storebuf	sb(rbuf,rs) ;
 	            if (dn && dn[0]) ylikely {
 	                rs = sb.str(dn) ;
-		    }
+		    } /* end */
 		    if (rs >= 0) ylikely {
 	                if (int i = sb.idx ; (i > 0) && (rbuf[i - 1] != '/')) {
 	                    rs = sb.chr('/') ;
