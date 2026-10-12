@@ -2,13 +2,13 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* string-copy variant */
+/* copy a counted source c-string to a destination buffer */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-10-13, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
@@ -32,6 +32,7 @@
 EXTERNC_begin
 
 extern char *strwcpyx(char *,int,...) noex ;
+extern char *strwcpy (char *,cchar *,int) noex ;
 
 extern char *strwcpy1(char *,ccp,int) noex ;
 extern char *strwcpy2(char *,ccp,ccp,int) noex ;
@@ -43,14 +44,10 @@ extern char *strwcpy6(char *,ccp,ccp,ccp,ccp,ccp,ccp,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-extern char *strwcpy(char *dp,cchar *sp,int sl = -1) noex ;
-#else /* __cplusplus */
-local inline char *strwcpy(char *dp,cchar *sp,int sl) noex {
-	return strwcpyx(dp,1,sp,sl) ;
+inline char *strwcpy(char *dp,
+		cc *s1) noex {
+	return strwcpyx(dp,1,s1,-1) ;
 } /* end subroutine */
-#endif /* __cplusplus */
-
-#ifdef	__cplusplus
 inline char *strwcpy(char *dp,
 		cc *s1,cc *s2,int sl = -1) noex {
 	return strwcpyx(dp,2,s1,s2,sl) ;
