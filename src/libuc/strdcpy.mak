@@ -114,16 +114,16 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_strd.o:	$(OBJ0_DTRDCPY)
+obj0_strd.o:		$(OBJ0_DTRDCPY)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_strd.o:	$(OBJ1_STRDCPY)
+obj1_strd.o:		$(OBJ1_STRDCPY)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_strd.o:	$(OBJ2_STRDCPY)
+obj2_strd.o:		$(OBJ2_STRDCPY)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_strd.o:	$(OBJ3_STRDCPY)
+obj3_strd.o:		$(OBJ3_STRDCPY)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
