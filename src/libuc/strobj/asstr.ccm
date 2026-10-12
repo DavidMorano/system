@@ -29,14 +29,14 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>		/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module asstr ;
 
@@ -58,7 +58,7 @@ export {
 	si_route,
 	si_comment,
 	si_overlast
-    } ;
+    } ; /* end */
     struct asstr ;
     struct asstr_co {
 	asstr		*op = nullptr ;
@@ -66,11 +66,11 @@ export {
 	void operator () (asstr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () (int = 0) noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (asstr_co) */
     struct asstr {
 	friend		asstr_co ;
@@ -98,7 +98,7 @@ export {
 	operator int () noex ;
 	destruct asstr() {
 	    if (sp) dtor() ;
-	} ;
+	} ; /* end */
     } ; /* end struct (asstr_head) */
 } /* end export */
 
