@@ -115,10 +115,10 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 	time_t		tiprev = time(nullptr) ;
 	time_t		tinow ;
 	int		rs = SR_OK ;
-	int		events = POLLEVENTS ;
 	int		pollint ;
 	int		tlen = 0 ;
-	int		f_eof = FALSE ;
+	short		events = POLLEVENTS ;
+	bool		f_eof = false ;
 
 #if	CF_DEBUG
 	char	ebuf[EBUFLEN + 1] ;
