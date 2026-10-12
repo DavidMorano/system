@@ -261,16 +261,16 @@ namespace {
 	    capend	(this,timemgrmem_capend) ;
 	    capsignal	(this,timemgrmem_capsignal) ;
 	} ; /* end ctor */
-	int cmd_create	(int,timemgr_arg *) noex ;
-	int cmd_destroy	(int,timemgr_arg *) noex ;
-	int cmd_set	(int,timemgr_arg *) noex ;
-	int cmd_get	(int,timemgr_arg *) noex ;
-	int cmd_over	(int,timemgr_arg *) noex ;
+	int cmd_create	(int,con timemgr_arg *) noex ;
+	int cmd_destroy	(int,con timemgr_arg *) noex ;
+	int cmd_set	(int,con timemgr_arg *) noex ;
+	int cmd_get	(int,con timemgr_arg *) noex ;
+	int cmd_over	(int,con timemgr_arg *) noex ;
 	int cmdtrans	(uctiment *) noex ;
-	int cmdsub	(cmdsubs,int,timemgr_arg *) noex ;
+	int cmdsub	(cmdsubs,int,con timemgr_arg *) noex ;
 	int priqins	(uctiment *) noex ;
 	int priqrem	(uctiment *) noex ;
-	int timerset	(time_t,time_t) noex ;
+	int timerset	(time_t,con ITIMERVAL &) noex ;
 	int workready	() noex ;
 	int workbegin	() noex ;
 	int workend	() noex ;
@@ -322,7 +322,9 @@ namespace {
 
 /* forward references */
 
-local void uctiment_load(uctiment *ep,con uctimnote *nop) noex ;
+local ITIMERVAL remitval(con ITIMERVAL &,time_t) noex ;
+local void	uctiment_load(uctiment *ep,con uctimnote *nop) noex ;
+local bool	isitvalpos(con ITIMERVAL &,time_t) noex ;
 
 local int	cmpqent(cvoid *,cvoid *) noex ;
 
@@ -379,7 +381,7 @@ int uc_timset(int id,mut ITIMERVAL *rtp,con ITIMERVAL *ntp) noex {
 	DEBPRINTF("ent id=%d\n",id) ;
 	if_constexpr (f_debug) {
 	    char tbuf[TIMEBUFLEN+1] ;
-	    DEBPRINTF("ntim=%s\n",strtimeval(ntp->it_value,tbuf)) ;
+	    DEBPRINTF("ntim=%s\n",strtime_val(ntp->it_value,tbuf)) ;
 	} /* end if_constexpr */
 	if (ntp) ylikely {
     	    rs = SR_INVALID ;
@@ -427,7 +429,7 @@ int timemgr_arg::operator () (cmdsubs cmd,int id) noex {
 	return timemgr_data.cmdsub(cmd,id,this) ;
 } /* end method (timemgr_arg::operator) */
 
-int timemgr::cmdsub(cmdsubs cmd,int id,timemgr_arg *uap) noex {
+int timemgr::cmdsub(cmdsubs cmd,int id,con timemgr_arg *uap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rv = 0 ;
@@ -616,7 +618,7 @@ int timemgr::pcapsignal() noex {
 	return rs ;
 } /* end method (timemgr::pcapsignal) */
 
-int timemgr::cmd_create(int,timemgr_arg *argp) noex {
+int timemgr::cmd_create(int,con timemgr_arg *argp) noex {
     	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	DEBPRINTF("ent\n") ;
@@ -642,7 +644,7 @@ int timemgr::cmd_create(int,timemgr_arg *argp) noex {
 	return rs ;
 } /* end method (timemgr::cmd_create) */
 
-int timemgr::cmd_destroy(int id,timemgr_arg *) noex {
+int timemgr::cmd_destroy(int id,con timemgr_arg *) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
@@ -676,22 +678,22 @@ int timemgr::cmd_destroy(int id,timemgr_arg *) noex {
 	return rs ;
 } /* end method (timemgr::cmd_destroy) */
 
-int timemgr::cmd_set(int id,timemgr_arg *uap) noex {
+int timemgr::cmd_set(int id,con timemgr_arg *uap) noex {
 	int		rs ;
-	if_constexpr (f_debug) {{
+	if_constexpr (f_debug) {
 	    const ITIMERVAL *ntp = uap->ntp ;
 	    char tbuf[TIMEBUFLEN+1] ;
-	    DEBPRINTF("ent val=%ld\n",strtimeval(ntp->it_value,tbuf)) ;
+	    DEBPRINTF("ent val=%ld\n",strtime_val(ntp->it_value,tbuf)) ;
 	} /* end if_constexpr */
 	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
 	    DEBPRINTF("ei=%d\n",rs) ;
 	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
 		custime dt = getustime ;
 		if (ITIMERVAL *rtp = uap->rtp) {
-		    *rtp = max((ep->val - dt),0L) ;
+		    *rtp = remitval(ep->val,dt) ;
 		} /* end if (remaining time) */
-		ep->val = uap->ntim ;	/* <- set time-value */
-		if ((ep->val - dt) > 0) {
+		ep->val = *uap->ntp ;	/* <- set time-value */
+		if (isitvalpos(ep->val,dt)) {
 	    	    DEBPRINTF("-> priqins\n") ;
 		    rs = priqins(ep) ;
 		} else {
@@ -704,7 +706,7 @@ int timemgr::cmd_set(int id,timemgr_arg *uap) noex {
 	return rs ;
 } /* end method (timemgr::cmd_set) */
 
-int timemgr::cmd_get(int id,timemgr_arg *uap) noex {
+int timemgr::cmd_get(int id,con timemgr_arg *uap) noex {
     	int		rs = SR_OK ;
 	DEBPRINTF("ent\n") ;
 	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
@@ -712,8 +714,8 @@ int timemgr::cmd_get(int id,timemgr_arg *uap) noex {
 	    if (uctiment *ep = resumelife<uctiment>(vp) ; ep) ylikely {
 		custime dt = getustime ;
 		rs = SR_OK ;
-		if (time_t *rtp = uap->rtp) {
-		    *rtp = max((ep->val - dt),0L) ;
+		if (ITIMERVAL *rtp = uap->rtp) {
+		    *rtp = remitval(ep->val,dt) ;
 		} /* end if (remaining time) */
 	    } /* end if (non-null) */
 	} /* end if (vechand_get) */
@@ -721,7 +723,7 @@ int timemgr::cmd_get(int id,timemgr_arg *uap) noex {
 	return rs ;
 } /* end method (timemgr::cmd_get) */
 
-int timemgr::cmd_over(int id,timemgr_arg *) noex {
+int timemgr::cmd_over(int id,con timemgr_arg *) noex {
     	int		rs = SR_OK ;
 	DEBPRINTF("ent\n") ;
 	if (void *vp ; (rs = ents.get(id,&vp)) >= 0) ylikely {
@@ -793,18 +795,20 @@ int timemgr::priqrem(uctiment *ep) noex {
 	return rs ;
 } /* end method (timemgr::priqrem) */
 
-int timemgr::timerset(custime dt,time_t val) noex {
+int timemgr::timerset(custime dt,con ITIMERVAL &val) noex {
     	cnullptr	np{} ;
-	custime		ival = (val - dt) ;
+	ITIMERVAL	it = val ;
 	int		rs ;
-	DEBPRINTF("ent ival=%ld\n",ival) ;
-	if (TIMEVAL tv ; (rs = timeval_load(&tv,ival,0)) >= 0) ylikely {
-	DEBPRINTF("-> itimerval_load\n") ;
-	    if (ITIMERVAL it ; (rs = itimerval_load(&it,&tv,np)) >= 0) {
-	DEBPRINTF("-> uitimer_set\n") ;
-	        rs = uitimer_set(itimid,&it,np) ;
-	    } /* end if (ITIMETVAL) */
-	} /* end if (TIMEVVAL) */
+	DEBPRINTF("ent\n") ;
+	if_constexpr (f_debug) {
+	    char tbuf[TIMEBUFLEN+1] ;
+	    DEBPRINTF("val=%s\n",strtime_val(val.it_value,tbuf)) ;
+	} /* end if_constexpr */
+	{
+	    it.it_value.tv_sec -= dt ;
+	    DEBPRINTF("-> uitimer_set\n") ;
+	    rs = uitimer_set(itimid,&it,np) ;
+	}
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method (timemgr::timerset) */
@@ -1437,6 +1441,16 @@ int uctimnote::load (void *op,psem *psp,uctim_f fp,int a) noex {
 	return rs ;
 } /* end method (uctimnote::load) */
 
+local ITIMERVAL remitval(con ITIMERVAL &itv,time_t dt) noex {
+    	ITIMERVAL	res = itv ;
+	res.it_value.tv_sec -= dt ;
+	if (res.it_value.tv_sec < 0L) {
+	    res.it_value.tv_sec = 0L ;
+	    res.it_value.tv_usec = 0 ;
+	}
+	return res ;
+} /* end subroutine (remitval) */
+
 local void uctiment_load(uctiment *ep,con uctimnote *nop) noex {
     	ep->val = {} ;
 	ep->id = 0 ;
@@ -1447,7 +1461,11 @@ local void uctiment_load(uctiment *ep,con uctimnote *nop) noex {
 } /* end subroutine (uctimeent_load) */
 
 local int cmpuctiment(con uctiment *e1p,con uctiment *e2p) noex {
-    	return saturate<int>(e1p->val - e2p->val) ;
+	int rc = 0 ;
+	if (auto ordval = (e1p->val <=> e2p->val) ; ordval == 0) {
+	    rc = (ordval > 0) ? +1 : -1 ;
+	}
+	return rc ;
 } /* end subroutine (cmpuctiment) */
 
 local int cmpqent(cvoid *v1p,cvoid *v2p) noex {
@@ -1465,5 +1483,9 @@ local int cmpqent(cvoid *v1p,cvoid *v2p) noex {
 	} /* end if */
 	return rc ;
 } /* end subroutine (cmpqent) */
+
+local bool isitvalpos(con ITIMERVAL &itv,time_t dt) noex {
+	return (itv.it_value.tv_sec > dt) ;
+} /* end subroutine (isitvalpos) */
 
 
