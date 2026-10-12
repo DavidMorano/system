@@ -13,7 +13,7 @@
 
 	= 2023-12-20, David A­D­ Morano
 	Everyone (!) has |strnstr(3c)| now.  After all of these
-	years, the world has caugþt up with me.  I must have actually
+	years, the world has caught up with me.  I must have actually
 	written this subroutine back in the 1980s or so when
 	|strnstr(3c)| did not yet exist.  So I am adding a checkable
 	option (see above in this file) to use the UNIX® C-lang
@@ -140,7 +140,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 		} /* end if (syshas.strnstr) */
 	    } else {
 	        rp = strstr(sp,ss) ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return rp ;
 } /* end subroutine (strnbasesub) */
