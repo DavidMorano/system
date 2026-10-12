@@ -24,7 +24,7 @@
 	Description:
 	This is essentially the same as the |snwcpy(3uc)| subroutine
 	except that non-printable characters are replaced with a
-	stuff-mark character.  Actually, this is identical to
+	stuff-mark character.  Actually, this is almost identical to
 	the |snwcpyclean(3uc)| subroutine.
 
 	Synopsis:
