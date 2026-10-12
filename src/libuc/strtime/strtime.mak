@@ -1,6 +1,6 @@
-# MAKEFILE (strtime)
+# MAKEFILE (timestr)
 
-T= strtime
+T= timestr
 
 ALL= $(T).o
 
@@ -17,7 +17,7 @@ RUNDIR		?= $(CGS_RUNDIR)
 
 CPP		?= cpp
 CC		?= gcc
-CXX		?= gpp
+CXX		?= gxx
 LD		?= gld
 RANLIB		?= granlib
 AR		?= gar
@@ -33,31 +33,23 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += strtime.h
+INCS += timestr.h
 
 MODS +=
 
 LIBS +=
 
 
-OBJ0= strtimeval.o
-OBJ1=
-OBJ2=
-OBJ3=
+OBJ0_TIMESTR= strtime_date.o strtime_elapsed.o
+OBJ1_TIMESTR= strtime_nist.o strtime_scandate.o
 
-OBJ4=
-OBJ5=
-OBJ6=
-OBJ7=
+OBJA_TIMESTR= obj0_timestr.o obj1_timestr.o
 
-OBJA= obj0.o
-OBJB= obj4.o obj5.o
-
-OBJ= $(OBJA)
+OBJ_TIMESTR= $(OBJA_TIMESTR)
 
 
-INCDIRS +=
-LIBDIRS += -L lib
+INCDIRS=
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -103,14 +95,14 @@ all:			$(ALL)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			$(OBJ)
-	$(LD) -r $(LDFLAGS) -o $@ $^
+$(T).o:			$(OBJ_TIMESTR)
+	$(LD) $(LDFLAGS) -r -o $@ $^
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
 
 again:
-	$(RM) $(ALL)
+	rm -f $(ALL)
 
 clean:
 	makeclean $(ALL)
@@ -119,38 +111,22 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0.o:			$(OBJ0)
+obj0_timestr.o:		$(OBJ0_TIMESTR)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1.o:			$(OBJ1)
+obj1_timestr.o:		$(OBJ1_TIMESTR)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2.o:			$(OBJ2)
+obj2_timestr.o:		$(OBJ2_TIMESTR)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3.o:			$(OBJ3)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj4.o:			$(OBJ4)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj5.o:			$(OBJ5)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj6.o:			$(OBJ6)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-obj7.o:			$(OBJ7)
+obj3_timestr.o:		$(OBJ3_TIMESTR)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-obja.o:			$(OBJA)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-objb.o:			$(OBJB)
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
-
-strtimeval.o:		strtimeval.cc	strtimeval.h		$(INCS)
+strtime_date.o:		strtime_date.cc		$(INCS)
+strtime_elapsed.o:	strtime_elapsed.cc	$(INCS)
+strtime_nist.o:		strtime_nist.cc		$(INCS)
+strtime_scandate.o:	strtime_scandate.cc	$(INCS)
 
 
