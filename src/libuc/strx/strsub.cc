@@ -35,6 +35,13 @@
 	-	pointer to found substring
 	NULL	substring was not found
 
+	Notes:
+	1. Note that the standard C-language library subroutine
+	|strcasestr(3c)| is not a suitable canidate for the
+	implementation the subroutine (below) |strcasesub(3uc)|.
+	That is because the standard C-library version does not do
+	case conversion for the Latin-1 characters.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
