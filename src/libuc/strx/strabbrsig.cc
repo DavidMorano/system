@@ -21,7 +21,7 @@
 	strabbrsig
 
 	Description:
-        We take a signal number and we return a corresponding signal
+        I take a signal number and we return a corresponding signal
         abbreviation string.
 
 	Synopsis:
@@ -74,7 +74,7 @@
 
 struct sigabbr {
 	int		n ;
-	cchar		*s ;
+	ccharp		s ;
 } ; /* end struct */
 
 
@@ -84,48 +84,48 @@ struct sigabbr {
 /* local variables */
 
 constexpr sigabbr	cvts[] = {
-	{ 0,		"TEST" },
-	{ SIGHUP,	"HUP" },
-	{ SIGINT,	"INT" },
-	{ SIGQUIT,	"QUIT" },
-	{ SIGILL,	"ILL" },
-	{ SIGTRAP,	"TRAP" }, /* 5 */
-	{ SIGABRT,	"ABRT" },
-	{ SIGEMT,	"EMT" },
-	{ SIGFPE,	"FPE" },
-	{ SIGKILL,	"KILL" },
-	{ SIGBUS,	"BUS" }, /* 10 */
-	{ SIGSEGV,	"SEGV" },
-	{ SIGSYS,	"SYS" },
-	{ SIGPIPE,	"PIPE" },
-	{ SIGALRM,	"ALRM" },
-	{ SIGTERM,	"TERM" }, /* 15 */
-	{ SIGUSR1,	"USR1" },
-	{ SIGUSR2,	"USR2" },
-	{ SIGCLD,	"CLD" },
-	{ SIGCHLD,	"CHLD" },
-	{ SIGPWR,	"PWR" }, /* 20 */
-	{ SIGWINCH,	"WINCH" },
-	{ SIGURG,	"URG" },
-	{ SIGPOLL,	"POLL" },
-	{ SIGSTOP,	"STOP" },
-	{ SIGTSTP,	"TSTP" }, /* 25 */
-	{ SIGCONT,	"CONT" },
-	{ SIGTTIN,	"TTIN" },
-	{ SIGTTOU,	"TTOU" },
-	{ SIGVTALRM,	"VTALRM" },
-	{ SIGPROF,	"PROF" }, /* 30 */
-	{ SIGXCPU,	"XCPU" },
-	{ SIGXFSZ,	"XFSZ" },
-	{ SIGWAITING,	"WAITING" },
-	{ SIGLWP,	"LWP" },
-	{ SIGFREEZE,	"FREEZE" },
-	{ SIGTHAW,	"THAW" },
-	{ SIGCANCEL,	"CANCEL" },
-	{ SIGLOST,	"LOST" },
-	{ SIGRTMIN,	"RTMIN" },
-	{ SIGRTMAX,	"RTMAX" },
-	{ -1, nullptr }
+	{ 0,		"TEST"		},
+	{ SIGHUP,	"HUP"		},
+	{ SIGINT,	"INT"		},
+	{ SIGQUIT,	"QUIT"		},
+	{ SIGILL,	"ILL"		},
+	{ SIGTRAP,	"TRAP"		}, /* 5 */
+	{ SIGABRT,	"ABRT"		},
+	{ SIGEMT,	"EMT"		},
+	{ SIGFPE,	"FPE"		},
+	{ SIGKILL,	"KILL"		},
+	{ SIGBUS,	"BUS"		}, /* 10 */
+	{ SIGSEGV,	"SEGV"		},
+	{ SIGSYS,	"SYS"		},
+	{ SIGPIPE,	"PIPE"		},
+	{ SIGALRM,	"ALRM"		},
+	{ SIGTERM,	"TERM"		}, /* 15 */
+	{ SIGUSR1,	"USR1"		},
+	{ SIGUSR2,	"USR2"		},
+	{ SIGCLD,	"CLD"		},
+	{ SIGCHLD,	"CHLD"		},
+	{ SIGPWR,	"PWR"		}, /* 20 */
+	{ SIGWINCH,	"WINCH"		},
+	{ SIGURG,	"URG"		},
+	{ SIGPOLL,	"POLL"		},
+	{ SIGSTOP,	"STOP"		},
+	{ SIGTSTP,	"TSTP"		}, /* 25 */
+	{ SIGCONT,	"CONT"		},
+	{ SIGTTIN,	"TTIN"		},
+	{ SIGTTOU,	"TTOU"		},
+	{ SIGVTALRM,	"VTALRM"	},
+	{ SIGPROF,	"PROF"		}, /* 30 */
+	{ SIGXCPU,	"XCPU"		},
+	{ SIGXFSZ,	"XFSZ"		},
+	{ SIGWAITING,	"WAITING"	},
+	{ SIGLWP,	"LWP"		},
+	{ SIGFREEZE,	"FREEZE"	},
+	{ SIGTHAW,	"THAW"		},
+	{ SIGCANCEL,	"CANCEL"	},
+	{ SIGLOST,	"LOST"		},
+	{ SIGRTMIN,	"RTMIN"		},
+	{ SIGRTMAX,	"RTMAX"		},
+	{ -1,		nullptr		}
 } ; /* end array (cvts) */
 
 cbool		f_sigrt		= F_SIGRT ;
@@ -136,7 +136,7 @@ cbool		f_sigrt		= F_SIGRT ;
 
 /* exported subroutines */
 
-const char *strabbrsig(int n) noex {
+cchar *strabbrsig(int n) noex {
 	cchar		*s = nullptr ;
 	if_constexpr (f_sigrt) {
 	    if ((n >= SIGRTMIN) && (n <= SIGRTMAX)) {
@@ -149,7 +149,7 @@ const char *strabbrsig(int n) noex {
 		s = rp ;
 	    } else {
 	        s = "*UNK*" ;
-	    }
+	    } /* end */
 	} /* end if */
 	return s ;
 } /* end subroutine (strabbrsig) */
