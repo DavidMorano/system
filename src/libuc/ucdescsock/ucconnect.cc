@@ -108,7 +108,7 @@ const bool	f_bad = F_BAD ;
 
 /* exported subroutines */
 
-int uc_connecte(int fd,const void *vsap,int sal,int to) noex {
+int uc_connecte(int fd,cvoid *vsap,int sal,int to) noex {
 	SOCKADDR	*sap = (SOCKADDR *) vsap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -129,7 +129,7 @@ int uc_connecte(int fd,const void *vsap,int sal,int to) noex {
 	return rs ;
 } /* end subroutine (uc_connecte) */
 
-int uc_connect(int fd,const void *vsap,int sal) noex {
+int uc_connect(int fd,cvoid *vsap,int sal) noex {
     	return uc_connecte(fd,vsap,sal,-1) ;
 } /* end subroutine (uc_connect) */
 
@@ -151,7 +151,7 @@ local int connwait(int fd,SOCKADDR *sap,int sal,int to) noex {
 	nfds += 1 ;
 	while ((rs >= 0) && (ti_now < ti_end)) {
 	    if ((rs = u_poll(fds,nfds,POLLTIMEOUT)) > 0) {
-	        cint	re = fds[0].revents ;
+	        cshort	re = fds[0].revents ;
 	        if (re & POLLOUT) {
 		    if_constexpr (f_bad) {
 	                if ((rs = u_connect(fd,sap,sal)) >= 0) {
@@ -174,17 +174,17 @@ local int connwait(int fd,SOCKADDR *sap,int sal,int to) noex {
 	            rs = SR_POLLERR ;
 	        } else if (re & POLLNVAL) {
 	            rs = SR_NOTOPEN ;
-		}
+		} /* end if */
 	    } else {
 	        if (rs == SR_INTR) rs = SR_OK ;
-	    }
+	    } /* end if */
 	    if (f_done) break ;
 	    ti_now = time(nullptr) ;
 	    if (rs < 0) break ;
 	} /* end while (loop timeout) */
 	if ((rs >= 0) && (ti_now >= ti_end)) {
 	    rs = SR_TIMEDOUT ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (connwait) */
 
