@@ -26,7 +26,7 @@
 
 	int process(pip,keyname)
 	struct proginfo	*pip ;
-	const char	keyname[] ;
+	cchar	keyname[] ;
 
 
 	Arguments:
@@ -90,7 +90,7 @@
 
 int process(pip,keyname)
 struct proginfo	*pip ;
-const char	keyname[] ;
+cchar	keyname[] ;
 {
 	int	rs ;
 	int	buflen ;
