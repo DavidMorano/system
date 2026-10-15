@@ -81,29 +81,29 @@ int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	            if (sl < 0) {
 	                while (*sp) {
 	                    *bp++ = *sp++ ;
-		        }
+		        } /* end while */
 	            } else {
 	                while (sl && *sp) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
-	                }
+	                } /* end while */
 	            } /* end if */
 	        } else {
 	            if (sl < 0) {
 	                while ((bp < (rbuf + rlen)) && *sp) {
 	                    *bp++ = *sp++ ;
-		        }
+		        } /* end while */
 		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
 		            rs = SR_OVERFLOW ;
-		        }
+		        } /* end if (error) */
 	            } else {
 	                while ((bp < (rbuf + rlen)) && sl && *sp) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
-	                }
+	                } /* end while */
 		        if ((bp == (rbuf + rlen)) && sl) {
 		            rs = SR_OVERFLOW ;
-		        }
+		        } /* end if (error) */
 	            } /* end if */
 	        } /* end if */
 	        *bp = '\0' ;
