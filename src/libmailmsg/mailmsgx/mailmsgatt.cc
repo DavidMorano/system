@@ -33,12 +33,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecitem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecitem.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsgatt.h"
 
@@ -114,7 +114,7 @@ int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *sp,int sl) noex {
 	        rs = vecitem_add(op,&ve,esz) ;
 	        if (rs < 0) {
 	            mailmsgattent_finish(&ve) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
