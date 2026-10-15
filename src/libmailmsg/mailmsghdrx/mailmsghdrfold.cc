@@ -60,19 +60,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* |UINT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ascii.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<ncol.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<isch.h>
+#include	<climits>		/* CSTD |UINT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<ncol.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"mailmsghdrfold.h"
@@ -157,10 +156,10 @@ int mailmsghdrfold_start(MF *op,int mcols,int ln,cchar *sp,int sl) noex {
 	        while (sl && isskip(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	        while (sl && isskip(sp[sl-1])) {
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	        op->sp = sp ;
 	        op->sl = sl ;
 	        op->magval = MAILMSGHDRFOLD_MAGIC ;
@@ -273,7 +272,7 @@ local int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
 	    while (sl && isskip(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    *rpp = sp ;
 	    while ((pl = nextbreak(nc,bch,sp,sl,&ncs)) > 0) {
 	        if ((nc + ncs) > mcols) {
@@ -288,7 +287,7 @@ local int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
 	        while (sl && isskip(sp[0])) {
 	            sp += 1 ;
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	        op->sp = sp ;
 	        op->sl = sl ;
 	    } /* end if */
@@ -310,7 +309,7 @@ local int findslices(MF *op,int ncol,cchar **rpp) noex {
 	    while (sl && isskip(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    *rpp = sp ;
 	    while (sl && sp[0] && (nc < mcols)) {
 	        if (sp[0] == CH_DQUOTE) {
@@ -334,7 +333,7 @@ local int findslices(MF *op,int ncol,cchar **rpp) noex {
 	    while (sl && isskip(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	    if (ll > 0) {
 	        op->sp = sp ;
 	        op->sl = sl ;
@@ -364,7 +363,7 @@ local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	int		pl = 0 ;
 	cchar		*cp = sp ;
 	/* skip over whitespace */
-	while (cl && CHAR_ISWHITE(cp[0])) {
+	while (cl && ischwht(cp[0])) {
 	    n = ncolchar(ntab,ncol,cp[0]) ;
 	    cp += 1 ;
 	    cl -= 1 ;
@@ -372,7 +371,7 @@ local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	    ncol += n ;
 	} /* end while */
 	/* skip over the non-whitespace */
-	while (cl && cp[0] && (! CHAR_ISWHITE(cp[0]))) {
+	while (cl && cp[0] && (! ischwht(cp[0]))) {
 	    if (cp[0] == CH_DQUOTE) {
 	        cp += 1 ;
 	        cl -= 1 ;
@@ -381,7 +380,7 @@ local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	        n = 0 ;
 	        if ((si = sidquote(cp,cl)) > 0) {
 	            n = ncolstr(ntab,ncol,cp,cl) ;
-	        }
+	        } /* end if */
 	    } else {
 	        si = 1 ;
 	        n = ncolchar(ntab,ncol,cp[0]) ;
@@ -407,7 +406,7 @@ local int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 	cchar		*cp = sp ;
 	*ncp = 0 ;
 	/* skip over whitespace */
-	while (cl && CHAR_ISWHITE(cp[0])) {
+	while (cl && ischwht(cp[0])) {
 	    n = ncolchar(ntab,ncol,cp[0]) ;
 	    cp += 1 ;
 	    cl -= 1 ;
@@ -458,7 +457,7 @@ local cchar *strnbreak(cchar *sp,int sl,int bch) noex {
 } /* end subroutine (strnbreak) */
 
 local bool isskip(int ch) noex {
-	return (CHAR_ISWHITE(ch) || iseol(ch)) ;
+	return (ischwht(ch) || ischeol(ch)) ;
 } /* end subrouine (isskip) */
 
 
