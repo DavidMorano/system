@@ -20,15 +20,12 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<vecitem.h>
-#include	<mimetypes.h>
-#include	<contentencodings.h>
-#include	<mailmsgattent.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecitem.h>		/* LIBUC */
+#include	<mimetypes.h>		/* LIBMAILMSG */
+#include	<contentencodings.h>	/* LIBMAILMSG */
+#include	<mailmsgattent.h>	/* LIBMAILMSG */
 
 
 #define	MAILMSGATT	vecitem
