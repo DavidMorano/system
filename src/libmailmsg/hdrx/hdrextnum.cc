@@ -43,18 +43,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<sbuf.h>
-#include	<ascii.h>
-#include	<six.h>			/* |sibrk(3uc)| */
-#include	<cfdec.h>
-#include	<char.h>
-#include	<mkchar.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC |sibrk(3uc)| */
+#include	<cfdec.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"hdrextnum.h"
@@ -105,9 +105,9 @@ int hdrextnum(cchar *sp,int sl) noex {
 	        int	len = rs ;
 	        if (int si ; (si = sibrk(digbuf,len," \t")) >= 0) {
 		    len = si ;
-	        }
+	        } /* end */
 	        rs = cfdeci(digbuf,len,&v) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? v : rs ;
 } /* end subroutine (hdrextnum) */
@@ -123,7 +123,7 @@ local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
-	}
+	} /* end while */
 	/* initialize for this entry */
 	if (sbuf b ; (rs = b.start(digbuf,digbuflen)) >= 0) {
 	    int		c_comment = 0 ;
@@ -145,8 +145,8 @@ local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                    } else {
 	                        sp += 1 ;
 	                        sl -= 1 ;
-	                    }
-	                }
+	                    } /* end if */
+	                } /* end if */
 	            } else {
 	                if (c_comment == 0) {
 	                    b.chr(*sp++) ;
@@ -154,7 +154,7 @@ local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                } else {
 	                    sp += 1 ;
 	                    sl -= 1 ;
-	                }
+	                } /* end if */
 	            } /* end if */
 	            break ;
 	        case CH_DQUOTE:
@@ -174,7 +174,7 @@ local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                } else {
 	                    sp += 1 ;
 	                    sl -= 1 ;
-	                }
+	                } /* end if */
 	            } /* end if */
 	            break ;
 	        case CH_RPAREN:
@@ -191,7 +191,7 @@ local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	                } else {
 	                    sp += 1 ;
 	                    sl -= 1 ;
-	                }
+	                } /* end if */
 	            } /* end if */
 	            break ;
 	        case CH_COMMA:
@@ -210,7 +210,7 @@ local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	            } else {
 	                sp += 1 ;
 	                sl -= 1 ;
-	            }
+	            } /* end if */
 	            f_wsnew = true ;
 	            break ;
 	        default:
@@ -220,7 +220,7 @@ local int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
 	            } else {
 	                sp += 1 ;
 	                sl -= 1 ;
-	            }
+	            } /* end if */
 	            break ;
 	        } /* end switch */
 	        f_wslast = f_wsnew ;
