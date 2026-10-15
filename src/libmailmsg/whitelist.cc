@@ -144,11 +144,11 @@ int whitelist_open(whitelist *op,cchar *fname) noex {
 	        if (rs < 0) {
 	            vecstr_finish(op->wlp) ;
 	            op->magval = 0 ;
-	        }
+	        } /* end if (error) */
 	    }
 	    if (rs < 0) {
 		whitelist_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (whitelist_ctor) */
 	return rs ;
 } /* end subroutine (whitelist_open) */
