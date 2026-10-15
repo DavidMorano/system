@@ -1,4 +1,4 @@
-/* strbcpyxw SUPPORT */
+/* strbcpyxw SUPPORT (String-Buffer-Copy) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -52,7 +52,7 @@
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
-	new standard, it might gets optimized for speed (like
+	new standard, it might get optimized for speed (like
 	writting in hand-coded assembly language).  So that is
 	pretty much the only reason I would use that interface
 	(which I do not like). 
@@ -142,7 +142,7 @@ local char *strbcpyxw_pos(char *dp,int dl,int n,va_list ap) noex {
 	    fbad = ((dl == 0) && *sp) ;
 	    if (fbad) break ;
 	} /* end for */
-	if ((! fbad) && (n > 0)) {
+	if ((! fbad) && (n > 0)) ylikely {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    int	sl = (int)	va_arg(ap,int) ;
 	    while ((dl > 0) && hasgot(sp,sl)) {
@@ -162,7 +162,7 @@ local char *strbcpyxw_neg(char *dp,int,int n,va_list ap) noex {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    dp = stpcpy(dp,sp) ;
 	} /* end for */
-	if (n > 0) {
+	if (n > 0) ylikely {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    int	sl = (int)	va_arg(ap,int) ;
 	    while (hasgot(sp,sl)) {
