@@ -113,7 +113,6 @@ import mailmsg_mag ;
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -162,13 +161,14 @@ template<typename ... Args>
 local int mailmsg_ctor(mailmsg *op,Args ... args) noex {
     	MAILMSG		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->slp = new(nothrow) strpack) != np) ylikely {
-	        if ((op->elp = new(nothrow) vecobj) != np) ylikely {
-	            if ((op->hlp = new(nothrow) vecobj) != np) ylikely {
+	    if ((op->slp = new(nt) strpack) != np) ylikely {
+	        if ((op->elp = new(nt) vecobj) != np) ylikely {
+	            if ((op->hlp = new(nt) vecobj) != np) ylikely {
 			rs = SR_OK ;
 		    } /* end if (new-vecobj) */
 		    if (rs < 0) {
