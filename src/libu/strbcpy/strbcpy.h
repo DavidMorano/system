@@ -1,4 +1,4 @@
-/* strbcpy HEADER */
+/* strbcpy HEADER (String-Buffer-Copy) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
