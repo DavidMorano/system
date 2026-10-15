@@ -75,7 +75,7 @@
 int process(pip,ofp,lockfname,timeout,to_remove)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	lockfname[] ;
+cchar	lockfname[] ;
 int		timeout, to_remove ;
 {
 	ustat	sb ;
