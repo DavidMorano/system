@@ -36,19 +36,19 @@
 #include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<baops.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<mailmsgmatenv.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"systems.h"
 #include	"dialer.h"
 #include	"cm.h"
-
 
 
 /* local defines */
@@ -58,12 +58,9 @@
 #endif
 
 
-
 /* external subroutines */
 
-extern int	bufprintf(char *,int,const char *,...) ;
-
-extern char	*timestr_edate(time_t,char *) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 
 /* external variables */
@@ -78,8 +75,10 @@ extern char	*timestr_edate(time_t,char *) ;
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int procflow(pip,conp,ifp,sip)
 struct proginfo	*pip ;
@@ -88,7 +87,7 @@ bfile		*ifp ;
 int		*sip ;
 {
 	MSGMATENV	ei ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		elen ;
@@ -128,7 +127,7 @@ int		*sip ;
 	            rs = bufprintf(envbuf,ENVBUFLEN,
 	                "From %s %s remote from %s\n",
 	                pip->username,
-	                timestr_edate(pip->daytime,timebuf),
+	                strtime_edate(pip->daytime,timebuf),
 	                pip->domainname) ;
 
 	            elen = rs ;
