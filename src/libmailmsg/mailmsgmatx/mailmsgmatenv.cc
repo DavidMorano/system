@@ -138,12 +138,12 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 	    bool	f_start = true ;
 	    rs = memclear(hop) ; /* dangerous */
 	    if (sl < 0) sl = lenstr(sp) ;
-	    while (sl && iseol(sp[sl-1])) sl -= 1 ;
+	    while (sl && ischeol(sp[sl-1])) sl -= 1 ;
 	    if ((sl > 0) && (*sp == '>')) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	        f_start = false ;
-	    }
+	    } /* end if */
 	    if ((sl > 5) && (sp[0] == 'F')) {
 	        int	si = 5 ;
 	        if (strncmp("From ",sp,si) == 0) {
