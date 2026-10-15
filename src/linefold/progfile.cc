@@ -79,7 +79,7 @@
 #include	<tabcols.h>
 #include	<intceil.h>
 #include	<char.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
@@ -132,8 +132,8 @@ struct linedesc {
 
 /* forward references */
 
-static int	procline(PROGINFO *,struct procoptions *,bfile *,LINEDESC *) ;
-static int	nexttoken(const char *,int,const char **) ;
+local int	procline(PROGINFO *,struct procoptions *,bfile *,LINEDESC *) ;
+local int	nexttoken(cchar *,int,cchar **) ;
 
 
 /* local variables */
@@ -148,12 +148,12 @@ int progfile(proginfo *pip,procoptions opts,cc *fname) noex {
 	LINEDESC	ld ;
 	bfile		infile, *ifp = &infile ;
 	bfile		tmpfile, *ofp = &tmpfile ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs, rs1 ;
 	int		len, lo ;
 	int		rlen ;
 	int		wlen = 0 ;
-	const char	*oflags ;
+	cchar	*oflags ;
 	char		template[MAXPATHLEN + 1] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		lbuf[LINEBUFLEN + 1] ;
@@ -344,7 +344,7 @@ ret0:
 /* local subroutines */
 
 
-static int procline(pip,optp,ofp,ldp)
+local int procline(pip,optp,ofp,ldp)
 PROGINFO	*pip ;
 struct procoptions	*optp ;
 bfile		*ofp ;
@@ -361,8 +361,8 @@ LINEDESC	*ldp ;
 	int		f_whitechar ;
 	int		f_eol = FALSE ;
 	int		f ;
-	const char	*lp ;
-	const char	*cp ;
+	cchar	*lp ;
+	cchar	*cp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -598,7 +598,7 @@ LINEDESC	*ldp ;
 /* end subroutine (procline) */
 
 
-static int nexttoken(cchar sp[],int sl,cchar **rpp)
+local int nexttoken(cchar sp[],int sl,cchar **rpp)
 {
 	int	rl = 0 ;
 	*rpp = sp ;
