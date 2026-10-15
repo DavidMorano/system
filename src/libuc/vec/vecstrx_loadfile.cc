@@ -78,7 +78,7 @@
 
 #pragma		GCC dependency		"mod/ulibvals.ccm"
 
-import ulibvals ;			/* *nothing-right-now* */
+import ulibvals ;
 
 /* local defines */
 
@@ -108,7 +108,7 @@ using libuc::libmem ;			/* variable */
 
 namespace {
     struct vars {
-        int	linebuflen ;
+        int	linebuflen ; /* <- currently unused */
 	operator int () noex ;
     } ; /* end struct (vars) */
 } /* end namespace */
@@ -125,9 +125,6 @@ local int	mkterms() noex ;
 /* local variables */
 
 static char		fterms[fieldterms_termsize] ;
-
-static int		maxline = ulibval.maxline ;
-
 static vars		var ;
 
 
@@ -142,14 +139,10 @@ int vecstrx::loadfile(int fu,cchar *fname) noex {
 	if (fname) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
-	        static cint	rst = mkterms() ;
-	        if ((rs = rst) >= 0) ylikely {
-	            static cint		rsv = var ;
-	            if ((rs = rsv) >= 0) ylikely {
-			rs = vecstrx_loadfiler(this,fu,fname) ;
-			c = rs ;
-		    } /* end if (mkvars) */
-		} /* end if (mkterms) */
+	        if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+		    rs = vecstrx_loadfiler(this,fu,fname) ;
+		    c = rs ;
+	        } /* end if (mkvars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -190,19 +183,19 @@ local int vecstrx_loadfd(vecstrx *vsp,int fu,int fd) noex {
 	    csize	fsz = size_t(sb.st_size) ;
 	    rs = SR_ISDIR ;
 	    if (! S_ISDIR(sb.st_mode)) {
-		cint	llen = var.linebuflen ;
 	        cint	fs = ((fsz == 0) ? 1 : int(fsz & INT_MAX)) ;
 		int	to = -1 ;
 	        int	fbsz = DEFBUFLEN ;
 	        int	fbo = 0 ;
 	        if (S_ISREG(sb.st_mode)) {
-	            cint	cs = BCEIL(fs,512) ;
+	            cint cs = BCEIL(fs,512) ;
 	            fbsz = min(cs,1024) ;
 	        } else {
 	            to = TO_READ ;
 	            if (S_ISSOCK(sb.st_mode)) fbo |= FILER_ONET ;
-	        }
-	        if (char *lbuf ; (rs = libmem.mall((llen+1),&lbuf)) >= 0) {
+	        } /* end if */
+	        if (char *lbuf ; (rs = libmem.ml(&lbuf)) >= 0) {
+		    cint llen = rs ;
 		    if (filer lf ; (rs = lf.start(fd,0z,fbsz,fbo)) >= 0) {
 	                while ((rs = lf.readln(lbuf,llen,to)) > 0) {
 			    rs = vecstrx_loadline(vsp,fu,lbuf,rs) ;
@@ -251,9 +244,10 @@ local int mkterms() noex {
 
 vars::operator int () noex {
         int             rs ;
-        if ((rs = maxline) >= 0) ylikely {
-            var.linebuflen = (rs * LINEBUFMULT) ;
-        }
+	if ((rs = ulibval.maxline) >= 0) ylikely {
+            linebuflen = (rs * LINEBUFMULT) ; /* <- currently unused */
+	    rs = mkterms() ;
+        } /* end */
         return rs ;
 } /* end subroutine (vars::operator) */
 
