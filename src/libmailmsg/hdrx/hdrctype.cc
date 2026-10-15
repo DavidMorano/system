@@ -28,16 +28,16 @@
 ****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<estrings.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<estrings.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdrctype.h"
 
@@ -87,13 +87,13 @@ int hdrctype_decode(hdrctype *op,cchar *hp,int µhl) noex {
 	        if ((cl = sfshrink(sp,sl,&cp)) > 0) {
 		    op->sub.tp = cp ;
 		    op->sub.tl = cl ;
-	        }
+	        } /* end if (sfshrink) */
 	        hl = intconv(tp - hp) ;
 	    } /* end if (strnchr) */
 	    if ((cl = sfshrink(hp,hl,&cp)) > 0) {
 	        op->main.tp = cp ;
 	        op->main.tl = cl ;
-	    }
+	    } /* end if (sfshrink) */
 	} /* end if (getlenstr) */
 	return rs ;
 } /* end subroutine (hdrctype_decode) */
