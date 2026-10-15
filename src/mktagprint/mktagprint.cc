@@ -23,9 +23,9 @@
 	int mktagprint(pip,aip,basedname,outfmt,outfname)
 	struct proginfo	*pip ;
 	struct arginfo	*aip ;
-	const char	basedname[] ;
-	const char	outfmt[] ;
-	const char	outfname[] ;
+	cchar	basedname[] ;
+	cchar	outfmt[] ;
+	cchar	outfname[] ;
 
 	Arguments:
 	- pip		program information pointer
@@ -71,8 +71,8 @@
 
 /* forward references */
 
-static int	proctagfile(struct proginfo *,const char *,BIBLEBOOK *,
-			int, bfile *, const char *) ;
+local int	proctagfile(struct proginfo *,cchar *,BIBLEBOOK *,
+			int, bfile *, cchar *) ;
 
 
 /* local variables */
@@ -83,9 +83,9 @@ static int	proctagfile(struct proginfo *,const char *,BIBLEBOOK *,
 int mktagprint(pip,aip,basedname,outfmt,outfname)
 struct proginfo	*pip ;
 struct arginfo	*aip ;
-const char	basedname[] ;
-const char	outfmt[] ;
-const char	outfname[] ;
+cchar	basedname[] ;
+cchar	outfmt[] ;
+cchar	outfname[] ;
 {
 	BIBLEBOOK	bb ;
 
@@ -270,13 +270,13 @@ ret0:
 /* local subroutines */
 
 
-static int proctagfile(pip,basedname,bbp,ofi,ofp,tagfname)
+local int proctagfile(pip,basedname,bbp,ofi,ofp,tagfname)
 struct proginfo	*pip ;
-const char	basedname[] ;
+cchar	basedname[] ;
 BIBLEBOOK	*bbp ;
 int		ofi ;
 bfile		*ofp ;
-const char	tagfname[] ;
+cchar	tagfname[] ;
 {
 	bfile	tagfile, *tfp = &tagfile ;
 
