@@ -46,8 +46,8 @@ struct cm_arguments {
 	cchar		*domainname ;
 	cchar		*hostname ;
 	cchar		*username ;
-	systems		*sp ;
-	sysdialer	*dp ;
+	systems		*sysp ;
+	sysdialer	*dialp ;
 	int		timeout ;	/* connection timeout */
 	int		options ;
 } ; /* end struct (cm_arguments) */
@@ -62,7 +62,7 @@ struct cm_head {
 	void		*addr ;		/* remote address */
 	void		*dobj ;		/* individual sysdialer object */
 	void		*callp ;
-	CM_ARGS		*ap ;
+	CM_ARGS		*argp ;
 	uint		magval ;
 	int		dsz ;		/* individual sysdialer object size */
 	int		dflags ;	/* sysdialer flags */
@@ -77,7 +77,7 @@ typedef	CM_INFO		cm_info ;
 
 EXTERNC_begin
 
-extern int cm_open(cm *,cm_args *,cchar *,cchar *,mainv) noex ;
+extern int cm_open(cm *,cm_args *,cchar *,cchar *,con mainv) noex ;
 extern int cm_getinfo(cm *,char *,int,cm_info *) noex ;
 extern int cm_reade(cm *,char *,int,int,int) noex ;
 extern int cm_recve(cm *,char *,int,int,int,int) noex ;
