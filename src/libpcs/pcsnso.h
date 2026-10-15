@@ -29,7 +29,6 @@
 #define	PCSNSO_PWD	struct pcsnso_pwdir
 #define	PCSNSO_TO	7
 #define	PCSNSO_MAGIC	0x99889298
-
 /* query options */
 #define	PCSNSO_ONOSERV	(1<<0)		/* do not call the server */
 #define	PCSNSO_OPREFIX	(1<<1)		/* prefix match */
