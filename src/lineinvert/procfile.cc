@@ -57,7 +57,7 @@
 #include	<vecobj.h>
 #include	<paramopt.h>
 #include	<opentmp.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -77,7 +77,7 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -93,7 +93,7 @@ struct fblock {
 
 /* forward references */
 
-static int copyout(struct proginfo *,bfile *,vecobj *,int,char **) ;
+local int copyout(struct proginfo *,bfile *,vecobj *,int,char **) ;
 
 static ulong	ufloorl(ulong,ulong) ;
 static ulong	uceill(ulong,ulong) ;
@@ -109,7 +109,7 @@ int procfile(pip,app,ofp,fname)
 struct proginfo	*pip ;
 PARAMOPT	*app ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	ustat	sb ;
 
@@ -470,7 +470,7 @@ badinopen:
 
 
 
-static int copyout(pip,ofp,listp,fd,cbp)
+local int copyout(pip,ofp,listp,fd,cbp)
 struct proginfo	*pip ;
 bfile		*ofp ;
 vecobj		*listp ;
