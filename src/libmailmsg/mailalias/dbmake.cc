@@ -113,7 +113,6 @@ using std::max ;			/* subroutine-template */
 using std::rotl ;			/* subroutine-template */
 using std::rotr ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -172,11 +171,11 @@ int dbmake::wrfileproc(cchar *fname) noex {
 	                while ((rs = breadln(&afile,lbuf,llen)) > 0) {
 			    cchar	*cp ;
 			    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
-	                            if (! CHAR_ISWHITE(cp[0])) {
-	                                f_havekey = false ;
-	                            }
-	                            rs = wrfileline(cp,cl) ;
-	                            c_rec += rs ;
+	                        if (! CHAR_ISWHITE(cp[0])) {
+	                            f_havekey = false ;
+	                        }
+	                        rs = wrfileline(cp,cl) ;
+	                        c_rec += rs ;
 	                    } /* end if (sfcontetnt) */
 	                    if (rs < 0) break ;
 	                } /* end while */
@@ -210,10 +209,10 @@ int dbmake::wrfile(time_t dt) noex {
 		    if ((rs = strtab_strsize(vlp)) >= 0) ylikely {
 			svsize = rs ;
 		        rs = wrfiler(dt) ;
-		    }
-		}
-	    }
-	}
+		    } /* end */
+		} /* end */
+	    } /* end */
+	} /* end */
 	return rs ;
 } /* end subroutine (dbmake::wrfile) */
 
@@ -314,7 +313,7 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 	                        strwcpylc(kbuf,kp,min(kl,klen)) ;
 	                    } else {
 	                        strwcpy(kbuf,kp,min(kl,klen)) ;
-	                    }
+	                    } /* end */
 	                } /* end if (positive) */
 	            } /* end if (field_get) */
 	        } /* end if (didn't have a key already) */
@@ -341,18 +340,18 @@ int dbmake::wrfileline(cchar *lbuf,int llen) noex {
 	                            ival = rs ;
 	                        } else if (rs >= 0) {
 	                            ival = rs ;
-	                        }
+	                        } /* end */
 			        /* enter record */
 	                        if ((rs >= 0) && (ival > 0)) {
 	                            record	re(ikey,ival) ;
 	                            if ((rs = rlp->find(&re)) == rsn) {
 	                                rs = rlp->add(&re) ;
-	                            }
+	                            } /* end */
 	                            if (rs >= 0) {
 	                                nrecs += 1 ;
 	                                c_rec += 1 ;
 				        c += 1 ;
-	                            }
+	                            } /* end */
 	                        } /* end if (new entry) */
 	                    } /* end if (ok) */
 	                    if (fsb.term == '#') break ;
@@ -377,7 +376,7 @@ int dbmake::wrfilekeytab() noex {
 	    if ((rs = strtab_recmk(klp,keytab,ktsize)) >= 0) {
 		rs = u_write(fd,keytab,ktsize) ;
 		wlen += rs ;
-	    }
+	    } /* end */
 	    rs1 = libmem.free(keytab) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
@@ -428,9 +427,9 @@ int dbmake::wrfilekeys() noex {
 			    wlen += rs ;
 	                    rs = u_write(fd,kstab,sksize) ;
 			    wlen += rs ;
-	                }
-	            }
-	        }
+	                } /* end */
+	            } /* end */
+	        } /* end */
 	        rs1 = libmem.free(kstab) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory allocation) */
@@ -449,7 +448,7 @@ int dbmake::wrfilevals() noex {
 	    if ((rs = strtab_strmk(vlp,vstab,svsize)) >= 0) ylikely {
 	        rs = u_write(fd,vstab,svsize) ;
 		wlen += rs ;
-	    }
+	    } /* end */
 	    rs1 = libmem.free(vstab) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (value string-table) */
@@ -494,7 +493,7 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	                        } else {
 	                            khash = rotr(khash,ns) ;
 				    khash += c ;
-	                        }
+	                        } /* end */
 	                        hi = hashindex(khash,n) ;
 	                        c += 1 ;
 	                    } /* end while */
@@ -517,7 +516,7 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	            } /* end for (looping through records) */
 	        } else {
 	            rs = SR_OVERFLOW ;
-	        }
+	        } /* end */
 	    } /* end if (vecobj_count) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
@@ -528,7 +527,7 @@ vars::operator int () noex {
     	if ((rs = mailaliaslen = mailvalue.mailaliaslen) >= 0) {
     	    mailaliaslen = rs ;
 	} /* end if */
-	return SR_OK ;
+	return rs ;
 } /* end method (vars::operator) */
 
 
