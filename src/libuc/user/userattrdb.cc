@@ -106,7 +106,7 @@ typedef userattrdb	uad ;
 /* forward references */
 
 template<typename ... Args>
-static inline int userattrdb_ctor(userattrdb *op,Args ... args) noex {
+local inline int userattrdb_ctor(userattrdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_OK ;
@@ -120,7 +120,7 @@ static inline int userattrdb_ctor(userattrdb *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (userattrdb_ctor) */
 
-static inline int userattrdb_dtor(userattrdb *op) noex {
+local inline int userattrdb_dtor(userattrdb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
@@ -129,7 +129,7 @@ static inline int userattrdb_dtor(userattrdb *op) noex {
 } /* end subroutine (userattrdb_dtor) */
 
 template<typename ... Args>
-static int userattrdb_magic(userattrdb *op,Args ... args) noex {
+local int userattrdb_magic(userattrdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == USERATTRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -137,10 +137,10 @@ static int userattrdb_magic(userattrdb *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (userattrdb_magic) */
 
-static int	userattrdb_opensysdb(uad *) noex ;
-static int	userattrdb_sysdb(uad *,char *,int,const char *) noex ;
+local int	userattrdb_opensysdb(uad *) noex ;
+local int	userattrdb_sysdb(uad *,char *,int,cchar *) noex ;
 
-static int	userattrdb_openudomain(uad *) noex ;
+local int	userattrdb_openudomain(uad *) noex ;
 
 
 /* local variables */
@@ -219,7 +219,7 @@ int userattrdb_count(uad *op) noex {
 
 /* private subroutines */
 
-static int userattrdb_opensysdb(uad *op) noex {
+local int userattrdb_opensysdb(uad *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (! op->init.sysdb) {
@@ -242,7 +242,7 @@ static int userattrdb_opensysdb(uad *op) noex {
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (userattrdb_openudomain) */
 
-static int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
+local int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 	int		rs = SR_OK ;
 	if (! op->init.sysdb) {
 	    rs = userattrdb_opensysdb(op) ;
