@@ -67,8 +67,9 @@
 #include	<mbcache.h>
 #include	<mailmsg.h>
 #include	<ema.h>
-#include	<instr.h>
-#include	<localmisc.h>
+#include	<instr.h>		/* ?? */
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -164,13 +165,13 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(struct subinfo *,cchar *,
+local int	subinfo_start(struct subinfo *,cchar *,
 			char *,int,cchar *,int) ;
-static int	subinfo_finish(struct subinfo *) ;
-static int	subinfo_username(struct subinfo *,cchar *) ;
+local int	subinfo_finish(struct subinfo *) ;
+local int	subinfo_username(struct subinfo *,cchar *) ;
 
-static int	procmailfile(char *,int,cchar *,time_t) ;
-static int	procmailmsg(MBC *,time_t,char *,int,int,int) ;
+local int	procmailfile(char *,int,cchar *,time_t) ;
+local int	procmailmsg(MBC *,time_t,char *,int,int,int) ;
 
 
 /* local variables */
@@ -238,7 +239,7 @@ int		period ;
 /* local subroutines */
 
 
-static int subinfo_start(sip,pr,fbuf,flen,un,period)
+local int subinfo_start(sip,pr,fbuf,flen,un,period)
 struct subinfo	*sip ;
 cchar	*pr ;
 char		fbuf[] ;
@@ -263,7 +264,7 @@ int		period ;
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(sip)
+local int subinfo_finish(sip)
 struct subinfo	*sip ;
 {
 	int		rs = SR_OK ;
@@ -281,7 +282,7 @@ struct subinfo	*sip ;
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_username(sip,un)
+local int subinfo_username(sip,un)
 struct subinfo	*sip ;
 cchar	un[] ;
 {
@@ -309,7 +310,7 @@ cchar	un[] ;
 /* end subroutine (subinfo_username) */
 
 
-static int procmailfile(char *rbuf,int rlen,cchar *mbfname,time_t nt)
+local int procmailfile(char *rbuf,int rlen,cchar *mbfname,time_t nt)
 {
 	MAILBOX		mb ;
 	MAILBOX_INFO	mbinfo ;
@@ -363,7 +364,7 @@ static int procmailfile(char *rbuf,int rlen,cchar *mbfname,time_t nt)
 }
 /* end subroutine (procmailfile) */
 
-static int procmailmsg(MBC *mbp,tm_t nt,char *rbuf,int rlen,int mi,int c) noex {
+local int procmailmsg(MBC *mbp,tm_t nt,char *rbuf,int rlen,int mi,int c) noex {
 	mbcache_scan	*msp ;
 	int		rs ;
 	int		f = FALSE ;
@@ -378,7 +379,7 @@ static int procmailmsg(MBC *mbp,tm_t nt,char *rbuf,int rlen,int mi,int c) noex {
 #if	CF_DEBUGS
 	{
 	    char	tbuf[TIMEBUFLEN+1] ;
-	    timestr_logz(t,tbuf) ;
+	    strtime_logz(t,tbuf) ;
 	    debugprintf("localnoticecheck/procmailmsg: hdr t=%s\n",tbuf) ;
 	}
 #endif
@@ -386,7 +387,7 @@ static int procmailmsg(MBC *mbp,tm_t nt,char *rbuf,int rlen,int mi,int c) noex {
 #if	CF_DEBUGS
 	{
 	        char	tbuf[TIMEBUFLEN+1] ;
-	        timestr_logz(t,tbuf) ;
+	        strtime_logz(t,tbuf) ;
 	        debugprintf("localnoticecheck/procmailmsg: env t=%s\n",tbuf) ;
 	}
 #endif
