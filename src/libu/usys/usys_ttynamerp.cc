@@ -47,7 +47,7 @@
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
-	new standard, it might gets optimized for speed (like
+	new standard, it might get optimized for speed (like
 	writting in hand-coded assembly language).  So that is
 	pretty much the only reason I would use that interface
 	(which I do not like).
@@ -66,8 +66,9 @@
 #include	<usysrets.h>		/* LIBU */
 #include	<aflag.hh>		/* LIBU mutex-flag */
 
-#include	"usys_ttynamerp.h"
 #include	"usys_darwin.h"
+#include	"usys_libstr.h"
+#include	"usys_ttynamerp.h"
 
 /* TTYNAMER start */
 #if	defined(SYSHAS_TTYNAMER) && (SYSHAS_TTYNAMER > 0)
@@ -76,52 +77,70 @@
 
 errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	csize		rsize = size_t(rlen) ;
-	errno_t		ec = 0 ;
-	if (char *p ; (p = ttyname_r(fd,rbuf,rsize)) == nullptr) {
-	    ec = errno ;
-	}
+	errno_t		ec = EBADF ; /* return-value */
+	if (fd >= 0) ylikely {
+	    ex = EFAULT ;
+	    if (rbuf) ylikely {
+		ec = EINVAL ;
+		if (rlen > 0) ylikely {
+	            if (char *p = ttyname_r(fd,rbuf,rsize)) ylikely {
+	                ec = errno ;
+	            } /* end if */
+		} /* end if */
+	    } /* end if */
+	} /* end if */
 	return ec ;
-} /* end */
+} /* end subroutine */
 
 #else /* all other operatring systems at this time */
 
 errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	csize		rsize = size_t(rlen) ;
-	return ttyname_r(fd,rbuf,rsize) ;
-} /* end */
+	errno_t		ec = EBADF ;
+	if (fd >= 0) ylikely {
+	    ec = EFAULT ;
+	    if (rbuf) ylikely {
+		ec = EINVAL ;
+		if (rlen > 0) ylikely {
+	            ec = ttyname_r(fd,rbuf,rsize) ;
+		} /* end if */
+	    } /* end if */
+	} /* end if */
+	return ec ;
+} /* end subroutine */
 
 #endif /* which OS */
 
 #else /* defined(SYSHAS_TTYNAMER) && (SYSHAS_TTYNAMER > 0) */
 
 errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
-	errno_t		ec = 0 ;
-	if (fd >= 0) {
-	    if (rbuf) {
-		if (rlen >= 0) {
+	errno_t		ec = EOK ; /* return-value */
+	if (fd >= 0) ylikely {
+	    if (rbuf) ylikely {
+		if (rlen > 0) ylikely {
 		    csize	rsize = size_t(rlen) ;
-		    if (char *p ; (p = ttyname(fd)) != nullptr) {
+		    if (char *p = ttyname(fd)) ylikely {
 			size_t	res ;
 			if ((res = strlcpy(rbuf,p,(rsize+1))) >= (rsize+1)) {
 			    ec = EOVERFLOW ;
 			    rbuf[0] = '\0' ;
 			} else {
 			    rbuf[res] = '\0' ;
-			}
+			} /* end */
 		    } else {
 			ec = errno ;
 		    } /* end if (ttyname) */
 		} else {
 	            ec = EINVAL ;
-		}
+		} /* end */
 	    } else {
 	        ec = EFAULT ;
-	    }
+	    } /* end */
 	} else {
 	    ec = EBADF ;
-	}
+	} /* end */
 	return ec ;
-} /* end */
+} /* end subroutine */
 
 #endif /* defined(SYSHAS_TTYNAMER) && (SYSHAS_TTYNAMER > 0) */
 /* TTYNAMER end */
