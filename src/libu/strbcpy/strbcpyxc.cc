@@ -1,4 +1,4 @@
-/* strbcpyxc SUPPORT */
+/* strbcpyxc SUPPORT (String-Buffer-Copy) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -91,18 +91,25 @@ extern "C" {
 
 /* forward references */
 
-local char *strbcpyxc(chtoxc_f chtoxc,char *dp,int dl,cchar *sp) noex {
+local inline char *cvtcpy(chtoxc_f cvt,char *dp,int &dl,cc *sp) noex {
+    	int dlx = dl ;
+	while (dlx && *sp) {
+	    *dp++ = cvt(*sp++) ;
+	    dlx -= 1 ;
+	} /* end while */
+	dl = dlx ;
+	return dp ;
+} /* end subroutine (cvtcpy) */
+
+local char *strbcpyxc(chtoxc_f cvt,char *dp,int dl,cchar *sp) noex {
     	if (dp && sp) ylikely {
 	    if (dl >= 0) {
-	        while (dl && *sp) {
-	            *dp++ = chtoxc(*sp++) ;
-		    dl -= 1 ;
-	        } /* end while */
+		dp = cvtcpy(cvt,dp,dl,sp) ;
 	        *dp = '\0' ;
 	        if ((dl == 0) && *sp) dp = nullptr ;
 	    } else {
 	        while (*sp) {
-	            *dp++ = chtoxc(*sp++) ;
+	            *dp++ = cvt(*sp++) ;
 		    dl -= 1 ;
 	        } /* end while */
 	        *dp = '\0' ;
@@ -113,15 +120,12 @@ local char *strbcpyxc(chtoxc_f chtoxc,char *dp,int dl,cchar *sp) noex {
 	return dp ;
 } /* end subroutine (strbcpyxc) */
 
-local char *strbcpyxcx(chtoxc_f chtoxc,char *dp,int dl,int na,va_list ap) noex {
+local char *strbcpyxcx(chtoxc_f cvt,char *dp,int dl,int na,va_list ap) noex {
 	if (dp) ylikely {
     	    bool fbad = false ;
 	    for (int i = 0 ; i < na ; i += 1) {
 	        ccp sp = (charp) va_arg(ap,charp) ;
-	        while (dl && *sp) {
-	            *dp++ = chtoxc(*sp++) ;
-		    dl -= 1 ;
-	        } /* end while */
+		dp = cvtcpy(cvt,dp,dl,sp) ;
 	        if ((fbad = ((dl == 0) && *sp))) break ;
 	    } /* end for */
 	    *dp = '\0' ;
