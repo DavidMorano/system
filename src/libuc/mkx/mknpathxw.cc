@@ -40,7 +40,7 @@
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
-	new standard, it might gets optimized for speed (like
+	new standard, it might get optimized for speed (like
 	writting in hand-coded assembly language).  So that is
 	pretty much the only reason I would use that interface
 	(which I do not like).
@@ -142,7 +142,7 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	                    bl -= 1 ;
 	                } else {
 	                    rs = SR_NAMETOOLONG ;
-		        }
+		        } /* end if (error) */
 	            } /* end if (needed a pathname separator) */
 	            if (rs >= 0) ylikely {
 	                if ((rs = snwcpy(bp,bl,sp,sl)) > 0) ylikely {
@@ -150,7 +150,7 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	                    bl -= rs ;
 	                } else if (rs == SR_OVERFLOW) {
 	                    rs = SR_NAMETOOLONG ;
-		        }
+		        } /* end if (error) */
 	            } /* end if */
 	        } /* end for */
 	        *bp = '\0' ; /* in case of overflow */
@@ -168,7 +168,7 @@ int maxpather::operator () (int plen) noex {
     	int		rs ;
 	if ((rs = plen) < 0) ylikely {
 	    rs = maxpathlen ;
-	}
+	} /* end if */
 	return rs ;
 } /* end method (maxpather::operator) */
 
