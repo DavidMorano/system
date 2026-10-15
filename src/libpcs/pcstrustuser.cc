@@ -213,7 +213,7 @@ local int subinfo_finish(SI *sip) noex {
 		rs1 = lm_free(sip->unbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 		sip->unbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (subinfo_finish) */
@@ -225,7 +225,7 @@ local int subinfo_listdb(SI *sip) noex {
 	if (un[0] == '-') {
 	    rs = subinfo_idun(sip) ;
 	    un = sip->un ;
-	}
+	} /* end */
 	if (rs >= 0) {
 	    f = (matstr(trustedusers,un,-1) >= 0) ;
 	} /* end if (ok) */
@@ -268,7 +268,7 @@ local int subinfo_filedbx(SI *sip,vecstr *svp,char *tbuf,int tlen) noex {
                     if ((rs = tu.loadfile(0,tbuf)) >= 0) {
                         rs1 = tu.find(un) ;
                         f = (rs1 >= 0) ;
-                    }
+                    } /* end */
                     rs1 = tu.finish ;
 		    if (rs >= 0) rs = rs1 ;
                 } /* end if (vecstr) */
@@ -287,8 +287,8 @@ local int subinfo_idpr(SI *sip) noex {
 	    if (ustat sb ; (rs = u_stat(pr,&sb)) >= 0) {
 	        sip->uid_pr = sb.st_uid ;
 	        sip->gid_pr = sb.st_gid ;
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return rs ;
 } /* end subroutine (subinfo_idpr) */
 
@@ -308,16 +308,16 @@ local int subinfo_idun(SI *sip) noex {
 			un = pw.pw_name ;
 	                len = int(strwcpy(sip->unbuf,un,ulen) - sip->unbuf) ;
 	                sip->un = sip->unbuf ;
-		    }
+		    } /* end */
 	        } else {
 	            rs = getpwx_name(&pw,pwbuf,pwlen,un) ;
-	        }
+	        } /* end */
 	        if (rs >= 0) {
 	            sip->uid_un = pw.pw_uid ;
 	            sip->gid_un = pw.pw_gid ;
 	        } else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
-		}
+		} /* end */
 		rs1 = lm_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a) */
@@ -334,13 +334,13 @@ local int subinfo_prgroup(SI *sip) noex {
 	int		f = false ;
 	if ((rs >= 0) && (! sip->fl.id_pr)) {
 	    rs = subinfo_idpr(sip) ;
-	}
+	} /* end */
 	if ((rs >= 0) && (! sip->fl.id_un)) {
 	    rs = subinfo_idun(sip) ;
-	}
+	} /* end */
 	if ((rs >= 0) && (! f)) {
 	    f = (sip->gid_un == sip->gid_pr) ;
-	}
+	} /* end */
 	/* check if username is in the PCS group */
 	if ((rs >= 0) && (! f)) {
 	    if (char *grbuf ; (rs = lm_gr(&grbuf)) >= 0) {
