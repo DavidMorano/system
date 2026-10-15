@@ -19,6 +19,13 @@
 #define	PCSCONFCONFIG_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
+
 #define	VERSION		"0d"
 #define	WHATINFO	"@(#)PCSCONF "
 #define	BANNER		"PCS Configuration"
