@@ -165,7 +165,7 @@ int mailmsgattent_start(MME *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 	    }
 	    if (rs < 0) {
 	        mailmsgattent_finish(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (mailmsgattent_start) */
@@ -311,7 +311,7 @@ int mailmsgattent_typeset(MME *op,cchar *tstr,cchar *ststr) noex {
 			    void *vp = voidp(op->type) ;
 	                    libmem.free(vp) ;
 	                    op->type = nullptr ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (memory-allocation) */
 	        } /* end if (tstr) */
 	        if (rs >= 0) {
@@ -383,7 +383,7 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	    } /* end if (error) */
 	    if (rs >= 0) {
 	        op->cte = code ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? code : rs ;
 } /* end subroutine (mailmsgattent_code) */
@@ -401,7 +401,7 @@ int mailmsgattent_setcode(MME *op,int code) noex {
                 } /* end if */
             } else {
                 rs = SR_INVALID ;
-            }
+            } /* end if (error) */
         } /* end if (magic) */
         return rs ;
 } /* end subroutine (mailmsgattent_setcode) */
@@ -447,7 +447,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                             if (afp) bclose(afp) ;
                         } else {
                             bseek(ifp,0L,SEEK_SET) ;
-                        }
+                        } /* end */
 			rs1 = lm_free(abuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
@@ -544,7 +544,7 @@ local int mailmsgattent_needaux(MME *op,cc *tmpdn,char *abuf,bfile *afp) noex {
                     rs = mkpath2(tmpfname,tmpdn,tmpcname) ;
                 } else {
                     rs = mkpath1(tmpfname,tmpcname) ;
-                }
+                } /* end */
                 if (rs >= 0) {
                     cmode   om = 0660 ;
                     if ((rs = mktmpfile(abuf,tmpfname,om)) >= 0) {
@@ -597,7 +597,7 @@ local int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
                     rs = bwrite(afp,lbuf,len) ;
                 } else {
                     if (code >= CE_BINARY) break ;
-                }
+                } /* end */
                 clen += len ;
                 if (lbuf[len - 1] == '\n') lines += 1 ;
                 if (rs < 0) break ;
@@ -620,7 +620,7 @@ local int freeit(void *p) noex {
             rs1 = libmem.free(*pp) ;
 	    if (rs >= 0) rs = rs1 ;
             *pp = nullptr ;
-        } /* end if */
+        } /* end if (memory-release) */
         return rs ;
 } /* end subroutine (freeit) */
 
