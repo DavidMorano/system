@@ -44,7 +44,7 @@
 #include	<sbuf.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
-#include	<strwcmp.h>
+#include	<strwcmp.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"retpath.h"
