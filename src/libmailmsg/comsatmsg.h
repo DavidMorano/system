@@ -47,11 +47,11 @@ struct comsatmsg_co {
 	void operator () (comsatmsg *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (comsatmsg_co) */
 struct comsatmsg : comsatmsg_head {
 	comsatmsg_co	start ;
@@ -60,7 +60,7 @@ struct comsatmsg : comsatmsg_head {
 	    start	(this,comsatmsgmem_start) ;
 	    finish	(this,comsatmsgmem_finish) ;
 	    a = nullptr ;
-	} ;
+	} ; /* end */
 	comsatmsg(const comsatmsg &) = delete ;
 	comsatmsg &operator = (const comsatmsg &) = delete ;
 	int rd(char *,int) noex ;
@@ -68,7 +68,7 @@ struct comsatmsg : comsatmsg_head {
 	void dtor() noex ;
 	destruct comsatmsg() {
 	    if (a) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (comsatmsg) */
 #else	/* __cplusplus */
 typedef COMSATMSG	comsatmsg ;
