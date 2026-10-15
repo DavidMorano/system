@@ -55,11 +55,11 @@ struct expcook_co {
 	void operator () (expcook *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (expcook_co) */
 struct expcook : expcook_head {
     	expcook_co	start ;
@@ -69,7 +69,7 @@ struct expcook : expcook_head {
 	    finish	(this,expcookmem_finish) ;
 	    magval = 0 ;
 	} ; /* end ctor */
-	int add		(cchar *,cchar *,int) noex ;
+	int add		(cchar *,cchar *,int = -1) noex ;
 	int curbegin	(expcook_cur *) noex ;
 	int curend	(expcook_cur *) noex ;
 	int curenum	(expcook_cur *,char *,int) noex ;
