@@ -1,4 +1,4 @@
-/* strbcpyx SUPPORT */
+/* strbcpyx SUPPORT (String-Buffer-Copy) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -19,12 +19,8 @@
 	vendor version.
 
 	= 2011-12-09, David A­D­ Morano
-	I got rid of the |strlcpy(3c)| usage.  It was never really
-	needed anyway.  The code is certainly cleaner without it.
-	And I do not really think it is a whole lot slower either
-	since the various string lengths used are usually fairly
-	small.  Other subroutines have gotten rid of |strlcpy(3c)|
-	also without any complaints.
+	I got rid of the usage of the subroutine |strlcpy(3c)| in
+	the subroutine |strbcpyx()| below.
 
 */
 
@@ -39,11 +35,11 @@
 	Description:
 	This subroutine concatenates c-strings into a single resulting
 	destination c-string.  It will not overflow the destiantion
-	character buffer length.¹  1. The result is always NUL terminated
+	character buffer length.  The result is always NUL terminated
 	(even beyond the destination character buffer length if
 	necessary).
 
-	Notes (obsoleted 2011-12-09, see revision above):
+	Notes:
 	I am using the new (rumored to be coming as a standard)
 	subroutine |strlcpy(3c)|.  I wrote my own version of this
 	until it gets into the standard libraries.  It might be in
@@ -51,7 +47,7 @@
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
-	new standard, it might gets optimized for speed (like
+	new standard, it might get optimized for speed (like
 	writting in hand-coded assembly language).  So that is
 	pretty much the only reason I would use that interface
 	(which I do not like).
@@ -64,9 +60,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |stpcpy(3c)| + |strlcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU |strbcpy(3usys)| */
 
 #include	"strbcpyx.h"
 
@@ -98,17 +92,7 @@
 /* exported subroutines */
 
 char *strbcpy(char *dp,int dl,cchar *sp) noex {
-    	char		*rp = nullptr ;
-    	if (dp && sp) ylikely {
-	    if (csize dsz = (dl + 1) ; dl >= 0) ylikely {
-    	        if (csize n = strlcpy(dp,sp,dsz) ; n < dsz) {
-		    rp = (dp + dl) ;
-	        } /* end */
-	    } else {
-		rp = stpcpy(dp,sp) ;
-	    } /* end */
-	} /* end if */
-    	return rp ;
+    	return usys::strbcpy(dp,dl,sp) ;
 } /* end subroutine (strbcpy) */
 
 char *strbcpy1(char *dp,int dl,
@@ -149,7 +133,7 @@ char *strbcpyx(char *dp,int dl,int n,...) noex {
 	        bool fbad = false ;
 	        for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
 	            ccharp sp = (cchar *) va_arg(ap,char *) ;
-	            while ((dl > 0) && *sp) {
+	            while (dl && *sp) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
 	            } /* end while */
