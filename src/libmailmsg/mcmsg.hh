@@ -65,11 +65,11 @@ struct mcmsg_co {
 	void operator () (T *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct */
 
 extern int mcmsg_coreq(mcmsg_req *,int) noex ;
@@ -156,7 +156,7 @@ struct mcmsg_ack {
 	mcmsg_ack() noex {
 	    start(this,mcmsgmem_start) ;
 	    finish(this,mcmsgmem_finish) ;
-	} ;
+	} ; /* end */
 	void dtor() noex ;
 	destruct mcmsg_ack() {
 	    dtor() ;
