@@ -43,7 +43,7 @@
 
 /* external subroutines */
 
-extern int	p_lspell(int,const char **,const char **,void *) ;
+extern int	p_lspell(int,cchar **,cchar **,void *) ;
 
 
 /* external variables */
