@@ -33,7 +33,7 @@ extern int	vstrkeydictcmpr(cchar **,cchar **) noex ;
 
 local inline int vstrkeydictcmp(cchar **s1pp,cchar **s2pp) noex {
     	return vstrkeydictcmpo(s1pp,s2pp) ;
-}
+} /* end */
 
 EXTERNC_end
 
