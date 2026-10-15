@@ -68,14 +68,13 @@
 #include	<dirlist.h>
 #include	<dirseen.h>
 #include	<dispatcher.h>
-#include	<ds.h>
+#include	<dispmgr.h>
 #include	<dw.h>
 #include	<ecmsg.h>
 #include	<ee.h>
 #include	<egs.h>
 #include	<eigendb.h>
 #include	<envstandards_darwin.h>
-#include	<envstandards_mac.h>
 #include	<envstandards_solaris.h>
 #include	<expandline.h>
 #include	<fhm.h>
