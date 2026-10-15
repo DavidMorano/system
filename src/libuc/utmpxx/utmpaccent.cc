@@ -99,10 +99,10 @@ local int	si_copystr(storeitem *,uent *,strs,cchar *,int) noex ;
 
 /* local variables */
 
-const int 	szid   = utmpsize.id ;
-const int 	szuser = utmpsize.user ;
-const int 	szline = utmpsize.line ;
-const int 	szhost = utmpsize.host ;
+cint 	szid   = utmpsize.id ;
+cint 	szuser = utmpsize.user ;
+cint 	szline = utmpsize.line ;
+cint 	szhost = utmpsize.host ;
 
 
 /* exported variables */
