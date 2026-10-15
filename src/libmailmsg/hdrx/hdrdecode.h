@@ -20,17 +20,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* |wchar_t| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<b64decoder.h>
-#include	<qpdecoder.h>
-#include	<chartrans.h>
+#include	<sys/types.h>		/* POSIX® |wchar_t| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<b64decoder.h>		/* LIBUC */
+#include	<qpdecoder.h>		/* LIBUC */
+#include	<chartrans.h>		/* LIBUC */
 
 
-#define	HDRDECODE_MAGIC		0x13f3c202
 #define	HDRDECODE		struct hdrdecode_head
 #define	HDRDECODE_FL		struct hdrdecode_flags
+#define	HDRDECODE_MAGIC		0x13f3c202
 #define	HDRDECODE_CSLEN		32
 
 
