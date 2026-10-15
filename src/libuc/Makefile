@@ -112,7 +112,7 @@ OBJ25= ucdescread.o ucdescwrite.o ucdescsock.o
 OBJ26= ucdescmisc.o ucdesclock.o
 OBJ27= ucproc.o ucdata.o
 
-OBJ28= uctc.o ucsysconf.o ucsysmisc.o
+OBJ28= ucsysconf.o ucsysmisc.o
 OBJ29= uclibmem.o ucyserattr.o
 OBJ30= ucsys.o ucatexit.o ucatfork.o
 OBJ31= tcx.o ucpts.o ucpwcache.o
