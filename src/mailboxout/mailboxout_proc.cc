@@ -63,6 +63,7 @@
 #include	<ema.h>
 #include	<dater.h>
 #include	<tmz.hh>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -132,15 +133,15 @@ struct msginfo {
 
 /* forward references */
 
-static int	procmsg(proginfo *,procdata *, char *,int) noex ;
-static int	procmsgenv(proginfo *,msginfo *, MSG *,char *,int) noex ;
-static int	ext_id(struct proginfo *,char *,char *) noex ;
-static int	ph_write() noex ;
-static int	didheader(vecstr *,struct msg_header *) noex ;
-static int	sfcomment(cchar *,int,char **) noex ;
-static int	cheapspamcheck(struct proginfo *,cchar *,int) noex ;
+local int	procmsg(proginfo *,procdata *, char *,int) noex ;
+local int	procmsgenv(proginfo *,msginfo *, MSG *,char *,int) noex ;
+local int	ext_id(struct proginfo *,char *,char *) noex ;
+local int	ph_write() noex ;
+local int	didheader(vecstr *,struct msg_header *) noex ;
+local int	sfcomment(cchar *,int,char **) noex ;
+local int	cheapspamcheck(struct proginfo *,cchar *,int) noex ;
 
-static inline bool hasfmat(cchar *lp,int ll) noex {
+local inline bool hasfmat(cchar *lp,int ll) noex {
     	return ((ll > 5) && (lp[0] == 'F')) ;
 }
 
@@ -304,7 +305,7 @@ int process(proginfo *pip,bfile *ifp,bfile *tfp,vecobj *fip) noex {
 
 
 /* process the current message */
-static int procmsg(pip,mdp,lbuf,len)
+local int procmsg(pip,mdp,lbuf,len)
 struct proginfo	*pip ;
 struct procdata	*mdp ;
 char		lbuf[] ;
@@ -1278,7 +1279,7 @@ ret0:
 /* end subroutine (procmsg) */
 
 
-static int procmsgenv(pip,mip,msgp,addrbuf,addrlen)
+local int procmsgenv(pip,mip,msgp,addrbuf,addrlen)
 struct proginfo	*pip ;
 struct msginfo	*mip ;
 MSG		*msgp ;
@@ -1521,7 +1522,7 @@ int		f_esc ;
 	    }
 
 	    if (cp == NULL)
-	        cp = timestr_edate(pip->now.time,timebuf) ;
+	        cp = strtime_edate(pip->now.time,timebuf) ;
 
 	    bprintf(afp,"%sFrom %s %s",
 	        ((envp->f_esc || f_esc) ? ">" : ""),
@@ -1544,7 +1545,7 @@ int		f_esc ;
 
 
 /* write out headers */
-static int ph_write(pip,afp,mhp,name,nlen,mode)
+local int ph_write(pip,afp,mhp,name,nlen,mode)
 struct proginfo	*pip ;
 bfile		*afp ;
 MSG_HEADER	*mhp ;
@@ -1740,7 +1741,7 @@ int		nlen, mode ;
 
 
 /* extract an ID out of an ID-type header (a lot of work for a simple task) */
-static int ext_id(pip,s,id)
+local int ext_id(pip,s,id)
 struct proginfo	*pip ;
 char		s[] ;
 char		id[] ;
@@ -1806,7 +1807,7 @@ char		id[] ;
 
 
 /* did we already "do" this header ? */
-static int didheader(hp,mhp)
+local int didheader(hp,mhp)
 vecstr			*hp ;
 struct msg_header	*mhp ;
 {
@@ -1830,7 +1831,7 @@ struct msg_header	*mhp ;
 
 
 /* strip garbage around items */
-static int sfcomment(sp,sl,cpp)
+local int sfcomment(sp,sl,cpp)
 cchar	*sp ;
 int		sl ;
 char		**cpp ;
@@ -1853,7 +1854,7 @@ char		**cpp ;
 }
 /* end subroutine (sfcomment) */
 
-static int cheapspamcheck(proginfo *pip,cchar *buf,int buflen) noex {
+local int cheapspamcheck(proginfo *pip,cchar *buf,int buflen) noex {
 	int	sl, cl ;
 	char	*sp, *cp ;
 	sp = (char *) buf ;
