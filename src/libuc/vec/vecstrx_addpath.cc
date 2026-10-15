@@ -86,7 +86,7 @@ import ulibvals ;
 
 /* local defines */
 
-#define	NPATH	4			/* buffer multiply-factor */
+#define	NPATH	6			/* buffer multiply-factor */
 
 
 /* imported namespaces */
@@ -105,6 +105,14 @@ using libuc::libmem ;			/* variable */
 
 /* local structures */
 
+namespace {
+    struct vars {
+	int		maxpath ;
+	operator int	() noex ;
+	int load	() noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
 
 /* forward references */
 
@@ -121,7 +129,7 @@ local int vecstrx_addone(vecstrx *op,char *pbuf,cchar *sp,int sl) noex {
 
 /* local variables */
 
-local int		maxpathlen = ulibval.maxpathlen ;
+static vars		var ;
 
 
 /* exported variables */
@@ -138,14 +146,14 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	    rs = SR_OK ;
 	    if (ll < 0) ll = lenstr(lp) ;
 	    if (ll > 0) {
-		if ((rs = maxpathlen) >= 0) ylikely {
-		    cint	plen = rs ;
+		if ((rs = var) >= 0) ylikely {
+		    cint	plen = var.maxpath ;
 		    if (char *pbuf ; (rs = libmem.mall((plen+1),&pbuf)) >= 0) {
 	                for (cc *tp ; (tp = strnbrk(lp,ll,":;")) != np ; ) {
 			    if (cint tl = intconv(tp - lp) ; tl >= 0) {
 				rs = vecstrx_addone(this,pbuf,lp,tl) ;
 				c += rs ;
-		            }
+		            } /* end */
 		            ll -= intconv((tp + 1) - lp) ;
 		            lp = (tp + 1) ;
 		            if (rs < 0) break ;
@@ -153,11 +161,11 @@ int vecstrx::addpathclean(cchar *lp,int ll) noex {
 	                if ((rs >= 0) && (ll > 0)) {
 			    rs = vecstrx_addone(this,pbuf,lp,ll) ;
 			    c += rs ;
-	                }
+	                } /* end */
 			rs1 = libmem.free(pbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */
-		} /* end if (maxpathlen) */
+		} /* end if (vars) */
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -183,7 +191,7 @@ int vecstrx::addpath(cchar *lp,int ll) noex {
 	        if ((rs >= 0) && (ll > 0)) {
 		    rs = adduniq(lp,ll) ;
 		    if (rs < INT_MAX) c += 1 ;
-	        }
+	        } /* end */
 	    } /* end if (non-zero) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -193,8 +201,8 @@ int vecstrx::addcspath() noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-        if ((rs = maxpathlen) >= 0) ylikely {
-            cint    clen = (NPATH * rs) ;
+        if ((rs = var) >= 0) ylikely {
+            cint    clen = (NPATH * var.maxpath) ;
             if (char *cbuf ; (rs = libmem.mall((clen+1),&cbuf)) >= 0) ylikely {
                 cint        req = _CS_PATH ;
                 if ((rs = u_sysconfstr(req,cbuf,clen)) >= 0) {
@@ -204,8 +212,24 @@ int vecstrx::addcspath() noex {
                 rs1 = libmem.free(cbuf) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (m-a-f) */
-        } /* end if (maxpathlen) */
+        } /* end if (vars) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (vecstrx::addcspath) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if (static cint rsi = load() ; (rs = rsi) >= 0) {
+	    rs = SR_OK ;
+	} /* end */
+	return rs ;
+} /* end method (vars::operator) */
+
+int vars::load() noex {
+    	int		rs ;
+	if ((rs = ulibval.maxpathlen) >= 0) ylikely {
+	    maxpath = rs ;
+	} /* end */
+	return rs ;
+} /* end method (vars::operator) */
 
 
