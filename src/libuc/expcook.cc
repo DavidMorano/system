@@ -68,8 +68,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* external subroutines */
 
@@ -84,11 +82,12 @@ using std::nothrow ;			/* constant */
 
 local inline int expcook_ctor(EX *op) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
-	    if ((op->hlp = new(nothrow) hdbstr) != np) ylikely {
+	    if ((op->hlp = new(nt) hdbstr) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-hdbstr) */
 	} /* end if (non-null) */
@@ -100,7 +99,7 @@ local int expcook_dtor(EX *op) noex {
 	if (op->hlp) ylikely {
 	    delete op->hlp ;
 	    op->hlp = nullptr ;
-	}
+	} /* end if (delete) */
 	return rs ;
 } /* end subroutine (expcook_dtor) */
 
@@ -109,7 +108,7 @@ local inline int expcook_magic(EX *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == EXPCOOK_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (expcook_magic) */
 
@@ -134,7 +133,7 @@ int expcook_start(EX *op) noex {
 	    op->magval = 0 ;
 	    if ((rs = slp->start(ne)) >= 0) ylikely {
 	        op->magval = EXPCOOK_MAGIC ;
-	    }
+	    } /* end */
 	    if (rs < 0) {
 		expcook_dtor(op) ;
 	    } /* end if (error) */
@@ -149,11 +148,11 @@ int expcook_finish(EX *op) noex {
 	    if (hdbstr	*slp = op->hlp ; op->hlp) ylikely {
 		rs1 = slp->finish ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = expcook_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -169,26 +168,27 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 	        rs = slp->delkey(kbuf,kl) ;
 	    } else if (rs == SR_NOTFOUND) {
 	        rs = SR_OK ;
-	    }
+	    } /* end */
 	    if ((rs >= 0) && vbuf) {
 	        rs = slp->add(kbuf,kl,vbuf,vlen) ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (expcook_add) */
 
 int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs ;
 	if ((rs = expcook_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) ylikely {
+	    if ((curp->clp = new(nt) hdbstr_cur) != np) ylikely {
 	        hdbstr	*slp = op->hlp ;
 	        rs = slp->curbegin(curp->clp) ;
 		if (rs < 0) {
 		    delete curp->clp ;
 		    curp->clp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-hdbstr) */
 	} /* end if (magic) */
 	return rs ;
@@ -202,11 +202,11 @@ int expcook_curend(EX *op,expcook_cur *curp) noex {
 	        hdbstr	*slp = op->hlp ;
 	        rs1 = slp->curend(curp->clp) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (curp->clp) {
 		delete curp->clp ;
 		curp->clp = nullptr ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (expcook_curend) */
@@ -268,7 +268,7 @@ int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	        } /* end if (buffer) */
 	    } else {
 	        rs = SR_OVERFLOW ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return (rs >= 0) ? bl : rs ;
 } /* end subroutine (expcook_exp) */
@@ -318,11 +318,11 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	            } else {
 		        kp = sp ;
 		        kl = 0 ;
-		    }
+		    } /* end */
 	            if ((rs >= 0) && kp) {
 		        rs = expcook_prockey(op,wch,bufp,kp,kl) ;
 		        len += rs ;
-		    }
+		    } /* end */
 	        } /* end if (buf-add leading part) */
 	        if (rs < 0) break ;
 	    } /* end for (expanding) */
@@ -330,7 +330,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 	    if ((rs >= 0) && (sl > 0)) {
 	        rs = bufp->strw(sp,sl) ;
 	        len += rs ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (expcook_expbuf) */
@@ -350,14 +350,14 @@ local int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
 	        if (vl > 0) {
 	            rs = bufp->strw(vp,vl) ;
 		    len += rs ;
-	        }
+	        } /* end */
 	    } else if (rs == SR_NOTFOUND) {
 	        if (wch > 0) {
 		    rs = buffer_keydef(bufp,wch,kp,kl) ;
 		    len += rs ;
 		} else if (wch == 0) {
 		    rs = SR_OK ;
-		}
+		} /* end */
 	    } /* end if (specified delimiter) */
 	} /* end if (non-zero key) */
 	return (rs >= 0) ? len : rs ;
