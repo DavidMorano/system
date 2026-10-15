@@ -38,9 +38,6 @@
 
 #include	"vecstrx.hh"
 
-#pragma		GCC dependency		"mod/ulibvals.ccm"
-
-import ulibvals ;			/* |ulibval(3u)| */
 
 /* local defines */
 
