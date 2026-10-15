@@ -33,16 +33,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<uclibmem.h>
-#include	<hmatch.h>
-#include	<bufsizevar.hh>
-#include	<sfx.h>
-#include	<strwcpy.h>
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<hmatch.h>		/* LIBUC */
+#include	<bufsizevar.hh>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"mailmsghdrval.h"
 
@@ -76,9 +76,8 @@ local int mailmsghdrval_loadadd(mailmsghdrval *,cchar *,int) noex ;
 
 /* local variables */
 
-static bufsizevar	maxlinelen(bufsize_ml) ;
-
-cint			extlen = REALNAMELEN ;
+static bufsizevar	maxlinelen	(bufsize_ml) ;
+cint			extlen		= REALNAMELEN ;
 
 
 /* exported variables */
@@ -99,7 +98,7 @@ int mailmsghdrval_start(mailmsghdrval *op,int i,cchar *hp,int hl) noex {
 		    op->vbuf[0] = '\0' ;
 		    if (hp) {
 	                rs = mailmsghdrval_loadadd(op,hp,hl) ;
-		    }
+		    } /* end */
 		    if (rs < 0) {
 		        libmem.free(op->vbuf) ;
 		        op->vbuf = nullptr ;
@@ -121,7 +120,7 @@ int mailmsghdrval_finish(mailmsghdrval *op) noex {
 	        rs1 = libmem.free(op->vbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->vbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->vlen = 0 ;
 	    op->vl = 0 ;
 	} /* end if (non-null) */
@@ -173,7 +172,7 @@ local int mailmsghdrval_loadadd(mailmsghdrval *op,cchar *hp,int hl) noex {
 	        if ((rs = libmem.rall(op->vbuf,(sz+1),&nvp)) >= 0) {
 		    op->vbuf = nvp ;
 		    op->vlen = sz ;
-		}
+		} /* end if (memory-acquire) */
 	    }  /* end if (buffer extension) */
 	    if (rs >= 0) {
 		char	*vp = (op->vbuf + op->vl) ;
