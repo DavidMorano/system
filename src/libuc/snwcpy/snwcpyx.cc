@@ -59,7 +59,7 @@
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
-	new standard, it might gets optimized for speed (like
+	new standard, it might get optimized for speed (like
 	writting in hand-coded assembly language).  So that is
 	pretty much the only reason I would use that interface
 	(which I do not like).
@@ -183,7 +183,7 @@ int snwcpyx(char *dp,int dl,int n,...) noex {
 	    dp[0] = '\0' ;
 	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 		size_t	ml ;
-	        cc	*sp = (cchar *) va_arg(ap,char *) ;
+	        ccharp	sp = (cchar *) va_arg(ap,char *) ;
 	        if (i < (n - 1)) {
 	            ml = strlcpy(bp,sp,rmlen) ;
 	            if (ml < rmlen) bp += ml ;
