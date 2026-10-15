@@ -51,6 +51,7 @@
 #include	<usys_pathpid.h>
 #include	<usys_plock.h>		/* defines |usys_plock()| */
 #include	<usys_snx.hh>
+#include	<usys_strbcpy.hh>
 #include	<usys_strw.hh>
 #include	<usys_ufcntl.h>
 #include	<usys_ugetdents.h>
@@ -85,6 +86,7 @@
 #include	<usys_strxbrk.h>
 #include	<usys_sysctl.h>
 #include	<usys_task.h>
+#include	<usys_termios.h>
 #include	<usys_timezone.h>
 #include	<usys_ttynamerp.h>
 #include	<usys_isaexec.h>
