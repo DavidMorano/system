@@ -29,11 +29,11 @@
 	and other weirdo characters into some of the value fields
 	of the RECEIVED header.  I do not know how many of these
 	weirdo characters are legal in an RFC-822 value (if any)
-	but we are currently using 'field_word(3dam)' with only the
+	but we are currently using |field_word(3dam)| with only the
 	semi-colon character as a terminator to try to handle these
 	wirdo cases.  If quote characters are not allowed to represent
 	a regular legal character (without any escape quoting),
-	then maybe 'field_get(3dam)' should be used.
+	then maybe |field_get(3dam)| should be used.
 
 	Note:
 	Note also that all RFC-822 comments are removed from the
@@ -192,7 +192,7 @@ int received_finish(received *op) noex {
 	        rs1 = libmem.free(op->a) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->a = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
