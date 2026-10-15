@@ -27,23 +27,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<vecobj.h>
-#include	<strn.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<vecobj.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsgviewer.h"
 
@@ -59,17 +60,11 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_open(cchar *,int,mode_t) noex ;
-} /* end extern (C) */
 
 
 /* external variables */
@@ -94,11 +89,12 @@ template<typename ... Args>
 local int mailmsgviewer_ctor(MMV *op,Args ... args) noex {
     	MAILMSGVIEWER	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->llp = new(nothrow) vecobj) != np) ylikely {
+	    if ((op->llp = new(nt) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
@@ -112,7 +108,7 @@ local int mailmsgviewer_dtor(MMV *op) noex {
 	    if (op->llp) ylikely {
 		delete op->llp ;
 		op->llp = nullptr ;
-	    }
+	    } /* end if (delete-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (mailmsgviewer_dtor) */
@@ -151,12 +147,12 @@ int mailmsgviewer_open(MMV *op,cchar *fname) noex {
 		    rs = mailmsgviewer_mapbegin(op,fname) ;
 	            if (rs < 0) {
 	                vecobj_finish(op->llp) ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (vecobj_start) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		mailmsgviewer_dtor(0) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mailmsgviewer_ctor) */
 	return rs ;
 } /* end subroutine (mailmsgviewer_open) */
