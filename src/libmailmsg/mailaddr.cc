@@ -133,56 +133,56 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 			        cint	vlen = intconv(tp - (cp1 + 1)) ;
 			        cchar	*vstr = (cp1 + 1) ;
 	                        rs = snwcpy(mahost,hnl,vstr,vlen) ;
-		            }
+		            } /* end if (ok) */
 	                    if (rs >= 0) {
 	                        rs = sncpy1(malocal,mal,(tp + 1)) ;
-		            }
+		            } /* end if (ok) */
 	                } else {
 	                    if (rs >= 0) {
 			        cint	vlen = intconv(cp2 - (cp1 + 1)) ;
 			        cchar	*vstr = (cp1 + 1) ;
 	                        rs = snwcpy(mahost,hnl,vstr,vlen) ;
-		            }
+		            } /* end if (ok) */
 	                    if (rs >= 0) {
 	                        rs = sncpy1(malocal,mal,(cp2 + 1)) ;
-		            }
+		            } /* end if (ok) */
 	                } /* end if */
 	            } else {
 		        /* normal ARPAnet address */
 	                t = mailaddrtype_arpa ;
 	                if (rs >= 0) {
 	                    rs = sncpy1(mahost,hnl,(cp1 + 1)) ;
-		        }
+		        } /* end if (ok) */
 	                if (rs >= 0) {
 			    cint	tl = intconv(cp1 - sp) ;
 	                    rs = snwcpy(malocal,mal,sp,tl) ;
-		        }
+		        } /* end if (ok) */
 	            } /* end if */
 	        } else if ((tp = strnrchr(sp,sl,'!')) != nullptr) {
 	            t = mailaddrtype_uucp ;
 	            if (rs >= 0) {
 			cint	tl = intconv(tp - sp) ;
 	                rs = snwcpy(mahost,hnl,sp,tl) ;
-	            }
+	            } /* end if (ok) */
 	            if (rs >= 0) {
 	                rs = sncpy(malocal,mal,(tp + 1)) ;
-	            }
+	            } /* end if (ok) */
 	        } else {
 	           /* local */
 	            t = mailaddrtype_local ;
 	            if (rs >= 0) {
 	                rs = sncpy(mahost,hnl,localhostpart) ;
-	            }
+	            } /* end if (ok) */
 	            if (rs >= 0) {
 	                rs = snwcpy(malocal,mal,sp,sl) ;
-	            }
+	            } /* end if (ok) */
 	        } /* end if */
 	        /* perform some cleanup (remove stupid trailing dots) */
 	        if (rs >= 0) {
 	            int		cl = lenstr(mahost) ;
 	            while ((cl > 0) && (mahost[cl - 1] == '.')) {
 	                cl -= 1 ;
-	            }
+	            } /* end while */
 	            mahost[cl] = '\0' ;
 	        } /* end if (ok) */
 	    } /* end if (vars) */
@@ -232,10 +232,10 @@ int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
 	                } else {
 	                    rs = b.chr(':') ;
 		        }
-	            }
+	            } /* end if (ok) */
 	            if (rs >= 0) {
 	                rs = b.str(malocal) ;
-		    }
+		    } /* end if (ok) */
 	            break ;
 		default:
 		    rs = SR_NOTSUP ;
@@ -297,7 +297,7 @@ int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,mat type) noex {
 	                } else {
 	                    rs = b.chr(':') ;
 			}
-	            }
+	            } /* end if (ok) */
 	            if (rs >= 0) {
 	                rs = b.str(malocal) ;
 		    }
