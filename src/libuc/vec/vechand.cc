@@ -62,7 +62,7 @@ using libuc::libmem ;			/* variable */
 
 #ifndef	TYPEDEF_CV
 #define	TYPEDEF_CV
-typedef const void	cv ;
+typedef cvoid	cv ;
 #endif
 
 
