@@ -169,14 +169,14 @@ local int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
 	            } else if ((rs == 0) || isNoMsg(rs)) {
 	                rs = mailmsg_envaddress(mmp,0,&vp) ;
 	                vl = rs ;
-		    }
-		}
-	    }
+		    } /* end */
+		} /* end */
+	    } /* end */
 	} /* end if */
 	if ((rs >= 0) && (vl > 0)) {
 	    rs = mkaddrfrom(rbuf,rlen,vp,vl) ;
 	    len = rs ;
-	}
+	} /* end */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mailmsg_fromer) */
 
