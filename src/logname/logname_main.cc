@@ -61,6 +61,7 @@
 #include	<user.h>		/* |userdomain(3uc)| */
 #include	<mallocstuff.h>
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -221,16 +222,16 @@ int main(int argc,con mainv argv,con mainv envv) {
 	int	f_self = FALSE ;
 	int	f_entok = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
+	cchar	*argp, *aop, *akp, *avp ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	buf[BUFLEN + 1], *bp ;
 	char	nodename[NODENAMELEN + 1] ;
 	char	domainname[MAXHOSTNAMELEN + 1] ;
 	char	entrybuf[PWENTRY_BUFLEN + 1] ;
-	const char	*ofname = nullptr ;
-	const char	*pwfname = nullptr ;
-	const char	*un = nullptr ;
-	const char	*cp, *cp2 ;
+	cchar	*ofname = nullptr ;
+	cchar	*pwfname = nullptr ;
+	cchar	*un = nullptr ;
+	cchar	*cp, *cp2 ;
 
 #if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
@@ -272,7 +273,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 0) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (argl > 1) {
 
@@ -371,7 +372,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 	                } else {
 
 	                    while (akl--) {
-				const int	kc = MKCHAR(*akp) ;
+				cint	kc = MKCHAR(*akp) ;
 
 	                        switch (kc) {
 
@@ -1030,13 +1031,13 @@ int main(int argc,con mainv argv,con mainv envv) {
 	                    if (rs >= 0) {
 
 	                        bprintf(ofp,"%s %-8s %16s",
-	                            timestr_log(t,timebuf),
+	                            strtime_log(t,timebuf),
 	                            line,hostname) ;
 
 	                        if (pip->verboselevel >= 1) {
 
 	                            bprintf(ofp," (%17s)",
-	                                timestr_elapsed((daytime - t),
+	                                strtime_elapsed((daytime - t),
 	                                timebuf)) ;
 
 	                        }
