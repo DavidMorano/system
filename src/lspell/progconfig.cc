@@ -277,8 +277,8 @@ int progconf_check(PI *pip)
 local int procfile(PI *pip,cchar **confs,cchar *cfn)
 {
 	vecstr		*svp = &pip->svars ;
-	const int	tlen = MAXPATHLEN ;
-	const int	m = R_OK ;
+	cint	tlen = MAXPATHLEN ;
+	cint	m = R_OK ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	char		tfname[MAXPATHLEN+1] ;
@@ -298,7 +298,7 @@ local int procfile_begin(PI *pip)
 	int		rs = SR_OK ;
 
 	if (pip->config == nullptr) {
-	    const int	size = sizeof(PCONF) ;
+	    cint	size = sizeof(PCONF) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 	        PCONF		*csp = p ;
@@ -435,7 +435,7 @@ local int pconf_load(PCONF *csp)
 	if (pfp == nullptr) return SR_FAULT ; /* ¥ GCC false complaint */
 
 	if (csp->nf > 0) {
-	    const int	plen = PBUFLEN ;
+	    cint	plen = PBUFLEN ;
 	    int		size ;
 	    char	*pbuf ;
 	    size = (plen+1) ;
@@ -460,7 +460,7 @@ local int pconf_loader(PCONF *csp,char *pbuf,int plen)
 	int		rs1 ;
 
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
-	    const int	elen = EBUFLEN ;
+	    cint	elen = EBUFLEN ;
 	    cchar	*kp, *vp ;
 	    int		pi ;
 	    int		kl, vl ;
