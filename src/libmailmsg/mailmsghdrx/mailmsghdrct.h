@@ -31,11 +31,11 @@ struct mailmsghdrct_param {
 } ; /* end struct */
 
 struct mailmsghdrct_head {
-	cchar		*mtp ;		/* type-main */
-	cchar		*stp ;		/* type-sub */
+	ccharp		mtp ;		/* type-main	- pointer */
+	ccharp		stp ;		/* type-sub	- pointer */
 	uint		magval ;
-	int		mtl ;		/* type-main */
-	int		stl ;		/* type-sub */
+	int		mtl ;		/* type-main	- length */
+	int		stl ;		/* type-sub	- length */
 	MAILMSGHDRCT_PAR	p[MAILMSGHDRCT_NPARAMS] ;
 } ; /* end struct */
 
