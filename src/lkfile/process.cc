@@ -34,12 +34,14 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<ctime>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -106,8 +108,8 @@ int		timeout, to_remove ;
 
 	            logfile_printf(&pip->lh,
 	                "%s removed old lock mtime=%s\n",
-	                timestr_log(pip->daytime,timebuf1),
-	                timestr_log(sb.st_mtime,timebuf2)) ;
+	                strtime_log(pip->daytime,timebuf1),
+	                strtime_log(sb.st_mtime,timebuf2)) ;
 
 	            if (pip->debuglevel > 0) {
 
@@ -118,7 +120,7 @@ int		timeout, to_remove ;
 	                bprintf(pip->efp,"%s: lkfile=%s mtime=%s\n",
 	                    pip->progname,
 	                    lockfname,
-	                    timestr_log(sb.st_mtime,timebuf2)) ;
+	                    strtime_log(sb.st_mtime,timebuf2)) ;
 
 	            }
 
@@ -170,18 +172,18 @@ int		timeout, to_remove ;
 
 	        bprintf(pip->efp,"%s: lkfile=%s mtime=%s\n",
 	            pip->progname,
-	            timestr_log(sb.st_mtime,timebuf)) ;
+	            strtime_log(sb.st_mtime,timebuf)) ;
 
 	    }
 
 	    logfile_printf(&pip->lh,
 	        "%s could not capture lock (rs %d)\n",
-	        timestr_log(pip->daytime,timebuf),
+	        strtime_log(pip->daytime,timebuf),
 	        rs) ;
 
 	    logfile_printf(&pip->lh,"lkfile=%s mtime=%s\n",
 	        lockfname,
-	        timestr_log(sb.st_mtime,timebuf)) ;
+	        strtime_log(sb.st_mtime,timebuf)) ;
 
 	    if (pip->verboselevel > 0)
 	        bprintf(ofp, "failed to capture lock (rs %d)\n",rs) ;
