@@ -71,21 +71,21 @@ namespace {
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
-	int init() noex ;
-	int fini() noex ;
-	int get() noex ;
-	int setmode(mode_t) noex ;
+	int init	() noex ;
+	int fini	() noex ;
+	int get		() noex ;
+	int setmode	(mode_t) noex ;
 	void forkbefore() noex {
 	    mx.lockbegin() ;
-	} ;
+	} ; /* end */
 	void forkafter() noex {
 	    mx.lockend() ;
-	} ;
+	} ; /* end */
 	destruct umasker() {
             if (cint rs = fini() ; rs < 0) {
                 ulogerror("umask",rs,"dtor-fini") ;
             }
-	} ;
+	} ; /* end */
     } ; /* end struct (umasker) */
 } /* end namespace */
 
@@ -203,11 +203,11 @@ int umasker::fini() noex {
 	        void_f	a = umask_atforkafter ;
 	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit = false ;
 	    finitdone = false ;
 	} /* end if (atexit registered) */
@@ -225,7 +225,7 @@ int umasker::get() noex {
 			mode_t cm = umask(0) ; /* in case of race! */
 			umask(cm) ;
 			omask = int(cm) ;
-		    }
+		    } /* end */
 	            rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex) */
@@ -246,7 +246,7 @@ int umasker::setmode(mode_t cmask) noex {
 	        if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
 		    {
 			omask = umask(cmask) ;
-		    }
+		    } /* end */
 	            rs1 = mx.lockend ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex) */
