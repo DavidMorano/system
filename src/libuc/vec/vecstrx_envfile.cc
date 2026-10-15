@@ -142,13 +142,11 @@ namespace {
 /* forward references */
 
 local int	vecstrx_envfiler(vecstrx *,cchar *) noex ;
-local int	mkinit() noex ;
 local int	mkterms() noex ;
 
 
 /* local variables */
 
-static int	maxline = ulibval.maxline ;
 static vars	var ;
 static char	fterms[fieldterms_termsize] ;
 cbool		f_debug = CF_DEBUG ;
@@ -166,11 +164,10 @@ int vecstrx::envfile(cchar *fname) noex {
 	if (fname) ylikely {
 	    rs = SR_INVALID ;
 	    if (fname[0]) ylikely {
-		if (static cint rsi = mkinit() ; (rs = rsi) >= 0) ylikely {
+		if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		    rs = vecstrx_envfiler(this,fname) ;
 		    c = rs ;
-		} /* end if (mkinit) */
-		DPRINTF("mkinit() _out rs=%d\n",rs) ;
+		} /* end if (vars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
@@ -225,7 +222,7 @@ int vecstrx_envfiler(vecstrx *op,cchar *fname) noex {
 int subinfo::start() noex {
 	int		rs ;
 	int		sz = 0 ;
-	int		ai = 2 ;
+	int		ai = 2 ; /* double-sized allocation */
 	llen = var.linebuflen ;
 	sz += (ai * (llen + 1)) ;
 	if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) {
@@ -320,20 +317,11 @@ local int mkterms() noex {
 
 vars::operator int () noex {
 	int		rs ;
-	if ((rs = maxline) >= 0) ylikely {
+	if ((rs = ulibval.maxline) >= 0) ylikely {
 	    linebuflen = (rs * LINEBUFMULT) ;
-	}
+	    rs = mkterms() ;
+	} /* end */
 	return rs ;
 } /* end subroutine (vars::operator) */
-
-local int mkinit() noex {
-    	int		rs ;
-	DPRINTF("ent\n") ;
-	if ((rs = mkterms()) >= 0) ylikely {
-	    rs = var ;
-	}
-	DPRINTF("ret rs=%d\n",rs) ;
-	return rs ;
-} /* end subroutine (mkinit) */
 
 
