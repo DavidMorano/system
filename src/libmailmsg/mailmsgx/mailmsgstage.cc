@@ -33,48 +33,49 @@
 	for repeated access.
 
 	Use should proceed roughly as:
-
+	{{
 		if ((rs = mailmsgstage_start()) >= 0) {
 
 		    mailmsgstage_xxxx() 
 
 		    mailmegstage_finish()
 		} end if (mailmsgstage)
+	}}
 
 	This object is pretty fast also!
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/stat.h>
-#include	<sys/mman.h>
-#include	<sys/time.h>		/* for |gethrtime(3c)| */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<netdb.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |memcpy(3c)| */
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<filer.h>
-#include	<fdliner.h>
-#include	<vechand.h>
-#include	<comparse.h>
-#include	<mhcom.h>
-#include	<strn.h>
-#include	<six.h>
-#include	<mkpathx.h>
-#include	<hasx.h>
-#include	<opentmp.h>
-#include	<char.h>
-#include	<localmisc.h>		/* |COLUMNS| */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<sys/mman.h>		/* POSIX® */
+#include	<sys/time.h>		/* POSIX® |gethrtime(3c)| */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |memcpy(3c)| */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<fdliner.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<comparse.h>		/* LIBUC */
+#include	<mhcom.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 #include	<hdrextnum.h>		/* MAILMSG */
 #include	<mailmsghdrs.h>		/* MAILMSG */
 #include	<mailmsgmatenv.h>	/* MAILMSG */
