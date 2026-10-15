@@ -93,14 +93,14 @@ using libuc::libmem ;			/* variable */
 
 namespace {
     struct vars {
-	char		*symbuf ;
+	charp		symbuf ;
 	int		symlen ;
 	vars() noex = default ;
-	operator int () noex ;
-	void dtor() noex ;
+	operator int	() noex ;
+	void dtor	() noex ;
 	destruct vars() {
 	    if (symbuf) dtor() ;
-	} ;
+	} ; /* end destruct */
     } ; /* end struct (vars) */
 } /* end namespace */
 
@@ -111,8 +111,6 @@ namespace {
 /* local variables */
 
 static vars		var ;
-
-static int		symnamelen = ulibval.maxsymbol ;
 
 
 /* exported variables */
@@ -141,7 +139,7 @@ int vecstrx::addsyms(cc *objn,mainv syms) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = symnamelen) >= 0) ylikely {
+	if ((rs = ulibval.maxsymbol) >= 0) ylikely {
 	    symlen = rs ;
 	    if (char *p ; (rs = libmem.mall((symlen + 1),&p)) >= 0) {
 		symbuf = p ;
