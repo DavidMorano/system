@@ -95,7 +95,7 @@ local inline bool isbasic(cc *keyp,int keyl,cc *hbuf,int hlen) noex {
     	bool f = (keyl > 0) && (hlen > 0) ;
 	if (f) {
        	    f = (TOUC(keyp[0]) == TOUC(hbuf[0])) ;
-	}
+	} /* end */
     	return f ;
 } /* end subroutine (isbasic) */
 
@@ -119,7 +119,7 @@ int headkeymat(cchar *keyp,cchar *hbuf,int µhlen) noex {
 			if (cint kl = rmblk(hbuf,si) ; kl == keyl) {
 		            if (strncasecmp(hbuf,keyp,keyl) == 0) {
 			        idx = (si + 1) ;
-		            }
+		            } /* end */
 		        } /* end if (rmblk) */
 	            } /* end if (had ':') */
 		} /* end if (basic requirement) */
