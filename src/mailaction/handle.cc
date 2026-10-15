@@ -1,8 +1,9 @@
-/* handle */
+/* mailaction_handle SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* handle a connect request for a service */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
@@ -10,67 +11,63 @@
 #define	CF_SVCSHELLARG	0		/* parse service as SHELL arg ? */
 #define	CF_PEERNAME	1
 
-
 /* revision history:
 
 	= 1996-07-01, David A­D­ Morano
-
 	This program was originally written.
 
-
 	= 1998-07-01, David A­D­ Morano
-
 	I added the ability to specify the "address_from"
 	for the case when we add an envelope header to the message.
 
-
 */
 
+/* Copyright © 1998,1998 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /**************************************************************************
 
+  	Description:
 	This subrotuine processes a new connection that just came in.
 	This connection may have been passed to us by our own daemon or
 	it may have been passed to us by executing us with the
 	connection on standard input.
 
 	We:
-
 	1) get the service name, which is terminated by a line feed
 	2) search for the service if we have it
 	3) acknowledge the client, positively or negatively
 	4) call the proper service handler subroutine
 
-
 ***************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<ctime>
 #include	<csignal>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<vecstr.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<srvtab.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"srventry.h"
 #include	"builtin.h"
@@ -104,7 +101,7 @@
 /* external subroutines */
 
 extern int	field_svcargs(FIELD *,VECSTR *) ;
-extern int	nlspeername(const char *,const char *,char *) ;
+extern int	nlspeername(cchar *,cchar *,char *) ;
 extern int	processargs(char *,VECSTR *) ;
 extern int	execute(struct proginfo *,int,char *,char *,
 			VECSTR *,VECSTR *) ;
@@ -113,10 +110,8 @@ extern int	handle_srventry(struct proginfo *,
 			struct clientinfo *,CONNECTION *,vecstr *,
 			SRVTAB_ENT *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -128,9 +123,10 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local variables */
 
 
+/* exported variables */
 
 
-
+/* exported subroutines */
 
 int handle(pip,bip,ourp,cip)
 struct proginfo		*pip ;
@@ -300,7 +296,7 @@ struct clientinfo	*cip ;
 	fsb.lp[fsb.rlen] = '\0' ;
 
 	logfile_printf(&pip->lh,"%s service=%s ss=%s\n",
-	    timestr_logz(pip->daytime,timebuf),
+	    strtime_logz(pip->daytime,timebuf),
 	    cip->service,cip->subservice) ;
 
 /* put the rest of the arguments into a string list */
