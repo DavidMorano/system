@@ -29,7 +29,7 @@
 	Synopsis:
 	int fdbinit(pip,fname)
 	struct proginfo	*pip ;
-	const char	fname[] ;
+	cchar	fname[] ;
 
 	Arguments:
 	pip		program information pointer
@@ -245,7 +245,7 @@ bad1:
 
 int fdbfetch(pip,keyname,buf,buflen)
 struct proginfo	*pip ;
-const char	keyname[] ;
+cchar	keyname[] ;
 char		buf[] ;
 int		buflen ;
 {
