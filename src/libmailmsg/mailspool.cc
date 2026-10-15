@@ -170,14 +170,14 @@ int mailspool_open(MS *op,cchar *md,cchar *un,int of,mode_t om,int to) noex {
 	            }
 		    if (rs < 0) {
 		        mailspool_lfend(op) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (mailspool-lf) */
 	        mfd = si_finish(sip) ;
 	        if (rs >= 0) rs = mfd ;
 	    } /* end if (si) */
 	    if (rs < 0) {
 	        mailspool_close(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? mfd : rs ;
 } /* end subroutine (mailspool_open) */
@@ -379,7 +379,7 @@ local int si_lockoutend(si *sip,int prs) noex {
 	    rs1 = uc_unlink(op->lfname) ;
 	    if (rs >= 0) rs = rs1 ;
 	    bp[0] = '\0' ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end subroutine (si_lockoutend) */
 
@@ -420,7 +420,7 @@ local int si_lockin(si *sip) noex {
 	    if (rs < 0) {
 		u_close(mfd) ;
 		op->mfd = -1 ;
-	    }
+	    } /* end if (error) */
 	} /* end if (file-open) */
 	return (rs >= 0) ? mfd : rs ;
 } /* end subroutine (si_lockin) */
