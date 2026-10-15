@@ -31,14 +31,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<mailmsg.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<mailmsg.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsghdrs.h"
 
@@ -161,7 +161,7 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	        op->v[i] = nullptr ;
 	        if (rs >= 0) {
 		    op->magval = MAILMSGHDRS_MAGIC ;
-		}
+		} /* end if (ok) */
 		if (rs < 0) {
 		    rs1 = libmem.free(p) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -181,7 +181,7 @@ int mailmsghdrs_finish(mailmsghdrs *op) noex {
 	        rs1 = libmem.free(op->v) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->v = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
