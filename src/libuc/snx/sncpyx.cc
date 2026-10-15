@@ -20,9 +20,14 @@
 	|int| for the buffer size while the new |strlcpy(3c)| is
 	suppoed to use |size_t|.
 
+	= 2026-10-14, David A­D­ Morano
+	I removed the use of the subroutine |strlcpy(3c)|.  It just
+	was the wrong choice for what I want these subroutines to
+	do.  It was replaced w/ |strbcpy(3usys)|.
+
 */
 
-/* Copyright © 1998,1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,1999,2026 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -47,7 +52,7 @@
 	>=0		number of bytes copied into the destination buffer
 	<0		error (system-return)
 
-	Notes:
+	Notes: (obsoleted 2026-10-14, see revision above)
 	I am using the new (rumored to be coming as a standard)
 	subroutine |strlcpy(3c)|.  I wrote my own version of this
 	until it gets into the standard libraries.  It might be in
@@ -55,7 +60,7 @@
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
-	new standard, it might gets optimized for speed (like
+	new standard, it might get optimized for speed (like
 	writting in hand-coded assembly language).  So that is
 	pretty much the only reason I would use that interface
 	(which I do not like).
@@ -93,13 +98,15 @@
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<cstring>		/* LIBUC |strlcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU |strbcpy(3usys)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"sncpyx.h"
 
 
 /* imported namespaces */
+
+using usys::strbcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -149,31 +156,49 @@ int sncpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return sncpyx(dp,dl,6,s1,s2,s3,s4,s5,s6) ;
 } /* end subroutine (sncpy6) */
 
+local int sncpyx_pos(char *dp,int dl,int n,va_list ap) noex {
+    	int		rs = SR_OVERFLOW ;
+	char *bp = dp ;
+	for (int i = 0 ; dp && (i < n) ; i += 1) {
+	    ccp sp = (cc *) va_arg(ap,cc *) ;
+	    ccp cp = dp ;
+	    dp = strbcpy(dp,dl,sp) ;
+	    if (dp == nullptr) break ;
+	    dl -= intconv(dp - cp) ;
+	} /* end for */
+	if (dp) {
+	    rs = intconv(dp - bp) ;
+	}
+	return rs ;
+} /* end subroutine (sncpyx_pos) */
+
+local int sncpyx_neg(char *dp,int dl,int n,va_list ap) noex {
+    	int		rs = SR_OVERFLOW ;
+	char *bp = dp ;
+	(void) dl ;
+	for (int i = 0 ; dp && (i < n) ; i += 1) {
+	    ccp sp = (cc *) va_arg(ap,cc *) ;
+	    dp = stpcpy(dp,sp) ;
+	} /* end for */
+	if (dp) {
+	    rs = intconv(dp - bp) ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (sncpyx_pos) */
+
 int sncpyx(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	int		rl = 0 ; /* return-value */
-	char		*bp = dp ;
-	if (dl < 0) dl = (INT_MAX - 1) ;
 	if (dp) ylikely {
-	    size_t	rlen = (dl+1) ;
 	    va_begin(ap,n) ;
-	    rs = SR_OK ;
-	    dp[0] = '\0' ;
-	    for (int i = 0 ; i < n ; i += 1) {
-		size_t	ml ;
-	        ccharp	sp = (cc *) va_arg(ap,cc *) ;
-	        if ((ml = strlcpy(bp,sp,rlen)) >= rlen) {
-	            rs = SR_OVERFLOW ;
-		    break ;
-	        } /* end */
-	        bp += ml ;
-	        rlen -= ml ;
-	    } /* end for */
-	    rl = intconv(bp - dp) ;
+	    if (dl >= 0) {
+		rs = sncpyx_pos(dp,dl,n,ap) ;
+	    } else {
+		rs = sncpyx_neg(dp,dl,n,ap) ;
+	    } /* end if */
 	    va_end(ap) ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
+	return rs ;
 } /* end subroutine (sncpyx) */
 
 
