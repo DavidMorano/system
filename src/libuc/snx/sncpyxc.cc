@@ -66,13 +66,26 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<toxc.h>		/* LIBUC */
+#include	<usupport.h>		/* LIBU |chtoxc(3u)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"sncpyxc.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using libu::chtobc ;
+using libu::chtolc ;
+using libu::chtouc ;
+using libu::chtofc ;
+
+
+/* local typedefs */
+
+typedef char (*chtoxc_f)(int) noex ;
 
 
 /* external subroutines */
@@ -86,26 +99,22 @@
 
 /* forward references (local subroutine-templates) */
 
-template<int (*toxc)(int)>
-local int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
+local int sncpyxc(chtoxc_f cvt,char *dbuf,int dlen,cchar *sp) noex {
     	int		rs = SR_FAULT ;
-	int		rl = 0 ; /* return-value */
 	if (dbuf && sp) ylikely {
 	    int		i = 0 ; /* used-afterwards */
 	    char	*dp = dbuf ;
-	    rs = SR_OK ;
+	    rs = SR_OVERFLOW ;
 	    if (dlen < 0) dlen = INT_MAX ;
 	    while ((i < dlen) && sp[i]) {
-	        *dp++ = charconv(toxc(sp[i++])) ;
+	        *dp++ = cvt(sp[i++]) ;
 	    } /* end while */
 	    *dp = '\0' ;
 	    if (sp[i] == '\0') {
-	        rl = intconv(dp - dbuf) ;
-	    } else {
-		rs = SR_OVERFLOW ;
+	        rs = intconv(dp - dbuf) ;
 	    } /* end if */
 	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
+	return rs ;
 } /* end subroutine-template (sncpyxc) */
 
 
@@ -118,19 +127,19 @@ local int sncpyxc(char *dbuf,int dlen,cchar *sp) noex {
 /* exported subroutines */
 
 int sncpybc(char *dp,int dl,cchar *s1) noex {
-	return sncpyxc<tobc>(dp,dl,s1) ;
+	return sncpyxc(chtobc,dp,dl,s1) ;
 } /* end subroutine */
 
 int sncpylc(char *dp,int dl,cchar *s1) noex {
-	return sncpyxc<tolc>(dp,dl,s1) ;
+	return sncpyxc(chtolc,dp,dl,s1) ;
 } /* end subroutine */
 
 int sncpyuc(char *dp,int dl,cchar *s1) noex {
-	return sncpyxc<touc>(dp,dl,s1) ;
+	return sncpyxc(chtouc,dp,dl,s1) ;
 } /* end subroutine */
 
 int sncpyfc(char *dp,int dl,cchar *s1) noex {
-	return sncpyxc<tofc>(dp,dl,s1) ;
+	return sncpyxc(chtofc,dp,dl,s1) ;
 } /* end subroutine */
 
 
