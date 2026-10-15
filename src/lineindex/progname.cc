@@ -63,8 +63,8 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -84,7 +84,7 @@ extern int	mkpath2(char *,const char *,const char *) ;
 
 int progname(pip,name)
 struct proginfo	*pip ;
-const char	name[] ;
+cchar	name[] ;
 {
 	LINEINDEX	li ;
 
