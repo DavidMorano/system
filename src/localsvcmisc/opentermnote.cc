@@ -27,8 +27,8 @@
 
 	Synopsis:
 	int opentermnote(pr,recips,max,opts)
-	const char	*pr ;
-	const char	**recips ;
+	cchar	*pr ;
+	cchar	**recips ;
 	int		max ;
 	int		opts ;
 
@@ -91,17 +91,17 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matkeystr(char **,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	matkeystr(char **,cchar *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -110,9 +110,9 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 struct targs {
-	const char	**recips ;
-	const char	*a ;		/* the allocation */
-	const char	*pr ;
+	cchar	**recips ;
+	cchar	*a ;		/* the allocation */
+	cchar	*pr ;
 	int		max ;
 	int		opts ;
 	int		rfd ;
@@ -121,10 +121,10 @@ struct targs {
 
 /* forward references */
 
-static int targs_start(TARGS *,const char *,const char **,int,int,int) ;
-static int targs_finish(TARGS *) ;
+local int targs_start(TARGS *,cchar *,cchar **,int,int,int) ;
+local int targs_finish(TARGS *) ;
 
-static int termnoter(TARGS *) ;
+local int termnoter(TARGS *) ;
 
 
 /* local variables */
@@ -167,11 +167,11 @@ int opentermnote(cchar *pr,cchar **recips,int max,int opts)
 
 	if ((rs = uc_piper(pipes,0,3)) >= 0) {
 	    TARGS	*tap ;
-	    const int	size = sizeof(TARGS) ;
+	    cint	size = sizeof(TARGS) ;
 	    int		i ;
 	    fd = pipes[0] ;
 	    if ((rs = uc_malloc(size,&tap)) >= 0) {
-	        const int	rfd = pipes[1] ;
+	        cint	rfd = pipes[1] ;
 	        if ((rs = targs_start(tap,pr,recips,max,opts,rfd)) >= 0) {
 	            if ((rs = uc_fork()) == 0) { /* child */
 	                int		ex ;
@@ -212,10 +212,10 @@ int opentermnote(cchar *pr,cchar **recips,int max,int opts)
 /* local subroutines */
 
 
-static int targs_start(tap,pr,recips,max,opts,rfd)
+local int targs_start(tap,pr,recips,max,opts,rfd)
 TARGS		*tap ;
-const char	*pr ;
-const char	**recips ;
+cchar	*pr ;
+cchar	**recips ;
 int		max ;
 int		opts ;
 int		rfd ;
@@ -239,14 +239,14 @@ int		rfd ;
 	    size += (strlen(recips[i]) + 1) ;
 	}
 	nrecips = i ;
-	size += ((nrecips + 1) * sizeof(const char *)) ;
+	size += ((nrecips + 1) * sizeof(cchar *)) ;
 
 	if ((rs = uc_malloc(size,&vp)) >= 0) {
 	tap->a = vp ;
-	tap->recips = (const char **) vp ;
+	tap->recips = (cchar **) vp ;
 	{
 	    char	*bp = vp ;
-	    strp = bp + ((nrecips + 1) * sizeof(const char *)) ;
+	    strp = bp + ((nrecips + 1) * sizeof(cchar *)) ;
 	}
 	for (i = 0 ; recips[i] != NULL ; i += 1) {
 	    tap->recips[i] = strp ;
@@ -262,7 +262,7 @@ int		rfd ;
 /* end subroutine (targs_start) */
 
 
-static int targs_finish(TARGS *tap)
+local int targs_finish(TARGS *tap)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -282,7 +282,7 @@ static int targs_finish(TARGS *tap)
 
 
 /* this is the worker subroutines */
-static int termnoter(TARGS *tap)
+local int termnoter(TARGS *tap)
 {
 	TERMNOTE	tn ;
 	int		rs = SR_OK ;
@@ -291,8 +291,8 @@ static int termnoter(TARGS *tap)
 	int		rfd ;
 	int		max, opts ;
 	int		c = 0 ;
-	const char	*pr ;
-	const char	**recips ;
+	cchar	*pr ;
+	cchar	**recips ;
 	char		*buf = NULL ;
 
 #if	CF_DEBUGS
