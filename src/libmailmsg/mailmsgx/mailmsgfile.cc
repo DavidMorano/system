@@ -42,37 +42,38 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdarg>
-#include	<cstring>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucdesc.h>
-#include	<bufsizeget.h>
-#include	<sysval.hh>
-#include	<opentmp.h>
-#include	<hdb.h>
-#include	<filer.h>
-#include	<linefold.h>
-#include	<fsdir.h>
-#include	<vecstr.h>
-#include	<vecpstr.h>
-#include	<upt.h>
-#include	<ncol.h>		/* |ncolstr(3uc)| */
-#include	<tabcols.h>		/* |TABCOLS_DEF| */
-#include	<mkx.h>
-#include	<mkpathx.h>
-#include	<pathadd.h>
-#include	<strwcpy.h>
-#include	<rmx.h>
-#include	<cfdec.h>
-#include	<char.h>
-#include	<varnames.hh>
-#include	<localmisc.h>		/* |COLUMNS| + |NTABCOLS| */
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<bufsizeget.h>		/* LIBUC */
+#include	<sysval.hh>		/* LIBUC */
+#include	<opentmp.h>		/* LIBUC */
+#include	<hdb.h>			/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<linefold.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vecpstr.h>		/* LIBUC */
+#include	<ncol.h>		/* LIBUC |ncolstr(3uc)| */
+#include	<tabcols.h>		/* LIBUC |TABCOLS_DEF| */
+#include	<mkx.h>			/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<varnames.hh>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU |COLUMNS| + |NTABCOLS| */
 
 #include	"mailmsgfile.h"
 
@@ -99,7 +100,6 @@ import uconstants ;			/* |varname(3u) */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -138,11 +138,12 @@ template<typename ... Args>
 local int mailmsgfile_ctor(mailmsgfile *op,Args ... args) noex {
     	MAILMSGFILE	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    memclear(hop) ;
 	    rs = SR_NOMEM ;
-	    if ((op->flp = new(nothrow) hdb) != np) ylikely {
+	    if ((op->flp = new(nt) hdb) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-hdb) */
 	} /* end if (non-null) */
