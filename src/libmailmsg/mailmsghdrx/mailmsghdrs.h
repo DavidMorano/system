@@ -20,9 +20,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<mailmsg.h>		/* used as argument */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mailmsg.h>		/* LIBMAILMSG used as argument */
 
 #define	MAILMSGHDRS		struct mailmsghdrs_head
 #define	MAILMSGHDRS_MAGIC	0x87987598
