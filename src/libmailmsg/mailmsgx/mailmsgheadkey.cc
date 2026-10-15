@@ -52,16 +52,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<hasx.h>
-#include	<isch.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsgheadkey.h"
 
@@ -104,21 +104,21 @@ cbool		f_progressive = CF_PROGRESSIVE ;
 int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
-	if (sp && kpp) {
+	if (sp && kpp) ylikely {
 	    rs = SR_OK ;
 	    if_constexpr (f_progressive) {
 	        cchar	*kp = nullptr ;
-	        while (sl && isspacetab(*sp)) {
+	        while (sl && ischblk(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        } /* end while */
 	        kp = sp ;
-	        while (sl && ishdrkey(*sp)) {
+	        while (sl && ischhdrkey(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        } /* end while */
 	        kl = (sp - kp) ;
-	        while (sl && isspacetab(*sp)) {
+	        while (sl && ischblk(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        } /* end while */
@@ -126,7 +126,7 @@ int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 		    *kpp = kp ;
 	        } else {
 		    kl = 0 ;
-	        }
+	        } /* end if */
 	    } else {
 	        if (char *tp ; (tp = strnochr(sp,sl,':')) != nullptr) {
 		    cint	ll = intconv(tp - sp) ;
@@ -136,7 +136,7 @@ int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 		            *kpp = cp ;
 			    kl = cl ;
 		        }
-		    }
+		    } /* end if (sfshrink) */
 	        } /* end if (had ':') */
 	    } /* end if_constexpr (f_progressive) */
 	} /* end if (non-null) */
