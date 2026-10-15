@@ -1,4 +1,4 @@
-/* uctimx HEADER interval timer) */
+/* uctimx HEADER (interval timer) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
