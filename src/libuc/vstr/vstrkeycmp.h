@@ -39,34 +39,34 @@ extern int	vstrkeyfoldcmpx(cchar **,cchar **,vstrorders) noex ;
 
 local inline int vstrkeycmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeybasecmp(s1pp,s2pp) ;
-}
+} /* end */
 local inline int vstrkeycmpo(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeybasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-}
+} /* end */
 local inline int vstrkeycmpr(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeybasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-}
+} /* end */
 
 local inline int vstrkeybasecmpo(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeybasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-}
+} /* end */
 local inline int vstrkeybasecmpr(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeybasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-}
+} /* end */
 
 local inline int vstrkeycasecmpo(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeycasecmpx(s1pp,s2pp,vstrorder_obverse) ;
-}
+} /* end */
 local inline int vstrkeycasecmpr(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeycasecmpx(s1pp,s2pp,vstrorder_reverse) ;
-}
+} /* end */
 
 local inline int vstrkeyfoldcmpo(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyfoldcmpx(s1pp,s2pp,vstrorder_obverse) ;
-}
+} /* end */
 local inline int vstrkeyfoldcmpr(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyfoldcmpx(s1pp,s2pp,vstrorder_reverse) ;
-}
+} /* end */
 
 EXTERNC_end
 
