@@ -101,7 +101,7 @@ int mailmsghdrct_start(MMHCT *op,cchar *hp,int hl) noex {
 	    rs = SR_NOSYS ;
 	    if (rs < 0) {
 		mailmsghdrct_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mailmsghdrct_ctor) */
 	return (rs >= 0) ? nparams : rs ;
 } /* end subroutine (mailmsghdrct_start) */
@@ -130,7 +130,7 @@ int mailmsghdrct_paramget(MMHCT *op,int i,MMHCT_PAR *rp) noex {
 	    if ((i >= 0) && (i < MAILMSGHDRCT_NPARAMS)) {
 		rs = op->p[i].kl ;
 		*rp = op->p[i] ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (mailmsghdrct_paramget) */
