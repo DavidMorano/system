@@ -71,6 +71,7 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<headkeymat.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -336,7 +337,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	pip->daytime = pip->now.time ;
 
-	timestr_logz(pip->daytime,pip->stamp) ;
+	strtime_logz(pip->daytime,pip->stamp) ;
 
 	pip->verboselevel = 1 ;
 
@@ -369,7 +370,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -1060,7 +1061,7 @@ int main(int argc,mainv argv,mainv envv) {
 #endif
 
 	    logfile_printf(&pip->lh,"%s %-14s %s/%s",
-	        timestr_logz(pip->now.time,timebuf),
+	        strtime_logz(pip->now.time,timebuf),
 	        pip->progname,
 	        VERSION,(pip->fl.sysv_ct ? "SYSV" : "BSD")) ;
 
@@ -2330,7 +2331,7 @@ local intt getprogopts(PI *pip,keyopt *kop,vecstr *setsp) noex {
 	            cp = "+" ;
 	            cl = 1 ;
 	            if (vlen > 0) {
-			const int	ch = MKCHAR(vp[0]) ;
+			cint	ch = MKCHAR(vp[0]) ;
 	                if (isdigitlatin(ch)) {
 
 	                    if (cfdeci(vp,vlen,&val) >= 0)
@@ -2736,7 +2737,7 @@ cchar	*nsp ;
 	strwcpy(nodename,nap,MIN(nl,NODENAMELEN)) ;
 
 	if (pp != nullptr) {
-	    const int	ch = MKCHAR(pp[0]) ;
+	    cint	ch = MKCHAR(pp[0]) ;
 
 	    if (isdigitlatin(ch)) {
 
