@@ -30,7 +30,7 @@ namespace libu {
     extern int cfdecti(cchar *,int,int *) noex ;
     inline int cfdect(cchar *sp,int sl,int *rp = nullptr) noex {
 	return libu::cfdecti(sp,sl,rp) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 
