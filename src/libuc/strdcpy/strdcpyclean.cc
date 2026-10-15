@@ -1,4 +1,4 @@
-/* strdcpyclean SUPPORT */
+/* strdcpyclean SUPPORT (String-Destination-Copy) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
