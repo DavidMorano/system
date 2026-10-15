@@ -45,16 +45,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ema.h>
-#include	<sfx.h>
-#include	<snwcpy.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ema.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdrextid.h"
 
@@ -104,15 +104,15 @@ int hdrextid(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	                    if ((ep->rp != nullptr) && (ep->rl > 0)) {
 			        sp = ep->rp ;
 			        sl = ep->rl ;
-			    }
+			    } /* end */
 	                    if (sl > 0) {
 			        int	al ;
 			        cchar	*ap ;
 			        if ((al = sfshrink(sp,sl,&ap)) > 0) {
 	                            rs = snwcpy(rbuf,rlen,ap,al) ;
 	                            len = rs ;
-			        }
-	                    }
+			        } /* end */
+	                    } /* end */
 	                } /* end if (non-null) */
 		        if (len > 0) break ;
 		        if (rs < 0) break ;
