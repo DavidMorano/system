@@ -63,11 +63,11 @@ OBJ15_USYS= usys_getauid.o usys_atox.o usys_strtox.o
 OBJ16_USYS= usys_getprocuid.o usys_sysctl.o
 OBJ17_USYS= usys_in4in6addr.o
 OBJ18_USYS= usys_strw.o usys_snx.o
-OBJ19_USYS= usys_execname.o
+OBJ19_USYS= usys_execname.o usys_termios.o
 
 OBJ20_USYS= usys_strxbrk.o 
 OBJ21_USYS= usys_stpcpy.o usys_stpncpy.o
-OBJ22_USYS=
+OBJ22_USYS= usys_strbcpy.o
 OBJ23_USYS=
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
@@ -77,7 +77,7 @@ OBJD= obj09_usys.o obj10_usys.o obj11_usys.o
 OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
 OBJG= obj18_usys.o obj19_usys.o obj20_usys.o
-OBJH= obj21_usys.o
+OBJH= obj21_usys.o obj22_usys.o
 
 OBJ_J0= obja.o objb.o objc.o objd.o 
 OBJ_J1= obje.o objf.o objg.o objh.o
@@ -276,6 +276,7 @@ usys_umaxmsglen.o:	usys_umaxmsglen.cc	usys_umaxmsglen.h	$(INCS)
 usys_plock.o:		usys_plock.cc		usys_plock.h		$(INCS)
 usys_execname.o:	usys_execname.cc	usys_execname.hh	$(INCS)
 usys_snx.o:		usys_snx.cc		usys_snx.hh		$(INCS)
+usys_strw.o:		usys_strbcpy.cc		usys_strbcpy.hh		$(INCS)
 usys_strw.o:		usys_strw.cc		usys_strw.hh		$(INCS)
 
 # missing operating system calls or facilities
@@ -314,6 +315,7 @@ usys_nprocs.o:		usys_nprocs.cc		usys_nprocs.h		$(INCS)
 usys_in4in6addr.o:	usys_in4in6addr.cc	usys_in4in6addr.h	$(INCS)
 usys_timezone.o:	usys_timezone.cc	usys_timezone.h		$(INCS)
 usys_sysctl.o:		usys_sysctl.cc		usys_sysctl.h		$(INCS)
+usys_termios.o:		usys_termios.cc		usys_termios.h		$(INCS)
 
 # special
 usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
