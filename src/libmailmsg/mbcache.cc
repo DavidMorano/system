@@ -160,12 +160,12 @@ local int mbcache_ctor(mbcache *op,Args ... args) noex {
 		    if (rs < 0) {
 		        delete op->spp ;
 		        op->spp = nullptr ;
-		    }
+		    } /* end if (delete) */
 		} /* end if (new-strpack) */
 		if (rs < 0) {
 		    delete op->mip ;
 		    op->mip = nullptr ;
-		}
+		} /* end if (delete) */
 	    } /* end if (new-mailbox_info) */
 	} /* end if (non-null) */
 	return rs ;
@@ -178,15 +178,15 @@ local int mbcache_dtor(mbcache *op) noex {
 	    if (op->dmp) ylikely {
 		delete op->dmp ;
 		op->dmp = nullptr ;
-	    }
+	    } /* end if (delete) */
 	    if (op->spp) ylikely {
 		delete op->spp ;
 		op->spp = nullptr ;
-	    }
+	    } /* end if (delete) */
 	    if (op->mip) ylikely {
 		delete op->mip ;
 		op->mip = nullptr ;
-	    }
+	    } /* end if (delete) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (mbcache_dtor) */
@@ -290,7 +290,7 @@ int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		mbcache_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mbcache_ctor) */
 	return (rs >= 0) ? nmsgs : rs ;
 } /* end subroutine (mbcache_start) */
@@ -320,17 +320,17 @@ local int mbcache_starter(mbcache *op,cc *mbfname) noex {
 			    }
 	                    if (rs < 0) {
 	                        strpack_finish(psp) ;
-			    }
+			    } /* end if (error) */
 	                } /* end if (strpack_start) */
 	                if (rs < 0) {
 	                    libmem.free(op->msgs) ;
 	                    op->msgs = nullptr ;
-	                }
+	                } /* end if (error) */
 	            } /* end if (memory-allocation) */
 	        } else {
 	            rs = SR_NOANODE ;
-		}
-	    }
+		} /* end if (error) */
+	    } /* end if */
 	    if (rs < 0) {
 		void *vp = voidp(op->mbfname) ;
 	        libmem.free(vp) ;
@@ -366,7 +366,7 @@ int mbcache_finish(mbcache *op) noex {
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->mbfname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    {
 		rs1 = mbcache_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
@@ -776,17 +776,17 @@ local int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 	                }
 	                if (rs < 0) {
 	                    msgent_finish(mep) ;
-			}
+			} /* end if (error) */
 	            } /* end if (msgent_start) */
 	            if (rs < 0) {
 	                libmem.free(mep) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (memory-allocation) */
 	    } /* end if (mailbox_getret) */
 	} /* end if (needed) */
 	if (mpp) {
 	    *mpp = (rs >= 0) ? op->msgs[mi] : nullptr ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (mbcache_msgframing) */
 
@@ -797,9 +797,9 @@ local int mbcache_msgtimers(mbcache *op,int mi,time_t *timep) noex {
 	        if (timep != nullptr) {
 	            timep[0] = mep->etime ;
 	            timep[1] = mep->htime ;
-	        }
-	    }
-	}
+	        } /* end */
+	    } /* end */
+	} /* end */
 	return rs ;
 } /* end subroutine (mbcache_msgtimers) */
 
@@ -824,7 +824,7 @@ local int mbcache_msgscanmk(mbcache *op,int mi) noex {
 	                mep->vs[mbcachemf_scanline] = bp ;
 	            } else {
 	                libmem.free(bp) ;
-		    }
+		    } /* end */
 	        } /* end if (memory-allocation) */
 	    } /* end if */
 	} /* end if (not-null) */
@@ -875,13 +875,13 @@ local int msgent_finish(ME *mep) noex {
 	        mep->fl.lineoffs = false ;
 	        rs1 = vecint_finish(&mep->lineoffs) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (mep->fname != nullptr) ylikely {
 		void *vp = voidp(mep->fname) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        mep->fname = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (msgent_finish) */
