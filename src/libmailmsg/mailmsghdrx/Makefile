@@ -40,19 +40,18 @@ MODS +=
 LIBS +=
 
 
-OBJ0_MAILMSGHDRX= mailmsghdrct.o mailmsghdrfold.o
-OBJ1_MAILMSGHDRX= mailmsghdrs.o mailmsghdrval.o
-OBJ2_MAILMSGHDRX=
-OBJ3_MAILMSGHDRX=
+OBJ0= mailmsghdrct.o mailmsghdrfold.o
+OBJ1= mailmsghdrs.o mailmsghdrval.o
+OBJ2=
+OBJ3=
 
-OBJA_MAILMSGHDRX= obj0_mailmsghdrx.o obj1_mailmsghdrx.o
+OBJA= obj0.o obj1.o
 
-OBJ_MAILMSGHDRX= $(OBJA_MAILMSGHDRX)
+OBJ= $(OBJA)
 
 
 LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -95,7 +94,7 @@ all:			$(ALL)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			$(OBJ_MAILMSGHDRX)
+$(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
@@ -111,16 +110,16 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_mailmsghdrx.o:	$(OBJ0_MAILMSGHDRX)
+obj0.o:			$(OBJ0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_mailmsghdrx.o:	$(OBJ1_MAILMSGHDRX)
+obj1.o:			$(OBJ1)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_mailmsghdrx.o:	$(OBJ2_MAILMSGHDRX)
+obj2.o:			$(OBJ2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_mailmsghdrx.o:	$(OBJ3_MAILMSGHDRX)
+obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
