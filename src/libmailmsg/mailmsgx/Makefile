@@ -40,20 +40,19 @@ MODS +=
 LIBS +=
 
 
-OBJ0_MAILMSGX= mailmsgatt.o mailmsgattent.o 
-OBJ1_MAILMSGX= mailmsgfile.o mailmsgfrom.o 
-OBJ2_MAILMSGX= mailmsgheadkey.o mailmsgstage.o
-OBJ3_MAILMSGX= mailmsgviewer.o
+OBJ0= mailmsgatt.o mailmsgattent.o 
+OBJ1= mailmsgfile.o mailmsgfrom.o 
+OBJ2= mailmsgheadkey.o mailmsgstage.o
+OBJ3= mailmsgviewer.o
 
-OBJA= obj0_mailmsgx.o obj1_mailmsgx.o
-OBJB= obj2_mailmsgx.o obj3_mailmsgx.o
+OBJA= obj0.o obj1.o
+OBJB= obj2.o obj3.o
 
-OBJ_MAILMSGX= obja.o objb.o
+OBJ= obja.o objb.o
 
 
 LDRPATH= $(EXTRA)/lib
-
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -99,7 +98,7 @@ all:			$(ALL)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).o:			$(OBJ_MAILMSGX)
+$(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 $(T).nm:		$(T).o
@@ -115,16 +114,16 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_mailmsgx.o:	$(OBJ0_MAILMSGX)
+obj0.o:			$(OBJ0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj1_mailmsgx.o:	$(OBJ1_MAILMSGX)
+obj1.o:			$(OBJ1)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj2_mailmsgx.o:	$(OBJ2_MAILMSGX)
+obj2.o:			$(OBJ2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-obj3_mailmsgx.o:	$(OBJ3_MAILMSGX)
+obj3.o:			$(OBJ3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -138,16 +137,9 @@ objb.o:			$(OBJB)
 mailmsgatt.o:		mailmsgatt.cc		mailmsgatt.h		$(INCS)
 mailmsgattent.o:	mailmsgattent.cc	mailmsgattent.h		$(INCS)
 mailmsgfile.o:		mailmsgfile.cc		mailmsgfile.h		$(INCS)
-mailmsgfile.o:		modules
 mailmsgfrom.o:		mailmsgfrom.cc		mailmsgfrom.h		$(INCS)
 mailmsgheadkey.o:	mailmsgheadkey.cc	mailmsgheadkey.h	$(INCS)
 mailmsgstage.o:		mailmsgstage.cc		mailmsgstage.h		$(INCS)
 mailmsgviewer.o:	mailmsgviewer.cc	mailmsgviewer.h		$(INCS)
-
-modules:		valuelims.o digbufsizes.o
-
-valuelims.o:		
-
-digbufsizes.o:
 
 
