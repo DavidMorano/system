@@ -43,7 +43,7 @@
 #include	<varsub.h>
 #include	<field.h>
 #include	<ascii.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
