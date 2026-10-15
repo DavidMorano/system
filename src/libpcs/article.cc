@@ -162,7 +162,7 @@ int article_start(AR *op) noex {
 	                op->fl.path = true ;
 	    	        retpath_finish(op->pathp) ;
 		    } /* end if (error) */
-	        }
+	        } /* end if */
 	        if (rs < 0) {
 	            op->fl.ngs = false ;
 		    ng_finish(op->ngp) ;
@@ -183,7 +183,7 @@ int article_finish(AR *op) noex {
 	        op->fl.msgdate = false ;
 	        rs1 = dater_finish(op->msgp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if */
 	    if (op->fl.envdates) {
 	        vechand *envp = op->envp ;
 	        op->fl.envdates = false ;
@@ -206,12 +206,12 @@ int article_finish(AR *op) noex {
 	        op->fl.path = false ;
 	        rs1 = retpath_finish(op->pathp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if */
 	    if (op->fl.ngs) {
 	        op->fl.ngs = false ;
 	        rs1 = ng_finish(op->ngp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if */
 	    for (int i = 0 ; i < articleaddr_overlast ; i += 1) {
 	        if (op->af[i]) {
 	            op->af[i] = false ;
@@ -230,7 +230,7 @@ int article_finish(AR *op) noex {
 	    {
 	        rs1 = article_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (article_finish) */
@@ -241,7 +241,7 @@ int article_addpath(AR *op,cchar *sp,int sl) noex {
 	    if (! op->fl.path) {
 	        op->fl.path = true ;
 	        rs = retpath_start(op->pathp) ;
-	    }
+	    } /* end */
 	    if (rs >= 0) ylikely {
 	        rs = retpath_parse(op->pathp,sp,sl) ;
 	    } /* end if (ok) */
@@ -255,7 +255,7 @@ int article_addng(AR *op,cchar *sp,int sl) noex {
 	    if (! op->fl.ngs) {
 	        op->fl.ngs = true ;
 	        rs = ng_start(op->ngp) ;
-	    }
+	    } /* end */
 	    if (rs >= 0) ylikely {
 	        rs = ng_addparse(op->ngp,sp,sl) ;
 	    } /* end if (ok) */
@@ -273,7 +273,7 @@ int article_addenvdate(AR *op,dater *d2p) noex {
 		    if (rs < 0) {
 		        dater_finish(dp) ;
 		    }
-	        }
+	        } /* end */
 	        if (rs < 0) {
 		    mem.free(dp) ;
 	        } /* end if (error) */
@@ -288,7 +288,7 @@ int article_addmsgdate(AR *op,dater *dp) noex {
 	    if (! op->fl.msgdate) {
 	        op->fl.msgdate = true ;
 	        rs = dater_start(op->msgp,nullptr,nullptr,0) ;
-	    }
+	    } /* end */
 	    if (rs >= 0) ylikely {
 	        rs = dater_setcopy(op->msgp,dp) ;
 	    } /* end if (ok) */
@@ -306,10 +306,10 @@ int article_addaddr(AR *op,int type,cchar *sp,int sl) noex {
 	        if (! op->af[type]) {
 	            op->af[type] = true ;
 	            rs = ema_start(&op->addr[type]) ;
-	        }
+	        } /* end */
 	        if (rs >= 0) ylikely {
 	            rs = ema_parse(&op->addr[type],sp,sl) ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -357,7 +357,7 @@ int article_addparse(AR *op,cchar *sp,int sl) noex {
 	                    if ((cl = sfshrink(ep->ap,ep->al,&cp)) > 0) {
 			        n += 1 ;
 	                        rs = ng_add(op->ngp,cp,cl,nullptr) ;
-		            }
+		            } /* end */
 		        } /* end if (non-null) */
 	                if (rs < 0) break ;
 	            } /* end for */
@@ -393,7 +393,7 @@ int article_getenvdate(AR *op,int i,dater **epp) noex {
 	    if (void *vp ; (rs = envp->get(i,&vp)) >= 0) {
 		dater *dp = (dater *) vp ;
 		*epp = dp ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (article_getenvdate) */
@@ -412,7 +412,7 @@ int article_getstr(AR *op,int type,cchar **rpp) noex {
 	    } /* end if (valid) */
 	    if (rpp) {
 	        *rpp = (rs >= 0) ? sp : nullptr ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (article_getstr) */
@@ -427,10 +427,10 @@ int article_getaddrema(AR *op,int type,ema **rpp) noex {
 	        if (! op->af[type]) {
 	            op->af[type] = true ;
 	            rs = ema_start(&op->addr[type]) ;
-	        }
+	        } /* end */
 	        if (rpp) {
 	            *rpp = (rs >= 0) ? (op->addr + type) : nullptr ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
