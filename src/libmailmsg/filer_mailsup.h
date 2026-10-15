@@ -43,9 +43,9 @@
 
 EXTERNC_begin
 
-extern int	filer_writehdr(filer *,cchar *,int) noex ;
-extern int	filer_writehdrkey(filer *,cchar *) noex ;
-extern int	filer_printlncont(filer *,int,cchar *,int) noex ;
+extern int	filer_writehdr		(filer *,cchar *,int) noex ;
+extern int	filer_writehdrkey	(filer *,cchar *) noex ;
+extern int	filer_printlncont	(filer *,int,cchar *,int) noex ;
 
 EXTERNC_end
 
