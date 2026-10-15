@@ -1,13 +1,11 @@
-/* watch */
+/* watch SUPPORT */
 
 /* watch (listen on) the specified socket */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1		/* switchable debug print-outs */
 #define	CF_WHOOPEN	0		/* who is open */
 #define	CF_SIGCHILD	0		/* catch SIGCHLD ? */
-
 
 /* revision history:
 
@@ -65,7 +63,6 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<baops.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<logfile.h>
 #include	<varsub.h>
@@ -74,6 +71,8 @@
 #include	<exitcodes.h>
 #include	<getax.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>
 
 #include	"connection.h"
 #include	"config.h"
@@ -97,17 +96,11 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkdirs(const char *,mode_t) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkdirs(cchar *,mode_t) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-
-#if	CF_DEBUG
-extern char	*d_reventstr() ;
-#endif
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* externals variables */
@@ -126,17 +119,17 @@ struct clientinfo {
 
 /* forward references */
 
-static int	spawnserver(PROGINFO *,int,struct clientinfo *) ;
-static int	mktmp(PROGINFO *,char *) ;
-static int	writeout() ;
+local int	spawnserver(PROGINFO *,int,struct clientinfo *) ;
+local int	mktmp(PROGINFO *,char *) ;
+local int	writeout() ;
 
-static void	int_exit(int) ;
-static void	int_child(int) ;
+local void	int_exit(int) ;
+local void	int_child(int) ;
 
 
 /* external variables */
 
-static int	f_exit, f_child ;
+local int	f_exit, f_child ;
 
 
 /* local variables */
@@ -305,7 +298,7 @@ char		username[] ;
 
 /* local subroutines */
 
-static int spawnserver(pip,fd_listen,cip)
+local int spawnserver(pip,fd_listen,cip)
 PROGINFO		*pip ;
 int			fd_listen ;
 struct clientinfo	*cip ;
@@ -480,7 +473,7 @@ struct clientinfo	*cip ;
 /* end subroutine (spawnserver) */
 
 
-static void int_exit(sn)
+local void int_exit(sn)
 int	sn ;
 {
 
@@ -489,7 +482,7 @@ int	sn ;
 /* end subroutine (int_exit) */
 
 
-static void int_child(sn)
+local void int_child(sn)
 int	sn ;
 {
 
@@ -500,7 +493,7 @@ int	sn ;
 #ifdef	COMMENT
 
 /* write out the output files from the executed program */
-static int writeout(pip,fd,s)
+local int writeout(pip,fd,s)
 PROGINFO	*pip ;
 int	fd ;
 char	s[] ;
@@ -540,7 +533,7 @@ char	s[] ;
 
 
 /* make the private TMP area */
-static int mktmp(pip,jobdname)
+local int mktmp(pip,jobdname)
 PROGINFO	*pip ;
 char		jobdname[] ;
 {
