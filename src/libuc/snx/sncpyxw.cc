@@ -18,9 +18,14 @@
 	vendors this will all seemlessly transition to using the
 	vendor version.
 
+	= 2026-10-14, David A­D­ Morano
+	I removed the use of the subroutine |strlcpy(3c)|.  It just
+	was the wrong choice for what I want these subroutines to
+	do.  It was replaced w/ |strbcpy(3usys)|.
+
 */
 
-/* Copyright © 1998,1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,1999,2026 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -38,7 +43,7 @@
 	buffer NUL-terminated.  Please observe and be careful with
 	any possible modifications.
 
-	Notes:
+	Notes: (obsoleted 2026-10-14, see revision above)
 	I am using the new (rumored to be coming as a standard)
 	subroutine |strlcpy(3c)|.  I wrote my own version of this
 	until it gets into the standard libraries.  It might be in
@@ -46,7 +51,7 @@
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
-	new standard, it might gets optimized for speed (like
+	new standard, it might get optimized for speed (like
 	writting in hand-coded assembly language).  So that is
 	pretty much the only reason I would use that interface
 	(which I do not like).
@@ -76,10 +81,18 @@
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<cstring>		/* CSTD |strlcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU |strbcpy(3usys)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"sncpyxw.h"
+
+
+/* local typedefs */
+
+
+/* imported namespaces */
+
+using usys::strbcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -95,8 +108,6 @@
 
 
 /* forward references */
-
-local bool hasgot(ccp,int) noex ;
 
 
 /* local variables */
@@ -140,45 +151,29 @@ int sncpy6w(char *dp,int dl,
 int sncpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	int		rl = 0 ; /* return-value */
 	if (dl < 0) dl = INT_MAX ;
 	if (dp) ylikely {
-	    size_t	rmlen = (dl + 1) ;
-	    char	*bp = dp ;
 	    va_begin(ap,n) ;
-	    rs = SR_OK ;
+	    char	*bp = dp ;
+	    rs = SR_OVERFLOW ;
 	    dp[0] = '\0' ;
-	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-		size_t	ml ;
-	        cc	*sp = (cchar *) va_arg(ap,char *) ;
-	        if (i < (n - 1)) {
-	            ml = strlcpy(bp,sp,rmlen) ;
-	            if (ml < rmlen) bp += ml ;
-	        } else { /* emulate |strlcpy(3c)| but w/ given length */
-	            int	sl = (int) va_arg(ap,int) ;
-		    ml = 0 ;
-		    while ((ml < (rmlen - 1)) && hasgot(sp,sl)) {
-		        *bp++ = *sp++ ;
-			sl -= 1 ;
-		        ml += 1 ;
-		    } /* end while */
-		    *bp = '\0' ;
-		    if (hasgot(sp,sl)) ml += 1 ; /* error condition */
-	        } /* end if */
-	        if (ml < rmlen) {
-		    rmlen -= ml ;
-		} else {
-		    rs = SR_OVERFLOW ;
-		} /* end if */
+	    for (int i = 0 ; dp && (i < (n - 1)) ; i += 1) {
+	        ccp  sp = (cchar *) va_arg(ap,char *) ;
+		ccp  cp = dp ;
+	        dp = strbcpy(dp,dl,sp) ;
+		dl -= intconv(dp - cp) ;
 	    } /* end for */
-	    rl = intconv(bp - dp) ;
+	    if (dp && (n > 0) && dl) {
+	        ccp  sp = (cchar *) va_arg(ap,char *) ;
+	        cint sl = (int) va_arg(ap,int) ;
+		dp = strbcpy(dp,dl,sp,sl) ;
+	    } /* end if */
+	    if (dp) {
+		rs = intconv(dp - bp) ;
+	    } /* end */
 	    va_end(ap) ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
+	return rs ;
 } /* end subroutine (sncpyxw) */
-
-local bool hasgot(ccp sp,int sl) noex {
-    	return (sl && *sp) ;
-} /* end subroutine (hasgot) */
 
 
