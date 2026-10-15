@@ -85,7 +85,7 @@ struct pcsmsg_getname {
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
 	char	un[USERNAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_name {
 	uint	msglen ;
@@ -93,7 +93,7 @@ struct pcsmsg_name {
 	uchar	msgtype ;		/* message type */
 	uchar	rc ;
 	char	rn[REALNAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_getuser {
 	uint	msglen ;
@@ -108,14 +108,14 @@ struct pcsmsg_user {
 	uchar	msgtype ;		/* message type */
 	uchar	rc ;
 	char	un[USERNAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_exit {
 	uint	msglen ;
 	uint	tag ;
 	uchar	msgtype ;		/* message type */
 	char	reason[REALNAMELEN+1] ;
-} ;
+} ; /* end struct */
 
 struct pcsmsg_mark {
 	uint	msglen ;
