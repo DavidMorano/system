@@ -30,22 +30,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<new>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<strn.h>
-#include	<sfx.h>
-#include	<six.h>
-#include	<snwcpyx.h>
-#include	<matstr.h>
-#include	<toxc.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSYD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<six.h>			/* LIBUC */
+#include	<snwcpyx.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<toxc.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"hdrdecode.h"
 
@@ -86,7 +86,7 @@ namespace {
 	int		edl ;			/* encoded data */
 	int		ech ;			/* encoding (character) */
 	int		skip ;			/* skip length */
-    } ;
+    } ; /* end struct */
     class subinfo {
 	hdrdecode	*op ;
 	wchar_t		*rarr ;
@@ -108,7 +108,7 @@ namespace {
 	        c = 1 ;
 	    }
 	    return c ;
-	} ;
+	} ; /* end struct */
 	int store(cchar *cp,int cl) noex {
 	    int		c = 0 ;
 	    for (int i = 0 ; (i < cl) && cp[i] ; i += 1) {
@@ -116,7 +116,7 @@ namespace {
 	        c += store(ch) ;
 	    }
 	    return c ;
-	} ;
+	} ; /* end struct */
 	int store(wchar_t *wp,int wl) noex {
 	    int		c = 0 ;
 	    for (int i = 0 ; (i < wl) && wp[i] ; i += 1) {
@@ -124,7 +124,7 @@ namespace {
 	        c += store(ch) ;
 	    }
 	    return c ;
-	} ;
+	} ; /* end struct */
 	int storetrans(int,cchar *,int) noex ;
     public:
 	subinfo(hdrdecode *aop,wchar_t *ararr,int arlen) noex {
@@ -132,15 +132,15 @@ namespace {
 	    rlen = arlen ;
 	    rl = 0 ;
 	    rarr = ararr ;
-	} ;
+	} ; /* end struct */
 	int begin(cchar *asp,int asl) noex {
 	    sp = asp ;
 	    sl = asl ;
 	    return SR_OK ;
-	} ;
+	} ; /* end struct */
 	int end() noex {
 	    return SR_OK ;
-	} ;
+	} ; /* end struct */
 	int proc() noex ;
     } ; /* end struct (subinfo) */
 } /* end namespace */
@@ -153,7 +153,7 @@ local inline int hdrdecode_magic(hdrdecode *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == HDRDECODE_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (hdrdecode_magic) */
 
@@ -208,41 +208,41 @@ int hdrdecode_finish(hdrdecode *op) noex {
 		{
 	            rs1 = chartrans_close(op->ctp) ;
 	            if (rs >= 0) rs = rs1 ;
-		}
+		} /* end */
 		{
 	            rs1 = libmem.free(op->ctp) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->ctp = nullptr ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	    if (op->b64p) ylikely {
 		{
 	            rs1 = b64decoder_finish(op->b64p) ;
 	            if (rs >= 0) rs = rs1 ;
-		}
+		} /* end */
 		{
 	            rs1 = libmem.free(op->b64p) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->b64p = nullptr ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	    if (op->qpp) ylikely {
 	        {
 	            rs1 = qpdecoder_finish(op->qpp) ;
 	            if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end */
 	        {
 	            rs1 = libmem.free(op->qpp) ;
 	            if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end */
 	        op->qpp = nullptr ;
-	    }
+	    } /* end */
 	    if (op->pr) ylikely {
 		void *vp = voidp(op->pr) ;
 	        rs1 = libmem.free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->pr = nullptr ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -268,7 +268,7 @@ int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int alen,cchar *sp,int sl) noex {
 	        } else {
 	            rs = wsnwcpynarrow(rarr,alen,sp,sl) ;
 	            c += rs ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -345,8 +345,8 @@ int subinfo::proc() noex {
 	if ((rs >= 0) && (sl > 0)) {
 	    if ((rs = procreg(sl)) >= 0) {
 	        c += rs ;
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (subinfo_proc) */
 
@@ -443,7 +443,7 @@ int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
 	    if ((rs = chartrans_transread(ctp,txid,tbuf,tlen,tp,tl)) >= 0) {
 	        rs = store(tbuf,rs) ;
 	        wl = rs ;
-	    }
+	    } /* end */
 	    rs1 = libmem.free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
@@ -530,16 +530,16 @@ local int escinfo_have(escinfo *eip,cchar *sp,int sl) noex {
 	                    eip->edl = intconv(sp + ei - eip->edp) ;
 	                } else {
 	                    si = -1 ;
-	                }
+	                } /* end */
 	            } else {
 	                si = -1 ;
-	            }
+	            } /* end */
 	        } else {
 	            si = -1 ;
-	        }
+	        } /* end */
 	    } else {
 	        si = -1 ;
-	    }
+	    } /* end */
 	} /* end if (have escape) */
 	return si ;
 } /* end subroutine (escinfo_have) */
