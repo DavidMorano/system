@@ -97,7 +97,7 @@ int prenvfile(cc *pr,vecstr *lp,char *fn) noex {
 		    if ((rs = mkpath(pbuf,pr,fn)) >= 0) ylikely {
 		        rs = lp->envfile(pbuf) ;
 		        n = rs ;
-		    }
+		    } /* end if (mkpath) */
 		    rs1 = mem.free(pbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
