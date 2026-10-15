@@ -96,7 +96,7 @@ local int lkmail_dtor(lkmail *op) noex {
 		rs1 = lm_free(op->lockfname) ;
 		if (rs >= 0) rs = rs1 ;
 		op->lockfname = nullptr ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (lkmail_dtor) */
@@ -106,7 +106,7 @@ local inline int lkmail_magic(lkmail *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == LKMAIL_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (lkmail_magic) */
 
@@ -115,9 +115,8 @@ local int	lkmail_starter(lkmail *) noex ;
 
 /* local variables */
 
-cbool		f_comment = false ;
-
-cbool		f_sgidgroups = CF_SGIDGROUPS ;
+cbool		f_comment	= false ;
+cbool		f_sgidgroups	= CF_SGIDGROUPS ;
 
 
 /* exported variables */
@@ -139,7 +138,7 @@ int lkmail_start(lkmail *op,lkmail_ids *idp,cchar *mfname) noex {
 	    } /* end if (mkfnamesuf) */
 	    if (rs < 0) {
 		lkmail_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (lkmail_ctor) */
 	return rs ;
 } /* end subroutine (lkmail_start) */
@@ -152,11 +151,11 @@ int lkmail_finish(lkmail *op) noex {
 	        rs1 = u_close(op->lfd) ;
 	        if (rs >= 0) rs = rs1 ;
 		op->lfd = -1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = lkmail_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -170,7 +169,7 @@ int lkmail_create(lkmail *op) noex {
 	    if (op->lfd >= 0) {
 	        u_close(op->lfd) ;
 	        op->lfd = -1 ;
-	    }
+	    } /* end */
 	    /* blow out if the lock file is already there! */
 	    if (ustat sb ; (rs = u_stat(op->lockfname,&sb)) == nrs) {
 	        /* go ahead and try to create the lock file */
@@ -185,7 +184,7 @@ int lkmail_create(lkmail *op) noex {
 	                rs = u_creat(op->lockfname,0444) ;
 	                lfd = rs ;
 	                u_setegid(op->id.gid) ;
-	            }
+	            } /* end */
 	        } /* end if (tryint to SGID to maildir) */
 		if_constexpr (f_sgidgroups) {
 	            if ((rs == SR_ACCES) || (rs == SR_PERM)) {
@@ -193,20 +192,20 @@ int lkmail_create(lkmail *op) noex {
 	                    rs = u_creat(op->lockfname,0444) ;
 	                    lfd = rs ;
 	                    u_setegid(op->id.gid) ;
-	                }
+	                } /* end */
 	            } /* end if (tryint to SGID to maildir) */
 		} /* end if_constexpr (f_sgidgroups) */
 	        if ((rs == SR_ACCES) || (rs == SR_PERM)) {
 	            rs = u_creat(op->lockfname,0444) ;
 	            lfd = rs ;
-	        }
+	        } /* end */
 	        if (op->id.euid == 0) {
 	            if ((rs == SR_ACCES) || (rs == SR_PERM)) {
 	                u_setegid(op->id.gid_maildir) ;
 	                rs = u_creat(op->lockfname,0444) ;
 	                lfd = rs ;
 	                u_setegid(op->id.gid) ;
-	            }
+	            } /* end */
 	            if ((rs == SR_ACCES) || (rs == SR_PERM)) {
 	                u_seteuid(op->id.uid_maildir) ;
 	                rs = u_creat(op->lockfname,0444) ;
@@ -218,7 +217,7 @@ int lkmail_create(lkmail *op) noex {
 	            op->lfd = lfd ;
 	        } else {
 	            rs = SR_TXTBSY ;
-	        }
+	        } /* end */
 	    } /* end if (u_stat) */
 	} /* end if (magic) */
 	return (rs >= 0) ? lfd : rs ;
@@ -232,21 +231,21 @@ int lkmail_unlink(lkmail *op) noex {
 	        u_setegid(op->id.egid) ;
 	        rs = u_unlink(op->lockfname) ;
 	        u_setegid(op->id.gid) ;
-	    }
+	    } /* end */
 	    if (rs == SR_ACCES) {
 	        rs = u_unlink(op->lockfname) ;
-	    }
+	    } /* end */
 	    if (op->id.euid == 0) {
 	        if (rs == SR_ACCES) {
 	            u_setegid(op->id.gid_maildir) ;
 	            rs = u_unlink(op->lockfname) ;
 	            u_setegid(op->id.gid) ;
-	        }
+	        } /* end */
 	        if (rs == SR_ACCES) {
 	            u_seteuid(op->id.uid_maildir) ;
 	            rs = u_unlink(op->lockfname) ;
 	            u_seteuid(op->id.uid) ;
-	        }
+	        } /* end */
 	    } /* end if (trying as superuser) */
 	} /* end if (magic) */
 	return rs ;
@@ -259,7 +258,7 @@ int lkmail_old(lkmail *op,time_t dt,int age) noex {
 	    if (age < 0) age = LKMAIL_AGE ;
 	    if (ustat sb ; (rs = u_stat(op->lockfname,&sb)) >= 0) {
 	        f = ((dt - sb.st_mtime) > age) ;
-	    }
+	    } /* end */
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (lkmail_old) */
@@ -278,8 +277,8 @@ local int lkmail_starter(lkmail *op) noex {
 		    if (ustat sb ; (rs = u_stat(mbuf,&sb)) >= 0) {
 			op->id.uid_maildir = sb.st_uid ;
 			op->id.gid_maildir = sb.st_gid ;
-		    }
-		}
+		    } /* end */
+		} /* end */
 	    } /* end if (sfdirname) */
 	    rs1 = lm_free(mbuf) ;
 	    if (rs >= 0) rs = rs1 ;
