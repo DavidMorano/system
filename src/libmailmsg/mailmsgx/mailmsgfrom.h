@@ -10,12 +10,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<time.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
+#include	<time.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	MAILMSGFROM	struct mailmsgfrom_head
@@ -26,16 +23,16 @@ struct mailmsgfrom_head {
 	char		*fbuf ;		/* FROM-buffer */
 	int		flen ;		/* FROM-buffer size */
 	int		fl ;		/* FROM-buffer result length */
-} ;
+} ; /* end struct */
 
 typedef	MAILMSGFROM	mailmsgfrom ;
 
 EXTERNC_begin
 
-extern int	mailmsgfrom_start(mailmsgfrom *,char *,int) noex ;
-extern int	mailmsgfrom_test(mailmsgfrom *,time_t) noex ;
-extern int	mailmsgfrom_loadfrom(mailmsgfrom *,cchar *,int) noex ;
-extern int	mailmsgfrom_finish(mailmsgfrom *) noex ;
+extern int	mailmsgfrom_start	(mailmsgfrom *,char *,int) noex ;
+extern int	mailmsgfrom_test	(mailmsgfrom *,time_t) noex ;
+extern int	mailmsgfrom_loadfrom	(mailmsgfrom *,cchar *,int) noex ;
+extern int	mailmsgfrom_finish	(mailmsgfrom *) noex ;
 
 EXTERNC_end
 
