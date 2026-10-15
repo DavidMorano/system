@@ -1,8 +1,8 @@
 
-static int mapdir_processor(ep,ev,groupname,fd)
+local int mapdir_processor(ep,ev,groupname,fd)
 ISSUE_MAPDIR	*ep ;
-const char	*ev[] ;
-const char	groupname[] ;
+cchar	*ev[] ;
+cchar	groupname[] ;
 int		fd ;
 {
 	ustat	sb ;
@@ -16,11 +16,11 @@ int		fd ;
 	int	rs1 ;
 	int	wlen = 0 ;
 
-	const char	*dn ;
-	const char	*gn ;
-	const char	*defname = ISSUE_DEFGROUP ;
-	const char	*allname = ISSUE_ALLGROUP ;
-	const char	*name = ISSUE_NAME ;
+	cchar	*dn ;
+	cchar	*gn ;
+	cchar	*defname = ISSUE_DEFGROUP ;
+	cchar	*allname = ISSUE_ALLGROUP ;
+	cchar	*name = ISSUE_NAME ;
 
 
 #if	CF_DEBUGS
@@ -41,15 +41,15 @@ int		fd ;
 	gn = groupname ;
 	if ((rs = vecstr_start(&nums,0,0)) >= 0) {
 	    int	i ;
-	    const char	*strs[5] ;
+	    cchar	*strs[5] ;
 
 	    loadstrs(strs,gn,defname,allname,name) ;
 
 	    if ((rs = fsdir_open(&d,dn)) >= 0) {
-	        const char	*tp ;
+	        cchar	*tp ;
 
 	        while (fsdir_read(&d,&de) > 0) {
-	            const char	*den = de.name ;
+	            cchar	*den = de.name ;
 	            if (den[0] == '.') continue ;
 
 #if	CF_DEBUGS
@@ -58,7 +58,7 @@ int		fd ;
 
 	            tp = strchr(den,'.') ;
 	            if ((tp != NULL) && (strcmp((tp+1),name) == 0)) {
-	                const char	*digp ;
+	                cchar	*digp ;
 	                int	f = TRUE ;
 
 	                digp = strnbrk(den,(tp-den),"0123456789") ;
@@ -89,7 +89,7 @@ int		fd ;
 
 #if	CF_DEBUGS
 	        {
-	            const char	*bep ;
+	            cchar	*bep ;
 	            for (i = 0 ; vecstr_get(&nums,i,&bep) >= 0 ; i += 1)
 	                debugprintf("issue/mapdir_processor: i=%u bep=%s\n",
 				i,bep) ;
@@ -115,19 +115,19 @@ ret0:
 /* end subroutine (mapdir_processor) */
 
 
-static int mapdir_processorthem(ep,ev,dn,blp,strs,fd)
+local int mapdir_processorthem(ep,ev,dn,blp,strs,fd)
 ISSUE_MAPDIR	*ep ;
-const char	*ev[] ;
-const char	dn[] ;
+cchar	*ev[] ;
+cchar	dn[] ;
 VECSTR		*blp ;
-const char	**strs ;
+cchar	**strs ;
 int		fd ;
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	wlen = 0 ;
 
-	const char	*kn ;
+	cchar	*kn ;
 
 
 	kn = strs[0] ;
@@ -158,12 +158,12 @@ ret0:
 /* end subroutine (mapdir_processorthem) */
 
 
-static int mapdir_processorone(ep,ev,dn,blp,kn,fd)
+local int mapdir_processorone(ep,ev,dn,blp,kn,fd)
 ISSUE_MAPDIR	*ep ;
-const char	*ev[] ;
-const char	*dn ;
+cchar	*ev[] ;
+cchar	*dn ;
 VECSTR		*blp ;
-const char	*kn ;
+cchar	*kn ;
 int		fd ;
 {
 	int	rs = SR_OK ;
@@ -173,7 +173,7 @@ int		fd ;
 	int	c = 0 ;
 	int	wlen = 0 ;
 
-	const char	*bep ;
+	cchar	*bep ;
 
 
 #if	CF_DEBUGS
