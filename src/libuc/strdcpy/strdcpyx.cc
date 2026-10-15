@@ -1,4 +1,4 @@
-/* strdcpyx SUPPORT */
+/* strdcpyx SUPPORT (String-Destination-Copy) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -51,7 +51,7 @@
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
-	new standard, it might gets optimized for speed (like
+	new standard, it might get optimized for speed (like
 	writting in hand-coded assembly language).  So that is
 	pretty much the only reason I would use that interface
 	(which I do not like).
@@ -134,7 +134,7 @@ char *strdcpyx(char *dp,int dl,int n,...) noex {
 	    if (dl >= 0) {
 	        for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
 	            ccharp sp = (cchar *) va_arg(ap,char *) ;
-	            while ((dl > 0) && *sp) {
+	            while (dl && *sp) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
 	            } /* end while */
