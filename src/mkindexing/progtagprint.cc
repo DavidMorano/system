@@ -24,9 +24,9 @@
 	int progtagprint(pip,aip,basedname,outfmt,ofname)
 	PROGINFO	*pip ;
 	ARGINFO		*aip ;
-	const char	basedname[] ;
-	const char	outfmt[] ;
-	const char	ofname[] ;
+	cchar	basedname[] ;
+	cchar	outfmt[] ;
+	cchar	ofname[] ;
 
 	Arguments:
 
@@ -67,21 +67,21 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sibrk(const char *,int,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sibrk(cchar *,int,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
 
 extern int	progtagprinter(PROGINFO *,cchar *,BIBLEBOOK *,
 			int, bfile *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -92,7 +92,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	proctagfile(PROGINFO *,cchar *,BIBLEBOOK *,
+local int	proctagfile(PROGINFO *,cchar *,BIBLEBOOK *,
 			int, bfile *, cchar *) ;
 
 
@@ -105,9 +105,9 @@ static int	proctagfile(PROGINFO *,cchar *,BIBLEBOOK *,
 int progtagprint(pip,aip,basedname,outfmt,ofname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
-const char	basedname[] ;
-const char	outfmt[] ;
-const char	ofname[] ;
+cchar	basedname[] ;
+cchar	outfmt[] ;
+cchar	ofname[] ;
 {
 	BIBLEBOOK	bb ;
 	bfile		outfile, *ofp = &outfile ;
@@ -118,7 +118,7 @@ const char	ofname[] ;
 	int		c = 0 ;
 	int		f_biblebook = FALSE ;
 	int		f ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (aip == NULL) return SR_FAULT ;
 
@@ -210,7 +210,7 @@ const char	ofname[] ;
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(&argfile,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = breadln(&argfile,lbuf,llen)) > 0) {
@@ -305,13 +305,13 @@ ret0:
 /* local subroutines */
 
 
-static int proctagfile(pip,basedname,bbp,ofi,ofp,tagfname)
+local int proctagfile(pip,basedname,bbp,ofi,ofp,tagfname)
 PROGINFO	*pip ;
-const char	basedname[] ;
+cchar	basedname[] ;
 BIBLEBOOK	*bbp ;
 int		ofi ;
 bfile		*ofp ;
-const char	tagfname[] ;
+cchar	tagfname[] ;
 {
 	bfile		tagfile, *tfp = &tagfile ;
 	int		rs  ;
@@ -328,7 +328,7 @@ const char	tagfname[] ;
 	if (strcmp(tagfname,"-") == 0) tagfname = BFILE_STDIN ;
 
 	if ((rs = bopen(tfp,tagfname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		fnl ;
 	    int		f_bol = TRUE ;
