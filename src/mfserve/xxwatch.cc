@@ -58,22 +58,24 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<climits>
-#include	<cstddef>		/* |unllptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<opendefstds.h>
-#include	<bfile.h>
 #include	<varsub.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
 #include	<connection.h>
 #include	<strx.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"standing.h"
 #include	"builtin.h"
@@ -135,7 +137,7 @@ extern int	progipcbegin(PROGINFO *) ;
 extern int	progipcend(PROGINFO *) ;
 extern int	proghandle(PROGINFO *,
 			STANDING *,BUILTIN *,CLIENTINFO *) ;
-extern int	proglogout(PROGINFO *,const char *,const char *) ;
+extern int	proglogout(PROGINFO *,cchar *,cchar *) ;
 extern int	progsvccheck(PROGINFO *) ;
 extern int	progacccheck(PROGINFO *) ;
 extern int	progpeername(PROGINFO *,CLIENTINFO *,char *) ;
@@ -185,53 +187,53 @@ IPCMSGINFO {
 
 /* forward references */
 
-static int	procwatcher(PROGINFO *,SUBINFO *,vecstr *) ;
-static int	procwatchmark(PROGINFO *,SUBINFO *,int) ;
-static int	procwatchjobs(PROGINFO *,SUBINFO *) ;
-static int	procwatchpoll(PROGINFO *,SUBINFO *) ;
-static int	procwatchnew(PROGINFO *,SUBINFO *,CLIENTINFO *) ;
-static int	procwatchint(PROGINFO *,SUBINFO *) ;
-static int	procwatchpollipc(PROGINFO *,SUBINFO *) ;
-static int	procwatchpolling(PROGINFO *,SUBINFO *,int,int) ;
+local int	procwatcher(PROGINFO *,SUBINFO *,vecstr *) ;
+local int	procwatchmark(PROGINFO *,SUBINFO *,int) ;
+local int	procwatchjobs(PROGINFO *,SUBINFO *) ;
+local int	procwatchpoll(PROGINFO *,SUBINFO *) ;
+local int	procwatchnew(PROGINFO *,SUBINFO *,CLIENTINFO *) ;
+local int	procwatchint(PROGINFO *,SUBINFO *) ;
+local int	procwatchpollipc(PROGINFO *,SUBINFO *) ;
+local int	procwatchpolling(PROGINFO *,SUBINFO *,int,int) ;
 
-static int	procwatchpollipc_gethelp(PROGINFO *,
+local int	procwatchpollipc_gethelp(PROGINFO *,
 			SUBINFO *, IPCMSGINFO *) ;
-static int	procwatchpollipc_noop(PROGINFO *,
+local int	procwatchpollipc_noop(PROGINFO *,
 			SUBINFO *, IPCMSGINFO *) ;
-static int	procwatchpollipc_passfd(PROGINFO *,
+local int	procwatchpollipc_passfd(PROGINFO *,
 			SUBINFO *, IPCMSGINFO *) ;
-static int	procwatchpollipc_exit(PROGINFO *,
+local int	procwatchpollipc_exit(PROGINFO *,
 			SUBINFO *, IPCMSGINFO *) ;
-static int	procwatchpollipc_getlistener(PROGINFO *,
+local int	procwatchpollipc_getlistener(PROGINFO *,
 			SUBINFO *, IPCMSGINFO *) ;
-static int	procwatchpollipc_mark(PROGINFO *,
+local int	procwatchpollipc_mark(PROGINFO *,
 			SUBINFO *, IPCMSGINFO *) ;
-static int	procwatchpollipc_default(PROGINFO *,
+local int	procwatchpollipc_default(PROGINFO *,
 			SUBINFO *, IPCMSGINFO *) ;
-static int	procwatchpollipc_cmd(PROGINFO *,
+local int	procwatchpollipc_cmd(PROGINFO *,
 			SUBINFO *, IPCMSGINFO *) ;
 
-static int	procwatchmaint(PROGINFO *,SUBINFO *) ;
-static int	procwatchmaintout(PROGINFO *,LISTENSPEC_INFO *,int,int) ;
+local int	procwatchmaint(PROGINFO *,SUBINFO *) ;
+local int	procwatchmaintout(PROGINFO *,LISTENSPEC_INFO *,int,int) ;
 
-static int	procwatchsubcmd(PROGINFO *,const char *) ;
+local int	procwatchsubcmd(PROGINFO *,cchar *) ;
 
-static int	procwatchsubcmd_clear(PROGINFO *) ;
+local int	procwatchsubcmd_clear(PROGINFO *) ;
 
-static int	ipcmsginfo_init(IPCMSGINFO *) ;
+local int	ipcmsginfo_init(IPCMSGINFO *) ;
 
-static void	int_exit(int) ;
-static void	int_interrupt(int) ;
-static void	int_child(int) ;
+local void	int_exit(int) ;
+local void	int_interrupt(int) ;
+local void	int_child(int) ;
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
-static volatile int	if_child ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
+local volatile int	if_child ;
 
-static const char	*subcmds[] = {
+static cchar	*subcmds[] = {
 	"clear",
 	NULL
 } ;
@@ -291,7 +293,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 /* before we go too far, are we the only one on this PID mutex? */
 
 	if ((pip->fl.defpidlock && (! pip->fl.named)) || pip->fl.daemon) {
-	    const char	*pidmsg ;
+	    cchar	*pidmsg ;
 
 	    rs = progpidbegin(pip,TO_LOCK) ;
 
@@ -403,7 +405,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 #endif /* CF_SIGCHILD */
 
 	if (pip->fl.daemon && pip->open.logprog) {
-	    const char	*ts = timestr_logz(pip->daytime,timebuf) ;
+	    cchar	*ts = strtime_logz(pip->daytime,timebuf) ;
 	    pip->daytime = time(NULL) ;
 	    proglog_printf(pip,"%s ready",ts) ;
 	    proglog_flush(pip) ;
@@ -425,7 +427,7 @@ int progwatch(PROGINFO *pip,vecstr *nlp)
 
 	if (pip->fl.daemon && pip->open.logprog) {
 	    proglog_printf(pip,"%s server exiting (%d)\n",
-	        timestr_logz(pip->daytime,timebuf),rs) ;
+	        strtime_logz(pip->daytime,timebuf),rs) ;
 	}
 
 	poller_finish(&wip->pm) ;
@@ -463,7 +465,7 @@ ret0:
 /* local subroutines */
 
 
-static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
+local int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 {
 	PROGINFO_IPC	*ipp = &pip->ipc ;
 	POLLER_SPEC	ps ;
@@ -587,11 +589,11 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 	        to_broken = TO_BROKEN ;
 		to_maint = 0 ;
 		if ((rs = procwatchsubcmd_clear(pip)) > 0) {
-		    const int	c = rs ;
+		    cint	c = rs ;
 		    if (pip->open.logprog) {
 			cchar	*fmt = "%s broken re-activation (%u)" ;
 			f_logged = TRUE ;
-			timestr_logz(pip->daytime,timebuf) ;
+			strtime_logz(pip->daytime,timebuf) ;
 	    		proglog_printf(pip,fmt,timebuf,c) ;
 		    }
 		}
@@ -615,7 +617,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 			    f_logged = TRUE ;
 	    		    proglog_printf(pip,
 				"%s re-configuration",
-				timestr_logz(pip->daytime,timebuf)) ;
+				strtime_logz(pip->daytime,timebuf)) ;
 			}
 			rs = procwatchsubcmd_clear(pip) ;
 		    } /* end if */
@@ -727,7 +729,7 @@ static int procwatcher(PROGINFO *pip,SUBINFO *wip,vecstr *nlp)
 /* end subroutine (procwatcher) */
 
 
-static int procwatchmark(PROGINFO *pip,SUBINFO *wip,int f_force)
+local int procwatchmark(PROGINFO *pip,SUBINFO *wip,int f_force)
 {
 	LISTENSPEC	*lsp ;
 	LISTENSPEC_INFO	li ;
@@ -751,7 +753,7 @@ static int procwatchmark(PROGINFO *pip,SUBINFO *wip,int f_force)
 	wip->ti_lastmark = pip->daytime ;
 	f_logged = TRUE ;
 	proglog_printf(pip,"%s mark> %s\n",
-	        timestr_logz(pip->daytime,timebuf),
+	        strtime_logz(pip->daytime,timebuf),
 	        pip->nodename) ;
 
 	for (i = 0 ; vecobj_get(llp,i,&lsp) >= 0 ; i += 1) {
@@ -781,7 +783,7 @@ ret0:
 /* end subroutine (procwatchmark) */
 
 
-static int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
+local int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
 {
 	PROGINFO_IPC	*ipp = &pip->ipc ;
 	POLLER_SPEC	ps ;
@@ -888,7 +890,7 @@ static int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
 
 		    ns = -1 ;
 	            if (fd == pip->fd_listentcp) {
-			const int	lfd = pip->fd_listentcp ;
+			cint	lfd = pip->fd_listentcp ;
 
 	                salen = sizeof(SOCKADDRESS) ;
 	                if ((rs1 = u_accept(lfd,&cip->sa,&salen)) >= 0) {
@@ -900,7 +902,7 @@ static int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
 
 	            } else if (fd == pip->fd_listenpass) {
 	                STRRECVFD	passer ;
-			const int	lfd = pip->fd_listenpass ;
+			cint	lfd = pip->fd_listenpass ;
 			int		size = sizeof(struct strrecvfd) ;
 			int		to = pip->to_recvfd ;
 
@@ -964,7 +966,7 @@ ret0:
 /* end subroutine (procwatchpoll) */
 
 
-static int procwatchpollipc(PROGINFO *pip,SUBINFO *wip)
+local int procwatchpollipc(PROGINFO *pip,SUBINFO *wip)
 {
 	struct msghdr	*mp ;
 	IPCMSGINFO	mi, *mip = &mi ;
@@ -977,14 +979,14 @@ static int procwatchpollipc(PROGINFO *pip,SUBINFO *wip)
 
 	mp = &mip->ipcmsg ;
 	if ((rs = u_recvmsg(ipp->fd_req,mp,0)) > 0) {
-	    const int	rcode = MKCHAR(mip->ipcbuf[0]) ;
+	    cint	rcode = MKCHAR(mip->ipcbuf[0]) ;
 	    mip->ipcmsglen = rs ;
 
 /* check if we were passed a FD */
 
 	if (mp->msg_controllen > 0) {
 	    struct cmsghdr	*cmp = CMSG_FIRSTHDR(mp) ;
-	    const int		fdlen = sizeof(int) ;
+	    cint		fdlen = sizeof(int) ;
 	    while (cmp != NULL) {
 
 	        ip = (int *) CMSG_DATA(cmp) ;
@@ -1061,7 +1063,7 @@ static int procwatchpollipc(PROGINFO *pip,SUBINFO *wip)
 /* end subroutine (procwatchpollipc) */
 
 
-static int procwatchpollipc_noop(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
+local int procwatchpollipc_noop(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 {
 	struct muximsg_response	m0 ;
 	struct muximsg_noop	m1 ;
@@ -1099,7 +1101,7 @@ ret0:
 /* end subroutine (procwatchpollipc_noop) */
 
 
-static int procwatchpollipc_passfd(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
+local int procwatchpollipc_passfd(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 {
 	struct muximsg_response	m0 ;
 	struct muximsg_passfd	m2 ;
@@ -1211,7 +1213,7 @@ ret0:
 /* end subroutine (procwatchpollipc_passfd) */
 
 
-static int procwatchpollipc_exit(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
+local int procwatchpollipc_exit(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 {
 	struct muximsg_response	m0 ;
 	struct muximsg_exit	m2 ;
@@ -1251,7 +1253,7 @@ ret0:
 /* end subroutine (procwatchpollipc_exit) */
 
 
-static int procwatchpollipc_getlistener(PROGINFO *pip,SUBINFO *wip,
+local int procwatchpollipc_getlistener(PROGINFO *pip,SUBINFO *wip,
 		IPCMSGINFO *mip)
 {
 	struct muximsg_getlistener	i9 ;
@@ -1355,7 +1357,7 @@ ret0:
 /* end subroutine (procwatchpollipc_getlistener) */
 
 
-static int procwatchpollipc_gethelp(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
+local int procwatchpollipc_gethelp(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 {
 	struct muximsg_gethelp	i13 ;
 	struct muximsg_help	i14 ;
@@ -1364,7 +1366,7 @@ static int procwatchpollipc_gethelp(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 	int		rs1 ;
 	int		idx ;
 	int		blen ;
-	const char	*cnp = NULL ;	/* command name-pointer */
+	cchar	*cnp = NULL ;	/* command name-pointer */
 
 	if ((rs1 = muximsg_gethelp(&i13,1,mip->ipcbuf,IPCBUFLEN)) >= 0) {
 
@@ -1416,12 +1418,12 @@ static int procwatchpollipc_gethelp(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 /* end subroutine (procwatchpollipc_gethelp) */
 
 
-static int procwatchpollipc_mark(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
+local int procwatchpollipc_mark(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 {
 	struct muximsg_mark	i11 ;
 	struct muximsg_response	i0 ;
 	PROGINFO_IPC	*ipp = &pip->ipc ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1453,7 +1455,7 @@ static int procwatchpollipc_mark(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 /* end subroutine (procwatchpollipc_mark) */
 
 
-static int procwatchpollipc_cmd(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
+local int procwatchpollipc_cmd(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 {
 	struct muximsg_response	m0 ;
 	struct muximsg_cmd	m15 ;
@@ -1502,12 +1504,12 @@ static int procwatchpollipc_cmd(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 /* end subroutine (procwatchpollipc_cmd) */
 
 
-static int procwatchpollipc_default(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
+local int procwatchpollipc_default(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 {
 	PROGINFO_IPC	*ipp = &pip->ipc ;
 	STANDING	*osp = &wip->ourstand ;
 	time_t		dt = pip->daytime ;
-	const int	rcode = MKCHAR(mip->ipcbuf[0]) ;
+	cint	rcode = MKCHAR(mip->ipcbuf[0]) ;
 	int		rs ;
 	int		len ;
 	char		resbuf[MSGBUFLEN + 1] ;
@@ -1530,7 +1532,7 @@ static int procwatchpollipc_default(PROGINFO *pip,SUBINFO *wip,IPCMSGINFO *mip)
 /* end subroutine (procwatchpollipc_default) */
 
 
-static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
+local int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1562,7 +1564,7 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 	            debugprintf("progwatchjobs: found child ji=%d\n",ji) ;
 #endif
 
-	        timestr_logz(pip->daytime,timebuf) ;
+	        strtime_logz(pip->daytime,timebuf) ;
 
 	        if (pip->open.logprog) {
 		    f = TRUE ;
@@ -1584,8 +1586,8 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 		}
 
 	    } else if (WIFSIGNALED(cs)) {
-		const int	sig = WTERMSIG(cs) ;
-		const char	*ss ;
+		cint	sig = WTERMSIG(cs) ;
+		cchar	*ss ;
 		char		sigbuf[20+1] ;
 
 		if ((ss = strabbrsig(sig)) == NULL) {
@@ -1631,7 +1633,7 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 	            if (rs >= 0)
 	                rs = proglogout(pip, "stderr", jep->efname) ;
 	            proglog_printf(pip,"elapsed time %s\n",
-	                timestr_elapsed((pip->daytime - jep->stime),
+	                strtime_elapsed((pip->daytime - jep->stime),
 	                timebuf)) ;
 	            proglog_setid(pip,pip->logid,-1) ;
 	        } /* end if (have logging) */
@@ -1664,7 +1666,7 @@ static int procwatchjobs(PROGINFO *pip,SUBINFO *wip)
 
 
 /* spawn a job */
-static int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
+local int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 {
 	JOBDB_ENT	*jep ;
 	pid_t		pid ;
@@ -1677,7 +1679,7 @@ static int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("procwatchnew: ent isascoket=%u\n",
-	        isasocket(cip->fd_input)) ;
+	        isfdsocket(cip->fd_input)) ;
 #endif
 
 /* enter this job into the database */
@@ -1720,13 +1722,13 @@ static int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: %s request\n",pip->progname,
-	            timestr_logz(cip->stime,timebuf)) ;
+	            strtime_logz(cip->stime,timebuf)) ;
 	    if (peername[0] != '\0')
 	        bprintf(pip->efp,"%s: from=%s\n",pip->progname,peername) ;
 	} /* end if */
 
 	if (pip->open.logprog) {
-	    timestr_logz(cip->stime,timebuf) ;
+	    strtime_logz(cip->stime,timebuf) ;
 	    proglog_printf(pip,"%s request",timebuf) ;
 	    if (peername[0] != '\0') {
 	        proglog_printf(pip,"from=%s",peername) ;
@@ -1864,7 +1866,7 @@ static int procwatchnew(PROGINFO *pip,SUBINFO *wip,CLIENTINFO *cip)
 
 	    cip->stime = pip->daytime ;
 	    if (pip->open.logprog) {
-		const int	v = cip->pid ;
+		cint	v = cip->pid ;
 	        proglog_printf(pip,"server pid=%u\n",v) ;
 	    }
 
@@ -1973,7 +1975,7 @@ ret0:
 /* end subroutine (procwatchnew) */
 
 
-static int procwatchint(PROGINFO *pip,SUBINFO *wip)
+local int procwatchint(PROGINFO *pip,SUBINFO *wip)
 {
 	int		rs ;
 	int		f_logged = FALSE ;
@@ -1983,7 +1985,7 @@ static int procwatchint(PROGINFO *pip,SUBINFO *wip)
 	if ((rs >= 0) && pip->open.logprog) {
 	    char	tbuf[TIMEBUFLEN + 1] ;
 	    f_logged = TRUE ;
-	    timestr_logz(pip->daytime,tbuf) ;
+	    strtime_logz(pip->daytime,tbuf) ;
 	    proglog_printf(pip,"%s interruption",tbuf) ;
 	}
 
@@ -1999,13 +2001,13 @@ static int procwatchint(PROGINFO *pip,SUBINFO *wip)
 +) register polls for active listeners that are not registered
 ****/
 
-static int procwatchmaint(PROGINFO *pip,SUBINFO	 *wip)
+local int procwatchmaint(PROGINFO *pip,SUBINFO	 *wip)
 {
 	LISTENSPEC	*lsp ;
 	LISTENSPEC_INFO	li ;
 	POLLER_SPEC	ps ;
 	vecobj		*llp = &pip->listens ;
-	const int	events = (POLLIN | POLLPRI) ;
+	cint	events = (POLLIN | POLLPRI) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ac ;
@@ -2138,7 +2140,7 @@ static int procwatchmaint(PROGINFO *pip,SUBINFO	 *wip)
 /* end subroutine (procwatchmaint) */
 
 
-static int procwatchpolling(PROGINFO *pip,SUBINFO *wip,int fd,int re)
+local int procwatchpolling(PROGINFO *pip,SUBINFO *wip,int fd,int re)
 {
 	LISTENSPEC	*lsp ;
 	POLLER_SPEC	ps ;
@@ -2198,7 +2200,7 @@ static int procwatchpolling(PROGINFO *pip,SUBINFO *wip,int fd,int re)
 
 #if	CF_DEBUG
 			if (DEBUGLEVEL(5)) {
-			const int	alen = MAXPATHLEN ;
+			cint	alen = MAXPATHLEN ;
 			int		al ;
 			char		abuf[MAXPATHLEN+1] ;
 			rs1 = sockaddress_getaf(&cip->sa) ;
@@ -2223,7 +2225,7 @@ static int procwatchpolling(PROGINFO *pip,SUBINFO *wip,int fd,int re)
 			        if ((rs < 0) && pip->open.logprog)
 				    proglog_printf(pip,
 				    "%s new-job failure (%d)",
-				    timestr_logz(pip->daytime,timebuf),rs) ;
+				    strtime_logz(pip->daytime,timebuf),rs) ;
 
 #if	CF_DEBUG
 			    if (DEBUGLEVEL(5))
@@ -2261,7 +2263,7 @@ static int procwatchpolling(PROGINFO *pip,SUBINFO *wip,int fd,int re)
 /* end subroutine (procwatchpolling) */
 
 
-static int procwatchsubcmd(PROGINFO *pip,cchar subcmd[])
+local int procwatchsubcmd(PROGINFO *pip,cchar subcmd[])
 {
 	int		rs = SR_OK ;
 
@@ -2283,7 +2285,7 @@ static int procwatchsubcmd(PROGINFO *pip,cchar subcmd[])
 /* end subroutine (procwatchsubcmd) */
 
 
-static int procwatchsubcmd_clear(PROGINFO *pip)
+local int procwatchsubcmd_clear(PROGINFO *pip)
 {
 	LISTENSPEC	*lsp ;
 	LISTENSPEC_INFO	li ;
@@ -2309,7 +2311,7 @@ static int procwatchsubcmd_clear(PROGINFO *pip)
 /* end subroutine (procwatchsubcmd_clear) */
 
 
-static int procwatchmaintout(pip,lip,f_add,ls)
+local int procwatchmaintout(pip,lip,f_add,ls)
 PROGINFO		*pip ;
 LISTENSPEC_INFO		*lip ;
 int			f_add ;
@@ -2317,8 +2319,8 @@ int			ls ;
 {
 	int		rs = SR_OK ;
 	int		f_logged = FALSE ;
-	const char	*statstr ;
-	const char	*broken = "broken" ;
+	cchar	*statstr ;
+	cchar	*broken = "broken" ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 	char		tmpbuf[LOGIDLEN + 1] ;
 
@@ -2349,7 +2351,7 @@ int			ls ;
 	if (pip->open.logprog) {
 	    f_logged = TRUE ;
 	    proglog_printf(pip,"%s %s listener=%s",
-		timestr_logz(pip->daytime,timebuf),
+		strtime_logz(pip->daytime,timebuf),
 		statstr,
 		lip->type) ;
 	    proglog_printf(pip,"addr=%s",
@@ -2358,7 +2360,7 @@ int			ls ;
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: %s %s listener=%s\n",pip->progname,
-		timestr_logz(pip->daytime,timebuf),
+		strtime_logz(pip->daytime,timebuf),
 		statstr,
 		lip->type) ;
 	    bprintf(pip->efp,"%s: addr=%s\n",
@@ -2370,28 +2372,28 @@ int			ls ;
 /* end subroutine (procwatchmaintout) */
 
 
-static void int_exit(int sn)
+local void int_exit(int sn)
 {
 	if_exit = TRUE ;
 }
 /* end subroutine (int_exit) */
 
 
-static void int_interrupt(int sn)
+local void int_interrupt(int sn)
 {
 	if_int = TRUE ;
 }
 /* end subroutine (int_int) */
 
 
-static void int_child(int sn)
+local void int_child(int sn)
 {
 	if_child = TRUE ;
 }
 /* end subroutine (int_child) */
 
 
-static int ipcmsginfo_init(IPCMSGINFO *mip)
+local int ipcmsginfo_init(IPCMSGINFO *mip)
 {
 	int		size ;
 
