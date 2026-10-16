@@ -73,12 +73,12 @@
 
 /* forward references */
 
-static int progentry_process(PROGENTRY *,char *,PROGENTRY_ARGS *,char *,int) ;
-static int expand(PROGENTRY_ARGS *,char *,int,char *,int) ;
-static int processargs(vecstr *,char *) ;
-static int mkfile(cchar *,cchar *,char *) ;
+local int progentry_process(PROGENTRY *,char *,PROGENTRY_ARGS *,char *,int) ;
+local int expand(PROGENTRY_ARGS *,char *,int,char *,int) ;
+local int processargs(vecstr *,char *) ;
+local int mkfile(cchar *,cchar *,char *) ;
 
-static void	freeit(char **) ;
+local void	freeit(char **) ;
 
 
 /* external variables */
@@ -684,7 +684,7 @@ goodret:
 
 
 /* expand out one program string entry */
-static int progentry_process(pep,inbuf,esap,outbuf,outlen)
+local int progentry_process(pep,inbuf,esap,outbuf,outlen)
 PROGENTRY	*pep ;
 char		inbuf[] ;		/* input string */
 PROGENTRY_ARGS	*esap ;			/* key-type arguments */
@@ -755,7 +755,7 @@ int		outlen ;		/* output buffer length */
 #
 */
 
-static int expand(esap,buf,len,rbuf,rlen)
+local int expand(esap,buf,len,rbuf,rlen)
 PROGENTRY_ARGS	*esap ;
 char		buf[], rbuf[] ;
 int		len, rlen ;
@@ -928,7 +928,7 @@ int		len, rlen ;
 /* end subroutine (expand) */
 
 
-static void freeit(pp)
+local void freeit(pp)
 char	**pp ;
 {
 
@@ -948,7 +948,7 @@ char	**pp ;
 
 
 /* process an argument list */
-static int processargs(alp,args)
+local int processargs(alp,args)
 vecstr		*alp ;
 char		args[] ;
 {
@@ -995,7 +995,7 @@ ret0:
 
 
 /* make our little files for input and output of the server programs */
-static int mkfile(tmpdir,in,outbuf)
+local int mkfile(tmpdir,in,outbuf)
 cchar	tmpdir[], in[] ;
 char		outbuf[] ;
 {
