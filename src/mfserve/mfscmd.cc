@@ -54,7 +54,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -99,13 +99,13 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	mfscmder(PROGINFO *,MFSC *,SHIO *) ;
+local int	mfscmder(PROGINFO *,MFSC *,SHIO *) ;
 
-static int	mfscmd_status(PROGINFO *,MFSC *,SHIO *) ;
-static int	mfscmd_help(PROGINFO *,MFSC *,SHIO *) ;
-static int	mfscmd_mark(PROGINFO *,MFSC *,SHIO *) ;
-static int	mfscmd_exit(PROGINFO *,MFSC *,SHIO *) ;
-static int	mfscmd_listeners(PROGINFO *,MFSC *,SHIO *) ;
+local int	mfscmd_status(PROGINFO *,MFSC *,SHIO *) ;
+local int	mfscmd_help(PROGINFO *,MFSC *,SHIO *) ;
+local int	mfscmd_mark(PROGINFO *,MFSC *,SHIO *) ;
+local int	mfscmd_exit(PROGINFO *,MFSC *,SHIO *) ;
+local int	mfscmd_listeners(PROGINFO *,MFSC *,SHIO *) ;
 
 
 /* local variables */
@@ -152,7 +152,7 @@ int mfscmd(PROGINFO *pip,cchar *ofn) {
 
 	    if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 		MFSC		c ;
-		const int	to = TO_OPENSERVE ;
+		cint	to = TO_OPENSERVE ;
 		cchar		*pr = pip->pr ;
 		if ((rs = mfsc_open(&c,pr,to)) > 0) {
 		    {
@@ -197,7 +197,7 @@ int mfscmd(PROGINFO *pip,cchar *ofn) {
 
 int mfscmd_svcname(PROGINFO *pip,int idx,cchar **rpp)
 {
-	const int	nidx = nelem(cmds) ;
+	cint	nidx = nelem(cmds) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -223,7 +223,7 @@ int mfscmd_svcname(PROGINFO *pip,int idx,cchar **rpp)
 /* local subroutines */
 
 
-static int mfscmder(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
+local int mfscmder(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
 	keyopt		*kop ;
@@ -269,7 +269,7 @@ static int mfscmder(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 	                    shio_printf(pip->efp,fmt,pn,kp,kl) ;
 			    {
 				char	tbuf[TIMEBUFLEN+1] ;
-				timestr_logz(pip->daytime,tbuf) ;
+				strtime_logz(pip->daytime,tbuf) ;
 				logprintf(pip,"%s unknown cmd=%r",tbuf,kp,kl) ;
 			    }
 	            } /* end if (valid) */
@@ -285,7 +285,7 @@ static int mfscmder(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 /* end subroutine (proccmd) */
 
 
-static int mfscmd_status(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
+local int mfscmd_status(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 {
 	MFSC_STATUS	stat ;
 	int		rs ;
@@ -327,9 +327,9 @@ static int mfscmd_status(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 /* end subroutine (mfscmd_status) */
 
 
-static int mfscmd_help(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
+local int mfscmd_help(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 {
-	const int	rlen = MAXNAMELEN ;
+	cint	rlen = MAXNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -355,7 +355,7 @@ static int mfscmd_help(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 /* end subroutine (mfscmd_help) */
 
 
-static int mfscmd_mark(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
+local int mfscmd_mark(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -378,7 +378,7 @@ static int mfscmd_mark(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 /* end subroutine (mfscmd_mark) */
 
 
-static int mfscmd_exit(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
+local int mfscmd_exit(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -401,9 +401,9 @@ static int mfscmd_exit(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 /* end subroutine (mfscmd_exit) */
 
 
-static int mfscmd_listeners(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
+local int mfscmd_listeners(PROGINFO *pip,MFSC *pcp,SHIO *ofp)
 {
-	const int	rlen = (2*MAXPATHLEN) ;
+	cint	rlen = (2*MAXPATHLEN) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
