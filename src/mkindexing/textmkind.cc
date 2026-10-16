@@ -49,7 +49,7 @@
 #include	<psem.h>
 #include	<eigendb.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"fsi.h"
@@ -416,8 +416,8 @@ bfile		*ofp ;
 
 	EIGENDB_CUR	ecur ;
 
-	const int	ci = mkcmd_eigenwords ;
-	const int	linelen = COLUMNS ;
+	cint	ci = mkcmd_eigenwords ;
+	cint	linelen = COLUMNS ;
 
 	int	rs = SR_OK ;
 	int	n ;
@@ -587,7 +587,7 @@ DISP		*dop ;
 	    rs = bopen(&argfile,BFILE_STDIN,"dr",0666) ;
 
 	if (rs >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    cchar	*cp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
@@ -1368,7 +1368,7 @@ ret0:
 local int ignoreline(lbuf,ll,ignorechars)
 cchar	lbuf[] ;
 cchar	ignorechars[] ;
-const int	ll ;
+cint	ll ;
 {
 
 	if ((ignorechars != nullptr) && (lbuf[0] == '%')) {
