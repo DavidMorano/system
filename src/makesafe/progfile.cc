@@ -50,6 +50,7 @@
 #include	<ascii.h>
 #include	<opentmp.h>
 #include	<dirlist.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -162,7 +163,7 @@ int progfile(PROGINFO *pip,cchar *name) noex {
 	if (DEBUGLEVEL(2)) {
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    debugprintf("progfile: mtime=%s\n",
-	        timestr_log(mtime_o,timebuf)) ;
+	        strtime_log(mtime_o,timebuf)) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -326,7 +327,7 @@ char		outfname[] ;
 	    if (DEBUGLEVEL(2)) {
 	        char	timebuf[TIMEBUFLEN + 1] ;
 	        debugprintf("progfile: stat rs=%d mtime=%s\n",
-	            rs1,timestr_log(mtime,timebuf)) ;
+	            rs1,strtime_log(mtime,timebuf)) ;
 	    }
 #endif
 
@@ -756,7 +757,7 @@ int		len ;
 	if ((cl2 = sfsub(lbuf,len,errsub2,&cp2)) >= 0) {
 	    if ((cl1 = sfsub(lbuf,MIN(len,(cp2-lbuf)),errsub1,&cp1)) > 0) {
 	        if ((cl = sfdequote(lbuf,(cp1-lbuf),&cp)) > 0) {
-	            const int	dl = (cp2 - (cp1 + cl1)) ;
+	            cint	dl = (cp2 - (cp1 + cl1)) ;
 	            cchar	*dp = (cp1 + cl1) ;
 	            if ((rs = cfdeci(dp,dl,&line)) >= 0) {
 			CPPERR	e ;
@@ -791,7 +792,7 @@ local int mkdepname(char *rbuf,cchar *name)
 
 	if ((tp = strrchr(name,'.')) != nullptr) {
 	    if (tp[1] == 'o') {
-	        const int	rlen = MAXPATHLEN ;
+	        cint	rlen = MAXPATHLEN ;
 	        if ((rs = sbuf_start(&dep,rbuf,rlen)) >= 0) {
 
 	            sbuf_strw(&dep,name,(tp - name)) ;
