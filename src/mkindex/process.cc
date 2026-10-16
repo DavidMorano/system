@@ -104,7 +104,7 @@ MEMFILE		*mfp ;		/* post MEMFILE */
 bfile		*nfp ;		/* name file pointer */
 cchar	fname[] ;
 {
-	const int	size = (pip->pagesize * 4) ;
+	cint	size = (pip->pagesize * 4) ;
 
 	int	rs ;
 	int	llen = (size-1) ;
