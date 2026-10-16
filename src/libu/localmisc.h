@@ -395,7 +395,12 @@ typedef cchar		cc ;
 #define	NTABCOLS	8		/* eight columns per TAB character */
 #endif
 
+#ifndef	eol
 #define	eol		'\n'
+#endif
+#ifndef	eos
+#define	eos		'\0'
+#endif
 
 #ifndef	SUBROUTINE_LEQUIV
 #define	SUBROUTINE_LEQUIV
