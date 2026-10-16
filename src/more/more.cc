@@ -50,7 +50,7 @@
 
 /* exported subroutiens */
 
-extern int	cfdeci(const char *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
 
 /* exported subroutines */
@@ -63,7 +63,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	bfile		infile, *ifp = &infile ;
 	bfile		outfile, *ofp = &outfile ;
 
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int	argl, aol ;
 	int	temp ;
