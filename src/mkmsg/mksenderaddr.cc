@@ -85,7 +85,7 @@ extern "C" {
 
 /* forward references */
 
-static int	piloadsender(PROGINFO *) noex ;
+local int	piloadsender(PROGINFO *) noex ;
 
 
 /* local variables */
@@ -126,7 +126,7 @@ int pimksenderaddr(PROGINFO *pip) noex {
 
 /* local subroutines */
 
-static int piloadsender(PROGINFO *pip) noex {
+local int piloadsender(PROGINFO *pip) noex {
 	buffer		b ;
 	int		rs ;
 	int		rs1 ;
@@ -153,7 +153,7 @@ static int piloadsender(PROGINFO *pip) noex {
 	    if (rs >= 0) {
 	        cchar	*bp ;
 	        if ((rs = buffer_get(&b,&bp)) >= 0) {
-	            const char	**vpp = &pip->hdr_sender ;
+	            cchar	**vpp = &pip->hdr_sender ;
 	            bl = rs ;
 	            rs = proginfo_setentry(pip,vpp,bp,bl) ;
 	        }
