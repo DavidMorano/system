@@ -104,7 +104,7 @@ int progoutfin(PROGINFO *pip,BDB *bdbp,CITEDB *cdbp,cchar *ofname) noex {
 	    bfile	*efp = (bfile *) pip->efp ;
 	    bfile	*tfp = &pip->tf.tfile ;
 	    uint	roff = 0 ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		clen ;
 	    int		nblock = 0 ;
 	    int		len, ll ;
@@ -114,7 +114,7 @@ int progoutfin(PROGINFO *pip,BDB *bdbp,CITEDB *cdbp,cchar *ofname) noex {
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	    if ((rs = citedb_curbegin(cdbp,&cur)) >= 0) {
-		const int	biblen = BIBBUFLEN ;
+		cint	biblen = BIBBUFLEN ;
 		char		bibbuf[BIBBUFLEN + 1] ;
 
 	        while ((rs1 = citedb_curenum(cdbp,&cur,&ce)) >= 0) {
