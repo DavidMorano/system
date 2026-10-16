@@ -30,6 +30,7 @@
 
 EXTERNC_begin
 
+extern int sncpy (char *,int,cchar *) noex ;
 extern int sncpyx(char *,int,int,...) noex ;
 
 extern int sncpy1(char *,int,cc *) noex ;
