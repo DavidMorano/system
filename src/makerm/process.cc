@@ -28,7 +28,7 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 
 #include	<usystem.h>
 #include	<bfile.h>
@@ -48,8 +48,8 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
 
 
 /* external variables */
@@ -66,7 +66,7 @@ extern int	sfbasename(const char *,int,const char **) ;
 
 int process(pip,dirname,name)
 struct proginfo	*pip ;
-const char	dirname[] ;
+cchar	dirname[] ;
 char		name[] ;
 {
 	ustat	sb ;
