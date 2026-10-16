@@ -71,7 +71,7 @@ import libutil ;			/* |memclear(3u)| */
 /* forward references */
 
 template<typename ... Args>
-static int recorder_ctor(dw *op,Args ... args) noex {
+local int recorder_ctor(dw *op,Args ... args) noex {
     	RECORDER	*hup = op ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
@@ -81,7 +81,7 @@ static int recorder_ctor(dw *op,Args ... args) noex {
 }
 /* end subroutine (recorder_ctor) */
 
-static int recorder_dtor(dw *op) noex {
+local int recorder_dtor(dw *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -91,7 +91,7 @@ static int recorder_dtor(dw *op) noex {
 /* end subroutine (recorder_dtor) */
 
 template<typename ... Args>
-static inline int recorder_magic(dw *op,Args ... args) noex {
+local inline int recorder_magic(dw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == RECORDER_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -100,10 +100,10 @@ static inline int recorder_magic(dw *op,Args ... args) noex {
 }
 /* end subroutine (recorder_magic) */
 
-static int	recorder_extend(RC *) ;
-static int	recorder_matfl3(RC *,cchar *,uint [][2],int,cchar *) ;
-static int	recorder_matun(RC *,cchar *,uint [][2],int,cchar *) ;
-static int	recorder_cden(RC *,int,int) ;
+local int	recorder_extend(RC *) ;
+local int	recorder_matfl3(RC *,cchar *,uint [][2],int,cchar *) ;
+local int	recorder_matun(RC *,cchar *,uint [][2],int,cchar *) ;
+local int	recorder_cden(RC *,int,int) ;
 
 
 /* local variables */
@@ -807,7 +807,7 @@ int recorder_info(RC *asp,RC_INFO *ip) noex {
 
 /* private subroutines */
 
-static int recorder_extend(RC *asp) noex {
+local int recorder_extend(RC *asp) noex {
 	int		rs = SR_OK ;
 	int		ne, size ;
 	uint		*nrt = NULL ;
@@ -830,7 +830,7 @@ static int recorder_extend(RC *asp) noex {
 }
 /* end subroutine (recorder_extend) */
 
-static int recorder_matfl3(RC *asp,cc *s,uint it[][2],int hi,cc *hbuf) noex {
+local int recorder_matfl3(RC *asp,cc *s,uint it[][2],int hi,cc *hbuf) noex {
 	int		si = asp->rectab[it[hi][0]].first ;
 	int		f ;
 	f = ((s + si)[0] == hbuf[0]) ;
@@ -842,7 +842,7 @@ static int recorder_matfl3(RC *asp,cc *s,uint it[][2],int hi,cc *hbuf) noex {
 }
 /* end subroutine (recorder_matfl3) */
 
-static int recorder_matun(RC *asp,cc *s,uint (*it)[2],int hi,cc *hbuf) noex {
+local int recorder_matun(RC *asp,cc *s,uint (*it)[2],int hi,cc *hbuf) noex {
 	int		si = asp->rectab[it[hi][0]].username ;
 	int		f ;
 	f = (strcmp((s + si),hbuf) == 0) ;
@@ -850,7 +850,7 @@ static int recorder_matun(RC *asp,cc *s,uint (*it)[2],int hi,cc *hbuf) noex {
 }
 /* end subroutine (recorder_matun) */
 
-static int recorder_cden(RC *asp,int wi,int c) noex {
+local int recorder_cden(RC *asp,int wi,int c) noex {
 	if (c >= RECORDER_NCOLLISIONS) {
 	    c = (RECORDER_NCOLLISIONS - 1) ;
 	}
