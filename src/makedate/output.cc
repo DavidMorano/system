@@ -28,13 +28,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -50,14 +53,6 @@ import libutil ;
 
 /* external subroutines */
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* local variables */
 
@@ -70,7 +65,7 @@ extern char	*timestr_logz(time_t,char *) ;
 int output(progifo *pip,cchar *ofname) noex {
 	bfile		ofile, *ofp = &ofile ;
 	const time_t	clock = pip->daytime ;
-	const int	olen = ORGLEN ;
+	cint	olen = ORGLEN ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	int		wlen = 0 ;
@@ -105,9 +100,9 @@ int output(progifo *pip,cchar *ofname) noex {
 	    off_t	offset ;
 
 	    if ((modstr != NULL) && (modstr[0] != '\0')) {
-	        rs = bprintf(ofp,"const char %s_makedate[] =\n\"",modstr) ;
+	        rs = bprintf(ofp,"cchar %s_makedate[] =\n\"",modstr) ;
 	    } else
-	        rs = bprintf(ofp,"const char makedate[] =\n\"") ;
+	        rs = bprintf(ofp,"cchar makedate[] =\n\"") ;
 
 	    wlen += rs ;
 	    rs = bputc(ofp,'@') ;
@@ -140,7 +135,7 @@ int output(progifo *pip,cchar *ofname) noex {
 	        wlen += rs ;
 	    }
 
-	    rs = bprintf(ofp," %s",timestr_logz(clock,timebuf)) ;
+	    rs = bprintf(ofp," %s",strtime_logz(clock,timebuf)) ;
 	    wlen += rs ;
 
 	    if ((pip->org != NULL) && (pip->org[0] != '\0')) {
