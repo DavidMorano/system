@@ -50,10 +50,10 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -69,9 +69,9 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* forward references */
 
-static int	progeigen_find(PROGINFO *) ;
-static int	loadcooks(PROGINFO *,EXPCOOK *,cchar *) ;
-static int	prochavefile(PROGINFO *,cchar *) ;
+local int	progeigen_find(PROGINFO *) ;
+local int	loadcooks(PROGINFO *,EXPCOOK *,cchar *) ;
+local int	prochavefile(PROGINFO *,cchar *) ;
 
 
 /* local structures */
@@ -79,7 +79,7 @@ static int	prochavefile(PROGINFO *,cchar *) ;
 
 /* local variables */
 
-static const char	*eigenfnames[] = {
+static cchar	*eigenfnames[] = {
 	"%p/lib/%s/%l.%f",
 	"/usr/lib/%s/%l.%f",
 	"%p/share/dict/%l.%f",
@@ -213,7 +213,7 @@ int progeigen_find(PROGINFO *pip)
 	if (elang == NULL) elang = EIGENLANG ;
 	if ((rs = expcook_start(ecp)) >= 0) {
 	    if ((rs = loadcooks(pip,ecp,elang)) >= 0) {
-		const int	elen = MAXPATHLEN ;
+		cint	elen = MAXPATHLEN ;
 		int		efl ;
 		int		i ;
 		cchar		*efp ;
@@ -255,7 +255,7 @@ int progeigen_find(PROGINFO *pip)
 /* end subroutine (progeigen_find) */
 
 
-static int prochavefile(PROGINFO *pip,cchar *fname)
+local int prochavefile(PROGINFO *pip,cchar *fname)
 {
 	ustat	sb ;
 	int		rs ;
@@ -283,7 +283,7 @@ static int prochavefile(PROGINFO *pip,cchar *fname)
 /* end subroutine (prochavefile) */
 
 
-static int loadcooks(PROGINFO *pip,EXPCOOK *ecp,cchar *elang)
+local int loadcooks(PROGINFO *pip,EXPCOOK *ecp,cchar *elang)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -292,7 +292,7 @@ static int loadcooks(PROGINFO *pip,EXPCOOK *ecp,cchar *elang)
 	cchar		*vp ;
 	char		kbuf[2] = "x" ;
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
-		const int	kc = MKCHAR(keys[i]) ;
+		cint	kc = MKCHAR(keys[i]) ;
 		vp = NULL ;
 		switch (kc) {
 		case 'p':
