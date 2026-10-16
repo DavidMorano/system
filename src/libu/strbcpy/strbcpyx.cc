@@ -43,7 +43,7 @@
 	I am using the new (rumored to be coming as a standard)
 	subroutine |strlcpy(3c)|.  I wrote my own version of this
 	until it gets into the standard libraries.  It might be in
-	someone's standard lirbrary already, but I do not have that
+	someone's standard library already, but I do not have that
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
@@ -125,28 +125,40 @@ char *strbcpy6(char *dp,int dl,
 	return strbcpyx(dp,dl,6,s1,s2,s3,s4,s5,s6) ;
 } /* end subroutine (strbcpy6) */
 
-char *strbcpyx(char *dp,int dl,int n,...) noex {
+char *strbcpyx_pos(char *dp,int dl,int na,va_list ap) noex {
+	bool fbad = false ;
+	for (int i = 0 ; (dl > 0) && (i < na) ; i += 1) {
+	    ccharp sp = (cchar *) va_arg(ap,char *) ;
+	    if (! sp) break ;
+	    while (dl && *sp) {
+		*dp++ = *sp++ ;
+		dl -= 1 ;
+	    } /* end while */
+	    if ((fbad = ((dl == 0) && *sp))) break ;
+	} /* end for */
+	*dp = '\0' ;
+	if (fbad) dp = nullptr ;
+	return dp ;
+} /* end subroutine (strbcpyx_pos) */
+
+char *strbcpyx_neg(char *dp,int dl,int na,va_list ap) noex {
+    	(void) dl ;
+	for (int i = 0 ; i < na ; i += 1) {
+	    ccharp sp = (cchar *) va_arg(ap,char *) ;
+	    if (! sp) break ;
+	    dp = stpcpy(dp,sp) ;
+	} /* end for */
+	return dp ;
+} /* end subroutine (strbcpyx_neg) */
+
+char *strbcpyx(char *dp,int dl,int na,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,n) ;
+	    va_begin(ap,na) ;
 	    if (dl >= 0) {
-	        bool fbad = false ;
-	        for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
-	            ccharp sp = (cchar *) va_arg(ap,char *) ;
-	            while (dl && *sp) {
-		        *dp++ = *sp++ ;
-		        dl -= 1 ;
-	            } /* end while */
-		    if ((fbad = ((dl == 0) && *sp))) break ;
-	        } /* end for */
-	        *dp = '\0' ;
-	        if (fbad) dp = nullptr ;
+		dp = strbcpyx_pos(dp,dl,na,ap) ;
 	    } else {
-	        for (int i = 0 ; i < n ; i += 1) {
-	            ccharp sp = (cchar *) va_arg(ap,char *) ;
-		    dp = stpcpy(dp,sp) ;
-	        } /* end for */
-	        *dp = '\0' ;
+		dp = strbcpyx_neg(dp,dl,na,ap) ;
 	    } /* end if */
 	    va_end(ap) ;
 	} /* end if (non-null) */
