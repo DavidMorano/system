@@ -45,7 +45,7 @@ struct mfsbuilt_c {
 struct mfsbuilt {
 	uint		magic ;
 	HDB		db ;
-	const char	*dname ;	/* directory of object modules */
+	cchar	*dname ;	/* directory of object modules */
 	time_t		ti_check ;	/* last check time */
 } ;
 
