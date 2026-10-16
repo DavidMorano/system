@@ -48,7 +48,7 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strlcpy(3c)| */
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
