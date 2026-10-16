@@ -137,29 +137,29 @@ struct wrcache {
 
 /* forward references */
 
-static int	progdber(PI *,bfile *,cchar *,cchar *,int,int) ;
-static int	procpw(PI *,STRTAB *,RECORDER *) ;
-static int	procpwfile(PI *,STRTAB *,RECORDER *) ;
-static int	procpwfiler(PI *,STRTAB *,RECORDER *,PWFILE_ENT *) ;
-static int	procpwsys(PI *,STRTAB *,RECORDER *) ;
+local int	progdber(PI *,bfile *,cchar *,cchar *,int,int) ;
+local int	procpw(PI *,STRTAB *,RECORDER *) ;
+local int	procpwfile(PI *,STRTAB *,RECORDER *) ;
+local int	procpwfiler(PI *,STRTAB *,RECORDER *,PWFILE_ENT *) ;
+local int	procpwsys(PI *,STRTAB *,RECORDER *) ;
 
-static int	procentry(PI *,STRTAB *,RECORDER *,cchar *,cchar *,int) ;
-static int	wrcache(PI *,STRTAB *,RECORDER *,cchar *,cchar *,int) ;
-static int	wrfile(PI *,WRCACHE *,cchar *) ;
-static int	wrsetup(PI *,WRCACHE *) ;
-static int	wrstuff(PI *,WRCACHE *) ;
-static int	wridx(PI *,WRCACHE *) ;
-static int	wridxer(PI *,WRCACHE *) ;
-static int	wrstats(PI *,bfile *,RECORDER *) ;
+local int	procentry(PI *,STRTAB *,RECORDER *,cchar *,cchar *,int) ;
+local int	wrcache(PI *,STRTAB *,RECORDER *,cchar *,cchar *,int) ;
+local int	wrfile(PI *,WRCACHE *,cchar *) ;
+local int	wrsetup(PI *,WRCACHE *) ;
+local int	wrstuff(PI *,WRCACHE *) ;
+local int	wridx(PI *,WRCACHE *) ;
+local int	wridxer(PI *,WRCACHE *) ;
+local int	wrstats(PI *,bfile *,RECORDER *) ;
 
-static int	mkourtmp(char *,cchar *,cchar *,cchar *,mode_t) ;
-static int	ourchmod(cchar *) ;
+local int	mkourtmp(char *,cchar *,cchar *,cchar *,mode_t) ;
+local int	ourchmod(cchar *) ;
 
-static int	mkpwihdr(uint *,int) ;
-static int	mkro(PI *) ;
+local int	mkpwihdr(uint *,int) ;
+local int	mkro(PI *) ;
 
 #if	CF_DEBUG && CF_DEBUGFILE
-static int	progdb_debugfile(PI *,cchar *) ;
+local int	progdb_debugfile(PI *,cchar *) ;
 #endif
 
 
@@ -216,7 +216,7 @@ int progdb(PI *pip,bfile *ofp,cchar *dbname) noex {
 }
 /* end subroutine (progdb) */
 
-static int progdber(PI *pip,bfile *ofp,cchar *dn,cchar *db,int ro,int n) noex {
+local int progdber(PI *pip,bfile *ofp,cchar *dn,cchar *db,int ro,int n) noex {
 	STRTAB		st ;
 	int		rs ;
 	int		rs1 ;
@@ -255,7 +255,7 @@ static int progdber(PI *pip,bfile *ofp,cchar *dn,cchar *db,int ro,int n) noex {
 }
 /* end subroutine (progdber) */
 
-static int procpw(PI *pip,STRTAB *stp,RECORDER *rp) noex {
+local int procpw(PI *pip,STRTAB *stp,RECORDER *rp) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((pip->pwfname != NULL) && (pip->pwfname[0] != '-')) {
@@ -269,7 +269,7 @@ static int procpw(PI *pip,STRTAB *stp,RECORDER *rp) noex {
 }
 /* end subroutine (procpw) */
 
-static int procpwfile(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
+local int procpwfile(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
 	PWFILE		pf ;
 	PWFILE_CUR	cur ;
 	PWFILE_ENT	pw ;
@@ -323,7 +323,7 @@ static int procpwfile(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
 }
 /* end subroutine (procpwfile) */
 
-static int procpwfiler(PI *pip,STRTAB *stp,RECORDER *rtp,
+local int procpwfiler(PI *pip,STRTAB *stp,RECORDER *rtp,
 		PWFILE_ENT *pwp) noex {
 	int		rs = SR_OK ;
 	int		nl = -1 ;
@@ -391,7 +391,7 @@ static int procpwfiler(PI *pip,STRTAB *stp,RECORDER *rtp,
 }
 /* end subroutine (procpwfiler) */
 
-static int procpwsys(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
+local int procpwsys(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
 	SETSTR		u ;
 	cint		n = 100 ;
 	int		rs ;
@@ -468,7 +468,7 @@ static int procpwsys(PI *pip,STRTAB *stp,RECORDER *rtp) noex {
 }
 /* end subroutine (procpwsys) */
 
-static int procentry(PI *pip,STRTAB *stp,RECORDER *rtp,cchar *username,
+local int procentry(PI *pip,STRTAB *stp,RECORDER *rtp,cchar *username,
 		cchar *nbuf,int nlen) noex {
 	REALNAME	rn ;
 	int		rs ;
@@ -611,7 +611,7 @@ static int procentry(PI *pip,STRTAB *stp,RECORDER *rtp,cchar *username,
 }
 /* end subroutine (procentry) */
 
-static int wrcache(PI *pip,STRTAB *stp,RECORDER *rp,
+local int wrcache(PI *pip,STRTAB *stp,RECORDER *rp,
 		cchar *dn,cchar *db,int ro) noex {
 	cmode		fm = 0664 ;
 	int		rs ;
@@ -656,7 +656,7 @@ static int wrcache(PI *pip,STRTAB *stp,RECORDER *rp,
 }
 /* end subroutine (wrcache) */
 
-static int wrfile(PI *pip,WRCACHE *wcp,cchar *fn) noex {
+local int wrfile(PI *pip,WRCACHE *wcp,cchar *fn) noex {
 	bfile		*ifp = &wcp->ifile ;
 	int		rs ;
 	int		rs1 ;
@@ -692,7 +692,7 @@ static int wrfile(PI *pip,WRCACHE *wcp,cchar *fn) noex {
 }
 /* end subroutine (wrfile) */
 
-static int wrsetup(PI *pip,WRCACHE *wcp) noex {
+local int wrsetup(PI *pip,WRCACHE *wcp) noex {
 	RECORDER	*rp = wcp->rp ;
 	RECORDER_ENT	*rectab ;
 	int		rs ;
@@ -743,7 +743,7 @@ static int wrsetup(PI *pip,WRCACHE *wcp) noex {
 }
 /* end subroutine (wrsetup) */
 
-static int wrstuff(PI *pip,WRCACHE *wcp) noex {
+local int wrstuff(PI *pip,WRCACHE *wcp) noex {
 	bfile		*ifp = &wcp->ifile ;
 	cint		hdrsize = (pwihdr_overlast * sizeof(uint)) ;
 	uint		*hdrp = wcp->hdr ;
@@ -776,7 +776,7 @@ static int wrstuff(PI *pip,WRCACHE *wcp) noex {
 }
 /* end subroutine (wrstuff) */
 
-static int wridx(PI *pip,WRCACHE *wcp) noex {
+local int wridx(PI *pip,WRCACHE *wcp) noex {
 	bfile		*ifp = &wcp->ifile ;
 	uint		(*recind)[2] ;
 	uint		*hdrp = wcp->hdr ;
@@ -805,7 +805,7 @@ static int wridx(PI *pip,WRCACHE *wcp) noex {
 }
 /* end subroutine (wridx) */
 
-static int wridxer(PI *pip,WRCACHE *wcp) noex {
+local int wridxer(PI *pip,WRCACHE *wcp) noex {
 	RECORDER	*rp = wcp->rp ;
 	bfile		*ifp = &wcp->ifile ;
 	uint		(*recind)[2] = wcp->recind ;
@@ -831,7 +831,7 @@ static int wridxer(PI *pip,WRCACHE *wcp) noex {
 }
 /* end subroutine (wridxer) */
 
-static int wrstats(PI *pip,bfile *ofp,RECORDER *recp) noex {
+local int wrstats(PI *pip,bfile *ofp,RECORDER *recp) noex {
 	RECORDER_INFO	s ;
 	int		rs ;
 
@@ -868,7 +868,7 @@ static int wrstats(PI *pip,bfile *ofp,RECORDER *recp) noex {
 }
 /* end subroutine (wrstats) */
 
-static int mkpwihdr(uint *hdrp,int fto) noex {
+local int mkpwihdr(uint *hdrp,int fto) noex {
 	hdrp[pwihdr_wrcount] = 0 ;
 	hdrp[pwihdr_rectab] = fto ;
 	fto += hdrp[pwihdr_recsize] ;
@@ -888,7 +888,7 @@ static int mkpwihdr(uint *hdrp,int fto) noex {
 }
 /* end subroutine (mkpwihdr) */
 
-static int mkourtmp(char *rbuf,cc *dbuf,cc *suf,cc *es,mode_t fm) noex {
+local int mkourtmp(char *rbuf,cc *dbuf,cc *suf,cc *es,mode_t fm) noex {
 	cint		clen = MAXNAMELEN ;
 	int		rs ;
 	cchar		*xx = "progdbXX" ;
@@ -903,7 +903,7 @@ static int mkourtmp(char *rbuf,cc *dbuf,cc *suf,cc *es,mode_t fm) noex {
 }
 /* end subroutine (mkourtmp) */
 
-static int mkro(PI *pip) noex {
+local int mkro(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		ro = (RECORDER_OSEC | RECORDER_ORANDLC) ;
 	if ((pip->typespec != NULL) && (pip->typespec[0] != '\0')) {
@@ -929,7 +929,7 @@ static int mkro(PI *pip) noex {
 }
 /* end subroutine (mkro) */
 
-static int ourchmod(cchar *fn) noex {
+local int ourchmod(cchar *fn) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = uc_stat(fn,&sb)) >= 0) {
@@ -943,7 +943,7 @@ static int ourchmod(cchar *fn) noex {
 /* end subroutine (ourchmod) */
 
 #if	CF_DEBUG && CF_DEBUGFILE
-static int progdb_debugfile(PI *pip,cchar *dbname) noex {
+local int progdb_debugfile(PI *pip,cchar *dbname) noex {
 	int		rs = SR_OK ;
 	if (DEBUGLEVEL(4)) {
 	    IPASSWD	pwi ;
