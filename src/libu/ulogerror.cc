@@ -40,13 +40,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD |getenv(3c)| */
 #include	<cstdio>		/* CSTD |snprintf(3c)| */
-#include	<cstring>		/* CSTD |strlcpy(3c)| */
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<usys.h>		/* LIBU |lenstr(3usys)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"ulogerror.h"		/* <- redundant */
@@ -61,6 +63,9 @@
 
 
 /* imported namespaces */
+
+using usys::lenstr ;			/* subroutine */
+using usys::strwcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -83,31 +88,62 @@ namespace {
     struct ulogerrmgr {
 	ulogerrmgr_ent	ents[ULOGERRMGR_NENTS] = {} ;
 	int		c = 0 ;
-	int record(cchar *,int,cchar * = nullptr) noex ;
-	void fini() noex ;
+	int record	(cchar *,int,cchar * = nullptr) noex ;
+	int fini	() noex ;
 	destruct ulogerrmgr() noex {
 	    fini() ;
 	} ; /* end destruct */
     private:
-	void fini_ents(int) noex ;
+	void fini_ents	(int) noex ;
     } ; /* end struct ulogerrmgr) */
 } /* end namespace */
 
 
 /* forward references */
 
-static charp strdcpyu(char *dp,int dl,cchar *sp) noex {
-	char		*rp = dp ;
-	if (dl >= 0) {
-	    csize	dsz = (dl + 1) ;
-	    if (size_t rsz ; (rsz = strlcpy(dp,sp,dsz)) >= dsz) {
-	        rp = charp(dp+dl) ;
-	    } else {
-	        cint	sl = int(rsz) ;
-	        rp = charp(dp+sl) ;
-	    }
-	} /* end if (non-zero positive) */
-	return rp ;
+local int uwrite(int fd,cvoid *wbuf,int wlen) noex {
+    	int		rs = SR_FAULT ;
+	if (wbuf) ylikely {
+	    rs = SR_BADF ;
+	    if (fd >= 0) ylikely {
+		rs = SR_INVALID ;
+		if (csize wsize = size_t(wlen) ; wlen >= 0) ylikely {
+		    ssize_t rsize ;
+		    rs = SR_OK ;
+		    bool fexit = false ;
+		    repeat {
+		        if ((rsize = write(fd,wbuf,wsize)) < 0) {
+			    rs = (neg errno) ;
+			    switch (rs) {
+			    case SR_INTR:
+			    case SR_AGAIN:
+			    case SR_NOMEM:
+				msleep(1) ;
+				break ;
+			    default:
+				fexit = true ;
+				break ;
+			    } /* end switch */
+			} else {
+			    rs = saturate<int>(rsize) ;
+			} /* end */
+		    } until ((rs >= 0) || fexit) ;
+	        } /* end if (valid) */
+	    } /* end if (good-desc) */
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine (uwrute) */
+
+local charp strdcpyu(char *dp,int dl,cchar *sp) noex {
+    	if (dp && sp) ylikely {
+	    *dp = eos ;
+	    if (dl >= 0) ylikely {
+	        dp = strwcpy(dp,sp,dl) ;
+	    } /* end if (non-zero positive) */
+	} else {
+	    dp = nullptr ;
+	} /* end if (non-null) */
+	return dp ;
 } /* end subroutine (strdcpyu) */
 
 
@@ -125,7 +161,7 @@ constinit ulogerrmgr	ulogerrmgr_data ;
 
 int ulogerror(cchar *id,int err,cchar *msg) noex {
 	int		f = false ;
-	if (id) {
+	if (id) ylikely {
 	    f = ulogerrmgr_data.record(id,err,msg) ;
 	}
 	return f ;
@@ -138,38 +174,43 @@ int ulogerrmgr::record(cchar *id,int err,cchar *msg) noex {
 	static cint	idlen = ULOGERRMGR_IDLEN ;
 	static cint	mglen = ULOGERRMGR_MSGLEN ;
 	int		f = false ;
-	if (c < ULOGERRMGR_NENTS) {
+	if (c < ULOGERRMGR_NENTS) ylikely {
 	    f = true ;
 	    ents[c].err = err ;
 	    strdcpyu(ents[c].id,idlen,id) ;
 	    if (msg) {
 	        strdcpyu(ents[c].msg,mglen,msg) ;
-	    }
+	    } /* end */
 	    c += 1 ;
 	} /* end if (recorded) */
 	return f ;
 } /* end subroutine (ulogerrmgr::record) */
 
-void ulogerrmgr::fini() noex {
+int ulogerrmgr::fini() noex {
 	static cint	fd = FD_STDERR ;
+	int		rs = SR_OK ;
 	cchar		*announce = "ulogerror: dump\n" ;
 	if (cchar *vnp = getenv(var) ; vnp) {
 	    if (vnp[0] && (c > 0)) {
-		write(fd,announce,strlen(announce)) ;
-		fini_ents(fd) ;
+		if (cint alen = lenstr(announce) ; alen > 0) {
+		    if ((rs = uwrite(fd,announce,alen)) >= 0) {
+		        fini_ents(fd) ;
+		    }
+		} /* end */
 	    } /* end if (have valid) */
 	} /* end if (have variable) */
+	return rs ;
 } /* end subroutine (ulogerrmgr::fini) */
 
 void ulogerrmgr::fini_ents(int fd) noex {
-	cauto	snfmt = snprintf ;
-	char	wbuf[wlen+1] ;
-	cchar	*fmt = "ulogerror: %s (%3d) %s\n" ;
+	cauto		snfmt = snprintf ;
+	char		wbuf[wlen + 1] ;
+	cchar		fmt[] = "ulogerror: %s (%3d) %s\n" ;
 	for (int i = 0 ; i < c ; i += 1) {
-	    csize	wsize = size_t(wlen + 1) ;
-	    cint	err = ents[i].err ;
-	    cchar	*id = ents[c].id ;
-	    cchar	*msg = ents[c].msg ;
+	    csize	wsize	= size_t(wlen + 1) ;
+	    cint	err	= ents[i].err ;
+	    ccharp	id	= ents[c].id ;
+	    ccharp	msg	= ents[c].msg ;
 	    if (int wl ; (wl = snfmt(wbuf,wsize,fmt,id,err,msg)) > 0) {
 		write(fd,wbuf,wl) ;
 	    } /* end if (snprintf) */
