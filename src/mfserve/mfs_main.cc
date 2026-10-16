@@ -107,7 +107,7 @@
 #include	<snx.h>			/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<spawner.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<toxc.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -184,57 +184,57 @@ extern char	**environ ;
 
 /* forward references */
 
-static int	mfsmain(int,mainv,mainv,void *) ;
+local int	mfsmain(int,mainv,mainv,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procdefargs(PROGINFO *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procdefargs(PROGINFO *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_hostname(PROGINFO *) ;
-static int	procuserinfo_other(PROGINFO *) ;
-static int	procuserinfo_aux(PROGINFO *) ;
-static int	procuserinfo_hz(PROGINFO *) ;
-static int	procuserinfo_groupname(PROGINFO *) ;
-static int	procuserinfo_org(PROGINFO *) ;
-static int	procuserinfo_orgcode(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_hostname(PROGINFO *) ;
+local int	procuserinfo_other(PROGINFO *) ;
+local int	procuserinfo_aux(PROGINFO *) ;
+local int	procuserinfo_hz(PROGINFO *) ;
+local int	procuserinfo_groupname(PROGINFO *) ;
+local int	procuserinfo_org(PROGINFO *) ;
+local int	procuserinfo_orgcode(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 
-static int	proclisten_begin(PROGINFO *) ;
-static int	proclisten_end(PROGINFO *) ;
+local int	proclisten_begin(PROGINFO *) ;
+local int	proclisten_end(PROGINFO *) ;
 
-static int	procourconf_begin(PROGINFO *) ;
-static int	procourconf_find(PROGINFO *) ;
-static int	procourconf_end(PROGINFO *) ;
+local int	procourconf_begin(PROGINFO *) ;
+local int	procourconf_find(PROGINFO *) ;
+local int	procourconf_end(PROGINFO *) ;
 
-static int	procourdefs(PROGINFO *) ;
+local int	procourdefs(PROGINFO *) ;
 
-static int	process(PROGINFO *,cchar *) ;
-static int	procourcmds(PROGINFO *,cchar *) ;
-static int	procregular(PROGINFO *) ;
-static int	procbackinfo(PROGINFO *) ;
-static int	procback(PROGINFO *) ;
-static int	procbacks(PROGINFO *) ;
-static int	procbackcheck(PROGINFO *) ;
-static int	procbacker(PROGINFO *,cchar *,cchar **) ;
-static int	procbackenv(PROGINFO *,SPAWNER *) ;
-static int	procmntcheck(PROGINFO *) ;
-static int	procdaemon(PROGINFO *) ;
-static int	procdaemoncheck(PROGINFO *) ;
+local int	process(PROGINFO *,cchar *) ;
+local int	procourcmds(PROGINFO *,cchar *) ;
+local int	procregular(PROGINFO *) ;
+local int	procbackinfo(PROGINFO *) ;
+local int	procback(PROGINFO *) ;
+local int	procbacks(PROGINFO *) ;
+local int	procbackcheck(PROGINFO *) ;
+local int	procbacker(PROGINFO *,cchar *,cchar **) ;
+local int	procbackenv(PROGINFO *,SPAWNER *) ;
+local int	procmntcheck(PROGINFO *) ;
+local int	procdaemon(PROGINFO *) ;
+local int	procdaemoncheck(PROGINFO *) ;
 
-static int	procbackdefs(PROGINFO *) ;
-static int	procdaemondefs(PROGINFO *) ;
-static int	procpidfname(PROGINFO *) ;
-static int	procservice(PROGINFO *) ;
-static int	procfcmd(PROGINFO *) ;
-static int	procexecname(PROGINFO *,char *,int) ;
+local int	procbackdefs(PROGINFO *) ;
+local int	procdaemondefs(PROGINFO *) ;
+local int	procpidfname(PROGINFO *) ;
+local int	procservice(PROGINFO *) ;
+local int	procfcmd(PROGINFO *) ;
+local int	procexecname(PROGINFO *,char *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -301,7 +301,7 @@ enum argopts {
 } ;
 
 /* these have to be in sync w/ the enums in 'config.h' */
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"mfserve",
 	"tcpmuxd",
 	"fingers",
@@ -331,7 +331,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"lockinfo",
 	"quiet",
 	"intrun",
@@ -393,7 +393,7 @@ enum progopts {
 	progopt_overlast
 } ;
 
-static const char	*sched1[] = {
+static cchar	*sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -401,7 +401,7 @@ static const char	*sched1[] = {
 	NULL
 } ;
 
-static const char	*cmds[] = {
+static cchar	*cmds[] = {
 	"exit",
 	"mark",
 	"report",
@@ -416,7 +416,7 @@ enum cmds {
 } ;
 
 /* thses are for the spawned child */
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGHUP,
 	SIGPIPE,
 	SIGPOLL,
@@ -455,7 +455,7 @@ int p_mfserve(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -554,7 +554,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -1005,7 +1005,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int kc = MKCHAR(*akp) ;
+	                    cint kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1414,7 +1414,7 @@ static int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 	    char	timebuf[TIMEBUFLEN+1] ;
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    switch (rs) {
 	    case SR_ALREADY:
 	    case SR_AGAIN:
@@ -1490,7 +1490,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar		*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -1537,7 +1537,7 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1557,7 +1557,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1869,7 +1869,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procdefargs(PROGINFO *pip)
+local int procdefargs(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	cchar		**envv = pip->envv ;
@@ -1892,7 +1892,7 @@ static int procdefargs(PROGINFO *pip)
 /* end subroutine (procdefargs) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs ;
 
@@ -1942,7 +1942,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1953,9 +1953,9 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_hostname(PROGINFO *pip)
+local int procuserinfo_hostname(PROGINFO *pip)
 {
-	const int	hlen = MAXHOSTNAMELEN ;
+	cint	hlen = MAXHOSTNAMELEN ;
 	int		rs ;
 	char		hbuf[MAXHOSTNAMELEN+1] ;
 	cchar		*nn = pip->nodename ;
@@ -1969,7 +1969,7 @@ static int procuserinfo_hostname(PROGINFO *pip)
 /* end subroutine (procuserinfo_hostname) */
 
 
-static int procuserinfo_other(PROGINFO *pip)
+local int procuserinfo_other(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = procuserinfo_aux(pip)) >= 0) {
@@ -1989,7 +1989,7 @@ static int procuserinfo_other(PROGINFO *pip)
 /* end subroutine (procuserinfo_other) */
 
 
-static int procuserinfo_aux(PROGINFO *pip)
+local int procuserinfo_aux(PROGINFO *pip)
 {
 	UINFO_AUX	aux ;
 	int		rs ;
@@ -2005,9 +2005,9 @@ static int procuserinfo_aux(PROGINFO *pip)
 /* end subroutine (procuserinfo_aux) */
 
 
-static int procuserinfo_hz(PROGINFO *pip)
+local int procuserinfo_hz(PROGINFO *pip)
 {
-	const int	dlen = DIGBUFLEN ;
+	cint	dlen = DIGBUFLEN ;
 	int		rs = SR_OK ;
 	int		cl = -1 ;
 	cchar		*cp ;
@@ -2045,7 +2045,7 @@ static int procuserinfo_hz(PROGINFO *pip)
 /* end subroutine (procuserinfo_hz) */
 
 
-static int procuserinfo_groupname(PROGINFO *pip)
+local int procuserinfo_groupname(PROGINFO *pip)
 {
 	int		rs ;
 	int		gnlen = GROUPNAMELEN ;
@@ -2059,9 +2059,9 @@ static int procuserinfo_groupname(PROGINFO *pip)
 /* end subroutine (procuserinfo_groupname) */
 
 
-static int procuserinfo_org(PROGINFO *pip)
+local int procuserinfo_org(PROGINFO *pip)
 {
-	const int	orglen = MAXNAMELEN ;
+	cint	orglen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	cchar		*orgp = pip->org ;
 	if ((orgp == NULL) || (orgp[0] == '\0')) {
@@ -2088,11 +2088,11 @@ static int procuserinfo_org(PROGINFO *pip)
 /* end subroutine (procuserinfo_org) */
 
 
-static int procuserinfo_orgcode(PROGINFO *pip)
+local int procuserinfo_orgcode(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if ((pip->orgcode == NULL) || (pip->orgcode[0] == '\0')) {
-	    const int	olen = ORGCODELEN ;
+	    cint	olen = ORGCODELEN ;
 	    int		ol = -1 ;
 	    cchar	*org = pip->org ;
 	    char	obuf[ORGCODELEN+1] ;
@@ -2112,7 +2112,7 @@ static int procuserinfo_orgcode(PROGINFO *pip)
 /* end subroutine (procuserinfo_orgcode) */
 
 
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -2123,14 +2123,14 @@ static int procuserinfo_logid(PROGINFO *pip)
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
 	            LOCINFO	*lip = pip->lip ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            lip->kserial = rs ;
 	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
-	                const int	s = lip->kserial ;
-	                const int	slen = LOGIDLEN ;
+	                cint	s = lip->kserial ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
@@ -2146,7 +2146,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 
 
 /* this initialization must precede the configuration-file initializaton */
-static int proclisten_begin(PROGINFO *pip)
+local int proclisten_begin(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->fl.daemon) {
@@ -2157,7 +2157,7 @@ static int proclisten_begin(PROGINFO *pip)
 /* end subroutine (proclisten_begin) */
 
 
-static int proclisten_end(PROGINFO *pip)
+local int proclisten_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2170,7 +2170,7 @@ static int proclisten_end(PROGINFO *pip)
 /* end subroutine (proclisten_end) */
 
 
-static int procourconf_begin(PROGINFO *pip)
+local int procourconf_begin(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -2182,10 +2182,10 @@ static int procourconf_begin(PROGINFO *pip)
 
 	if ((rs = procourconf_find(pip)) >= 0) {
 	    if (pip->cfname != NULL) {
-	        const int	size = sizeof(CONFIG) ;
+	        cint	size = sizeof(CONFIG) ;
 	        void		*p ;
 	        if ((rs = uc_malloc(size,&p)) >= 0) {
-	            const int	ic = lip->intconf ;
+	            cint	ic = lip->intconf ;
 	            cchar	*cfn = pip->cfname ;
 	            pip->config = p ;
 	            if ((rs = config_start(pip->config,pip,cfn,ic)) >= 0) {
@@ -2210,7 +2210,7 @@ static int procourconf_begin(PROGINFO *pip)
 /* end subroutine (procourconf_begin) */
 
 
-static int procourconf_find(PROGINFO *pip)
+local int procourconf_find(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
@@ -2230,7 +2230,7 @@ static int procourconf_find(PROGINFO *pip)
 	    LOCINFO	*lip = pip->lip ;
 	    if (lip->open.svars) {
 	        vecstr		*svp = &lip->svars ;
-	        const int	tlen = MAXPATHLEN ;
+	        cint	tlen = MAXPATHLEN ;
 	        cchar		*cfn = CONFIGFNAME ;
 	        char		tbuf[MAXPATHLEN+1] ;
 	        if ((rs = permsched(sched1,svp,tbuf,tlen,cfn,R_OK)) >= 0) {
@@ -2274,7 +2274,7 @@ static int procourconf_find(PROGINFO *pip)
 /* end subroutine (procourconf_find) */
 
 
-static int procourconf_end(PROGINFO *pip)
+local int procourconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2300,7 +2300,7 @@ static int procourconf_end(PROGINFO *pip)
 /* end subroutine (procourconf_end) */
 
 
-static int procourdefs(PROGINFO *pip)
+local int procourdefs(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2335,7 +2335,7 @@ static int procourdefs(PROGINFO *pip)
 /* end subroutine (procourdefs) */
 
 
-static int procbackdefs(PROGINFO *pip)
+local int procbackdefs(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2354,7 +2354,7 @@ static int procbackdefs(PROGINFO *pip)
 /* end subroutine (procbackdefs) */
 
 
-static int procdaemondefs(PROGINFO *pip)
+local int procdaemondefs(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2408,9 +2408,9 @@ static int procdaemondefs(PROGINFO *pip)
 /* end subroutine (procdaemondefs) */
 
 
-static int procpidfname(PROGINFO *pip)
+local int procpidfname(PROGINFO *pip)
 {
-	const int	clen = MAXNAMELEN ;
+	cint	clen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		pfl = -1 ;
 	int		f_changed = FALSE ;
@@ -2430,7 +2430,7 @@ static int procpidfname(PROGINFO *pip)
 	    f_changed = TRUE ;
 	    if ((rs = mkpath2(rundname,pip->pr,RUNDNAME)) >= 0) {
 	        ustat	sb ;
-	        const int	rsn = SR_NOENT ;
+	        cint	rsn = SR_NOENT ;
 	        if ((rs = uc_stat(rundname,&sb)) >= 0) {
 	            if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
 	        } else if (rs == rsn) {
@@ -2471,7 +2471,7 @@ static int procpidfname(PROGINFO *pip)
 /* end subroutine (procpidfname) */
 
 
-static int process(PROGINFO *pip,cchar *ofn)
+local int process(PROGINFO *pip,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -2522,7 +2522,7 @@ static int process(PROGINFO *pip,cchar *ofn)
 /* end subroutine (process) */
 
 
-static int procbackinfo(PROGINFO *pip)
+local int procbackinfo(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2560,7 +2560,7 @@ static int procbackinfo(PROGINFO *pip)
 /* end subroutine (procbackinfo) */
 
 
-static int procback(PROGINFO *pip)
+local int procback(PROGINFO *pip)
 {
 	int		rs ;
 
@@ -2588,7 +2588,7 @@ static int procback(PROGINFO *pip)
 /* end subroutine (procback) */
 
 
-static int procbackcheck(PROGINFO *pip)
+local int procbackcheck(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -2624,7 +2624,7 @@ static int procbackcheck(PROGINFO *pip)
 /* end subroutine (procbackcheck) */
 
 
-static int procmntcheck(PROGINFO *pip)
+local int procmntcheck(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2650,9 +2650,9 @@ static int procmntcheck(PROGINFO *pip)
 /* end subroutine (procmntcheck) */
 
 
-static int procbacks(PROGINFO *pip)
+local int procbacks(PROGINFO *pip)
 {
-	const int	elen = MAXPATHLEN ;
+	cint	elen = MAXPATHLEN ;
 	int		rs ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
@@ -2724,7 +2724,7 @@ static int procbacks(PROGINFO *pip)
 /* end subroutine (procbacks) */
 
 
-static int procbacker(PROGINFO *pip,cchar *pf,cchar **av)
+local int procbacker(PROGINFO *pip,cchar *pf,cchar **av)
 {
 	SPAWNER		s ;
 	int		rs ;
@@ -2772,7 +2772,7 @@ static int procbacker(PROGINFO *pip,cchar *pf,cchar **av)
 /* end subroutine (procbacker) */
 
 
-static int procbackenv(PROGINFO *pip,SPAWNER *srp)
+local int procbackenv(PROGINFO *pip,SPAWNER *srp)
 {
 	LOCINFO		*lip = pip->lip ;
 	BUFFER		b ;
@@ -2911,7 +2911,7 @@ static int procbackenv(PROGINFO *pip,SPAWNER *srp)
 /* end subroutine (procbackenv) */
 
 
-static int procdaemon(PROGINFO *pip)
+local int procdaemon(PROGINFO *pip)
 {
 	int		rs ;
 	int		rs1 ;
@@ -2958,7 +2958,7 @@ static int procdaemon(PROGINFO *pip)
 	}
 	if (pip->open.logprog) {
 	    char	timebuf[TIMEBUFLEN+1] ;
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    logprintf(pip,"%s exiting c=%u (%d)",timebuf,c,rs) ;
 	}
 
@@ -2972,7 +2972,7 @@ static int procdaemon(PROGINFO *pip)
 /* end subroutine (procdaemon) */
 
 
-static int procdaemoncheck(PROGINFO *pip)
+local int procdaemoncheck(PROGINFO *pip)
 {
 	int		rs ;
 
@@ -2993,7 +2993,7 @@ static int procdaemoncheck(PROGINFO *pip)
 /* end subroutine (procdaemoncheck) */
 
 
-static int procourcmds(PROGINFO *pip,cchar *ofn)
+local int procourcmds(PROGINFO *pip,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -3005,7 +3005,7 @@ static int procourcmds(PROGINFO *pip,cchar *ofn)
 /* end subroutine (procourcmds) */
 
 
-static int procregular(PROGINFO *pip)
+local int procregular(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -3031,7 +3031,7 @@ static int procregular(PROGINFO *pip)
 /* end subroutine (procregular) */
 
 
-static int procservice(PROGINFO *pip)
+local int procservice(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -3078,13 +3078,13 @@ static int procservice(PROGINFO *pip)
 	        if (rs >= 0) {
 	            if ((rs = lib_issig(SIGTSTP)) > 0) {
 	                char	tbuf[TIMEBUFLEN+1] ;
-	                timestr_logz(pip->daytime,tbuf) ;
+	                strtime_logz(pip->daytime,tbuf) ;
 	                fmt = "%s: %s command suspended\n" ;
 	                shio_printf(pip->efp,fmt,pn,tbuf) ;
 	                shio_flush(pip->efp) ;
 	                rs = uc_raise(SIGSTOP) ;
 	                pip->daytime = time(NULL) ;
-	                timestr_logz(pip->daytime,tbuf) ;
+	                strtime_logz(pip->daytime,tbuf) ;
 	                fmt = "%s: %s command resumed\n" ;
 	                shio_printf(pip->efp,fmt,pn,tbuf) ;
 	            } /* end if (lib_issig) */
@@ -3117,14 +3117,14 @@ static int procservice(PROGINFO *pip)
 /* end subroutine (procservice) */
 
 
-static int procfcmd(PROGINFO *pip)
+local int procfcmd(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		f_exit = FALSE ;
 
 	if (lip->cmd[0] != '\0') {
-	    const int	ci = matostr(cmds,3,lip->cmd,-1) ;
+	    cint	ci = matostr(cmds,3,lip->cmd,-1) ;
 
 	    switch (ci) {
 	    case cmd_exit:
@@ -3155,7 +3155,7 @@ static int procfcmd(PROGINFO *pip)
 /* end if (procfcmd) */
 
 
-static int procexecname(PROGINFO *pip,char *rbuf,int rlen)
+local int procexecname(PROGINFO *pip,char *rbuf,int rlen)
 {
 	int		rs ;
 	if ((rs = proginfo_progdname(pip)) >= 0) {
