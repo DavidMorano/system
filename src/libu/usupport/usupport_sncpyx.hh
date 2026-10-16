@@ -27,6 +27,7 @@
 
 
 namespace libu {
+    extern int sncpy (char *,int,cchar *) noex ;
     extern int sncpyx(char *,int,int,...) noex ;
     inline int sncpy1(char *dp,int dl,
 	    	cc *s1) noex {
