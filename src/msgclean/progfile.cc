@@ -40,6 +40,7 @@
 #include	<vecstr.h>
 #include	<mailmsgmathdr.h>
 #include	<strn.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -68,7 +69,6 @@ extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -79,9 +79,9 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	fileneed(PROGINFO *,bfile *) ;
-static int	filefix(PROGINFO *,bfile *) ;
-static int	procfixer(PROGINFO *,cchar *,bfile *) ;
+local int	fileneed(PROGINFO *,bfile *) ;
+local int	filefix(PROGINFO *,bfile *) ;
+local int	procfixer(PROGINFO *,cchar *,bfile *) ;
 
 
 /* local variables */
@@ -172,9 +172,9 @@ cchar	fname[] ;
 	        debugprintf("progfile: ageint=%u \n",
 	            pip->intage) ;
 	        debugprintf("progfile: daytime=%s\n",
-	            timestr_logz(daytime,timebuf)) ;
+	            strtime_logz(daytime,timebuf)) ;
 	        debugprintf("progfile: mtime=%s\n",
-	            timestr_logz(sb.st_mtime,timebuf)) ;
+	            strtime_logz(sb.st_mtime,timebuf)) ;
 	    }
 #endif /* CF_DEBUG */
 
@@ -278,11 +278,11 @@ cchar	fname[] ;
 /* local subroutines */
 
 
-static int fileneed(pip,ifp)
+local int fileneed(pip,ifp)
 PROGINFO	*pip ;
 bfile		*ifp ;
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		len, hi ;
 	int		kl ;
@@ -344,7 +344,7 @@ bfile		*ifp ;
 /* end subroutine (fileneed) */
 
 
-static int filefix(PROGINFO *pip,bfile *ifp)
+local int filefix(PROGINFO *pip,bfile *ifp)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -368,7 +368,7 @@ static int filefix(PROGINFO *pip,bfile *ifp)
 /* end subroutine (filefix) */
 
 
-static int procfixer(PROGINFO *pip,cchar *fname,bfile *ifp)
+local int procfixer(PROGINFO *pip,cchar *fname,bfile *ifp)
 {
 	bfile		tfile, *tfp = &tfile ;
 	int		rs ;
@@ -387,7 +387,7 @@ static int procfixer(PROGINFO *pip,cchar *fname,bfile *ifp)
 	    off_t	boff ;
 	    off_t	off ;
 	    off_t	off_seek = -1 ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		f_bol, f_eol ;
 	    char	lbuf[LINEBUFLEN + 1] ;
