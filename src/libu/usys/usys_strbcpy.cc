@@ -62,7 +62,7 @@ local char *strbcpy_pos(char *dp,int dl,cchar *sp,int sl) noex {
 	    if ((dl == 0) && *sp) dp = nullptr ;
 	} /* end if */
 	return dp ;
-} /* end subroutine */
+} /* end subroutine (strbcpy_pos) */
 
 local char *strbcpy_neg(char *dp,int dl,cchar *sp,int sl) noex {
 	(void) dl ;
@@ -75,7 +75,7 @@ local char *strbcpy_neg(char *dp,int dl,cchar *sp,int sl) noex {
 	    dp = stpcpy(dp,sp) ;
 	} /* end if */
     	return dp ;
-} /* end subroutine */
+} /* end subroutine (strbcpy_neg) */
 
 namespace usys {
     char *strbcpy(char *dp,int dl,cchar *sp,int sl) noex {
