@@ -56,15 +56,17 @@
 
 #include	"usys_libstr.h"
 
+/*----------------------------------------------------------------------------*/
 /* STRNLEN begin */
-#if	(!defined(SYSHAS_STRNLEN)) || (SYSHAS_STRNLEN == 0)
+#if	defined(SYSHAS_STRNLEN) && (SYSHAS_STRNLEN > 0)
+#else /* defined(SYSHAS_STRNLEN) && (SYSHAS_STRNLEN > 0) */
 
 #ifndef	SUBROUTINE_STRNLEN
 #define	SUBROUTINE_STRNLEN
 
 size_t strnlen(cchar *s,size_t nsz) noex {
 	int		rsz = 0 ;
-	if (s) {
+	if (s) ylikely {
 	    for (rsz = 0 ; (rsz < nsz) && *s ; rsz += 1) {
 	        s += 1 ;
 	    } /* end for */
@@ -74,11 +76,14 @@ size_t strnlen(cchar *s,size_t nsz) noex {
 
 #endif /* SUBROUTINE_STRNLEN */
 
-#endif /* (!defined(SYSHAS_STRNLEN)) || (SYSHAS_STRNLEN == 0) */
+#endif /* defined(SYSHAS_STRNLEN) && (SYSHAS_STRNLEN > 0) */
 /* STRNLEN end */
+/*----------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------*/
 /* STRLCPY begin */
-#if	(!defined(SYSHAS_STRLCPY)) || (SYSHAS_STRLCPY == 0)
+#if	defined(SYSHAS_STRLCPY) && (SYSHAS_STRLCPY > 0)
+#else /* defined(SYSHAS_STRLCPY) && (SYSHAS_STRLCPY > 0) */
 
 #ifndef	SUBROUTINE_STRLCPY
 #define	SUBROUTINE_STRLCPY
@@ -99,7 +104,8 @@ size_t strlcpy(char *dst,cchar *src,size_t msz) noex {
 
 #endif /* SUBROUTINE_STRLCPY */
 
-#endif /* (!defined(SYSHAS_STRLCPY)) || (SYSHAS_STRLCPY == 0) */
+#endif /* defined(SYSHAS_STRLCPY) && (SYSHAS_STRLCPY > 0) */
 /* STRLCPY end */
+/*----------------------------------------------------------------------------*/
 
 
