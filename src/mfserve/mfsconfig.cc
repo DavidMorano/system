@@ -122,7 +122,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	config_reader(CONFIG *,MFSLISTEN_ACQ *,char *,char *,char *) ;
+local int	config_reader(CONFIG *,MFSLISTEN_ACQ *,char *,char *,char *) ;
 
 
 /* local variables */
@@ -300,7 +300,7 @@ int config_check(CONFIG *cfp)
 
 	if (cfp->fl.p) {
 	    const time_t	dt = pip->daytime ;
-	    const int		intcheck = cfp->intcheck ;
+	    cint		intcheck = cfp->intcheck ;
 	    int			f_check = TRUE ;
 
 	    f_check = f_check && (intcheck > 0) ;
@@ -403,8 +403,8 @@ int config_reader(CONFIG *cfp,MFSLISTEN_ACQ *acp,
 	lip = pip->lip ;
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 	    EXPCOOK	*ecp = &lip->cooks ;
-	    const int	elen = EBUFLEN ;
-	    const int	plen = PBUFLEN ;
+	    cint	elen = EBUFLEN ;
+	    cint	plen = PBUFLEN ;
 	    int		pi ;
 	    int		kl ;
 	    int		ml, vl, el ;
