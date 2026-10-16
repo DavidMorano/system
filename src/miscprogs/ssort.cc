@@ -25,7 +25,7 @@
 
 
 
-int main(int argc,const char **argv) {
+int main(int argc,cchar **argv) {
 	bfile	in, out, err ;
 
 	int	i, rs, len ;
