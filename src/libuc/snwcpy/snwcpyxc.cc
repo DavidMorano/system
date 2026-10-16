@@ -46,6 +46,8 @@
 
 /* local typedefs */
 
+typedef char (*chtoxc_f)(int) ;
+
 
 /* external subroutines */
 
@@ -55,8 +57,7 @@
 
 /* forward references */
 
-template<char (*chtoxc)(int)>
-int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
+local int snwcpyxc(chtoxc_f cvt,char *dbuf,int dlen,cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ; /* return-value */
 	if (dbuf && sp) ylikely {
 	    int		i = 0 ; /* used-afterwards */
@@ -64,7 +65,7 @@ int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
     	    rs = SR_OVERFLOW ;
 	    if (dlen < 0) dlen = INT_MAX ;
 	    while ((i < dlen) && sl && sp[i]) {
-	        *dp++ = chtoxc(sp[i++]) ;
+	        *dp++ = cvt(sp[i++]) ;
 	        sl -= 1 ;
 	    } /* end while */
 	    *dp = '\0' ;
@@ -85,19 +86,19 @@ int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
 /* exported subroutines */
 
 int snwcpybc(char *dp,int dl,cchar *sp,int sl) noex {
-	return snwcpyxc<chtobc>(dp,dl,sp,sl) ;
+	return snwcpyxc(chtobc,dp,dl,sp,sl) ;
 } /* end */
 
 int snwcpylc(char *dp,int dl,cchar *sp,int sl) noex {
-	return snwcpyxc<chtolc>(dp,dl,sp,sl) ;
+	return snwcpyxc(chtolc,dp,dl,sp,sl) ;
 } /* end */
 
 int snwcpyuc(char *dp,int dl,cchar *sp,int sl) noex {
-	return snwcpyxc<chtouc>(dp,dl,sp,sl) ;
+	return snwcpyxc(chtouc,dp,dl,sp,sl) ;
 } /* end */
 
 int snwcpyfc(char *dp,int dl,cchar *sp,int sl) noex {
-	return snwcpyxc<chtofc>(dp,dl,sp,sl) ;
+	return snwcpyxc(chtofc,dp,dl,sp,sl) ;
 } /* end */
 
 
