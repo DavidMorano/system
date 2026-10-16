@@ -56,7 +56,7 @@
 #include	<ascii.h>
 #include	<eigendb.h>
 #include	<upt.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<iserror.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
@@ -90,7 +90,7 @@ extern int	progtagprint(PROGINFO *,ARGINFO *,cchar *, cchar *, cchar *) ;
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
@@ -114,35 +114,35 @@ struct pinfo {
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,cchar *) ;
-static int	process(PROGINFO *,ARGINFO *,PINFO *,cchar *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,cchar *) ;
+local int	process(PROGINFO *,ARGINFO *,PINFO *,cchar *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
 
-static int	procmode_begin(PROGINFO *,ARGINFO *,cchar *) ;
-static int	procmode_end(PROGINFO *) ;
+local int	procmode_begin(PROGINFO *,ARGINFO *,cchar *) ;
+local int	procmode_end(PROGINFO *) ;
 
-static int	procdef_begin(PROGINFO *) ;
-static int	procdef_end(PROGINFO *) ;
+local int	procdef_begin(PROGINFO *) ;
+local int	procdef_end(PROGINFO *) ;
 
-static int	arginfo_start(PROGINFO *,ARGINFO *,int,cchar **) ;
-static int	arginfo_finish(PROGINFO *,ARGINFO *) ;
-static int	arginfo_argmark(ARGINFO *,int) ;
-static int	arginfo_arg(PROGINFO *,ARGINFO *,cchar *,int) ;
+local int	arginfo_start(PROGINFO *,ARGINFO *,int,cchar **) ;
+local int	arginfo_finish(PROGINFO *,ARGINFO *) ;
+local int	arginfo_argmark(ARGINFO *,int) ;
+local int	arginfo_arg(PROGINFO *,ARGINFO *,cchar *,int) ;
 
-static int	loadncpus(PROGINFO *) ;
+local int	loadncpus(PROGINFO *) ;
 
-static int	pinfo_mkterms(PINFO *) ;
+local int	pinfo_mkterms(PINFO *) ;
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
 static cchar *argopts[] = {
 	"ROOT",
@@ -380,7 +380,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -722,7 +722,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1099,7 +1099,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
-	    const int	f_sp = pip->fl.optsendparams ;
+	    cint	f_sp = pip->fl.optsendparams ;
 	    bprintf(pip->efp,"%s: cfname=%s\n",pn,cfname) ;
 	    bprintf(pip->efp,"%s: sendparams=%u\n",pn,f_sp);
 	}
@@ -1160,7 +1160,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    pip->eigenwords = MAXEIGENWORDS ;
 
 	if (rs >= 0) {
-	    const int	tlen = MAXPATHLEN ;
+	    cint	tlen = MAXPATHLEN ;
 	    int		tl = -1 ;
 	    char	tbuf[MAXPATHLEN+1] ;
 	    if (sdn == NULL) {
@@ -1303,7 +1303,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -1360,7 +1360,7 @@ int progexit(PROGINFO *pip)
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1388,7 +1388,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1561,7 +1561,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1596,7 +1596,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,cchar *afn)
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1639,7 +1639,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,PINFO *inp,cchar *ofn)
+local int process(PROGINFO *pip,ARGINFO *aip,PINFO *inp,cchar *ofn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1680,7 +1680,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,PINFO *inp,cchar *ofn)
 /* end subroutine (process) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1696,7 +1696,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1707,7 +1707,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procdef_begin(PROGINFO *pip)
+local int procdef_begin(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->npar == 0) {
@@ -1719,7 +1719,7 @@ static int procdef_begin(PROGINFO *pip)
 /* end subroutine (procdef_begin) */
 
 
-static int procdef_end(PROGINFO *pip)
+local int procdef_end(PROGINFO *pip)
 {
 	if (pip == NULL) return SR_FAULT ;
 	return SR_OK ;
@@ -1727,7 +1727,7 @@ static int procdef_end(PROGINFO *pip)
 /* end subroutine (procdef_end) */
 
 
-static int procmode_begin(PROGINFO *pip,ARGINFO *aip,cchar *afn)
+local int procmode_begin(PROGINFO *pip,ARGINFO *aip,cchar *afn)
 {
 	int		rs = SR_OK ;
 	switch (pip->progmode) {
@@ -1778,7 +1778,7 @@ static int procmode_begin(PROGINFO *pip,ARGINFO *aip,cchar *afn)
 /* end subroiutine (procmode_begin) */
 
 
-static int procmode_end(PROGINFO *pip)
+local int procmode_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1795,7 +1795,7 @@ static int procmode_end(PROGINFO *pip)
 /* end subroutine (procmode_end) */
 
 
-static int arginfo_start(PROGINFO *pip,ARGINFO *aip,int argc,cchar **argv)
+local int arginfo_start(PROGINFO *pip,ARGINFO *aip,int argc,cchar **argv)
 {
 	int		rs ;
 
@@ -1817,7 +1817,7 @@ static int arginfo_start(PROGINFO *pip,ARGINFO *aip,int argc,cchar **argv)
 /* end subroutine (arginfo_start) */
 
 
-static int arginfo_finish(PROGINFO *pip,ARGINFO *aip)
+local int arginfo_finish(PROGINFO *pip,ARGINFO *aip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1836,14 +1836,14 @@ static int arginfo_finish(PROGINFO *pip,ARGINFO *aip)
 /* end subroutine (arginfo_finish) */
 
 
-static int arginfo_argmark(ARGINFO *aip,int ai)
+local int arginfo_argmark(ARGINFO *aip,int ai)
 {
 	return bits_set(&aip->pargs,ai) ;
 }
 /* end subroutine (arginfo_argmark) */
 
 
-static int arginfo_arg(PROGINFO *pip,ARGINFO *aip,cchar *sp,int sl)
+local int arginfo_arg(PROGINFO *pip,ARGINFO *aip,cchar *sp,int sl)
 {
 	int		rs ;
 
@@ -1857,7 +1857,7 @@ static int arginfo_arg(PROGINFO *pip,ARGINFO *aip,cchar *sp,int sl)
 /* end subroutine (arginfo_arg) */
 
 
-static int loadncpus(PROGINFO *pip)
+local int loadncpus(PROGINFO *pip)
 {
 	int		rs = getnprocessors(pip->envv,0) ;
 	if (pip == NULL) return SR_FAULT ;
@@ -1867,7 +1867,7 @@ static int loadncpus(PROGINFO *pip)
 /* end subroutine (loadncpus) */
 
 
-static int pinfo_mkterms(PINFO *inp)
+local int pinfo_mkterms(PINFO *inp)
 {
 	uchar		*terms = inp->terms ;
 	int		rs = SR_OK ;
