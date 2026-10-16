@@ -98,10 +98,10 @@ extern int	hashmapverify(struct proginfo *,struct hashmap *) ;
 
 /* forward references */
 
-static int	tagindex(bfile *,HDB *) ;
-static int	procquery(struct proginfo *,struct hashmap *,
+local int	tagindex(bfile *,HDB *) ;
+local int	procquery(struct proginfo *,struct hashmap *,
 			const uchar *,vecstr *,vecstr *,bfile *,bfile *) ;
-static int	tag_parse(RTAGS_TAG *,cchar *,cchar *,
+local int	tag_parse(RTAGS_TAG *,cchar *,cchar *,
 			cchar *,int) ;
 
 
