@@ -165,36 +165,36 @@ struct ktag_head {
 
 /* forward references */
 
-static int	procmk(PROGINFO *,ARGINFO *) ;
-static int	procfiles(PROGINFO *,ARGINFO *) ;
-static int	procfile(PROGINFO *,cchar *) ;
-static int	procmkeigen(PROGINFO *) ;
+local int	procmk(PROGINFO *,ARGINFO *) ;
+local int	procfiles(PROGINFO *,ARGINFO *) ;
+local int	procfile(PROGINFO *,cchar *) ;
+local int	procmkeigen(PROGINFO *) ;
 
-static int	procdbcheck(PROGINFO *,cchar *,mode_t) ;
-static int	procdnamecheck(PROGINFO *,cchar *,mode_t) ;
+local int	procdbcheck(PROGINFO *,cchar *,mode_t) ;
+local int	procdnamecheck(PROGINFO *,cchar *,mode_t) ;
 
-static int	proccmd(PROGINFO *,cchar *,int) ;
-static int	proccmd_eigen(PROGINFO *,cchar *,int) ;
+local int	proccmd(PROGINFO *,cchar *,int) ;
+local int	proccmd_eigen(PROGINFO *,cchar *,int) ;
 
-static int	loadsubstr(PROGINFO *,cchar **,cchar *,int) ;
+local int	loadsubstr(PROGINFO *,cchar **,cchar *,int) ;
 
-static int	subinfo_start(SUBINFO *,PROGINFO *,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_eigendefs(SUBINFO *) ;
-static int	subinfo_txtopen(SUBINFO *) ;
-static int	subinfo_txtclose(SUBINFO *) ;
-static int	subinfo_addtags(SUBINFO *,TXTINDEXMK_TAG *,int) ;
+local int	subinfo_start(SUBINFO *,PROGINFO *,cchar *) ;
+local int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_eigendefs(SUBINFO *) ;
+local int	subinfo_txtopen(SUBINFO *) ;
+local int	subinfo_txtclose(SUBINFO *) ;
+local int	subinfo_addtags(SUBINFO *,TXTINDEXMK_TAG *,int) ;
 
 #ifdef	COMMENT
-static int	subinfo_minwlen(SUBINFO *) ;
+local int	subinfo_minwlen(SUBINFO *) ;
 #endif
 
-static int	ktag_start(KTAG *,KTAG_PARAMS *,TAGINFO *,cchar *,cchar *,int) ;
-static int	ktag_add(KTAG *,cchar *,int) ;
-static int	ktag_procline(KTAG *,cchar *,int) ;
-static int	ktag_mktag(KTAG *,TXTINDEXMK_TAG *) ;
-static int	ktag_finish(KTAG *) ;
-static int	ktag_procword(KTAG *,cchar *,int) ;
+local int	ktag_start(KTAG *,KTAG_PARAMS *,TAGINFO *,cchar *,cchar *,int) ;
+local int	ktag_add(KTAG *,cchar *,int) ;
+local int	ktag_procline(KTAG *,cchar *,int) ;
+local int	ktag_mktag(KTAG *,TXTINDEXMK_TAG *) ;
+local int	ktag_finish(KTAG *) ;
+local int	ktag_procword(KTAG *,cchar *,int) ;
 
 
 /* local variables */
@@ -266,7 +266,7 @@ int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname)
 /* local subroutines */
 
 
-static int procmk(PROGINFO *pip,ARGINFO *aip)
+local int procmk(PROGINFO *pip,ARGINFO *aip)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -298,11 +298,11 @@ static int procmk(PROGINFO *pip,ARGINFO *aip)
 /* end subroutine (procmk) */
 
 
-static int procmkeigen(PROGINFO *pip)
+local int procmkeigen(PROGINFO *pip)
 {
 	SUBINFO		*sip = pip->sip ;
 	TXTINDEXMK_KEY	*keys = NULL ;
-	const int	nkeys = pip->eigenwords ;
+	cint	nkeys = pip->eigenwords ;
 	int		rs ;
 	int		c = 0 ;
 
@@ -312,7 +312,7 @@ static int procmkeigen(PROGINFO *pip)
 #endif
 
 	if ((rs = subinfo_txtopen(sip)) >= 0) {
-	    const int	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
+	    cint	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
 	    if ((rs = uc_malloc(size,&keys)) >= 0) {
 		VECPSTR		*esp = &sip->eigenwords ;
 		TXTINDEXMK	*tmp = &sip->tm ;
@@ -360,7 +360,7 @@ static int procmkeigen(PROGINFO *pip)
 /* end subroutine (procmkeigen) */
 
 
-static int procdbcheck(PROGINFO *pip,cchar db[],mode_t m)
+local int procdbcheck(PROGINFO *pip,cchar db[],mode_t m)
 {
 	int		rs = SR_OK ;
 	int		dl ;
@@ -376,7 +376,7 @@ static int procdbcheck(PROGINFO *pip,cchar db[],mode_t m)
 /* end subroutine (procdbcheck) */
 
 
-static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m)
+local int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m)
 {
 	ustat	sb ;
 	int		rs ;
@@ -385,8 +385,8 @@ static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m)
 
 	if ((rs = u_stat(dname,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
-	        const int	nrs = SR_NOENT ;
-		const int	am = (X_OK|W_OK) ;
+	        cint	nrs = SR_NOENT ;
+		cint	am = (X_OK|W_OK) ;
 	        if ((rs = progids_permids(pip,&sb,am)) == nrs) {
 	            rs = mkdirs(dname,m) ;
 	        }
@@ -400,7 +400,7 @@ static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m)
 /* end subroutine (procdnamecheck) */
 
 
-static int procfiles(PROGINFO *pip,ARGINFO *aip)
+local int procfiles(PROGINFO *pip,ARGINFO *aip)
 {
 	vecstr		*alp = &aip->args ;
 	int		rs = SR_OK ;
@@ -453,7 +453,7 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip)
 /* end subroutine (procfiles) */
 
 
-static int procfile(PROGINFO *pip,cchar *fname)
+local int procfile(PROGINFO *pip,cchar *fname)
 {
 	SUBINFO		*sip = pip->sip ;
 	KTAG		e ;
@@ -484,7 +484,7 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
 	    TXTINDEXMK_TAG	t ;
 	    TAGINFO		ti ;
-	    const int		llen = LINEBUFLEN ;
+	    cint		llen = LINEBUFLEN ;
 	    int			rlen ;
 	    int			si ;
 	    int			len ;
@@ -709,7 +709,7 @@ static int procfile(PROGINFO *pip,cchar *fname)
 /* end subroutine (procfile) */
 
 
-static int proccmd(PROGINFO *pip,cchar *sp,int sl)
+local int proccmd(PROGINFO *pip,cchar *sp,int sl)
 {
 	SUBINFO		*sip = pip->sip ;
 	int		rs = SR_OK ;
@@ -784,7 +784,7 @@ static int proccmd(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (proccmd) */
 
 
-static int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl)
+local int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl)
 {
 	SUBINFO		*sip = pip->sip ;
 	vecpstr		*slp ;
@@ -805,7 +805,7 @@ static int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (proccmd_eigen) */
 
 
-static int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl)
+local int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		cl ;
@@ -829,7 +829,7 @@ static int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl)
 /* end subroutine (loadsubstr) */
 
 
-static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname)
+local int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname)
 {
 	int		rs ;
 	cchar		*cp ;
@@ -868,7 +868,7 @@ static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -904,7 +904,7 @@ static int subinfo_finish(SUBINFO *sip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_eigendefs(SUBINFO *sip)
+local int subinfo_eigendefs(SUBINFO *sip)
 {
 	PROGINFO	*pip = sip->pip ;
 	VECPSTR		*esp = &sip->eigenwords ;
@@ -939,7 +939,7 @@ static int subinfo_eigendefs(SUBINFO *sip)
 /* end subroutine (subinfo_eigendefs) */
 
 
-static int subinfo_txtopen(SUBINFO *sip)
+local int subinfo_txtopen(SUBINFO *sip)
 {
 	PROGINFO	*pip = sip->pip ;
 	TXTINDEXMK_PA	ta ;
@@ -964,7 +964,7 @@ static int subinfo_txtopen(SUBINFO *sip)
 	if (! sip->fl.txtopen) {
 	    if (sip->dbname != NULL) {
 		const mode_t	om = MKINV_INDPERM ;
-		const int	of = O_CREAT ;
+		cint	of = O_CREAT ;
 		cchar		*db = sip->dbname ;
 	        if ((rs = txtindexmk_open(&sip->tm,&ta,db,of,om)) >= 0) {
 	            sip->fl.txtopen = TRUE ;
@@ -987,7 +987,7 @@ static int subinfo_txtopen(SUBINFO *sip)
 /* end subroutine (subinfo_txtopen) */
 
 
-static int subinfo_txtclose(SUBINFO *sip)
+local int subinfo_txtclose(SUBINFO *sip)
 {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
@@ -1010,7 +1010,7 @@ static int subinfo_txtclose(SUBINFO *sip)
 /* end subroutine (subinfo_txtclose) */
 
 
-static int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn)
+local int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn)
 {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
@@ -1044,7 +1044,7 @@ static int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn)
 /* end subroutine (subinfo_addtags) */
 
 
-static int ktag_start(kop,kap,tip,fname,lp,ll)
+local int ktag_start(kop,kap,tip,fname,lp,ll)
 KTAG		*kop ;
 KTAG_PARAMS	*kap ;
 TAGINFO		*tip ;
@@ -1066,8 +1066,8 @@ int		ll ;
 #endif
 
 	if ((rs = uc_mallocstrw(fname,tip->fnamelen,&cp)) >= 0) {
-	    const int	size = sizeof(KTAG_KEY) ;
-	    const int	vopts = VECOBJ_OCOMPACT ;
+	    cint	size = sizeof(KTAG_KEY) ;
+	    cint	vopts = VECOBJ_OCOMPACT ;
 	    kop->fname = cp ;
 	    if ((rs = vecobj_start(&kop->keys,size,0,vopts)) >= 0) {
 	        if ((rs = vecpstr_start(&kop->store,10,80,0)) >= 0) {
@@ -1094,7 +1094,7 @@ int		ll ;
 /* end subroutine (ktag_start) */
 
 
-static int ktag_finish(kop)
+local int ktag_finish(kop)
 KTAG		*kop ;
 {
 	int		rs = SR_OK ;
@@ -1123,7 +1123,7 @@ KTAG		*kop ;
 /* end subroutine (ktag_finish) */
 
 
-static int ktag_add(kop,lp,ll)
+local int ktag_add(kop,lp,ll)
 KTAG		*kop ;
 cchar		*lp ;
 int		ll ;
@@ -1137,7 +1137,7 @@ int		ll ;
 /* end subroutine (ktag_add) */
 
 
-static int ktag_mktag(kop,tagp)
+local int ktag_mktag(kop,tagp)
 KTAG		*kop ;
 TXTINDEXMK_TAG	*tagp ;
 {
@@ -1197,7 +1197,7 @@ TXTINDEXMK_TAG	*tagp ;
 /* end subroutine (ktag_mktag) */
 
 
-static int ktag_procline(kop,lp,ll)
+local int ktag_procline(kop,lp,ll)
 KTAG		*kop ;
 cchar		*lp ;
 int		ll ;
@@ -1249,7 +1249,7 @@ int		ll ;
 /* end subroutine (ktag_procline) */
 
 
-static int ktag_procword(kop,cp,cl)
+local int ktag_procword(kop,cp,cl)
 KTAG		*kop ;
 cchar		*cp ;
 int		cl ;
