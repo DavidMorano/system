@@ -61,6 +61,7 @@
 #include	<srvtab.h>
 #include	<acctab.h>
 #include	<cq.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -101,19 +102,17 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
 extern int	snddd(char *,int,uint,uint) ;
 extern int	cfdeci(char *,int,int *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	checklockfile(struct proginfo *,bfile *,char *,char *,
 			time_t,pid_t) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* externals variables */
@@ -139,16 +138,16 @@ struct procinfo {
 
 /* forward references */
 
-static int	process_cycle(struct proginfo *,struct procinfo *) ;
-static int	process_report(struct proginfo *,struct procinfo *,
+local int	process_cycle(struct proginfo *,struct procinfo *) ;
+local int	process_report(struct proginfo *,struct procinfo *,
 			struct pollentry *) ;
 
-static void	int_all(int) ;
+local void	int_all(int) ;
 
 
 /* local variables */
 
-static int	f_exit ;
+local int	f_exit ;
 
 
 
@@ -359,7 +358,7 @@ vecstr			*snp ;		/* initial service names */
 
 	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,cp,
-	            timestr_logz(sip->daytime,timebuf)) ;
+	            strtime_logz(sip->daytime,timebuf)) ;
 
 	} /* end if (daemon mode exit stuff) */
 
@@ -399,7 +398,7 @@ bad0:
 
 
 /* do a cycle of work */
-static int process_cycle(pip,sip)
+local int process_cycle(pip,sip)
 struct proginfo	*pip ;
 struct procinfo	*sip ;
 {
@@ -474,7 +473,7 @@ struct procinfo	*sip ;
 	                    logfile_printf(&pip->lh,
 	                        "%s another program has my lock file, "
 	                        "other PID=%d\n",
-	                        timestr_logz(sip->daytime,timebuf),
+	                        strtime_logz(sip->daytime,timebuf),
 	                        rs) ;
 
 	            } else {
@@ -482,7 +481,7 @@ struct procinfo	*sip ;
 	                if (pip->fl.log)
 	                    logfile_printf(&pip->lh,
 	                        "%s tampered lock file, rs=%d\n",
-	                        timestr_logz(sip->daytime,timebuf),
+	                        strtime_logz(sip->daytime,timebuf),
 	                        rs) ;
 
 	            }
@@ -524,7 +523,7 @@ struct procinfo	*sip ;
 	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,
 	                    "%s another program has PID file, other PID=%d\n",
-	                    timestr_logz(sip->daytime,timebuf),
+	                    strtime_logz(sip->daytime,timebuf),
 	                    rs) ;
 
 	        } else {
@@ -532,7 +531,7 @@ struct procinfo	*sip ;
 	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,
 	                    "%s something happened to PID file, rs=%d\n",
-	                    timestr_logz(sip->daytime,timebuf),
+	                    strtime_logz(sip->daytime,timebuf),
 	                    rs) ;
 
 	        }
@@ -563,7 +562,7 @@ badlockfile:
 /* end subroutine (process_cycle) */
 
 
-static int process_report(pip,sip,pep)
+local int process_report(pip,sip,pep)
 struct proginfo		*pip ;
 struct procinfo		*sip ;
 struct pollentry	*pep ;
@@ -627,7 +626,7 @@ ret0:
 /* end subroutine (process_cycle) */
 
 
-static void int_all(sn)
+local void int_all(sn)
 int	sn ;
 {
 
