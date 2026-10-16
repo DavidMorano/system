@@ -36,7 +36,7 @@
 	I am using the new (rumored to be coming as a standard)
 	subroutine |strlcpy(3c)|.  I wrote my own version of this
 	until it gets into the standard libraries.  It might be in
-	someone's standard lirbrary already, but I do not have that
+	someone's standard library already, but I do not have that
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
@@ -56,6 +56,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
+#include	<snaddslash.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"mknpathxw.h"
@@ -127,34 +128,27 @@ int mknpathxw(char *pbuf,int plen,int n,...) noex {
 	char		*bp = pbuf ;
 	if (pbuf) ylikely {
 	    if ((rs = getrlen(plen)) >= 0) ylikely {
+		cint	blen = rs ;
 	        int	bl = rs ;
 	        int	sl = -1 ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	            cc		*sp = (cchar *) va_arg(ap,char *) ;
-		    bool	f = true ;
+		    cint rl = intconv(bp - pbuf) ;
+	            ccp  sp = (ccharp) va_arg(ap,char *) ;
 	            if (i == (n - 1)) sl = (int) va_arg(ap,int) ;
-	            f = f && (i > 0) && ((bp == pbuf) || (bp[-1] != '/')) ;
-		    f = f && (sp[0] != '\0') && (sp[0] != '/') ;
-		    if (f) {
-	                if (bl > 0) {
-	                    *bp++ = '/' ;
-	                    bl -= 1 ;
-	                } else {
-	                    rs = SR_NAMETOOLONG ;
-		        } /* end if (error) */
-	            } /* end if (needed a pathname separator) */
-	            if (rs >= 0) ylikely {
+		    if (! sp) break ;
+		    if ((rs = snaddslash(pbuf,blen,rl)) >= 0) ylikely {
+			bp += rs ;
+			bl -= rs ;
 	                if ((rs = snwcpy(bp,bl,sp,sl)) > 0) ylikely {
 	                    bp += rs ;
 	                    bl -= rs ;
-	                } else if (rs == SR_OVERFLOW) {
-	                    rs = SR_NAMETOOLONG ;
-		        } /* end if (error) */
+			} /* end if */
 	            } /* end if */
 	        } /* end for */
-	        *bp = '\0' ; /* in case of overflow */
+	        *bp = eos ; /* in case of overflow */
 		pl = intconv(bp - pbuf) ;
+	        if (rs == SR_OVERFLOW) rs = SR_NAMETOOLONG ;
 	        va_end(ap) ;
 	    } /* end if (getplen) */
 	} /* end if (non-null) */
