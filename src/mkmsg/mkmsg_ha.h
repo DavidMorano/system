@@ -29,7 +29,7 @@ enum has {
 } ; /* end enum (has) */
 
 
-extern const char	*ha[] ;
+extern cchar	*ha[] ;
 
 
 #endif /* HA_INCLUDE */
