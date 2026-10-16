@@ -31,7 +31,7 @@
 
 extern "C" {
     extern int ulogerror(cchar *,int,cchar * = nullptr) noex ;
-}
+} /* end extern (C) */
 
 #else /* __cplusplus */
 
