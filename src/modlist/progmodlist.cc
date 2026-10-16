@@ -22,8 +22,8 @@
 	int progmodlist(pip,ofp,basedir,name)
 	PROGINFO	*pip ;
 	bfile		*ofp ;
-	const char	basedir[] ;
-	const char	name[] ;
+	cchar	basedir[] ;
+	cchar	name[] ;
 
 	Arguments:
 
@@ -77,8 +77,8 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -87,14 +87,14 @@ extern int	mkpath2(char *,const char *,const char *) ;
 /* local structures */
 
 struct stdfile {
-	const char	*name ;
+	cchar	*name ;
 	int		fd ;
 } ;
 
 
 /* forward references */
 
-static int	lister(PROGINFO *,bfile *,int) ;
+local int	lister(PROGINFO *,bfile *,int) ;
 
 
 /* local variables */
@@ -113,13 +113,13 @@ static struct stdfile	stds[] = {
 int progmodlist(pip,ofp,basedir,name)
 PROGINFO	*pip ;
 bfile		*ofp ;
-const char	basedir[] ;
-const char	name[] ;
+cchar	basedir[] ;
+cchar	name[] ;
 {
 	int		rs ; /* initialized below */
 	int		i ;
 	int		sfd = -1 ;
-	const char	*bdp ;
+	cchar	*bdp ;
 	char		dfname[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -203,7 +203,7 @@ ret0:
 
 
 /* list the modules */
-static int lister(pip,ofp,sfd)
+local int lister(pip,ofp,sfd)
 PROGINFO	*pip ;
 bfile		*ofp ;
 int		sfd ;
