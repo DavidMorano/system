@@ -36,7 +36,7 @@
 
 /* this is the shared-object description */
 struct txtindexes_obj {
-	const char	*name ;
+	cchar	*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
@@ -61,9 +61,9 @@ struct txtindexes_fi {
 } ;
 
 struct txtindexes_mi {
-	const char	*sdn ;
-	const char	*sfn ;
-	const char	*estab ;	/* eigen-string table */
+	cchar	*sdn ;
+	cchar	*sfn ;
+	cchar	*estab ;	/* eigen-string table */
 	uint		*table ;	/* mapped hash table */
 	uint		*lists ;	/* mapped lists */
 	int		*ertab ;	/* eigen-record table */
@@ -84,7 +84,7 @@ struct txtindexes_i {
 
 struct txtindexes_head {
 	uint		magic ;
-	const char 	*dbname ;
+	cchar 	*dbname ;
 	TXTINDEXES_FI	hf, tf ;
 	TXTINDEXES_MI	mi ;
 	TXTINDEXHDR	ifi ;		/* index-file (header) information */
@@ -100,14 +100,14 @@ struct txtindexes_head {
 extern "C" {
 #endif
 
-extern int	txtindexes_open(TXTINDEXES *,const char *) ;
+extern int	txtindexes_open(TXTINDEXES *,cchar *) ;
 extern int	txtindexes_count(TXTINDEXES *) ;
 extern int	txtindexes_neigen(TXTINDEXES *) ;
 extern int	txtindexes_info(TXTINDEXES *,TXTINDEXES_INFO *) ;
-extern int	txtindexes_iseigen(TXTINDEXES *,const char *,int) ;
+extern int	txtindexes_iseigen(TXTINDEXES *,cchar *,int) ;
 extern int	txtindexes_curbegin(TXTINDEXES *,TXTINDEXES_CUR *) ;
 extern int	txtindexes_lookup(TXTINDEXES *,TXTINDEXES_CUR *,
-			const char **) ;
+			cchar **) ;
 extern int	txtindexes_read(TXTINDEXES *,TXTINDEXES_CUR *,
 			TXTINDEXES_TAG *) ;
 extern int	txtindexes_curend(TXTINDEXES *,TXTINDEXES_CUR *) ;
