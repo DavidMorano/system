@@ -35,7 +35,7 @@
 #include	"ha.h"
 
 
-const char	*ha[] = {
+cchar	*ha[] = {
 	"errorsto",
 	"replyto",
 	"sender",
