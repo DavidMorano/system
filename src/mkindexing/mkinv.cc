@@ -57,7 +57,7 @@
 #include	<nulstr.h>
 #include	<char.h>
 #include	<ascii.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<naturalwords.h>	/* LIBDAM |NATURALWORDLEN| */
 #include	<localmisc.h>		/* LIBU */
 
@@ -141,36 +141,36 @@ struct ktag_head {
 
 /* forward references */
 
-static int	procmk(PROGINFO *,ARGINFO *) ;
-static int	procfiles(PROGINFO *,ARGINFO *) ;
-static int	procfile(PROGINFO *,cchar *) ;
-static int	procmkeigen(PROGINFO *) ;
+local int	procmk(PROGINFO *,ARGINFO *) ;
+local int	procfiles(PROGINFO *,ARGINFO *) ;
+local int	procfile(PROGINFO *,cchar *) ;
+local int	procmkeigen(PROGINFO *) ;
 
-static int	procdbcheck(PROGINFO *,cchar *,mode_t) ;
-static int	procdnamecheck(PROGINFO *,cchar *,mode_t) ;
+local int	procdbcheck(PROGINFO *,cchar *,mode_t) ;
+local int	procdnamecheck(PROGINFO *,cchar *,mode_t) ;
 
-static int	proccmd(PROGINFO *,cchar *,int) ;
-static int	proccmd_eigen(PROGINFO *,cchar *,int) ;
+local int	proccmd(PROGINFO *,cchar *,int) ;
+local int	proccmd_eigen(PROGINFO *,cchar *,int) ;
 
-static int	loadsubstr(PROGINFO *,cchar **,cchar *,int) ;
+local int	loadsubstr(PROGINFO *,cchar **,cchar *,int) ;
 
-static int	subinfo_start(SUBINFO *,PROGINFO *,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_eigendefs(SUBINFO *) ;
-static int	subinfo_txtopen(SUBINFO *) ;
-static int	subinfo_txtclose(SUBINFO *) ;
-static int	subinfo_addtags(SUBINFO *,TXTINDEXMK_TAG *,int) ;
+local int	subinfo_start(SUBINFO *,PROGINFO *,cchar *) ;
+local int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_eigendefs(SUBINFO *) ;
+local int	subinfo_txtopen(SUBINFO *) ;
+local int	subinfo_txtclose(SUBINFO *) ;
+local int	subinfo_addtags(SUBINFO *,TXTINDEXMK_TAG *,int) ;
 
 #ifdef	COMMENT
-static int	subinfo_minwlen(SUBINFO *) ;
+local int	subinfo_minwlen(SUBINFO *) ;
 #endif
 
-static int	ktag_start(KTAG *,KTAG_PARAMS *,TAGINFO *,cchar *,cchar *,int) ;
-static int	ktag_add(KTAG *,cchar *,int) ;
-static int	ktag_procline(KTAG *,cchar *,int) ;
-static int	ktag_mktag(KTAG *,TXTINDEXMK_TAG *) ;
-static int	ktag_finish(KTAG *) ;
-static int	ktag_procword(KTAG *,cchar *,int) ;
+local int	ktag_start(KTAG *,KTAG_PARAMS *,TAGINFO *,cchar *,cchar *,int) ;
+local int	ktag_add(KTAG *,cchar *,int) ;
+local int	ktag_procline(KTAG *,cchar *,int) ;
+local int	ktag_mktag(KTAG *,TXTINDEXMK_TAG *) ;
+local int	ktag_finish(KTAG *) ;
+local int	ktag_procword(KTAG *,cchar *,int) ;
 
 
 /* local variables */
@@ -229,7 +229,7 @@ int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname) noex {
 
 /* local subroutines */
 
-static int procmk(PROGINFO *pip,ARGINFO *aip) noex {
+local int procmk(PROGINFO *pip,ARGINFO *aip) noex {
 	int		rs ;
 	int		c = 0 ;
 
@@ -249,7 +249,7 @@ static int procmk(PROGINFO *pip,ARGINFO *aip) noex {
 }
 /* end subroutine (procmk) */
 
-static int procmkeigen(PROGINFO *pip) noex {
+local int procmkeigen(PROGINFO *pip) noex {
 	SUBINFO		*sip = pip->sip ;
 	TXTINDEXMK_KEY	*keys = NULL ;
 	cint		nkeys = pip->eigenwords ;
@@ -299,7 +299,7 @@ static int procmkeigen(PROGINFO *pip) noex {
 }
 /* end subroutine (procmkeigen) */
 
-static int procdbcheck(PROGINFO *pip,cchar *db,mode_t m) noex {
+local int procdbcheck(PROGINFO *pip,cchar *db,mode_t m) noex {
 	int		rs = SR_OK ;
 	int		dl ;
 	cchar		*dp ;
@@ -313,7 +313,7 @@ static int procdbcheck(PROGINFO *pip,cchar *db,mode_t m) noex {
 }
 /* end subroutine (procdbcheck) */
 
-static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m) noex {
+local int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m) noex {
 	USTAT		sb ;
 	int		rs ;
 
@@ -321,8 +321,8 @@ static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m) noex {
 
 	if ((rs = u_stat(dname,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
-	        const int	nrs = SR_NOENT ;
-		const int	am = (X_OK|W_OK) ;
+	        cint	nrs = SR_NOENT ;
+		cint	am = (X_OK|W_OK) ;
 	        if ((rs = progids_permids(pip,&sb,am)) == nrs) {
 	            rs = mkdirs(dname,m) ;
 	        }
@@ -335,7 +335,7 @@ static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m) noex {
 }
 /* end subroutine (procdnamecheck) */
 
-static int procfiles(PROGINFO *pip,ARGINFO *aip) noex {
+local int procfiles(PROGINFO *pip,ARGINFO *aip) noex {
 	vecstr		*alp = &aip->args ;
 	int		rs = SR_OK ;
 	int		pan = 0 ;
@@ -371,7 +371,7 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip) noex {
 }
 /* end subroutine (procfiles) */
 
-static int procfile(PROGINFO *pip,cchar *fname) noex {
+local int procfile(PROGINFO *pip,cchar *fname) noex {
 	SUBINFO		*sip = pip->sip ;
 	KTAG		e ;
 	KTAG_PARAMS	ka{} ;
@@ -522,7 +522,7 @@ static int procfile(PROGINFO *pip,cchar *fname) noex {
 }
 /* end subroutine (procfile) */
 
-static int proccmd(PROGINFO *pip,cchar *sp,int sl) noex {
+local int proccmd(PROGINFO *pip,cchar *sp,int sl) noex {
 	SUBINFO		*sip = pip->sip ;
 	int		rs = SR_OK ;
 
@@ -589,7 +589,7 @@ static int proccmd(PROGINFO *pip,cchar *sp,int sl) noex {
 }
 /* end subroutine (proccmd) */
 
-static int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl) noex {
+local int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl) noex {
 	SUBINFO		*sip = pip->sip ;
 	vecpstr		*slp ;
 	int		rs = SR_OK ;
@@ -608,7 +608,7 @@ static int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl) noex {
 }
 /* end subroutine (proccmd_eigen) */
 
-static int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl) noex {
+local int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*cp ;
@@ -630,7 +630,7 @@ static int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl) noex {
 }
 /* end subroutine (loadsubstr) */
 
-static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname) noex {
+local int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname) noex {
 	int		rs ;
 	cchar		*cp ;
 
@@ -667,7 +667,7 @@ static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+local int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -701,7 +701,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_eigendefs(SUBINFO *sip) noex {
+local int subinfo_eigendefs(SUBINFO *sip) noex {
 	PROGINFO	*pip = sip->pip ;
 	VECPSTR		*esp = &sip->eigenwords ;
 	int		rs ;
@@ -734,7 +734,7 @@ static int subinfo_eigendefs(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_eigendefs) */
 
-static int subinfo_txtopen(SUBINFO *sip) noex {
+local int subinfo_txtopen(SUBINFO *sip) noex {
 	PROGINFO	*pip = sip->pip ;
 	TXTINDEXMK_PA	ta{} ;
 	int		rs = SR_OK ;
@@ -768,7 +768,7 @@ static int subinfo_txtopen(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_txtopen) */
 
-static int subinfo_txtclose(SUBINFO *sip) noex {
+local int subinfo_txtclose(SUBINFO *sip) noex {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -785,7 +785,7 @@ static int subinfo_txtclose(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_txtclose) */
 
-static int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn) noex {
+local int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn) noex {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
 
@@ -804,7 +804,7 @@ static int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn) noex {
 /* end subroutine (subinfo_addtags) */
 
 
-static int ktag_start(KTAG *kop,KTAG_PARAMS *kap,TAGINFO *tip,
+local int ktag_start(KTAG *kop,KTAG_PARAMS *kap,TAGINFO *tip,
 		cchar *fname,cchar *lp,int ll) noex {
 	int		rs ;
 	int		c = 0 ;
@@ -839,7 +839,7 @@ static int ktag_start(KTAG *kop,KTAG_PARAMS *kap,TAGINFO *tip,
 }
 /* end subroutine (ktag_start) */
 
-static int ktag_finish(KTAG *kop) noex {
+local int ktag_finish(KTAG *kop) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -865,12 +865,12 @@ static int ktag_finish(KTAG *kop) noex {
 }
 /* end subroutine (ktag_finish) */
 
-static int ktag_add(KTAG *kop,cchar *lp,int ll) noex {
+local int ktag_add(KTAG *kop,cchar *lp,int ll) noex {
 	return ktag_procline(kop,lp,ll) ;
 }
 /* end subroutine (ktag_add) */
 
-static int ktag_mktag(KTAG *kop,TXTINDEXMK_TAG *tagp) noex {
+local int ktag_mktag(KTAG *kop,TXTINDEXMK_TAG *tagp) noex {
 	KTAG_PARAMS	*kap = kop->kap ;
 	int		rs ;
 
@@ -902,7 +902,7 @@ static int ktag_mktag(KTAG *kop,TXTINDEXMK_TAG *tagp) noex {
 }
 /* end subroutine (ktag_mktag) */
 
-static int ktag_procline(KTAG *kop,cchar *lp,int ll) noex {
+local int ktag_procline(KTAG *kop,cchar *lp,int ll) noex {
 	KTAG_PARAMS	*kap = kop->kap ;
 	XWORDS		w ;
 	int		rs = SR_OK ;
@@ -941,7 +941,7 @@ static int ktag_procline(KTAG *kop,cchar *lp,int ll) noex {
 }
 /* end subroutine (ktag_procline) */
 
-static int ktag_procword(KTAG *kop,cchar *cp,int cl) noex {
+local int ktag_procword(KTAG *kop,cchar *cp,int cl) noex {
 	int		rs ;
 	cchar		*sp ;
 
