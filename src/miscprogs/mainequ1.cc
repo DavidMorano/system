@@ -4,9 +4,9 @@
 #include	<math.h>
 #include	<cstdio>
 
-static int	equ(double,double) ;
+local int	equ(double,double) ;
 
-int main(int argc,const char **argv,const char **envv) {
+int main(int argc,cchar **argv,cchar **envv) {
 	double		n = 100 ;
 	double		x ;
 	double		y ;
@@ -36,7 +36,7 @@ int main(int argc,const char **argv,const char **envv) {
 
 /* local subroutines */
 
-static int equ(double a,double b) {
+local int equ(double a,double b) {
 	double		small = 0.1 ;
 	return (fabs(a-b) < small) ;
 }
