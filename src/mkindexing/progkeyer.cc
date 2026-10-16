@@ -63,7 +63,7 @@
 #include	<char.h>
 #include	<eigendb.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"xwords.h"
@@ -83,19 +83,19 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfword(const char *,int,const char **) ;
-extern int	field_word(FIELD *,const uchar *,const char **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfword(cchar *,int,cchar **) ;
+extern int	field_word(FIELD *,const uchar *,cchar **) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -106,8 +106,8 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	ignoreline(const char *,int,const char *) ;
-static int	procword(PROGINFO *,HDB *,int,cchar *,int) ;
+local int	ignoreline(cchar *,int,cchar *) ;
+local int	procword(PROGINFO *,HDB *,int,cchar *,int) ;
 
 
 /* local variables */
@@ -136,8 +136,8 @@ cchar		*fname ;
 	int		f_open = FALSE ;
 	int		f_eol ;
 	uchar		bterms[32] ;
-	const char	*sp ;
-	const char	*cp ;
+	cchar	*sp ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUG
@@ -173,7 +173,7 @@ cchar		*fname ;
 	    off_t	offset = 0 ;
 	    off_t	recoff = 0 ;
 	    uint	reclen = 0 ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		lo = 0 ;
 	    int		hashsize = 20 ;
@@ -524,7 +524,7 @@ cchar		*fname ;
 
 
 /* which input lines are supposed to be ignored? */
-static int ignoreline(cchar *lbuf,int ll,cchar *ignorechars)
+local int ignoreline(cchar *lbuf,int ll,cchar *ignorechars)
 {
 	int	f = FALSE ;
 	if ((ignorechars != NULL) && (lbuf[0] == '%')) {
@@ -537,7 +537,7 @@ static int ignoreline(cchar *lbuf,int ll,cchar *ignorechars)
 
 
 /* process a word */
-static int procword(PROGINFO *pip,HDB *keydbp,int n,cchar *wp,int wl)
+local int procword(PROGINFO *pip,HDB *keydbp,int n,cchar *wp,int wl)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
@@ -546,7 +546,7 @@ static int procword(PROGINFO *pip,HDB *keydbp,int n,cchar *wp,int wl)
 	    if ((wl > 0) && (wl <= NATURALWORDLEN)) {
 	        if (wl >= pip->minwordlen) {
 	            EIGENDB	*edbp = &pip->eigendb ;
-	            const int	rsn = SR_NOTFOUND ;
+	            cint	rsn = SR_NOTFOUND ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
