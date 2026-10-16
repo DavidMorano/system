@@ -77,10 +77,10 @@
 
 /* imported namespaces */
 
-using libu::chtobc ;
-using libu::chtolc ;
-using libu::chtouc ;
-using libu::chtofc ;
+using libu::chtobc ;			/* subroutine */
+using libu::chtolc ;			/* subroutine */
+using libu::chtouc ;			/* subroutine */
+using libu::chtofc ;			/* subroutine */
 
 
 /* local typedefs */
@@ -117,6 +117,54 @@ local int sncpyxc(chtoxc_f cvt,char *dbuf,int dlen,cchar *sp) noex {
 	return rs ;
 } /* end subroutine-template (sncpyxc) */
 
+namespace {
+    struct cvter {
+	chtoxc_f	cvt ;
+	charp		dp ;
+	int		dl ;
+	cvter(chtoxc_f ªf,charp ªdp,int ªdl) noex {
+	    cvt = ªf ;
+	    dp = ªdp ;
+	    dl = ªdl ;
+	} ; /* end ctor */
+        int operator ()	(int,va_list) noex ;
+        int cvtcpy	(cchar *) noex ;
+    } ; /* end struct (cvter) */
+} /* end namespace */
+
+int cvter::operator () (int na,va_list ap) noex {
+    	int		rs = SR_OK ;
+	char		*bp = dp ;
+	for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
+	    ccp sp = (charp) va_arg(ap,charp) ;
+	    rs = cvtcpy(sp) ;
+	} /* end for */
+	if (rs >= 0) rs = intconv(dp - bp) ;
+	return rs ;
+} /* end method (cvter::operator) */
+
+int cvter::cvtcpy(cchar *sp) noex {
+    	int		rs = SR_OK ;
+	if (dl >= 0) {
+	    int dlx ; /* used-afterwards */
+    	    for (dlx = dl ; dlx && *sp ; dlx -= 1) {
+	        *dp++ = cvt(*sp++) ;
+	    } /* end for */
+	    dl = dlx ;
+	    if ((dl == 0) && *sp) rs = SR_OVERFLOW ;
+	} else {
+    	    while (*sp) {
+	        *dp++ = cvt(*sp++) ;
+	    } /* end while */
+	} /* end if */
+	return rs ;
+} /* end method (cvter::cvtcpy) */
+
+local int sncpyxcx(chtoxc_f cvt,char *dp,int dl,int na,va_list ap) noex {
+    	cvter co(cvt,dp,dl) ;
+	return co(na,ap) ;
+} /* end subroutine (sncpyxcx) */
+
 
 /* local variables */
 
@@ -140,6 +188,50 @@ int sncpyuc(char *dp,int dl,cchar *s1) noex {
 
 int sncpyfc(char *dp,int dl,cchar *s1) noex {
 	return sncpyxc(chtofc,dp,dl,s1) ;
+} /* end subroutine */
+
+int sncpybcx(char *dp,int dl,int na,...) noex {
+    	va_list		ap ;
+	int		rs = SR_FAULT ;
+	if (dp) ylikely {
+	    va_begin(ap,na) ;
+	    rs = sncpyxcx(chtobc,dp,dl,na,ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine */
+
+int sncpylcx(char *dp,int dl,int na,...) noex {
+    	va_list		ap ;
+	int		rs = SR_FAULT ;
+	if (dp) ylikely {
+	    va_begin(ap,na) ;
+	    rs = sncpyxcx(chtolc,dp,dl,na,ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine */
+
+int sncpyucx(char *dp,int dl,int na,...) noex {
+    	va_list		ap ;
+	int		rs = SR_FAULT ;
+	if (dp) ylikely {
+	    va_begin(ap,na) ;
+	    rs = sncpyxcx(chtouc,dp,dl,na,ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
+    	return rs ;
+} /* end subroutine */
+
+int sncpyfcx(char *dp,int dl,int na,...) noex {
+    	va_list		ap ;
+	int		rs = SR_FAULT ;
+	if (dp) ylikely {
+	    va_begin(ap,na) ;
+	    rs = sncpyxcx(chtofc,dp,dl,na,ap) ;
+	    va_end(ap) ;
+	} /* end if (non-null) */
+    	return rs ;
 } /* end subroutine */
 
 
