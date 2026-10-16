@@ -83,8 +83,7 @@ int memclearer(void *op,int sz) noex {
     	if (op) ylikely {
 	    rs = SR_INVALID ;
 	    if (sz >= 0) {
-		rs = sz ;
-	        if (sz > 0) {
+		if ((rs = sz) > 0) {
     	            csize osize = size_t(sz) ;
     	            memset(op,0,osize) ;
 	        }
