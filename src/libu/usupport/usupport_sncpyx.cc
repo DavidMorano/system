@@ -41,7 +41,7 @@
 	I am using the new (rumored to be coming as a standard)
 	subroutine |strlcpy(3c)|.  I wrote my own version of this
 	until it gets into the standard libraries.  It might be in
-	someone's standard lirbrary already, but I do not have that
+	someone's standard library already, but I do not have that
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
@@ -56,9 +56,10 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| + |va_arg(3c)| */
-#include	<cstring>		/* CSTD |strlcpy(3c)| */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_sncpyx.hh"
@@ -68,6 +69,8 @@
 
 
 /* imported namespaces */
+
+using usys::strbcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -94,31 +97,69 @@
 /* exported subroutines */
 
 namespace libu {
+    int sncpy(char *dp,int dl,cchar *sp) noex {
+	int		rs = SR_FAULT ;
+	if (dp && sp) ylikely {
+	    if (dl >= 0) {
+	        if (char *rp = strbcpy(dp,dl,sp)) {
+		    rs = intconv(rp - dp) ;
+		} else {
+		    rs = SR_OVERFLOW ;
+		} /* end */
+	    } else {
+	        rs = intconv(stpcpy(dp,sp) - dp) ;
+	    } /* end */
+	} /* end if (non-null) */
+	return rs ;
+    } /* end subroutine (snwcpy) */
+} /* end namespace (libu) */
+
+local int sncpyx_pos(char *dp,int dl,int n,va_list ap) noex {
+    	int		rs = SR_OVERFLOW ;
+	char *bp = dp ;
+	for (int i = 0 ; dp && (i < n) ; i += 1) {
+	    ccp sp = (cc *) va_arg(ap,cc *) ;
+	    ccp cp = dp ;
+	    if (! sp) break ;
+	    dp = strbcpy(dp,dl,sp) ;
+	    if (dp == nullptr) break ;
+	    dl -= intconv(dp - cp) ;
+	} /* end for */
+	if (dp) {
+	    rs = intconv(dp - bp) ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (sncpyx_pos) */
+
+local int sncpyx_neg(char *dp,int dl,int n,va_list ap) noex {
+    	int		rs = SR_OVERFLOW ;
+	char *bp = dp ;
+	(void) dl ;
+	for (int i = 0 ; dp && (i < n) ; i += 1) {
+	    ccp sp = (cc *) va_arg(ap,cc *) ;
+	    if (! sp) break ;
+	    dp = stpcpy(dp,sp) ;
+	} /* end for */
+	if (dp) {
+	    rs = intconv(dp - bp) ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (sncpyx_neg) */
+
+namespace libu {
     int sncpyx(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	int		rl = 0 ; /* return-value */
-	if (dl < 0) dl = INT_MAX ;
 	if (dp) ylikely {
-	    char	*bp = dp ;
-	    size_t	rlen = (dl + 1) ;
 	    va_begin(ap,n) ;
-	    rs = SR_OK ;
-	    dp[0] = '\0' ;
-	    for (int i = 0 ; i < n ; i += 1) {
-	        ccharp	sp = (cc *) va_arg(ap,cc *) ;
-	        if (size_t ml ; (ml = strlcpy(bp,sp,rlen)) >= rlen) {
-	            rs = SR_OVERFLOW ;
-		    break ;
-	        } else {
-	            bp += ml ;
-	            rlen -= ml ;
-		} /* end if */
-	    } /* end for */
-	    rl = intconv(bp - dp) ;
+	    if (dl >= 0) {
+		rs = sncpyx_pos(dp,dl,n,ap) ;
+	    } else {
+		rs = sncpyx_neg(dp,dl,n,ap) ;
+	    } /* end if */
 	    va_end(ap) ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
+	return rs ;
     } /* end subroutine (sncpyx) */
 } /* end namespace (libu) */
 
