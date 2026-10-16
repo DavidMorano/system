@@ -33,26 +33,28 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<bfile.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
 #include	<field.h>
 #include	<getusername.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<msgid.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
-#include	"config.h"
+#include	"msgidadm_config.h"
 #include	"defs.h"
-#include	"msgid.h"
 
 
 /* local defines */
@@ -65,21 +67,14 @@
 
 #define	O_FLAGS		O_RDONLY
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#define	LI		struct locinfo
+#define	LI_FL	struct locinfo_flags
 
 
 /* external subroutines */
 
 extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
 
 
 /* external variables */
@@ -91,50 +86,39 @@ struct locinfo_flags {
 	uint		all:1 ;
 	uint		mid:1 ;
 	uint		header:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
 	int		(*cmpfunc)() ;
-	LOCINFO_FL	f ;
+	LI_FL		fl ;
 	int		nentries ;
 	int		ski ;
 	int		tdi ;
 	char		username[USERNAMELEN + 1] ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PI *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,vecstr *,cchar *) ;
-static int	procout(PROGINFO *,vecstr *,cchar *,cchar *) ;
+local int	procargs(PI *,ARGINFO *,bits *,vecstr *,cchar *) noex ;
+local int	procout(PI *,vecstr *,cchar *,cchar *) noex ;
 
-static int	loadname(PROGINFO *,vecstr *,cchar *,int) ;
-static int	loadnames(PROGINFO *,VECSTR *,cchar *,int) ;
+local int	loadname(PI *,vecstr *,cchar *,int) noex ;
+local int	loadnames(PI *,VECSTR *,cchar *,int) noex ;
+local int	process(PI *,cchar *,bfile *,vecstr *) noex ;
 
-static int	process(PROGINFO *,cchar *,bfile *,vecstr *) ;
-static int	cmp_utime(), cmp_ctime(), cmp_mtime() ;
+local int	cmp_utime() noex ;
+local int	cmp_ctime() noex ;
+local int	cmp_mtime() noex ;
 
-static int	cmpr_utime(), cmpr_ctime(), cmpr_mtime() ;
+local int	cmpr_utime() noex ;
+local int	cmpr_ctime() noex ;
+local int	cmpr_mtime() noex ;
 
 
 /* local variables */
-
-static cchar *argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"db",
-	"td",
-	"nh",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -149,15 +133,30 @@ enum argopts {
 	argopt_td,
 	argopt_nh,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static const struct pivars	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"db",
+	"td",
+	"nh",
+	NULL
+} ; /* end array */
+
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRLOCAL
-} ;
+} ; /* end array */
 
 static const struct mapex	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -169,18 +168,7 @@ static const struct mapex	mapexs[] = {
 	{ SR_REMOTE, EX_PROTOCOL },
 	{ SR_NOSPC, EX_TEMPFAIL },
 	{ 0, 0 }
-} ;
-
-static cchar *sortkeys[] = {
-	"utime",
-	"mtime",
-	"ctime",
-	"update",
-	"msg",
-	"create",
-	"none",
-	NULL
-} ;
+} ; /* end array */
 
 enum sortkeys {
 	sortkey_utime,
@@ -191,9 +179,20 @@ enum sortkeys {
 	sortkey_ctime2,
 	sortkey_none,
 	sortkey_overlast
-} ;
+} ; /* end enum */
 
-static const uchar	aterms[] = {
+static cchar *sortkeys[] = {
+	"utime",
+	"mtime",
+	"ctime",
+	"update",
+	"msg",
+	"create",
+	"none",
+	NULL
+} ; /* end array */
+
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -202,16 +201,17 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
-	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+int main(int argc,con mainv argv,con mainv envv) {
+	PI		pi, *pip = &pi ;
+	LI		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	bits		pargs ;
 	keyopt		akopts ;
@@ -274,7 +274,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	dbfname[0] = '\0' ;
 
 	pip->lip = lip ;
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 
 	lip->fl.header = TRUE ;
 
@@ -300,7 +300,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -489,7 +489,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -864,15 +864,12 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
 
-
-static int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -891,11 +888,10 @@ static int usage(PROGINFO *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,
 		vecstr *rlp,cchar *afn)
 {
 	int		rs = SR_OK ;
@@ -932,7 +928,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -965,11 +961,10 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 	} /* end if (processing file argument file list) */
 
 	return (rs >= 0) ? pan : rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
 
-static int procout(PROGINFO *pip,vecstr *rlp,cchar *dfn,cchar *ofn)
+local int procout(PI *pip,vecstr *rlp,cchar *dfn,cchar *ofn)
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs = SR_OK ;
@@ -990,11 +985,10 @@ static int procout(PROGINFO *pip,vecstr *rlp,cchar *dfn,cchar *ofn)
 	}
 
 	return rs ;
-}
-/* end subroutine (procout) */
+} /* end subroutine (procout) */
 
-static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
-	LOCINFO		*lip = pip->lip ;
+local int process(PI *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
+	LI		*lip = pip->lip ;
 	vecobj		entries ;
 	time_t		t ;
 	int		rs, rs1 ;
@@ -1149,9 +1143,9 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 	        char	timebuf3[TIMEBUFLEN + 1] ;
 	        debugprintf("main: tdi=%u ut=%s mt=%s ct=%s\n",
 	            lip->tdi,
-	            timestr_log(ep->utime,timebuf1),
-	            timestr_log(ep->mtime,timebuf2),
-	            timestr_log(ep->ctime,timebuf3)) ;
+	            strtime_log(ep->utime,timebuf1),
+	            strtime_log(ep->mtime,timebuf2),
+	            strtime_log(ep->ctime,timebuf3)) ;
 	    }
 #endif /* CF_DEBUG */
 
@@ -1170,7 +1164,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
 	        debugprintf("main: t=%s\n",
-	            timestr_log(t,timebuf)) ;
+	            strtime_log(t,timebuf)) ;
 #endif
 
 	    n = NCOLSFROM ;
@@ -1194,7 +1188,7 @@ static int process(PROGINFO *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 
 	        rs = bprintf(ofp,"%-*s %-14s %5u %r%c\n",
 	            NCOLSRECIP,recipbuf,
-	            timestr_log(t,timebuf),
+	            strtime_log(t,timebuf),
 	            ep->count,
 	            cp,cl,chend) ;
 
@@ -1233,11 +1227,10 @@ ret1:
 
 ret0:
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
 
-static int loadnames(PROGINFO *pip,VECSTR *nlp,cchar *sp,int sl)
+local int loadnames(PI *pip,VECSTR *nlp,cchar *sp,int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1260,13 +1253,11 @@ static int loadnames(PROGINFO *pip,VECSTR *nlp,cchar *sp,int sl)
 	} /* end if (field) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (loadnames) */
+} /* end subroutine (loadnames) */
 
-
-static int loadname(PROGINFO *pip,vecstr *nlp,cchar cp[],int cl)
+local int loadname(PI *pip,vecstr *nlp,cchar cp[],int cl)
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	int		rs = SR_OK ;
 
 	if (cp[0] == '-') {
@@ -1283,11 +1274,10 @@ static int loadname(PROGINFO *pip,vecstr *nlp,cchar cp[],int cl)
 	}
 
 	return rs ;
-}
-/* end subroutine (loadname) */
+} /* end subroutine (loadname) */
 
 
-static int cmp_utime(void **e1pp,void **e2pp)
+local int cmp_utime(void **e1pp,void **e2pp)
 {
 	MSGID_ENT	*e1p, *e2p ;
 
@@ -1303,11 +1293,10 @@ static int cmp_utime(void **e1pp,void **e2pp)
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e2p->utime - e1p->utime) ;
-}
-/* end subroutine (cmp_utime) */
+} /* end subroutine (cmp_utime) */
 
 
-static int cmpr_utime(void **e1pp,void **e2pp)
+local int cmpr_utime(void **e1pp,void **e2pp)
 {
 	MSGID_ENT	*e1p, *e2p ;
 
@@ -1323,11 +1312,10 @@ static int cmpr_utime(void **e1pp,void **e2pp)
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e1p->utime - e2p->utime) ;
-}
-/* end subroutine (cmpr_utime) */
+} /* end subroutine (cmpr_utime) */
 
 
-static int cmp_ctime(void **e1pp,void **e2pp)
+local int cmp_ctime(void **e1pp,void **e2pp)
 {
 	MSGID_ENT	*e1p, *e2p ;
 
@@ -1343,11 +1331,10 @@ static int cmp_ctime(void **e1pp,void **e2pp)
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e2p->ctime - e1p->ctime) ;
-}
-/* end subroutine (cmp_ctime) */
+} /* end subroutine (cmp_ctime) */
 
 
-static int cmpr_ctime(void **e1pp,void **e2pp)
+local int cmpr_ctime(void **e1pp,void **e2pp)
 {
 	MSGID_ENT	*e1p, *e2p ;
 
@@ -1363,11 +1350,10 @@ static int cmpr_ctime(void **e1pp,void **e2pp)
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e1p->ctime - e2p->ctime) ;
-}
-/* end subroutine (cmpr_ctime) */
+} /* end subroutine (cmpr_ctime) */
 
 
-static int cmp_mtime(void **e1pp,void **e2pp)
+local int cmp_mtime(void **e1pp,void **e2pp)
 {
 	MSGID_ENT	*e1p, *e2p ;
 
@@ -1383,11 +1369,10 @@ static int cmp_mtime(void **e1pp,void **e2pp)
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e2p->mtime - e1p->mtime) ;
-}
-/* end subroutine (cmp_mtime) */
+} /* end subroutine (cmp_mtime) */
 
 
-static int cmpr_mtime(void **e1pp,void **e2pp)
+local int cmpr_mtime(void **e1pp,void **e2pp)
 {
 	MSGID_ENT	*e1p, *e2p ;
 
@@ -1403,7 +1388,6 @@ static int cmpr_mtime(void **e1pp,void **e2pp)
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e1p->mtime - e2p->mtime) ;
-}
-/* end subroutine (cmpr_mtime) */
+} /* end subroutine (cmpr_mtime) */
 
 
