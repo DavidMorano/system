@@ -68,7 +68,7 @@ OBJ19_USYS= usys_execname.o usys_termios.o
 OBJ20_USYS= usys_strxbrk.o 
 OBJ21_USYS= usys_stpcpy.o usys_stpncpy.o
 OBJ22_USYS= usys_strbcpy.o
-OBJ23_USYS=
+OBJ23_USYS= usys_lenstr.o
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
@@ -77,7 +77,7 @@ OBJD= obj09_usys.o obj10_usys.o obj11_usys.o
 OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
 OBJG= obj18_usys.o obj19_usys.o obj20_usys.o
-OBJH= obj21_usys.o obj22_usys.o
+OBJH= obj21_usys.o obj22_usys.o obj23_usys.o
 
 OBJ_J0= obja.o objb.o objc.o objd.o 
 OBJ_J1= obje.o objf.o objg.o objh.o
@@ -292,6 +292,7 @@ usys_resolvepath.o:	usys_resolvepath.cc	usys_resolvepath.h	$(INCS)
 usys_waitid.o:		usys_waitid.cc		usys_waitid.h		$(INCS)
 usys_sigx.o:		usys_sigx.cc		usys_sigx.h		$(INCS)
 usys_pipes.o:		usys_pipes.cc		usys_pipes.h		$(INCS)
+usys_lenstr.o:		usys_lenstr.cc		usys_lenstr.hh		$(INCS)
 usys_libstr.o:		usys_libstr.cc		usys_libstr.h		$(INCS)
 usys_getexecname.o:	usys_getexecname.cc	usys_getexecname.h	$(INCS)
 usys_stat.o:		usys_stat.cc		usys_stat.h		$(INCS)
