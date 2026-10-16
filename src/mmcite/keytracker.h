@@ -42,7 +42,7 @@
 
 struct keytracker_head {
 	bits		dones ;
-	const char	*(*keyvals)[2] ;
+	cchar	*(*keyvals)[2] ;
 	int		n ;
 } ;
 
@@ -53,9 +53,9 @@ struct keytracker_head {
 extern "C" {
 #endif
 
-extern int	keytracker_start(KEYTRACKER *,const char *(*)[2]) ;
+extern int	keytracker_start(KEYTRACKER *,cchar *(*)[2]) ;
 extern int	keytracker_done(KEYTRACKER *,int) ;
-extern int	keytracker_more(KEYTRACKER *,const char *) ;
+extern int	keytracker_more(KEYTRACKER *,cchar *) ;
 extern int	keytracker_finish(KEYTRACKER *) ;
 
 #ifdef	__cplusplus
