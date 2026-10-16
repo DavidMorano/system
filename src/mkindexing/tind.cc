@@ -342,8 +342,8 @@ local int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
-	const int	n = nelem(subs) ;
-	const int	vo = VECSTR_OCOMPACT ;
+	cint	n = nelem(subs) ;
+	cint	vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 
@@ -353,7 +353,7 @@ local int txtindex_objloadbegin(TXTINDEX *op,cchar *pr,cchar *objname)
 #endif
 
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
+	    cint	nlen = SYMNAMELEN ;
 	    int		i ;
 	    int		f_modload = FALSE ;
 	    char	nbuf[SYMNAMELEN + 1] ;
@@ -445,12 +445,12 @@ local int txtindex_objloadend(TXTINDEX *op)
 local int txtindex_loadcalls(TXTINDEX *op,cchar objname[])
 {
 	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+	cint	nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp ;
+	cvoid	*snp ;
 
 	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
