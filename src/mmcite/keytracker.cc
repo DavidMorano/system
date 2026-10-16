@@ -52,14 +52,14 @@
 
 /* external subroutines */
 
-extern int	nextfield(const char *,int,const char **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
 
 
 /* forward references */
 
-static int	keytracker_checkmore(KEYTRACKER *,const char *,int) ;
+local int	keytracker_checkmore(KEYTRACKER *,cchar *,int) ;
 
-static int	matkey(const char *(*)[2],const char *,int) ;
+local int	matkey(cchar *(*)[2],cchar *,int) ;
 
 
 /* exported subroutines */
@@ -127,7 +127,7 @@ int keytracker_more(KEYTRACKER *op,cchar *morestr)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
-	const char	*tp, *sp ;
+	cchar	*tp, *sp ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -154,11 +154,11 @@ int keytracker_more(KEYTRACKER *op,cchar *morestr)
 /* private subroutines */
 
 
-static int keytracker_checkmore(KEYTRACKER *op,cchar *sp,int sl)
+local int keytracker_checkmore(KEYTRACKER *op,cchar *sp,int sl)
 {
 	int		cl ;
 	int		f = FALSE ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (sl < 0)
 	    sl = strlen(sp) ;
@@ -176,7 +176,7 @@ static int keytracker_checkmore(KEYTRACKER *op,cchar *sp,int sl)
 /* end subroutine (keytracker_checkmore) */
 
 
-static int matkey(cchar *(*keyvals)[2],cchar *kp,int kl)
+local int matkey(cchar *(*keyvals)[2],cchar *kp,int kl)
 {
 	int		i ;
 	int		f = FALSE ;
