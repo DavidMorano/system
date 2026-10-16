@@ -76,7 +76,7 @@ extern int	checkname() ;
 
 int process(pip,name,pp)
 struct proginfo	*pip ;
-const char	name[] ;
+cchar	name[] ;
 PARAMOPT	*pp ;
 {
 	ustat	sb ;
