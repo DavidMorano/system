@@ -72,6 +72,7 @@
 #include	<acctab.h>
 #include	<paramfile.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -133,11 +134,11 @@ extern void	pcspoll_checker() ;
 
 /* forward references */
 
-static int	procfile(struct proginfo *,int (*)(char *,char *,vecstr *),
-			const char *,vecstr *,char *,vecstr *) ;
-static int	getsets(struct proginfo *,vecstr *,struct configinfo *) ;
-static int	matme(char *,char *,char **,char **) ;
-static int	checkstamp(struct proginfo *,char *,int) ;
+local int	procfile(struct proginfo *,int (*)(char *,char *,vecstr *),
+			cchar *,vecstr *,char *,vecstr *) ;
+local int	getsets(struct proginfo *,vecstr *,struct configinfo *) ;
+local int	matme(char *,char *,char **,char **) ;
+local int	checkstamp(struct proginfo *,char *,int) ;
 
 
 /* local variables */
@@ -825,7 +826,7 @@ int main(int argc,mainv argv,mainv envv) {
 #if	CF_GETEXECNAME && defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 	    if ((pr == NULL) && (pip->pr == NULL)) {
 
-	        const char	*pp ;
+	        cchar	*pp ;
 
 
 	        pp = getexecname() ;
@@ -2012,7 +2013,7 @@ int main(int argc,mainv argv,mainv envv) {
 #endif
 
 	    bprintf(lfp,"%s: %s %s started\n",
-	        pip->progname,timestr_lodaytime,timebuf),
+	        pip->progname,strtime_lodaytime,timebuf),
 	        BANNER) ;
 
 	    bflush(pip->lfp) ;
@@ -2060,7 +2061,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	pip->logid = mallocstr(buf) ;
 
-	rs = SR_BAD ;
+	rs = SR_BADE ;
 	if (logfname[0] == '\0') {
 
 	    logfile_type = 1 ;
@@ -2111,7 +2112,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    if (pip->fl.daemon || pip->fl.named) {
 
 	        logfile_printf(&pip->lh,"%s %s %s\n",
-	            timestr_logz(daytime,timebuf),
+	            strtime_logz(daytime,timebuf),
 	            BANNER,
 	            "started") ;
 
@@ -2121,7 +2122,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    } else
 	        logfile_printf(&pip->lh,"%s %-14s %s/%s\n",
-	            timestr_logz(daytime,timebuf),
+	            strtime_logz(daytime,timebuf),
 	            pip->progname,
 	            VERSION,(u.f.sysv_ct) ? "SYSV" : "BSD") ;
 
@@ -2352,7 +2353,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        bprintf(&pidfile,"%s!%s\n",pip->nodename,pip->username) ;
 
 	        bprintf(&pidfile,"%s %s\n",
-	            timestr_logz(daytime,timebuf),BANNER) ;
+	            strtime_logz(daytime,timebuf),BANNER) ;
 
 	        if (userbuf[0] != '\0')
 	            bprintf(&pidfile,"host=%s.%s user=%s pid=%d\n",
@@ -2844,7 +2845,7 @@ int main(int argc,mainv argv,mainv envv) {
 #endif
 
 	    logfile_printf(&pip->lh,"%s finished initializing\n",
-	        timestr_logz(daytime,timebuf)) ;
+	        strtime_logz(daytime,timebuf)) ;
 
 	} /* end if (making log entries) */
 
@@ -3252,10 +3253,10 @@ badret:
 
 
 /* process an environment or paths-type file */
-static int procfile(pip,func,pr,svp,fname,elp)
+local int procfile(pip,func,pr,svp,fname,elp)
 struct proginfo	*pip ;
 int		(*func)(char *,char *,vecstr *) ;
-const char	pr[] ;
+cchar	pr[] ;
 VECSTR		*svp ;
 char		fname[] ;
 vecstr		*elp ;
@@ -3305,7 +3306,7 @@ vecstr		*elp ;
 
 
 /* get any of my values from the main configuration */
-static int getsets(pip,sp,cip)
+local int getsets(pip,sp,cip)
 struct proginfo		*pip ;
 vecstr			*sp ;
 struct configinfo	*cip ;
@@ -3401,7 +3402,7 @@ struct configinfo	*cip ;
 
 
 /* does a key match my search name ? */
-static int matme(key,ts,kpp,vpp)
+local int matme(key,ts,kpp,vpp)
 char	key[] ;
 char	ts[] ;
 char	**kpp, **vpp ;
@@ -3445,7 +3446,7 @@ char	**kpp, **vpp ;
 
 
 /* check the program time stamp file for need of processing or not */
-static int checkstamp(pip,stampfname,mintime)
+local int checkstamp(pip,stampfname,mintime)
 struct proginfo	*pip ;
 char	stampfname[] ;
 int	mintime ;
@@ -3501,7 +3502,7 @@ int	mintime ;
 	    } /* end if */
 
 	    bprintf(&tsfile,"%s\n",
-	        timestr_logz(daytime,timebuf)) ;
+	        strtime_logz(daytime,timebuf)) ;
 
 	    bclose(&tsfile) ;
 
@@ -3512,9 +3513,9 @@ int	mintime ;
 /* end subroutine (checkstamp) */
 
 
-static int checkmailuser(pip,name)
+local int checkmailuser(pip,name)
 struct proginfo	*pip ;
-const char	name[] ;
+cchar	name[] ;
 {
 
 
