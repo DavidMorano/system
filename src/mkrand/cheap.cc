@@ -45,7 +45,7 @@ ULONG		newcheap(ULONG) ;
 
 static uint	randlcu(uint) ;
 
-static int	randlc(int) ;
+local int	randlc(int) ;
 
 
 /* exported subroutines */
@@ -196,7 +196,7 @@ uint	v ;
 
 
 /* standard positive random number (do not touch !) */
-static int randlc(v)
+local int randlc(v)
 int	v ;
 {
 	register int	hi, lo ;
