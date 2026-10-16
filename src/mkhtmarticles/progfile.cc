@@ -53,6 +53,7 @@
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 
@@ -96,7 +97,6 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	bprintlns(bfile *,int,cchar *,int) ;
 
 extern int	strdcpy1w(char *,int,cchar *,int) ;
-extern char	*timestr_log(time_t, char *) ;
 
 
 /* external variables */
@@ -107,9 +107,9 @@ extern char	*timestr_log(time_t, char *) ;
 
 /* forward references */
 
-static int	sihyphen(cchar *,int) ;
-static int	artdate(int,cchar *,int,time_t *) ;
-static int	mkrealname(char *,int,cchar *,int) ;
+local int	sihyphen(cchar *,int) ;
+local int	artdate(int,cchar *,int,time_t *) ;
+local int	mkrealname(char *,int,cchar *,int) ;
 
 
 /* local variables */
@@ -161,7 +161,7 @@ cchar	fname[] ;
 
 	time_t	stime, dtime ;
 
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 
 	int	rs, rs1 ;
 	int	si, len, ml, cl, bl ;
@@ -418,7 +418,7 @@ cchar	fname[] ;
 	if (DEBUGLEVEL(3)) {
 	            debugprintf("progfile: uc_timelocal() rs=%d\n",rs) ;
 	            debugprintf("progfile: date=>%s<\n",
-	                timestr_log(pfp->date,timebuf)) ;
+	                strtime_log(pfp->date,timebuf)) ;
 	}
 #endif
 
@@ -625,7 +625,7 @@ cchar	fname[] ;
 
 
 /* find string index of a hyphen (minus) character */
-static int sihyphen(s,sl)
+local int sihyphen(s,sl)
 cchar	s[] ;
 int		sl ;
 {
@@ -644,7 +644,7 @@ int		sl ;
 
 
 /* find a date for the article */
-static int artdate(cy,s,slen,rtp)
+local int artdate(cy,s,slen,rtp)
 int		cy ;
 cchar	s[] ;
 int		slen ;
@@ -801,7 +801,7 @@ time_t		*rtp ;
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    debugprintf("artdate: uc_mktime() rs=%d\n",rs) ;
 	    debugprintf("artdate: date=>%s<\n",
-	        timestr_log(*rtp,timebuf)) ;
+	        strtime_log(*rtp,timebuf)) ;
 	}
 	    debugprintf("artdate: ret rs=%d\n",rs) ;
 #endif /* CF_DEBUG */
@@ -811,7 +811,7 @@ time_t		*rtp ;
 /* end subroutine (artdate) */
 
 
-static int mkrealname(namebuf,namelen,sp,sl)
+local int mkrealname(namebuf,namelen,sp,sl)
 char		namebuf[] ;
 int		namelen ;
 cchar	*sp ;
