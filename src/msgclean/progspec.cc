@@ -54,17 +54,16 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	isDotDir(const char *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	isDotDir(cchar *) ;
 
 extern int	progabort(PROGINFO *) ;
-extern int	progfile(PROGINFO *,PARAMOPT *,const char *) ;
+extern int	progfile(PROGINFO *,PARAMOPT *,cchar *) ;
 
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
