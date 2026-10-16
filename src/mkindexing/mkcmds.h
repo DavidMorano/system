@@ -39,7 +39,7 @@ enum mkcmds {
 } ;
 
 
-extern const char	*mkcmds[] ;
+extern cchar	*mkcmds[] ;
 
 
 #endif /* MKCMDS_INCLUDE */
