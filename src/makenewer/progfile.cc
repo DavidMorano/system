@@ -70,12 +70,12 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	procfiler(struct proginfo *,int,ustat *,
+local int	procfiler(struct proginfo *,int,ustat *,
 			cchar *,cchar *) ;
 
-static int	filesuf(struct proginfo *,vecstr *,char *,
+local int	filesuf(struct proginfo *,vecstr *,char *,
 			cchar *,int) ;
-static int	mknewfname(char *,cchar *,cchar *,cchar *) ;
+local int	mknewfname(char *,cchar *,cchar *,cchar *) ;
 
 
 /* local variables */
@@ -365,7 +365,7 @@ ret0:
 /* end subroutine (procfiler) */
 
 
-static int filesuf(pip,slp,newfname,fname,fnamelen)
+local int filesuf(pip,slp,newfname,fname,fnamelen)
 struct proginfo	*pip ;
 vecstr		*slp ;
 char		newfname[] ;
@@ -438,7 +438,7 @@ ret0:
 /* end subroutine (filesuf) */
 
 
-static int mknewfname(newfname,fname,sp,cp)
+local int mknewfname(newfname,fname,sp,cp)
 char		newfname[] ;
 cchar	fname[] ;
 cchar	*sp ;
