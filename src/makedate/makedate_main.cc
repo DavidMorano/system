@@ -65,16 +65,16 @@
 
 /* external subroutines */
 
-extern int	printhelp(bfile *,const char *,const char *,const char *) ;
+extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	moduleclean(PROGINFO *,char *,int,const char *) ;
+extern int	moduleclean(PROGINFO *,char *,int,cchar *) ;
 extern int	output(PROGINFO *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -83,16 +83,16 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_org(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_org(PROGINFO *) ;
 
 #if	CF_LOGID
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 #endif /* CF_LOGID */
 
 
@@ -101,7 +101,7 @@ static int	procuserinfo_logid(PROGINFO *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"TMPDIR",
 	"VERSION",
@@ -184,14 +184,14 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -239,7 +239,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -461,7 +461,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -791,12 +791,12 @@ badarg:
 
 
 /* print out (standard error) some short usage */
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	if (pip->efp != NULL) {
 
@@ -819,9 +819,9 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
-	const int	olen = ORGLEN ;
+	cint	olen = ORGLEN ;
 	int		rs = SR_OK ;
 	char		obuf[ORGLEN+1] ;
 
@@ -844,7 +844,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -867,7 +867,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -901,7 +901,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -912,11 +912,11 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_org(PROGINFO *pip)
+local int procuserinfo_org(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	if ((pip->org == NULL) || (pip->org[0] == '\0')) {
-	   const int	olen = ORGLEN ;
+	   cint	olen = ORGLEN ;
 	   cchar	*pr = pip->pr ;
 	   cchar	*un = pip->username ;
 	   char		obuf[ORGLEN+1] ;
@@ -931,19 +931,19 @@ static int procuserinfo_org(PROGINFO *pip)
 
 
 #if	CF_LOGID
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
