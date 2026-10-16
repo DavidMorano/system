@@ -32,7 +32,7 @@ enum hnames {
 } ; /* end enum (hname) */
 
 
-extern const char	*hname[] ;
+extern cchar	*hname[] ;
 
 
 #endif /* HNAME_INCLUDE */
