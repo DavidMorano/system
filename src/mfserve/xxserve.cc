@@ -67,6 +67,7 @@
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<svckey.h>
 #include	<procse.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -296,7 +297,7 @@ cchar	*sav[] ;
 
 	if (pip->debuglevel > 0) {
 	    bprintf(pip->efp,"%s: %s svc=%s\n",pip->progname,
-	        timestr_logz(pip->daytime,timebuf), cip->service) ;
+	        strtime_logz(pip->daytime,timebuf), cip->service) ;
 	    if (cip->subservice != nullptr)
 	        bprintf(pip->efp,"%s: subsvc=%s\n", pip->progname,
 	            cip->subservice) ;
@@ -304,7 +305,7 @@ cchar	*sav[] ;
 
 	if (pip->open.logprog) {
 	    proglog_printf(pip,"%s svc=%s\n",
-	        timestr_logz(pip->daytime,timebuf), cip->service) ;
+	        strtime_logz(pip->daytime,timebuf), cip->service) ;
 	    if (cip->subservice != nullptr)
 	        proglog_printf(pip,"subsvc=%s\n", cip->subservice) ;
 	}
