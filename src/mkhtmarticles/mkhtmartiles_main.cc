@@ -42,6 +42,7 @@
 #include	<vecstr.h>
 #include	<sbuf.h>
 #include	<realname.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -234,7 +235,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -383,7 +384,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -732,7 +733,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            debugprintf("main: title=%s\n",fi.title) ;
 	            debugprintf("main: author=%s\n",fi.author) ;
 	            debugprintf("main: date=%s\n",
-			timestr_log(fi.date,timebuf)) ;
+			strtime_log(fi.date,timebuf)) ;
 	            debugprintf("main: publisher=%s\n",fi.publisher) ;
 	        }
 	    }
