@@ -1,0 +1,45 @@
+/* libfsup-memnset MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2020-10-13, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module libfsup:memnset ;
+
+export {
+    constexpr inline int memnset(void *dp,int ch,int n) noex {
+	int		rl = -1 ; /* return-value */
+	if (dp) ylikely {
+	    char *bp = charp(dp) ;
+	    while (n-- > 0) {
+		*bp++ = char(ch) ;
+	    } /* end while */
+	    rl = intconv(bp - charp(dp)) ;
+	} /* end if (non-null) */
+	return rl ;
+    } /* end subroutine (memnset) */
+} /* end export */
+
+
