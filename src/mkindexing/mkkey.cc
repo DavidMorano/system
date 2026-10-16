@@ -90,7 +90,7 @@ extern int	getnprocessors(cchar **,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
@@ -140,26 +140,26 @@ struct wargs {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,PROGINFO *,
+local int	subinfo_start(SUBINFO *,PROGINFO *,
 ARGINFO *,cuchar *,cchar *,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_sendparams(SUBINFO *,bfile *) ;
-static int	subinfo_sendparamseigens(SUBINFO *,bfile *) ;
-static int	subinfo_sendparamsval(SUBINFO *,bfile *,cchar *,int) ;
-static int	subinfo_sendparamsstr(SUBINFO *,bfile *,cchar *,cchar *) ;
+local int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_sendparams(SUBINFO *,bfile *) ;
+local int	subinfo_sendparamseigens(SUBINFO *,bfile *) ;
+local int	subinfo_sendparamsval(SUBINFO *,bfile *,cchar *,int) ;
+local int	subinfo_sendparamsstr(SUBINFO *,bfile *,cchar *,cchar *) ;
 
-static int	subinfo_args(SUBINFO *,DISP *) ;
-static int	subinfo_argfile(SUBINFO *,DISP *) ;
-static int	subinfo_stdin(SUBINFO *,DISP *) ;
-static int	subinfo_procfile(SUBINFO *,DISP *,cchar *) ;
+local int	subinfo_args(SUBINFO *,DISP *) ;
+local int	subinfo_argfile(SUBINFO *,DISP *) ;
+local int	subinfo_stdin(SUBINFO *,DISP *) ;
+local int	subinfo_procfile(SUBINFO *,DISP *,cchar *) ;
 
-static int	worker(void *) ;
+local int	worker(void *) ;
 
-static int	ereport(PROGINFO *,cchar *,int) ;
+local int	ereport(PROGINFO *,cchar *,int) ;
 
-static int	disp_start(DISP *,WARGS *) ;
-static int	disp_addwork(DISP *,cchar *,int) ;
-static int	disp_finish(DISP *,int) ;
+local int	disp_start(DISP *,WARGS *) ;
+local int	disp_addwork(DISP *,cchar *,int) ;
+local int	disp_finish(DISP *,int) ;
 
 
 /* local variables */
@@ -258,7 +258,7 @@ cchar	ofname[] ;
 /* local subroutines */
 
 
-static int subinfo_start(sip,pip,aip,terms,delimiter,ignchrs)
+local int subinfo_start(sip,pip,aip,terms,delimiter,ignchrs)
 SUBINFO		*sip ;
 PROGINFO	*pip ;
 ARGINFO		*aip ;
@@ -282,7 +282,7 @@ cchar	ignchrs[] ;
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -296,7 +296,7 @@ static int subinfo_finish(SUBINFO *sip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_sendparams(SUBINFO *sip,bfile *ofp)
+local int subinfo_sendparams(SUBINFO *sip,bfile *ofp)
 {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
@@ -358,7 +358,7 @@ static int subinfo_sendparams(SUBINFO *sip,bfile *ofp)
 /* end subroutine (subinfo_sendparams) */
 
 
-static int subinfo_sendparamseigens(SUBINFO *sip,bfile *ofp)
+local int subinfo_sendparamseigens(SUBINFO *sip,bfile *ofp)
 {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
@@ -367,8 +367,8 @@ static int subinfo_sendparamseigens(SUBINFO *sip,bfile *ofp)
 
 	if (pip->open.eigendb) {
 	    if ((rs = progeigen_count(pip)) > 0) {
-	        const int	ci = mkcmd_eigenwords ;
-	        const int	linelen = COLUMNS ;
+	        cint	ci = mkcmd_eigenwords ;
+	        cint	linelen = COLUMNS ;
 		int		llen = 0 ;
 	        if ((rs = bprintf(ofp,"-%s",mkcmds[ci])) >= 0) {
 		    PROGEIGEN_CUR	ecur ;
@@ -424,7 +424,7 @@ static int subinfo_sendparamseigens(SUBINFO *sip,bfile *ofp)
 /* end subroutine (subinfo_sendparamseigens) */
 
 
-static int subinfo_sendparamsval(sip,ofp,cmd,v)
+local int subinfo_sendparamsval(sip,ofp,cmd,v)
 SUBINFO		*sip ;
 bfile		*ofp ;
 cchar	cmd[] ;
@@ -445,7 +445,7 @@ int		v ;
 /* end subroutine (subinfo_sendparamsval) */
 
 
-static int subinfo_sendparamsstr(sip,ofp,cmd,s)
+local int subinfo_sendparamsstr(sip,ofp,cmd,s)
 SUBINFO		*sip ;
 bfile		*ofp ;
 cchar	cmd[] ;
@@ -466,7 +466,7 @@ cchar	s[] ;
 /* end subroutine (subinfo_sendparamsstr) */
 
 
-static int subinfo_args(sip,dop)
+local int subinfo_args(sip,dop)
 SUBINFO		*sip ;
 DISP		*dop ;
 {
@@ -495,7 +495,7 @@ DISP		*dop ;
 /* end subroutine (subinfo_args) */
 
 
-static int subinfo_argfile(sip,dop)
+local int subinfo_argfile(sip,dop)
 SUBINFO		*sip ;
 DISP		*dop ;
 {
@@ -544,7 +544,7 @@ ret0:
 /* end subroutine (subinfo_argfile) */
 
 
-static int subinfo_stdin(sip,dop)
+local int subinfo_stdin(sip,dop)
 SUBINFO		*sip ;
 DISP		*dop ;
 {
@@ -561,7 +561,7 @@ DISP		*dop ;
 /* end subroutine (subinfo_stdin) */
 
 
-static int subinfo_procfile(sip,dop,fname)
+local int subinfo_procfile(sip,dop,fname)
 SUBINFO		*sip ;
 DISP		*dop ;
 cchar	fname[] ;
@@ -603,7 +603,7 @@ ret0:
 /* end subroutine (subinfo_procfile) */
 
 
-static int disp_start(dop,wap)
+local int disp_start(dop,wap)
 DISP		*dop ;
 WARGS		*wap ;
 {
@@ -703,7 +703,7 @@ bad0:
 /* end subroutine (disp_start) */
 
 
-static int disp_finish(dop,f_abort)
+local int disp_finish(dop,f_abort)
 DISP		*dop ;
 int		f_abort ;
 {
@@ -745,7 +745,7 @@ int		f_abort ;
 /* end subroutine (disp_finish) */
 
 
-static int disp_addwork(dop,tagbuf,taglen)
+local int disp_addwork(dop,tagbuf,taglen)
 DISP		*dop ;
 cchar	tagbuf[] ;
 int		taglen ;
@@ -769,7 +769,7 @@ int		taglen ;
 /* end subroutine (disp_addwork) */
 
 
-static int worker(ptvp)
+local int worker(ptvp)
 void		*ptvp ;
 {
 	PROGINFO	*pip ;
@@ -854,7 +854,7 @@ void		*ptvp ;
 /* end subroutine (worker) */
 
 
-static int ereport(pip,fname,frs)
+local int ereport(pip,fname,frs)
 PROGINFO	*pip ;
 cchar	fname[] ;
 int		frs ;
