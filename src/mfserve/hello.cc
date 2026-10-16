@@ -25,10 +25,10 @@
 	Synopsis:
 	int hello_start(op,pr,jep,argv,envv)
 	HELLO		*op ;
-	const char	*pr ;
+	cchar	*pr ;
 	SREQ		*jep ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 
 	Arguments:
 	op		object pointer
