@@ -36,7 +36,7 @@
 #include	"hname.h"
 
 
-const char	*hname[] = {
+cchar	*hname[] = {
 	"errorsto",
 	"replyto",
 	"sender",
