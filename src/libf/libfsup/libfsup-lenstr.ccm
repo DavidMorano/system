@@ -1,0 +1,69 @@
+/* libfsup-lenstr MODULE */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2020-10-13, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* CSTD |min(C++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module libfsup:lenstr ;
+
+export {
+    constexpr inline int clenstr(cchar *sp,int sl = -1) noex {
+    	cchar *cp = sp ;
+	while (sl-- && *cp) {
+	    cp += 1 ;
+	}
+	return intconv(cp - sp) ;
+    } /* end subroutine (clenstr) */
+    constexpr inline int lenstr(cchar *sp,int sl = -1) noex {
+    	int		len = -1 ;
+	if (sp) ylikely {
+	    if (sl >= 0) {
+    	        csize strsize = size_t(sl) ;
+	        len = intconv(strnlen(sp,strsize)) ;
+	    } else {
+	        len = intconv(strlen(sp)) ;
+	    }
+	} /* end if (non-null) */
+    	return len ;
+    } /* end subroutine (lenstr) */
+    constexpr inline int getlenstr(cchar *sp,int sl = -1) noex {
+	int		len = -1 ;
+	if (sp) ylikely {
+	    if (sl >= 0) {
+		len = sl ;
+	    } else {
+	        len = intconv(strlen(sp)) ;
+	    }
+	} /* end if (non-null) */
+	return len ;
+    } /* end subroutine (getlenstr) */
+    extern int lenstrline(cchar *,int = -1,int = -1) noex ;
+} /* end export */
+
+
