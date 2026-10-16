@@ -47,6 +47,7 @@
 
 /* utilities */
 #include	<usys_execname.hh>
+#include	<usys_lenstr.hh>
 #include	<usys_onc.hh>
 #include	<usys_pathpid.h>
 #include	<usys_plock.h>		/* defines |usys_plock()| */
