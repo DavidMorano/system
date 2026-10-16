@@ -51,7 +51,7 @@ struct textmkind_tag {
 } ;
 
 struct textmkind_obj {
-	const char	*name ;
+	cchar	*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
@@ -73,11 +73,11 @@ struct textmkind_flags {
 
 struct textmkind_head {
 	uint		magic ;
-	const char	*pr ;
-	const char	*dbname ;		/* DB database name */
-	const char	*basedname ;		/* base-directory */
-	const char	*sdn ;
-	const char	*sfn ;
+	cchar	*pr ;
+	cchar	*dbname ;		/* DB database name */
+	cchar	*basedname ;		/* base-directory */
+	cchar	*sdn ;
+	cchar	*sfn ;
 	void		*disp ;
 	struct textmkind_flags	f ;
 	EIGENDB		edb ;
@@ -102,7 +102,7 @@ extern "C" {
 extern int textmkind_open(TEXTMKIND *,cchar *,cchar *,cchar *) ;
 extern int textmkind_count(TEXTMKIND *) ;
 extern int textmkind_info(TEXTMKIND *,TEXTMKIND_INFO *) ;
-extern int textmkind_add(TEXTMKIND *,const char *,int) ;
+extern int textmkind_add(TEXTMKIND *,cchar *,int) ;
 extern int textmkind_close(TEXTMKIND *) ;
 
 #ifdef	__cplusplus
