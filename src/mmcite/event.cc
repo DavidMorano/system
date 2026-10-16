@@ -68,7 +68,7 @@
 
 int event_start(op,offset,ckp)
 EVENT		*op ;
-const char	*ckp ;
+cchar	*ckp ;
 {
 
 
@@ -120,7 +120,7 @@ off_t		*offp ;
 /* get the entry under the current cursor */
 int event_citekey(op,rpp)
 EVENT		*op ;
-const char	**rpp ;
+cchar	**rpp ;
 {
 	int	rs ;
 
