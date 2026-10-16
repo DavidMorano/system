@@ -62,8 +62,8 @@
 
 /* forward references */
 
-static int	vecstr_loadenames(vecstr *,cchar **,cchar *) ;
-static int	vecstr_loadename(vecstr *,cchar *,cchar *) ;
+local int	vecstr_loadenames(vecstr *,cchar **,cchar *) ;
+local int	vecstr_loadename(vecstr *,cchar *,cchar *) ;
 
 
 /* local variables */
@@ -136,7 +136,7 @@ ret0:
 /* local subroutines */
 
 
-static int vecstr_loadenames(elp,names,fname)
+local int vecstr_loadenames(elp,names,fname)
 vecstr		*elp ;
 cchar	*names[] ;
 cchar	fname[] ;
@@ -158,7 +158,7 @@ cchar	fname[] ;
 /* end subroutine (vecstr_loadenames) */
 
 
-static int vecstr_loadename(elp,name,fname)
+local int vecstr_loadename(elp,name,fname)
 vecstr		*elp ;
 cchar	name[] ;
 cchar	fname[] ;
