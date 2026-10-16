@@ -61,6 +61,7 @@
 #include	<lfm.h>
 #include	<char.h>
 #include	<rmdirfiles.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"shio.h"
@@ -118,37 +119,37 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	locinfo_envdefs(LOCINFO *) ;
+local int	locinfo_envdefs(LOCINFO *) ;
 
-static int	locinfo_cookbegin(LOCINFO *) ;
-static int	locinfo_cookload(LOCINFO *) ;
-static int	locinfo_cookend(LOCINFO *) ;
+local int	locinfo_cookbegin(LOCINFO *) ;
+local int	locinfo_cookload(LOCINFO *) ;
+local int	locinfo_cookend(LOCINFO *) ;
 
-static int	locinfo_svbegin(LOCINFO *) ;
-static int	locinfo_svload(LOCINFO *) ;
-static int	locinfo_svend(LOCINFO *) ;
+local int	locinfo_svbegin(LOCINFO *) ;
+local int	locinfo_svload(LOCINFO *) ;
+local int	locinfo_svend(LOCINFO *) ;
 
-static int	locinfo_cmdsbegin(LOCINFO *) ;
-static int	locinfo_cmdsend(LOCINFO *) ;
+local int	locinfo_cmdsbegin(LOCINFO *) ;
+local int	locinfo_cmdsend(LOCINFO *) ;
 
-static int	locinfo_pidlockbegin(LOCINFO *) ;
-static int	locinfo_pidlockend(LOCINFO *) ;
+local int	locinfo_pidlockbegin(LOCINFO *) ;
+local int	locinfo_pidlockend(LOCINFO *) ;
 
-static int	locinfo_tmplockbegin(LOCINFO *) ;
-static int	locinfo_tmplockend(LOCINFO *) ;
+local int	locinfo_tmplockbegin(LOCINFO *) ;
+local int	locinfo_tmplockend(LOCINFO *) ;
 
-static int	locinfo_genlockbegin(LOCINFO *,LFM *,cchar *) ;
-static int	locinfo_genlockend(LOCINFO *,LFM *) ;
-static int	locinfo_genlockdir(LOCINFO *,cchar *) ;
-static int	locinfo_genlockprint(LOCINFO *,cchar *,LFM_CHECK *) ;
-static int	locinfo_tmpourdname(LOCINFO *) ;
-static int	locinfo_runas(LOCINFO *) ;
-static int	locinfo_chids(LOCINFO *,cchar *) ;
-static int	locinfo_cookargsload(LOCINFO *,cchar **) ;
-static int	locinfo_maintourtmper(LOCINFO *,int) ;
+local int	locinfo_genlockbegin(LOCINFO *,LFM *,cchar *) ;
+local int	locinfo_genlockend(LOCINFO *,LFM *) ;
+local int	locinfo_genlockdir(LOCINFO *,cchar *) ;
+local int	locinfo_genlockprint(LOCINFO *,cchar *,LFM_CHECK *) ;
+local int	locinfo_tmpourdname(LOCINFO *) ;
+local int	locinfo_runas(LOCINFO *) ;
+local int	locinfo_chids(LOCINFO *,cchar *) ;
+local int	locinfo_cookargsload(LOCINFO *,cchar **) ;
+local int	locinfo_maintourtmper(LOCINFO *,int) ;
 
 #if	CF_DEBUGS && CF_DEBUGDUMP
-static int	vecstr_dump(vecstr *,cchar *) ;
+local int	vecstr_dump(vecstr *,cchar *) ;
 #endif
 
 
@@ -388,7 +389,7 @@ int locinfo_defs(LOCINFO *lip)
 
 	if (lip->open.svars) {
 	    vecstr	*svp = &lip->svars ;
-	    const int	tlen = MAXPATHLEN ;
+	    cint	tlen = MAXPATHLEN ;
 	    char	tbuf[MAXPATHLEN+1] ;
 	    if ((rs >= 0) && (lip->svcfname == NULL)) {
 	        cchar	*fn = SVCCNAME ;
@@ -534,7 +535,7 @@ int locinfo_tmpourdir(LOCINFO *lip)
 	        cchar		*ourtmp = lip->tmpourdname ;
 	        if ((rs = u_stat(ourtmp,&usb)) >= 0) {
 	            if (S_ISDIR(usb.st_mode)) {
-	                const int	am = (R_OK|W_OK|X_OK) ;
+	                cint	am = (R_OK|W_OK|X_OK) ;
 	                rs = u_access(ourtmp,am) ;
 	            } else {
 	                rs = SR_NOTDIR ;
@@ -563,7 +564,7 @@ int locinfo_builtdname(LOCINFO *lip)
 	    cchar	*sn = pip->searchname ;
 	    char	tbuf[MAXPATHLEN+1] ;
 	    if ((rs = mkpath4(tbuf,pr,"lib",sn,"svcs")) >= 0) {
-	        const int	am = (R_OK|X_OK) ;
+	        cint	am = (R_OK|X_OK) ;
 	        pl = rs ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -616,7 +617,7 @@ int locinfo_msfile(LOCINFO *lip)
 	}
 
 	if (rs >= 0) {
-	    const int	am = (R_OK|W_OK) ;
+	    cint	am = (R_OK|W_OK) ;
 	    rs = perm(lip->msfname,-1,-1,NULL,am) ;
 	}
 
@@ -629,7 +630,7 @@ int locinfo_msfile(LOCINFO *lip)
 	    const uid_t	uid = getuid() ;
 	    const uid_t	euid = geteuid() ;
 	    if ((rs = u_creat(lip->msfname,msmode)) >= 0) {
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 	        if ((rs = uc_fminmod(fd,msmode)) >= 0) {
 	            if (uid == euid) { /* we are not running SUID */
 	                if ((rs = locinfo_rootids(lip)) >= 0) {
@@ -708,7 +709,7 @@ int locinfo_rootids(LOCINFO *lip)
 	    if ((rs = proginfo_rootname(pip)) >= 0) {
 		if ((rs = bufsizeget(bufsize_pw)) >= 0) {
 	            struct passwd	pw ;
-	            const int		pwlen = rs ;
+	            cint		pwlen = rs ;
 	            char		*pwbuf ;
 	            if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	                cchar	*rn = pip->rootname ;
@@ -755,7 +756,7 @@ int locinfo_nsbegin(LOCINFO *lip)
 	    MFSNS	*nop = &lip->ns ;
 	    cchar	*pr = pip->pr ;
 	    if ((rs = mfsns_open(nop,pr)) >= 0) {
-	        const int	no = MFSNS_ONOSERV ;
+	        cint	no = MFSNS_ONOSERV ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
 	            debugprintf("locinfo_nsbegin: mfsns_open() rs=%d\n",rs) ;
@@ -829,18 +830,18 @@ int locinfo_nslook(LOCINFO *lip,char *rbuf,int rlen,cchar *un,int w)
 int locinfo_maintourtmp(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	to = lip->intdirmaint ;
+	cint	to = lip->intdirmaint ;
 	int		rs = SR_OK ;
 	int		f ;
 	f = ((to > 0) && ((pip->daytime - lip->ti_tmpmaint) >= to)) ;
 	if (f || lip->fl.maint) {
 	    lip->ti_tmpmaint = pip->daytime ;
 	    if (lip->tmpourdname != NULL) {
-	        const int	to_client = lip->intclient ;
+	        cint	to_client = lip->intclient ;
 	        if (to_client > 0) {
 	            if ((rs = locinfo_maintourtmper(lip,to_client)) >= 0) {
 	                char	tbuf[TIMEBUFLEN+1] ;
-	                timestr_logz(pip->daytime,tbuf) ;
+	                strtime_logz(pip->daytime,tbuf) ;
 	                logprintf(pip,"%s maint-tmp",tbuf) ;
 	                if (pip->debuglevel > 0) {
 	                    cchar	*pn = pip->progname ;
@@ -966,7 +967,7 @@ int locinfo_varsub(LOCINFO *lip,char *rbuf,int rlen,cchar *sp,int sl)
 	int		rl = 0 ;
 	if (lip->open.subs) {
 	    varsub	*vsp = &lip->subs ;
-	    const int	vlen = VBUFLEN ;
+	    cint	vlen = VBUFLEN ;
 	    char	vbuf[VBUFLEN+1] ;
 	    if ((rs = varsub_exp(vsp,vbuf,vlen,sp,sl)) >= 0) {
 	        EXPCOOK	*ecp = &lip->cooks ;
@@ -988,7 +989,7 @@ int locinfo_daemonbegin(LOCINFO *lip)
 	if ((rs = envhelp_start(ehp,envbads,pip->envv)) >= 0) {
 	    VARSUB	*slp = &lip->subs ;
 	    if ((rs = locinfo_envdefs(lip)) >= 0) {
-	        const int	n = 250 ;
+	        cint	n = 250 ;
 	        lip->open.envs = TRUE ;
 	        if ((rs = varsub_start(slp,n)) >= 0) {
 	            cchar	**ev ;
@@ -1120,17 +1121,17 @@ int locinfo_getreqs(LOCINFO *lip)
 /* private subroutines */
 
 
-static int locinfo_envdefs(LOCINFO *lip)
+local int locinfo_envdefs(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	ENVHELP		*ehp = &lip->envs ;
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		i ;
 	for (i = 0 ; envdefs[i] != NULL ; i += 1) {
 	    cchar	*var = envdefs[i] ;
 	    if ((rs = envhelp_present(ehp,var,-1,NULL)) == rsn) {
-	        const int	kc = MKCHAR(var[0]) ;
+	        cint	kc = MKCHAR(var[0]) ;
 	        int		vl = -1 ;
 	        cchar		*vp = NULL ;
 	        switch (kc) {
@@ -1141,7 +1142,7 @@ static int locinfo_envdefs(LOCINFO *lip)
 	            if (strcmp(var,VARHOME) == 0) {
 	                vp = pip->homedname ;
 	            } else { /* HOST */
-	                const int	hlen = MAXHOSTNAMELEN ;
+	                cint	hlen = MAXHOSTNAMELEN ;
 	                cchar		*nn = pip->nodename ;
 	                cchar		*dn = pip->domainname ;
 	                char		hbuf[MAXHOSTNAMELEN+1] ;
@@ -1152,7 +1153,7 @@ static int locinfo_envdefs(LOCINFO *lip)
 	            break ;
 	        case 'P':
 	            if (var[1] == 'A') { /* PATH */
-	                const int	plen = (2*MAXPATHLEN) ;
+	                cint	plen = (2*MAXPATHLEN) ;
 	                char		*pbuf ;
 	                if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
 	                    if ((rs = uc_sysconfstr(_CS_PATH,pbuf,plen)) >= 0) {
@@ -1179,7 +1180,7 @@ static int locinfo_envdefs(LOCINFO *lip)
 /* end subroutine (locinfo_envdefs) */
 
 
-static int locinfo_cookbegin(LOCINFO *lip)
+local int locinfo_cookbegin(LOCINFO *lip)
 {
 	EXPCOOK		*ecp = &lip->cooks ;
 	int		rs ;
@@ -1196,7 +1197,7 @@ static int locinfo_cookbegin(LOCINFO *lip)
 /* end subroutine (locinfo_cookbegin) */
 
 
-static int locinfo_cookend(LOCINFO *lip)
+local int locinfo_cookend(LOCINFO *lip)
 {
 	EXPCOOK		*ecp = &lip->cooks ;
 	int		rs = SR_OK ;
@@ -1211,7 +1212,7 @@ static int locinfo_cookend(LOCINFO *lip)
 /* end subroutine (locinfo_cookend) */
 
 
-static int locinfo_cookload(LOCINFO *lip)
+local int locinfo_cookload(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	EXPCOOK		*cop = &lip->cooks ;
@@ -1257,7 +1258,7 @@ static int locinfo_cookload(LOCINFO *lip)
 	        break ;
 	    case cook_ncpu:
 	        {
-	            const int	dlen = DIGBUFLEN ;
+	            cint	dlen = DIGBUFLEN ;
 	            char	dbuf[DIGBUFLEN + 1] ;
 	            if (pip->ncpu >= 0) {
 	                rs = ctdeci(dbuf,dlen,pip->ncpu) ;
@@ -1309,7 +1310,7 @@ static int locinfo_cookload(LOCINFO *lip)
 	        break ;
 	    case cook_h:
 	        {
-	            const int	hnlen = MAXHOSTNAMELEN ;
+	            cint	hnlen = MAXHOSTNAMELEN ;
 	            cchar	*nn = pip->nodename ;
 	            cchar	*dn = pip->domainname ;
 	            char	hnbuf[MAXHOSTNAMELEN + 1] ;
@@ -1353,7 +1354,7 @@ static int locinfo_cookload(LOCINFO *lip)
 	        break ;
 	    case cook_oo:
 	        {
-	            const int	oolen = ORGLEN ;
+	            cint	oolen = ORGLEN ;
 	            int		i ;
 	            int		ch ;
 	            cchar	*o = pip->org ;
@@ -1429,7 +1430,7 @@ int locinfo_svend(LOCINFO *lip)
 /* end subroutine (locinfo_svend) */
 
 
-static int locinfo_svload(LOCINFO *lip)
+local int locinfo_svload(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	vecstr		*svp = &lip->svars ;
@@ -1440,7 +1441,7 @@ static int locinfo_svload(LOCINFO *lip)
 	cchar		*vp ;
 	char		ks[2] = { 0, 0 } ;
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
-	    const int	kch = MKCHAR(keys[i]) ;
+	    cint	kch = MKCHAR(keys[i]) ;
 	    vp = NULL ;
 	    vl = -1 ;
 	    switch (kch) {
@@ -1465,7 +1466,7 @@ static int locinfo_svload(LOCINFO *lip)
 /* end subroutine (locinfo_svload) */
 
 
-static int locinfo_cmdsbegin(LOCINFO *lip)
+local int locinfo_cmdsbegin(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.cmds) {
@@ -1479,7 +1480,7 @@ static int locinfo_cmdsbegin(LOCINFO *lip)
 /* end subroutine (locinfo_cmdsbegin) */
 
 
-static int locinfo_cmdsend(LOCINFO *lip)
+local int locinfo_cmdsend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1494,7 +1495,7 @@ static int locinfo_cmdsend(LOCINFO *lip)
 /* end subroutine (locinfo_cmdsend) */
 
 
-static int locinfo_pidlockbegin(LOCINFO *lip)
+local int locinfo_pidlockbegin(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1520,7 +1521,7 @@ static int locinfo_pidlockbegin(LOCINFO *lip)
 /* end subroutine (locinfo_pidlockbegin) */
 
 
-static int locinfo_pidlockend(LOCINFO *lip)
+local int locinfo_pidlockend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1535,7 +1536,7 @@ static int locinfo_pidlockend(LOCINFO *lip)
 /* end subroutine (locinfo_pidlockend) */
 
 
-static int locinfo_tmplockbegin(LOCINFO *lip)
+local int locinfo_tmplockbegin(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1580,7 +1581,7 @@ static int locinfo_tmplockbegin(LOCINFO *lip)
 /* end subroutine (locinfo_tmplockbegin) */
 
 
-static int locinfo_tmplockend(LOCINFO *lip)
+local int locinfo_tmplockend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1595,15 +1596,15 @@ static int locinfo_tmplockend(LOCINFO *lip)
 /* end subroutine (locinfo_tmplockend) */
 
 
-static int locinfo_genlockbegin(LOCINFO *lip,LFM *lfp,cchar *lfn)
+local int locinfo_genlockbegin(LOCINFO *lip,LFM *lfp,cchar *lfn)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
 	int		f = FALSE ;
 	if ((rs = locinfo_genlockdir(lip,lfn)) >= 0) {
 	    LFM_CHECK	lc ;
-	    const int	ltype = LFM_TRECORD ;
-	    const int	to_lock = lip->to_lock ;
+	    cint	ltype = LFM_TRECORD ;
+	    cint	to_lock = lip->to_lock ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*un = pip->username ;
 	    cchar	*bn = pip->banner ;
@@ -1630,7 +1631,7 @@ static int locinfo_genlockbegin(LOCINFO *lip,LFM *lfp,cchar *lfn)
 /* end subroutine (locinfo_genlockbegin) */
 
 
-static int locinfo_genlockend(LOCINFO *lip,LFM *lfp)
+local int locinfo_genlockend(LOCINFO *lip,LFM *lfp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1642,7 +1643,7 @@ static int locinfo_genlockend(LOCINFO *lip,LFM *lfp)
 /* end subroutine (locinfo_genlockend) */
 
 
-static int locinfo_genlockdir(LOCINFO *lip,cchar *lfn)
+local int locinfo_genlockdir(LOCINFO *lip,cchar *lfn)
 {
 	int		rs = SR_OK ;
 	if (lip == NULL) return SR_FAULT ;
@@ -1653,7 +1654,7 @@ static int locinfo_genlockdir(LOCINFO *lip,cchar *lfn)
 	        char	tbuf[MAXPATHLEN+1] ;
 	        if ((rs = mkpath1w(tbuf,cp,cl)) >= 0) {
 	            USTAT	usb ;
-	            const int	rsn = SR_NOENT ;
+	            cint	rsn = SR_NOENT ;
 	            if ((rs = u_stat(tbuf,&usb)) == rsn) {
 	                const mode_t	dm = 0777 ;
 	                rs = mkdirs(tbuf,dm) ;
@@ -1668,7 +1669,7 @@ static int locinfo_genlockdir(LOCINFO *lip,cchar *lfn)
 /* end subroutine (locinfo_genlockdir) */
 
 
-static int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
+local int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1696,7 +1697,7 @@ static int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
 	    cchar	*fmt ;
 
 	    fmt = "%s: %s lock %s\n" ;
-	    timestr_logz(pip->daytime,timebuf) ;
+	    strtime_logz(pip->daytime,timebuf) ;
 	    shio_printf(pip->efp,fmt,pn,timebuf,np) ;
 
 	    fmt = "%s: other_pid=%d\n" ;
@@ -1724,7 +1725,7 @@ static int locinfo_genlockprint(LOCINFO *lip,cchar *lfn,LFM_CHECK *lcp)
 /* end subroutine (locinfo_genlockprint) */
 
 
-static int locinfo_tmpourdname(LOCINFO *lip)
+local int locinfo_tmpourdname(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1754,7 +1755,7 @@ static int locinfo_tmpourdname(LOCINFO *lip)
 
 
 /* are we running with our username the same as our root name? */
-static int locinfo_runas(LOCINFO *lip)
+local int locinfo_runas(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		f = lip->fl.runasprn ;
@@ -1773,7 +1774,7 @@ static int locinfo_runas(LOCINFO *lip)
 /* end subroutine (locinfo_runas) */
 
 
-static int locinfo_chids(LOCINFO *lip,cchar *dname)
+local int locinfo_chids(LOCINFO *lip,cchar *dname)
 {
 	int		rs ;
 	if ((rs = locinfo_rootids(lip)) >= 0) {
@@ -1790,7 +1791,7 @@ static int locinfo_chids(LOCINFO *lip,cchar *dname)
 /* end subrutine (locinfo_chids) */
 
 
-static int locinfo_cookargsload(LOCINFO *lip,cchar **sav)
+local int locinfo_cookargsload(LOCINFO *lip,cchar **sav)
 {
 	EXPCOOK		*ecp = &lip->cooks ;
 	int		rs ;
@@ -1826,7 +1827,7 @@ static int locinfo_cookargsload(LOCINFO *lip,cchar **sav)
 /* end subrutine (locinfo_argsload) */
 
 
-static int locinfo_maintourtmper(LOCINFO *lip,int to_client)
+local int locinfo_maintourtmper(LOCINFO *lip,int to_client)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1847,7 +1848,7 @@ static int locinfo_maintourtmper(LOCINFO *lip,int to_client)
 
 
 #if	CF_DEBUGS && CF_DEBUGDUMP
-static int vecstr_dump(vecstr *dlp,cchar *id)
+local int vecstr_dump(vecstr *dlp,cchar *id)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
