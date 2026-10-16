@@ -72,7 +72,7 @@
 
 /* external subroutines */
 
-extern int	sfbasename(const char *,int,const char **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
 
 
 /* external variables */
@@ -80,14 +80,14 @@ extern int	sfbasename(const char *,int,const char **) ;
 
 /* forward references */
 
-static int	addsize() ;
+local int	addsize() ;
 
 
 /* exported subroutines */
 
 
 int checkname(name,sbp,ckp)
-const char	name[] ;
+cchar	name[] ;
 ustat	*sbp ;
 struct checkparams	*ckp ;
 {
@@ -164,7 +164,7 @@ struct checkparams	*ckp ;
 
 
 /* add up the size of this file to the total */
-static int addsize(gp,size)
+local int addsize(gp,size)
 struct global	*gp ;
 size_t		size ;
 {
