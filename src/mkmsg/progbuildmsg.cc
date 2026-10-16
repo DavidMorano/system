@@ -54,20 +54,23 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
-#include	<cstddef>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstrings>		/* for |strcasecmp(3c)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<sbuf.h>
 #include	<ema.h>
 #include	<mimetypes.h>
 #include	<paramopt.h>
-#include	<pcsconf.h>		/* for 'PCS_MSGIDLEN' */
+#include	<toxc.h>		/* LIBUC */
 #include	<dater.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
+#include	<pcsconf.h>		/* LIBPCS 'PCS_MSGIDLEN' */
 
 #include	"mailmsgatt.h"
 #include	"mailmsgattent.h"
@@ -94,31 +97,20 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-
 extern int	progouthead(PROGINFO *,bfile *,cchar *,cchar *,int) ;
-extern int	progoutheadema(PROGINFO *,bfile *,const char *,EMA *) ;
+extern int	progoutheadema(PROGINFO *,bfile *,cchar *,EMA *) ;
 extern int	progoutpart(PROGINFO *,bfile *,int,cchar *,MAILMSGATTENT *) ;
 
 extern int	mkmsgbound(PROGINFO *,char *,int) ;
 extern int	mkface(PROGINFO *,char *,int) ;
-extern int	outhead(PROGINFO *,bfile *,const char *,cchar *,int) ;
+extern int	outhead(PROGINFO *,bfile *,cchar *,cchar *,int) ;
 extern int	outheadema(PROGINFO *,bfile *,char *,EMA *) ;
 extern int	outpart(PROGINFO *,bfile *,int,char *,MAILMSGATTENT *ep) ;
-extern int	tolc(int) ;
 
 #ifdef	COMMENT
 extern int	outct(PROGINFO *,bfile *,MAILMSGATTENT *) ;
 extern int	outbase64(PROGINFO *,bfile *,char *,int) ;
 #endif /* COMMENT */
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*timestr_hdate(time_t,char *) ;
 
 
 /* external variables */
@@ -129,17 +121,19 @@ extern char	*timestr_hdate(time_t,char *) ;
 
 /* forward references */
 
-static int	progbuildmsghdrs(PROGINFO *,EMA *,paramopt *,int) ;
-static int	progbuildmsgothers(PROGINFO *,paramopt *,int) ;
-static int	printct(PROGINFO *,cchar *,cchar *,cchar *) ;
-static int	ishigh(int) ;
+local int	progbuildmsghdrs(PROGINFO *,EMA *,paramopt *,int) ;
+local int	progbuildmsgothers(PROGINFO *,paramopt *,int) ;
+local int	printct(PROGINFO *,cchar *,cchar *,cchar *) ;
+local int	ishigh(int) ;
 
 
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int progbuildmsg(pip,adds,hlp,mtp,iep,alp)
 PROGINFO	*pip ;
@@ -157,7 +151,7 @@ MAILMSGATT	*alp ;
 	int		wlen = 0 ;
 	int		f_multipart = FALSE ;
 	int		f_mime = pip->fl.mime ;
-	const char	*ccp ;
+	cchar	*ccp ;
 	char		msgbound[MSGBOUNDLEN + 1] ;
 
 #if	CF_DEBUG
@@ -325,7 +319,7 @@ MAILMSGATT	*alp ;
 #endif
 
 	    if (rs >= 0) {
-	        const char	*dis = pip->disclaimer ;
+	        cchar	*dis = pip->disclaimer ;
 
 	        if ((dis != NULL) && (dis[0] != '\0')) {
 	            bfile	dfile ;
@@ -409,7 +403,7 @@ MAILMSGATT	*alp ;
 /* local subroutines */
 
 
-static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,paramopt *hlp,int f_mime)
+local int progbuildmsghdrs(PROGINFO *pip,EMA *adds,paramopt *hlp,int f_mime)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -444,7 +438,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,paramopt *hlp,int f_mime)
 /* header-FACE */
 
 	if ((rs >= 0) && pip->fl.add_face) {
-	    const int	flen = FACEBUFLEN ;
+	    cint	flen = FACEBUFLEN ;
 	    char	fbuf[FACEBUFLEN + 1] ;
 	    fbuf[0] = '\0' ;
 	    if ((rs = mkface(pip,fbuf,flen)) > 0) { /* positive */
@@ -498,7 +492,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,paramopt *hlp,int f_mime)
 	} else if ((rs = paramopt_havekey(hlp,"date")) == 0) {
 	    f_date = TRUE ;
 	    if (pip->daytime == 0) pip->daytime = time(NULL) ;
-	    timestr_hdate(pip->daytime,timebuf) ;
+	    strtime_hdate(pip->daytime,timebuf) ;
 	    rs = bprintf(pip->ofp,"Date: %s\n",timebuf) ;
 	    wlen += rs ;
 	} /* end if (date handling) */
@@ -525,7 +519,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,paramopt *hlp,int f_mime)
 
 	if ((rs >= 0) && (pip->hdr_subject != NULL)) {
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((cl = sfshrink(pip->hdr_subject,-1,&cp)) > 0) {
 		kn = "Subject" ;
 	        rs = progouthead(pip,pip->ofp,kn,cp,cl) ;
@@ -589,7 +583,7 @@ static int progbuildmsghdrs(PROGINFO *pip,EMA *adds,paramopt *hlp,int f_mime)
 /* end subroutine (progbuildmsghdrs) */
 
 
-static int progbuildmsgothers(PROGINFO *pip,paramopt *hlp,int f_date)
+local int progbuildmsgothers(PROGINFO *pip,paramopt *hlp,int f_date)
 {
 	paramopt_cur	kcur, vcur ;
 	int		rs ;
@@ -629,7 +623,7 @@ static int progbuildmsgothers(PROGINFO *pip,paramopt *hlp,int f_date)
 #endif
 
 	                if (rs >= 0) {
-			    const int	kc = MKCHAR(kp[0]) ;
+			    cint	kc = MKCHAR(kp[0]) ;
 	                    if ((tolc(kc) != 'd') ||
 	                        (strcasecmp(kp,"date") != 0) ||
 	                        (! f_date)) {
@@ -660,7 +654,7 @@ static int progbuildmsgothers(PROGINFO *pip,paramopt *hlp,int f_date)
 /* end subroutine (progbuildmsgothers) */
 
 
-static int printct(PROGINFO *pip,cchar *kn,cchar *val,cchar *msgbound)
+local int printct(PROGINFO *pip,cchar *kn,cchar *val,cchar *msgbound)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -677,7 +671,7 @@ static int printct(PROGINFO *pip,cchar *kn,cchar *val,cchar *msgbound)
 /* end subroutine (printct) */
 
 
-static int ishigh(int ch)
+local int ishigh(int ch)
 {
 	return (ch & 0x80) ;
 }
