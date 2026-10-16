@@ -68,17 +68,17 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
 extern int	progfile(PROGINFO *,paramopt *,BDB *,CITEDB *,cchar *) ;
 extern int	progoutfin(PROGINFO *,BDB *,CITEDB *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -90,22 +90,22 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-int		findbibfile(PROGINFO *,paramopt *,const char *,char *) ;
+int		findbibfile(PROGINFO *,paramopt *,cchar *,char *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,bits *,paramopt *,
+local int	process(PROGINFO *,ARGINFO *,bits *,paramopt *,
 			cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,
+local int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,
 			BDB *,CITEDB *,cchar *) ;
-static int	procereport(PROGINFO *,int) ;
+local int	procereport(PROGINFO *,int) ;
 
-static int	loadbibfiles(PROGINFO *,paramopt *,BDB *) ;
+local int	loadbibfiles(PROGINFO *,paramopt *,BDB *) ;
 
 
 /* local variables */
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"mmcite",
 	NULL
 } ;
@@ -115,7 +115,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -169,7 +169,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"uniq",
 	"follow",
 	"nofollow",
@@ -211,15 +211,15 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pmspec = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pmspec = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -275,7 +275,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -503,7 +503,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -884,8 +884,8 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
-	        const char	*ids = "main" ;
+	        cint	size = (10*sizeof(uint)) ;
+	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
 	        debugprintf("main: MIoutnummax=%u\n",mi[ucmallreg_outnummax]) ;
@@ -938,7 +938,7 @@ int findbibfile(PROGINFO *pip,paramopt *app,cchar *fname,char *tmpfname)
 	if (fname[0] != '/') {
 	    USTAT		sb ;
 	    paramopt_cur	cur ;
-	    const char		*cp ;
+	    cchar		*cp ;
 
 	    rs = SR_NOENT ;
 	    tmpfname[0] = '\0' ;
@@ -970,12 +970,12 @@ int findbibfile(PROGINFO *pip,paramopt *app,cchar *fname,char *tmpfname)
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<file(s)> ...] [-af {<afile>|-}]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -990,11 +990,11 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 		cchar *ofn,cchar *afn)
 {
 	vecstr		*flp = &pip->filenames ;
-	const int	n = DEFNFILES ;
+	cint	n = DEFNFILES ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*pn = pip->progname ;
@@ -1042,7 +1042,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 		BDB *bdp,CITEDB *cdp,cchar *afn)
 {
 	int		rs = SR_OK ;
@@ -1081,7 +1081,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 	    if (afn[0] == '-') afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1139,7 +1139,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 /* end subroutine (procargs) */
 
 
-static int procereport(PROGINFO *pip,int prs)
+local int procereport(PROGINFO *pip,int prs)
 {
 	int		rs = SR_OK ;
 	cchar		*pn = pip->progname ;
@@ -1156,12 +1156,12 @@ static int procereport(PROGINFO *pip,int prs)
 /* end subroutine (procereport) */
 
 
-static int loadbibfiles(PROGINFO *pip,paramopt *app,BDB *bdbp)
+local int loadbibfiles(PROGINFO *pip,paramopt *app,BDB *bdbp)
 {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	const char	*po = PO_BIBFILE ;
+	cchar	*po = PO_BIBFILE ;
 
 	if ((rs = paramopt_havekey(app,po)) > 0) {
 	    paramopt_cur	cur ;
