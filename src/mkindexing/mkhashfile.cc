@@ -96,7 +96,7 @@ enum headers {
 
 /* forward references */
 
-static int showtable(cchar *,uint,int) noex ;
+local int showtable(cchar *,uint,int) noex ;
 
 
 /* local variables */
@@ -333,18 +333,18 @@ struct hashmap	*hmip ;
 
 #ifdef	COMMENT
 
-static int showtable(fname,taboff,tablen)
+local int showtable(fname,taboff,tablen)
 cchar	fname[] ;
 uint		taboff ;
 int		tablen ;
 {
-	const int	size = tablen * sizeof(uint) ;
+	cint	size = tablen * sizeof(uint) ;
 	off_t	uoff ;
 	uint		*ptab ;
 	int		rs ;
 	if ((rs = uc_malloc(size,&ptab)) >= 0) {
 	    if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	        const int	hfd = rs ;
+	        cint	hfd = rs ;
 	        off_t	uoff = taboff ;
 		int		i ;
 	        u_seek(hfd,uoff,SEEK_SET) ;
