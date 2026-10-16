@@ -78,13 +78,13 @@ extern int	strlinelen(cchar *,int,int) ;
 
 int		progconfigread(PROGINFO *) ;
 
-static int	progconfigreader(PROGINFO *,vecobj *,char *,int) ;
+local int	progconfigreader(PROGINFO *,vecobj *,char *,int) ;
 
-static int	proclistenadd(PROGINFO *,vecobj *,cchar *,int) ;
-static int	proclistenmerge(PROGINFO *,vecobj *) ;
-static int	proclistenpresent(PROGINFO *,vecobj *,LISTENSPEC *) ;
-static int	proclistentmpdel(PROGINFO *,vecobj *,int) ;
-static int	proclistenfins(PROGINFO *,vecobj *) ;
+local int	proclistenadd(PROGINFO *,vecobj *,cchar *,int) ;
+local int	proclistenmerge(PROGINFO *,vecobj *) ;
+local int	proclistenpresent(PROGINFO *,vecobj *,LISTENSPEC *) ;
+local int	proclistentmpdel(PROGINFO *,vecobj *,int) ;
+local int	proclistenfins(PROGINFO *,vecobj *) ;
 
 
 /* local variables */
@@ -349,7 +349,7 @@ int progconfigread(PROGINFO *pip)
 	    int		size = sizeof(LISTENSPEC) ;
 	    pip->changed.pc = TRUE ;
 	    if ((rs = vecobj_start(&tmplistens,size,6,0)) >= 0) {
-	        const int	plen = PBUFLEN ;
+	        cint	plen = PBUFLEN ;
 	        char		*pbuf ;
 	        size = (plen+1) ;
 	        if ((rs = uc_malloc(size,&pbuf)) >= 0) {
@@ -369,13 +369,13 @@ int progconfigread(PROGINFO *pip)
 /* end subroutine (progconfigread) */
 
 
-static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
+local int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 {
 	paramfile	*pfp = &pip->params ;
 	paramfile_cur	cur ;
 	paramfile_ent	pe ;
 	EXPCOOK		*ckp ;
-	const int	elen = EBUFLEN ;
+	cint	elen = EBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 = 0 ;
 	int		pi ;
@@ -681,7 +681,7 @@ static int progconfigreader(PROGINFO *pip,vecobj *tlp,char *pbuf,int plen)
 
 
 /* add a listener-specification to a temporary listen list */
-static int proclistenadd(PROGINFO *pip,vecobj *tlp,cchar *ebuf,int elen)
+local int proclistenadd(PROGINFO *pip,vecobj *tlp,cchar *ebuf,int elen)
 {
 	LISTENSPEC	ls ;
 	VECSTR		al, *alp = &al ;
@@ -748,7 +748,7 @@ static int proclistenadd(PROGINFO *pip,vecobj *tlp,cchar *ebuf,int elen)
 /* end subroutine (proclistenadd) */
 
 
-static int proclistenmerge(PROGINFO *pip,vecobj *tlp)
+local int proclistenmerge(PROGINFO *pip,vecobj *tlp)
 {
 	LISTENSPEC	*lsp ;
 	LISTENSPEC	*tlsp ;
@@ -802,7 +802,7 @@ static int proclistenmerge(PROGINFO *pip,vecobj *tlp)
 /* end subroutine (proclistenmerge) */
 
 
-static int proclistenpresent(PROGINFO *pip,vecobj *tlp,LISTENSPEC *lsp)
+local int proclistenpresent(PROGINFO *pip,vecobj *tlp,LISTENSPEC *lsp)
 {
 	LISTENSPEC	*tlsp ;
 	int		rs ;
@@ -821,7 +821,7 @@ static int proclistenpresent(PROGINFO *pip,vecobj *tlp,LISTENSPEC *lsp)
 /* end subroutine (proclistenpresent) */
 
 
-static int proclistentmpdel(PROGINFO *pip,vecobj *tlp,int ei)
+local int proclistentmpdel(PROGINFO *pip,vecobj *tlp,int ei)
 {
 	LISTENSPEC	*tlsp = NULL ;
 	int		rs ;
@@ -841,7 +841,7 @@ static int proclistentmpdel(PROGINFO *pip,vecobj *tlp,int ei)
 /* end subroutine (proclistentmpdel) */
 
 
-static int proclistenfins(PROGINFO *pip,vecobj *tlp)
+local int proclistenfins(PROGINFO *pip,vecobj *tlp)
 {
 	LISTENSPEC	*lsp ;
 	int		rs = SR_OK ;
