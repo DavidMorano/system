@@ -60,21 +60,21 @@
 /* external subroutines */
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
 /* forward references */
 
-static int	mfslisten_acqmerge(PROGINFO *,MFSLISTEN_ACQ *) ;
-static int	mfslisten_acqpresent(PROGINFO *,MFSLISTEN_ACQ *,LISTENSPEC *) ;
-static int	mfslisten_acqtmpdel(PROGINFO *,MFSLISTEN_ACQ *,int) ;
-static int	mfslisten_acqfins(PROGINFO *,MFSLISTEN_ACQ *) ;
-static int	mfslisten_delmarked(PROGINFO *,POLLER *) ;
-static int	mfslisten_hit(PROGINFO *,LISTENSPEC **,int,int) ;
-static int	mfslisten_new(PROGINFO *,int,int) ;
-static int	mfslisten_fins(PROGINFO *) ;
+local int	mfslisten_acqmerge(PROGINFO *,MFSLISTEN_ACQ *) ;
+local int	mfslisten_acqpresent(PROGINFO *,MFSLISTEN_ACQ *,LISTENSPEC *) ;
+local int	mfslisten_acqtmpdel(PROGINFO *,MFSLISTEN_ACQ *,int) ;
+local int	mfslisten_acqfins(PROGINFO *,MFSLISTEN_ACQ *) ;
+local int	mfslisten_delmarked(PROGINFO *,POLLER *) ;
+local int	mfslisten_hit(PROGINFO *,LISTENSPEC **,int,int) ;
+local int	mfslisten_new(PROGINFO *,int,int) ;
+local int	mfslisten_fins(PROGINFO *) ;
 
 
 /* local variables */
@@ -89,9 +89,9 @@ int mfslisten_begin(PROGINFO *pip)
 	int		rs = SR_OK ;
 	if (! lip->open.listens) {
 	    VECOBJ	*llp = &lip->listens ;
-	    const int	esize = sizeof(LISTENSPEC) ;
-	    const int	n = 4 ;
-	    const int	vo = 0 ;
+	    cint	esize = sizeof(LISTENSPEC) ;
+	    cint	n = 4 ;
+	    cint	vo = 0 ;
 	    if ((rs = vecobj_start(llp,esize,n,vo)) >= 0) {
 	        lip->open.listens = TRUE ;
 	    }
@@ -132,9 +132,9 @@ int mfslisten_acqbegin(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 	int		rs = SR_OK ;
 	if (pip->fl.daemon) {
 	    VECOBJ	*tlp = &acp->tmps ;
-	    const int	esize = sizeof(LISTENSPEC) ;
-	    const int	n = 4 ;
-	    const int	vo = 0 ;
+	    cint	esize = sizeof(LISTENSPEC) ;
+	    cint	n = 4 ;
+	    cint	vo = 0 ;
 	    rs = vecobj_start(tlp,esize,n,vo) ;
 	}
 #if	CF_DEBUG
@@ -270,7 +270,7 @@ int mfslisten_maint(PROGINFO *pip,POLLER *pmp)
 	    LISTENSPEC_INFO	li ;
 	    POLLER_SPEC		ps ;
 	    vecobj		*llp = &lip->listens ;
-	    const int		events = (POLLIN | POLLPRI) ;
+	    cint		events = (POLLIN | POLLPRI) ;
 	    int			i ;
 	    int			f_active ;
 	    int			f_broken ;
@@ -281,7 +281,7 @@ int mfslisten_maint(PROGINFO *pip,POLLER *pmp)
 	                f_active = (li.state & LISTENSPEC_MACTIVE) ;
 	                f_broken = (li.state & LISTENSPEC_MBROKEN) ;
 	                if ((! f_active) && (! f_broken)) {
-			    const int	f = TRUE ;
+			    cint	f = TRUE ;
 		            int		lo = 0 ;
 		            if (pip->fl.reuseaddr) {
 				lo |= LISTENSPEC_MREUSE ;
@@ -335,11 +335,11 @@ int mfslisten_poll(PROGINFO *pip,POLLER *pmp,int fd,int re)
 	    int			salen = sizeof(SOCKADDRESS) ;
 	    f = TRUE ;
 	    if ((rs = locinfo_getaccto(lip)) >= 0) { /* "accept" timeout */
-	        const int	to = rs ;
+	        cint	to = rs ;
 	        if ((rs = listenspec_accept(lsp,&sa,&salen,to)) >= 0) {
-	            const int	cfd = rs ;
+	            cint	cfd = rs ;
 		    if ((rs = listenspec_gettype(lsp)) >= 0) {
-			const int	stype = rs ; /* sub-type */
+			cint	stype = rs ; /* sub-type */
 		        if ((rs = mfslisten_new(pip,stype,cfd)) >= 0) {
 			    POLLER_SPEC	ps ;
 			    ps.fd = fd ;
@@ -379,7 +379,7 @@ int mfslisten_getinst(PROGINFO *pip,MFSLISTEN_INST *ip,int idx)
 /* local subroutines */
 
 
-static int mfslisten_acqmerge(PROGINFO *pip,MFSLISTEN_ACQ *acp)
+local int mfslisten_acqmerge(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 {
 	LOCINFO		*lip = pip->lip ;
 	VECOBJ		*tlp = &acp->tmps ;
@@ -442,7 +442,7 @@ static int mfslisten_acqmerge(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 /* end subroutine (mfslisten_acqmerge) */
 
 
-static int mfslisten_acqpresent(PROGINFO *pip,MFSLISTEN_ACQ *acp,
+local int mfslisten_acqpresent(PROGINFO *pip,MFSLISTEN_ACQ *acp,
 		LISTENSPEC *lsp)
 {
 	VECOBJ		*tlp = &acp->tmps ;
@@ -476,7 +476,7 @@ static int mfslisten_acqpresent(PROGINFO *pip,MFSLISTEN_ACQ *acp,
 /* end subroutine (mfslisten_acqpresent) */
 
 
-static int mfslisten_acqtmpdel(PROGINFO *pip,MFSLISTEN_ACQ *acp,int ei)
+local int mfslisten_acqtmpdel(PROGINFO *pip,MFSLISTEN_ACQ *acp,int ei)
 {
 	VECOBJ		*tlp = &acp->tmps ;
 	LISTENSPEC	*tlsp = NULL ;
@@ -499,7 +499,7 @@ static int mfslisten_acqtmpdel(PROGINFO *pip,MFSLISTEN_ACQ *acp,int ei)
 /* end subroutine (mfslisten_acqtmpdel) */
 
 
-static int mfslisten_acqfins(PROGINFO *pip,MFSLISTEN_ACQ *acp)
+local int mfslisten_acqfins(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 {
 	VECOBJ		*tlp = &acp->tmps ;
 	LISTENSPEC	*lsp ;
@@ -521,7 +521,7 @@ static int mfslisten_acqfins(PROGINFO *pip,MFSLISTEN_ACQ *acp)
 /* end subroutine (mfslisten_acqfins) */
 
 
-static int mfslisten_delmarked(PROGINFO *pip,POLLER *pmp)
+local int mfslisten_delmarked(PROGINFO *pip,POLLER *pmp)
 {
 	LOCINFO		*lip = pip->lip ;
 	LISTENSPEC	*lsp ;
@@ -559,7 +559,7 @@ static int mfslisten_delmarked(PROGINFO *pip,POLLER *pmp)
 
 
 /* ARGSUSED */
-static int mfslisten_hit(PROGINFO *pip,LISTENSPEC **rpp,int fd,int re)
+local int mfslisten_hit(PROGINFO *pip,LISTENSPEC **rpp,int fd,int re)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -591,7 +591,7 @@ static int mfslisten_hit(PROGINFO *pip,LISTENSPEC **rpp,int fd,int re)
 /* end subroutine (mfslisten_hit) */
 
 
-static int mfslisten_new(PROGINFO *pip,int stype,int fd)
+local int mfslisten_new(PROGINFO *pip,int stype,int fd)
 {
 	int		rs = SR_OK ;
 
@@ -601,7 +601,7 @@ static int mfslisten_new(PROGINFO *pip,int stype,int fd)
 #endif
 
 	if (pip->watch != NULL) {
-	    const int	jtype = jobtype_listen ;
+	    cint	jtype = jobtype_listen ;
 	    rs = mfswatch_newjob(pip,jtype,stype,fd,-1) ;
 	} else {
 	    u_close(fd) ;
@@ -616,7 +616,7 @@ static int mfslisten_new(PROGINFO *pip,int stype,int fd)
 /* end subroutine (mfslisten_new) */
 
 
-static int mfslisten_fins(PROGINFO *pip)
+local int mfslisten_fins(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
