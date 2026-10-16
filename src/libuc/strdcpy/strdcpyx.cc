@@ -47,7 +47,7 @@
 	I am using the new (rumored to be coming as a standard)
 	subroutine |strlcpy(3c)|.  I wrote my own version of this
 	until it gets into the standard libraries.  It might be in
-	someone's standard lirbrary already, but I do not have that
+	someone's standard library already, but I do not have that
 	in any of the operating systems I am working with.  And no,
 	I do not like the function signature of that new interface
 	(API).  I do not like it, but if it is going to become a
