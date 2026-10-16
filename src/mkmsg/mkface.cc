@@ -50,7 +50,7 @@
 #include	<sfx.h>
 #include	<mkpathx.h>
 #include	<isnot.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"config.h"
