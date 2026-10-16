@@ -41,8 +41,10 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
+/*----------------------------------------------------------------------------*/
 /* STRNLEN begin */
-#if	(!defined(SYSHAS_STRNLEN)) || (SYSHAS_STRNLEN == 0)
+#if	defined(SYSHAS_STRNLEN) && (SYSHAS_STRNLEN > 0)
+#else /* defined(SYSHAS_STRNLEN) && (SYSHAS_STRNLEN > 0) */
 
 #ifndef	DECLARATION_STRNLEN
 #define	DECLARATION_STRNLEN
@@ -51,11 +53,14 @@ extern int	strnlen(cchar *,size_t) noex ;
 EXTERNC_end
 #endif /* DECLARATION_STRNLEN */
 
-#endif /* (!defined(SYSHAS_STRNLEN)) || (SYSHAS_STRNLEN == 0) */
+#endif /* defined(SYSHAS_STRNLEN) && (SYSHAS_STRNLEN > 0) */
 /* STRNLEN end */
+/*----------------------------------------------------------------------------*/
 
+/*----------------------------------------------------------------------------*/
 /* STRLCPY begin */
-#if	(!defined(SYSHAS_STRLCPY)) || (SYSHAS_STRLCPY == 0)
+#if	defined(SYSHAS_STRLCPY) && (SYSHAS_STRLCPY > 0)
+#else /* defined(SYSHAS_STRLCPY) && (SYSHAS_STRLCPY > 0) */
 
 #ifndef	DECLARATION_STRLCPY
 #define	DECLARATION_STRLCPY
@@ -64,8 +69,9 @@ extern int	strlcpy(char *,cchar *,size_t) noex ;
 EXTERNC_end
 #endif /* DECLARATION_STRLCPY */
 
-#endif /* (!defined(SYSHAS_STRLCPY)) || (SYSHAS_STRLCPY == 0) */
+#endif /* defined(SYSHAS_STRLCPY) && (SYSHAS_STRLCPY > 0) */
 /* STRLCPY end */
+/*----------------------------------------------------------------------------*/
 
 
 #endif /* USYSLIBSTR_INCLUDE */
