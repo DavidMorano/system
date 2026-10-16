@@ -37,7 +37,7 @@
 
 struct event_head {
 	off_t	offset ;
-	const char	*citekey ;
+	cchar	*citekey ;
 } ;
 
 
@@ -47,9 +47,9 @@ struct event_head {
 extern "C" {
 #endif
 
-extern int	event_start(EVENT *,off_t,const char *) ;
+extern int	event_start(EVENT *,off_t,cchar *) ;
 extern int	event_offset(EVENT *,off_t *) ;
-extern int	event_citekey(EVENT *,const char **) ;
+extern int	event_citekey(EVENT *,cchar **) ;
 extern int	event_finish(EVENT *) ;
 
 #ifdef	__cplusplus
