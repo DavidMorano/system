@@ -88,29 +88,36 @@ extern "C" {
 
 /* local structures */
 
+namespace {
+    struct dstspan {
+	charp	dp ;
+	int	dl ;
+    } ; /* end struct (dstspan) */
+} /* end namespace */
+
 
 /* forward references */
 
-local inline char *cvtcpy(chtoxc_f cvt,char *dp,int &dl,cc *sp) noex {
-    	int dlx = dl ;
-	while (dlx && *sp) {
+local inline dstspan cvtcpy(chtoxc_f cvt,char *dp,int dl,cc *sp) noex {
+	while (dl && *sp) {
 	    *dp++ = cvt(*sp++) ;
-	    dlx -= 1 ;
+	    dl -= 1 ;
 	} /* end while */
-	dl = dlx ;
-	return dp ;
+	return { dp, dl } ;
 } /* end subroutine (cvtcpy) */
 
 local char *strbcpyxc(chtoxc_f cvt,char *dp,int dl,cchar *sp) noex {
     	if (dp && sp) ylikely {
+	    dstspan ds ;
 	    if (dl >= 0) {
-		dp = cvtcpy(cvt,dp,dl,sp) ;
+		ds = cvtcpy(cvt,dp,dl,sp) ;
+		dp = ds.dp ;
+		dl = ds.dl ;
 	        *dp = '\0' ;
 	        if ((dl == 0) && *sp) dp = nullptr ;
 	    } else {
 	        while (*sp) {
 	            *dp++ = cvt(*sp++) ;
-		    dl -= 1 ;
 	        } /* end while */
 	        *dp = '\0' ;
 	    } /* end if */
@@ -120,19 +127,63 @@ local char *strbcpyxc(chtoxc_f cvt,char *dp,int dl,cchar *sp) noex {
 	return dp ;
 } /* end subroutine (strbcpyxc) */
 
-local char *strbcpyxcx(chtoxc_f cvt,char *dp,int dl,int na,va_list ap) noex {
-	if (dp) ylikely {
-    	    bool fbad = false ;
-	    for (int i = 0 ; i < na ; i += 1) {
-	        ccp sp = (charp) va_arg(ap,charp) ;
-		dp = cvtcpy(cvt,dp,dl,sp) ;
-	        if ((fbad = ((dl == 0) && *sp))) break ;
-	    } /* end for */
-	    *dp = '\0' ;
-	    if (fbad) dp = nullptr ;
-	} /* end if (non-null) */
+namespace {
+    struct cvter {
+	chtoxc_f	cvt ;
+	charp		dp ;
+	int		dl ;
+	cvter(chtoxc_f ªf,charp ªdp,int ªdl) noex {
+	    cvt = ªf ;
+	    dp = ªdp ;
+	    dl = ªdl ;
+	} ; /* end ctor */
+	charp operator () (int,va_list) noex ;
+	charp cvtpos	(int,va_list) noex ;
+	charp cvtneg	(int,va_list) noex ;
+    } ; /* end struct (cvter) */
+} /* end namespace */
+
+charp cvter::cvtpos(int na,va_list ap) noex {
+	dstspan ds ;
+    	bool fbad = false ;
+	for (int i = 0 ; i < na ; i += 1) {
+	    ccp sp = (charp) va_arg(ap,charp) ;
+	    if (! sp) break ;
+	    ds = cvtcpy(cvt,dp,dl,sp) ;
+	    dp = ds.dp ;
+	    dl = ds.dl ;
+	    if ((fbad = ((dl == 0) && *sp))) break ;
+	} /* end for */
+	*dp = '\0' ;
+	if (fbad) dp = nullptr ;
 	return dp ;
-} /* end subroutine (strbcpyxcx) */
+} /* end method (cvter:cvtpos) */
+
+charp cvter::cvtneg(int na,va_list ap) noex {
+	dstspan ds ;
+	for (int i = 0 ; i < na ; i += 1) {
+	    ccp sp = (charp) va_arg(ap,charp) ;
+	    if (! sp) break ;
+	    ds = cvtcpy(cvt,dp,-1,sp) ;
+	    dp = ds.dp ;
+	} /* end for */
+	return dp ;
+} /* end method (cvter:cvtneg) */
+
+charp cvter::operator () (int na,va_list ap) noex {
+    	char *rp{} ;
+    	if (dl >= 0) {
+	    rp = cvtpos(na,ap) ;
+	} else {
+	    rp = cvtneg(na,ap) ;
+	} /* end if */
+	return rp ;
+} /* end method (cvter::operator) */
+
+local char *strbcpyxcx(chtoxc_f cvt,char *dp,int dl,int na,va_list ap) noex {
+    	cvter co(cvt,dp,dl) ;
+	return co(na,ap) ;
+} /* end subroutine */
 
 
 /* local variables */
