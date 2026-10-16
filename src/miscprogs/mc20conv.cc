@@ -57,7 +57,7 @@
 
 
 
-int main(int argc,const char **argv) {
+int main(int argc,cchar **argv) {
 	struct fh	st_fh ;
 	struct uh	st_uh ;
 	struct sh	st_sh[20] ;
