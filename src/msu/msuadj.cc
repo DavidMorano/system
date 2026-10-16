@@ -131,18 +131,18 @@ struct ipcmsginfo {
 
 /* forward references */
 
-static int	procipcreqother(PROGINFO *,int) ;
-static int	procipcreqmsg(PROGINFO *,int,MSFILE_ENT *) ;
-static int	procipcreqmsger(PROGINFO *,IPCMSGINFO *,MSFILE_ENT *,uint) ;
+local int	procipcreqother(PROGINFO *,int) ;
+local int	procipcreqmsg(PROGINFO *,int,MSFILE_ENT *) ;
+local int	procipcreqmsger(PROGINFO *,IPCMSGINFO *,MSFILE_ENT *,uint) ;
 
-static int	procipcreqmsg_getstatus(PROGINFO *,IPCMSGINFO *) ;
-static int	procipcreqmsg_getsysmisc(PROGINFO *,IPCMSGINFO *,MSFILE_ENT *) ;
-static int	procipcreqmsg_exit(PROGINFO *,IPCMSGINFO *) ;
-static int	procipcreqmsg_mark(PROGINFO *,IPCMSGINFO *) ;
-static int	procipcreqmsg_report(PROGINFO *,IPCMSGINFO *) ;
-static int	procipcreqmsg_invalid(PROGINFO *,IPCMSGINFO *) ;
+local int	procipcreqmsg_getstatus(PROGINFO *,IPCMSGINFO *) ;
+local int	procipcreqmsg_getsysmisc(PROGINFO *,IPCMSGINFO *,MSFILE_ENT *) ;
+local int	procipcreqmsg_exit(PROGINFO *,IPCMSGINFO *) ;
+local int	procipcreqmsg_mark(PROGINFO *,IPCMSGINFO *) ;
+local int	procipcreqmsg_report(PROGINFO *,IPCMSGINFO *) ;
+local int	procipcreqmsg_invalid(PROGINFO *,IPCMSGINFO *) ;
 
-static int	ipcmsginfo_init(struct ipcmsginfo *) ;
+local int	ipcmsginfo_init(struct ipcmsginfo *) ;
 
 
 /* local variables */
@@ -261,11 +261,11 @@ int procipcreq(PROGINFO *pip,int re,MSFILE_ENT *mep)
 /* local subroutines */
 
 
-static int procipcreqother(PROGINFO *pip,int re)
+local int procipcreqother(PROGINFO *pip,int re)
 {
 	int		rs = SR_OK ;
 	int		f_logged = FALSE ;
-	const char	*ccp = NULL ;
+	cchar	*ccp = NULL ;
 
 	if (re & POLLHUP) {
 	    ccp = "hangup" ;
@@ -289,7 +289,7 @@ static int procipcreqother(PROGINFO *pip,int re)
 /* end subroutine (procipcreqother) */
 
 
-static int procipcreqmsg(PROGINFO *pip,int re,MSFILE_ENT *mep)
+local int procipcreqmsg(PROGINFO *pip,int re,MSFILE_ENT *mep)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -298,7 +298,7 @@ static int procipcreqmsg(PROGINFO *pip,int re,MSFILE_ENT *mep)
 	if ((re & POLLIN) || (re & POLLPRI)) {
 	    IPCMSGINFO	mi, *mip = &mi ;
 	    MSGHDR	*mp ;
-	    const int	fdlen = sizeof(int) ;
+	    cint	fdlen = sizeof(int) ;
 	    int		*ip = NULL ;
 
 	    ipcmsginfo_init(mip) ;
@@ -358,7 +358,7 @@ static int procipcreqmsg(PROGINFO *pip,int re,MSFILE_ENT *mep)
 /* end subroutine (procipcreqmsg) */
 
 
-static int procipcreqmsger(PROGINFO *pip,IPCMSGINFO *mip,MSFILE_ENT *mep,
+local int procipcreqmsger(PROGINFO *pip,IPCMSGINFO *mip,MSFILE_ENT *mep,
 		uint mt)
 {
 	int		rs = SR_OK ;
@@ -391,12 +391,12 @@ static int procipcreqmsger(PROGINFO *pip,IPCMSGINFO *mip,MSFILE_ENT *mep,
 /* end subroutine (procipcreqmsger) */
 
 
-static int procipcreqmsg_getstatus(PROGINFO *pip,struct ipcmsginfo *mip)
+local int procipcreqmsg_getstatus(PROGINFO *pip,struct ipcmsginfo *mip)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_getstatus	m1 ;
 	LOCINFO		*lip = pip->lip ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs ;
 
 	if ((rs = msumsg_getstatus(&m1,1,mip->ipcbuf,ipclen)) >= 0) {
@@ -428,12 +428,12 @@ static int procipcreqmsg_getstatus(PROGINFO *pip,struct ipcmsginfo *mip)
 /* end subroutine (procipcreqmsg_getstatus) */
 
 
-static int procipcreqmsg_exit(PROGINFO *pip,struct ipcmsginfo *mip)
+local int procipcreqmsg_exit(PROGINFO *pip,struct ipcmsginfo *mip)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_exit	m3 ;
 	LOCINFO		*lip = pip->lip ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs ;
 
 	if ((rs = msumsg_exit(&m3,1,mip->ipcbuf,ipclen)) >= 0) {
@@ -463,13 +463,13 @@ static int procipcreqmsg_exit(PROGINFO *pip,struct ipcmsginfo *mip)
 /* end subroutine (procipcreqmsg_exit) */
 
 
-static int procipcreqmsg_mark(PROGINFO *pip,struct ipcmsginfo *mip)
+local int procipcreqmsg_mark(PROGINFO *pip,struct ipcmsginfo *mip)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_mark	m4 ;
 	LOCINFO		*lip = pip->lip ;
 	long		lw ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs ;
 
 	if ((rs = msumsg_mark(&m4,1,mip->ipcbuf,ipclen)) >= 0) {
@@ -504,12 +504,12 @@ static int procipcreqmsg_mark(PROGINFO *pip,struct ipcmsginfo *mip)
 /* end subroutine (procipcreqmsg_mark) */
 
 
-static int procipcreqmsg_report(PROGINFO *pip,struct ipcmsginfo *mip)
+local int procipcreqmsg_report(PROGINFO *pip,struct ipcmsginfo *mip)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_report	m5 ;
 	LOCINFO		*lip = pip->lip ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs ;
 
 	if ((rs = msumsg_report(&m5,1,mip->ipcbuf,ipclen)) >= 0) {
@@ -543,7 +543,7 @@ static int procipcreqmsg_report(PROGINFO *pip,struct ipcmsginfo *mip)
 /* end subroutine (procipcreqmsg_report) */
 
 
-static int procipcreqmsg_getsysmisc(pip,mip,mep)
+local int procipcreqmsg_getsysmisc(pip,mip,mep)
 PROGINFO		*pip ;
 struct ipcmsginfo	*mip ;
 MSFILE_ENT		*mep ;
@@ -551,7 +551,7 @@ MSFILE_ENT		*mep ;
 	struct msumsg_sysmisc		m6 ;
 	struct msumsg_getsysmisc	m2 ;
 	LOCINFO		*lip = pip->lip ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs ;
 
 	if ((rs = msumsg_getsysmisc(&m2,1,mip->ipcbuf,ipclen)) >= 0) {
@@ -588,13 +588,13 @@ MSFILE_ENT		*mep ;
 /* end subroutine (procipcreqmsg_getsysmisc) */
 
 
-static int procipcreqmsg_invalid(pip,mip)
+local int procipcreqmsg_invalid(pip,mip)
 PROGINFO		*pip ;
 struct ipcmsginfo	*mip ;
 {
 	struct msumsg_status	m0 ;
 	LOCINFO		*lip = pip->lip ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs ;
 
 /* response */
@@ -619,7 +619,7 @@ struct ipcmsginfo	*mip ;
 /* end subroutine (procipcreqmsg_invalid) */
 
 
-static int ipcmsginfo_init(mip)
+local int ipcmsginfo_init(mip)
 struct ipcmsginfo	*mip ;
 {
 	int		size ;
