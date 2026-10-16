@@ -139,24 +139,24 @@
 
 /* external subroutines */
 
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	mkpr(char *,int,cchar *,cchar *) ;
+extern int	pathclean(char *,cchar *,int) ;
 extern int	filer_writefill(FILER *,char *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -170,11 +170,11 @@ struct loadinfo_flags {
 } ;
 
 struct loadinfo {
-	const char	*pr ;
-	const char	*dbname ;
-	const char	*username ;
-	const char	*rn ;
-	const char	*prbuf ;
+	cchar	*pr ;
+	cchar	*dbname ;
+	cchar	*username ;
+	cchar	*rn ;
+	cchar	*prbuf ;
 	LOADINFO_FL	f ;
 	EXPCOOK		cooks ;
 	mode_t		om ;
@@ -183,31 +183,31 @@ struct loadinfo {
 
 /* forward references */
 
-static int	msuclient_setbegin(MSUCLIENT *,const char *) ;
-static int	msuclient_setend(MSUCLIENT *) ;
+local int	msuclient_setbegin(MSUCLIENT *,cchar *) ;
+local int	msuclient_setend(MSUCLIENT *) ;
 
-static int	msuclient_shmcreate(MSUCLIENT *,cchar *,mode_t) ;
-static int	msuclient_shmcreater(MSUCLIENT *,LOADINFO *,int,cchar *) ;
-static int	msuclient_shmdestroy(MSUCLIENT *) ;
-static int	msuclient_shmwr(MSUCLIENT *,int,mode_t) ;
+local int	msuclient_shmcreate(MSUCLIENT *,cchar *,mode_t) ;
+local int	msuclient_shmcreater(MSUCLIENT *,LOADINFO *,int,cchar *) ;
+local int	msuclient_shmdestroy(MSUCLIENT *) ;
+local int	msuclient_shmwr(MSUCLIENT *,int,mode_t) ;
 
-static int	msuclient_shmmapbegin(MSUCLIENT *,int) ;
-static int	msuclient_shmmapend(MSUCLIENT *) ;
+local int	msuclient_shmmapbegin(MSUCLIENT *,int) ;
+local int	msuclient_shmmapend(MSUCLIENT *) ;
 
-static int	msuclient_shmproc(MSUCLIENT *) ;
-static int	msuclient_shmverify(MSUCLIENT *,SYSMISCFH *) ;
+local int	msuclient_shmproc(MSUCLIENT *) ;
+local int	msuclient_shmverify(MSUCLIENT *,SYSMISCFH *) ;
 
-static int	msuclient_shmopenwait(MSUCLIENT *,cchar *,mode_t) ;
+local int	msuclient_shmopenwait(MSUCLIENT *,cchar *,mode_t) ;
 
-static int	loadinfo_start(LOADINFO *,cchar *,cchar *,mode_t) ;
-static int	loadinfo_finish(LOADINFO *) ;
-static int	loadinfo_expand(LOADINFO *,char *,const char *) ;
-static int	loadinfo_cookcheck(LOADINFO *,const char *) ;
-static int	loadinfo_rn(LOADINFO *) ;
-static int	loadinfo_username(LOADINFO *) ;
-static int	loadinfo_chown(LOADINFO *,int,int) ;
+local int	loadinfo_start(LOADINFO *,cchar *,cchar *,mode_t) ;
+local int	loadinfo_finish(LOADINFO *) ;
+local int	loadinfo_expand(LOADINFO *,char *,cchar *) ;
+local int	loadinfo_cookcheck(LOADINFO *,cchar *) ;
+local int	loadinfo_rn(LOADINFO *) ;
+local int	loadinfo_username(LOADINFO *) ;
+local int	loadinfo_chown(LOADINFO *,int,int) ;
 
-static int	getcookname(const char *,const char **) ;
+local int	getcookname(cchar *,cchar **) ;
 
 
 /* local variables */
@@ -365,7 +365,7 @@ int msuclient_get(MSUCLIENT *op,time_t dt,int to,MSUCLIENT_DATA *dp)
 /* local subroutines */
 
 
-static int msuclient_setbegin(MSUCLIENT *op,cchar *pr)
+local int msuclient_setbegin(MSUCLIENT *op,cchar *pr)
 {
 
 	op->pr = pr ;
@@ -374,7 +374,7 @@ static int msuclient_setbegin(MSUCLIENT *op,cchar *pr)
 /* end subroutine (msuclient_setbegin) */
 
 
-static int msuclient_setend(MSUCLIENT *op)
+local int msuclient_setend(MSUCLIENT *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -391,7 +391,7 @@ static int msuclient_setend(MSUCLIENT *op)
 /* end subroutine (msuclient_setend) */
 
 
-static int msuclient_shmcreate(MSUCLIENT *op,cchar *dbname,mode_t om)
+local int msuclient_shmcreate(MSUCLIENT *op,cchar *dbname,mode_t om)
 {
 	LOADINFO	li ;
 	int		rs ;
@@ -445,7 +445,7 @@ static int msuclient_shmcreate(MSUCLIENT *op,cchar *dbname,mode_t om)
 /* end subroutine (msuclient_shmcreate) */
 
 
-static int msuclient_shmcreater(MSUCLIENT *op,LOADINFO *lip,int shmi,
+local int msuclient_shmcreater(MSUCLIENT *op,LOADINFO *lip,int shmi,
 		cchar *shmname)
 {
 	ustat	sb ;
@@ -594,7 +594,7 @@ ret0:
 /* end subroutine (msuclient_shmcreater) */
 
 
-static int msuclient_shmdestroy(MSUCLIENT *op)
+local int msuclient_shmdestroy(MSUCLIENT *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -616,7 +616,7 @@ static int msuclient_shmdestroy(MSUCLIENT *op)
 /* end subroutine (msuclient_shmdestroy) */
 
 
-static int msuclient_shmwr(MSUCLIENT *op,int fd,mode_t om)
+local int msuclient_shmwr(MSUCLIENT *op,int fd,mode_t om)
 {
 	SYSMISCFH	hdr ;
 	FILER		babyfile ;
@@ -679,7 +679,7 @@ static int msuclient_shmwr(MSUCLIENT *op,int fd,mode_t om)
 /* end subroutine (msuclient_shmwr) */
 
 
-static int msuclient_shmopenwait(MSUCLIENT *op,cchar *shmname,mode_t om)
+local int msuclient_shmopenwait(MSUCLIENT *op,cchar *shmname,mode_t om)
 {
 	int		rs = SR_OK ;
 	int		oflags = O_RDWR ;
@@ -706,7 +706,7 @@ static int msuclient_shmopenwait(MSUCLIENT *op,cchar *shmname,mode_t om)
 /* end subroutine (msuclient_shmopenwait) */
 
 
-static int msuclient_shmmapbegin(MSUCLIENT *op,int fd)
+local int msuclient_shmmapbegin(MSUCLIENT *op,int fd)
 {
 	size_t		msize ;
 	int		rs = SR_OK ;
@@ -733,7 +733,7 @@ static int msuclient_shmmapbegin(MSUCLIENT *op,int fd)
 /* end subroutine (msuclient_shmmapbegin) */
 
 
-static int msuclient_shmmapend(MSUCLIENT *op)
+local int msuclient_shmmapend(MSUCLIENT *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -755,7 +755,7 @@ static int msuclient_shmmapend(MSUCLIENT *op)
 /* end subroutine (msuclient_shmmapend) */
 
 
-static int msuclient_shmproc(MSUCLIENT *op)
+local int msuclient_shmproc(MSUCLIENT *op)
 {
 	SYSMISCFH	hdr ;
 	int		rs ;
@@ -809,7 +809,7 @@ static int msuclient_shmproc(MSUCLIENT *op)
 /* end subroutine (msuclient_shmproc) */
 
 
-static int msuclient_shmverify(MSUCLIENT *op,SYSMISCFH *hp)
+local int msuclient_shmverify(MSUCLIENT *op,SYSMISCFH *hp)
 {
 	int		rs = SR_OK ;
 	int		f_stale = (hp->shmsize != op->shmsize) ;
@@ -823,7 +823,7 @@ static int msuclient_shmverify(MSUCLIENT *op,SYSMISCFH *hp)
 /* end subroutine (msuclient_shmverify) */
 
 
-static int msuclient_shmupdate(MSUCLIENT *op)
+local int msuclient_shmupdate(MSUCLIENT *op)
 {
 	pid_t		pid ;
 	int		rs = SR_OK ;
@@ -856,7 +856,7 @@ static int msuclient_shmupdate(MSUCLIENT *op)
 /* end subroutine (msuclient_shmupdate) */
 
 
-static int loadinfo_start(LOADINFO *lip,cchar *pr,cchar *dbname,mode_t om)
+local int loadinfo_start(LOADINFO *lip,cchar *pr,cchar *dbname,mode_t om)
 {
 	int		rs ;
 
@@ -877,7 +877,7 @@ static int loadinfo_start(LOADINFO *lip,cchar *pr,cchar *dbname,mode_t om)
 /* end subroutine (loadinfo_start) */
 
 
-static int loadinfo_finish(LOADINFO *lip)
+local int loadinfo_finish(LOADINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -908,7 +908,7 @@ static int loadinfo_finish(LOADINFO *lip)
 /* end subroutine (loadinfo_finish) */
 
 
-static int loadinfo_expand(LOADINFO *lip,char *shmname,cchar *template)
+local int loadinfo_expand(LOADINFO *lip,char *shmname,cchar *template)
 {
 	int		rs ;
 
@@ -921,7 +921,7 @@ static int loadinfo_expand(LOADINFO *lip,char *shmname,cchar *template)
 /* end subroutine (loadinfo_expand) */
 
 
-static int loadinfo_cookcheck(LOADINFO *lip,cchar *template)
+local int loadinfo_cookcheck(LOADINFO *lip,cchar *template)
 {
 	EXPCOOK		*ecp = &lip->cooks ;
 	int		rs = SR_OK ;
@@ -929,10 +929,10 @@ static int loadinfo_cookcheck(LOADINFO *lip,cchar *template)
 	int		cni ;
 	int		cnl ;
 	int		vl ;
-	const char	*sp ;
-	const char	*tp ;
-	const char	*cnp ;
-	const char	*vp ;
+	cchar	*sp ;
+	cchar	*tp ;
+	cchar	*cnp ;
+	cchar	*vp ;
 	char		cnbuf[CNBUFLEN + 1] ;
 
 	sp = template ;
@@ -993,13 +993,13 @@ static int loadinfo_cookcheck(LOADINFO *lip,cchar *template)
 /* end subroutine (loadinfo_cookcheck) */
 
 
-static int loadinfo_rn(lip)
+local int loadinfo_rn(lip)
 LOADINFO	*lip ;
 {
 	int		rs = SR_OK ;
 	int		bl ;
-	const char	*cp ;
-	const char	*bp ;
+	cchar	*cp ;
+	cchar	*bp ;
 
 	if (lip->rn != NULL) {
 	    bl = strlen(lip->rn) ;
@@ -1022,12 +1022,12 @@ ret0:
 /* end subroutine (loadinfo_rn) */
 
 
-static int loadinfo_username(lip)
+local int loadinfo_username(lip)
 LOADINFO	*lip ;
 {
 	int		rs = SR_OK ;
 	int		unl = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		userbuf[USERNAMELEN + 1] ;
 
 	if (lip->username == NULL) {
@@ -1048,15 +1048,15 @@ LOADINFO	*lip ;
 
 
 /* ARGSUSED */
-static int loadinfo_chown(lip,fd,shmi)
+local int loadinfo_chown(lip,fd,shmi)
 LOADINFO	*lip ;
 int		fd ;
 int		shmi ;
 {
 	struct passwd	pw ;
-	const int	pwlen = bufsizeget(bufsize_pw) ;
+	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs = SR_OK ;
-	const char	*sysuser = "sys" ;
+	cchar	*sysuser = "sys" ;
 	char		*pwbuf ;
 
 	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
@@ -1077,13 +1077,13 @@ int		shmi ;
 /* end subroutine (loadinfo_chown) */
 
 
-static int getcookname(sp,rpp)
-const char	*sp ;
-const char	**rpp ;
+local int getcookname(sp,rpp)
+cchar	*sp ;
+cchar	**rpp ;
 {
 	int		cnl = 1 ;
-	const char	*cnp ;
-	const char	*tp ;
+	cchar	*cnp ;
+	cchar	*tp ;
 
 	if (sp[0] == CH_LBRACK) {
 	    cnp = (sp + 1) ;
