@@ -53,6 +53,7 @@
 #include	<sbuf.h>
 #include	<realname.h>
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 
@@ -86,19 +87,18 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	bprintlns(bfile *,int,const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	bprintlns(bfile *,int,cchar *,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnbrk(const char *,int,const char *) ;
-extern int	strdcpy1w(char *,int,const char *,int) ;
-extern char	*timestr_log(time_t, char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnbrk(cchar *,int,cchar *) ;
+extern int	strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* external variables */
@@ -109,29 +109,29 @@ extern char	*timestr_log(time_t, char *) ;
 
 /* forward references */
 
-static int	sihyphen(const char *,int) ;
-static int	artdate(int,const char *,int,time_t *) ;
-static int	mkrealname(char *,int,const char *,int) ;
+local int	sihyphen(cchar *,int) ;
+local int	artdate(int,cchar *,int,time_t *) ;
+local int	mkrealname(char *,int,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*fulldays[] = {
+static cchar	*fulldays[] = {
 	"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
 	"Friday", "Saturday", NULL
 } ;
 
-static const char	*fullmonths[] = {
+static cchar	*fullmonths[] = {
 	"January", "February", "March", "April", "May", "June", 
 	"July", "August", "September", "October", "November", "December", 
 	NULL
 } ;
 
-static const char	*days[] = {
+static cchar	*days[] = {
 	"sun", "mon", "tue", "wed", "thu", "fri", "sat", NULL
 } ;
 
-static const char	*months[] = {
+static cchar	*months[] = {
 	"jan", "feb", "mar", "apr", "may", "jun", 
 	"jul", "aug", "sep", "oct", "nov", "dec", NULL
 } ;
@@ -153,7 +153,7 @@ enum states {
 int progfile(pip,pfp,fname)
 struct proginfo	*pip ;
 struct artinfo	*pfp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	ustat	sb ;
 
@@ -163,7 +163,7 @@ const char	fname[] ;
 
 	time_t	stime, dtime ;
 
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 
 	int	rs, rs1 ;
 	int	si, len, ml, cl, bl ;
@@ -176,7 +176,7 @@ const char	fname[] ;
 	int	f_blockquote = FALSE ;
 	int	f_artinfo = FALSE ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	buf[BUFLEN + 1] ;
 	char	lbuf[LINEBUFLEN + 1] ;
@@ -419,7 +419,7 @@ const char	fname[] ;
 	if (DEBUGLEVEL(3)) {
 	            debugprintf("progfile: uc_timelocal() rs=%d\n",rs) ;
 	            debugprintf("progfile: date=>%s<\n",
-	                timestr_log(pfp->date,timebuf)) ;
+	                strtime_log(pfp->date,timebuf)) ;
 	}
 #endif
 
@@ -624,8 +624,8 @@ const char	fname[] ;
 
 
 /* find string index of a hyphen (minus) character */
-static int sihyphen(s,sl)
-const char	s[] ;
+local int sihyphen(s,sl)
+cchar	s[] ;
 int		sl ;
 {
 	int	i ;
@@ -643,9 +643,9 @@ int		sl ;
 
 
 /* find a date for the article */
-static int artdate(cy,s,slen,rtp)
+local int artdate(cy,s,slen,rtp)
 int		cy ;
-const char	s[] ;
+cchar	s[] ;
 int		slen ;
 time_t		*rtp ;
 {
@@ -654,7 +654,7 @@ time_t		*rtp ;
 	int	rs, cl ;
 	int	mon, day, year ;
 
-	const char	*tp, *cp ;
+	cchar	*tp, *cp ;
 
 
 #if	CF_DEBUG
@@ -726,7 +726,7 @@ time_t		*rtp ;
 #endif
 
 	        slen -= (tp - s) ;
-	        s = (const char *) tp ;
+	        s = (cchar *) tp ;
 	        if ((slen > 0) && (! CHAR_ISWHITE(s[0]))) {
 	            s += 1 ;
 	            slen -= 1 ;
@@ -810,7 +810,7 @@ time_t		*rtp ;
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    debugprintf("artdate: uc_mktime() rs=%d\n",rs) ;
 	    debugprintf("artdate: date=>%s<\n",
-	        timestr_log(*rtp,timebuf)) ;
+	        strtime_log(*rtp,timebuf)) ;
 	}
 	    debugprintf("artdate: ret rs=%d\n",rs) ;
 #endif /* CF_DEBUG */
@@ -820,10 +820,10 @@ time_t		*rtp ;
 /* end subroutine (artdate) */
 
 
-static int mkrealname(namebuf,namelen,sp,sl)
+local int mkrealname(namebuf,namelen,sp,sl)
 char		namebuf[] ;
 int		namelen ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	REALNAME	rn ;
