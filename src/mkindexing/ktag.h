@@ -31,7 +31,7 @@ struct ktag_params {
 struct ktag_head {
 	KTAG_PARAMS	*kap ;
 	TXTINDEXMK_KEY	*tkeys ;	/* storage for TXTMKINDEXMK_ADDTAGS */
-	const char	*fname ;
+	cchar	*fname ;
 	vecobj		keys ;
 	vecstr		store ;
 	ulong		recoff ;
@@ -46,12 +46,12 @@ struct ktag_head {
 extern "C" {
 #endif
 
-extern int	ktag_start(KTAG *,KTAG_PARAMS *,uint,const char *,int) ;
-extern int	ktag_add(KTAG *,const char *,int) ;
-extern int	ktag_procline(KTAG *,const char *,int) ;
-extern int	ktag_procword(KTAG *,const char *,int) ;
+extern int	ktag_start(KTAG *,KTAG_PARAMS *,uint,cchar *,int) ;
+extern int	ktag_add(KTAG *,cchar *,int) ;
+extern int	ktag_procline(KTAG *,cchar *,int) ;
+extern int	ktag_procword(KTAG *,cchar *,int) ;
 extern int	ktag_mktag(KTAG *,uint,TXTINDEXMK_TAG *) ;
-extern int	ktag_storelc(KTAG *,const char **,const char *,int) ;
+extern int	ktag_storelc(KTAG *,cchar **,cchar *,int) ;
 extern int	ktag_finish(KTAG *) ;
 
 #ifdef	__cplusplus
