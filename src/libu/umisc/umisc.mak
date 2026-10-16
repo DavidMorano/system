@@ -42,15 +42,16 @@ LIBS +=
 
 OBJPART += umisc-mknpathx.o umisc-mknpathxw.o
 OBJPART += umisc-pathnadd.o umisc-snadd.o
+OBJPART += umisc-strw.o umisc-strbcpy.o
 
 OBJPRIME= umisc0.o
 
 OBJ00= umisc1.o umisc2.o umisc3.o
 OBJ01= umisc4.o umisc5.o umisc6.o
-OBJ02= 
+OBJ02= umisc%strw.o umisc%strbcpy.o
 OBJ03= 
 
-OBJA= obj00.o obj01.o
+OBJA= obj00.o obj01.o obj02.o
 OBJB= 
 OBJC= 
 OBJD= 
@@ -158,17 +159,11 @@ objimpl.o:		$(OBJIMPL)
 
 # module partitions
 umisc-mknpathx.o:	umisc-mknpathx.ccm
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
 umisc-mknpathxw.o:	umisc-mknpathxw.ccm
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
 umisc-pathnadd.o:	umisc-pathnadd.ccm
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
 umisc-snadd.o:		umisc-snadd.ccm
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
+umisc-strw.o:		umisc-strw.ccm
+umisc-strbcpy.o:	umisc-strbcpy.ccm
 
 # module primary
 umisc0.o:		umisc.ccm $(OBJPART)
@@ -176,24 +171,13 @@ umisc0.o:		umisc.ccm $(OBJPART)
 
 # module implementation
 umisc1.o:		umisc1.cc objprime.o
-	$(COMPILE.cc) $<
-
 umisc2.o:		umisc2.cc objprime.o
-	$(COMPILE.cc) $<
-
 umisc3.o:		umisc3.cc objprime.o
-	$(COMPILE.cc) $<
-
 umisc4.o:		umisc4.cc objprime.o
-	$(COMPILE.cc) $<
-
 umisc5.o:		umisc5.cc objprime.o
-	$(COMPILE.cc) $<
-
 umisc6.o:		umisc6.cc objprime.o
-	$(COMPILE.cc) $<
-
 umisc7.o:		umisc7.cc objprime.o
-	$(COMPILE.cc) $<
+umisc%strw.o:		umisc%strw.cc objprime.o
+umisc%strbcpy.o:	umisc%strbcpy.cc objprime.o
 
 
