@@ -49,7 +49,7 @@
 #include	<outline.h>
 #include	<strn.h>
 #include	<sfx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
@@ -90,10 +90,10 @@
 
 extern uint	uceil(uint,int) ;
 
-extern int	sncpy1(char *,int,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 
@@ -105,16 +105,16 @@ extern int	debugprintf(const char *,...) ;
 
 /* forward references */
 
-int		progprinthdremas(PROGINFO *,bfile *,const char *,EMA *) ;
+int		progprinthdremas(PROGINFO *,bfile *,cchar *,EMA *) ;
 
-static int	procprintline(PROGINFO *,bfile *,int,const char *,int) ;
+local int	procprintline(PROGINFO *,bfile *,int,cchar *,int) ;
 
 #ifdef	COMMENT
-static int	procoutvalue(PROGINFO *,bfile *,OUTLINE *,
-			const char *,int) ;
+local int	procoutvalue(PROGINFO *,bfile *,OUTLINE *,
+			cchar *,int) ;
 #endif
 
-static int	nexttoken(const char *,int,const char **) ;
+local int	nexttoken(cchar *,int,cchar **) ;
 
 
 /* local variables */
@@ -130,7 +130,7 @@ int progprinthdraddrs(PROGINFO *pip,bfile *ofp,MAILMSG *mp,cchar *hdr)
 	int		i ;
 	int		sl ;
 	int		wlen = 0 ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	if (ofp == NULL) return SR_FAULT ;
 	if (mp == NULL) return SR_FAULT ;
@@ -227,8 +227,8 @@ int progprinthdrs(PROGINFO *pip,bfile *ofp,MAILMSG *mp,cchar *hdr)
 	int		olenr ;
 	int		sl, cl ;
 	int		wlen = 0 ;
-	const char	*sp ;
-	const char	*cp ;
+	cchar	*sp ;
+	cchar	*cp ;
 
 	if (mp == NULL) return SR_FAULT ;
 	if (hdr == NULL) return SR_FAULT ;
@@ -350,9 +350,9 @@ int progprinthdr(PROGINFO *pip,bfile *ofp,cchar *hdr,cchar *vp,int vl)
 
 
 /* output a header line (and do some safety checking along the way) */
-static int procprintline(PROGINFO *pip,bfile *ofp,int olenr,cchar *lp,int ll)
+local int procprintline(PROGINFO *pip,bfile *ofp,int olenr,cchar *lp,int ll)
 {
-	const int	linewidth = MAILMSGLINELEN ;
+	cint	linewidth = MAILMSGLINELEN ;
 	int		rs = SR_OK ;
 	int		li ;
 	int		tl, cl ;
@@ -362,7 +362,7 @@ static int procprintline(PROGINFO *pip,bfile *ofp,int olenr,cchar *lp,int ll)
 	int		wlen = 0 ;
 	int		f_rmwhite = TRUE ;
 	int		f_badchar = FALSE ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -486,15 +486,15 @@ static int procprintline(PROGINFO *pip,bfile *ofp,int olenr,cchar *lp,int ll)
 #ifdef	COMMENT
 
 /* output a single value for a header (folding lines as needed) */
-static int procoutvalue(PROGINFO *pip,bfile *ofp,OUTLINE *ldp,cchar *v,int vlen)
+local int procoutvalue(PROGINFO *pip,bfile *ofp,OUTLINE *ldp,cchar *v,int vlen)
 {
 	int		rs = SR_OK ;
 	int		nlen ;
 	int		wlen = 0 ;
 	int		cl, cl2 ;
 	int		f_linestart = FALSE ;
-	const char	*fmt ;
-	const char	*tp, *cp ;
+	cchar	*fmt ;
+	cchar	*tp, *cp ;
 
 	if (ldp == NULL)
 	    return SR_INVALID ;
@@ -546,7 +546,7 @@ static int procoutvalue(PROGINFO *pip,bfile *ofp,OUTLINE *ldp,cchar *v,int vlen)
 #endif /* COMMENT */
 
 
-static int nexttoken(cchar *sp,int sl,cchar **rpp)
+local int nexttoken(cchar *sp,int sl,cchar **rpp)
 {
 	int		len = 0 ;
 	*rpp = sp ;
