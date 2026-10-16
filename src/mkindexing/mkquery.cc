@@ -89,12 +89,12 @@ extern int	progexit(PROGINFO *) ;
 
 /* forward references */
 
-static int	procdb(PROGINFO *,ARGINFO *,bfile *,cchar *) ;
+local int	procdb(PROGINFO *,ARGINFO *,bfile *,cchar *) ;
 
-static int	procspecs(PROGINFO *,bfile *,TEXTLOOK *,cchar *,int) ;
-static int	procspec(PROGINFO *,bfile *,TEXTLOOK *,vecstr *) ;
+local int	procspecs(PROGINFO *,bfile *,TEXTLOOK *,cchar *,int) ;
+local int	procspec(PROGINFO *,bfile *,TEXTLOOK *,vecstr *) ;
 
-static int	procout(PROGINFO *,bfile *,TEXTLOOK_TAG *) ;
+local int	procout(PROGINFO *,bfile *,TEXTLOOK_TAG *) ;
 
 
 /* local variables */
@@ -169,7 +169,7 @@ cchar	ofname[] ;
 /* local subroutines */
 
 
-static int procdb(pip,aip,ofp,dbname)
+local int procdb(pip,aip,ofp,dbname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bfile		*ofp ;
@@ -327,7 +327,7 @@ ret0:
 /* end subroutine (procdb) */
 
 
-static int procspecs(pip,ofp,tlp,sp,sl)
+local int procspecs(pip,ofp,tlp,sp,sl)
 PROGINFO	*pip ;
 bfile		*ofp ;
 TEXTLOOK	*tlp ;
@@ -385,7 +385,7 @@ int		sl ;
 /* end subroutine (procspecs) */
 
 
-static int procspec(pip,ofp,tlp,qsp)
+local int procspec(pip,ofp,tlp,qsp)
 PROGINFO	*pip ;
 bfile		*ofp ;
 TEXTLOOK	*tlp ;
@@ -447,7 +447,7 @@ vecstr		*qsp ;
 }
 /* end subroutine (procspec) */
 
-static int procout(PROGINFO *pip,bfile *ofp,TEXTLOOK_TAG *tagp) noex {
+local int procout(PROGINFO *pip,bfile *ofp,TEXTLOOK_TAG *tagp) noex {
 	uint		recoff ;
 	uint		reclen ;
 	cint	olen = OUTBUFLEN ;
