@@ -112,10 +112,9 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf && spathbuf) ylikely {
-	    rbuf[0] = '\0' ;
+	    rbuf[0] = eos ;
 	    if ((rs = maxpathlen) >= 0) ylikely {
-		cint	rlen = rs ;
-	        rs = pathnclean(rbuf,rlen,spathbuf,spathlen) ;
+	        rs = pathnclean(rbuf,rs,spathbuf,spathlen) ;
 		len = rs ;
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
@@ -140,7 +139,7 @@ local int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
                     f_prev = true ;
                     if (*pp == '/') {
                         rs = pb.chr('/') ;
-                    }
+                    } /* end */
                 } /* end if */
                 if (rs >= 0) ylikely {
                     cchar       *cp{} ;
@@ -204,7 +203,7 @@ int pathbuf::finish() noex {
 	if ((rs = PATHBUF_IDX) >= 0) ylikely {
 	    char	*bp = (PATHBUF_BUFP + PATHBUF_IDX) ;
 	    len = PATHBUF_IDX ;
-	    *bp = '0' ;			/* NUL-terminate */
+	    *bp = eos ;			/* NUL-terminate */
 	    PATHBUF_BUFP = nullptr ;
 	    PATHBUF_BUFPL = 0 ;
 	    PATHBUF_IDX = SR_NOTOPEN ;
