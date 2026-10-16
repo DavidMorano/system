@@ -131,7 +131,7 @@ namespace {
 /* local variables */
 
 constinit timemgr	timeout_data ;
-static initer		init_data ;
+local initer		init_data ;
 
 
 /* exported variables */
