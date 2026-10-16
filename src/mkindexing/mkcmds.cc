@@ -24,7 +24,7 @@
 #include	"mkcmds.h"
 
 
-const char	*mkcmds[] = {
+cchar	*mkcmds[] = {
 	[mkcmd_minwordlen] = "minwordlen",
 	[mkcmd_maxwordlen] = "maxwordlen",
 	[mkcmd_eigenwords] = "eigenwords",
