@@ -58,10 +58,10 @@
 
 /* imported namespaces */
 
-using libu::chtobc ;
-using libu::chtolc ;
-using libu::chtouc ;
-using libu::chtofc ;
+using libu::chtobc ;			/* subroutine */
+using libu::chtolc ;			/* subroutine */
+using libu::chtouc ;			/* subroutine */
+using libu::chtofc ;			/* subroutine */
 
 
 /* local typedefs */
