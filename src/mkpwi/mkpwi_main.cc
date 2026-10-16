@@ -102,21 +102,21 @@ extern int	nprintf(cchar *,cchar *,...) ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procdbname(PROGINFO *pip) ;
-static int	procvardname(PROGINFO *,char *) ;
-static int	proclogresult(PROGINFO *,int) ;
+local int	procdbname(PROGINFO *pip) ;
+local int	procvardname(PROGINFO *,char *) ;
+local int	proclogresult(PROGINFO *,int) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
 
 #if	CF_KSHLOGID
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 #endif
 
-static int	procout_begin(PROGINFO *,cchar *) ;
-static int	procout_end(PROGINFO *) ;
+local int	procout_begin(PROGINFO *,cchar *) ;
+local int	procout_end(PROGINFO *) ;
 
 
 /* local variables */
@@ -900,7 +900,7 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -924,7 +924,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procdbname(PROGINFO *pip)
+local int procdbname(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	cchar		*pn = pip->progname ;
@@ -964,7 +964,7 @@ static int procdbname(PROGINFO *pip)
 /* end subroutine (procdbname) */
 
 
-static int procvardname(PROGINFO *pip,char *dbuf)
+local int procvardname(PROGINFO *pip,char *dbuf)
 {
 	int		rs ;
 	cchar		*pwi = PWIDNAME ;
@@ -996,7 +996,7 @@ static int procvardname(PROGINFO *pip,char *dbuf)
 /* end subroutine (procvardname) */
 
 
-static int proclogresult(PROGINFO *pip,int res)
+local int proclogresult(PROGINFO *pip,int res)
 {
 	int		rs = SR_OK ;
 	cchar		*pn = pip->progname ;
@@ -1018,7 +1018,7 @@ static int proclogresult(PROGINFO *pip,int res)
 /* end subroutine (proclogresult) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1067,7 +1067,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1079,7 +1079,7 @@ static int procuserinfo_end(PROGINFO *pip)
 
 
 #if	CF_KSHLOGID
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -1111,7 +1111,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 #endif /* CF_KSHLOGID */
 
 
-static int procout_begin(PROGINFO *pip,cchar *ofn)
+local int procout_begin(PROGINFO *pip,cchar *ofn)
 {
 	int		rs = SR_OK ;
 	if (pip->verboselevel > 1) {
@@ -1134,7 +1134,7 @@ static int procout_begin(PROGINFO *pip,cchar *ofn)
 /* end subroutine (procout_begin) */
 
 
-static int procout_end(PROGINFO *pip)
+local int procout_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
