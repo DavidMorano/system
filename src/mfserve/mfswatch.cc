@@ -94,6 +94,7 @@
 #include	<spawnproc.h>
 #include	<filer.h>
 #include	<strx.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -466,7 +467,7 @@ local int mfswatch_configmaint(PROGINFO *pip)
 	        if ((rs = config_check(cfp)) > 0) {
 	            cchar	*fmt = "%s configuration data-base changed\n" ;
 	            char	tbuf[TIMEBUFLEN+1] ;
-	            timestr_logz(pip->daytime,tbuf) ;
+	            strtime_logz(pip->daytime,tbuf) ;
 	            rs = logprintf(pip,fmt,tbuf) ;
 	        }
 	    }
@@ -1191,7 +1192,7 @@ local int mfswatch_tabsmaint(PROGINFO *pip)
 	    if ((rs = svcfile_check(sfp,pip->daytime)) > 0) {
 	        cchar	*fmt = "%s service data-base changed\n" ;
 	        char	tbuf[TIMEBUFLEN+1] ;
-	        timestr_logz(pip->daytime,tbuf) ;
+	        strtime_logz(pip->daytime,tbuf) ;
 	        rs = logprintf(pip,fmt,tbuf) ;
 	    }
 	}
@@ -1491,7 +1492,7 @@ local int mfswatch_builtmaint(PROGINFO *pip)
 	    if ((rs = mfsbuilt_check(blp,pip->daytime)) > 0) {
 	        cchar	*fmt = "%s built-in modules changed\n" ;
 	        char	tbuf[TIMEBUFLEN+1] ;
-	        timestr_logz(pip->daytime,tbuf) ;
+	        strtime_logz(pip->daytime,tbuf) ;
 	        rs = logprintf(pip,fmt,tbuf) ;
 	    }
 	}
@@ -2167,7 +2168,7 @@ local int mfswatch_jobretire(PROGINFO *pip,SREQ *jep)
 	    SREQDB	*dbp = &wip->reqs ;
 	    cchar	*fmt = "%s done" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
-	    timestr_logz(pip->daytime,tbuf) ;
+	    strtime_logz(pip->daytime,tbuf) ;
 	    logssprintf(pip,jep->logid,fmt,tbuf) ;
 	    rs = sreqdb_delobj(dbp,jep) ;
 	}
@@ -2354,7 +2355,7 @@ local int mfswatch_logprogres(PROGINFO *pip,int jsn,cchar *lid,
 #endif
 
 	if (lid == NULL) lid = "orgphan" ;
-	timestr_logz(pip->daytime,timebuf) ;
+	strtime_logz(pip->daytime,timebuf) ;
 
 	if (WIFEXITED(cs)) {
 
@@ -2444,7 +2445,7 @@ local int mfswatch_logprogchild(PROGINFO *pip,SREQ *jep)
 	if (DEBUGLEVEL(4))
 	    debugprintf("mfswatch_logprogchild: logoutfile() rs=%d\n",rs) ;
 #endif
-	    timestr_elapsed((pip->daytime - jep->stime), timebuf) ;
+	    strtime_elapsed((pip->daytime - jep->stime), timebuf) ;
 	    logssprintf(pip,lid,"elapsed time %s\n",timebuf) ;
 	} /* end if (have logging) */
 #if	CF_DEBUG
@@ -2463,7 +2464,7 @@ local int mfswatch_logconn(PROGINFO *pip,int jsn,int jt,int st,cchar *lid)
 	cchar		*fmt ;
 	char		tbuf[TIMEBUFLEN+1] ;
 	fmt = "%s connect jtype=%u stype=%u" ;
-	timestr_logz(pip->daytime,tbuf) ;
+	strtime_logz(pip->daytime,tbuf) ;
 	logssprintf(pip,lid,fmt,tbuf,jt,st) ;
 	return rs ;
 }
