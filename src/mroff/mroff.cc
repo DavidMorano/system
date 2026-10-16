@@ -2,48 +2,49 @@
 
 /* format a file into double mini-style pages for a printer */
 
-
 #define	CF_DEBUG	1
-
 
 /* revision history:
 
-	= 87/09/10, David A­D­ Morano
+	= 1987-09=10, David A­D­ Morano
 	This code was originally written.
 
-	= 98/02/27, David A­D­ Morano
+	= 1998-02-27, David A­D­ Morano
 	This subroutine has been enhanced from the original MROFF
 	program to work with the new one which can provide
 	a non-standard print-out page header.
 
-
 */
 
+/* Copyright © 1987,1998 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
-/*******************************************************************
+/*******************************************************************************
 
+  	Description:
 	This subroutine will read the input file and format it into
 	TROFF constant width font style input.
 
+*******************************************************************************/
 
-*********************************************************************/
-
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
 #include	<ctime>
-
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"mroff.h"
-
 
 
 /* local defines */
@@ -54,7 +55,6 @@
 #define	MAXBS		20
 
 
-
 /* external subroutines */
 
 
@@ -63,14 +63,14 @@
 
 /* forward references */
 
-static int	scanc() ;
+local int	scanc() ;
 
 
 /* local data */
 
 static char	lbuf[MAXLINES][LINELEN + MAXBS + 3] ;
 
-static int	llen[MAXLINES] ;
+local int	llen[MAXLINES] ;
 
 
 
@@ -226,7 +226,7 @@ next_page:
 	        if (rop->fl.headers) {
 
 	            len2 = sprintf(headline,headerstring,
-	                timestr_edate(sb.st_mtime,timebuf),page) ;
+	                strtime_edate(sb.st_mtime,timebuf),page) ;
 
 	            strncpy(headline + len2,blankline,40) ;
 
@@ -276,7 +276,7 @@ next_page:
 	            if (rop->fl.headers) {
 
 	                len2 = sprintf(headline,"%s Reference %3d",
-	                    timestr_edate(sb.st_mtime,timebuf),page) ;
+	                    strtime_edate(sb.st_mtime,timebuf),page) ;
 
 	                strncpy(headline + len2,blankline,40) ;
 
@@ -342,7 +342,7 @@ next_page:
 	        if (rop->fl.headers) {
 
 	            len2 = sprintf(headline,headerstring,
-	                timestr_edate(sb.st_mtime,timebuf),page) ;
+	                strtime_edate(sb.st_mtime,timebuf),page) ;
 
 	            strncpy(headline + len2,blankline,40) ;
 
@@ -424,7 +424,7 @@ done:
 /* end subroutine (mroff) */
 
 
-static int scanc(buf,c,n)
+local int scanc(buf,c,n)
 int	n ;
 char	*buf, c ;
 {
