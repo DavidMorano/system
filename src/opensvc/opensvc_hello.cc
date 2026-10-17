@@ -24,12 +24,12 @@
 	Synopsis:
 
 	int opensvc_hello(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -88,19 +88,19 @@
 
 
 int opensvc_hello(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
 	int		pipes[2] ;
 	int		fd = -1 ;
 	int		sl = -1 ;
-	const char	*sp = "hello world!\n" ;
+	cchar	*sp = "hello world!\n" ;
 
 	if ((rs = u_pipe(pipes)) >= 0) {
 	    int	wfd = pipes[1] ;
