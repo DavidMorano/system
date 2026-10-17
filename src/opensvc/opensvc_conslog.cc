@@ -27,12 +27,12 @@
 
 	Synopsis:
 	int opensvc_conslog(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -94,13 +94,13 @@
 
 /* forward references */
 
-static int worker(int,int,int) ;
-static int conswrite(int,int,int,const char *,int) ;
+local int worker(int,int,int) ;
+local int conswrite(int,int,int,cchar *,int) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"sn",
 	NULL
@@ -117,17 +117,17 @@ enum argopts {
 
 
 int opensvc_conslog(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	bits		pargs ;
 	keyopt		akopts ;
-	const int	am = (of & O_ACCMODE) ;
+	cint	am = (of & O_ACCMODE) ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -140,12 +140,12 @@ int		to ;
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_akopts = FALSE ;
 	int		f ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*sn = "conslog" ;
-	const char	*facspec = NULL ;
-	const char	*prispec = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*sn = "conslog" ;
+	cchar	*facspec = NULL ;
+	cchar	*prispec = NULL ;
+	cchar	*cp ;
 
 	if (argv != NULL) {
 	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
@@ -173,7 +173,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int ach = MKCHAR(argp[1]) ;
+		cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -246,7 +246,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -344,7 +344,7 @@ int		to ;
 
 	if (rs >= 0) {
 	if ((rs = u_pipe(pipes)) >= 0) {
-	    const int	rfd = pipes[0] ; /* read end */
+	    cint	rfd = pipes[0] ; /* read end */
 	    fd = pipes[1] ; /* write end */
 
 	    if ((rs = uc_fork()) == 0) worker(rfd,fac,pri) ;
@@ -370,7 +370,7 @@ badpargs:
 
 /* local subroutines */
 
-static int worker(int rfd,int fac,int pri) noex {
+local int worker(int rfd,int fac,int pri) noex {
 	const mode_t	om = 0666 ;
 	cint		of = O_WRONLY ;
 	int		rs ;
@@ -411,11 +411,11 @@ static int worker(int rfd,int fac,int pri) noex {
 /* end subroutine (worker) */
 
 
-static int conswrite(fd,logfac,logpri,bp,bl)
+local int conswrite(fd,logfac,logpri,bp,bl)
 int		fd ;
 int		logfac ;
 int		logpri ;
-const char	bp[] ;
+cchar	bp[] ;
 int		bl ;
 {
 	struct strbuf	cmsg, dmsg ;
