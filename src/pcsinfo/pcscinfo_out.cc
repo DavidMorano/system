@@ -26,8 +26,8 @@
 	int outhead(pip,ofp,name,v,vlen)
 	struct proginfo	*pip ;
 	bfile		*ofp ;
-	const char	name[] ;
-	const char	v[] ;
+	cchar	name[] ;
+	cchar	v[] ;
 	int		vlen ;
 
 
@@ -37,7 +37,7 @@
 	int outheadema(pip,ofp,name,ap)
 	struct proginfo	*pip ;
 	bfile		*ofp ;
-	const char	name[] ;
+	cchar	name[] ;
 	EMA		*ap ;
 
 
@@ -103,9 +103,9 @@
 
 /* external subroutines */
 
-extern int	nextfield(const char *,int,const char **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -124,13 +124,13 @@ struct outline {
 
 /* forward references */
 
-static int	outct(struct proginfo *,bfile *,MSGATTACH_ENT *) ;
-static int	outbase64(struct proginfo *,bfile *,char *,int) ;
-static int	outvalue(struct proginfo *,bfile *,struct outline *,
-			const char *,int) ;
+local int	outct(struct proginfo *,bfile *,MSGATTACH_ENT *) ;
+local int	outbase64(struct proginfo *,bfile *,char *,int) ;
+local int	outvalue(struct proginfo *,bfile *,struct outline *,
+			cchar *,int) ;
 
-static int	outline_start(struct outline *,int,int) ;
-static int	outline_finish(struct outline *) ;
+local int	outline_start(struct outline *,int,int) ;
+local int	outline_finish(struct outline *) ;
 
 
 /* local variables */
@@ -143,8 +143,8 @@ static int	outline_finish(struct outline *) ;
 int outhead(pip,ofp,name,v,vlen)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	name[] ;
-const char	v[] ;
+cchar	name[] ;
+cchar	v[] ;
 int		vlen ;
 {
 	struct outline	ld ;
@@ -184,7 +184,7 @@ int		vlen ;
 int outheadema(pip,ofp,name,ap)
 struct proginfo	*pip ;
 bfile		*ofp ;
-const char	name[] ;
+cchar	name[] ;
 EMA		*ap ;
 {
 	EMA_ENT	*ep ;
@@ -197,7 +197,7 @@ EMA		*ap ;
 	int	wlen = 0 ;
 	int	f_linestart = FALSE ;
 
-	const char	*fmt ;
+	cchar	*fmt ;
 
 
 	if ((name == NULL) || (name[0] == '\0'))
@@ -554,7 +554,7 @@ MSGATTACH_ENT	*ep ;
 
 
 /* write out in BASE64! */
-static int outbase64(pip,ofp,buf,buflen)
+local int outbase64(pip,ofp,buf,buflen)
 struct proginfo	*pip ;
 bfile		*ofp ;
 char		buf[] ;
@@ -625,12 +625,12 @@ int		buflen ;
 
 
 /* output the content type */
-static int outct(pip,ofp,ep)
+local int outct(pip,ofp,ep)
 struct proginfo	*pip ;
 bfile		*ofp ;
 MSGATTACH_ENT	*ep ;
 {
-	const int	code = ep->code ;
+	cint	code = ep->code ;
 	int	rs ;
 	int	wlen = 0 ;
 
@@ -703,11 +703,11 @@ MSGATTACH_ENT	*ep ;
 
 
 /* output a single value for a header */
-static int outvalue(pip,ofp,ldp,v,vlen)
+local int outvalue(pip,ofp,ldp,v,vlen)
 struct proginfo	*pip ;
 bfile		*ofp ;
 struct outline	*ldp ;
-const char	v[] ;
+cchar	v[] ;
 int		vlen ;
 {
 	int	rs = SR_OK ;
@@ -769,7 +769,7 @@ int		vlen ;
 /* end subroutine (outvalue) */
 
 
-static int outline_start(op,maxlen,rlen)
+local int outline_start(op,maxlen,rlen)
 struct outline	*op ;
 int		maxlen ;
 int		rlen ;
@@ -788,7 +788,7 @@ int		rlen ;
 /* end subroutine (outline_start) */
 
 
-static int outline_finish(op)
+local int outline_finish(op)
 struct outline	*op ;
 {
 
