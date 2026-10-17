@@ -31,6 +31,7 @@ module ;
 export module modsncpy ;
 
 export {
+    int sncpy (char *dp,int dl,cchar *sp) noex ;
     int sncpyx(char *,int,int,...) noex ;
     inline int sncpy1(char *dp,int dl,cc *s1) noex {
 	return sncpyx(dp,dl,1,s1) ;
