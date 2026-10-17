@@ -44,6 +44,9 @@ module ;
 
 export module modmisc ;
 
+export import :strw ;
+export import :strbcpy ;
+
 export import :mknpathx ;
 export import :mknpathxw ;
 export import :pathnadd ;
