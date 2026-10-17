@@ -1,13 +1,13 @@
-/* progconfig */
+/* progconfig SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* handle MSU configuration functions */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_CPUSPEED	1		/* calculate CPU speed */
-
 
 /* revision history:
 
@@ -20,15 +20,13 @@
 
 /*******************************************************************************
 
-        These subroutines form part of the MSU program (yes, getting a little
-        bit more complicated every day now).
-
+  	Description:
+	These subroutines form part of the MSU program (yes, getting
+	a little bit more complicated every day now).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -38,28 +36,29 @@
 #include	<sys/msg.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<poll.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<baops.h>
+#include	<poll.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<expcook.h>
 #include	<logfile.h>
 #include	<msfile.h>
-#include	<kinfo.h>
 #include	<lfm.h>
 #include	<getusername.h>
 #include	<getutmpent.h>
 #include	<sockaddress.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<kinfo.h>		/* Solaris® */
 
 #include	"config.h"
 #include	"progconfig.h"
@@ -109,38 +108,34 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	optbool(const char *,int) ;
+extern int	optbool(cchar *,int) ;
 extern int	getutmpterm(char *,int,pid_t) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	securefile(const char *,uid_t,gid_t) ;
-extern int	getserial(const char *) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	securefile(cchar *,uid_t,gid_t) ;
+extern int	getserial(cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_loga(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -151,17 +146,17 @@ extern char	*timestr_elapsed(time_t,char *) ;
 
 /* forward references */
 
-static int	config_addcooks(struct config *) ;
+local int	config_addcooks(struct config *) ;
 
-static int	setfname(struct proginfo *,char *,const char *,int,
-			int,const char *,const char *,const char *) ;
+local int	setfname(struct proginfo *,char *,cchar *,int,
+			int,cchar *,cchar *,cchar *) ;
 
 
 /* local variables */
 
 #ifdef	COMMENT
 
-static const char	*sched1[] = {
+static cchar	*sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -171,7 +166,7 @@ static const char	*sched1[] = {
 
 #endif /* COMMENT */
 
-static const char	*params[] = {
+static cchar	*params[] = {
 	"cmd",
 	"logsize",
 	"msfile",
@@ -210,7 +205,7 @@ enum params {
 int config_start(cfp,pip,configfname,intcheck)
 struct config	*cfp ;
 struct proginfo	*pip ;
-const char	*configfname ;
+cchar	*configfname ;
 int		intcheck ;
 {
 	EXPCOOK	*ckp ;
@@ -296,7 +291,7 @@ struct config	*cfp ;
 	pip = cfp->pip ;
 	if (cfp->fl.p) {
 	    const time_t	dt = pip->daytime ;
-	    const int		intcheck = cfp->intcheck ;
+	    cint		intcheck = cfp->intcheck ;
 	    int			f_check = TRUE ;
 
 	    f_check = f_check && (intcheck >= 0) ;
@@ -378,7 +373,7 @@ struct config	*cfp ;
 	paramfile_cur		cur ;
 	paramfile_ent		pe ;
 
-	const int	elen = EBUFLEN ;
+	cint	elen = EBUFLEN ;
 
 	int	rs = SR_NOTOPEN ;
 	int	rs1 ;
@@ -390,8 +385,8 @@ struct config	*cfp ;
 	char	pbuf[PBUFLEN + 1] ;
 	char	ebuf[EBUFLEN + 1] ;
 
-	const char	*ccp ;
-	const char	*kp, *vp ;
+	cchar	*ccp ;
+	cchar	*kp, *vp ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 
@@ -596,7 +591,7 @@ ret0:
 /* private subroutines */
 
 
-static int config_addcooks(cfp)
+local int config_addcooks(cfp)
 struct config	*cfp ;
 {
 	struct proginfo	*pip = cfp->pip ;
@@ -631,11 +626,11 @@ struct config	*cfp ;
 
 
 /* calculate a file name */
-static int setfname(pip,fname,ebuf,el,f_def,dname,name,suf)
+local int setfname(pip,fname,ebuf,el,f_def,dname,name,suf)
 struct proginfo	*pip ;
 char		fname[] ;
-const char	ebuf[] ;
-const char	dname[], name[], suf[] ;
+cchar	ebuf[] ;
+cchar	dname[], name[], suf[] ;
 int		el ;
 int		f_def ;
 {
@@ -643,7 +638,7 @@ int		f_def ;
 	int	ml ;
 	int	fl = 0 ;
 
-	const char	*np ;
+	cchar	*np ;
 
 	char	tmpname[MAXNAMELEN + 1] ;
 
