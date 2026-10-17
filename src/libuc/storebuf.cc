@@ -103,11 +103,11 @@ int storebuf_xxxx(char *rp,int rl,int i,int dlen,ctx_f<T> ctx,T v) noex {
 	    if (i >= 0) ylikely {
 	        char	*bp = (rp + i) ;
 		rs = SR_OK ;
-	        *bp = '\0' ;
+	        *bp = eos ;
 	        if ((rl < 0) || ((rl - i) >= dlen)) {
 	            if ((rs = ctx(bp,(rl - i),v)) >= 0) {
 		        len = rs ;
-	            }
+	            } /* end if */
 	        } else {
 	            if (char dbuf[dlen+1] ; (rs = ctx(dbuf,dlen,v)) >= 0) {
 	                len = rs ;
@@ -115,7 +115,7 @@ int storebuf_xxxx(char *rp,int rl,int i,int dlen,ctx_f<T> ctx,T v) noex {
 	                    strwcpy(bp,dbuf,len) ;
 	                } else {
 		            rs = SR_OVERFLOW ;
-		        }
+		        } /* end if (ok) */
 	            } /* end if (ctx) */
 	        } /* end if */
 	    } /* end if (valid) */
@@ -166,11 +166,11 @@ int storebuf_chrs(char *rbuf,int rlen,int idx,int ch,int n) noex {
 	        if ((rlen < 0) || ((rlen - idx) >= n)) ylikely {
 		    for (int i = 0 ; i < n ; i += 1) {
 	                *bp++ = char(ch) ;
-		    }
+		    } /* end for */
 	        } else {
 	            rs = SR_OVERFLOW ;
-	        }
-	        *bp = '\0' ;
+	        } /* end if (error) */
+	        *bp = eos ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
@@ -187,8 +187,8 @@ int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 	            *bp++ = char(ch) ;
 	        } else {
 	            rs = SR_OVERFLOW ;
-	        }
-	        *bp = '\0' ;
+	        } /* end if (error) */
+	        *bp = eos ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
@@ -206,7 +206,7 @@ int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	            if (sl < 0) {
 	                while (*sp) {
 	                    *bp++ = *sp++ ;
-	 	        }
+	 	        } /* end while */
 	            } else {
 	                memcopy(bp,sp,sl) ;
 	                bp += sl ;
@@ -215,20 +215,20 @@ int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	            if (sl < 0) {
 	                while ((bp < (rbuf + rlen)) && *sp) {
 	                    *bp++ = *sp++ ;
-		        }
+		        } /* end while */
 		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
 		            rs = SR_OVERFLOW ;
-		        }
+		        } /* end if (error) */
 	            } else {
 		        if ((rlen - i) >= sl) {
 	                    memcopy(bp,sp,sl) ;
 	                    bp += sl ;
 		        } else {
 		            rs = SR_OVERFLOW ;
-			}
+			} /* end if (error) */
 	            } /* end if */
 	        } /* end if */
-	        *bp = '\0' ;
+	        *bp = eos ;
 		len = intconv(bp - (rbuf + i)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -260,7 +260,7 @@ int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 		        } /* end while */
 		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
 		            rs = SR_OVERFLOW ;
-		        }
+		        } /* end if (error) */
 	            } else {
 	                while ((bp < (rbuf + rlen)) && sl && *sp) {
 	                    *bp++ = *sp++ ;
@@ -268,10 +268,10 @@ int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	                } /* end while */
 		        if ((bp == (rbuf + rlen)) && sl) {
 		            rs = SR_OVERFLOW ;
-		        }
+		        } /* end if (error) */
 	            } /* end if */
 	        } /* end if */
-	        *bp = '\0' ;
+	        *bp = eos ;
 		len = intconv(bp - (rbuf + i)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
