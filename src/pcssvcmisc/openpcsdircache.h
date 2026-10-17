@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-extern int openpcsdircache(const char *,const char *,int,mode_t,int) ;
+extern int openpcsdircache(cchar *,cchar *,int,mode_t,int) ;
 
 #ifdef	__cplusplus
 }
