@@ -79,7 +79,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
-#include	<cstring>		/* CSTD |strlcpy(3c)| */
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU |strbcpy(3usys)| */
 #include	<localmisc.h>		/* LIBU */
@@ -153,10 +153,10 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 	int		rs = SR_FAULT ;
 	if (dl < 0) dl = INT_MAX ;
 	if (dp) ylikely {
+	    charp bp = dp ;
 	    va_begin(ap,n) ;
-	    char	*bp = dp ;
 	    rs = SR_OVERFLOW ;
-	    dp[0] = '\0' ;
+	    dp[0] = eos ;
 	    for (int i = 0 ; dp && (i < (n - 1)) ; i += 1) {
 	        ccp  sp = (cchar *) va_arg(ap,char *) ;
 		ccp  cp = dp ;
