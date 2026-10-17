@@ -1,4 +1,4 @@
-/* progfile */
+/* progfile SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -21,31 +21,32 @@
 
 /******************************************************************************
 
+  	Description:
 	This subroutine provides the actual check and fix on the files
 	specified.
 
 ******************************************************************************/
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctype.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
 #include	<paramopt.h>
 #include	<vecstr.h>
-#include	<ascii.h>
 #include	<strn.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<isch.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -65,8 +66,6 @@ extern int	matstr(cchar **,cchar *,int) ;
 extern int	matcasestr(cchar **,cchar *,int) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 
-extern char	*timestr_logz(time_t,char *) ;
-
 
 /* external variables */
 
@@ -84,9 +83,9 @@ struct echars {
 
 /* forward references */
 
-static int	proccheck(struct proginfo *,cchar *) ;
-static int	isourprint(struct echars,int) ;
-static int	isprintreg(int) ;
+local int	proccheck(struct proginfo *,cchar *) ;
+local int	isourprint(struct echars,int) ;
+local int	isprintreg(int) ;
 
 
 /* local variables */
@@ -169,7 +168,7 @@ cchar	fname[] ;
 	        debugprintf("progfile: ageint=%u \n",
 	            pip->ageint) ;
 	        debugprintf("progfile: mtime=%s\n",
-	            timestr_logz(sb.st_mtime,timebuf)) ;
+	            strtime_logz(sb.st_mtime,timebuf)) ;
 	    }
 #endif /* CF_DEBUG */
 
@@ -220,7 +219,7 @@ cchar	fname[] ;
 
 /* local subroutines */
 
-static int proccheck(pip,fname)
+local int proccheck(pip,fname)
 struct proginfo	*pip ;
 cchar	fname[] ;
 {
@@ -307,7 +306,7 @@ ret0:
 /* end subroutine (proccheck) */
 
 
-static int isourprint(struct echars ec,int ch)
+local int isourprint(struct echars ec,int ch)
 {
 	int		f ;
 
@@ -318,10 +317,10 @@ static int isourprint(struct echars ec,int ch)
 	f = f || (ec.bs && (ch == CH_BS)) ;
 	return f ;
 }
-/* end subroutines (isourprint) */
+/* end subroutine (isourprint) */
 
 
-static int isprintreg(int ch)
+local int isprintreg(int ch)
 {
 	int		f ;
 	f = isprint(ch) ;
