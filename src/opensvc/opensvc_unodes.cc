@@ -24,12 +24,12 @@
 	Synopsis:
 
 	int opensvc_unodes(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -84,8 +84,8 @@
 
 /* forward references */
 
-static int	process(int,cchar *) ;
-static int	pcsunodes_trans(PCSUNODES *,int,char *,int) ;
+local int	process(int,cchar *) ;
+local int	pcsunodes_trans(PCSUNODES *,int,char *,int) ;
 
 
 /* local variables */
@@ -96,12 +96,12 @@ static int	pcsunodes_trans(PCSUNODES *,int,char *,int) ;
 
 /* ARGSUSED */
 int opensvc_unodes(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs ;
@@ -109,7 +109,7 @@ int		to ;
 	int		fd = -1 ;
 	int		pipes[2] ;
 	if ((rs = u_pipe(pipes)) >= 0) {
-	    const int	wfd = pipes[1] ;
+	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
 	    {
 		rs = process(wfd,pr) ;
@@ -126,9 +126,9 @@ int		to ;
 /* local subroutines */
 
 
-static int process(int wfd,cchar *pr)
+local int process(int wfd,cchar *pr)
 {
-	const int	nlen = MAXHOSTNAMELEN ;
+	cint	nlen = MAXHOSTNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	char		*nbuf ;
@@ -148,7 +148,7 @@ static int process(int wfd,cchar *pr)
 }
 /* end subroutie (process) */
 
-static int pcsunodes_trans(PCSUNODES *unp,int wfd,char *nbuf,int nlen) noex {
+local int pcsunodes_trans(PCSUNODES *unp,int wfd,char *nbuf,int nlen) noex {
 	int		rs ;
 	int		rs1 ;
 	if (filer fb ; (rs = filer_start(&fb,wfd,0z,0,0)) >= 0) {
