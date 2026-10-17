@@ -158,7 +158,7 @@ constexpr int uxxtostr(char *endp,int b,UT v) noex {
     char            *rp = endp ;
     if (endp) ylikely {
         rs = SR_INVALID ;
-        *rp = '\0' ;
+        *rp = eos ;
         if ((b >= 2) && (b <= xxtostr_maxbase)) ylikely {
             const uint ub = uint(b) ;
 	    rs = SR_OK ;
@@ -213,7 +213,7 @@ constexpr int uxxtostr10(char *endp,UT v) noex {
     char            *rp = endp ;
     if (endp) ylikely {
         rs = SR_OK ;
-        *rp = '\0' ;
+        *rp = eos ;
         if (v != 0) ylikely {
             int di ;
             if_constexpr (szof(UT) > szof(ulong)) {
@@ -261,7 +261,7 @@ constexpr int sxxtostr10(char *endp,ST v) noex {
         if ((rs = uxxtostr10(endp,uv)) >= 0) {
             rp = (endp - rs) ;
             if (v < 0) *--rp = '-' ;
-        }
+        } /* end */
     } /* end if (non-null) */
     return (rs >= 0) ? intconv(endp - rp) : rs ;
 } /* end subroutine (sxxtostr10) */
@@ -276,14 +276,14 @@ constexpr char *stostr(T v,char *endp,int b) noex {
             rsl = sxxtostr10<UT>(endp,vv) ;
         } else {
             rsl = sxxtostr<UT>(endp,b,vv) ;
-        }
+        } /* end */
         return rsl ;
     } ; /* end lambda (sxx) */
     if ((rs = sxx(v)) >= 0) ylikely {
         rp = (endp - rs) ;
     } else {
         errno = (neg rs) ;
-    }
+    } /* end */
     return (rs >= 0) ? rp : nullptr ;
 } /* end subroutine (stostr) */
 
@@ -297,14 +297,14 @@ constexpr char *utostr(UT uv,char *endp,int b) noex {
             rsl = uxxtostr10<UT>(endp,vv) ;
         } else {
             rsl = uxxtostr<UT>(endp,b,vv) ;
-        }
+        } /* end */
         return rsl ;
     } ; /* end lambda (uxx) */
     if ((rs = uxx(uv)) >= 0) ylikely {
         rp = (endp - rs) ;
     } else {
         errno = (neg rs) ;
-    }
+    } /* end */
     return (rs >= 0) ? rp : nullptr ;
 } /* end subroutine (utostr) */
 
