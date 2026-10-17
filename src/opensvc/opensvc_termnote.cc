@@ -24,12 +24,12 @@
 	Synopsis:
 
 	int opensvc_termnote(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -98,21 +98,21 @@ struct subinfo_flags {
 struct subinfo {
 	SUBINFO_FL	have, f, changed, finval ;
 	keyopt		akopts ;
-	const char	**envv ;
+	cchar	**envv ;
 	int		max ;
 } ;
 
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,const char **) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_opts(SUBINFO *) ;
+local int	subinfo_start(SUBINFO *,cchar **) ;
+local int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_opts(SUBINFO *) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"all",
 	"biff",
 	"bell",
@@ -128,7 +128,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char *akonames[] = {
+static cchar *akonames[] = {
 	"all",
 	"biff",
 	"bell",
@@ -160,12 +160,12 @@ static const uchar	aterms[] = {
 
 
 int opensvc_termnote(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO	si, *sip = &si ;
@@ -183,11 +183,11 @@ int		to ;
 	int		fd = -1 ;
 	int		f_optplus, f_optminus, f_optequal ;
 	int		f ;
-	const char	**recips = NULL ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*afname = NULL ;
-	const char	*cp ;
+	cchar	**recips = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*cp ;
 
 	if (argv != NULL) {
 	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
@@ -213,7 +213,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -408,11 +408,11 @@ int		to ;
 
 	    if ((rs = bopen(afp,afname,"r",0666)) >= 0) {
 		FIELD		fsb ;
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 	        int		len ;
 		int		fl ;
 	        char		lbuf[LINEBUFLEN + 1] ;
-		const char	*fp ;
+		cchar	*fp ;
 
 	        while ((rs = breadln(afp,lbuf,llen)) > 0) {
 	            len = rs ;
@@ -492,7 +492,7 @@ ret0:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip,const char **envv)
+local int subinfo_start(SUBINFO *sip,cchar **envv)
 {
 	int		rs = SR_OK ;
 
@@ -507,7 +507,7 @@ static int subinfo_start(SUBINFO *sip,const char **envv)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -523,13 +523,13 @@ static int subinfo_finish(SUBINFO *sip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_opts(SUBINFO *sip)
+local int subinfo_opts(SUBINFO *sip)
 {
 	keyopt		*kop = &sip->akopts ;
 	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(sip->envv,VAROPTS)) != NULL)
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -538,7 +538,7 @@ static int subinfo_opts(SUBINFO *sip)
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int		oi ;
 	        int		kl, vl ;
-	        const char	*kp, *vp ;
+	        cchar	*kp, *vp ;
 
 	    while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
