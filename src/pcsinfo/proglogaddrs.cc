@@ -1,4 +1,4 @@
-/* proglogaddrs */
+/* pcsinfo_proglogaddrs SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -36,19 +36,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<field.h>
 #include	<logfile.h>
 #include	<vecstr.h>
@@ -59,8 +58,10 @@
 #include	<emainfo.h>
 #include	<strn.h>
 #include	<char.h>
-#include	<ischarx.h>
-#include	<localmisc.h>
+#include	<isch.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -111,16 +112,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
-extern int	sfsubstance(const char *,int,const char **) ;
-
-extern char	*timestr_edate(time_t,char *) ;
-extern char	*timestr_hdate(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern int	sfsubstance(cchar *,int,cchar **) ;
 
 
 /* external variables */
@@ -131,16 +128,16 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int proglogaddr(struct proginfo *,MAILMSG *,int) ;
+local int proglogaddr(struct proginfo *,MAILMSG *,int) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-static int debug_fsize(bfile *) ;
+local int debug_fsize(bfile *) ;
 #endif
 
 
 /* local variables */
 
-static const int	hikeys[] = {
+static cint	hikeys[] = {
 	HI_ERRORSTO,
 	HI_SENDER,
 	HI_REPLYTO,
@@ -177,7 +174,7 @@ MAILMSG		*msgp ;
 /* local subroutines */
 
 
-static int proglogaddr(pip,msgp,hi)
+local int proglogaddr(pip,msgp,hi)
 struct proginfo	*pip ;
 MAILMSG		*msgp ;
 int		hi ;
@@ -186,7 +183,7 @@ int		hi ;
 	int		rs1 ;
 	int		sl ;
 	cchar		*sp ;
-	const char	*hkey ;
+	cchar	*hkey ;
 
 	hkey = mailmsghdrs_names[hi] ;
 
@@ -199,7 +196,7 @@ int		hi ;
 	            int		c = 0 ;
 	            int		cl ;
 	            int		f_route ;
-	            const char	*cp ;
+	            cchar	*cp ;
 	            for (j = 0 ; ema_get(&a,j,&ep) >= 0 ; j += 1) {
 
 	                f_route = TRUE ;
