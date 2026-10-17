@@ -139,8 +139,8 @@ int		to ;
 	cchar	*cmdname = CMDNAME ;
 	char		cmdsymname[MAXNAMELEN+1] ;
 	char		numbuf[NUMBUFLEN+1] ;
-	const void	*symp = NULL ;
-	const void	*callsymp = NULL ;
+	cvoid	*symp = NULL ;
+	cvoid	*callsymp = NULL ;
 	void		*sop = RTLD_DEFAULT ;
 
 #if	CF_DEBUGS 
@@ -156,7 +156,7 @@ int		to ;
 	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
 	    if ((argc >= 2) && (argv[1] != NULL)) {
 		if (hasalldig(argv[1],-1)) {
-		    const int	ml = (NUMBUFLEN-1) ;
+		    cint	ml = (NUMBUFLEN-1) ;
 	            strwcpy((numbuf+1),argv[1],ml) ;
 		}
 	    }
