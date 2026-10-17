@@ -30,12 +30,12 @@
 	Synopsis:
 
 	int opensvc_pcsinfo(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -98,11 +98,11 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -124,10 +124,10 @@ struct subinfo {
 
 /* forward references */
 
-static int opensvc_pcsinfo(cchar *,cchar *,int,mode_t,cchar **,cchar **,int) ;
+local int opensvc_pcsinfo(cchar *,cchar *,int,mode_t,cchar **,cchar **,int) ;
 
-static int subinfo_start(SUBINFO *,cchar *,cchar **) ;
-static int subinfo_finish(SUBINFO *) ;
+local int subinfo_start(SUBINFO *,cchar *,cchar **) ;
+local int subinfo_finish(SUBINFO *) ;
 
 
 /* local variables */
@@ -165,12 +165,12 @@ enum submodes {
 
 
 int opensvc_name(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	return opensvc_pcsinfo(pr,prn,of,om,argv,envv,to) ;
@@ -179,12 +179,12 @@ int		to ;
 
 
 int opensvc_projinfo(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	return opensvc_pcsinfo(pr,prn,of,om,argv,envv,to) ;
@@ -193,12 +193,12 @@ int		to ;
 
 
 int opensvc_pcsorg(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	return opensvc_pcsinfo(pr,prn,of,om,argv,envv,to) ;
@@ -210,13 +210,13 @@ int		to ;
 
 
 /* ARGSUSED */
-static int opensvc_pcsinfo(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+local int opensvc_pcsinfo(pr,prn,of,om,argv,envv,to)
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
@@ -279,7 +279,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -370,7 +370,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
