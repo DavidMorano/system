@@ -27,12 +27,12 @@
 
 	Synopsis:
 	int opensvc_logload(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -99,9 +99,9 @@
 
 /* forward references */
 
-static int	mkstr(char *,int,cchar *,double *,int,cchar *,cchar *) ;
+local int	mkstr(char *,int,cchar *,double *,int,cchar *,cchar *) ;
 
-static int	getloadlevel(double) ;
+local int	getloadlevel(double) ;
 
 
 /* local variables */
@@ -118,21 +118,21 @@ static cchar	*loadlevels[] = {
 
 
 int opensvc_logload(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	double		dla[3] ;
-	const int	ulen = USERNAMELEN ;
-	const int	clen = NODENAMELEN ;
-	const int	nlen = NETLOADLEN ;
-	const int	slen = SYSTATLEN ;
-	const int	llen = LINEBUFLEN ;
-	const int	mstatlen = MIN(SYSTATLEN,MAXSTATLEN) ;
+	cint	ulen = USERNAMELEN ;
+	cint	clen = NODENAMELEN ;
+	cint	nlen = NETLOADLEN ;
+	cint	slen = SYSTATLEN ;
+	cint	llen = LINEBUFLEN ;
+	cint	mstatlen = MIN(SYSTATLEN,MAXSTATLEN) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		argc = 0 ;
@@ -141,9 +141,9 @@ int		to ;
 	int		ll = -1 ;
 	int		cols = COLUMNS ;
 	int		nu = 0 ;
-	const char	*un = NULL ;
-	const char	*varcols = getourenv(envv,VARCOLUMNS) ;
-	const char	*cluster = getourenv(envv,VARCLUSTER) ;
+	cchar	*un = NULL ;
+	cchar	*varcols = getourenv(envv,VARCOLUMNS) ;
+	cchar	*cluster = getourenv(envv,VARCLUSTER) ;
 	char		nn[NODENAMELEN+1] ;
 	char		dn[MAXHOSTNAMELEN+1] ;
 	char		prlocal[MAXPATHLEN+1] ;
@@ -182,7 +182,7 @@ int		to ;
 
 	if ((rs >= 0) && ((un == NULL) || (un[0] == '\0'))) {
 	    int		pl, bl ;
-	    const char	*bp ;
+	    cchar	*bp ;
 	    pl = strlen(pr) ;
 	    while (pl && (pr[pl-1] == '/')) pl -= 1 ;
 	    if ((bl = sfbasename(pr,-1,&bp)) > 0) {
@@ -263,7 +263,7 @@ int		to ;
 
 	if (rs >= 0) {
 	    if ((rs = u_pipe(pipes)) >= 0) {
-	        const int	wfd = pipes[1] ;
+	        cint	wfd = pipes[1] ;
 	        fd = pipes[0] ;
 
 	        rs = u_write(wfd,lbuf,ll) ;
@@ -282,14 +282,14 @@ ret0:
 /* local subroutines */
 
 
-static int mkstr(lbuf,llen,cn,dla,nu,nbuf,sbuf)
+local int mkstr(lbuf,llen,cn,dla,nu,nbuf,sbuf)
 char		lbuf[] ;
 int		llen ;
-const char	cn[] ;
+cchar	cn[] ;
 double		dla[3] ;
 int		nu ;
-const char	nbuf[] ;
-const char	sbuf[] ;
+cchar	nbuf[] ;
+cchar	sbuf[] ;
 {
 	double		ddla = dla[2] ;
 	int		rs ;
@@ -322,7 +322,7 @@ const char	sbuf[] ;
 /* end subroutine (mkstr) */
 
 
-static int getloadlevel(double dla)
+local int getloadlevel(double dla)
 {
 	int		li = 0 ;
 	if (dla >= 0.33) {
