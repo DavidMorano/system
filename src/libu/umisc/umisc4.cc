@@ -93,7 +93,7 @@ int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	                while ((bp < (rbuf + rlen)) && *sp) {
 	                    *bp++ = *sp++ ;
 		        } /* end while */
-		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
+		        if ((bp == (rbuf + rlen)) && *sp) {
 		            rs = SR_OVERFLOW ;
 		        } /* end if (error) */
 	            } else {
@@ -106,7 +106,7 @@ int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 		        } /* end if (error) */
 	            } /* end if */
 	        } /* end if */
-	        *bp = '\0' ;
+	        *bp = eos ;
 		len = intconv(bp - (rbuf + i)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
