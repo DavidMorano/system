@@ -1,12 +1,12 @@
-/* main (parsedate) */
+/* parsedate_main SUPPOE (parsedate) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* the "parsedate" daemon */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
 #define	CF_GETDATE2	0
-
 
 /* revision history:
 
@@ -19,31 +19,29 @@
 
 /*******************************************************************************
 
+  	Description:
 	We parse date-strings here.
-
 
 *******************************************************************************/
 
-
-#include	<envatandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<fcntl.h>
-#include	<unistd.h>
-#include	<ctime>
-#include	<cerrno>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<baops.h>
-#include	<char.h>
+#include	<baops.h>		/* LIBU */
+#include	<char.h>		/* LIBUC */
 #include	<strtime.h>		/* LIBUC */
-#include	<localmisc.h>
-#include	<bfile.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -58,16 +56,16 @@
 
 /* local structures */
 
-static cchar	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"TMPDIR",
-	NULL
-} ;
-
 #define	ARGOPT_ROOT	0
 #define	ARGOPT_VERSION	1
 #define	ARGOPT_TMPDIR	2
+
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"TMPDIR",
+	nullptr
+} ; /* end array */
 
 
 /* extern subroutines */
@@ -97,44 +95,40 @@ local void		printout() ;
 struct global	g ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
-	bfile		infile, *ifp = NULL ;
+int main(int argc,con mainv argv,con mainv) {
+	bfile		infile, *ifp = nullptr ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		errfile ;
-
-	struct tm	ts, *timep ;
-
+	TM		ts, *timep ;
 	ustat	sb ;
-
 	int	argr, argl, aol, akl, avl, npa, maxai, kwi ;
 	int	ngi, i, j ;
 	int	rs ;
 	int	len ;
 	int	f_optminus, f_optplus, f_optequal ;
-	int	f_extra = FALSE ;
-	int	f_usage = FALSE ;
-	int	f_done = FALSE ;
-	int	f_version = FALSE ;
+	int	f_extra = false ;
+	int	f_usage = false ;
+	int	f_done = false ;
+	int	f_version = false ;
 	int	efd ;
 
 	char	*argp, *aop, *akp, *avp ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
 	char	mskfname_buf[MAXPATHLEN + 1] ;
-	char	*mskfname = NULL ;
-	char	*datestring = NULL ;
+	char	*mskfname = nullptr ;
+	char	*datestring = nullptr ;
 	char	buf[BUFSIZE + 1] ;
 	char	linebuf[LINELEN + 1] ;
 	char	*cp, *cp1, *cp2 ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if (fstat(3,&sb) >= 0) {
 	    debugsetfd(3) ;
 	} else {
@@ -143,7 +137,7 @@ char	*argv[] ;
 	}
 #endif
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("main: entered\n") ;
 #endif
 
@@ -151,29 +145,29 @@ char	*argv[] ;
 
 	efd = dup(2) ;
 
-	g.efp = NULL ;
+	g.efp = nullptr ;
 	if (bopen(&errfile,(char *) efd,"dwca",0644) >= 0)
 	    g.efp = &errfile ;
 
 
 /* get some program information */
 
-	if ((g.programroot = getenv("PROGRAMROOT")) == NULL)
+	if ((g.programroot = getenv("PROGRAMROOT")) == nullptr)
 	    g.programroot = PROGRAMROOT ;
 
 
 /* initialize some stuff before command line argument processing */
 
-	if ((g.tmpdir = getenv("TMPDIR")) == NULL)
+	if ((g.tmpdir = getenv("TMPDIR")) == nullptr)
 	    g.tmpdir = TMPDIR ;
 
 	g.debuglevel = 0 ;
 
-	g.f.verbose = FALSE ;
-	g.f.quiet = FALSE ;
-	g.f.daemon = FALSE ;
-	g.f.tmpfile = FALSE ;
-	g.f.alternate = FALSE ;
+	g.f.verbose = false ;
+	g.f.quiet = false ;
+	g.f.daemon = false ;
+	g.f.tmpfile = false ;
+	g.f.alternate = false ;
 
 
 /* process program arguments */
@@ -199,14 +193,14 @@ char	*argv[] ;
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 
 	            } else {
 
@@ -224,7 +218,7 @@ char	*argv[] ;
 	                case ARGOPT_ROOT:
 	                    if (f_optequal) {
 
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) g.programroot = avp ;
 
 	                    } else {
@@ -245,7 +239,7 @@ char	*argv[] ;
 	                case ARGOPT_TMPDIR:
 	                    if (f_optequal) {
 
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) g.tmpdir = avp ;
 
 	                    } else {
@@ -264,7 +258,7 @@ char	*argv[] ;
 
 /* version */
 	                case ARGOPT_VERSION:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal) goto badargextra ;
 
 	                    break ;
@@ -276,8 +270,8 @@ char	*argv[] ;
 	                            "%s: unknown argument keyword \"%s\"\n",
 	                            g.progname,aop) ;
 
-	                    f_usage = TRUE ;
-	                    f_done = TRUE ;
+	                    f_usage = true ;
+	                    f_done = true ;
 	                    break ;
 
 	                } /* end switch (key words) */
@@ -289,14 +283,14 @@ char	*argv[] ;
 	                    switch ((int) *akp) {
 
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 	                    case 'D':
 	                        g.debuglevel = 1 ;
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (cfdec(avp,avl, &g.debuglevel) < 0)
 	                                goto badargvalue ;
 
@@ -305,27 +299,27 @@ char	*argv[] ;
 	                        break ;
 
 	                    case 'v':
-	                        g.f.verbose = TRUE ;
+	                        g.f.verbose = true ;
 	                        break ;
 
 	                    case 'a':
-	                        g.f.alternate = TRUE ;
+	                        g.f.alternate = true ;
 	                        break ;
 
 	                    case 'd':
-	                        g.f.daemon = TRUE ;
+	                        g.f.daemon = true ;
 	                        break ;
 
 /* quiet mode */
 	                    case 'q':
-	                        g.f.quiet = TRUE ;
+	                        g.f.quiet = true ;
 	                        break ;
 
 /* get a DATEMSK file */
 	                    case 'm':
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) mskfname = avp ;
 
 	                        } else {
@@ -346,7 +340,7 @@ char	*argv[] ;
 	                    case 's':
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) datestring = avp ;
 
 	                        } else {
@@ -364,7 +358,7 @@ char	*argv[] ;
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 				break ;
 
 	                    default:
@@ -407,8 +401,8 @@ char	*argv[] ;
 
 	            if (! f_extra) {
 
-	                f_extra = TRUE ;
-	                if (g.efp != NULL)
+	                f_extra = true ;
+	                if (g.efp != nullptr)
 	                    bprintf(g.efp,"%s: extra arguments ignored\n",
 	                        g.progname) ;
 
@@ -417,19 +411,19 @@ char	*argv[] ;
 
 	    } /* end if (key letter/word or positional) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("main: bottom of loop\n") ;
 #endif
 
 	} /* end while (all command line argument processing) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("main: finished parsing arguments\n") ;
 #endif
 
 	if (f_version) {
 
-	    if (g.efp != NULL)
+	    if (g.efp != nullptr)
 	        bprintf(g.efp,"%s: version %s\n",
 	            g.progname,VERSION) ;
 
@@ -437,7 +431,7 @@ char	*argv[] ;
 
 	if (g.debuglevel > 0) {
 
-	    if (g.efp != NULL)
+	    if (g.efp != nullptr)
 	        bprintf(g.efp,"%s: debuglevel %d\n",
 	            g.progname,g.debuglevel) ;
 
@@ -455,7 +449,7 @@ char	*argv[] ;
 
 
 	mskfname_buf[0] = '\0' ;
-	if (mskfname == NULL) {
+	if (mskfname == nullptr) {
 
 #if	CF_DEBUG
 	    if (g.debuglevel > 0)
@@ -468,7 +462,7 @@ char	*argv[] ;
 	    if (rs < 0)
 	        goto badtmpmk ;
 
-	    g.f.tmpfile  = TRUE ;
+	    g.f.tmpfile  = true ;
 	    mskfname = mskfname_buf ;
 	    if ((rs = u_open(mskfname,O_WRONLY,0664)) < 0)
 	        goto badmskopen ;
@@ -498,7 +492,7 @@ char	*argv[] ;
 	    goto badoutopen ;
 
 
-	if ((datestring != NULL) && (datestring[0] != '\0')) {
+	if ((datestring != nullptr) && (datestring[0] != '\0')) {
 
 	    printout(datestring,ofp,g.efp) ;
 
@@ -543,14 +537,14 @@ char	*argv[] ;
 #endif
 
 earlyret:
-	if (g.efp != NULL)
+	if (g.efp != nullptr)
 	    bclose(g.efp) ;
 
 	return rs ;
 
 /* handle the bad things */
 badret:
-	if (ifp != NULL)
+	if (ifp != nullptr)
 	    bclose(ifp) ;
 
 	bclose(ofp) ;
@@ -558,14 +552,14 @@ badret:
 	if (g.f.tmpfile && (mskfname_buf[0] != '\0'))
 	    unlink(mskfname_buf) ;
 
-	if (g.efp != NULL)
+	if (g.efp != nullptr)
 	    bclose(g.efp) ;
 
 	return BAD ;
 
 /* program usage */
 usage:
-	if (g.efp == NULL) goto badret ;
+	if (g.efp == nullptr) goto badret ;
 
 	bprintf(g.efp,
 	    "%s: USAGE> %s [-s date_string] [-m datemskfile] [-d]\n", 
@@ -577,7 +571,7 @@ usage:
 	goto badret ;
 
 badargextra:
-	if (g.efp == NULL) goto badret ;
+	if (g.efp == nullptr) goto badret ;
 
 	bprintf(g.efp,"%s: no value associated with this option key\n",
 	    g.progname) ;
@@ -585,7 +579,7 @@ badargextra:
 	goto badret ;
 
 badargvalue:
-	if (g.efp == NULL) goto badret ;
+	if (g.efp == nullptr) goto badret ;
 
 	bprintf(g.efp,"%s: bad argument value was specified\n",
 	    g.progname) ;
@@ -593,7 +587,7 @@ badargvalue:
 	goto badret ;
 
 badargnum:
-	if (g.efp == NULL) goto badret ;
+	if (g.efp == nullptr) goto badret ;
 
 	bprintf(g.efp,"%s: not enough arguments specified\n",
 	    g.progname) ;
@@ -603,7 +597,7 @@ badargnum:
 badinopen:
 	if (g.f.quiet || g.f.daemon) goto badret ;
 
-	if (g.efp == NULL) goto badret ;
+	if (g.efp == nullptr) goto badret ;
 
 	bprintf(g.efp,"%s: could not open input file, rs=%d\n",
 	    g.progname,rs) ;
@@ -613,7 +607,7 @@ badinopen:
 badoutopen:
 	if (g.f.quiet || g.f.daemon) goto badret ;
 
-	if (g.efp == NULL) goto badret ;
+	if (g.efp == nullptr) goto badret ;
 
 	bprintf(g.efp,"%s: could not open output file, rs=%d\n",
 	    g.progname,rs) ;
@@ -623,7 +617,7 @@ badoutopen:
 badtmpmk:
 	if (g.f.quiet || g.f.daemon) goto badret ;
 
-	if (g.efp == NULL) goto badret ;
+	if (g.efp == nullptr) goto badret ;
 
 	bprintf(g.efp,"%s: could not make a temporary file, rs=%d\n",
 	    g.progname,rs) ;
@@ -634,7 +628,7 @@ badmskopen:
 badmskfile:
 	if (g.f.quiet || g.f.daemon) goto badret ;
 
-	if (g.efp == NULL) goto badret ;
+	if (g.efp == nullptr) goto badret ;
 
 	bprintf(g.efp,"%s: could not open the mask file, rs=%d\n",
 	    g.progname,rs) ;
@@ -654,7 +648,7 @@ bfile	*ofp, *efp ;
 
 	time_t		time ;
 
-	int		len, f_good = FALSE  ;
+	int		len, f_good = false  ;
 
 	char		*tp ;
 	char		timebuf[TIMEBUFLEN + 1], timebuf2[TIMEBUFLEN + 1] ;
@@ -672,7 +666,7 @@ bfile	*ofp, *efp ;
 
 /* try our selves ! */
 
-	if (timep == NULL) {
+	if (timep == nullptr) {
 
 	    len = strlen(datestring) ;
 
@@ -703,11 +697,11 @@ bfile	*ofp, *efp ;
 	} else
 	    time = mktime(timep) ;
 
-	if (timep != NULL) f_good = TRUE ;
+	if (timep != nullptr) f_good = true ;
 
 #else
 
-	time = getindate(datestring,NULL) ;
+	time = getindate(datestring,nullptr) ;
 
 #if	CF_DEBUG
 	if (g.debuglevel > 1)
@@ -717,45 +711,41 @@ bfile	*ofp, *efp ;
 
 	if (time == ((time_t) -1)) {
 
-		time = getabsdate(datestring,NULL) ;
+		time = getabsdate(datestring,nullptr) ;
 
 #if	CF_DEBUG
-	if (g.debuglevel > 1)
+	if (g.debuglevel > 1) {
 	    debugprintf("printout: 2nd time=%s\n",
 		strtime_gmlog(time,timebuf)) ;
 #endif
 
-		if (time != ((time_t) -1)) f_good = TRUE ;
+		if (time != ((time_t) -1)) f_good = true ;
 
-	} else
-		f_good = TRUE ;
+	} else {
+		f_good = true ;
+	}
 
 #endif
 
 	if (! f_good) {
 
-	    if (g.f.daemon)
+	    if (g.f.daemon) {
 	        bprintf(ofp,"BAD\n") ;
-
-	    else
+	    } else {
 	        bprintf(ofp,"*\n") ;
-
+	    }
 	    return ;
 
 	} else {
-
-	    if (g.f.daemon)
+	    if (g.f.daemon) {
 	        bprintf(ofp,"OK %ld\n",time) ;
-
-	    else
+	    } else {
 	        bprintf(ofp,"%s LOC, %s GMT\n",
 			strtime_log(time,timebuf),
 			strtime_gmlog(time,timebuf2)) ;
-
+	    }
 	}
-
-}
-/* end subroutine (printout) */
+} /* end subroutine (printout) */
 
 
 #if	defined(SYSV) && CF_GETDATE2
@@ -767,7 +757,7 @@ char	s[] ;
 {
 	bfile	mskfile, *mfp = &mskfile ;
 
-	struct tm	ts, *timep ;
+	TM	ts, *timep ;
 
 	int	len, i ;
 
@@ -780,12 +770,12 @@ char	s[] ;
 	    debugprintf("getdate2: entered\n") ;
 #endif
 
-	if ((s == NULL) || (s[0] == '\0')) return NULL ;
+	if ((s == nullptr) || (s[0] == '\0')) return nullptr ;
 
-	if (bopen(mfp,g.mskfname,"r",0666) < 0) return NULL ;
+	if (bopen(mfp,g.mskfname,"r",0666) < 0) return nullptr ;
 
 	i = 0 ;
-	timep = NULL ;
+	timep = nullptr ;
 	while ((len = breadln(mfp,linebuf,LINELEN)) > 0) {
 
 	    if (linebuf[len - 1] == '\n') len -= 1 ;
@@ -794,14 +784,14 @@ char	s[] ;
 
 	    cp = strptime(s,linebuf,&ts) ;
 
-	    if (cp != NULL) break ;
+	    if (cp != nullptr) break ;
 
 	    i += 1 ;
 	}
 
 	bclose(mfp) ;
 
-	if (cp == NULL) return NULL ;
+	if (cp == nullptr) return nullptr ;
 
 #if	CF_DEBUG
 	if (g.debuglevel > 0)
