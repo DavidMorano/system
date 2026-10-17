@@ -144,7 +144,7 @@ namespace libu {
 		    dp = stpcpy(dp,sp) ;
 	        } /* end for */
 	    } /* end if */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
