@@ -103,7 +103,7 @@ cint		nzeros	= 4 ;		/* result number of zeros */
 char *inet_ntoa_r(INADDR in,char *rbuf,int rlen) noex {
 	char		*rp = nullptr ; /* return-value */
 	if (rbuf) ylikely {
-	    rbuf[0] = '0' ;
+	    rbuf[0] = eos ;
 	    if (rlen >= (ndots + nzeros)) ylikely {
 		try {
 	            cint	n = INET4ADDRLEN ;
