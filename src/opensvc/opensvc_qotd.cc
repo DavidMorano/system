@@ -339,7 +339,7 @@ int opensvc_qotd(cchar *pr,cchar *prn,int of,mode_t om,
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -490,7 +490,7 @@ int opensvc_qotd(cchar *pr,cchar *prn,int of,mode_t om,
 
 	if (rs >= 0) {
 	    if ((rs = subinfo_mjd(sip,dayspec)) >= 0) {
-		const int	mjd = rs ;
+		cint	mjd = rs ;
 		rs = openqotd(pr,mjd,of,to) ;
 		fd = rs ;
 	    } /* end if (subinfo_mjd) */
