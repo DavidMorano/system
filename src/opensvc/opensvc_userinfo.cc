@@ -25,12 +25,12 @@
 	Synopsis:
 
 	int opensvc_name(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -93,11 +93,11 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -118,16 +118,16 @@ struct subinfo {
 
 /* forward references */
 
-static int subinfo_start(SUBINFO *,cchar *,cchar **,int f) ;
-static int subinfo_finish(SUBINFO *) ;
-static int subinfo_af(SUBINFO *,FILER *,cchar *) ;
-static int subinfo_def(SUBINFO *,FILER *) ;
-static int subinfo_all(SUBINFO *,FILER *) ;
-static int subinfo_args(SUBINFO *,FILER *,ARGINFO *,bits *,cchar *) ;
-static int subinfo_users(SUBINFO *,FILER *,cchar *,int) ;
-static int subinfo_user(SUBINFO *,FILER *,cchar *,int) ;
+local int subinfo_start(SUBINFO *,cchar *,cchar **,int f) ;
+local int subinfo_finish(SUBINFO *) ;
+local int subinfo_af(SUBINFO *,FILER *,cchar *) ;
+local int subinfo_def(SUBINFO *,FILER *) ;
+local int subinfo_all(SUBINFO *,FILER *) ;
+local int subinfo_args(SUBINFO *,FILER *,ARGINFO *,bits *,cchar *) ;
+local int subinfo_users(SUBINFO *,FILER *,cchar *,int) ;
+local int subinfo_user(SUBINFO *,FILER *,cchar *,int) ;
 
-static int	getuser(cchar **,char *,int) ;
+local int	getuser(cchar **,char *,int) ;
 
 
 /* local variables */
@@ -163,12 +163,12 @@ static const uchar	aterms[] = {
 
 /* ARGSUSED */
 int opensvc_name(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	ARGINFO		ainfo ;
@@ -186,7 +186,7 @@ int		to ;
 	int		f_full = FALSE ;
 	int		f_all = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
+	cchar	*argp, *aop, *akp, *avp ;
 	cchar		*argval = NULL ;
 	cchar		*afname = NULL ;
 
@@ -227,7 +227,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -318,7 +318,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -455,7 +455,7 @@ badpargs:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip,cchar *pr,cchar **ev,int f)
+local int subinfo_start(SUBINFO *sip,cchar *pr,cchar **ev,int f)
 {
 	int		rs ;
 	memset(sip,0,sizeof(SUBINFO)) ;
@@ -469,7 +469,7 @@ static int subinfo_start(SUBINFO *sip,cchar *pr,cchar **ev,int f)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -480,14 +480,14 @@ static int subinfo_finish(SUBINFO *sip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_all(SUBINFO *sip,FILER *ofp)
+local int subinfo_all(SUBINFO *sip,FILER *ofp)
 {
 	SYSUSERNAMES	u ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = sysusernames_open(&u,NULL)) >= 0) {
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    while ((rs = sysusernames_readent(&u,ubuf,ulen)) > 0) {
 		rs = subinfo_user(sip,ofp,ubuf,rs) ;
@@ -503,10 +503,10 @@ static int subinfo_all(SUBINFO *sip,FILER *ofp)
 
 
 /* ARGSUSED */
-static int subinfo_args(SUBINFO *sip,FILER *ofp,ARGINFO *aip,bits *bop,
+local int subinfo_args(SUBINFO *sip,FILER *ofp,ARGINFO *aip,bits *bop,
 		cchar *afn)
 {
-	const int	argc = aip->argc ;
+	cint	argc = aip->argc ;
 	int		rs = SR_OK ;
 	int		ai ;
 	int		wlen = 0 ;
@@ -537,7 +537,7 @@ static int subinfo_args(SUBINFO *sip,FILER *ofp,ARGINFO *aip,bits *bop,
 /* end subroutine (subinfo_args) */
 
 
-static int subinfo_af(SUBINFO *sip,FILER *ofp,cchar *afn)
+local int subinfo_af(SUBINFO *sip,FILER *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -584,9 +584,9 @@ static int subinfo_af(SUBINFO *sip,FILER *ofp,cchar *afn)
 /* end subroutine (subinfo_af) */
 
 
-static int subinfo_def(SUBINFO *sip,FILER *ofp)
+local int subinfo_def(SUBINFO *sip,FILER *ofp)
 {
-	const int	ulen = USERNAMELEN ;
+	cint	ulen = USERNAMELEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	cchar		**envv = sip->envv ;
@@ -600,7 +600,7 @@ static int subinfo_def(SUBINFO *sip,FILER *ofp)
 /* end subroutine (subinfo_def) */
 
 
-static int subinfo_users(SUBINFO *sip,FILER *ofp,cchar *lbuf,int llen)
+local int subinfo_users(SUBINFO *sip,FILER *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -623,16 +623,16 @@ static int subinfo_users(SUBINFO *sip,FILER *ofp,cchar *lbuf,int llen)
 /* end subroutine (subinfo_users) */
 
 
-static int subinfo_user(SUBINFO *sip,FILER *ofp,cchar *sp,int sl)
+local int subinfo_user(SUBINFO *sip,FILER *ofp,cchar *sp,int sl)
 {
 	NULSTR		n ;
-	const int	w = sip->w ;
+	cint	w = sip->w ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	cchar		*un ;
 	if ((rs = nulstr_start(&n,sp,sl,&un)) >= 0) {
-	    const int	rlen = REALNAMELEN ;
+	    cint	rlen = REALNAMELEN ;
 	    char	rbuf[REALNAMELEN+1] ;
 	    if ((rs = pcsns_get(&sip->ns,rbuf,rlen,un,w)) >= 0) {
 	        rs = filer_println(ofp,rbuf,rs) ;
@@ -646,7 +646,7 @@ static int subinfo_user(SUBINFO *sip,FILER *ofp,cchar *sp,int sl)
 /* end subroutine (subinfo_user) */
 
 
-static int getuser(cchar **envv,char *ubuf,int ulen)
+local int getuser(cchar **envv,char *ubuf,int ulen)
 {
 	int		rs = SR_OK ;
 	cchar		*un = getourenv(envv,VARMOTDUSER) ;
