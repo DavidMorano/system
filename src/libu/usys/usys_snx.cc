@@ -54,7 +54,7 @@ namespace usys {
 		} /* end for */
 		if ((rl == dl) && *sp) {
 		    rs = SR_OVERFLOW ;
-		} /* end */
+		} /* end if (error) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
