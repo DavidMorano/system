@@ -72,7 +72,7 @@ struct citedb_offset {
 
 /* store keyname in hash table */
 struct citedb_store {
-	const char	*citekey ;
+	cchar	*citekey ;
 	int		n ;		/* total number of this citation */
 	char		citestr[CITEDB_CITESTRLEN + 1] ;
 } ;
@@ -93,11 +93,11 @@ extern "C" {
 
 extern int	citedb_start(CITEDB *) ;
 extern int	citedb_finish(CITEDB *) ;
-extern int	citedb_adds(CITEDB *,int,uint,const char *,int) ;
+extern int	citedb_adds(CITEDB *,int,uint,cchar *,int) ;
 extern int	citedb_curbegin(CITEDB *,CITEDB_CUR *) ;
 extern int	citedb_curend(CITEDB *,CITEDB_CUR *) ;
 extern int	citedb_curenum(CITEDB *,CITEDB_CUR *,CITEDB_ENT *) ;
-extern int	citedb_fetch(CITEDB *,const char *,
+extern int	citedb_fetch(CITEDB *,cchar *,
 			CITEDB_CUR *,CITEDB_ENT *) ;
 extern int	citedb_audit(CITEDB *) ;
 
