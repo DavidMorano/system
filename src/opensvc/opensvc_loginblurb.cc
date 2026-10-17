@@ -184,8 +184,8 @@ int		to ;
 	cchar	*strspec = NULL ;
 	char		strbuf[STRBUFLEN+1] ;
 	char		cmdsymname[MAXNAMELEN+1] ;
-	const void	*symp = NULL ;
-	const void	*callsymp = NULL ;
+	cvoid	*symp = NULL ;
+	cvoid	*callsymp = NULL ;
 	void		*sop = NULL ;
 
 #if	CF_DEBUGS && CF_DEBUGN
