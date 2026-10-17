@@ -63,20 +63,20 @@ sint	strtosi(cchar *s,char **epp,int b) noex {
 		    if (uv || (! bit(v,((nb / 2) - 1)))) {
 			res = INT_MIN ;
 			ec = ERANGE ;
-		    }
+		    } /* end */
 		} else {	/* test poitive value */
 	            uv >>= (nb / 2) ;
 		    if (uv || bit(v,((nb / 2) - 1))) {
 			res = INT_MAX ;
 			ec = ERANGE ;
-		    }
+		    } /* end */
 		} /* end if */
 	    } else {
 		if (fneg) {
 	            res = UINT_MIN ;
 		} else {
 	            res = UINT_MAX ;
-		}
+		} /* end */
 	    } /* end if */
 	} else {
 	    ec = EFAULT ;
