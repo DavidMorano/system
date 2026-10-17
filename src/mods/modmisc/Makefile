@@ -40,21 +40,42 @@ MODS +=
 LIBS +=
 
 
-LIBFMISC_OP= modmisc0.o
+DEPS_IMPL= modmisc0.o
 
-LIBFMISC_OA0= modmisc-mknpathx.o
-LIBFMISC_OA1= modmisc-mknpathxw.o
-LIBFMISC_OA2= modmisc-pathnadd.o
-LIBFMISC_OA3= modmisc-snadd.o
+# module primary
+MODMISC_OP= modmisc0.o
 
-LIBFMISC_OA+= modmisc_oa0.o modmisc_oa1.o
-LIBFMISC_OA+= modmisc_oa2.o modmisc_oa3.o
+# module partitions
+MODMISC_OA0= modmisc-mknpathx.o
+MODMISC_OA1= modmisc-mknpathxw.o
+MODMISC_OA2= modmisc-pathnadd.o
+MODMISC_OA3= modmisc-snadd.o
 
-LIBFMISC_OI0= modmisc1.o modmisc2.o
-LIBFMISC_OI1= modmisc3.o modmisc4.o
-LIBFMISC_OI2= modmisc5.o modmisc6.o
+MODMISC_OA4= modmisc-strw.o
+MODMISC_OA5= modmisc-strbcpy.o
+MODMISC_OA6=
+MODMISC_OA7= 
 
-LIBFMISC_OI= modmisc_oi0.o modmisc_oi1.o modmisc_oi2.o
+MODMISC_OA+= modmisc_oa0.o modmisc_oa1.o
+MODMISC_OA+= modmisc_oa2.o modmisc_oa3.o
+MODMISC_OA+= modmisc_oa4.o modmisc_oa5.o
+
+# module implementations
+MODMISC_OI0= modmisc1.o modmisc2.o
+MODMISC_OI1= modmisc3.o modmisc4.o
+MODMISC_OI2= modmisc5.o modmisc6.o
+MODMISC_OI3= modmisc7.o
+MODMISC_OI4= modmisc%strw.o modmisc%strbcpy.o
+MODMISC_OI5=
+MODMISC_OI6=
+MODMISC_OI7=
+
+MODMISC_OI+= modmisc_oi0.o modmisc_oi1.o 
+MODMISC_OI+= modmisc_oi2.o modmisc_oi3.o
+MODMISC_OI+= modmisc_oi4.o
+
+
+DEPS_PRIM= $(MODMISC_OA)
 
 
 INCDIRS +=
@@ -120,6 +141,7 @@ again:
 
 clean:
 	makeclean $(ALL)
+	rmsubpat
 
 control:
 	(uname -n ; date) > Control
@@ -129,48 +151,78 @@ control:
 modmisc0.o:		modmisc.ccm modmisc_oa.o	modmisc.hh	$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-modmisc_op.o:		modmisc0.o
-	$(LD) -r $(LDFLAGS) -o $@ $^
-
 # partitions
 modmisc-mknpathx.o:	modmisc-mknpathx.ccm	modmisc.hh	$(INCS)
 modmisc-mknpathxw.o:	modmisc-mknpathxw.ccm	modmisc.hh	$(INCS)
 modmisc-pathnadd.o:	modmisc-pathnadd.ccm	modmisc.hh	$(INCS)
 modmisc-snadd.o:	modmisc-snadd.ccm	modmisc.hh	$(INCS)
 
-modmisc_oa0.o:		$(LIBFMISC_OA0)
+modmisc_oa0.o:		$(MODMISC_OA0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-modmisc_oa1.o:		$(LIBFMISC_OA1)
+modmisc_oa1.o:		$(MODMISC_OA1)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-modmisc_oa2.o:		$(LIBFMISC_OA2)
+modmisc_oa2.o:		$(MODMISC_OA2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-modmisc_oa3.o:		$(LIBFMISC_OA3)
+modmisc_oa3.o:		$(MODMISC_OA3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-modmisc_oa.o:		$(LIBFMISC_OA)
+modmisc_oa4.o:		$(MODMISC_OA4)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-modmisc_oi0.o:		$(LIBFMISC_OI0)
+modmisc_oa5.o:		$(MODMISC_OA5)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-modmisc_oi1.o:		$(LIBFMISC_OI1)
+modmisc_oa6.o:		$(MODMISC_OA6)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-modmisc_oi2.o:		$(LIBFMISC_OI2)
+modmisc_oa7.o:		$(MODMISC_OA7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
-modmisc_oi.o:		$(LIBFMISC_OI)
+# consolidation partitions
+modmisc_oa.o:		$(MODMISC_OA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+modmisc_oi0.o:		$(MODMISC_OI0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modmisc_oi1.o:		$(MODMISC_OI1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modmisc_oi2.o:		$(MODMISC_OI2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modmisc_oi3.o:		$(MODMISC_OI3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modmisc_oi4.o:		$(MODMISC_OI4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modmisc_oi5.o:		$(MODMISC_OI5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modmisc_oi6.o:		$(MODMISC_OI6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+modmisc_oi7.o:		$(MODMISC_OI7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+# consolidation implementations
+modmisc_oi.o:		$(MODMISC_OI)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 # implementation
-modmisc1.o:		modmisc1.cc modmisc0.o 	$(DEPS_MISC) 	$(INCS)
-modmisc2.o:		modmisc2.cc modmisc0.o	$(DEPS_MISC)	$(INCS)
-modmisc3.o:		modmisc3.cc modmisc0.o	$(DEPS_MISC)	$(INCS)
-modmisc4.o:		modmisc4.cc modmisc0.o	$(DEPS_MISC)	$(INCS)
-modmisc5.o:		modmisc5.cc modmisc0.o	$(DEPS_MISC)	$(INCS)
-modmisc6.o:		modmisc6.cc modmisc0.o	$(DEPS_MISC)	$(INCS)
+modmisc1.o:		modmisc1.cc	 		$(DEPS_IMPL) 	$(INCS)
+modmisc2.o:		modmisc2.cc			$(DEPS_IMPL)	$(INCS)
+modmisc3.o:		modmisc3.cc			$(DEPS_IMPL)	$(INCS)
+modmisc4.o:		modmisc4.cc			$(DEPS_IMPL)	$(INCS)
+modmisc5.o:		modmisc5.cc			$(DEPS_IMPL)	$(INCS)
+modmisc6.o:		modmisc6.cc			$(DEPS_IMPL)	$(INCS)
+modmisc7.o:		modmisc7.cc			$(DEPS_IMPL)	$(INCS)
+modmisc%strw.o:		modmisc%strw.cc			$(DEPS_IMPL)	$(INCS)
+modmisc%strbcpy.o:	modmisc%strbcp.cc		$(DEPS_IMPL)	$(INCS)
 
 
