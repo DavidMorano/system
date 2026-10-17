@@ -232,7 +232,7 @@ int pmq_open(pmq *op,cchar *name,int of,mode_t om,const pmq_attr *attr) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		pmq_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (pmq_ctor) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (pmq_open) */
@@ -244,17 +244,17 @@ int pmq_close(pmq *op) noex {
 	    {
 		rs1 = pmq_nameclean(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        posixhelp	po ;
 		po.m = &posixhelp::close ;
 	        rs1 = po(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    { /* end */
 		rs1 = pmq_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -334,7 +334,7 @@ int uc_unlinkpmq(cchar *name) noex {
 	                name = altname ;
 		    } else if (name[1] == '\0') {
 			rs = SR_INVALID ;
-	            }
+	            } /* end */
 		    if (rs >= 0) {
 	                bool	f_exit = false ;
 	                repeat {
@@ -375,10 +375,10 @@ local int pmq_nameload(pmq *op,cchar *name) noex {
 	    if (char *cp ; (rs = lm_mall((cl + 1),&cp)) >= 0) ylikely {
 	        if ((rs = sncpy(cp,cl,prefix,name)) >= 0) {
 		    op->name = cp ;
-	        }
+	        } /* end */
 	        if (rs < 0) {
 		    lm_free(cp) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (m-a) */
 	} /* end if (ok) */
 	return rs ;
@@ -444,7 +444,7 @@ int posixhelp::open(pmq *op) noex {
 	int		rs = SR_OK ;
 	if (mqd_t res ; (res = mq_open(op->name,of,om,nattr)) == mqdbad) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (posixhelp::open) */
 
@@ -452,7 +452,7 @@ int posixhelp::close(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_close(op->pq)) < 0) nlikely {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (posixhelp::close) */
 
@@ -460,7 +460,7 @@ int posixhelp::send(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_send(op->pq,sbuf,slen,prio)) < 0) nlikely {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (posixhelp::send) */
 
@@ -468,7 +468,7 @@ int posixhelp::recv(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_receive(op->pq,rbuf,rlen,priop)) < 0) nlikely {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (posixhelp::recv) */
 
@@ -476,7 +476,7 @@ int posixhelp::attrset(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_setattr(op->pq,nattr,oattr)) < 0) nlikely {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (posixhelp::setattr) */
 
@@ -484,7 +484,7 @@ int posixhelp::attrget(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_getattr(op->pq,oattr)) < 0) nlikely {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (posixhelp::attrget) */
 
@@ -492,7 +492,7 @@ int posixhelp::notify(pmq *op) noex {
 	int		rs ;
 	if ((rs = mq_notify(op->pq,sep)) < 0) nlikely {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (posixhelp::notify) */
 
@@ -502,8 +502,8 @@ int posixhelp::unlink(pmq *op) noex {
 	    if ((rs = mq_unlink(op->name)) < 0) nlikely {
 		rs = (neg errno) ;
 	    } else {
-	        op->name[0] = '0' ;
-	    }
+	        op->name[0] = eos ;
+	    } /* end if */
 	} /* end if (non-empty) */
 	return rs ;
 } /* end method (posixhelp::unlink) */
@@ -536,7 +536,7 @@ local int pmqdirrm(cchar *name) noex {
 	if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) {
 	    if ((rs = mkpath2(tbuf,pp,name)) >= 0) {
 	        rs = u_unlink(tbuf) ;
-	    }
+	    } /* end if */
 	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
@@ -583,13 +583,13 @@ local int getpmquid(void) noex {
 	    if (ucentpwx pw ; (rs = pw.nam(pwbuf,pwlen,un)) >= 0) {
 	        uid = pw.pw_uid ;
 	    } else if (rs == rsn) {
-		    un = PMQ_USERNAME2 ;
+		un = PMQ_USERNAME2 ;
 	        if ((rs = pw.name(pwbuf,pwlen,un)) >= 0) {
 		    uid = pw.pw_uid ;
 		} else if (rs == rsn) {
 		    rs = SR_OK ;
 		    uid = PMQ_UID ;
-		}
+		} /* end */
 	    } /* end if */
 	    rs1 = lm_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -605,7 +605,7 @@ local int getpmqgid(void) noex {
 	    gn = PMQ_GROUPNAME2 ;
 	    if ((rs = getgid_group(gn,-1)) == rsn) {
 		rs = PMQ_GID ;
-	    }
+	    } /* end */
 	} /* end if (getgid_group) */
 	return rs ;
 } /* end subroutine (getpmqgid) */
