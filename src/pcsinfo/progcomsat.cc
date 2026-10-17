@@ -98,10 +98,10 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	specs(struct proginfo *,vecobj *,vecstr *,int,int) ;
-static int	recips(struct proginfo *,int,SOCKADDRESS *,int,vecobj *) ;
-static int	rmtabnodes(struct proginfo *,vecstr *) ;
-static int	mkcsmsg(char *,int,cchar *,int,uint) ;
+local int	specs(struct proginfo *,vecobj *,vecstr *,int,int) ;
+local int	recips(struct proginfo *,int,SOCKADDRESS *,int,vecobj *) ;
+local int	rmtabnodes(struct proginfo *,vecstr *) ;
+local int	mkcsmsg(char *,int,cchar *,int,uint) ;
 
 
 /* local variables */
@@ -201,7 +201,7 @@ vecobj		*rsp ;
 /* private subroutines */
 
 
-static int specs(pip,rsp,nlp,fd,defport)
+local int specs(pip,rsp,nlp,fd,defport)
 struct proginfo	*pip ;
 vecobj		*rsp ;
 vecstr		*nlp ;
@@ -313,7 +313,7 @@ int		defport ;
 /* end subroutine (specs) */
 
 
-static int recips(pip,fd,sap,sal,rsp)
+local int recips(pip,fd,sap,sal,rsp)
 struct proginfo	*pip ;
 int		fd ;
 SOCKADDRESS	*sap ;
@@ -405,7 +405,7 @@ vecobj		*rsp ;
 /* end subroutine (recips) */
 
 
-static int rmtabnodes(pip,nlp)
+local int rmtabnodes(pip,nlp)
 struct proginfo	*pip ;
 vecstr		*nlp ;
 {
@@ -450,7 +450,7 @@ vecstr		*nlp ;
 
 
 /* make (marshall) the COMSAT message itself */
-static int mkcsmsg(char *mbuf,int mlen,cchar *up,int ul,uint val) noex {
+local int mkcsmsg(char *mbuf,int mlen,cchar *up,int ul,uint val) noex {
 	int		rs ;
 	int		rs1 ;
 	if (sbuf b ; (rs = sbuf_start(&b,mbuf,mlen)) >= 0) {
