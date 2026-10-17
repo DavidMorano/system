@@ -80,6 +80,7 @@
 #include	<acctab.h>		/* LIBUC */
 #include	<cq.h>			/* LIBUC */
 #include	<spawner.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -187,13 +188,13 @@ local int	loadexports(struct proginfo *,vecstr *) ;
 
 local int	procxfile(struct proginfo *,cchar *) ;
 
-static void	int_all(int) ;
+local void	int_all(int) ;
 
 
 /* local variables */
 
-static volatile int	if_term ;
-static volatile int	if_int ;
+local volatile int	if_term ;
+local volatile int	if_int ;
 
 
 /* exported subroutines */
@@ -287,7 +288,7 @@ vecstr		*snp ;
 
 	if (pip->fl.daemon && pip->open.logprog) {
 	    logfile_printf(&pip->lh,"%s finished initializing\n",
-	        timestr_logz(pip->daytime,timebuf)) ;
+	        strtime_logz(pip->daytime,timebuf)) ;
 	    logfile_flush(&pip->lh) ;
 	} /* end if (making log entries) */
 
@@ -594,7 +595,7 @@ vecstr		*snp ;
 		    bprintf(pip->efp,"%s: interrupt\n",pip->progname) ;
 		if (pip->open.logprog)
 	            logfile_printf(&pip->lh,"%s interrupt (%d)",
-			timestr_logz(pip->daytime,timebuf),rs) ;
+			strtime_logz(pip->daytime,timebuf),rs) ;
 	    } /* end if */
 
 /* check up on the log file */
@@ -641,7 +642,7 @@ vecstr		*snp ;
 
 	    if (pip->open.logprog)
 	        logfile_printf(&pip->lh,fmt,
-	            timestr_logz(pip->daytime,timebuf),s,rs) ;
+	            strtime_logz(pip->daytime,timebuf),s,rs) ;
 
 	    if (pip->debuglevel > 0) {
 		char	pn[MAXNAMELEN + 20] ;
@@ -1000,7 +1001,7 @@ struct proginfo	*pip ;
 	            logfile_setid(&pip->lh,pep->jobid) ;
 
 	            logfile_printf(&pip->lh, "%s server(%d) exit ex=%u\n",
-	                timestr_logz(pip->daytime,timebuf),pid,
+	                strtime_logz(pip->daytime,timebuf),pid,
 	                (cstat & 255)) ;
 
 /* process this guy's termination */
@@ -1025,7 +1026,7 @@ struct proginfo	*pip ;
 	                debugprintf("procruncheck: proglogout() rs=%d\n",rs) ;
 #endif
 
-	            timestr_elapsed((pip->daytime - pep->stime),timebuf) ;
+	            strtime_elapsed((pip->daytime - pep->stime),timebuf) ;
 	            logfile_printf(&pip->lh,"elapsed runtime %s\n",timebuf) ;
 
 	        } /* end if (have logging) */
@@ -1072,7 +1073,7 @@ struct proginfo	*pip ;
 	    if ((rs1 > 0) && pip->open.logprog)
 	        logfile_printf(&pip->lh,
 	            "%s service file changed\n",
-	            timestr_logz(pip->daytime,timebuf)) ;
+	            strtime_logz(pip->daytime,timebuf)) ;
 #endif /* COMMENT */
 
 	}
@@ -1087,7 +1088,7 @@ struct proginfo	*pip ;
 
 	    if ((rs1 > 0) && pip->open.logprog)
 	        logfile_printf(&pip->lh,"%s access table changed\n",
-	            timestr_logz(pip->daytime,timebuf)) ;
+	            strtime_logz(pip->daytime,timebuf)) ;
 
 	} /* end if (ACCTAB) */
 #endif /* CF_ACCTABCHECK */
@@ -1585,9 +1586,9 @@ SVCENTRY_ARGS	*pap ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(2)) {
 	                debugprintf("procservice: daytime=%s\n",
-	                    timestr_logz(pip->daytime,timebuf)) ;
+	                    strtime_logz(pip->daytime,timebuf)) ;
 	                debugprintf("procservice: mtime=%s\n",
-	                    timestr_logz(sb.st_mtime,timebuf)) ;
+	                    strtime_logz(sb.st_mtime,timebuf)) ;
 	            }
 #endif /* CF_DEBUG */
 
@@ -1636,19 +1637,19 @@ SVCENTRY_ARGS	*pap ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
 	        debugprintf("procservice: %s svc=%s\n",
-	            timestr_logz(pip->daytime,timebuf),
+	            strtime_logz(pip->daytime,timebuf),
 	            pep->name) ;
 #endif /* CF_DEBUG */
 
 	    if (pip->open.logprog)
 	        logfile_printf(&pip->lh,"%s svc=%s\n",
-	            timestr_logz(pip->daytime,timebuf),
+	            strtime_logz(pip->daytime,timebuf),
 	            pep->name) ;
 
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: %s svc=%s\n",
 	            pip->progname,
-	            timestr_logz(pip->daytime,timebuf),
+	            strtime_logz(pip->daytime,timebuf),
 	            pep->name) ;
 
 	    if (rs >= 0)
@@ -1682,7 +1683,7 @@ SVCENTRY_ARGS	*pap ;
 /* update the time stamp by writing to it */
 
 	        bprintf(&tsfile,"%s\n",
-	            timestr_logz(pip->daytime,timebuf)) ;
+	            strtime_logz(pip->daytime,timebuf)) ;
 
 	    } else { /* failure */
 
@@ -2218,10 +2219,10 @@ SVCENTRY	*pep ;
 	    et = (pip->daytime - at) ;
 	    logfile_setid(&pip->lh,pep->jobid) ;
 	    logfile_printf(&pip->lh,"%s job-out svc=%s (%u)",
-		timestr_logz(pip->daytime,timebuf),
+		strtime_logz(pip->daytime,timebuf),
 		    pep->name,pep->pid) ;
 	    logfile_printf(&pip->lh,"job-out elapsed=%s",
-		timestr_elapsed(et,timebuf)) ;
+		strtime_elapsed(et,timebuf)) ;
 
 	} /* end if */
 
@@ -2244,7 +2245,7 @@ local int proclogsecurity(struct proginfo *pip,cchar *pfname)
 
 	    if (pip->debuglevel > 0) {
 		char	timebuf[TIMEBUFLEN+1] ;
-	        timestr_logz(pip->daytime,timebuf) ;
+	        strtime_logz(pip->daytime,timebuf) ;
 	        bprintf(pip->efp,"%s: %s server=%r\n",
 	            pip->progname,timebuf,ap,al) ;
 	    }
@@ -2337,7 +2338,7 @@ local int loadexports(proginfo *pip,vecstr *elp) noex {
 #endif /* CF_ENVLOCAL */
 
 
-static void int_all(int sn)
+local void int_all(int sn)
 {
 	int		oerrno = errno ;
 
