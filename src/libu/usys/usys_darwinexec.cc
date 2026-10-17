@@ -93,6 +93,7 @@
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"usys_pathpid.h"	/* |usys_pathpid(3usys)| */
+#include	"usys_snx.hh"		/* |sncpy(3usys)| */
 #include	"usys_darwin.h"
 #include	"usys_darwinexec.h"
 
@@ -121,7 +122,7 @@ import libutil ;			/* |lenstr(3u)| */
 import umisc ;				/* |mknpath(3u)| */
 import usysbasic ;
 
-using libu::sncpy ;			/* subroutine (usupport) */
+using usys::sncpy ;			/* subroutine (usupport) */
 using usys::usys_pathpid ;		/* subroutine (usys) */
 using usys::darwin_argzget ;		/* subroutine (usys) */
 
