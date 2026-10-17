@@ -123,7 +123,7 @@ int mkflags(char *fbuf,int flen,int fg) noex {
 	            } /* end switch */
 	            if (ch) {
 		        *fp++ = char(ch) ;
-	            }
+	            } /* end */
 	        } /* end if (had flag) */
 	    } /* end for */
 	    fl = intconv(fp - fbuf) ;
@@ -160,7 +160,7 @@ int mkfmt(char *fbuf,int flen,int fc,int fg,int w,int p,int sz) noex {
 		        fl -= rs ;
 		    }
 	        } /* end if (precision) */
-	        *fp = '\0' ;
+	        *fp = eos ;
 	    } /* end block */
 	    if (rs >= 0) ylikely {
 	        if (sz == szof(longdouble)) {
@@ -173,7 +173,7 @@ int mkfmt(char *fbuf,int flen,int fc,int fg,int w,int p,int sz) noex {
 	        fl += 1 ;
 	    } /* end if (ok) */
 	} /* end if (mkflags) */
-	*fp = '\0' ;
+	*fp = eos ;
 	return (rs >= 0) ? fl : rs ;
 } /* end subroutine (mkfmt) */
 
