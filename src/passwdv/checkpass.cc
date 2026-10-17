@@ -77,14 +77,14 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sfshrink(const char *,int,char **) ;
-extern int	matstr(const char **,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,char **) ;
+extern int	matstr(cchar **,cchar *,int) ;
 extern int	havenis() ;
 
-extern int	passwdok(const char *,const char *) ;
+extern int	passwdok(cchar *,cchar *) ;
 
 
 /* external variables */
@@ -93,20 +93,20 @@ extern int	passwdok(const char *,const char *) ;
 /* local structures */
 
 struct passdata {
-	const char	*username ;
+	cchar	*username ;
 	char		*passbuf ;
 } ;
 
 
 /* forward references */
 
-static int	try_start(PASSDATA *,char *,const char *) ;
-static int	try_pwd(PASSDATA *) ;
-static int	try_spw(PASSDATA *) ;
-static int	try_nisplus(PASSDATA *) ;
-static int	try_finish(PASSDATA *) ;
+local int	try_start(PASSDATA *,char *,cchar *) ;
+local int	try_pwd(PASSDATA *) ;
+local int	try_spw(PASSDATA *) ;
+local int	try_nisplus(PASSDATA *) ;
+local int	try_finish(PASSDATA *) ;
 
-static int	readpass(int,char *,int) ;
+local int	readpass(int,char *,int) ;
 
 
 /* local variables */
@@ -118,7 +118,7 @@ static cchar	*badpasswds[] = {
 	NULL
 } ;
 
-static int	(*tries[])(PASSDATA *) = {
+local int	(*tries[])(PASSDATA *) = {
 	try_pwd,
 	try_spw,
 	try_nisplus,
@@ -194,7 +194,7 @@ ret0:
 /* local subroutines */
 
 
-static int try_start(PASSDATA *pdp,char *passbuf,cchar *username)
+local int try_start(PASSDATA *pdp,char *passbuf,cchar *username)
 {
 
 	if (pdp == NULL) return SR_FAULT ;
@@ -210,7 +210,7 @@ static int try_start(PASSDATA *pdp,char *passbuf,cchar *username)
 /* end subroutine (try_start) */
 
 
-static int try_finish(PASSDATA *pdp)
+local int try_finish(PASSDATA *pdp)
 {
 
 	if (pdp == NULL) return SR_FAULT ;
@@ -222,10 +222,10 @@ static int try_finish(PASSDATA *pdp)
 /* end subroutine (try_finish) */
 
 
-static int try_pwd(PASSDATA *pdp)
+local int try_pwd(PASSDATA *pdp)
 {
 	struct passwd	pw ;
-	const int	pwlen = bufsizeget(bufsize_pw) ;
+	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	char		*pwbuf ;
 
@@ -246,10 +246,10 @@ static int try_pwd(PASSDATA *pdp)
 /* end subroutine (try_pwd) */
 
 
-static int try_spw(PASSDATA *pdp)
+local int try_spw(PASSDATA *pdp)
 {
 	struct spwd	sp ;
-	const int	splen = bufsizeget(bufsize_sp) ;
+	cint	splen = bufsizeget(bufsize_sp) ;
 	int		rs ;
 	char		*spbuf ;
 
@@ -270,7 +270,7 @@ static int try_spw(PASSDATA *pdp)
 /* end subroutine (try_spw) */
 
 
-static int try_nisplus(PASSDATA *pdp)
+local int try_nisplus(PASSDATA *pdp)
 {
 	SPAWNPROC	ps ;
 	vecstr		args ;
@@ -278,8 +278,8 @@ static int try_nisplus(PASSDATA *pdp)
 	int		rs ;
 	int		len ;
 	int		cstat ;
-	const char	*progfname = PROG_NISMATCH ;
-	const char	**av ;
+	cchar	*progfname = PROG_NISMATCH ;
+	cchar	**av ;
 
 #if	CF_DEBUGS
 	debugprintf("checkpass/try_nisplus: ent\n") ;
@@ -314,7 +314,7 @@ static int try_nisplus(PASSDATA *pdp)
 	ps.disp[1] = SPAWNPROC_DCREATE ;
 	ps.disp[2] = SPAWNPROC_DCLOSE ;
 	if ((rs = spawnproc(&ps,progfname,av,NULL)) >= 0) {
-	    const int	fd = ps.fd[1] ;
+	    cint	fd = ps.fd[1] ;
 	    int		cex ;
 	    cpid = rs ;
 
@@ -354,14 +354,14 @@ ret0:
 /* end subroutine (try_nisplus) */
 
 
-static int readpass(int fd,char *outbuf,int outlen)
+local int readpass(int fd,char *outbuf,int outlen)
 {
 	FILER		b ;
 	int		rs ;
 	int		len ;
 	int		cl = -1 ;
-	const char	*tp ;
-	const char	*cp = NULL ;
+	cchar	*tp ;
+	cchar	*cp = NULL ;
 	char		rdbuf[RDBUFLEN + 1] ;
 
 	if (outbuf == NULL) return SR_FAULT ;
