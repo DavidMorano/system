@@ -31,12 +31,12 @@
 
 	Synopsis:
 	int opensvc_hotd(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -103,9 +103,9 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -114,41 +114,41 @@ extern int	nprintf(const char *,const char *,...) ;
 
 /* local structures */
 
-typedef int (*subhave_t)(const char *) ;
-typedef int (*subcall_t)(const char *,int,const char **,const char **,void *) ;
-typedef int (*subcalla_t)(const void *,int,const char **,const char **,void *) ;
+typedef int (*subhave_t)(cchar *) ;
+typedef int (*subcall_t)(cchar *,int,cchar **,cchar **,void *) ;
+typedef int (*subcalla_t)(cvoid *,int,cchar **,cchar **,void *) ;
 
 struct subinfo {
-	const char	*pr ;
-	const char	**envv ;
-	const char	*cmdname ;
-	const char	*dayspec ;
+	cchar	*pr ;
+	cchar	**envv ;
+	cchar	*cmdname ;
+	cchar	*dayspec ;
 	void		*sop ;
 	subhave_t	subhave ;
 	subcall_t	subcall ;
 	subcalla_t	subcalla ;
-	const void	*subcmd ;
+	cvoid	*subcmd ;
 } ;
 
 
 /* forward references */
 
-static int subinfo_start(SUBINFO *,cchar *,cchar **,cchar *,cchar *) ;
-static int subinfo_attbegin(SUBINFO *) ;
-static int subinfo_callprog(SUBINFO *) ;
-static int subinfo_attend(SUBINFO *) ;
-static int subinfo_finish(SUBINFO *) ;
+local int subinfo_start(SUBINFO *,cchar *,cchar **,cchar *,cchar *) ;
+local int subinfo_attbegin(SUBINFO *) ;
+local int subinfo_callprog(SUBINFO *) ;
+local int subinfo_attend(SUBINFO *) ;
+local int subinfo_finish(SUBINFO *) ;
 
 
 /* local variables */
 
-static const char	*syslibs[] = {
+static cchar	*syslibs[] = {
 	"/usr/extra/lib",
 	"/usr/preroot/lib",
 	NULL
 } ;
 
-static const char	*attsyms[] = {
+static cchar	*attsyms[] = {
 	"lib_proghave",
 	"lib_progcall",
 	"lib_progcalla",
@@ -161,12 +161,12 @@ static const char	*attsyms[] = {
 
 /* ARGSUSED */
 int opensvc_hotd(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO		oi ;
@@ -174,8 +174,8 @@ int		to ;
 	int		rs1 ;
 	int		argc = 0 ;
 	int		fd = -1 ;
-	const char	*cmdname = CMDNAME ;
-	const char	*dayspec = NULL ;
+	cchar	*cmdname = CMDNAME ;
+	cchar	*dayspec = NULL ;
 
 #if	CF_DEBUGN
 	nprintf(NDF,"opensvc_hotd: ent\n") ;
@@ -234,7 +234,7 @@ int		to ;
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *oip,cchar *pr,cchar **envv,
+local int subinfo_start(SUBINFO *oip,cchar *pr,cchar **envv,
 		cchar *cmdname,cchar *dayspec)
 {
 	memset(oip,0,sizeof(SUBINFO)) ;
@@ -247,7 +247,7 @@ static int subinfo_start(SUBINFO *oip,cchar *pr,cchar **envv,
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *oip)
+local int subinfo_finish(SUBINFO *oip)
 {
 	if (oip == NULL) return SR_FAULT ;
 	return SR_OK ;
@@ -255,20 +255,20 @@ static int subinfo_finish(SUBINFO *oip)
 /* end subroutine (subinfo_finish) */
 
 
-static int subinfo_attbegin(SUBINFO *oip)
+local int subinfo_attbegin(SUBINFO *oip)
 {
-	const int	cslen = SYMNAMELEN ;
+	cint	cslen = SYMNAMELEN ;
 	int		rs ;
-	const char	*pr = oip->pr ;
-	const char	*cmdname = oip->cmdname ;
+	cchar	*pr = oip->pr ;
+	cchar	*cmdname = oip->cmdname ;
 	char		csbuf[SYMNAMELEN+1] ;
 	if ((rs = sncpy2(csbuf,cslen,"p_",cmdname)) >= 0) {
-	    const int	dlmode = RTLD_LAZY ;
+	    cint	dlmode = RTLD_LAZY ;
 	    char	libdname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath2(libdname,pr,"lib")) >= 0) {
-		const char	*ln = LKCMDNAME ;
-	    	const char	*dnames[10] ; /* careful */
-	    	const char	*syms[5] ; /* careful */
+		cchar	*ln = LKCMDNAME ;
+	    	cchar	*dnames[10] ; /* careful */
+	    	cchar	*syms[5] ; /* careful */
 	        int		i = 0 ;
 		int		j ;
 		void		*n = NULL ;
@@ -314,7 +314,7 @@ static int subinfo_attbegin(SUBINFO *oip)
 /* end subroutine (subinfo_attbegin) */
 
 
-static int subinfo_attend(SUBINFO *oip)
+local int subinfo_attend(SUBINFO *oip)
 {
 	void		*sop = oip ->sop ;
 	if ((sop != NULL) && (! isSpecialObject(sop))) dlclose(sop) ;
@@ -323,7 +323,7 @@ static int subinfo_attend(SUBINFO *oip)
 /* end subroutine (subinfo_attend) */
 
 
-static int subinfo_callprog(SUBINFO *oip) {
+local int subinfo_callprog(SUBINFO *oip) {
 	int		rs ;
 	int		fd = -1 ;
 	if ((rs = opentmp(NULL,0,0664)) >= 0) {
@@ -335,9 +335,9 @@ static int subinfo_callprog(SUBINFO *oip) {
 		subcalla_t	subcalla = oip->subcalla ;
 	    	int		ex ;
 		int		ac = 0 ;
-		const char	**envv = oip->envv ;
-		const char	*cmdname = oip->cmdname ;
-	    	    const char	*av[10] ; /* careful */
+		cchar	**envv = oip->envv ;
+		cchar	*cmdname = oip->cmdname ;
+	    	    cchar	*av[10] ; /* careful */
 	            av[ac++] = cmdname ;
 	            av[ac++] = "-ef" ;
 #if	CF_DEBUGOUT
