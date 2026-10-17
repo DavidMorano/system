@@ -127,9 +127,9 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 
 int pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
-	if (pbuf && sp) {
+	if (pbuf && sp) ylikely {
 	    rs = SR_INVALID ;
-	    if ((plen >= 0) && (pl >= 0)) {
+	    if ((plen >= 0) && (pl >= 0)) ylikely {
 		rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
 		pl = rs ;
 	    } /* end if (valid) */
@@ -140,12 +140,14 @@ int pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
-	if (pbuf) {
+	if (pbuf) ylikely {
 	    rs = SR_INVALID ;
 	    if ((plen >= 0) && (pl >= 0)) ylikely {
 	        va_begin(ap,n) ;
+		rs = SR_OK ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		    cchar	*sp = (char *) va_arg(ap,char *) ;
+		    ccharp sp = (char *) va_arg(ap,char *) ;
+		    if (! sp) break ;
 		    rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
 		    pl = rs ;
 	        } /* end for */
@@ -161,7 +163,7 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    if (pl >= 0) ylikely {
 	        if ((rs = maxpathlen) >= 0) ylikely {
-		    cint	plen = rs ;
+		    cint plen = rs ;
 		    rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
 		    pl = rs ;
 	        } /* end if (maxpathlen) */
@@ -177,10 +179,11 @@ int pathaddx(char *pbuf,int pl,int n,...) noex {
 	    rs = SR_INVALID ;
 	    if (pl >= 0) ylikely {
 	        if ((rs = maxpathlen) >= 0) ylikely {
-		    cint	plen = rs ;
+		    cint plen = rs ;
 	            va_begin(ap,n) ;
 	            for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		        cchar	*sp = (char *) va_arg(ap,char *) ;
+		        ccharp sp = (char *) va_arg(ap,char *) ;
+			if (! sp) break ;
 		        rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
 		        pl = rs ;
 	            } /* end for */
@@ -199,11 +202,11 @@ local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	if ((pl > 0) && (pbuf[pl - 1] != '/')) {
 	    rs = storebuf_chr(pbuf,plen,pl,'/') ;
 	    pl += rs ;
-	}
+	} /* end */
 	if (rs >= 0) ylikely {
 	    rs = storebuf_strw(pbuf,plen,pl,sp,sl) ;
 	    pl += rs ;
-	}
+	} /* end */
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (local_pathadd) */
 
