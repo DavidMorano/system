@@ -64,6 +64,7 @@ export {
 
 export {
     int snaddslash(char *,int,int) noex ;
+    int snaddpath(char *,int,int) noex ;
 } /* end export */
 
 
