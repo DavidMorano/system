@@ -25,12 +25,12 @@
 	Synopsis:
 
 	int opensvc_org(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -93,23 +93,23 @@
 
 
 int opensvc_org(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		argc = 0 ;
 	int		pipes[2] ;
 	int		fd = -1 ;
 	int		ll = -1 ;
 	int		cols = COLUMNS ;
-	const char	*un = NULL ;
-	const char	*varcols ;
+	cchar	*un = NULL ;
+	cchar	*varcols ;
 	char		ubuf[USERNAMELEN+1] ;
 	char		lbuf[LINEBUFLEN+2] ;
 
@@ -139,7 +139,7 @@ int		to ;
 	if ((un == NULL) || (un[0] == '\0')) {
 	    un = getourenv(envv,VARMOTDUSER) ;
 	    if ((un == NULL) || (un[0] == '\0')) {
-		const char	*uidp = getourenv(envv,VARMOTDUID) ;
+		cchar	*uidp = getourenv(envv,VARMOTDUID) ;
 		if ((uidp != NULL) && (uidp[0] != '\0')) {
 		    int		v ;
 		    uid_t	uid ;
