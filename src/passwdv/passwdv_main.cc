@@ -33,22 +33,22 @@
 #include	<sys/param.h>
 #include	<termios.h>
 #include	<unistd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<paramopt.h>
 #include	<bits.h>
-#include	<bfile.h>
 #include	<ids.h>
 #include	<field.h>
-#include	<isfiledesc.h>
+#include	<pwfile.h>
 #include	<isnot.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	"pwfile.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -58,8 +58,8 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#define	LI		locinfo
+#define	LI_FL		locinfo_flags
 
 #ifndef	CF_PERCACHE
 #define	CF_PERCACHE	0		/* register |ourfini()| mod-unload */
@@ -86,8 +86,8 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, done ;
-	LOCINFO_FL	open ;
+	LI_FL	have, f, changed, done ;
+	LI_FL	open ;
 	vecstr		stores ;
 	PWFILE		pf ;
 	PROGINFO	*pip ;
@@ -98,20 +98,20 @@ struct locinfo {
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procgather(PROGINFO *,paramopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
-static int	procone(PROGINFO *,cchar *) ;
+local int	procgather(PROGINFO *,paramopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
+local int	procone(PROGINFO *,cchar *) ;
 
-static int	procout_begin(PROGINFO *,bfile *,cchar *) ;
-static int	procout_end(PROGINFO *,bfile *) ;
+local int	procout_begin(PROGINFO *,bfile *,cchar *) ;
+local int	procout_end(PROGINFO *,bfile *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_pwbegin(LOCINFO *,cchar *) ;
-static int	locinfo_pwend(LOCINFO *) ;
+local int	locinfo_start(LI *,PROGINFO *) ;
+local int	locinfo_finish(LI *) ;
+local int	locinfo_setentry(LI *,cchar **,cchar *,int) ;
+local int	locinfo_pwbegin(LI *,cchar *) ;
+local int	locinfo_pwend(LI *) ;
 
 extern "C" {
     static void	ourfini() noex ;
@@ -192,7 +192,7 @@ constexpr bool		f_percache = CF_PERCACHE ;
 
 int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+	LI		li, *lip = &li ;
 	ARGINFO		ainfo{} ;
 	bits		pargs ;
 	paramopt	aparams ;
@@ -266,7 +266,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -474,7 +474,7 @@ int main(int argc,mainv argv,mainv envv) {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -747,11 +747,11 @@ badarg:
 
 /* local subroutines */
 
-static voidourfini() noex {
+local voidourfini() noex {
 	percache_fini(&pc) ;
 }
 
-static int usage(PROGINFO *pip) noex {
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar	*pn = pip->progname ;
@@ -769,7 +769,7 @@ static int usage(PROGINFO *pip) noex {
 }
 /* end subroutine (usage) */
 
-static int procgather(PROGINFO *pip,paramopt *pop) noex {
+local int procgather(PROGINFO *pip,paramopt *pop) noex {
 	paramopt_cur	cur ;
 	int		rs ;
 	int		rs1 ;
@@ -795,7 +795,7 @@ static int procgather(PROGINFO *pip,paramopt *pop) noex {
 } 
 /* end subroutine (procgather) */
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cl ;
@@ -828,7 +828,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -871,7 +871,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 /* end subroutine (procargs) */
 
 
-static int procone(PROGINFO *pip,cchar *un)
+local int procone(PROGINFO *pip,cchar *un)
 {
 	int		rs ;
 	if ((rs = process(pip,un)) >= 0) {
@@ -884,8 +884,8 @@ static int procone(PROGINFO *pip,cchar *un)
 }
 /* end subroutine (procone) */
 
-static int procout_begin(PROGINFO *pip,cchar *ofn) noex {
-	LOCINFO		*lip = (LOCINFO *) pip->lip ;
+local int procout_begin(PROGINFO *pip,cchar *ofn) noex {
+	LI		*lip = (LI *) pip->lip ;
 	int		rs = SR_OK ;
 	if (! pip->fl.nooutput) {
 	    cint	oflen = szof(bfile) ;
@@ -907,8 +907,8 @@ static int procout_begin(PROGINFO *pip,cchar *ofn) noex {
 }
 /* end subroutine (procout_begin) */
 
-static int procout_end(PROGINFO *pip) noex {
-	LOCINFO		*lip = (LOCINFO *) pip->lip ;
+local int procout_end(PROGINFO *pip) noex {
+	LI		*lip = (LI *) pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((! pip->fl.nooutput) && (lip->ofp != NULL)) {
@@ -922,7 +922,7 @@ static int procout_end(PROGINFO *pip) noex {
 }
 /* end subroutine (procout_end) */
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
+local int locinfo_start(LI *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == NULL) return SR_FAULT ;
@@ -934,7 +934,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 }
 /* end subroutine (locinfo_start) */
 
-static int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -966,7 +966,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_finish) */
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
 	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -1000,13 +1000,13 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
 }
 /* end subroutine (locinfo_setentry) */
 
-static int locinfo_pwbegin(LOCINFO *lip,cchar *pfn) noex {
+local int locinfo_pwbegin(LI *lip,cchar *pfn) noex {
 	int		rs = SR_OK ;
 	return rs ;
 }
 /* end subroutine (locinfo_pwbegin) */
 
-static int locinfo_pwend(LOCINFO *lip) noex {
+local int locinfo_pwend(LI *lip) noex {
 	int		rs = SR_OK ;
 	return rs ;
 }
