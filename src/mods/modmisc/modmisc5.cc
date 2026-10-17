@@ -36,10 +36,7 @@ module ;
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modmisc ;
@@ -77,11 +74,12 @@ int snaddx(char *rbuf,int rlen,int rl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		cchar	*sp = (char *) va_arg(ap,char *) ;
+		ccharp sp = (charp) va_arg(ap,char *) ;
+		if (! sp) break ;
 		rs = snadd(rbuf,rlen,rl,sp) ;
 		len += rs ;
 		rl += rs ;
