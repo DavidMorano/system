@@ -269,66 +269,66 @@ struct vrbuf {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar **) noex ;
-static int	subinfo_setroot(SUBINFO *,cchar *,cchar *) noex ;
-static int	subinfo_outbegin(SUBINFO *) noex ;
-static int	subinfo_outend(SUBINFO *,int) noex ;
-static int	subinfo_book(SUBINFO *) noex ;
-static int	subinfo_booksize(SUBINFO *) noex ;
-static int	subinfo_booklookup(SUBINFO *,char *,int,int) noex ;
-static int	subinfo_bookmatch(SUBINFO *,cchar *,int) noex ;
-static int	subinfo_today(SUBINFO *) noex ;
-static int	subinfo_defdayspec(SUBINFO *,dayspec *) noex ;
-static int	subinfo_year(SUBINFO *) noex ;
-static int	subinfo_tmtime(SUBINFO *) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
-static int	subinfo_mkmodquery(SUBINFO *,bibleverse_q *,int) noex ;
-static int	subinfo_bvs(SUBINFO *) noex ;
-static int	subinfo_bvsbuild(SUBINFO *) noex ;
-static int	subinfo_bvsbuilder(SUBINFO *) noex ;
-static int	subinfo_ispara(SUBINFO *,bibleverse_q *) noex ;
-static int	subinfo_text(SUBINFO *) noex ;
-static int	subinfo_textquery(SUBINFO *,char *,int,bibleverse_q *) noex ;
-static int	subinfo_vc(SUBINFO *) noex ;
-static int	subinfo_vcbegin(SUBINFO *) noex ;
-static int	subinfo_vcfetch(SUBINFO *,VCINFO *,int) noex ;
-static int	subinfo_vcmjd(SUBINFO *,VCINFO *,int) noex ;
-static int	subinfo_vcload(SUBINFO *,VCINFO *,cchar *,int,int) noex ;
-static int	subinfo_vcbookname(SUBINFO *,VCINFO *,cchar *) noex ;
-static int	subinfo_vcend(SUBINFO *) noex ;
-static int	subinfo_titlelang(SUBINFO *) noex ;
+local int	subinfo_start(SUBINFO *,cchar **) noex ;
+local int	subinfo_setroot(SUBINFO *,cchar *,cchar *) noex ;
+local int	subinfo_outbegin(SUBINFO *) noex ;
+local int	subinfo_outend(SUBINFO *,int) noex ;
+local int	subinfo_book(SUBINFO *) noex ;
+local int	subinfo_booksize(SUBINFO *) noex ;
+local int	subinfo_booklookup(SUBINFO *,char *,int,int) noex ;
+local int	subinfo_bookmatch(SUBINFO *,cchar *,int) noex ;
+local int	subinfo_today(SUBINFO *) noex ;
+local int	subinfo_defdayspec(SUBINFO *,dayspec *) noex ;
+local int	subinfo_year(SUBINFO *) noex ;
+local int	subinfo_tmtime(SUBINFO *) noex ;
+local int	subinfo_finish(SUBINFO *) noex ;
+local int	subinfo_mkmodquery(SUBINFO *,bibleverse_q *,int) noex ;
+local int	subinfo_bvs(SUBINFO *) noex ;
+local int	subinfo_bvsbuild(SUBINFO *) noex ;
+local int	subinfo_bvsbuilder(SUBINFO *) noex ;
+local int	subinfo_ispara(SUBINFO *,bibleverse_q *) noex ;
+local int	subinfo_text(SUBINFO *) noex ;
+local int	subinfo_textquery(SUBINFO *,char *,int,bibleverse_q *) noex ;
+local int	subinfo_vc(SUBINFO *) noex ;
+local int	subinfo_vcbegin(SUBINFO *) noex ;
+local int	subinfo_vcfetch(SUBINFO *,VCINFO *,int) noex ;
+local int	subinfo_vcmjd(SUBINFO *,VCINFO *,int) noex ;
+local int	subinfo_vcload(SUBINFO *,VCINFO *,cchar *,int,int) noex ;
+local int	subinfo_vcbookname(SUBINFO *,VCINFO *,cchar *) noex ;
+local int	subinfo_vcend(SUBINFO *) noex ;
+local int	subinfo_titlelang(SUBINFO *) noex ;
 
 #if	CF_SUBNDATS
-static int	subinfo_ndays(SUBINFO *,bibleverse_q *,int) noex ;
+local int	subinfo_ndays(SUBINFO *,bibleverse_q *,int) noex ;
 #endif
 
-static int	procopts(SUBINFO *,keyopt *) noex ;
-static int	process(SUBINFO *,ARGINFO *,bits *,cchar *,int) noex ;
-static int	procsome(SUBINFO *,ARGINFO *,bits *,cchar *,int) noex ;
-static int	procspecs(SUBINFO *,cchar *,int) noex ;
-static int	procspec(SUBINFO *,cchar *,int) noex ;
-static int	procallcache(SUBINFO *) noex ;
-static int	procallcacheout(SUBINFO *,VOTDC *,VOTDC_CITE *,
+local int	procopts(SUBINFO *,keyopt *) noex ;
+local int	process(SUBINFO *,ARGINFO *,bits *,cchar *,int) noex ;
+local int	procsome(SUBINFO *,ARGINFO *,bits *,cchar *,int) noex ;
+local int	procspecs(SUBINFO *,cchar *,int) noex ;
+local int	procspec(SUBINFO *,cchar *,int) noex ;
+local int	procallcache(SUBINFO *) noex ;
+local int	procallcacheout(SUBINFO *,VOTDC *,VOTDC_CITE *,
 			char *,int) noex ;
-static int	procallcacheoutcite(SUBINFO *,VOTDC *,VOTDC_CITE *) noex ;
-static int	procall(SUBINFO *) noex ;
-static int	procparse(SUBINFO *,bibleverse_q *,cchar *,int) noex ;
-static int	procmulti(SUBINFO *,bibleverse_q *,int,int) noex ;
-static int	procload(SUBINFO *,VRBUF *,int,bibleverse_q *) noex ;
-static int	proctoday(SUBINFO *,int,int) noex ;
-static int	procmjds(SUBINFO *,int,int,int) noex ;
-static int	procvcache(SUBINFO *,int,int) noex ;
-static int	procvcacher(SUBINFO *,VCINFO *,int) noex ;
-static int	procvoutcite(SUBINFO *,VCINFO *,int) noex ;
-static int	procvoutverse(SUBINFO *,VCINFO *) noex ;
-static int	procoutcite(SUBINFO *,bibleverse_q *,int) noex ;
-static int	procoutverse(SUBINFO *,bibleverse_q *,cchar *,int) noex ;
-static int	procoutline(SUBINFO *,int,cchar *,int) noex ;
+local int	procallcacheoutcite(SUBINFO *,VOTDC *,VOTDC_CITE *) noex ;
+local int	procall(SUBINFO *) noex ;
+local int	procparse(SUBINFO *,bibleverse_q *,cchar *,int) noex ;
+local int	procmulti(SUBINFO *,bibleverse_q *,int,int) noex ;
+local int	procload(SUBINFO *,VRBUF *,int,bibleverse_q *) noex ;
+local int	proctoday(SUBINFO *,int,int) noex ;
+local int	procmjds(SUBINFO *,int,int,int) noex ;
+local int	procvcache(SUBINFO *,int,int) noex ;
+local int	procvcacher(SUBINFO *,VCINFO *,int) noex ;
+local int	procvoutcite(SUBINFO *,VCINFO *,int) noex ;
+local int	procvoutverse(SUBINFO *,VCINFO *) noex ;
+local int	procoutcite(SUBINFO *,bibleverse_q *,int) noex ;
+local int	procoutverse(SUBINFO *,bibleverse_q *,cchar *,int) noex ;
+local int	procoutline(SUBINFO *,int,cchar *,int) noex ;
 
-static int	vcinfo_start(VCINFO *) noex ;
-static int	vcinfo_finish(VCINFO *) noex ;
+local int	vcinfo_start(VCINFO *) noex ;
+local int	vcinfo_finish(VCINFO *) noex ;
 
-static int	votdsq_load(VOTDC_Q *,bibleverse_q *) noex ;
+local int	votdsq_load(VOTDC_Q *,bibleverse_q *) noex ;
 
 
 /* local variables */
@@ -971,7 +971,7 @@ badsubstart:
 /* local subroutines */
 
 /* process the program ako-names */
-static int procopts(SUBINFO *sip,keyopt *kop) noex {
+local int procopts(SUBINFO *sip,keyopt *kop) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
@@ -1129,7 +1129,7 @@ static int procopts(SUBINFO *sip,keyopt *kop) noex {
 }
 /* end subroutine (procopts) */
 
-static int process(SUBINFO *sip,ARGINFO *aip,bits *bop,cchar *afn,
+local int process(SUBINFO *sip,ARGINFO *aip,bits *bop,cchar *afn,
 		int f_apm) noex {
 	cint		fd = sip->wfd ;
 	int		rs ;
@@ -1158,7 +1158,7 @@ static int process(SUBINFO *sip,ARGINFO *aip,bits *bop,cchar *afn,
 }
 /* end subroutine (process) */
 
-static int procsome(SUBINFO *sip,ARGINFO *aip,bits *bop,cchar *afn,
+local int procsome(SUBINFO *sip,ARGINFO *aip,bits *bop,cchar *afn,
 		int f_apm) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1243,7 +1243,7 @@ static int procsome(SUBINFO *sip,ARGINFO *aip,bits *bop,cchar *afn,
 }
 /* end subroutine (procsome) */
 
-static int procspecs(SUBINFO *sip,cchar *sp,int sl) noex {
+local int procspecs(SUBINFO *sip,cchar *sp,int sl) noex {
 	FIELD		fsb ;
 	int		rs ;
 	int		wlen = 0 ;
@@ -1276,7 +1276,7 @@ static int procspecs(SUBINFO *sip,cchar *sp,int sl) noex {
 }
 /* end subroutine (procspecs) */
 
-static int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
+local int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
 	int		rs = SR_OK ;
 	int		ndays = sip->nitems ;
 	int		wlen = 0 ;
@@ -1348,7 +1348,7 @@ static int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
 }
 /* end subroutine (procspec) */
 
-static int procallcache(SUBINFO *sip) noex {
+local int procallcache(SUBINFO *sip) noex {
 	VOTDC		*vcp = &sip->vcache ;
 	int		rs ;
 	int		rs1 ;
@@ -1383,7 +1383,7 @@ static int procallcache(SUBINFO *sip) noex {
 }
 /* end subroutine (procallcache) */
 
-static int procallcacheout(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep,
+local int procallcacheout(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep,
 		char *vbuf,int vl) noex {
 	int		rs ;
 	int		wlen = 0 ;
@@ -1402,7 +1402,7 @@ static int procallcacheout(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep,
 }
 /* end subroutine (procallcacheout) */
 
-static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
+local int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*fmt ;
@@ -1438,7 +1438,7 @@ static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 }
 /* end subroutine (procallcacheoutcite) */
 
-static int procall(SUBINFO *sip) noex {
+local int procall(SUBINFO *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1474,7 +1474,7 @@ static int procall(SUBINFO *sip) noex {
 }
 /* end subroutine (procall) */
 
-static int procmulti(SUBINFO *sip,bibleverse_q *qp,int f_cite,int ndays) noex {
+local int procmulti(SUBINFO *sip,bibleverse_q *qp,int f_cite,int ndays) noex {
 	VRBUF		*vrp ;
 	int		rs ;
 	int		rs1 ;
@@ -1522,7 +1522,7 @@ static int procmulti(SUBINFO *sip,bibleverse_q *qp,int f_cite,int ndays) noex {
 }
 /* end subroutine (procmulti) */
 
-static int procload(SUBINFO *sip,VRBUF *vrp,int nbuf,bibleverse_q *qp) noex {
+local int procload(SUBINFO *sip,VRBUF *vrp,int nbuf,bibleverse_q *qp) noex {
 	int		rs ;
 	int		nb = 0 ;
 	if ((rs = subinfo_text(sip)) >= 0) {
@@ -1546,7 +1546,7 @@ static int procload(SUBINFO *sip,VRBUF *vrp,int nbuf,bibleverse_q *qp) noex {
 }
 /* end subroutine (procload) */
 
-static int procparse(SUBINFO *sip,bibleverse_q *qp,cchar sp[],int sl) noex {
+local int procparse(SUBINFO *sip,bibleverse_q *qp,cchar sp[],int sl) noex {
 	BCSPEC		bb ;
 	int		rs ;
 
@@ -1566,7 +1566,7 @@ static int procparse(SUBINFO *sip,bibleverse_q *qp,cchar sp[],int sl) noex {
 }
 /* end subroutine (procparse) */
 
-static int proctoday(SUBINFO *sip,int f_cite,int ndays) noex {
+local int proctoday(SUBINFO *sip,int f_cite,int ndays) noex {
 	int		rs ;
 	int		wlen = 0 ;
 
@@ -1595,7 +1595,7 @@ static int proctoday(SUBINFO *sip,int f_cite,int ndays) noex {
 }
 /* end subroutine (proctoday) */
 
-static int procmjds(SUBINFO *sip,int mjd,int f_cite,int ndays) noex {
+local int procmjds(SUBINFO *sip,int mjd,int f_cite,int ndays) noex {
 	bibleverse_q	q ;
 	int		rs ;
 	int		wlen = 0 ;
@@ -1609,7 +1609,7 @@ static int procmjds(SUBINFO *sip,int mjd,int f_cite,int ndays) noex {
 }
 /* end subroutine (procmjds) */
 
-static int procvcache(SUBINFO *sip,int mjd,int ndays) noex {
+local int procvcache(SUBINFO *sip,int mjd,int ndays) noex {
 	VCINFO		vci ;
 	int		rs ;
 	int		rs1 ;
@@ -1629,7 +1629,7 @@ static int procvcache(SUBINFO *sip,int mjd,int ndays) noex {
 }
 /* end subroutine (procvcache) */
 
-static int procvcacher(SUBINFO *sip,VCINFO *vip,int mjd) noex {
+local int procvcacher(SUBINFO *sip,VCINFO *vip,int mjd) noex {
 	int		rs ;
 	int		vl = 0 ;
 	if ((rs = subinfo_vc(sip)) >= 0) {
@@ -1652,7 +1652,7 @@ static int procvcacher(SUBINFO *sip,VCINFO *vip,int mjd) noex {
 }
 /* end subroutine (procvcacher) */
 
-static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
+local int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	bibleverse_q	*qp = &vip->q ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1705,7 +1705,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 }
 /* end subroutine (procvoutcite) */
 
-static int procvoutverse(SUBINFO *sip,VCINFO *vcip) noex {
+local int procvoutverse(SUBINFO *sip,VCINFO *vcip) noex {
 	bibleverse_q	*qp = &vcip->q ;
 	int		rs = SR_OK ;
 	int		vlen = vcip->vlen ;
@@ -1719,7 +1719,7 @@ static int procvoutverse(SUBINFO *sip,VCINFO *vcip) noex {
 }
 /* end subroutine (procvoutverse) */
 
-static int procoutcite(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
+local int procoutcite(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
 	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		cl ;
@@ -1781,7 +1781,7 @@ static int procoutcite(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
 }
 /* end subroutine (procoutcite) */
 
-static int procoutverse(SUBINFO *sip,bibleverse_q *qp,cchar vp[],int vl) noex {
+local int procoutverse(SUBINFO *sip,bibleverse_q *qp,cchar vp[],int vl) noex {
 	WORDFILL	w ;
 	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
@@ -1847,7 +1847,7 @@ static int procoutverse(SUBINFO *sip,bibleverse_q *qp,cchar vp[],int vl) noex {
 /* end subroutine (procoutverse) */
 
 /* ARGSUSED */
-static int procoutline(SUBINFO *sip,int line,cchar *lp,int ll) noex {
+local int procoutline(SUBINFO *sip,int line,cchar *lp,int ll) noex {
 	int		rs ;
 	int		indent ;
 	int		wlen = 0 ;
@@ -1862,7 +1862,7 @@ static int procoutline(SUBINFO *sip,int line,cchar *lp,int ll) noex {
 }
 /* end subroutine (procoutline) */
 
-static int subinfo_start(SUBINFO *sip,cchar **envv) noex {
+local int subinfo_start(SUBINFO *sip,cchar **envv) noex {
 	int		rs = SR_OK ;
 
 	if (envv == nullptr) envv = environ ;
@@ -1885,7 +1885,7 @@ static int subinfo_start(SUBINFO *sip,cchar **envv) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+local int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1922,7 +1922,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_setroot(SUBINFO *sip,cchar *pr,cchar *sn) noex {
+local int subinfo_setroot(SUBINFO *sip,cchar *pr,cchar *sn) noex {
 	if (pr == nullptr) return SR_FAULT ;
 	sip->pr = pr ;
 	if (sn == nullptr) sn = getourenv(sip->envv,VARSEARCHNAME) ;
@@ -1932,7 +1932,7 @@ static int subinfo_setroot(SUBINFO *sip,cchar *pr,cchar *sn) noex {
 }
 /* end subroutine (subinfo_setroot) */
 
-static int subinfo_outbegin(SUBINFO *sip) noex {
+local int subinfo_outbegin(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->fl.all || sip->fl.allcache) {
 	    if ((rs = opentmp(nullptr,0,0)) >= 0) {
@@ -1950,7 +1950,7 @@ static int subinfo_outbegin(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_outbegin) */
 
-static int subinfo_outend(SUBINFO *sip,int ars) noex {
+local int subinfo_outend(SUBINFO *sip,int ars) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sip->fl.all || sip->fl.allcache) {
@@ -1967,7 +1967,7 @@ static int subinfo_outend(SUBINFO *sip,int ars) noex {
 }
 /* end subroutine (subinfo_outend) */
 
-static int subinfo_booksize(SUBINFO *sip) noex {
+local int subinfo_booksize(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if ((rs = subinfo_book(sip)) >= 0) {
 	    rs = biblebook_size(&sip->ndb) ;
@@ -1976,7 +1976,7 @@ static int subinfo_booksize(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_booksize) */
 
-static int subinfo_booklookup(SUBINFO *sip,char *nbuf,int nlen,int bi) noex {
+local int subinfo_booklookup(SUBINFO *sip,char *nbuf,int nlen,int bi) noex {
 	int		rs ;
 	int		len = 0 ;
 
@@ -1991,7 +1991,7 @@ static int subinfo_booklookup(SUBINFO *sip,char *nbuf,int nlen,int bi) noex {
 }
 /* end subroutine (subinfo_booklookup) */
 
-static int subinfo_bookmatch(SUBINFO *sip,cchar *mbuf,int mlen) noex {
+local int subinfo_bookmatch(SUBINFO *sip,cchar *mbuf,int mlen) noex {
 	int		rs ;
 	int		bi = 0 ;
 
@@ -2005,7 +2005,7 @@ static int subinfo_bookmatch(SUBINFO *sip,cchar *mbuf,int mlen) noex {
 }
 /* end subroutine (subinfo_bookmatch) */
 
-static int subinfo_book(SUBINFO *sip) noex {
+local int subinfo_book(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (! sip->open.ndb) {
 	    BIBLEBOOK	*bbp = &sip->ndb ;
@@ -2017,7 +2017,7 @@ static int subinfo_book(SUBINFO *sip) noex {
 /* end subroutine (subinfo_book) */
 
 /* get (find out) the current MJD (for today) */
-static int subinfo_today(SUBINFO *sip) noex {
+local int subinfo_today(SUBINFO *sip) noex {
 	cint	to = TO_MJD ;
 	int		rs ;
 	int		mjd = sip->mjd ;
@@ -2039,7 +2039,7 @@ static int subinfo_today(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_today) */
 
-static int subinfo_defdayspec(SUBINFO *sip,dayspec *dsp) noex {
+local int subinfo_defdayspec(SUBINFO *sip,dayspec *dsp) noex {
 	int		rs = SR_OK ;
 	if ((rs >= 0) && (dsp->y <= 0)) {
 	    rs = subinfo_year(sip) ;
@@ -2054,7 +2054,7 @@ static int subinfo_defdayspec(SUBINFO *sip,dayspec *dsp) noex {
 /* end subroutine (subinfo_defdayspec) */
 
 /* get the current year (if necessary) */
-static int subinfo_year(SUBINFO *sip) noex {
+local int subinfo_year(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->year <= 0) {
 	    if ((rs = subinfo_tmtime(sip)) >= 0) {
@@ -2065,7 +2065,7 @@ static int subinfo_year(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_year) */
 
-static int subinfo_tmtime(SUBINFO *sip) noex {
+local int subinfo_tmtime(SUBINFO *sip) noex {
 	cint	tc = TIMECOUNT ;
 	cint	to = TO_TIME ;
 	int		rs = SR_OK ;
@@ -2090,7 +2090,7 @@ static int subinfo_tmtime(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_tmtime) */
 
-static int subinfo_mkmodquery(SUBINFO *sip,bibleverse_q *qp,int mjd) noex {
+local int subinfo_mkmodquery(SUBINFO *sip,bibleverse_q *qp,int mjd) noex {
 	int		rs = SR_OK ;
 
 	if (! sip->open.sdb) {
@@ -2110,7 +2110,7 @@ static int subinfo_mkmodquery(SUBINFO *sip,bibleverse_q *qp,int mjd) noex {
 }
 /* end subroutine (subinfo_mkmodquery) */
 
-static int subinfo_bvs(SUBINFO *sip) noex {
+local int subinfo_bvs(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (! sip->open.sdb) {
 	    BVS		*bsp = &sip->sdb ;
@@ -2134,7 +2134,7 @@ static int subinfo_bvs(SUBINFO *sip) noex {
 /* end subroutine (subinfo_bvs) */
 
 /* build the BVS database */
-static int subinfo_bvsbuild(SUBINFO *sip) noex {
+local int subinfo_bvsbuild(SUBINFO *sip) noex {
 {
 	int		rs = SR_OK ;
 	if (sip->open.vdb) {
@@ -2146,7 +2146,7 @@ static int subinfo_bvsbuild(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_bvsbuild) */
 
-static int subinfo_bvsbuilder(SUBINFO *sip) noex {
+local int subinfo_bvsbuilder(SUBINFO *sip) noex {
 	BVSMK		*bmp = &sip->bsmk ;
 	cmode		om = 0666 ;
 	cint		of = 0 ;
@@ -2203,7 +2203,7 @@ static int subinfo_bvsbuilder(SUBINFO *sip) noex {
 
 /* return maximum days possible for this citation */
 #if	CF_SUBNDATS
-static int subinfo_ndays(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
+local int subinfo_ndays(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -2236,7 +2236,7 @@ static int subinfo_ndays(SUBINFO *sip,bibleverse_q *qp,int ndays) noex {
 /* end subroutine (subinfo_ndays) */
 #endif /* CF_SUBNDATS */
 
-static int subinfo_ispara(SUBINFO *sip,bibleverse_q *qp) noex {
+local int subinfo_ispara(SUBINFO *sip,bibleverse_q *qp) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 
@@ -2263,7 +2263,7 @@ static int subinfo_ispara(SUBINFO *sip,bibleverse_q *qp) noex {
 }
 /* end subroutine (subinfo_ispara) */
 
-static int subinfo_vc(SUBINFO *sip) noex {
+local int subinfo_vc(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->fl.trycache && (! sip->open.vcache)) {
 	    rs = subinfo_vcbegin(sip) ;
@@ -2272,7 +2272,7 @@ static int subinfo_vc(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_vc) */
 
-static int subinfo_vcbegin(SUBINFO *sip) noex {
+local int subinfo_vcbegin(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (sip->fl.trycache && (! sip->open.vcache)) {
 	    cint	of = O_CREAT ;
@@ -2285,7 +2285,7 @@ static int subinfo_vcbegin(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_vcbegin) */
 
-static int subinfo_vcend(SUBINFO *sip) noex {
+local int subinfo_vcend(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sip->open.vcache) {
@@ -2296,7 +2296,7 @@ static int subinfo_vcend(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_vcend) */
 
-static int subinfo_vcfetch(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
+local int subinfo_vcfetch(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
 	VOTDC		*vcp = &sip->vcache ;
 	VOTDC_Q		vq ;
 	cint	vlen = vcip->vlen ;
@@ -2316,7 +2316,7 @@ static int subinfo_vcfetch(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
 }
 /* end subroutine (subinfo_vcfetch) */
 
-static int subinfo_vcmjd(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
+local int subinfo_vcmjd(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
 	bibleverse_q	*qp = &vcip->q ;
 	int		rs ;
 	int		vl = 0 ;
@@ -2335,7 +2335,7 @@ static int subinfo_vcmjd(SUBINFO *sip,VCINFO *vcip,int mjd) noex {
 }
 /* end subroutine (subinfo_vcmjd) */
 
-static int subinfo_vcload(SUBINFO *sip,VCINFO *vcip,cchar *lang,int mjd,
+local int subinfo_vcload(SUBINFO *sip,VCINFO *vcip,cchar *lang,int mjd,
 		int vl) noex {
 	int		rs ;
 	if ((rs = subinfo_titlelang(sip)) >= 0) {
@@ -2350,7 +2350,7 @@ static int subinfo_vcload(SUBINFO *sip,VCINFO *vcip,cchar *lang,int mjd,
 }
 /* end subroutine (subinfo_vcload) */
 
-static int subinfo_vcbookname(SUBINFO *sip,VCINFO *vip,cchar *lang) noex {
+local int subinfo_vcbookname(SUBINFO *sip,VCINFO *vip,cchar *lang) noex {
 	int		rs = SR_OK ;
 	if (vip->nbuf[0] == '\0') {
 	    VOTDC	*vcp = &sip->vcache ;
@@ -2363,7 +2363,7 @@ static int subinfo_vcbookname(SUBINFO *sip,VCINFO *vip,cchar *lang) noex {
 }
 /* end subroutine (subinfo_vcbookname) */
 
-static int subinfo_text(SUBINFO *sip) noex {
+local int subinfo_text(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if (! sip->open.vdb) {
 	    cchar	*pr = sip->pr ;
@@ -2377,14 +2377,14 @@ static int subinfo_text(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_text) */
 
-static int subinfo_textquery(SUBINFO *sip,char *vbuf,int vlen,
+local int subinfo_textquery(SUBINFO *sip,char *vbuf,int vlen,
 		bibleverse_q *qp) noex {
 	return bibleverse_read(&sip->vdb,vbuf,vlen,qp) ;
 	return rs ;
 }
 /* end subroutine (subinfo_textquery) */
 
-static int subinfo_titlelang(SUBINFO *sip) noex {
+local int subinfo_titlelang(SUBINFO *sip) noex {
 	VOTDC		*vcp = &sip->vcache ;
 	int		rs ;
 	cchar		*lang = sip->lang ;
@@ -2418,7 +2418,7 @@ static int subinfo_titlelang(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_titlelang) */
 
-static int vcinfo_start(VCINFO *op) noex {
+local int vcinfo_start(VCINFO *op) noex {
 	cint	nlen = BNBUFLEN ;
 	cint	vlen = BVBUFLEN ;
 	int		rs ;
@@ -2442,7 +2442,7 @@ static int vcinfo_start(VCINFO *op) noex {
 }
 /* end subroutine (vcinfo_start) */
 
-static int vcinfo_finish(VCINFO *op) noex {
+local int vcinfo_finish(VCINFO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->a != nullptr) {
@@ -2458,7 +2458,7 @@ static int vcinfo_finish(VCINFO *op) noex {
 }
 /* end subroutine (vcinfo_finish) */
 
-static int votdsq_load(VOTDC_Q *vqp,bibleverse_q *qp) noex {
+local int votdsq_load(VOTDC_Q *vqp,bibleverse_q *qp) noex {
 	vqp->b = qp->b ;
 	vqp->c = qp->c ;
 	vqp->v = qp->v ;
