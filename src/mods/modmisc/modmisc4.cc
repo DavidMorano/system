@@ -35,10 +35,7 @@ module ;
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modmisc ;
@@ -75,41 +72,41 @@ module modmisc ;
 int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (rbuf && sp) {
+	if (rbuf && sp) ylikely {
 	    rs = SR_INVALID ;
- 	    if (i >= 0) {	
+ 	    if (i >= 0) ylikely {	
 	        char	*bp = (rbuf + i) ;
 	        rs = SR_OK ;
 	        if (rlen < 0) {
 	            if (sl < 0) {
 	                while (*sp) {
 	                    *bp++ = *sp++ ;
-		        }
+		        } /* end while */
 	            } else {
 	                while (sl && *sp) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
-	                }
+	                } /* end while */
 	            } /* end if */
 	        } else {
 	            if (sl < 0) {
 	                while ((bp < (rbuf + rlen)) && *sp) {
 	                    *bp++ = *sp++ ;
-		        }
-		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
+		        } /* end while */
+		        if ((bp == (rbuf + rlen)) && *sp) {
 		            rs = SR_OVERFLOW ;
-		        }
+		        } /* end if (error) */
 	            } else {
 	                while ((bp < (rbuf + rlen)) && sl && *sp) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
-	                }
+	                } /* end while */
 		        if ((bp == (rbuf + rlen)) && sl) {
 		            rs = SR_OVERFLOW ;
-		        }
+		        } /* end if (error) */
 	            } /* end if */
 	        } /* end if */
-	        *bp = '\0' ;
+	        *bp = eos ;
 		len = intconv(bp - (rbuf + i)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
