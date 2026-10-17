@@ -40,6 +40,7 @@
 
 #include	<snaddw.h>
 #include	<snaddslash.h>
+#include	<snaddpath.h>
 
 
 EXTERNC_begin
