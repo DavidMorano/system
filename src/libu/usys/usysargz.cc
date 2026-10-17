@@ -73,8 +73,8 @@ import libutil ;
 #endif
 
 using std::once_call ;			/* subroutine */
-using libu::sncpy ;			/* subroutine */
-using libu::snwcpy ;			/* subroutine */
+using usys::sncpy ;			/* subroutine */
+using usys::snwcpy ;			/* subroutine */
 
 cint		tlen = MAXPATH ;
 
@@ -108,7 +108,7 @@ namespace usys {
     int usysargz::get(char *rbuf,int rlen) noex {
 	if ((rss >= 0) && name) {
 	    rss = snwcpy(rbuf,rlen,name,nlen) ;
-	}
+	} /* end */
 	return rss ;
     } /* end method (usysargz::get) */
 } /* end namespace (usys) */
