@@ -39,19 +39,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
+#include	<sys/param.h>		/* POSIX® */
 #include	<sys/mount.h>		/* |USTATFS| */
-#include	<sys/statvfs.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usysflag.h>
-#include	<usupport.h>
+#include	<sys/statvfs.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_ufstype.h"
 
@@ -59,14 +58,14 @@ import libutil ;
 
 /* imported namespaces */
 
-using libu::sncpy ;
-using libu::snwcpy ;
+using usys::sncpy ;			/* subroutine */
+using usys::snwcpy ;			/* subroutine */
 
 /* external subroutines */
 
 extern "C" {
-    extern int	u_fstatfs(int,USTATFS *) noex ;
-    extern int	u_fstatvfs(int,USTATVFS *) noex ;
+    extern int	u_fstatfs	(int,USTATFS *) noex ;
+    extern int	u_fstatvfs	(int,USTATVFS *) noex ;
 } /* end extern */
 
 /* exported subroutines */
@@ -81,7 +80,7 @@ namespace libu {
 	        cchar	*cp = vsb.f_basetype ;
 	        cint	cl = xstrnlen(vsb.f_basetype,FSTYPSZ) ;
 	        rs = snwcpy(nbuf,nlen,cp,cl) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ufstype) */
@@ -97,7 +96,7 @@ namespace libu {
 	        ccharp	cp = sb.f_fstypename ;
 	        cint	cl = cstrnlen(sb.f_fstypename,MFSNAMELEN) ;
 	        rs = snwcpy(nbuf,nlen,cp,cl) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ufstype) */
@@ -112,7 +111,7 @@ Linux just does not have an easy way to get a file-system type c-string.
 namespace libu {
     sysret_t ufstype(char *rbuf,int rlen,int) noex {
 	return sncpy(rbuf,rlen,"remote") ;
-    }
+    } /* end */
 } /* end namespace */
 
 #else /* all other operating systems */
@@ -120,7 +119,7 @@ namespace libu {
 namespace libu {
     sysret_t ufstype(char *rbuf,int rlen,int) noex {
 	return sncpy(rbuf,rlen,"remote") ;
-    }
+    } /* end */
 } /* end namespace */
 
 #endif /* which operating system */
