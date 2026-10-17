@@ -59,7 +59,7 @@
 
 /* external subroutines */
 
-extern char	*strdcpy1(char *,int,const char *) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
 
 
 /* external variables */
@@ -70,14 +70,14 @@ extern char	*strdcpy1(char *,int,const char *) ;
 
 /* forward references */
 
-static int	scanc(const char *,int,int) ;
+local int	scanc(cchar *,int,int) ;
 
 
 /* local variables */
 
 static char	lbuf[MAXLINES][LINEBUFLEN + MAXBS + 3] ;
 
-static int	llen[MAXLINES] ;
+local int	llen[MAXLINES] ;
 
 
 /* exported subroutines */
@@ -85,13 +85,13 @@ static int	llen[MAXLINES] ;
 
 int main(argc,argv,envv)
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 {
 	bfile		input, *ifp = &input ;
 	bfile		output, *ofp = &output ;
 	bfile		error, *efp = &error ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 
 	int	rs = SR_OK ;
 	int	argl, aol ;
@@ -99,13 +99,13 @@ const char	*envv[] ;
 	int	page, len, l, lines, rs ;
 	int	tbl ;
 
-	const char	*progname, *argp, *aop ;
-	const char	*pn = NULL ;
-	const char	*sn = NULL ;
-	const char	*fontname = "CB" ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
+	cchar	*progname, *argp, *aop ;
+	cchar	*pn = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*fontname = "CB" ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
 
 	char	*tbp ;
 	char	tbuf[LINEBUFLEN + 1] ;
@@ -303,7 +303,7 @@ next_page:
 	            for (i = 0 ; (i < NTOPLINES) && (i < lines) ; i += 1) {
 
 	                if ((si = substring(lbuf[i],llen[i],"Page")) >= 0) {
-			    const char	*rs = "Reference " ;
+			    cchar	*rs = "Reference " ;
 			    int		rl ;
 
 			    rl = strlen(rs) ;
@@ -458,9 +458,9 @@ badargnum:
 /* local subroutines */
 
 
-static int scanc(buf,mch,n)
+local int scanc(buf,mch,n)
 int		n, mch ;
-const char	buf[] ;
+cchar	buf[] ;
 {
 	int	j ;
 	int	f = FALSE ;
