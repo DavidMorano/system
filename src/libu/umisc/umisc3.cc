@@ -76,7 +76,7 @@ module umisc ;
 
 /* forward references */
 
-local int	local_pathadd(char *,int,int,cchar *,int) noex ;
+local int	local_pathadd(char *,int,int,cchar *,int = -1) noex ;
 
 
 /* local variables */
@@ -106,8 +106,10 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	    rs = SR_INVALID ;
 	    if ((plen >= 0) && (pl >= 0)) ylikely {
 	        va_begin(ap,n) ;
+		rs = SR_OK ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		    cchar	*sp = (char *) va_arg(ap,char *) ;
+		    ccharp sp = (char *) va_arg(ap,char *) ;
+		    if (! sp) break ;
 		    rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
 		    pl = rs ;
 	        } /* end for */
@@ -125,11 +127,11 @@ local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	if ((pl > 0) && (pbuf[pl - 1] != '/')) {
 	    rs = snaddslash(pbuf,plen,pl) ;
 	    pl += rs ;
-	}
+	} /* end */
 	if (rs >= 0) ylikely {
 	    rs = snaddw(pbuf,plen,pl,sp,sl) ;
 	    pl += rs ;
-	}
+	} /* end */
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (local_pathadd) */
 
