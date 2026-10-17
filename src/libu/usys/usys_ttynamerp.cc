@@ -11,9 +11,15 @@
 	= 2001-04-11, David A-D- Morano
 	This subroutine was written for Rightcore Network Services.
 
+	= 2026-10-15, David A-D- Morano
+	I got rid of the usage of the subroutine |strlcpy(3c)|.
+	That subroutine just did not fit our philosophy of
+	good programming practices.  Its function signature was
+	bad, and its semantics were bad.
+
 */
 
-/* Copyright © 2001 David A-D- Morano.  All rights reserved. */
+/* Copyright © 2001,2026 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -39,7 +45,7 @@
 	==0		OK
 	*errno*		UNIX® ERRNO code
 
-	Notes:
+	Notes: (obsoleted 2026-10-15, see revision note above)
 	I am using the new (rumored to be coming as a standard)
 	subroutine |strlcpy(3c)|.  I wrote my own version of this
 	until it gets into the standard libraries.  It might be in
@@ -57,7 +63,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>		/* POSIX® |ttyname_r(3c)| */
 #include	<cerrno>		/* CSTD */
-#include	<cstring>		/* CSTD |strncpy(3c)| + |strlcpy(3c)| */
+#include	<cstring>		/* CSTD |strncpy(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
@@ -67,7 +73,7 @@
 #include	<aflag.hh>		/* LIBU mutex-flag */
 
 #include	"usys_darwin.h"
-#include	"usys_libstr.h"
+#include	"usys_strbcpy.hh"	/* |strbcpy(3usys)| */
 #include	"usys_ttynamerp.h"
 
 /* TTYNAMER start */
@@ -76,14 +82,14 @@
 #if defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
 errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
-	csize		rsize = size_t(rlen) ;
 	errno_t		ec = EBADF ; /* return-value */
 	if (fd >= 0) ylikely {
 	    ex = EFAULT ;
 	    if (rbuf) ylikely {
 		ec = EINVAL ;
 		if (rlen > 0) ylikely {
-	            if (char *p = ttyname_r(fd,rbuf,rsize)) ylikely {
+		    csize rsize = size_t(rlen) ;
+	            if (ttyname_r(fd,rbuf,rsize)) ylikely {
 	                ec = errno ;
 	            } /* end if */
 		} /* end if */
@@ -95,13 +101,13 @@ errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 #else /* all other operatring systems at this time */
 
 errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
-	csize		rsize = size_t(rlen) ;
 	errno_t		ec = EBADF ;
 	if (fd >= 0) ylikely {
 	    ec = EFAULT ;
 	    if (rbuf) ylikely {
 		ec = EINVAL ;
 		if (rlen > 0) ylikely {
+		    csize rsize = size_t(rlen) ;
 	            ec = ttyname_r(fd,rbuf,rsize) ;
 		} /* end if */
 	    } /* end if */
@@ -114,18 +120,15 @@ errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
 #else /* defined(SYSHAS_TTYNAMER) && (SYSHAS_TTYNAMER > 0) */
 
 errno_t ttyname_rp(int fd,char *rbuf,int rlen) noex {
+    	using usys:sncpy ;
 	errno_t		ec = EOK ; /* return-value */
 	if (fd >= 0) ylikely {
 	    if (rbuf) ylikely {
 		if (rlen > 0) ylikely {
-		    csize	rsize = size_t(rlen) ;
-		    if (char *p = ttyname(fd)) ylikely {
-			size_t	res ;
-			if ((res = strlcpy(rbuf,p,(rsize+1))) >= (rsize+1)) {
-			    ec = EOVERFLOW ;
-			    rbuf[0] = '\0' ;
-			} else {
-			    rbuf[res] = '\0' ;
+		    if (cchar *p = ttyname(fd)) ylikely {
+			if (cint rs = sncpy(rbuf,rlen,p) ; rs < 0) ylikely {
+			    ec = (neg rs) ;
+			    rbuf[0] = eos ;
 			} /* end */
 		    } else {
 			ec = errno ;
