@@ -28,12 +28,12 @@
 
 	Synopsis:
 	int opensvc_weather(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -88,18 +88,18 @@
 
 
 int opensvc_weather(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
 	int		argc = 0 ;
 	int		fd = -1 ;
-	const char	*ws = NULL ;
+	cchar	*ws = NULL ;
 
 	if (argv) {
 	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
