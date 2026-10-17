@@ -65,8 +65,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<bufsizevar.hh>		/* LIBUC */
-#include	<sncpyx.h>		/* LIBUC |sncpy(3uc)| */
-#include	<snaddslash.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"mknpathx.h"
@@ -136,34 +135,22 @@ int mknpath6(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return mknpathx(pp,pl,6,s1,s2,s3,s4,s5,s6) ;
 } /* end subroutine (mknpath5) */
 
-int mknpathx(char *pbuf,int plen,int n,...) noex {
+int mknpathx(char *pbuf,int µplen,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
 	if (pbuf) ylikely {
-	    charp bp = pbuf ;
-	    if ((rs = getrlen(plen)) >= 0) ylikely {
-		cint blen = rs ;
-		int  bl = rs ;
+	    if ((rs = getrlen(µplen)) >= 0) ylikely {
+		cint	plen = rs ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-		    cint rl = intconv(bp - pbuf) ;
 	            ccp	 sp = (charp) va_arg(ap,char *) ;
 		    if (! sp) break ;
-		    if ((rs = snaddslash(pbuf,blen,rl)) >= 0) {
-			bp += rs ;
-			bl -= rs ;
-	                if ((rs = sncpy(bp,bl,sp)) >= 0) {
-	                    bp += rs ;
-			    bl -= rs ;
-			} /* end if (sncpy) */
-		    } /* end if (ok) */
+		    rs = pathnadd(pbuf,plen,pl,sp) ;
+		    pl = rs ;
 	        } /* end for */
 	        va_end(ap) ;
 	    } /* end if (getrlen) */
-	    *bp = eos ; /* in case of overflow */
-	    if (rs == SR_OVERFLOW) rs = SR_NAMETOOLONG ;
-	    pl = intconv(bp - pbuf) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (mknpathx) */
