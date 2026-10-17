@@ -16,7 +16,7 @@
 	to be coming as a new standard.  We are currently using our
 	own implementation of that, but when it is supported by
 	vendors this will all seemlessly (pretty much) transition
-	to using the vendor version. My |strlcpy(3u)| uses an
+	to using the vendor version. My |strlcpy(3usys)| uses an
 	|int| for the buffer size while the new |strlcpy(3c)| is
 	suppoed to use |size_t|.
 
