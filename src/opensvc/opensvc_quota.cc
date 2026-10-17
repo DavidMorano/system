@@ -27,12 +27,12 @@
 	Synopsis:
 
 	int opensvc_quota(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -100,8 +100,8 @@
 
 /* forward references */
 
-static int	procuser(char *,int,const char *) ;
-static int	mkfsline(char *,int,const char *,STATVFS *) ;
+local int	procuser(char *,int,cchar *) ;
+local int	mkfsline(char *,int,cchar *,STATVFS *) ;
 
 
 /* local variables */
@@ -111,21 +111,21 @@ static int	mkfsline(char *,int,const char *,STATVFS *) ;
 
 
 int opensvc_quota(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		argc = 0 ;
 	int		pipes[2] ;
 	int		fd = -1 ;
 	int		ll = -1 ;
-	const char	*un = NULL ;
+	cchar	*un = NULL ;
 	char		ubuf[USERNAMELEN+1] ;
 	char		lbuf[LINEBUFLEN+1] ;
 
@@ -145,7 +145,7 @@ int		to ;
 	if ((un == NULL) || (un[0] == '\0')) {
 	    un = getourenv(envv,VARMOTDUSER) ;
 	    if ((un == NULL) || (un[0] == '\0')) {
-	        const char	*uidp = getourenv(envv,VARMOTDUID) ;
+	        cchar	*uidp = getourenv(envv,VARMOTDUID) ;
 	        if ((uidp != NULL) && (uidp[0] != '\0')) {
 	            int		v ;
 	            uid_t	uid ;
@@ -189,9 +189,9 @@ int		to ;
 /* local subroutines */
 
 
-static int procuser(char *lbuf,int llen,cchar *un)
+local int procuser(char *lbuf,int llen,cchar *un)
 {
-	const int	hlen = MAXPATHLEN ;
+	cint	hlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		ll = 0 ;
 	char		hbuf[MAXPATHLEN+1] ;
@@ -201,7 +201,7 @@ static int procuser(char *lbuf,int llen,cchar *un)
 #else
 	{
 	    struct passwd	pw ;
-	    const int		pwlen = bufsizeget(bufsize_pw) ;
+	    cint		pwlen = bufsizeget(bufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
@@ -225,10 +225,10 @@ static int procuser(char *lbuf,int llen,cchar *un)
 /* end subroutine (procuser) */
 
 
-static int mkfsline(lbuf,llen,fpath,fssp)
+local int mkfsline(lbuf,llen,fpath,fssp)
 char		lbuf[] ;
 int		llen ;
-const char	*fpath ;
+cchar	*fpath ;
 STATVFS	*fssp ;
 {
 	LONG		vt ;
@@ -254,12 +254,12 @@ STATVFS	*fssp ;
 /* we go through some trouble here to get a snughed-up floating number */
 
 	{
-	    const char	*dp ;
+	    cchar	*dp ;
 	    char	digbuf[DIGBUFLEN+1] ;
 	    if (per < 0) per = 99.9 ;
 	    rs = bufprintf(digbuf,DIGBUFLEN,"%4.1f",per) ;
 	    if (rs >= 0) {
-	        const char *fmt = "%s avail=%llu total=%llu util=%s%%\n" ;
+	        cchar *fmt = "%s avail=%llu total=%llu util=%s%%\n" ;
 	        dp = digbuf ;
 	        while (dp[0] && CHAR_ISWHITE(*dp)) dp += 1 ;
 	        rs = bufprintf(lbuf,llen,fmt,fpath,vavail,vtotal,dp) ;
