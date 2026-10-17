@@ -35,6 +35,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 
+
 #ifndef	DECLARATION_TTYNAMERP
 #define	DECLARATION_TTYNAMERP
 EXTERNC_begin
