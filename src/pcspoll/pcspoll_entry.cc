@@ -71,13 +71,13 @@
 
 /* forward references */
 
-static int	progentry_process(PROGENTRY *,cchar *,PROGENTRY_ARGS *,
+local int	progentry_process(PROGENTRY *,cchar *,PROGENTRY_ARGS *,
 			char *,int) ;
-static int	expand(PROGENTRY_ARGS *,cchar *,int,char *,int) ;
-static int	vecstr_processargs(vecstr *,char *) ;
-static int	mkfile(cchar *,cchar *,char *) ;
+local int	expand(PROGENTRY_ARGS *,cchar *,int,char *,int) ;
+local int	vecstr_processargs(vecstr *,char *) ;
+local int	mkfile(cchar *,cchar *,char *) ;
 
-static void	freeit(char **) ;
+local void	freeit(char **) ;
 
 
 /* external variables */
@@ -533,7 +533,7 @@ retok:
 
 
 /* expand out one program string entry */
-static int progentry_process(pep,inbuf,esap,outbuf,outlen)
+local int progentry_process(pep,inbuf,esap,outbuf,outlen)
 PROGENTRY	*pep ;
 cchar	inbuf[] ;		/* input string */
 PROGENTRY_ARGS	*esap ;			/* key-type arguments */
@@ -602,7 +602,7 @@ int		outlen ;		/* output buffer length */
 #
 */
 
-static int expand(esap,buf,len,rbuf,rlen)
+local int expand(esap,buf,len,rbuf,rlen)
 PROGENTRY_ARGS	*esap ;
 cchar	buf[] ;
 int		len ;
@@ -779,7 +779,7 @@ int		rlen ;
 /* end subroutine (expand) */
 
 
-static void freeit(pp)
+local void freeit(pp)
 char	**pp ;
 {
 
@@ -794,7 +794,7 @@ char	**pp ;
 
 
 /* process an argument list */
-static int vecstr_processargs(alp,args)
+local int vecstr_processargs(alp,args)
 vecstr		*alp ;
 char		args[] ;
 {
@@ -845,7 +845,7 @@ ret0:
 
 
 /* make our little files for input and output of the server programs */
-static int mkfile(tmpdname,in,outbuf)
+local int mkfile(tmpdname,in,outbuf)
 cchar	tmpdname[] ;
 cchar	in[] ;
 char		outbuf[] ;
