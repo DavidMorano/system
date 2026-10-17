@@ -26,7 +26,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -55,13 +55,13 @@
 
 /* external subroutines */
 
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	dialtcp(cchar *,cchar *,int,int,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* local structures */
@@ -69,25 +69,25 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	fspipe_readfile(FSPIPE *,const char *) ;
-static int	fspipe_freeall(FSPIPE *) ;
-static int	fspipe_findentry(FSPIPE *,const char *,FSPIPE_ENT **) ;
+local int	fspipe_readfile(FSPIPE *,cchar *) ;
+local int	fspipe_freeall(FSPIPE *) ;
+local int	fspipe_findentry(FSPIPE *,cchar *,FSPIPE_ENT **) ;
 
-static int	entry_init(FSPIPE_ENT *) ;
-static int	entry_initlocal(FSPIPE_ENT *,int) ;
-static int	entry_initinit(FSPIPE_ENT *,int) ;
-static int	entry_free(FSPIPE_ENT *) ;
-static int	entry_loadlocal(FSPIPE_ENT *,char *) ;
-static int	entry_loadinet(FSPIPE_ENT *,char *) ;
-static int	entry_openlocal(FSPIPE_ENT *,int) ;
-static int	entry_openinet(FSPIPE_ENT *,int) ;
+local int	entry_init(FSPIPE_ENT *) ;
+local int	entry_initlocal(FSPIPE_ENT *,int) ;
+local int	entry_initinit(FSPIPE_ENT *,int) ;
+local int	entry_free(FSPIPE_ENT *) ;
+local int	entry_loadlocal(FSPIPE_ENT *,char *) ;
+local int	entry_loadinet(FSPIPE_ENT *,char *) ;
+local int	entry_openlocal(FSPIPE_ENT *,int) ;
+local int	entry_openinet(FSPIPE_ENT *,int) ;
 
-static void	freeit() ;
+local void	freeit() ;
 
 
 /* local variables */
 
-static const char	*transports[] = {
+static cchar	*transports[] = {
 	"local",
 	"inet",
 	NULL
@@ -103,7 +103,7 @@ static const char	*transports[] = {
 
 int fspipe_open(pfp,fname)
 FSPIPE		*pfp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	FSPIPE_ENT	*ep ;
 
@@ -241,7 +241,7 @@ FSPIPE		*pfp ;
 /* open and listen to a fspipe */
 int fspipe_openlisten(pfp,fname,oflags,perm)
 FSPIPE		*pfp ;
-const char	fname[] ;
+cchar	fname[] ;
 int		oflags ;
 int		perm ;
 {
@@ -312,7 +312,7 @@ FSPIPE		*pfp ;
 /* write to this fspipe */
 int fspipe_write(pfp,buf,buflen)
 FSPIPE		*pfp ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 
@@ -361,9 +361,9 @@ void	*intarg ;
 
 
 /* open the fspipe file and read into entry structures */
-static int fspipe_readfile(pfp,fname)
+local int fspipe_readfile(pfp,fname)
 FSPIPE		*pfp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	FSPIPE_ENT	e ;
 	bfile		pfile, *pp = &pfile ;
@@ -485,7 +485,7 @@ bad0:
 /* find a transport entry by name */
 static fspipe_findentry(pfp,name,epp)
 FSPIPE		*pfp ;
-const char	name[] ;
+cchar	name[] ;
 FSPIPE_ENT	**epp ;
 {
 	int	rs ;
@@ -506,7 +506,7 @@ FSPIPE_ENT	**epp ;
 
 
 /* free all of the resources associated with the transport entries */
-static int fspipe_freeall(pfp)
+local int fspipe_freeall(pfp)
 FSPIPE		*pfp ;
 {
 	FSPIPE_ENT	*ep ;
@@ -529,7 +529,7 @@ FSPIPE		*pfp ;
 /* end subroutine (fspipe_freeall) */
 
 
-static int entry_init(ep)
+local int entry_init(ep)
 FSPIPE_ENT	*ep ;
 {
 
@@ -546,7 +546,7 @@ FSPIPE_ENT	*ep ;
 
 
 /* initialize an INET TCP transport */
-static int entry_initinet(ep,perm)
+local int entry_initinet(ep,perm)
 FSPIPE_ENT	*ep ;
 int		perm ;
 {
@@ -634,7 +634,7 @@ bad0:
 
 
 /* initialize a local transport */
-static int entry_initlocal(ep,perm)
+local int entry_initlocal(ep,perm)
 FSPIPE_ENT	*ep ;
 int		perm ;
 {
@@ -643,7 +643,7 @@ int		perm ;
 	int	rs ;
 	int	pipes[2] ;
 
-	const char	*template ;
+	cchar	*template ;
 
 	char	tmpfname[MAXPATHLEN + 2] ;
 
@@ -717,7 +717,7 @@ bad0:
 
 
 /* handle a LOCAL entry */
-static int entry_loadlocal(ep,s)
+local int entry_loadlocal(ep,s)
 FSPIPE_ENT	*ep ;
 char		s[] ;
 {
@@ -760,7 +760,7 @@ char		s[] ;
 
 
 /* handle an INET entry */
-static int entry_loadinet(ep,s)
+local int entry_loadinet(ep,s)
 FSPIPE_ENT	*ep ;
 char		s[] ;
 {
@@ -803,7 +803,7 @@ char		s[] ;
 /* end subroutine (entry_loadinet) */
 
 
-static int entry_openlocal(ep,f_listen)
+local int entry_openlocal(ep,f_listen)
 FSPIPE_ENT	*ep ;
 int		f_listen ;
 {
@@ -844,7 +844,7 @@ bad0:
 /* end subroutine (entry_openlocal) */
 
 
-static int entry_openinet(ep,f_listen)
+local int entry_openinet(ep,f_listen)
 FSPIPE_ENT	*ep ;
 int		f_listen ;
 {
@@ -855,8 +855,8 @@ int		f_listen ;
 	int	to, opts ;
 	int	af = 0 ;
 
-	const char	*hostname ;
-	const char	*portspec ;
+	cchar	*hostname ;
+	cchar	*portspec ;
 
 #if	CF_DEBUGS
 	debugprintf("fspipe/entry_openinet: protocol=%s\n",
@@ -879,7 +879,7 @@ int		f_listen ;
 
 
 /* free up an entry */
-static int entry_free(ep)
+local int entry_free(ep)
 FSPIPE_ENT	*ep ;
 {
 
@@ -909,7 +909,7 @@ FSPIPE_ENT	*ep ;
 
 
 /* free up a malloc'ed thing */
-static void freeit(p)
+local void freeit(p)
 void	*p ;
 {
 
