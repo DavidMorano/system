@@ -69,8 +69,8 @@
 
 /* external subroutines */
 
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matostr(const char **,const char *,int) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	matostr(cchar **,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
@@ -114,14 +114,14 @@ int progadjust(PROGINFO *pip,struct timeval *tvp)
 	    return SR_DOM ;
 
 	    if (pip->open.logsys) {
-		const int	logpri = LOG_NOTICE ;
+		cint	logpri = LOG_NOTICE ;
 		logsys_printf(&pip->ls,logpri,"time-off sec=%ld usec=%ld",
 	    		tvp->tv_sec,tvp->tv_usec) ;
 	    }
 
 	if (labs(tvp->tv_sec) > 0) {
 	    if (pip->open.logsys) {
-		const int	logpri = LOG_NOTICE ;
+		cint	logpri = LOG_NOTICE ;
 		logsys_printf(&pip->ls,logpri,"adjusting=%u",(! pip->fl.test)) ;
 	    }
 	    if (pip->debuglevel > 0) {
