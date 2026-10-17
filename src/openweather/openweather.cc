@@ -61,12 +61,12 @@
 
 /* forward reference */
 
-static int	ow_setextras(OW *) ;
-static int	ow_mklogid(OW *) ;
-static int	ow_lfopen(OW *) ;
-static int	ow_lfclose(OW *) ;
-static int	ow_lsopen(OW *) ;
-static int	ow_lsclose(OW *) ;
+local int	ow_setextras(OW *) ;
+local int	ow_mklogid(OW *) ;
+local int	ow_lfopen(OW *) ;
+local int	ow_lfclose(OW *) ;
+local int	ow_lsopen(OW *) ;
+local int	ow_lsclose(OW *) ;
 
 
 /* local variables */
@@ -332,8 +332,8 @@ int ow_logprintf(OW *sip,cchar *fmt,...)
 {
 	va_list	ap ;
 
-	const int	m = 0 ; /* mode==0 */
-	const int	dlen = LINEBUFLEN ;
+	cint	m = 0 ; /* mode==0 */
+	cint	dlen = LINEBUFLEN ;
 
 	int	rs = SR_OK ;
 	int	dl = 0 ;
@@ -365,7 +365,7 @@ int ow_logprintf(OW *sip,cchar *fmt,...)
 	}
 
 	if ((rs >= 0) && sip->fl.ls && sip->open.ls && (dl > 0)) {
-	    const int	logpri = LOG_NOTICE ;
+	    cint	logpri = LOG_NOTICE ;
 	    logsys_write(&sip->ls,logpri,dbuf,dl) ;
 	}
 
@@ -435,7 +435,7 @@ OW		*sip ;
 	        rs1 = u_stat(tmpourdname,&usb) ;
 	        if (rs1 >= 0) {
 	            if (S_ISDIR(usb.st_mode)) {
-	                const int	am = (R_OK|W_OK|X_OK) ;
+	                cint	am = (R_OK|W_OK|X_OK) ;
 	                f_needmode = ((usb.st_mode & dmode) != dmode) ;
 	                rs = u_access(tmpourdname,am) ;
 	            } else
@@ -754,7 +754,7 @@ int		f_def ;
 /* local subroutines */
 
 
-static int ow_setextras(sip)
+local int ow_setextras(sip)
 OW		*sip ;
 {
 	int	rs = SR_OK ;
@@ -779,7 +779,7 @@ OW		*sip ;
 /* end subroutine (ow_setextras) */
 
 
-static int ow_lfopen(OW *sip)
+local int ow_lfopen(OW *sip)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -820,7 +820,7 @@ static int ow_lfopen(OW *sip)
 /* end subroutine (ow_lfopen) */
 
 
-static int ow_lfclose(OW *sip)
+local int ow_lfclose(OW *sip)
 {
 	int	rs = SR_OK ;
 
@@ -835,7 +835,7 @@ static int ow_lfclose(OW *sip)
 /* end subroutine (ow_lfclose) */
 
 
-static int ow_lsopen(OW *sip)
+local int ow_lsopen(OW *sip)
 {
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -861,7 +861,7 @@ static int ow_lsopen(OW *sip)
 /* end subroutine (ow_lsopen) */
 
 
-static int ow_lsclose(OW *sip)
+local int ow_lsclose(OW *sip)
 {
 	int	rs = SR_OK ;
 
@@ -876,13 +876,13 @@ static int ow_lsclose(OW *sip)
 /* end subroutine (ow_lsclose) */
 
 
-static int ow_mklogid(OW *sip)
+local int ow_mklogid(OW *sip)
 {
 	int	rs = SR_OK ;
 
 
 	if (sip->logid[0] == '\0') {
-	    const int	logidlen = LOGFILE_LOGIDLEN ;
+	    cint	logidlen = LOGFILE_LOGIDLEN ;
 
 	    if (sip->nodename == NULL)
 	        rs = ow_nodedomain(sip) ;
