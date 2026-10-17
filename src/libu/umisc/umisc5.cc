@@ -78,7 +78,8 @@ int snaddx(char *rbuf,int rlen,int rl,int n,...) noex {
 	    va_begin(ap,n) ;
 	    rs = SR_OK ;
 	    for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		cchar	*sp = (char *) va_arg(ap,char *) ;
+		ccharp sp = (charp) va_arg(ap,char *) ;
+		if (! sp) break ;
 		rs = snadd(rbuf,rlen,rl,sp) ;
 		len += rs ;
 		rl += rs ;
