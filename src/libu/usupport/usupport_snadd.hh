@@ -58,6 +58,11 @@ namespace libu {
     } /* end subroutine (snadd) */
 } /* end namespace (libu) */
 
+namespace libu {
+    int snaddslash(char *,int,int) noex ;
+    int snaddpath(char *,int,int,cchar *,int = -1) noex ;
+} /* end namespace (libu) */
+
 
 #endif /* USUPPORTSNADD_INCLUDE */
 
