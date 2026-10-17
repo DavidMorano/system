@@ -67,14 +67,14 @@
 
 
 int passwdok(password,pw_stored)
-const char	password[] ;
-const char	pw_stored[] ;
+cchar	password[] ;
+cchar	pw_stored[] ;
 {
 	int	c1, c2 ;
 	int	f_passed = FALSE ;
 	int	f_cmp ;
 
-	const char	*pw_given ;
+	cchar	*pw_given ;
 
 	char	cryptbuf[40] ;
 
