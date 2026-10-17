@@ -53,7 +53,7 @@
 #include	<sbuf.h>
 #include	<tmpx.h>
 #include	<sesnotes.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
