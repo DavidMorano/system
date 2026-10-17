@@ -51,12 +51,11 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
-#include	<cstring>		/* CSTD |strlcpy(3c)| */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<bufsizevar.hh>		/* LIBUC */
-#include	<snwcpy.h>		/* LIBUC */
-#include	<snaddslash.h>		/* LIBUC */
+#include	<pathadd.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"mknpathxw.h"
@@ -121,34 +120,22 @@ int mknpath6w(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,
 	return mknpathxw(pp,pl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end subroutine (mknpath6w) */
 
-int mknpathxw(char *pbuf,int plen,int n,...) noex {
+int mknpathxw(char *pbuf,int µplen,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
-	char		*bp = pbuf ;
 	if (pbuf) ylikely {
-	    if ((rs = getrlen(plen)) >= 0) ylikely {
-		cint	blen = rs ;
-	        int	bl = rs ;
+	    if ((rs = getrlen(µplen)) >= 0) ylikely {
+		cint	plen = rs ;
 	        int	sl = -1 ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-		    cint rl = intconv(bp - pbuf) ;
 	            ccp  sp = (ccharp) va_arg(ap,char *) ;
 	            if (i == (n - 1)) sl = (int) va_arg(ap,int) ;
 		    if (! sp) break ;
-		    if ((rs = snaddslash(pbuf,blen,rl)) >= 0) ylikely {
-			bp += rs ;
-			bl -= rs ;
-	                if ((rs = snwcpy(bp,bl,sp,sl)) > 0) ylikely {
-	                    bp += rs ;
-	                    bl -= rs ;
-			} /* end if */
-	            } /* end if */
+		    rs = pathnadd(pbuf,plen,pl,sp,sl) ;
+		    pl = rs ;
 	        } /* end for */
-	        *bp = eos ; /* in case of overflow */
-		pl = intconv(bp - pbuf) ;
-	        if (rs == SR_OVERFLOW) rs = SR_NAMETOOLONG ;
 	        va_end(ap) ;
 	    } /* end if (getplen) */
 	} /* end if (non-null) */
