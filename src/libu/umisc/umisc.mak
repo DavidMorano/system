@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += umisc.h
+INCS += umisc.hh
 
 MODS += umisc.ccm
 
@@ -48,10 +48,10 @@ OBJPRIME= umisc0.o
 
 OBJ00= umisc1.o umisc2.o umisc3.o
 OBJ01= umisc4.o umisc5.o umisc6.o
-OBJ02= umisc%strw.o umisc%strbcpy.o
-OBJ03= 
+OBJ02= umisc7.o
+OBJ03= umisc%strw.o umisc%strbcpy.o
 
-OBJA= obj00.o obj01.o obj02.o
+OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= 
 OBJC= 
 OBJD= 
@@ -170,14 +170,14 @@ umisc0.o:		umisc.ccm $(OBJPART)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
-umisc1.o:		umisc1.cc objprime.o
-umisc2.o:		umisc2.cc objprime.o
-umisc3.o:		umisc3.cc objprime.o
-umisc4.o:		umisc4.cc objprime.o
-umisc5.o:		umisc5.cc objprime.o
-umisc6.o:		umisc6.cc objprime.o
-umisc7.o:		umisc7.cc objprime.o
-umisc%strw.o:		umisc%strw.cc objprime.o
-umisc%strbcpy.o:	umisc%strbcpy.cc objprime.o
+umisc1.o:		umisc1.cc			$(OBJPRIME)	$(INCS)
+umisc2.o:		umisc2.cc			$(OBJPRIME)	$(INCS)
+umisc3.o:		umisc3.cc			$(OBJPRIME)	$(INCS)
+umisc4.o:		umisc4.cc			$(OBJPRIME)	$(INCS)
+umisc5.o:		umisc5.cc			$(OBJPRIME)	$(INCS)
+umisc6.o:		umisc6.cc			$(OBJPRIME)	$(INCS)
+umisc7.o:		umisc7.cc			$(OBJPRIME)	$(INCS)
+umisc%strw.o:		umisc%strw.cc			$(OBJPRIME)	$(INCS)
+umisc%strbcpy.o:	umisc%strbcpy.cc		$(OBJPRIME)	$(INCS)
 
 
