@@ -2,8 +2,8 @@
 int ow_setfname(lip,fname,ebuf,el,f_def,dname,name,suf)
 OW		*lip ;
 char		fname[] ;
-const char	ebuf[] ;
-const char	dname[], name[], suf[] ;
+cchar	ebuf[] ;
+cchar	dname[], name[], suf[] ;
 int		el ;
 int		f_def ;
 {
