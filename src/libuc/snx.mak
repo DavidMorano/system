@@ -40,13 +40,13 @@ MODS +=
 LIBS +=
 
 
-OBJ0_SNX= snadd.o snaddw.o sncpyarr.o
-OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o
+OBJ0_SNX= snadd.o snaddw.o snaddslash.o snaddpath.o 
+OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o sncpyarr.o
 OBJ2_SNX= snfilemode.o snflags.o snflager.o sninetaddr.o
 OBJ3_SNX= snkeyval.o snloadavg.o
 OBJ4_SNX= snrealname.o snshellunder.o sntid.o
 OBJ5_SNX= sntmtime.o snuuid.o snxxx.o snwx.o
-OBJ6_SNX= snaddslash.o snclean.o
+OBJ6_SNX= snclean.o
 OBJ7_SNX= snabbrname.o snabbrnum.o
 
 OBJA_SNX= obj0_snx.o obj1_snx.o
@@ -164,6 +164,7 @@ sntmtime.o:		sntmtime.cc	sntmtime.h	$(INCS)
 snadd.o:		snadd.cc	snadd.h		$(INCS)
 snaddw.o:		snaddw.cc	snaddw.h	$(INCS)
 snaddslash.o:		snaddslash.cc	snaddslash.h	$(INCS)
+snaddpath.o:		snaddpath.cc	snaddpath.h	$(INCS)
 snwx.o:			snwx.cc		snwx.h		$(INCS)
 snclean.o:		snclean.cc	snclean.h	$(INCS)
 
