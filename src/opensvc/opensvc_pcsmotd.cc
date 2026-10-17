@@ -25,12 +25,12 @@
 	Synopsis:
 
 	int opensvc_pcsmotd(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -115,17 +115,17 @@ extern int	nprintf(cchar *,...) ;
 
 
 int opensvc_pcsmotd(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	MOTD_ID		mid ;
 	gid_t		gid = getgid() ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		argc = 0 ;
@@ -134,12 +134,12 @@ int		to ;
 	int		ll = -1 ;
 	int		cols = COLUMNS ;
 
-	const char	*varprlocal = VARPRLOCAL ;
-	const char	*prlocal = NULL ;
-	const char	*un = NULL ;
-	const char	*groupname = NULL ;
-	const char	*admin = NULL ;
-	const char	*admins[3] ;
+	cchar	*varprlocal = VARPRLOCAL ;
+	cchar	*prlocal = NULL ;
+	cchar	*un = NULL ;
+	cchar	*groupname = NULL ;
+	cchar	*admin = NULL ;
+	cchar	*admins[3] ;
 
 	char		ubuf[USERNAMELEN+1] ;
 	char		gbuf[GROUPNAMELEN+1] ;
@@ -154,7 +154,7 @@ int		to ;
 
 #ifdef	COMMENT
 	{
-	    const char	*varcols = getourenv(envv,VARCOLUMNS) ;
+	    cchar	*varcols = getourenv(envv,VARCOLUMNS) ;
 	    if (varcols != NULL) {
 	        int	rs1 ;
 	        int	v ;
@@ -185,7 +185,7 @@ int		to ;
 /* get the program-root for LOCAL */
 
 	{
-	    const char	*dnp = getourenv(envv,VARDOMAIN) ;
+	    cchar	*dnp = getourenv(envv,VARDOMAIN) ;
 	    char	nn[NODENAMELEN+1] ;
 	    char	dn[MAXHOSTNAMELEN+1] ;
 
