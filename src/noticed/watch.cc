@@ -64,18 +64,17 @@
 #include	<vecstr.h>
 #include	<opentmp.h>
 #include	<sockaddress.h>
+#include	<srvtab.h>
+#include	<acctab.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
+#include	<localmisc.h>		/* LIBU */
 
-#include	"srvtab.h"
-#include	"acctab.h"
-
-#include	"localmisc.h"
 #include	"jobdb.h"
 #include	"builtin.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"standing.h"
-
 
 
 /* local defines */
@@ -87,7 +86,6 @@
 #define	O_SRVFLAGS	(O_RDWR | O_CREAT )
 
 
-
 /* external subroutines */
 
 extern int	uc_moveup(int,int) ;
@@ -96,8 +94,6 @@ extern int	checklockfile(struct proginfo *,bfile *,char *,char *,
 extern int	handle(struct proginfo *, struct serverinfo *, 
 			BUILTIN *,STANDING *, struct clientinfo *) ;
 
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 #if	CF_DEBUG
 extern char	*d_reventstr() ;
@@ -109,17 +105,17 @@ extern char	*d_reventstr() ;
 
 /* forward references */
 
-static int	writeout() ;
-static int	write_mqid() ;
-static int	watch_newjob(struct proginfo *, struct serverinfo *,
+local int	writeout() ;
+local int	write_mqid() ;
+local int	watch_newjob(struct proginfo *, struct serverinfo *,
 			BUILTIN *, STANDING *, struct clientinfo *,int,int) ;
 
-static void	int_all(int) ;
+local void	int_all(int) ;
 
 
 /* external variables */
 
-static int	f_exit ;
+local int	f_exit ;
 
 
 /* local structures */
@@ -167,7 +163,7 @@ BUILTIN		*bip ;
 	time_t		t_lastmark = 0 ;
 
 	int	i, len ;
-	int	rs = SR_BAD ;
+	int	rs = SR_BADE ;
 	int	to_pollidle = TI_POLL * 1000 ;
 	int	to_poll ;
 	int	loopcount = 0 ;
@@ -641,13 +637,13 @@ top:
 
 	            rs = SR_OK ;
 	            logfile_printf(&pip->lh, "%s server exit, ex=%d\n",
-	                timestr_log(daytime,timebuf),
+	                strtime_log(daytime,timebuf),
 	                child_stat & 255) ;
 
 	            writeout(pip,efd,"standard error") ;
 
 	            logfile_printf(&pip->lh,"elapsed time %s\n",
-	                timestr_elapsed((daytime - jep->atime),timebuf)) ;
+	                strtime_elapsed((daytime - jep->atime),timebuf)) ;
 
 	            u_close(efd) ;
 
@@ -705,7 +701,7 @@ top:
 
 	            logfile_printf(&pip->lh,
 	                "%s another program has my lock file, other PID=%d\n",
-	                timestr_log(daytime,timebuf),
+	                strtime_log(daytime,timebuf),
 	                rs) ;
 
 	            goto badlockfile ;
@@ -730,7 +726,7 @@ top:
 
 	        logfile_printf(&pip->lh,
 	            "%s another program has my PID file, other PID=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            rs) ;
 
 	        goto badpidfile ;
@@ -752,14 +748,14 @@ top:
 
 	    if ((rs = srvtab_check(sfp,daytime,NULL)) > 0)
 	        logfile_printf(&pip->lh,"%s server table file changed\n",
-	            timestr_log(daytime,timebuf)) ;
+	            strtime_log(daytime,timebuf)) ;
 
 		if (pip->marktime > 0) {
 
 			if (pip->marktime < (daytime - t_lastmark)) {
 
 				logfile_printf(&pip->lh,"%s mark> %s\n",
-					timestr_log(daytime,timebuf),
+					strtime_log(daytime,timebuf),
 					pip->nodename) ;
 
 				t_lastmark = daytime ;
@@ -776,7 +772,7 @@ top:
 
 	    if ((rs = acctab_check(atp,NULL)) > 0)
 	        logfile_printf(&pip->lh,"%s access table file changed\n",
-	            timestr_log(daytime,timebuf)) ;
+	            strtime_log(daytime,timebuf)) ;
 
 	}
 
@@ -809,7 +805,7 @@ top:
 	    u_time(&daytime) ;
 
 	    logfile_printf(&pip->lh,"%s daemon exiting\n",
-	        timestr_log(daytime,timebuf)) ;
+	        strtime_log(daytime,timebuf)) ;
 
 	}
 
@@ -852,7 +848,7 @@ bad0:
 
 
 
-static void int_all(sn)
+local void int_all(sn)
 int	sn ;
 {
 
@@ -863,7 +859,7 @@ int	sn ;
 
 
 /* write out the output files from the executed program */
-static int writeout(pip,fd,s)
+local int writeout(pip,fd,s)
 struct proginfo	*pip ;
 int	fd ;
 char	s[] ;
@@ -909,7 +905,7 @@ char	s[] ;
 
 
 /* write our MSGQ ID to the MSGQ ID file */
-static int write_mqid(pip,mqid)
+local int write_mqid(pip,mqid)
 struct proginfo	*pip ;
 int		mqid ;
 {
@@ -936,7 +932,7 @@ int		mqid ;
 
 
 /* spawn a job */
-static int watch_newjob(pip,sip,bip,ourp,cip,nsi,nso)
+local int watch_newjob(pip,sip,bip,ourp,cip,nsi,nso)
 struct proginfo		*pip ;
 struct serverinfo	*sip ;
 BUILTIN			*bip ;
