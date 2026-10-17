@@ -25,12 +25,12 @@
 	Synopsis:
 
 	int opensvc_holidays(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -82,7 +82,7 @@
 
 /* forward references */
 
-static int	printhols(const char *,FILER *,int,const char *) ;
+local int	printhols(cchar *,FILER *,int,cchar *) ;
 
 
 /* local variables */
@@ -92,22 +92,22 @@ static int	printhols(const char *,FILER *,int,const char *) ;
 
 
 int opensvc_holidays(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	int		rs = SR_OK ;
 	int		argc = 0 ;
 	int		year = 2013 ;
 	int		fd = -1 ;
-	const char	*kn = NULL ;
-	const char	*admin = NULL ;
-	const char	*admins[3] ;
-	const char	*query = NULL ;
+	cchar	*kn = NULL ;
+	cchar	*admin = NULL ;
+	cchar	*admins[3] ;
+	cchar	*query = NULL ;
 
 	if (argv != NULL) {
 	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
@@ -152,11 +152,11 @@ int		to ;
 /* local subroutines */
 
 
-static int printhols(pr,fbp,year,query)
-const char	*pr ;
+local int printhols(pr,fbp,year,query)
+cchar	*pr ;
 FILER		*fbp ;
 int		year ;
-const char	*query ;
+cchar	*query ;
 {
 	HOLIDAYS	h ;
 	HOLIDAYS_CUR	c ;
@@ -172,7 +172,7 @@ const char	*query ;
 
 	    if ((rs = holidays_open(&h,pr,year,NULL)) >= 0) {
 		if ((rs = holidays_curbegin(&h,&c)) >= 0) {
-		    const int	vlen = VBUFLEN ;
+		    cint	vlen = VBUFLEN ;
 		    int		vl ;
 		    char	vbuf[VBUFLEN+1] ;
 		    while (rs >= 0) {
