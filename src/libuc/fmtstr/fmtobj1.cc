@@ -196,7 +196,7 @@ int fmtobj::istart() noex {
 	    if ((tbuf = new(nothrow) char[TBUFLEN + 1]) != np) {
 	        rs = SR_OK ;
 	        tlen = TBUFLEN ;
-        	tbuf[tlen] = '\0' ;
+        	tbuf[tlen] = eos ;
 	    } /* end if (new-char) */
 	} /* end if (non-null) */
 	return rs ;
@@ -323,17 +323,17 @@ int fmtobj::code_chr(va_list ap) noex {
             case lenmod_long:
                 f_wint = true ;
                 break ;
-            }
+            } /* end switch */
         } else {
             f_wchar = true ;
-        }
+        } /* end if */
         if (f_wint) {
             ch = (int) va_arg(ap,wint_t) ;
         } else if (f_wchar) {
             ch = (int) va_arg(ap,int) ; /* <- |wchar_t| */
         } else {
             ch = (int) va_arg(ap,int) ;
-        }
+        } /* end if */
         /* see if we can handle the general case easily */
         ch &= UCHAR_MAX ;
         if ((spec.width <= 1) && (spec.prec <= 1)) {
@@ -341,8 +341,8 @@ int fmtobj::code_chr(va_list ap) noex {
             if (sub.fl.mclean) {
                 if ((ch != '\n') && isourbad(ch)) {
                     ch = chx_badsub ;
-                }
-            }
+                } /* end */
+            } /* end */
             rs = sub.chr(ch) ;
         } else {
             tbuf[0] = char(ch) ;
@@ -396,10 +396,10 @@ int fmtobj::code_str(va_list ap) noex {
             sd.wsp = (const wchar_t *) va_arg(ap,wchar_t *) ;
         } else {
             sd.sp = (cchar *) va_arg(ap,char *) ;
-        }
+        } /* end */
         if ((fcode == 'r') || (fcode == 'R')) {
             sd.sl = (int) va_arg(ap,int) ;
-        }
+        } /* end */
 #ifdef  COMMENT /* null-pointer check (done later) */
         {
             cvoid *p = sd.sp ;
@@ -407,7 +407,7 @@ int fmtobj::code_str(va_list ap) noex {
                 p = sd.lsp ;
             } else if (sd.fl.wchar) {
                 p = sd.wsp ;
-            }
+            } /* end */
             if ((p == nullptr) && (sd.sl != 0)) {
                 sd.lsp = nullptr ;
                 sd.wsp = nullptr ;
@@ -460,7 +460,7 @@ int fmtobj::code_bin(va_list ap) noex {
                         if (f_got || (ch != '0')) {
                             f_got = true ;
                             *bp++ = char(ch) ;
-                        }
+                        } /* end */
                     } /* end for */
                 } /* end if */
                 if (ndigs > 16) {
@@ -469,7 +469,7 @@ int fmtobj::code_bin(va_list ap) noex {
                         if (f_got || (ch != '0')) {
                             f_got = true ;
                             *bp++ = char(ch) ;
-                        }
+                        } /* end */
                     } /* end for */
                 } /* end if */
                 for (int i = 15 ; i >= 0 ; i -= 1) {
@@ -477,18 +477,18 @@ int fmtobj::code_bin(va_list ap) noex {
                     if (f_got || (ch != '0')) {
                         f_got = true ;
                         *bp++ = char(ch) ;
-                    }
+                    } /* end */
                 } /* end for */
                 if (! f_got) {
                     *bp++ = '0' ;
-                }
-                *bp = '\0' ;
+                } /* end */
+                *bp = eos ;
                 bl = intconv(bp - tbuf) ;	/* forward */
                 bp = tbuf ;			/* forward */
             } else {
                 /* form the digits that we will (maximally) need */
                 bp = (tbuf + tlen) ;		/* backward */
-                *bp = '\0' ;
+                *bp = eos ;
                 for (int i = (ndigs - 1) ; i >= 0 ; i -= 1) {
                     *--bp = digtable[unum & 1] ;
                     unum >>= 1 ;
@@ -530,7 +530,7 @@ int fmtobj::code_oct(va_list ap) noex {
             cchar   *digtable = digtable_lo ;
             /* form the digits that we will (maximally) need */
             bp = (tbuf + tlen) ;		/* backward */
-            *bp = '\0' ;
+            *bp = eos ;
             for (int i = (nd - 1) ; i >= 0 ; i -= 1) {
                 *--bp = digtable[unum & 7] ;
                 unum >>= 3 ;
@@ -555,21 +555,21 @@ int fmtobj::code_dec(va_list ap) noex {
                 snum = (longlong) va_arg(ap,longlong) ;
             } else {
                 unum = (ulonglong) va_arg(ap,ulonglong) ;
-            }
+            } /* end */
             break ;
         case lenmod_long:
             if (f_signed) {
                 snum = (longlong) va_arg(ap,long) ;
             } else {
                 unum = (ulonglong) va_arg(ap,ulong) ;
-            }
+            } /* end */
             break ;
         default:
             if (f_signed) {
                 snum = (longlong) va_arg(ap,int) ;
             } else {
                 unum = (ulonglong) va_arg(ap,uint) ;
-            }
+            } /* end */
             if (spec.lenmod == lenmod_half) {
                 unum &= USHORT_MAX ;
                 snum &= USHORT_MAX ;
@@ -589,7 +589,7 @@ int fmtobj::code_dec(va_list ap) noex {
                 if (f_signed && (snum < 0)) {
                     *--bp = '-' ;
                     fl.misign = true ;
-                }
+                } /* end */
                 bl = intconv((tbuf + tlen) - bp) ;	/* backward */
 	    } else {
 	        bp = strdcpy(tbuf,tlen,"¿domain-error¿") ;
@@ -603,8 +603,8 @@ int fmtobj::code_dec(va_list ap) noex {
 
 /* handle he"x"adecimal numbers */
 int fmtobj::code_hex(va_list ap) noex {
-    	int		rs = SR_OK ;
         ulonglong       unum ;
+    	int		rs = SR_OK ;
         int		ndigs = 0 ;
         bool		f_lc = ((fcode == 'p') || (fcode == 'x')) ;
 	DPRINTF("ent\n") ;
@@ -638,7 +638,7 @@ int fmtobj::code_hex(va_list ap) noex {
             cchar *digtable = (f_lc) ? digtable_lo : digtable_hi ;
             /* form the digits that we will (maximally) need */
             bp = (tbuf + tlen) ;		/* backward */
-            *bp = '\0' ;
+            *bp = eos ;
             for (int i = (ndigs - 1) ; i >= 0 ; i -= 1) {
                 *--bp = digtable[unum & 0x0F] ;
                 unum >>= 4 ;
@@ -681,7 +681,7 @@ int fmtobj::code_float(va_list ap) noex {
 void fmtobj::dtor() noex {
 	if (cint rs = finish() ; rs < 0) {
 	    ulogerror("fmtobj",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (fmtobj::dtor) */
 
 fmtobj_co::operator int () noex {
