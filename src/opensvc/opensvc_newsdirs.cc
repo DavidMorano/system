@@ -26,12 +26,12 @@
 	Synopsis:
 
 	int opensvc_newsdirs(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -102,11 +102,11 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 #if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -128,10 +128,10 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_start(SUBINFO *) ;
+local int	subinfo_finish(SUBINFO *) ;
 #if	CF_SETENTRY
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
+local int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 #endif
 
 
@@ -156,20 +156,20 @@ enum argopts {
 
 
 int opensvc_newsdirs(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
 	bits		pargs ;
 	keyopt		akopts ;
-	const int	flen = MAILADDRLEN ;
-	const int	llen = LINEBUFLEN ;
-	const int	ulen = USERNAMELEN ;
+	cint	flen = MAILADDRLEN ;
+	cint	llen = LINEBUFLEN ;
+	cint	ulen = USERNAMELEN ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -183,11 +183,11 @@ int		to ;
 	int		f_akopts = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*varcols ;
-	const char	*un = NULL ;
-	const char	*newsdname = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*varcols ;
+	cchar	*un = NULL ;
+	cchar	*newsdname = NULL ;
 
 	char		nbuf[MAXPATHLEN+1] ;
 	char		ubuf[USERNAMELEN+1] ;
@@ -235,7 +235,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -327,7 +327,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -445,7 +445,7 @@ int		to ;
 	if ((un == NULL) || (un[0] == '\0')) {
 	     un = getourenv(envv,VARMOTDUSER) ;
 	     if ((un == NULL) || (un[0] == '\0')) {
-		const char	*uidp = getourenv(envv,VARMOTDUID) ;
+		cchar	*uidp = getourenv(envv,VARMOTDUID) ;
 		if ((uidp != NULL) && (uidp[0] != '\0')) {
 		    int		v ;
 		    uid_t	uid ;
@@ -487,7 +487,7 @@ int		to ;
 	}
 
 	if (rs >= 0) {
-	    const int	ttl = sip->ttl ;
+	    cint	ttl = sip->ttl ;
 	    rs = pcsopendircache(pr,newsdname,of,om,ttl) ;
 	    fd = rs ;
 	}
@@ -522,7 +522,7 @@ badsubstart:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip)
+local int subinfo_start(SUBINFO *sip)
 {
 	int	rs ;
 
@@ -537,7 +537,7 @@ static int subinfo_start(SUBINFO *sip)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -585,7 +585,7 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar vp[],int vl)
 	    vnlen = strnlen(vp,vl) ;
 
 	    if ((rs = vecstr_add(&sip->stores,vp,vnlen)) >= 0) {
-	        const char	*cp ;
+	        cchar	*cp ;
 	        i = rs ;
 	        rs = vecstr_get(&sip->stores,i,&cp) ;
 	        if (rs >= 0) *epp = cp ;
