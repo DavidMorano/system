@@ -31,12 +31,12 @@
 
 	Synopsis:
 	int opensvc_issue(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -109,10 +109,10 @@ struct subinfo {
 	SUBINFO_FL	have, f, changed, finval ;
 	SUBINFO_FL	open ;
 	vecstr		stores ;
-	const char	*pr ;
-	const char	*un ;
-	const char	*groupname ;
-	const char	*kn ;
+	cchar	*pr ;
+	cchar	*un ;
+	cchar	*groupname ;
+	cchar	*kn ;
 	uid_t		uid ;
 	gid_t		gid ;
 	int		linelen ;
@@ -122,27 +122,27 @@ struct subinfo {
 
 /* forward references */
 
-static int	npargs(ARGINFO *,bits *) ;
-static int	loadadmins(ARGINFO *,bits *,const char **) ;
+local int	npargs(ARGINFO *,bits *) ;
+local int	loadadmins(ARGINFO *,bits *,cchar **) ;
 
-static int	subinfo_start(SUBINFO *,const char *) ;
-static int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_start(SUBINFO *,cchar *) ;
+local int	subinfo_finish(SUBINFO *) ;
 
 #if	CF_SETENTRY
-static int	subinfo_setentry(SUBINFO *,const char **,
-			const char *,int) ;
+local int	subinfo_setentry(SUBINFO *,cchar **,
+			cchar *,int) ;
 #endif
 
 #if	CF_GETUSER
-static int	subinfo_getuser(SUBINFO *,const char *) ;
+local int	subinfo_getuser(SUBINFO *,cchar *) ;
 #endif
 
-static int	subinfo_openissue(SUBINFO *,const char *,const char **) ;
+local int	subinfo_openissue(SUBINFO *,cchar *,cchar **) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"sn",
 	NULL
@@ -160,12 +160,12 @@ enum argopts {
 
 /* ARGSUSED */
 int opensvc_issue(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO	si, *sip = &si ;
@@ -180,10 +180,10 @@ int		to ;
 	int		fd = -1 ;
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_akopts = FALSE ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*un = NULL ;
-	const char	*kn = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*un = NULL ;
+	cchar	*kn = NULL ;
 
 	if (argv != NULL) {
 	    for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
@@ -214,7 +214,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -287,7 +287,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -390,10 +390,10 @@ int		to ;
 
 	if (rs >= 0) {
 	    if ((rs = npargs(&ainfo,&pargs)) >= 0) {
-	        const int	size = ((rs+1)*sizeof(const char **)) ;
+	        cint	size = ((rs+1)*sizeof(cchar **)) ;
 	        void	*p ;
 	        if ((rs = uc_malloc(size,&p)) >= 0) {
-	            const char	**admins = p ;
+	            cchar	**admins = p ;
 	            if (admins[0] == NULL) admins = NULL ;
 	            if ((rs = loadadmins(&ainfo,&pargs,admins)) >= 0) {
 	                if ((rs = subinfo_openissue(sip,kn,admins)) >= 0) {
@@ -430,7 +430,7 @@ badsubstart:
 /* local subroutines */
 
 
-static int npargs(ARGINFO *aip,bits *bop)
+local int npargs(ARGINFO *aip,bits *bop)
 {
 	int		rs = SR_OK ;
 	int		ai ;
@@ -440,7 +440,7 @@ static int npargs(ARGINFO *aip,bits *bop)
 	    f = (ai <= aip->ai_max) && ((rs = bits_test(bop,ai)) > 0) ;
 	    f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
 	    if (f) {
-	        const char	*cp = aip->argv[ai] ;
+	        cchar	*cp = aip->argv[ai] ;
 	        if (cp[0] != '\0') n += 1 ;
 	    }
 	    if (rs < 0) break ;
@@ -450,7 +450,7 @@ static int npargs(ARGINFO *aip,bits *bop)
 /* end subroutine (npargs) */
 
 
-static int loadadmins(ARGINFO *aip,bits *bop,const char **admins)
+local int loadadmins(ARGINFO *aip,bits *bop,cchar **admins)
 {
 	int		rs = SR_OK ;
 	int		ai ;
@@ -460,7 +460,7 @@ static int loadadmins(ARGINFO *aip,bits *bop,const char **admins)
 	    f = (ai <= aip->ai_max) && ((rs = bits_test(bop,ai)) > 0) ;
 	    f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
 	    if (f) {
-	        const char	*cp = aip->argv[ai] ;
+	        cchar	*cp = aip->argv[ai] ;
 	        if (cp[0] != '\0') admins[n++] = aip->argv[ai] ;
 	    }
 	    if (rs < 0) break ;
@@ -471,7 +471,7 @@ static int loadadmins(ARGINFO *aip,bits *bop,const char **admins)
 /* end subroutine (loadadmins) */
 
 
-static int subinfo_start(SUBINFO *sip,cchar *pr)
+local int subinfo_start(SUBINFO *sip,cchar *pr)
 {
 	int		rs = SR_OK ;
 
@@ -486,7 +486,7 @@ static int subinfo_start(SUBINFO *sip,cchar *pr)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -505,7 +505,7 @@ static int subinfo_finish(SUBINFO *sip)
 
 
 #if	CF_SETENTRY
-static int subinfo_setentry(SUBINFO *sip,cchar **epp,char *vp,int vl)
+local int subinfo_setentry(SUBINFO *sip,cchar **epp,char *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -542,10 +542,10 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,char *vp,int vl)
 
 
 #if	CF_GETUSER
-static int subinfo_getuser(SUBINFO *sip,const char *un)
+local int subinfo_getuser(SUBINFO *sip,cchar *un)
 {
 	struct passwd	pw ;
-	const int	pwlen = bufsizeget(bufsize_pw) ;
+	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	char		*pwbuf ;
 
@@ -557,7 +557,7 @@ static int subinfo_getuser(SUBINFO *sip,const char *un)
 	    rs = getpwusername(&pw,pwbuf,pwlen,-1) ;
 	}
 	if (rs >= 0) {
-	    const char	**vpp ;
+	    cchar	**vpp ;
 	    sip->uid = pw.pw_uid ;
 	    sip->gid = pw.pw_gid ;
 	    if (sip->un == NULL) {
@@ -565,7 +565,7 @@ static int subinfo_getuser(SUBINFO *sip,const char *un)
 	        rs = subinfo_setentry(sip,vpp,pw.pw_name,-1) ;
 	    }
 	    if (rs >= 0) {
-	        const int	gnlen = GROUPNAMELEN ;
+	        cint	gnlen = GROUPNAMELEN ;
 	        char		gnbuf[GROUPNAMELEN+1] ;
 	        if ((rs = getgroupname(gnbuf,gnlen,pw.pw_gid)) >= 0) {
 	            vpp = &sip->groupname ;
@@ -582,12 +582,12 @@ static int subinfo_getuser(SUBINFO *sip,const char *un)
 #endif /* CF_GETUSER */
 
 
-static int subinfo_openissue(SUBINFO *sip,cchar *kn,cchar **admins)
+local int subinfo_openissue(SUBINFO *sip,cchar *kn,cchar **admins)
 {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	const char	*pr = sip->pr ;
+	cchar	*pr = sip->pr ;
 
 	if ((rs = opentmp(NULL,0,0664)) >= 0) {
 	    ISSUE	m ;
