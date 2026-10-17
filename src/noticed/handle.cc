@@ -45,12 +45,9 @@
 	3) check if it is a local username
 	4) check if there is a "default" service table entry
 
-
 ***************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -58,15 +55,15 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bufsizeget.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<vecstr.h>
 #include	<hostent.h>
@@ -74,7 +71,10 @@
 #include	<inetaddr.h>
 #include	<pwfile.h>
 #include	<srvtab.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"srventry.h"
 #include	"connection.h"
@@ -115,9 +115,9 @@
 
 /* external subroutines */
 
-extern int	sisub(const char *,int,const char *) ;
+extern int	sisub(cchar *,int,cchar *) ;
 extern int	field_svcargs(FIELD *,VECSTR *) ;
-extern int	nlspeername(const char *,const char *,char *) ;
+extern int	nlspeername(cchar *,cchar *,char *) ;
 extern int	isNotPresent(int) ;
 
 extern int	processargs(char *,VECSTR *) ;
@@ -128,9 +128,8 @@ extern int	handle_srventry(struct proginfo *,struct clientinfo *,
 extern int	handle_login(struct proginfo *,struct clientinfo *,
 			CONNECTION *,vecstr *, int, struct passwd *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -231,7 +230,7 @@ struct clientinfo	*cip ;
 	if (rs > 0)
 	    logfile_printf(&pip->lh,"from host=%s\n",peername) ;
 
-	f_socket = isasocket(ifd) ;
+	f_socket = isfdsocket(ifd) ;
 
 /* pop off the service name */
 
@@ -387,14 +386,14 @@ struct clientinfo	*cip ;
 #endif
 
 	logfile_printf(&pip->lh,"%s service=%s\n",
-	    timestr_logz(pip->daytime,timebuf),
+	    strtime_logz(pip->daytime,timebuf),
 	    cip->service) ;
 
 /* do we have this service in our server table? */
 
 	{
 	    PASSWDENT	pw ;
-	    const int	pwlen = bufsizeget(bufsize_pw) ;
+	    cint	pwlen = bufsizeget(bufsize_pw) ;
 	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 		cchar	*svc = cip->serivice ;
