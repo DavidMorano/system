@@ -28,12 +28,12 @@
 	Synopsis:
 
 	int opensvc_zoneabbr(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -112,11 +112,11 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -137,19 +137,19 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_start(SUBINFO *) ;
+local int	subinfo_finish(SUBINFO *) ;
 #if	CF_SETENTRY
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
+local int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	subinfo_procuser(SUBINFO *,char *,int,const char *) ;
-static int	mkfsline(char *,int,int,const char *,STATVFS *) ;
+local int	subinfo_procuser(SUBINFO *,char *,int,cchar *) ;
+local int	mkfsline(char *,int,int,cchar *,STATVFS *) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"sn",
 	NULL
@@ -166,19 +166,19 @@ enum argopts {
 
 
 int opensvc_zoneabbr(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
 	bits		pargs ;
 	keyopt		akopts ;
-	const int	ulen = USERNAMELEN ;
-	const int	llen = LINEBUFLEN ;
+	cint	ulen = USERNAMELEN ;
+	cint	llen = LINEBUFLEN ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -191,9 +191,9 @@ int		to ;
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_akopts = FALSE ;
 	int		f ;
-	const char	*un = NULL ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*un = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char		ubuf[USERNAMELEN+1] ;
 	char		lbuf[LINEBUFLEN+1] ;
 
@@ -299,7 +299,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -401,7 +401,7 @@ int		to ;
 	nprintf(NDEBFNAME,"opensvc_zoneabbr: MOTD-un=%s\n",un) ;
 #endif
 	    if ((un == NULL) || (un[0] == '\0')) {
-	        const char	*uidp = getourenv(envv,VARMOTDUID) ;
+	        cchar	*uidp = getourenv(envv,VARMOTDUID) ;
 #if	CF_DEBUGN
 	nprintf(NDEBFNAME,"opensvc_zoneabbr: MOTD-uid=%s\n",uidp) ;
 #endif
@@ -463,7 +463,7 @@ ret0:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip)
+local int subinfo_start(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 
@@ -477,7 +477,7 @@ static int subinfo_start(SUBINFO *sip)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -515,7 +515,7 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 		int	i ;
 	        vnlen = strnlen(vp,vl) ;
 	        if ((rs = vecstr_add(&sip->stores,vp,vnlen)) >= 0) {
-	            const char	*cp ;
+	            cchar	*cp ;
 	            i = rs ;
 	            if ((rs = vecstr_get(&sip->stores,i,&cp)) >= 0) {
 	                *epp = cp ;
@@ -532,9 +532,9 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_SETENTRY */
 
 
-static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
+local int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
 {
-	const int	hlen = MAXPATHLEN ;
+	cint	hlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		f_blocks = sip->fl.blocks ;
 	int		ll = 0 ;
@@ -577,11 +577,11 @@ static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
 /* end subroutine (subinfo_procuser) */
 
 
-static int mkfsline(lbuf,llen,f_blocks,fpath,fssp)
+local int mkfsline(lbuf,llen,f_blocks,fpath,fssp)
 char		lbuf[] ;
 int		llen ;
 int		f_blocks ;
-const char	*fpath ;
+cchar	*fpath ;
 STATVFS	*fssp ;
 {
 	LONG		vt ;
@@ -607,12 +607,12 @@ STATVFS	*fssp ;
 /* we go through some trouble here to get a snuggled-up floating number */
 
 	{
-	    const char	*dp ;
+	    cchar	*dp ;
 	    char	digbuf[DIGBUFLEN+1] ;
 	    if (per < 0) per = 99.9 ;
 	    rs = bufprintf(digbuf,DIGBUFLEN,"%4.1f",per) ;
 	    if (rs >= 0) {
-	        const char *fmt ;
+	        cchar *fmt ;
 		if (f_blocks) {
 	            fmt = "%s avail=%llu total=%llu util=%s%%\n" ;
 		} else {
