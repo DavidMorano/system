@@ -33,7 +33,7 @@
 	int		un ;
 	char		mbuf[] ;
 	int		mlen ;
-	const char	up[] ;
+	cchar	up[] ;
 	int		ul ;
 
 	Arguments:
@@ -92,19 +92,19 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	tmpx_getuserterms(TMPX *,VECSTR *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	tmpx_getuserterms(TMPX *,VECSTR *,cchar *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* local structures */
@@ -112,13 +112,13 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* forward references */
 
-static int noteone(struct proginfo *,const char *,const char *,int) ;
-static int writenotice(struct proginfo *,int,const char *,int) ;
+local int noteone(struct proginfo *,cchar *,cchar *,int) ;
+local int writenotice(struct proginfo *,int,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	eol[] = "\033[K\r\n" ;
+static cchar	eol[] = "\033[K\r\n" ;
 
 
 /* exported subroutines */
@@ -128,9 +128,9 @@ int notify(pip,txp,un,mbuf,mlen,up,ul)
 struct proginfo	*pip ;
 TMPX		*txp ;
 int		un ;
-const char	mbuf[] ;
+cchar	mbuf[] ;
 int		mlen ;
-const char	up[] ;
+cchar	up[] ;
 int		ul ;
 {
 	VECSTR	uterms ;
@@ -142,8 +142,8 @@ int		ul ;
 	int	cl ;
 	int	n = 0 ;
 
-	const char	*tp ;
-	const char	*cp ;
+	cchar	*tp ;
+	cchar	*cp ;
 
 	char	username[USERNAMELEN + 1] ;
 	char	termfname[MAXPATHLEN+1] ;
@@ -276,22 +276,22 @@ ret0:
 /* local subroutines */
 
 
-static int noteone(pip,termfname,mbuf,mlen)
+local int noteone(pip,termfname,mbuf,mlen)
 struct proginfo	*pip ;
-const char	termfname[] ;
-const char	mbuf[] ;
+cchar	termfname[] ;
+cchar	mbuf[] ;
 int		mlen ;
 {
 	ustat	sb ;
 
-	const int	oflags = (O_WRONLY | O_NOCTTY) ;
+	cint	oflags = (O_WRONLY | O_NOCTTY) ;
 
 	int	rs = SR_OK ;
 	int	n = 0 ;
 
 
 	if ((rs = uc_open(termfname,oflags,0666)) >= 0) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
@@ -337,10 +337,10 @@ int		mlen ;
 /* end subroutine (noteone) */
 
 
-static int writenotice(pip,fd_termdev,tbuf,tlen)
+local int writenotice(pip,fd_termdev,tbuf,tlen)
 struct proginfo	*pip ;
 int		fd_termdev ;
-const char	tbuf[] ;
+cchar	tbuf[] ;
 int		tlen ;
 {
 	SBUF	out ;
@@ -350,7 +350,7 @@ int		tlen ;
 	int	sl, cl ;
 	int	wlen = 0 ;
 
-	const char	*tp, *sp, *cp ;
+	cchar	*tp, *sp, *cp ;
 
 	char	buf[BUFLEN + 1] ;
 
