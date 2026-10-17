@@ -72,17 +72,17 @@
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 extern int	dupup(int,int) ;
 
 extern int	progjobdir(PROGINFO *,char *) ;
 extern int	progreqfile(PROGINFO *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -98,7 +98,7 @@ union conmsg {
 
 /* forward references */
 
-static int	cmsg_passfd(struct cmsghdr *,int) ;
+local int	cmsg_passfd(struct cmsghdr *,int) ;
 
 
 /* local variables */
@@ -167,8 +167,8 @@ int progpass(PROGINFO *pip,ARGINFO *aip)
 	oflags = O_SRVFLAGS ;
 	operms = (S_IFSOCK | 0600) ;
 	if ((rs = opentmpusd(template,oflags,operms,fname)) >= 0) {
-	    const int	af = AF_UNIX ;
-	    const char	*rf = pip->reqfname ;
+	    cint	af = AF_UNIX ;
+	    cchar	*rf = pip->reqfname ;
 	    int	fd = rs ;
 
 /* create the socket-address to the server request socket */
@@ -246,7 +246,7 @@ ret0:
 /* local subroutines */
 
 
-static int cmsg_passfd(cmp,fd)
+local int cmsg_passfd(cmp,fd)
 struct cmsghdr	*cmp ;
 int		fd ;
 {
