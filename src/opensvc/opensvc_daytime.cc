@@ -29,12 +29,12 @@
 
 	Synopsis:
 	int opensvc_daytime(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -64,7 +64,7 @@
 #include	<keyopt.h>
 #include	<nulstr.h>
 #include	<nistinfo.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<filereadln.h>
 #include	<localmisc.h>
 
@@ -99,12 +99,12 @@
 
 
 int opensvc_daytime(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	struct nistinfo	ni ;
@@ -115,8 +115,8 @@ int		to ;
 	int		pipes[2] ;
 	int		fd = -1 ;
 	int		sl ;
-	const char	*sp = NULL ;
-	const char	*orgcode = NULL ;
+	cchar	*sp = NULL ;
+	cchar	*orgcode = NULL ;
 	char		ntbuf[NISTINFO_BUFLEN+2] ;
 	char		ocbuf[OCBUFLEN+1] ;
 	char		*bp ;
@@ -165,7 +165,7 @@ int		to ;
 	        strwcpy(ni.org,orgcode,NISTINFO_ORGLEN) ;
 	    }
 	    bp = ntbuf ;
-	    sp = timestr_nist(daytime,ntbuf,&ni) ;
+	    sp = strtime_nist(daytime,ntbuf,&ni) ;
 
 	    sl = strlen(sp) ;
 
@@ -177,7 +177,7 @@ int		to ;
 
 	if (rs >= 0) {
 	    if ((rs = u_pipe(pipes)) >= 0) {
-	        const int	wfd = pipes[1] ;
+	        cint	wfd = pipes[1] ;
 	        fd = pipes[0] ;
 
 	        rs = u_write(wfd,sp,sl) ;
