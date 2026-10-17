@@ -134,7 +134,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int mklinestr(char *,int,cchar *,cchar *,cchar *,cchar *) ;
+local int mklinestr(char *,int,cchar *,cchar *,cchar *,cchar *) ;
 
 
 /* local variables */
@@ -180,10 +180,10 @@ int		to ;
 	bits		pargs ;
 	keyopt		akopts ;
 	uid_t		uid = 0 ;
-	const int	ulen = USERNAMELEN ;
-	const int	olen = ORGLEN ;
-	const int	ollen = ORGLOCLEN ;
-	const int	llen = LINEBUFLEN ;
+	cint	ulen = USERNAMELEN ;
+	cint	olen = ORGLEN ;
+	cint	ollen = ORGLOCLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -238,7 +238,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int ach = MKCHAR(argp[1]) ;
+		cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -320,7 +320,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -592,7 +592,7 @@ int		to ;
 
 	if (rs >= 0) {
 	    if ((rs = u_pipe(pipes)) >= 0) {
-	        const int	wfd = pipes[1] ; /* write end */
+	        cint	wfd = pipes[1] ; /* write end */
 		{
 	            fd = pipes[0] ; /* read end */
 	            rs = u_write(wfd,lbuf,ll) ;
@@ -619,7 +619,7 @@ badpargs:
 /* local subroutines */
 
 
-static int mklinestr(lbuf,llen,dbuf,obuf,olbuf,keyname)
+local int mklinestr(lbuf,llen,dbuf,obuf,olbuf,keyname)
 char		lbuf[] ;
 int		llen ;
 cchar		*dbuf ;
