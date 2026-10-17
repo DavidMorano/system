@@ -58,7 +58,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |stpcpy(3c)| + |strlcpy(3c)| */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU |strbcpy(3usys)| */
 
