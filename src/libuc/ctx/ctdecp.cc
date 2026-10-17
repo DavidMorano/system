@@ -84,7 +84,7 @@ int ctdecpux(int (*ctx)(char *,int,UT),char *dp,int dl,int p,UT uv) noex {
 	int		rs ;
 	if (((rs = ctx(dp,dl,uv)) >= 0) && (rs < p)) {
 	    rs = zerofill(dp,dl,p,rs) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine-template (ctdecpux) */
 
@@ -100,13 +100,13 @@ int ctdecpx(int (*ctx)(char *,int,int,UT),char *dp,int dl,int p,T v) noex {
 	        uv = -uv ;
 	        rp += 1 ;
 	        rl -= 1 ;
-	    }
+	    } /* end */
 	    if ((rs = ctx(rp,rl,p,uv)) >= 0) ylikely {
 	        n = rs ;
 	        if (v < 0) {
 	            dp[0] = '-' ;
 	            n += 1 ;
-	        }
+	        } /* end */
 	    } /* end if (ctx) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
