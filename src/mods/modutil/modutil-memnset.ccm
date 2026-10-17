@@ -50,6 +50,9 @@ export {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
     } /* end subroutine (memnset) */
+    constexpr inline int memfill(void *dp,int dl,int ch,int n = -1) noex {
+	return memnset(dp,dl,ch,n) ;
+    } /* end subroutine (memfill) */
 } /* end export */
 
 
