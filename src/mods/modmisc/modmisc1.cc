@@ -30,6 +30,19 @@
 	This module provides miscellaneous UNIX® or other
 	common (library oriented) subroutines.
 
+	Notes:
+	I am using the new (rumored to be coming as a standard)
+	subroutine |strlcpy(3c)|.  I wrote my own version of this
+	until it gets into the standard libraries.  It might be in
+	someone's standard library already, but I do not have that
+	in any of the operating systems I am working with.  And no,
+	I do not like the function signature of that new interface
+	(API).  I do not like it, but if it is going to become a
+	new standard, it might get optimized for speed (like
+	writting in hand-coded assembly language).  So that is
+	pretty much the only reason I would use that interface
+	(which I do not like).
+
 *******************************************************************************/
 
 module ;
@@ -37,13 +50,10 @@ module ;
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strlcpy(3c)| */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |sncpy(3usys)| */
 #include	<localmisc.h>		/* LIBU */
 
 module modmisc ;
@@ -52,6 +62,8 @@ module modmisc ;
 
 
 /* imported namespaces */
+
+using usys::sncpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -68,16 +80,11 @@ module modmisc ;
 
 /* forward references */
 
-local int cstrlcpy(char *dp,cchar *sp,int sl) noex {
-    	csize	ssize = size_t(sl) ;
-	return int(strlcpy(dp,sp,ssize)) ;
-} /* end subroutine */
-
 local int getrlen(int plen) noex {
     	int		rs = SR_INVALID ;
-	if (plen > 0) {
+	if (plen > 0) ylikely {
 	    rs = plen ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (getrlen) */
 
@@ -114,41 +121,22 @@ int mknpath6(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 	return mknpathx(pp,pl,6,s1,s2,s3,s4,s5,s6) ;
 } /* end */
 
-int mknpathx(char *pbuf,int plen,int n,...) noex {
+int mknpathx(char *pbuf,int µplen,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
-	if (pbuf) {
-	    char	*bp = pbuf ;
-	    if ((rs = getrlen(plen)) >= 0) {
-	        int	rlen = (rs + 1) ;
+	if (pbuf) ylikely {
+	    if ((rs = getrlen(µplen)) >= 0) ylikely {
+		cint plen = rs ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	            cc		*sp = (char *) va_arg(ap,char *) ;
-		    bool	f = true ;
-	            f = f && (i > 0) && ((bp == pbuf) || (bp[-1] != '/')) ;
-		    f = f && (sp[0] != '\0') && (sp[0] != '/') ;
-		    if (f) {
-	                if (rlen > 1) {		/* must be at least '2' */
-	                    *bp++ = '/' ;
-	                    rlen -= 1 ;
-		        } else {
-	                    rs = SR_NAMETOOLONG ;
-		        }
-	            } /* end if (needed a pathname separator) */
-		    if (rs >= 0) {
-	                if (int ml ; (ml = cstrlcpy(bp,sp,rlen)) < rlen) {
-	        	    bp += ml ;
-	        	    rlen -= ml ;
-		        } else {
-	                    rs = SR_NAMETOOLONG ;
-		        }
-		    } /* end if */
+	            ccp  sp = (charp) va_arg(ap,char *) ;
+		    if (! sp) break ;
+		    rs = pathnadd(pbuf,plen,pl,sp) ;
+		    pl = rs ;
 	        } /* end for */
 	        va_end(ap) ;
 	    } /* end if (getrlen) */
-	    *bp = '\0' ; /* in case of overflow */
-	    pl = intconv(bp - pbuf) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (mknpathx) */
