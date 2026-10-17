@@ -25,12 +25,12 @@
 	Synopsis:
 
 	int opensvc_motdblurb(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -129,11 +129,11 @@
 /* external subroutines */
 
 #if	CF_DEBUGS || CF_DEBUGN
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -153,21 +153,21 @@ extern int	nprintf(const char *,const char *,...) ;
 
 
 int opensvc_motdblurb(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		argc = 0 ;
 	int		ll = 0 ;
 	int		pipes[2] ;
 	int		fd = -1 ;
-	const char	*strspec = NULL ;
+	cchar	*strspec = NULL ;
 	char		nodename[NODENAMELEN+1] ;
 	char		strbuf[STRBUFLEN+1] ;
 	char		lbuf[LINEBUFLEN+1] ;
@@ -212,10 +212,10 @@ int		to ;
 /* do we need a default argument? */
 
 	if ((strspec == NULL) || (strspec[0] == '\0')) {
-	    const char	*gn = getourenv(envv,VARMOTDGROUP) ;
+	    cchar	*gn = getourenv(envv,VARMOTDGROUP) ;
 	    char	gbuf[GROUPNAMELEN+1] ;
 	    if ((gn == NULL) || (gn[0] == '\0')) {
-		const char	*gidp = getourenv(envv,VARMOTDGID) ;
+		cchar	*gidp = getourenv(envv,VARMOTDGID) ;
 		gid_t	gid = 0 ;
 		if ((gidp != NULL) && (gidp[0] != '\0')) {
 		    int		v ;
@@ -244,7 +244,7 @@ int		to ;
 	    int		nuser ;
 	    int		nproc = 0 ;
 	    int		mu = 0 ;
-	    const char	*fmt ;
+	    cchar	*fmt ;
 
 	    if (rs >= 0) {
 		rs = getnodename(nodename,NODENAMELEN) ;
@@ -314,7 +314,7 @@ int		to ;
 
 	if ((rs >= 0) && (ll > 0)) {
 	    if ((rs = u_pipe(pipes)) >= 0) {
-	        const int	wfd = pipes[1] ;
+	        cint	wfd = pipes[1] ;
 		{
 	            fd = pipes[0] ;
 	            rs = u_write(wfd,lbuf,ll) ;
