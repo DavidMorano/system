@@ -54,7 +54,6 @@
 /* external subroutines */
 
 extern char	*putheap() ;
-extern char	*timestr_log() ;
 
 
 /* external data */
