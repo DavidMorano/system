@@ -35,15 +35,11 @@ module ;
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modmisc ;
-
-import modsnwcpy ;
 
 /* local defines */
 
@@ -67,9 +63,9 @@ import modsnwcpy ;
 
 local int getrlen(int plen) noex {
     	int		rs = SR_INVALID ;
-	if (plen > 0) {
+	if (plen > 0) ylikely {
 	    rs = plen ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (getrlen) */
 
@@ -107,41 +103,22 @@ int mknpath6w(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,
 	return mknpathxw(pp,pl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end subroutine (mknpath6w) */
 
-int mknpathxw(char *pbuf,int plen,int n,...) noex {
+int mknpathxw(char *pbuf,int µplen,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		pl = 0 ;
-	char		*bp = pbuf ;
 	if (pbuf) ylikely {
-	    if ((rs = getrlen(plen)) >= 0) ylikely {
-	        int	bl = rs ;
-	        int	sl = -1 ;
+	    if ((rs = getrlen(µplen)) >= 0) ylikely {
+		cint	plen = rs ;
+		int	sl = -1 ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	            cc		*sp = (cchar *) va_arg(ap,char *) ;
-		    bool	f = true ;
+	            ccp  sp = (ccharp) va_arg(ap,char *) ;
 	            if (i == (n - 1)) sl = (int) va_arg(ap,int) ;
-	            f = f && (i > 0) && ((bp == pbuf) || (bp[-1] != '/')) ;
-		    f = f && (sp[0] != '\0') && (sp[0] != '/') ;
-		    if (f) {
-	                if (bl > 0) {
-	                    *bp++ = '/' ;
-	                    bl -= 1 ;
-	                } else {
-	                    rs = SR_NAMETOOLONG ;
-		        }
-	            } /* end if (needed a pathname separator) */
-	            if (rs >= 0) {
-	                if ((rs = snwcpy(bp,bl,sp,sl)) > 0) {
-	                    bp += rs ;
-	                    bl -= rs ;
-	                } else if (rs == SR_OVERFLOW) {
-	                    rs = SR_NAMETOOLONG ;
-		        }
-	            } /* end if */
+		    if (! sp) break ;
+		    rs = pathnadd(pbuf,plen,pl,sp,sl) ;
+		    pl = rs ;
 	        } /* end for */
-	        *bp = '\0' ; /* in case of overflow */
-		pl = intconv(bp - pbuf) ;
 	        va_end(ap) ;
 	    } /* end if (getrlen) */
 	} /* end if (non-null) */
