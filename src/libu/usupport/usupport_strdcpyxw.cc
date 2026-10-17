@@ -147,7 +147,7 @@ namespace libu {
 	            } /* end while */
 	        } /* end if */
 	    } /* end for */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
