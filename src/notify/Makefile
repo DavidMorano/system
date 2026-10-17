@@ -1,26 +1,25 @@
-# MAKEFILE (notify)
+# MAKEFILE (notify_dave)
 
-T= notify
+T= notify_dave
 
-ALL= $(T)
+ALL= $(T) $(T).ksh
 
-SRCROOT= /usr/apache
+SRCROOT= $(LOCAL)
 
 
-CGIBINDIR= $(SRCROOT)/cgi
+BINDIR= $(SRCROOT)/bin
 
 
 all:		$(ALL)
 
-$(T):		$(T).cgi
-	rm -f $(T)
-	ln -f $(T).cgi $(T)
+$(T):		$(T).ee
+	cp -p $(T).ee $(T)
 
-install:	$(T).cgi
-	makenewer -r $(T).cgi $(CGIBINDIR)
-	ln -f $(CGIBINDIR)/${T}.cgi $(CGIBINDIR)/${T} 
+install:	$(ALL)
+	bsdinstall $(ALL) $(BINDIR)
 
 clean:
 	rm -f $(T)
+
 
 
