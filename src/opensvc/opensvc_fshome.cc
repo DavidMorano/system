@@ -28,12 +28,12 @@
 	Synopsis:
 
 	int opensvc_fshome(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -114,11 +114,11 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -139,14 +139,14 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_procuser(SUBINFO *,char *,int,const char *) ;
+local int	subinfo_start(SUBINFO *) ;
+local int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_procuser(SUBINFO *,char *,int,cchar *) ;
 #if	CF_SETENTRY
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
+local int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	mkfsline(char *,int,int,const char *,STATVFS *) ;
+local int	mkfsline(char *,int,int,cchar *,STATVFS *) ;
 
 
 /* local variables */
@@ -168,19 +168,19 @@ enum argopts {
 
 
 int opensvc_fshome(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
 	bits		pargs ;
 	keyopt		akopts ;
-	const int	ulen = USERNAMELEN ;
-	const int	llen = LINEBUFLEN ;
+	cint	ulen = USERNAMELEN ;
+	cint	llen = LINEBUFLEN ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -192,9 +192,9 @@ int		to ;
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_akopts = FALSE ;
 	int		f ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*un = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*un = NULL ;
 	char		ubuf[USERNAMELEN+1] ;
 	char		lbuf[LINEBUFLEN+1] ;
 
@@ -227,7 +227,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -300,7 +300,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -403,7 +403,7 @@ int		to ;
 	    nprintf(NDF,"opensvc_fshome: MOTD-un=%s\n",un) ;
 #endif
 	    if ((un == NULL) || (un[0] == '\0')) {
-	        const char	*uidp = getourenv(envv,VARMOTDUID) ;
+	        cchar	*uidp = getourenv(envv,VARMOTDUID) ;
 #if	CF_DEBUGN
 	        nprintf(NDF,"opensvc_fshome: MOTD-uid=%s\n",uidp) ;
 #endif
@@ -428,7 +428,7 @@ int		to ;
 
 	if (rs >= 0) {
 	if ((rs = subinfo_procuser(sip,lbuf,llen,un)) >= 0) {
-	    const int	ll = rs ;
+	    cint	ll = rs ;
 	    if ((rs = u_pipe(pipes)) >= 0) {
 	        int	wfd = pipes[1] ;
 	        fd = pipes[0] ;
@@ -480,7 +480,7 @@ badsubstart:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip)
+local int subinfo_start(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 
@@ -494,7 +494,7 @@ static int subinfo_start(SUBINFO *sip)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -553,17 +553,17 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_SETENTRY */
 
 
-static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
+local int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
 {
 	PASSWDENT	pw ;
-	const int	pwlen = bufsizeget(bufsize_pw) ;
+	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		f_blocks = sip->fl.blocks ;
 	int		rs ;
 	int		ll = 0 ;
 	char		*pwbuf ;
 
 	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	    const int	hlen = MAXPATHLEN ;
+	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN+1] ;
 
 #if	CF_GETUSERHOME /* not perfect enough for mixed environments */
@@ -603,7 +603,7 @@ static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un)
 /* end subroutine (subinfo_procuser) */
 
 
-static int mkfsline(char *lbuf,int llen,int f_blocks,cchar *fpath,
+local int mkfsline(char *lbuf,int llen,int f_blocks,cchar *fpath,
 		STATVFS	*fssp)
 {
 	LONG		vt, va, vu ;
@@ -628,11 +628,11 @@ static int mkfsline(char *lbuf,int llen,int f_blocks,cchar *fpath,
 /* we go through some trouble here to get a snuggled-up floating number */
 
 	{
-	    const char	*dp ;
+	    cchar	*dp ;
 	    char	digbuf[DIGBUFLEN+1] ;
 	    if (per < 0) per = 99.9 ;
 	    if ((rs = bufprintf(digbuf,DIGBUFLEN,"%4.1f",per)) >= 0) {
-	        const char *fmt ;
+	        cchar *fmt ;
 	        if (f_blocks) {
 	            fmt = "%s avail=%llu partition=%llu util=%s%%\n" ;
 	        } else {
