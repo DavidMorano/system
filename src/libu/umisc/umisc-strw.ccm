@@ -40,6 +40,10 @@ module ;
 export module umisc:strw ;
 
 
-char *strwcpy(char *,cchar *,int = -1) noex ;
+export {
+    namespace umisc_ns {
+        char *strwcpy(char *,cchar *,int = -1) noex ;
+    } /* end namespace (umisc_ns) */
+} /* end export */
 
 
