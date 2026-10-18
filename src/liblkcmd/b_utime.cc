@@ -60,26 +60,27 @@
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<sys/loadavg.h>
-#include	<climits>
-#include	<csignal>
+#include	<utmpx.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctype.h>
-#include	<utmpx.h>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<baops.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<vecstr.h>
 #include	<tmpx.h>
-#include	<kinfo.h>
-#include	<exitcodes.h>
 #include	<mallocstuff.h>
 #include	<field.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<kinfo.h>		/* Solaris® */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -95,21 +96,19 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(PROGINFO *,const char *,
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
+extern int	proginfo_setpiv(PROGINFO *,cchar *,
 			const struct pivars *) ;
-extern int	nusers(const char *) ;
+extern int	nusers(cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -127,37 +126,37 @@ struct locinfo_flags {
 
 struct locinfo {
 	PROGINFO	*pip ;
-	const char	*utfname ;
+	cchar	*utfname ;
 	double		fla[3] ;
 	uint		nprocs ;
 	uint		nusers ;
-	struct locinfo_flags	f ;
+	locinfo_flags	fl ;
 } ;
 
 
 /* forward references */
 
-static void	sighand_int(int) ;
+local void	sighand_int(int) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	locinfo_start(PROGINFO *,struct locinfo *,const char *) ;
-static int	locinfo_finish(PROGINFO *) ;
+local int	locinfo_start(PROGINFO *,struct locinfo *,cchar *) ;
+local int	locinfo_finish(PROGINFO *) ;
 
-static int	procspec(PROGINFO *,void *, const char *) ;
+local int	procspec(PROGINFO *,void *, cchar *) ;
 
-static int	getla(PROGINFO *) ;
-static int	getnusers(PROGINFO *) ;
-static int	getnprocs(PROGINFO *) ;
-static int	nprocs(PROGINFO *) ;
+local int	getla(PROGINFO *) ;
+local int	getnusers(PROGINFO *) ;
+local int	getnprocs(PROGINFO *) ;
+local int	nprocs(PROGINFO *) ;
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
-static const int	sigblocks[] = {
+static cint	sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -166,19 +165,19 @@ static const int	sigblocks[] = {
 	0
 } ;
 
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 	0
 } ;
 
-static const int	sigints[] = {
+static cint	sigints[] = {
 	SIGINT,
 	SIGTERM,
 	0
 } ;
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -203,7 +202,7 @@ enum argopts {
 } ;
 
 /* define the configuration keywords */
-static const char *reqopts[] = {
+static cchar *reqopts[] = {
 	"la1min",
 	"la5min",
 	"la15min",
@@ -241,25 +240,23 @@ static const uchar	aterms[] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int b_utime(argc,argv,contextp)
 int		argc ;
-const char	*argv[] ;
+cchar	*argv[] ;
 void		*contextp ;
 {
 	PROGINFO	pi, *pip = &pi ;
-	struct locinfo	li, *lip = &li ;
-
-	struct sigaction	san ;
-	struct sigaction	sao[nelem(sigints) + nelem(sigignores)] ;
-
-	sigset_t	oldsigmask, newsigmask ;
-
+	LOCINFO		li, *lip = &li ;
+	SIGACTION	san ;
+	SIGACTION	sao[nelem(sigints) + nelem(sigignores)] ;
 	SHIO	errfile ;
 	SHIO	outfile, *ofp = &outfile ;
-
+	sigset_t	oldsigmask, newsigmask ;
 	int	argr, argl, aol, akl, avl, kwi ;
 	int	ai, ai_max, ai_pos ;
 	int	argvalue = -1 ;
@@ -274,16 +271,15 @@ void		*contextp ;
 	int	f_help = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char	argpresent[MAXARGGROUPS] ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*argfname = NULL ;
-	const char	*outfname = NULL ;
-	const char	*utfname = NULL ;
-	const char	*cp ;
-
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*argfname = NULL ;
+	cchar	*outfname = NULL ;
+	cchar	*utfname = NULL ;
+	cchar	*cp ;
 
 	if_exit = 0 ;
 	if_int = 0 ;
@@ -746,7 +742,7 @@ void		*contextp ;
 
 	        char	linebuf[LINEBUFLEN + 1] ;
 	        char	name[MAXNAMELEN + 1] ;
-		const char	*fp ;
+		cchar	*fp ;
 
 	        while ((rs = shio_readline(afp,linebuf,LINEBUFLEN)) > 0) {
 	            len = rs ;
@@ -871,7 +867,7 @@ badarg:
 /* local subroutines */
 
 
-static void sighand_int(sn)
+local void sighand_int(sn)
 int	sn ;
 {
 
@@ -882,7 +878,7 @@ int	sn ;
 /* end subroutine (sighand_int) */
 
 
-static int usage(pip)
+local int usage(pip)
 PROGINFO	*pip ;
 {
 	int	rs ;
@@ -931,10 +927,10 @@ PROGINFO	*pip ;
 
 
 /* process a specification name */
-static int procspec(pip,ofp,name)
+local int procspec(pip,ofp,name)
 PROGINFO	*pip ;
 void		*ofp ;
-const char	name[] ;
+cchar	name[] ;
 {
 	struct locinfo	*lip = pip->lip ;
 
@@ -1013,10 +1009,10 @@ const char	name[] ;
 /* end subroutine (procspec) */
 
 
-static int locinfo_start(pip,lip,utfname)
+local int locinfo_start(pip,lip,utfname)
 PROGINFO	*pip ;
 struct locinfo	*lip ;
-const char	*utfname ;
+cchar	*utfname ;
 {
 
 
@@ -1029,7 +1025,7 @@ const char	*utfname ;
 }
 
 
-static int locinfo_finish(pip)
+local int locinfo_finish(pip)
 PROGINFO	*pip ;
 {
 
@@ -1039,7 +1035,7 @@ PROGINFO	*pip ;
 }
 
 
-static int getla(pip)
+local int getla(pip)
 PROGINFO	*pip ;
 {
 	struct locinfo	*lip = pip->lip ;
@@ -1059,7 +1055,7 @@ PROGINFO	*pip ;
 /* end subroutine (getla) */
 
 
-static int getnusers(pip)
+local int getnusers(pip)
 PROGINFO	*pip ;
 {
 	struct locinfo	*lip = pip->lip ;
@@ -1080,7 +1076,7 @@ PROGINFO	*pip ;
 /* end subroutine (getnusers) */
 
 
-static int getnprocs(PROGINFO *pip)
+local int getnprocs(PROGINFO *pip)
 {
 	struct locinfo	*lip = pip->lip ;
 
