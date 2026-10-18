@@ -56,7 +56,7 @@
 
 /* external subroutines */
 
-extern int	pathclean(char *,const char *,int) ;
+extern int	pathclean(char *,cchar *,int) ;
 
 
 /* externals variables */
@@ -86,8 +86,8 @@ static const uchar	fterms[32] = {
 
 
 int procfilepath(programroot,fname,lp)
-const char	programroot[] ;
-const char	fname[] ;
+cchar	programroot[] ;
+cchar	fname[] ;
 VECSTR		*lp ;
 {
 	ustat	sb ;
