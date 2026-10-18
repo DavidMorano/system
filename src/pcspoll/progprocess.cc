@@ -195,7 +195,7 @@ int progprocess(PROGINFO *pip,ARGINFO *aip,USERINFO *uip) noex {
 
 local int proglog_extra(PROGINFO *pip)
 {
-	const int	f = (pip->fl.named || pip->fl.passfd) ;
+	cint	f = (pip->fl.named || pip->fl.passfd) ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	    if ((pip->cfname != NULL) && (rs1 >= 0)) {
@@ -453,7 +453,7 @@ PROGINFO	*pip ;
 
 #if	CF_LOGID
 	{
-	    const int	llen = LOGIDLEN ;
+	    cint	llen = LOGIDLEN ;
 	    cchar	*nn = pip->nodename ;
 	    int		serial = pip->serial ;
 	    char	lbuf[LOGIDLEN + 1] ;
