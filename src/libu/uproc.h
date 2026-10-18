@@ -37,7 +37,7 @@
 #include	<uexecname.h>
 #include	<unanosleep.h>
 #include	<uprocess.h>
-#include	<usig.h>
+#include	<usigx.h>
 
 
 #endif /* UPROC_INCLUDE */
