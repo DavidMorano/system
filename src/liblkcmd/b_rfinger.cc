@@ -34,7 +34,7 @@
 	Synopsis:
 	$ rfinger <user>@<host> [-d <dialerspec>]
 
-
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -53,21 +53,23 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<ctime>
-#include	<climites>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
 #include	<uclibmem.h>
 #include	<bits.h>
 #include	<vecstr.h>
 #include	<keyopt.h>
 #include	<userinfo.h>
 #include	<schedvar.h>
-#include	<ascii.h>
 #include	<vechand.h>
 #include	<strpack.h>
 #include	<field.h>
@@ -75,11 +77,11 @@
 #include	<termout.h>
 #include	<opendial.h>
 #include	<snwcpy.h>
-#include	<ischarx.h>
+#include	<isfd.h>		/* LIBUC */
 #include	<iserror.h>
 #include	<isnot.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -1468,7 +1470,7 @@ local int procdial(PROGINFO *pip,void *ofp,cchar *ap) noex {
 		    if ((rs = opendial(di,af,hn,ps,ss,nullptr,ev,to,oo)) >= 0) {
 	    		cint	s = rs ;
 	    		if ((rs = uc_writen(s,qp,ql)) >= 0) {
-	    		    if (lip->fl.shutdown && isasocket(s)) {
+	    		    if (lip->fl.shutdown && isfdsocket(s)) {
 	        		rs = u_shutdown(s,SHUT_WR) ;
 			    }
 			    if (rs >= 0) {
