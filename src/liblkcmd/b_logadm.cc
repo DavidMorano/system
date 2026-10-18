@@ -61,6 +61,7 @@
 #include	<tmpx.h>
 #include	<field.h>
 #include	<getutmpent.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -130,30 +131,30 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_utfname(LOCINFO *,cchar *) ;
-static int	locinfo_to(LOCINFO *,int) ;
-static int	locinfo_username(LOCINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_utfname(LOCINFO *,cchar *) ;
+local int	locinfo_to(LOCINFO *,int) ;
+local int	locinfo_username(LOCINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCUTMPENT
-static int	locinfo_utmpent(LOCINFO *) ;
+local int	locinfo_utmpent(LOCINFO *) ;
 #endif
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,void *,cchar *,int) ;
-static int	procspec(PROGINFO *,void *, cchar *,int) ;
-static int	procout(PROGINFO *,SHIO *,cchar *,int) ;
-static int	proclogin(PROGINFO *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(PROGINFO *,void *,cchar *,int) ;
+local int	procspec(PROGINFO *,void *, cchar *,int) ;
+local int	procout(PROGINFO *,SHIO *,cchar *,int) ;
+local int	proclogin(PROGINFO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -212,7 +213,7 @@ static const MAPEX	mapexs[] = {
 } ;
 
 /* define the configuration keywords */
-static const char	*qopts[] = {
+static cchar	*qopts[] = {
 	"line",
 	"name",
 	"user",
@@ -288,7 +289,7 @@ int p_logadm(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -378,7 +379,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -578,7 +579,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1023,7 +1024,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1079,7 +1080,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	if (lip == NULL)
@@ -1095,7 +1096,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 
 	if (lip == NULL)
@@ -1106,7 +1107,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
+local int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 {
 
 	if (lip == NULL)
@@ -1118,7 +1119,7 @@ static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 /* end subroutine (locinfo_utfname) */
 
 
-static int locinfo_to(LOCINFO *lip,int to)
+local int locinfo_to(LOCINFO *lip,int to)
 {
 
 	if (to < 0) to = TO_CACHE ;
@@ -1130,7 +1131,7 @@ static int locinfo_to(LOCINFO *lip,int to)
 
 
 #if	CF_LOCUTMPENT
-static int locinfo_utmpent(LOCINFO *lip)
+local int locinfo_utmpent(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1148,7 +1149,7 @@ static int locinfo_utmpent(LOCINFO *lip)
 #endif /* CF_LOCUTMPENT */
 
 
-static int locinfo_username(LOCINFO *lip)
+local int locinfo_username(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1166,7 +1167,7 @@ static int locinfo_username(LOCINFO *lip)
 /* end subroutine (locinfo_username) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -1210,7 +1211,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-		    const int	llen = LINEBUFLEN ;
+		    cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1261,7 +1262,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
+local int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1285,7 +1286,7 @@ static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 
 
 /* process a specification name */
-static int procspec(PROGINFO *pip,void *ofp,cchar qp[],int ql)
+local int procspec(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 {
 	LOCINFO		*lip = pip->lip ;
 	GETUTMPENT	*utp ;
@@ -1343,7 +1344,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	case qopt_date:
 	case qopt_time:
 	    sp = cvtbuf ;
-	    timestr_log(utp->date,cvtbuf) ;
+	    strtime_log(utp->date,cvtbuf) ;
 	    break ;
 	case qopt_pid:
 	case qopt_sid:
@@ -1372,7 +1373,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 /* end subroutine (procspec) */
 
 
-static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
+local int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1391,10 +1392,10 @@ static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 /* end subroutine (procout) */
 
 
-static int proclogin(PROGINFO *pip)
+local int proclogin(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	dlen = MAXPATHLEN ;
+	cint	dlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		fd ;
