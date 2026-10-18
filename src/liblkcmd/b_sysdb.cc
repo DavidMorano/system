@@ -131,56 +131,56 @@ struct procusers {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PI *) ;
+local int	usage(PI *) ;
 
-static int	locinfo_start(LOCINFO *,PI *) ;
-static int	locinfo_dbfname(LOCINFO *,cchar *) ;
-static int	locinfo_to(LOCINFO *,int) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_defaults(LOCINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PI *) ;
+local int	locinfo_dbfname(LOCINFO *,cchar *) ;
+local int	locinfo_to(LOCINFO *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_defaults(LOCINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
-static int	procopts(PI *,keyopt *) ;
-static int	process(PI *,ARGINFO *,bits *,cchar *,cchar *,int) ;
-static int	procall(PI *,int,void *) ;
-static int	procsome(PI *,int,void *,ARGINFO *,bits *,cchar *) ;
-static int	procspecs(PI *,void *,int,cchar *,int) ;
-static int	procspec(PI *,void *,int,cchar *,int) ;
+local int	procopts(PI *,keyopt *) ;
+local int	process(PI *,ARGINFO *,bits *,cchar *,cchar *,int) ;
+local int	procall(PI *,int,void *) ;
+local int	procsome(PI *,int,void *,ARGINFO *,bits *,cchar *) ;
+local int	procspecs(PI *,void *,int,cchar *,int) ;
+local int	procspec(PI *,void *,int,cchar *,int) ;
 
-static int process_begin(PI *,int) ;
-static int process_end(PI *,int) ;
+local int process_begin(PI *,int) ;
+local int process_end(PI *,int) ;
 
-static int procshells_begin(PI *,int) ;
-static int procshells_end(PI *,int) ;
-static int procshells_all(PI *,int,void *) ;
-static int procshells_query(PI *,int,void *,cchar *,int) ;
+local int procshells_begin(PI *,int) ;
+local int procshells_end(PI *,int) ;
+local int procshells_all(PI *,int,void *) ;
+local int procshells_query(PI *,int,void *,cchar *,int) ;
 
-static int procprotos_begin(PI *,int) ;
-static int procprotos_all(PI *,int,void *) ;
-static int procprotos_query(PI *,int,void *,cchar *,int) ;
-static int procprotos_end(PI *,int) ;
+local int procprotos_begin(PI *,int) ;
+local int procprotos_all(PI *,int,void *) ;
+local int procprotos_query(PI *,int,void *,cchar *,int) ;
+local int procprotos_end(PI *,int) ;
 
-static int procnets_begin(PI *,int) ;
-static int procnets_all(PI *,int,void *) ;
-static int procnets_query(PI *,int,void *,cchar *,int) ;
-static int procnets_end(PI *,int) ;
+local int procnets_begin(PI *,int) ;
+local int procnets_all(PI *,int,void *) ;
+local int procnets_query(PI *,int,void *,cchar *,int) ;
+local int procnets_end(PI *,int) ;
 
-static int prochosts_begin(PI *,int) ;
-static int prochosts_all(PI *,int,void *) ;
-static int prochosts_query(PI *,int,void *,cchar *,int) ;
-static int prochosts_end(PI *,int) ;
+local int prochosts_begin(PI *,int) ;
+local int prochosts_all(PI *,int,void *) ;
+local int prochosts_query(PI *,int,void *,cchar *,int) ;
+local int prochosts_end(PI *,int) ;
 
-static int procsvcs_begin(PI *,int) ;
-static int procsvcs_all(PI *,int,void *) ;
-static int procsvcs_query(PI *,int,void *,cchar *,int) ;
-static int procsvcs_end(PI *,int) ;
+local int procsvcs_begin(PI *,int) ;
+local int procsvcs_all(PI *,int,void *) ;
+local int procsvcs_query(PI *,int,void *,cchar *,int) ;
+local int procsvcs_end(PI *,int) ;
 
-static int procuas_begin(PI *,int) ;
-static int procuas_all(PI *,int,void *) ;
-static int procuas_query(PI *,int,void *,cchar *,int) ;
-static int procuas_end(PI *,int) ;
+local int procuas_begin(PI *,int) ;
+local int procuas_all(PI *,int,void *) ;
+local int procuas_query(PI *,int,void *,cchar *,int) ;
+local int procuas_end(PI *,int) ;
 
 
 /* local variables */
@@ -310,7 +310,7 @@ int p_sysdb(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* local subroutines */
 
-static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PI		pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -402,7 +402,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -587,7 +587,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -931,7 +931,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar		*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("b_sysdb: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -976,7 +976,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PI *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -997,7 +997,7 @@ static int usage(PI *pip)
 
 
 /* process the program ako-options */
-static int procopts(PI *pip,keyopt *kop)
+local int procopts(PI *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1052,7 +1052,7 @@ static int procopts(PI *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
+local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 		int w)
 {
 	SHIO		ofile, *ofp = &ofile ;
@@ -1089,7 +1089,7 @@ static int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 /* end subroutine (process) */
 
 
-static int process_begin(PI *pip,int w)
+local int process_begin(PI *pip,int w)
 {
 	int		rs ;
 
@@ -1132,7 +1132,7 @@ static int process_begin(PI *pip,int w)
 /* end subroutine (process_begin) */
 
 
-static int process_end(PI *pip,int w)
+local int process_end(PI *pip,int w)
 {
 	int		rs = SR_OK ;
 
@@ -1175,7 +1175,7 @@ static int process_end(PI *pip,int w)
 /* end subrotine (process_end) */
 
 
-static int procall(PI *pip,int w,void *ofp)
+local int procall(PI *pip,int w,void *ofp)
 {
 	int		rs = SR_OK ;
 
@@ -1218,7 +1218,7 @@ static int procall(PI *pip,int w,void *ofp)
 /* end subroutine (procall) */
 
 
-static int procsome(PI *pip,int w,void *ofp,ARGINFO *aip,bits *bop,
+local int procsome(PI *pip,int w,void *ofp,ARGINFO *aip,bits *bop,
 		cchar *afn)
 {
 	int		rs = SR_OK ;
@@ -1259,7 +1259,7 @@ static int procsome(PI *pip,int w,void *ofp,ARGINFO *aip,bits *bop,
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1295,7 +1295,7 @@ static int procsome(PI *pip,int w,void *ofp,ARGINFO *aip,bits *bop,
 }
 /* end subroutine (procsome) */
 
-static int procspecs(PI *pip,void *ofp,int w,cchar *lbuf,int llen) noex {
+local int procspecs(PI *pip,void *ofp,int w,cchar *lbuf,int llen) noex {
 	FIELD		fsb ;
 	int		rs ;
 	int		wlen = 0 ;
@@ -1316,7 +1316,7 @@ static int procspecs(PI *pip,void *ofp,int w,cchar *lbuf,int llen) noex {
 }
 /* end subroutine (procspecs) */
 
-static int procspec(PI *pip,void *ofp,int w,cchar *sp,int sl) noex {
+local int procspec(PI *pip,void *ofp,int w,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 
 	switch (w) {
@@ -1353,7 +1353,7 @@ static int procspec(PI *pip,void *ofp,int w,cchar *sp,int sl) noex {
 /* end subroutine (procspec) */
 
 /* ARGSUSED */
-static int procshells_begin(PI *pip,int w) noex {
+local int procshells_begin(PI *pip,int w) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procshells_begin: ent\n") ;
@@ -1362,7 +1362,7 @@ static int procshells_begin(PI *pip,int w) noex {
 }
 
 /* ARGSUSED */
-static int procshells_end(PI *pip,int w) noex {
+local int procshells_end(PI *pip,int w) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procshells_end: ent\n") ;
@@ -1371,8 +1371,8 @@ static int procshells_end(PI *pip,int w) noex {
 }
 
 /* ARGSUSED */
-static int procshells_all(PI *pip,int w,void *ofp) noex {
-	const int	uslen = MAXPATHLEN ;
+local int procshells_all(PI *pip,int w,void *ofp) noex {
+	cint	uslen = MAXPATHLEN ;
 	int		rs ;
 	char		usbuf[MAXPATHLEN+1] ;
 	while ((rs = getus_ent(usbuf,uslen)) > 0) {
@@ -1383,12 +1383,12 @@ static int procshells_all(PI *pip,int w,void *ofp) noex {
 }
 
 /* ARGSUSED */
-static int procshells_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
+local int procshells_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	return SR_INVALID ;
 }
 
 /* ARGSUSED */
-static int procprotos_begin(PI *pip,int w) noex {
+local int procprotos_begin(PI *pip,int w) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procprotos_begin: ent\n") ;
@@ -1397,7 +1397,7 @@ static int procprotos_begin(PI *pip,int w) noex {
 }
 
 /* ARGSUSED */
-static int procprotos_end(PI *pip,int w) noex {
+local int procprotos_end(PI *pip,int w) noex {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procprotos_end: ent\n") ;
@@ -1406,9 +1406,9 @@ static int procprotos_end(PI *pip,int w) noex {
 }
 
 /* ARGSUSED */
-static int procprotos_all(PI *pip,int w,void *ofp) noex {
+local int procprotos_all(PI *pip,int w,void *ofp) noex {
 	struct protoent	pe ;
-	const int	pelen = bufsizeget(bufsize_pr) ;
+	cint	pelen = bufsizeget(bufsize_pr) ;
 	int		rs ;
 	int		rs1 ;
 	char		*pebuf ;
@@ -1418,7 +1418,7 @@ static int procprotos_all(PI *pip,int w,void *ofp) noex {
 #endif
 	if ((rs = uc_malloc((pelen+1),&pebuf)) >= 0) {
 	    SETSTR	ss ;
-	    const int	n = 20 ;
+	    cint	n = 20 ;
 	    if ((rs = setstr_start(&ss,n)) >= 0) {
 		cchar	*np ;
 	        while ((rs = getpe_ent(&pe,pebuf,pelen)) > 0) {
@@ -1441,14 +1441,14 @@ static int procprotos_all(PI *pip,int w,void *ofp) noex {
 }
 
 /* ARGSUSED */
-static int procprotos_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
+local int procprotos_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    struct protoent	pe ;
-	    const int		pelen = bufsizeget(bufsize_pr) ;
+	    cint		pelen = bufsizeget(bufsize_pr) ;
 	    char		*pebuf ;
 	    if ((rs = uc_malloc((pelen+1),&pebuf)) >= 0) {
 	        if ((rs = getpe_name(&pe,pebuf,pelen,name)) > 0) {
@@ -1463,25 +1463,25 @@ static int procprotos_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 }
 
 /* ARGSUSED */
-static int procnets_begin(PI *pip,int w) noex {
+local int procnets_begin(PI *pip,int w) noex {
 	return getne_begin(TRUE) ;
 }
 
 /* ARGSUSED */
-static int procnets_end(PI *pip,int w) noex {
+local int procnets_end(PI *pip,int w) noex {
 	return getne_end() ;
 }
 
 /* ARGSUSED */
-static int procnets_all(PI *pip,int w,void *ofp) noex {
+local int procnets_all(PI *pip,int w,void *ofp) noex {
 	struct netent	ne ;
-	const int	nelen = bufsizeget(bufsize_nw) ;
+	cint	nelen = bufsizeget(bufsize_nw) ;
 	int		rs ;
 	int		rs1 ;
 	char		*nebuf ;
 	if ((rs = uc_malloc((nelen+1),&nebuf)) >= 0) {
 	    SETSTR	ss ;
-	    const int	n = 20 ;
+	    cint	n = 20 ;
 	    if ((rs = setstr_start(&ss,n)) >= 0) {
 		cchar	*np ;
 	        while ((rs = getne_ent(&ne,nebuf,nelen)) > 0) {
@@ -1500,14 +1500,14 @@ static int procnets_all(PI *pip,int w,void *ofp) noex {
 }
 
 /* ARGSUSED */
-static int procnets_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
+local int procnets_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    struct netent	ne ;
-	    const int		nelen = bufsizeget(bufsize_nw) ;
+	    cint		nelen = bufsizeget(bufsize_nw) ;
 	    char		*nebuf ;
 	    if ((rs = uc_malloc((nelen+1),&nebuf)) >= 0) {
 	        if ((rs = getne_name(&ne,nebuf,nelen,name)) > 0) {
@@ -1522,25 +1522,25 @@ static int procnets_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 }
 
 /* ARGSUSED */
-static int prochosts_begin(PI *pip,int w) noex {
+local int prochosts_begin(PI *pip,int w) noex {
 	return gethe_begin(FALSE) ;
 }
 
 /* ARGSUSED */
-static int prochosts_end(PI *pip,int w) noex {
+local int prochosts_end(PI *pip,int w) noex {
 	return gethe_end() ;
 }
 
 /* ARGSUSED */
-static int prochosts_all(PI *pip,int w,void *ofp) noex {
+local int prochosts_all(PI *pip,int w,void *ofp) noex {
 	struct hostent	he ;
-	const int	helen = bufsizeget(bufsize_ho) ;
+	cint	helen = bufsizeget(bufsize_ho) ;
 	int		rs ;
 	int		rs1 ;
 	char		*hebuf ;
 	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
 	    SETSTR	ss ;
-	    const int	n = 20 ;
+	    cint	n = 20 ;
 	    if ((rs = setstr_start(&ss,n)) >= 0) {
 		cchar	*np ;
 	        while ((rs = gethe_ent(&he,hebuf,helen)) > 0) {
@@ -1559,14 +1559,14 @@ static int prochosts_all(PI *pip,int w,void *ofp) noex {
 }
 
 /* ARGSUSED */
-static int prochosts_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
+local int prochosts_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    struct hostent	he ;
-	    const int		helen = bufsizeget(bufsize_ho) ;
+	    cint		helen = bufsizeget(bufsize_ho) ;
 	    char		*hebuf ;
 	    if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
 	        if ((rs = gethe_name(&he,hebuf,helen,name)) > 0) {
@@ -1581,25 +1581,25 @@ static int prochosts_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 }
 
 /* ARGSUSED */
-static int procsvcs_begin(PI *pip,int w) noex {
+local int procsvcs_begin(PI *pip,int w) noex {
 	return getse_begin(FALSE) ;
 }
 
 /* ARGSUSED */
-static int procsvcs_end(PI *pip,int w) noex {
+local int procsvcs_end(PI *pip,int w) noex {
 	return getse_end() ;
 }
 
 /* ARGSUSED */
-static int procsvcs_all(PI *pip,int w,void *ofp) noex {
+local int procsvcs_all(PI *pip,int w,void *ofp) noex {
 	struct servent	se ;
-	const int	selen = bufsizeget(bufsize_sv) ;
+	cint	selen = bufsizeget(bufsize_sv) ;
 	int		rs ;
 	int		rs1 ;
 	char		*sebuf ;
 	if ((rs = uc_malloc((selen+1),&sebuf)) >= 0) {
 	    SETSTR	ss ;
-	    const int	n = 20 ;
+	    cint	n = 20 ;
 	    if ((rs = setstr_start(&ss,n)) >= 0) {
 		cchar	*np ;
 	        while ((rs = getse_ent(&se,sebuf,selen)) > 0) {
@@ -1618,7 +1618,7 @@ static int procsvcs_all(PI *pip,int w,void *ofp) noex {
 }
 
 /* ARGSUSED */
-static int procsvcs_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
+local int procsvcs_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	LOCINFO		*lip = pip->lip ;
 	nulstr		s ;
 	int		rs ;
@@ -1626,7 +1626,7 @@ static int procsvcs_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    struct servent	se ;
-	    const int		selen = bufsizeget(bufsize_sv) ;
+	    cint		selen = bufsizeget(bufsize_sv) ;
 	    cchar		*proto = lip->proto ;
 	    char		*sebuf ;
 	    if ((rs = uc_malloc((selen+1),&sebuf)) >= 0) {
@@ -1642,25 +1642,25 @@ static int procsvcs_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 }
 
 /* ARGSUSED */
-static int procuas_begin(PI *pip,int w) noex {
+local int procuas_begin(PI *pip,int w) noex {
 	return getua_begin(FALSE) ;
 }
 
 /* ARGSUSED */
-static int procuas_end(PI *pip,int w) noex {
+local int procuas_end(PI *pip,int w) noex {
 	return getua_end() ;
 }
 
 /* ARGSUSED */
-static int procuas_all(PI *pip,int w,void *ofp) noex {
+local int procuas_all(PI *pip,int w,void *ofp) noex {
 	userattr_t	ua ;
-	const int	ualen = bufsizeget(bufsize_ua) ;
+	cint	ualen = bufsizeget(bufsize_ua) ;
 	int		rs ;
 	int		rs1 ;
 	char		*uabuf ;
 	if ((rs = uc_malloc((ualen+1),&uabuf)) >= 0) {
 	    SETSTR	ss ;
-	    const int	n = 20 ;
+	    cint	n = 20 ;
 	    if ((rs = setstr_start(&ss,n)) >= 0) {
 		int	nl ;
 	        cchar	*fmt = "%s %d\n" ;
@@ -1682,14 +1682,14 @@ static int procuas_all(PI *pip,int w,void *ofp) noex {
 }
 
 /* ARGSUSED */
-static int procuas_query(PI *pip,int w,void *ofp,cchar *sp,int sl) noex {
+local int procuas_query(PI *pip,int w,void *ofp,cchar *sp,int sl) noex {
 	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
 	cchar		*name ;
 	if ((rs = nulstr_start(&s,sp,sl,&name)) >= 0) {
 	    userattr_t	ua ;
-	    const int	ualen = bufsizeget(bufsize_ua) ;
+	    cint	ualen = bufsizeget(bufsize_ua) ;
 	    char	*uabuf ;
 	    if ((rs = uc_malloc((ualen+1),&uabuf)) >= 0) {
 	        if ((rs = getua_name(&ua,uabuf,ualen,name)) > 0) {
@@ -1704,7 +1704,7 @@ static int procuas_query(PI *pip,int w,void *ofp,cchar *sp,int sl) noex {
 }
 /* end subroutine (procus_query) */
 
-static int locinfo_start(LOCINFO *lip,PI *pip) noex {
+local int locinfo_start(LOCINFO *lip,PI *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == nullptr)
@@ -1719,7 +1719,7 @@ static int locinfo_start(LOCINFO *lip,PI *pip) noex {
 }
 /* end subroutine (locinfo_start) */
 
-static int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1735,7 +1735,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_finish) */
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
 	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -1769,7 +1769,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
 }
 /* end subroutine (locinfo_setentry) */
 
-static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
+local int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
 	if (lip == nullptr)
 	    return SR_FAULT ;
 
@@ -1783,7 +1783,7 @@ static int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
 }
 /* end subroutine (locinfo_dbfname) */
 
-static int locinfo_to(LOCINFO *lip,int to) noex {
+local int locinfo_to(LOCINFO *lip,int to) noex {
 	if (to < 0) to = TO_CACHE ;
 
 	lip->to = to ;
@@ -1791,7 +1791,7 @@ static int locinfo_to(LOCINFO *lip,int to) noex {
 }
 /* end subroutine (locinfo_to) */
 
-static int locinfo_defaults(LOCINFO *lip) noex {
+local int locinfo_defaults(LOCINFO *lip) noex {
 	PI		*pip = lip->pip ;
 	int		rs = SR_OK ;
 
