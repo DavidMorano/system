@@ -131,7 +131,7 @@ local int	matextra(cchar **,int,cchar *,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -178,7 +178,7 @@ static const MAPEX	mapexs[] = {
 } ;
 
 /* define the configuration keywords */
-static const char	*qopts[] = {
+static cchar	*qopts[] = {
 	"fsbs",
 	"fspbs",
 	"fstotal",
