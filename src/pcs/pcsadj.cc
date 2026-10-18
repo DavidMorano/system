@@ -50,6 +50,7 @@
 #include	<sockaddress.h>
 #include	<conmsghdr.h>
 #include	<pcsns.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"shio.h"
@@ -108,23 +109,23 @@ struct pcsadj {
 
 /* forward references */
 
-static int	pcsadj_allocbegin(PROGINFO *) noex ;
-static int	pcsadj_allocend(PROGINFO *) noex ;
+local int	pcsadj_allocbegin(PROGINFO *) noex ;
+local int	pcsadj_allocend(PROGINFO *) noex ;
 
-static int	pcsadj_objbegin(PROGINFO *) noex ;
-static int	pcsadj_objend(PROGINFO *) noex ;
+local int	pcsadj_objbegin(PROGINFO *) noex ;
+local int	pcsadj_objend(PROGINFO *) noex ;
 
-static int	pcsadj_reqother(PROGINFO *,int) noex ;
-static int	pcsadj_reqmsg(PROGINFO *,int) noex ;
+local int	pcsadj_reqother(PROGINFO *,int) noex ;
+local int	pcsadj_reqmsg(PROGINFO *,int) noex ;
 
-static int	pcsadj_getstatus(PROGINFO *,MSGDATA *) noex ;
-static int	pcsadj_gethelp(PROGINFO *,MSGDATA *) noex ;
-static int	pcsadj_getval(PROGINFO *,MSGDATA *) noex ;
-static int	pcsadj_mark(PROGINFO *,MSGDATA *) noex ;
-static int	pcsadj_exit(PROGINFO *,MSGDATA *) noex ;
+local int	pcsadj_getstatus(PROGINFO *,MSGDATA *) noex ;
+local int	pcsadj_gethelp(PROGINFO *,MSGDATA *) noex ;
+local int	pcsadj_getval(PROGINFO *,MSGDATA *) noex ;
+local int	pcsadj_mark(PROGINFO *,MSGDATA *) noex ;
+local int	pcsadj_exit(PROGINFO *,MSGDATA *) noex ;
 
-static int	pcsadj_send(PROGINFO *,MSGDATA *,int,uint) noex ;
-static int	pcsadj_invalid(PROGINFO *,MSGDATA *,int,int) noex ;
+local int	pcsadj_send(PROGINFO *,MSGDATA *,int,uint) noex ;
+local int	pcsadj_invalid(PROGINFO *,MSGDATA *,int,int) noex ;
 
 
 /* local variables */
@@ -222,7 +223,7 @@ int pcsadj_req(PROGINFO *pip,int re) noex {
 
 /* local subroutines */
 
-static int pcsadj_allocbegin(PROGINFO *pip) noex {
+local int pcsadj_allocbegin(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	cint		asize = sizeof(PCSADJ) ;
 	int		rs ;
@@ -237,7 +238,7 @@ static int pcsadj_allocbegin(PROGINFO *pip) noex {
 }
 /* end subroutine (pcsadj_allocbegin) */
 
-static int pcsadj_allocend(PROGINFO *pip) noex {
+local int pcsadj_allocend(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -252,7 +253,7 @@ static int pcsadj_allocend(PROGINFO *pip) noex {
 }
 /* end subroutine (pcsadj_allocend) */
 
-static int pcsadj_objbegin(PROGINFO *pip) noex {
+local int pcsadj_objbegin(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	if (lip->adj != NULL) {
@@ -265,7 +266,7 @@ static int pcsadj_objbegin(PROGINFO *pip) noex {
 }
 /* end subroutine (pcsadj_objbegin) */
 
-static int pcsadj_objend(PROGINFO *pip) noex {
+local int pcsadj_objend(PROGINFO *pip) noex {
 	PCSADJ		*pap ;
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -284,7 +285,7 @@ static int pcsadj_objend(PROGINFO *pip) noex {
 }
 /* end subroutine (pcsadj_objend) */
 
-static int pcsadj_reqother(PROGINFO *pip,int re) noex {
+local int pcsadj_reqother(PROGINFO *pip,int re) noex {
 	int		rs = SR_OK ;
 	int		f_logged = FALSE ;
 	cchar		*ccp = NULL ;
@@ -310,7 +311,7 @@ static int pcsadj_reqother(PROGINFO *pip,int re) noex {
 }
 /* end subroutine (pcsadj_reqother) */
 
-static int pcsadj_reqmsg(PROGINFO *pip,int re) noex {
+local int pcsadj_reqmsg(PROGINFO *pip,int re) noex {
 	LOCINFO		*lip = pip->lip ;
 	PCSADJ		*pap ;
 	MSGDATA		*mdp ;
@@ -362,7 +363,7 @@ static int pcsadj_reqmsg(PROGINFO *pip,int re) noex {
 }
 /* end subroutine (pcsadj_reqmsg) */
 
-static int pcsadj_getstatus(PROGINFO *pip,MSGDATA *mdp) noex {
+local int pcsadj_getstatus(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_status	m0 ;
 	struct pcsmsg_getstatus	m1 ;
 	int		rs ;
@@ -390,7 +391,7 @@ static int pcsadj_getstatus(PROGINFO *pip,MSGDATA *mdp) noex {
 }
 /* end subroutine (pcsadj_getstatus) */
 
-static int pcsadj_gethelp(PROGINFO *pip,MSGDATA *mdp) noex {
+local int pcsadj_gethelp(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_gethelp	mreq ;
 	struct pcsmsg_help	mres ;
 	int		rs ;
@@ -424,7 +425,7 @@ static int pcsadj_gethelp(PROGINFO *pip,MSGDATA *mdp) noex {
 }
 /* end subroutine (pcsadj_gethelp) */
 
-static int pcsadj_getval(PROGINFO *pip,MSGDATA *mdp) noex {
+local int pcsadj_getval(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_getval	mreq ;
 	struct pcsmsg_val	mres ;
 	LOCINFO		*lip = pip->lip ;
@@ -455,7 +456,7 @@ static int pcsadj_getval(PROGINFO *pip,MSGDATA *mdp) noex {
 	        if ((rs = pcsmsg_val(&mres,0,mbuf,mlen)) >= 0) {
 	            char	tbuf[TIMEBUFLEN+1] ;
 	            rs = pcsadj_send(pip,mdp,rs,mreq.tag) ;
-	            timestr_logz(pip->daytime,tbuf) ;
+	            strtime_logz(pip->daytime,tbuf) ;
 	            if ((rs == 0) || (mres.rc != pcsmsgrc_ok)) vl = 0 ;
 	            logprintf(pip,"%s req k=%s w=%u vl=%u",tbuf,key,w,vl) ;
 	        } /* end if (pcsmsg_val) */
@@ -468,7 +469,7 @@ static int pcsadj_getval(PROGINFO *pip,MSGDATA *mdp) noex {
 }
 /* end subroutine (pcsadj_getval) */
 
-static int pcsadj_mark(PROGINFO *pip,MSGDATA *mdp) noex {
+local int pcsadj_mark(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_mark	mreq ;
 	struct pcsmsg_ack	mres ;
 	int		rs ;
@@ -495,7 +496,7 @@ static int pcsadj_mark(PROGINFO *pip,MSGDATA *mdp) noex {
 }
 /* end subroutine (pcsadj_mark) */
 
-static int pcsadj_exit(PROGINFO *pip,MSGDATA *mdp) noex {
+local int pcsadj_exit(PROGINFO *pip,MSGDATA *mdp) noex {
 	struct pcsmsg_exit	mreq ;
 	struct pcsmsg_ack	mres ;
 	int		rs ;
@@ -517,7 +518,7 @@ static int pcsadj_exit(PROGINFO *pip,MSGDATA *mdp) noex {
 }
 /* end subroutine (pcsadj_exit) */
 
-static int pcsadj_invalid(PROGINFO *pip,MSGDATA *mdp,int mrs,int f) noex {
+local int pcsadj_invalid(PROGINFO *pip,MSGDATA *mdp,int mrs,int f) noex {
 	struct pcsmsg_status	mres ;
 	int		rs ;
 	cchar		*s = ((f) ? "invalid" : "bad-fmt") ;
@@ -537,7 +538,7 @@ static int pcsadj_invalid(PROGINFO *pip,MSGDATA *mdp,int mrs,int f) noex {
 }
 /* end subroutine (pcsadj_invalid) */
 
-static int pcsadj_send(PROGINFO *pip,MSGDATA *mdp,int dl,uint tag) noex {
+local int pcsadj_send(PROGINFO *pip,MSGDATA *mdp,int dl,uint tag) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		len = 0 ;
