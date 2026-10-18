@@ -63,6 +63,7 @@
 #include	<vecobj.h>
 #include	<ids.h>
 #include	<getax.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -88,10 +89,10 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -149,26 +150,26 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_procopts(LOCINFO *) ;
-static int	locinfo_ftypes(LOCINFO *) ;
-static int	locinfo_ids(LOCINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_getgroup(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_procopts(LOCINFO *) ;
+local int	locinfo_ftypes(LOCINFO *) ;
+local int	locinfo_ids(LOCINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_getgroup(LOCINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procfile(PROGINFO *,const char *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procfile(PROGINFO *,cchar *) ;
 
-static int	isNeedStat(PROGINFO *) ;
+local int	isNeedStat(PROGINFO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -224,7 +225,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"quiet",
 	"intage",
 	"same",
@@ -240,7 +241,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*ftypes[] = {
+static cchar	*ftypes[] = {
 	"file",
 	"link",
 	"exists",
@@ -287,7 +288,7 @@ int b_isfile(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -311,7 +312,7 @@ int p_isfile(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -335,15 +336,15 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 	int		f_exit = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*intagespec = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*intagespec = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -397,7 +398,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -607,7 +608,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -722,7 +723,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 	                                paramopt	*pop = &lip->aparams ;
-	                                const char	*po = PO_TYPE ;
+	                                cchar	*po = PO_TYPE ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
 	                        } else
@@ -882,7 +883,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (DEBUGLEVEL(2)) {
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    debugprintf("b_isfile: daytime=%s\n",
-	        timestr_logz(pip->daytime,timebuf)) ;
+	        strtime_logz(pip->daytime,timebuf)) ;
 	    debugprintf("b_isfile: intage=%d\n",
 	        lip->intage) ;
 	}
@@ -896,8 +897,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,ofn,afn) ;
 	    f_exit = rs ;
 	} else if (ex == EX_OK) {
@@ -918,7 +919,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if ((rs >= 0) && (ex == EX_OK) && f_exit) ex = 1 ;
 
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
-	    const char	*fmt = "%s: f_exit=%u\n" ;
+	    cchar	*fmt = "%s: f_exit=%u\n" ;
 	    shio_printf(pip->efp,fmt,pip->progname,f_exit) ;
 	}
 
@@ -999,12 +1000,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s <file(s)> [<opt(s)>] [-<intage>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1020,7 +1021,7 @@ static int usage(PROGINFO *pip)
 
 
 /* ARGSUSED */
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1030,7 +1031,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	int		f_exit = FALSE ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
@@ -1067,7 +1068,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1114,7 +1115,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 
 
 /* process a file (carefully follow the logic in this subroutine) */
-static int procfile(PROGINFO *pip,cchar fname[])
+local int procfile(PROGINFO *pip,cchar fname[])
 {
 	ustat	usb ;
 	LOCINFO		*lip = pip->lip ;
@@ -1140,7 +1141,7 @@ static int procfile(PROGINFO *pip,cchar fname[])
 	    if (DEBUGLEVEL(2)) {
 	        char	timebuf[TIMEBUFLEN + 1] ;
 	        debugprintf("b/procfile: mtime=%s\n",
-	            timestr_logz(usb.st_mtime,timebuf)) ;
+	            strtime_logz(usb.st_mtime,timebuf)) ;
 	    }
 #endif /* CF_DEBUG */
 
@@ -1282,7 +1283,7 @@ static int procfile(PROGINFO *pip,cchar fname[])
 /* end subroutine (procfile) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs ;
 
@@ -1306,7 +1307,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1336,14 +1337,14 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 /* process the program options */
-static int locinfo_procopts(LOCINFO *lip)
+local int locinfo_procopts(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	keyopt		*kop = &lip->akopts ;
 	keyopt_cur	kcur ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1430,7 +1431,7 @@ static int locinfo_procopts(LOCINFO *lip)
 /* end subroutine (locinfo_procopts) */
 
 
-static int locinfo_ftypes(LOCINFO *lip)
+local int locinfo_ftypes(LOCINFO *lip)
 {
 	paramopt_cur	cur ;
 	int		rs ;
@@ -1440,7 +1441,7 @@ static int locinfo_ftypes(LOCINFO *lip)
 	if ((rs = paramopt_curbegin(&lip->aparams,&cur)) >= 0) {
 	    int		vl ;
 	    int		fti ;
-	    const char	*vp ;
+	    cchar	*vp ;
 
 	    while (rs >= 0) {
 
@@ -1511,7 +1512,7 @@ static int locinfo_ftypes(LOCINFO *lip)
 /* end subroutine (locinfo_ftypes) */
 
 
-static int locinfo_ids(LOCINFO *lip)
+local int locinfo_ids(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1525,7 +1526,7 @@ static int locinfo_ids(LOCINFO *lip)
 /* end subroutine (locinfo_ids) */
 
 
-static int locinfo_getgroup(LOCINFO *lip)
+local int locinfo_getgroup(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1546,7 +1547,7 @@ static int locinfo_getgroup(LOCINFO *lip)
 /* end subroutine (locinfo_getgroup) */
 
 
-static int isNeedStat(PROGINFO *pip)
+local int isNeedStat(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		f_needstat = FALSE ;
