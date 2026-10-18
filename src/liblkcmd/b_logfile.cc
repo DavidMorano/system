@@ -65,6 +65,7 @@
 #include	<expcook.h>
 #include	<tmctimeh>
 #include	<strn.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -122,10 +123,10 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -146,9 +147,9 @@ struct locinfo {
 	PROGINFO	*pip ;
 	LOCINFO_FL	have, f, changed, finval ;
 	LOCINFO_FL	open ;
-	const char	*facname ;
-	const char	*facversion ;
-	const char	*alloc ;
+	cchar	*facname ;
+	cchar	*facversion ;
+	cchar	*alloc ;
 	int		to_read ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 } ;
@@ -156,34 +157,34 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	process(PROGINFO *,EXPCOOK *,const char *) ;
-static int	procline(PROGINFO *,const char *,int) ;
-static int	procsubs(PROGINFO *,EXPCOOK *,char *,int,cchar *,int) ;
-static int	loadcooks(PROGINFO *,EXPCOOK *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,EXPCOOK *,cchar *) ;
+local int	procline(PROGINFO *,cchar *,int) ;
+local int	procsubs(PROGINFO *,EXPCOOK *,char *,int,cchar *,int) ;
+local int	loadcooks(PROGINFO *,EXPCOOK *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
 
-static int	mkreport(PROGINFO *,int,cchar **,int) ;
-static int	mkreportfile(PROGINFO *,char *,cchar *) ;
-static int	mkreportout(PROGINFO *,cchar *,cchar *,int,cchar **,int) ;
-static int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
+local int	mkreport(PROGINFO *,int,cchar **,int) ;
+local int	mkreportfile(PROGINFO *,char *,cchar *) ;
+local int	mkreportout(PROGINFO *,cchar *,cchar *,int,cchar **,int) ;
+local int	mktmpreportdir(char *,cchar *,cchar *,mode_t) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_facility(LOCINFO *,const char *) ;
-static int	locinfo_logbegin(LOCINFO *,USERINFO *,const char *) ;
-static int	locinfo_logend(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_facility(LOCINFO *,cchar *) ;
+local int	locinfo_logbegin(LOCINFO *,USERINFO *,cchar *) ;
+local int	locinfo_logend(LOCINFO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -227,7 +228,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"audit",
 	"create",
 	"logsize",
@@ -252,7 +253,7 @@ int b_logfile(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -276,7 +277,7 @@ int p_logfile(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -302,16 +303,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*efname = NULL ;
-	const char	*lfname = NULL ;
-	const char	*namespec = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*lfname = NULL ;
+	cchar	*namespec = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -375,7 +376,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -519,7 +520,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -937,12 +938,12 @@ badprogstart:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<logfile>] [-c[=<b>]] [-n <name>[:<ver>]]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -962,13 +963,13 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1040,7 +1041,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1061,12 +1062,12 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
-	    const char	*nn = pip->nodename ;
-	    const char	*dn = pip->domainname ;
+	    cchar	*nn = pip->nodename ;
+	    cchar	*dn = pip->domainname ;
 	    if ((rs = snsds(hbuf,hlen,nn,dn)) >= 0) {
-	        const char	**vpp = &pip->hostname ;
+	        cchar	**vpp = &pip->hostname ;
 	        rs = proginfo_setentry(pip,vpp,hbuf,rs) ;
 	    }
 	}
@@ -1076,7 +1077,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1087,13 +1088,13 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int process(PROGINFO *pip,EXPCOOK *clp,cchar ifname[])
+local int process(PROGINFO *pip,EXPCOOK *clp,cchar ifname[])
 {
 	LOCINFO		*lip = pip->lip ;
 	time_t		ti_lastcheck = pip->daytime ;
-	const int	llen = LINEBUFLEN ;
-	const int	olen = OUTBUFLEN ;
-	const int	to = lip->to_read ;
+	cint	llen = LINEBUFLEN ;
+	cint	olen = OUTBUFLEN ;
+	cint	to = lip->to_read ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		eofstrlen ;
@@ -1102,8 +1103,8 @@ static int process(PROGINFO *pip,EXPCOOK *clp,cchar ifname[])
 	int		tlen = 0 ;
 	int		f_stdin = FALSE ;
 	int		f_fifo = FALSE ;
-	const char	*eofstr = EOFSTR ;
-	const char	*obp ;
+	cchar	*eofstr = EOFSTR ;
+	cchar	*obp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 	char		obuf[OUTBUFLEN + 1] ;
 
@@ -1172,7 +1173,7 @@ static int process(PROGINFO *pip,EXPCOOK *clp,cchar ifname[])
 
 	                pip->daytime = time(NULL) ;
 	                if (rs >= 0) {
-	                    const int	to = INTFLUSH ;
+	                    cint	to = INTFLUSH ;
 	                    if ((pip->daytime - ti_lastcheck) >= to) {
 	                        ti_lastcheck = pip->daytime ;
 	                        rs = logfile_check(&pip->lh,pip->daytime) ;
@@ -1201,11 +1202,11 @@ static int process(PROGINFO *pip,EXPCOOK *clp,cchar ifname[])
 /* end subroutine (process) */
 
 
-static int procline(PROGINFO *pip,cchar obuf[],int olen)
+local int procline(PROGINFO *pip,cchar obuf[],int olen)
 {
 	LINEFOLD	lf ;
-	const int	cols = LOGCOLS ;
-	const int	indent = 2 ;
+	cint	cols = LOGCOLS ;
+	cint	indent = 2 ;
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
@@ -1213,7 +1214,7 @@ static int procline(PROGINFO *pip,cchar obuf[],int olen)
 	if ((rs = linefold_start(&lf,cols,indent,obuf,olen)) >= 0) {
 	    int		i ;
 	    int		ll ;
-	    const char	*lp ;
+	    cchar	*lp ;
 	    for (i = 0 ; (ll = linefold_get(&lf,i,&lp)) >= 0 ; i += 1) {
 	        tlen += ll ;
 	        rs = logfile_write(&pip->lh,lp,ll) ;
@@ -1228,12 +1229,12 @@ static int procline(PROGINFO *pip,cchar obuf[],int olen)
 /* end subroutine (procline) */
 
 
-static int procsubs(pip,ckp,obuf,olen,lbuf,llen)
+local int procsubs(pip,ckp,obuf,olen,lbuf,llen)
 PROGINFO	*pip ;
 EXPCOOK		*ckp ;
 char		obuf[] ;
 int		olen ;
-const char	lbuf[] ;
+cchar	lbuf[] ;
 int		llen ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1246,7 +1247,7 @@ int		llen ;
 
 	    if ((pip->daytime != dt) || (lip->timebuf[0] == '\0')) {
 	        pip->daytime = dt ;
-	        timestr_logz(dt,lip->timebuf) ;
+	        strtime_logz(dt,lip->timebuf) ;
 	        rs = expcook_add(ckp,"T",lip->timebuf,-1) ;
 	    }
 
@@ -1273,7 +1274,7 @@ int		llen ;
 /* end subroutine (procsubs) */
 
 
-static int loadcooks(PROGINFO *pip,EXPCOOK *ckp)
+local int loadcooks(PROGINFO *pip,EXPCOOK *ckp)
 {
 	int		rs = SR_OK ;
 
@@ -1291,8 +1292,8 @@ static int loadcooks(PROGINFO *pip,EXPCOOK *ckp)
 
 	if (rs >= 0) {
 	    int		rs1 ;
-	    const char	*nn = pip->nodename ;
-	    const char	*dn = pip->domainname ;
+	    cchar	*nn = pip->nodename ;
+	    cchar	*dn = pip->domainname ;
 	    char	hostname[MAXHOSTNAMELEN + 1] ;
 	    rs1 = snsds(hostname,MAXHOSTNAMELEN,nn,dn) ;
 	    if (rs1 > 0)
@@ -1304,9 +1305,9 @@ static int loadcooks(PROGINFO *pip,EXPCOOK *ckp)
 /* end subroutine (loadcooks) */
 
 
-static int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
+local int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 {
-	const int	ulen = USERNAMELEN ;
+	cint	ulen = USERNAMELEN ;
 	int		rs ;
 	char		ubuf[USERNAMELEN+1] ;
 
@@ -1321,12 +1322,12 @@ static int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 	    if ((rs = mktmpreportdir(rbuf,ubuf,dname,m)) >= 0) {
 	        char	fbuf[MAXPATHLEN+1] ;
 	        if ((rs = mkreportfile(pip,fbuf,rbuf)) >= 0) {
-	            const int	nlen = NODENAMELEN ;
+	            cint	nlen = NODENAMELEN ;
 	            char	nbuf[NODENAMELEN+1] ;
 	            if (pip->pid == 0) pip->pid = getpid() ;
 	            if ((rs = getnodename(nbuf,nlen)) >= 0) {
-	                const int	llen = LOGIDLEN ;
-	                const int	v = pip->pid ;
+	                cint	llen = LOGIDLEN ;
+	                cint	v = pip->pid ;
 	                cchar		*onn = pip->nodename ;
 	                char		lbuf[LOGIDLEN+1] ;
 	                pip->nodename = nbuf ;
@@ -1347,14 +1348,14 @@ static int mkreport(PROGINFO *pip,int argc,cchar **argv,int rv)
 /* end subroutine (mkreport) */
 
 
-static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
+local int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 {
 	TMTIME		mt ;
 	const time_t	dt = pip->daytime ;
 	int		rs ;
 
 	if ((rs = tmtime_timelocal(&mt,dt)) >= 0) {
-	    const int	tlen = TIMEBUFLEN ;
+	    cint	tlen = TIMEBUFLEN ;
 	    cchar	*fmt = "r%y%m%d%H%M%S" ;
 	    char	tbuf[TIMEBUFLEN+1] ;
 	    if ((rs = sntmtime(tbuf,tlen,&mt,fmt)) >= 0) {
@@ -1367,7 +1368,7 @@ static int mkreportfile(PROGINFO *pip,char *fbuf,cchar *rbuf)
 /* end subroutine (mkreportfile) */
 
 
-static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
+local int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 	int ac,cchar **av,int rv)
 {
 	bfile		rfile, *rfp = &rfile ;
@@ -1375,9 +1376,9 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 	int		rs ;
 	cchar		*fmt ;
 	char		tbuf[TIMEBUFLEN+1] ;
-	timestr_logz(dt,tbuf) ;
+	strtime_logz(dt,tbuf) ;
 	if ((rs = bopen(rfp,fbuf,"wct",0666)) >= 0) {
-	    const int	al = DISARGLEN ;
+	    cint	al = DISARGLEN ;
 	    int		v = pip->pid ;
 	    int		i ;
 
@@ -1414,7 +1415,7 @@ static int mkreportout(PROGINFO *pip,cchar *fbuf,cchar *id,
 
 
 /* ARGSUSED */
-static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
+local int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
 {
 	cchar		*rdname = REPORTDNAME ;
 	int		rs ;
@@ -1451,7 +1452,7 @@ static int mktmpreportdir(char *rbuf,cchar *ubuf,cchar *dname,mode_t m)
 /* end subroutine (mktmpreportdir) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	memset(lip,0,sizeof(LOCINFO)) ;
@@ -1463,7 +1464,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1479,12 +1480,12 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_facility(LOCINFO *lip,cchar *namespec)
+local int locinfo_facility(LOCINFO *lip,cchar *namespec)
 {
 	int		rs = SR_OK ;
 
 	if ((namespec != NULL) && (namespec[0] != '\0')) {
-	    const char	*tp, *cp ;
+	    cchar	*tp, *cp ;
 	    lip->facname = namespec ;
 	    if ((tp = strchr(namespec,':')) != NULL) {
 	        lip->facversion = (tp+1) ;
@@ -1500,11 +1501,11 @@ static int locinfo_facility(LOCINFO *lip,cchar *namespec)
 /* end subroutine (locinfo_facility) */
 
 
-static int locinfo_logbegin(LOCINFO *lip,USERINFO *uip,const char *lfname)
+local int locinfo_logbegin(LOCINFO *lip,USERINFO *uip,cchar *lfname)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
-	const char	*logid = pip->logid ;
+	cchar	*logid = pip->logid ;
 
 	if ((rs = logfile_open(&pip->lh,lfname,0,0666,logid)) >= 0) {
 	    pip->open.logprog = TRUE ;
@@ -1514,8 +1515,8 @@ static int locinfo_logbegin(LOCINFO *lip,USERINFO *uip,const char *lfname)
 	    }
 	    if (rs >= 0) {
 	        time_t		dt = pip->daytime ;
-	        const char	*fac = lip->facname ;
-	        const char	*ver = lip->facversion ;
+	        cchar	*fac = lip->facname ;
+	        cchar	*ver = lip->facversion ;
 	        rs = logfile_userinfo(&pip->lh,uip,dt,fac,ver) ;
 	    }
 	    if (rs < 0) {
@@ -1529,7 +1530,7 @@ static int locinfo_logbegin(LOCINFO *lip,USERINFO *uip,const char *lfname)
 /* end subroutine (locinfo_logbegin) */
 
 
-static int locinfo_logend(LOCINFO *lip)
+local int locinfo_logend(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
