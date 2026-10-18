@@ -49,7 +49,7 @@ OBJPRIME=
 OBJ0= uexec.o 
 OBJ1= uexecname.o
 OBJ2= uprocess.o
-OBJ3= usig.o
+OBJ3= usigx.o usigblock.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB=
@@ -153,7 +153,9 @@ objimpl.o:		$(OBJIMPL)
 uexec.o:		uexec.cc	uexec.h				$(INCS)
 unanosleep.o:		unanosleep.cc	unanosleep.h			$(INCS)
 uprocess.o:		uprocess.cc	uprocess.h			$(INCS)
-usig.o:			usig.cc		usig.h				$(INCS)
+usigs.o:		usigx.cc	usigx.h				$(INCS)
 uexecname.o:		uexecname.cc	uexecname.h			$(INCS)
+
+usigblock.o:		usigblock.ccm	usigblock.hh			$(INCS)
 
 
