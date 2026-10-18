@@ -76,6 +76,7 @@
 #include	<keyopt.h>
 #include	<sbuf.h>
 #include	<termstr.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<debug.h>
@@ -490,7 +491,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -680,7 +681,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -949,7 +950,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if ((rs = shio_open(ofp,ofname,"wct",0666)) >= 0) {
 	    if ((rs = shio_getfd(ofp)) >= 0) {
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 	        if (isatty(fd)) {
 	            rs = process(pip,ofp,fd,termspec) ;
 	        } else {
@@ -1335,7 +1336,7 @@ cchar	termspec[] ;
 
 	    } else
 	        rs = shio_printf(ofp,"%r\n",
-	            timestr_std(daytime,timebuf),19) ;
+	            strtime_std(daytime,timebuf),19) ;
 
 	} /* end if (date) */
 
@@ -1656,17 +1657,17 @@ time_t		daytime ;
 	    if (termflags & TCF_MSD) {
 
 	        bufsd(pip,termflags,&b,(80 - 19),
-	            timestr_std(daytime,timebuf),19) ;
+	            strtime_std(daytime,timebuf),19) ;
 
 	    } else if ((termflags & TCF_MVCSR) || (termflags & TCF_MACSR)) {
 
 	        bufdiv(pip,termflags,&b,0,(80 - 19),
-	            timestr_std(daytime,timebuf),19) ;
+	            strtime_std(daytime,timebuf),19) ;
 
 	    } else {
 
 	        sbuf_strw(&b,
-	            timestr_std(daytime,timebuf),19) ;
+	            strtime_std(daytime,timebuf),19) ;
 	        sbuf_chr(&b,'\n') ;
 	    }
 
@@ -1883,7 +1884,7 @@ time_t		daytime ;
 	        if (rs >= 0) {
 
 	            sbuf_strw(&lb,
-	                timestr_std(daytime,timebuf),nfcols) ;
+	                strtime_std(daytime,timebuf),nfcols) ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(3))
@@ -1915,12 +1916,12 @@ time_t		daytime ;
 	} else if ((termflags & TCF_MVCSR) || (termflags & TCF_MACSR)) {
 
 	    rs = bufdiv(pip,termflags,&b,0,(80 - 19),
-	        timestr_std(daytime,timebuf),19) ;
+	        strtime_std(daytime,timebuf),19) ;
 
 	} else {
 
 	    sbuf_strw(&b,
-	        timestr_std(daytime,timebuf),19) ;
+	        strtime_std(daytime,timebuf),19) ;
 	    sbuf_chr(&b,'\n') ;
 
 	}
