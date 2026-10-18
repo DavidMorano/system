@@ -92,6 +92,7 @@
 #include	<strw.h>		/* LIBUC |strwset(3uc)| */
 #include	<strn.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<mapex.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG */
@@ -1831,7 +1832,7 @@ int		ml ;
 	    char	tbuf[TIMEBUFLEN+1] ;
 	    debugprintf("b_mbproc/procbase: mo=%lld\n",mo) ;
 	    debugprintf("b_mbproc/procbase: t=%s\n",
-	        timestr_log(t,tbuf)) ;
+	        strtime_log(t,tbuf)) ;
 	}
 #endif
 
@@ -2255,7 +2256,7 @@ local int locinfo_yearbase(LOCINFO *lip,cchar *sp,int sl)
 	                                char	tbuf[TIMEBUFLEN+1] ;
 	                                debugprintf("locinfo_yearbase: "
 					    "i=%u t=%s\n",
-	                                    i,timestr_log(t,tbuf)) ;
+	                                    i,strtime_log(t,tbuf)) ;
 	                            }
 #endif
 	                        } /* end if (tmtime_mktime) */
@@ -2321,7 +2322,7 @@ local int locinfo_yfile(LOCINFO *lip,time_t t)
 	if (DEBUGLEVEL(4)) {
 	    char	tbuf[TIMEBUFLEN+1] ;
 	    debugprintf("locinfo_yfile: nyrs=%u t=%s\n",
-	        nyrs,timestr_log(t,tbuf)) ;
+	        nyrs,strtime_log(t,tbuf)) ;
 	}
 #endif
 
@@ -2398,7 +2399,7 @@ local int locinfo_yfile(LOCINFO *lip,time_t t)
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
 	            char	tbuf[TIMEBUFLEN+1] ;
-	            timestr_log(t,tbuf) ;
+	            strtime_log(t,tbuf) ;
 	            debugprintf("locinfo_yfile: new maxtime=%s\n",tbuf) ;
 	        }
 #endif
@@ -2457,7 +2458,7 @@ local int locinfo_yclose(LOCINFO *lip,int i)
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5)) {
 	        char	tbuf[TIMEBUFLEN+1] ;
-	        timestr_log(mt,tbuf) ;
+	        strtime_log(mt,tbuf) ;
 	        debugprintf("locinfo_yclose: fn=%s\n",lip->yearfnames[i]) ;
 	        debugprintf("locinfo_yfile: final maxtime=%s\n",tbuf) ;
 	        debugprintf("locinfo_yclose: utime() rs=%d\n",rs1) ;
