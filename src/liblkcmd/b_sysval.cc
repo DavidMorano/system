@@ -120,6 +120,7 @@
 #include	<nulstr.h>
 #include	<sysmemutil.h>
 #include	<prgetclustername.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -234,72 +235,72 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,const char **,const char **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procqueries(PROGINFO *,void *,cchar *,int) ;
-static int	procquery(PROGINFO *,void *, cchar *,int) ;
-static int	procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *,int) ;
-static int	procfs(PROGINFO *,char *,int,int,cchar *,int) ;
-static int	procacc(PROGINFO *,char *,int,cchar *,int) ;
-static int	procsystat(PROGINFO *,char *,int,cchar *,int) ;
-static int	procla(PROGINFO *,SHIO *,char *,int,int) ;
-static int	procnfile(PROGINFO *,cchar *,int) ;
-static int	procmaxpid(PROGINFO *,cchar *,int) ;
-static int	procout(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procqueries(PROGINFO *,void *,cchar *,int) ;
+local int	procquery(PROGINFO *,void *, cchar *,int) ;
+local int	procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *,int) ;
+local int	procfs(PROGINFO *,char *,int,int,cchar *,int) ;
+local int	procacc(PROGINFO *,char *,int,cchar *,int) ;
+local int	procsystat(PROGINFO *,char *,int,cchar *,int) ;
+local int	procla(PROGINFO *,SHIO *,char *,int,int) ;
+local int	procnfile(PROGINFO *,cchar *,int) ;
+local int	procmaxpid(PROGINFO *,cchar *,int) ;
+local int	procout(PROGINFO *,SHIO *,cchar *,int) ;
 
-static int	getla(PROGINFO *) ;
-static int	getsysmisc(PROGINFO *) ;
-static int	getnusers(PROGINFO *) ;
-static int	getnprocs(PROGINFO *,int) ;
-static int	getnprocs_all(PROGINFO *) ;
-static int	getncpus(PROGINFO *) ;
-static int	getbtime(PROGINFO *) ;
-static int	getrnum(PROGINFO *) ;
-static int	getmem(PROGINFO *) ;
+local int	getla(PROGINFO *) ;
+local int	getsysmisc(PROGINFO *) ;
+local int	getnusers(PROGINFO *) ;
+local int	getnprocs(PROGINFO *,int) ;
+local int	getnprocs_all(PROGINFO *) ;
+local int	getncpus(PROGINFO *) ;
+local int	getbtime(PROGINFO *) ;
+local int	getrnum(PROGINFO *) ;
+local int	getmem(PROGINFO *) ;
 
-static int	cftime(PROGINFO *,char *,int,ulong) ;
+local int	cftime(PROGINFO *,char *,int,ulong) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_utfname(LOCINFO *,cchar *) ;
-static int	locinfo_flags(LOCINFO *,int,int) ;
-static int	locinfo_to(LOCINFO *,int) ;
-static int	locinfo_defaults(LOCINFO *) ;
-static int	locinfo_gmtime(LOCINFO *) ;
-static int	locinfo_wtime(LOCINFO *) ;
-static int	locinfo_rtime(LOCINFO *,ulong *) ;
-static int	locinfo_username(LOCINFO *) ;
-static int	locinfo_hz(LOCINFO *) ;
-static int	locinfo_uname(LOCINFO *) ;
-static int	locinfo_uaux(LOCINFO *) ;
-static int	locinfo_hostid(LOCINFO *) ;
-static int	locinfo_systypenum(LOCINFO *) ;
-static int	locinfo_runlevel(LOCINFO *) ;
-static int	locinfo_tz(LOCINFO *) ;
-static int	locinfo_sysdomain(LOCINFO *) ;
-static int	locinfo_systemname(LOCINFO *) ;
-static int	locinfo_clustername(LOCINFO *) ;
-static int	locinfo_nodename(LOCINFO *) ;
-static int	locinfo_fsdir(LOCINFO *) ;
-static int	locinfo_netload(LOCINFO *,char *,int,cchar *,int) ;
-static int	locinfo_pagesize(LOCINFO *) ;
-static int	locinfo_timeform(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_utfname(LOCINFO *,cchar *) ;
+local int	locinfo_flags(LOCINFO *,int,int) ;
+local int	locinfo_to(LOCINFO *,int) ;
+local int	locinfo_defaults(LOCINFO *) ;
+local int	locinfo_gmtime(LOCINFO *) ;
+local int	locinfo_wtime(LOCINFO *) ;
+local int	locinfo_rtime(LOCINFO *,ulong *) ;
+local int	locinfo_username(LOCINFO *) ;
+local int	locinfo_hz(LOCINFO *) ;
+local int	locinfo_uname(LOCINFO *) ;
+local int	locinfo_uaux(LOCINFO *) ;
+local int	locinfo_hostid(LOCINFO *) ;
+local int	locinfo_systypenum(LOCINFO *) ;
+local int	locinfo_runlevel(LOCINFO *) ;
+local int	locinfo_tz(LOCINFO *) ;
+local int	locinfo_sysdomain(LOCINFO *) ;
+local int	locinfo_systemname(LOCINFO *) ;
+local int	locinfo_clustername(LOCINFO *) ;
+local int	locinfo_nodename(LOCINFO *) ;
+local int	locinfo_fsdir(LOCINFO *) ;
+local int	locinfo_netload(LOCINFO *,char *,int,cchar *,int) ;
+local int	locinfo_pagesize(LOCINFO *) ;
+local int	locinfo_timeform(LOCINFO *,cchar *,int) ;
 
 extern "C" {
     static void	ourfini() noex ;
 }
 
-static int	getam(cchar *,int) ;
+local int	getam(cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -353,7 +354,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"utf",
 	"db",
 	"ttl",
@@ -373,7 +374,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*timeforms[] = {
+static cchar	*timeforms[] = {
 	"decimal",
 	"hexadecimal",
 	"wall",
@@ -631,7 +632,7 @@ int p_sysval(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -1262,12 +1263,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 /* execute this on module (shared-object) un-load */
-static void ourfini() noex {
+local void ourfini() noex {
 	percache_fini(&pc) ;
 }
 /* end subroutine (ourfini) */
 
-static int usage(PROGINFO *pip) noex {
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		wlen = 0 ;
@@ -1328,7 +1329,7 @@ static int usage(PROGINFO *pip) noex {
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1413,7 +1414,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1511,7 +1512,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procqueries(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
+local int procqueries(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1535,7 +1536,7 @@ static int procqueries(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 
 
 /* process a specification name */
-static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
+local int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 {
 	int		rs = SR_OK ;
 	int		vl = 0 ;
@@ -1590,7 +1591,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 /* end subroutine (procquery) */
 
 
-static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
+local int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
 	cint	cvtlen = CVTBUFLEN ;
@@ -2125,7 +2126,7 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 /* end subroutine (procqueryer) */
 
 
-static int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
+local int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2228,7 +2229,7 @@ static int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
 /* end subroutine (procfs) */
 
 
-static int procacc(PROGINFO *pip,char *cbuf,int clen,cchar *vp,int vl)
+local int procacc(PROGINFO *pip,char *cbuf,int clen,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -2257,7 +2258,7 @@ static int procacc(PROGINFO *pip,char *cbuf,int clen,cchar *vp,int vl)
 }
 /* end subroutine (procacc) */
 
-static int procsystat(PROGINFO *pip,char *cbuf,int clen,cc *vp,int vl) noex {
+local int procsystat(PROGINFO *pip,char *cbuf,int clen,cc *vp,int vl) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	if (lip->fl.set) {
@@ -2282,7 +2283,7 @@ static int procsystat(PROGINFO *pip,char *cbuf,int clen,cc *vp,int vl) noex {
 }
 /* end subroutine (procsystat) */
 
-static int procla(PROGINFO *pip,SHIO *ofp,char *rbuf,int rlen,int ri) noex {
+local int procla(PROGINFO *pip,SHIO *ofp,char *rbuf,int rlen,int ri) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		wlen = 0 ;
@@ -2317,7 +2318,7 @@ static int procla(PROGINFO *pip,SHIO *ofp,char *rbuf,int rlen,int ri) noex {
 /* end subroutine (procla) */
 
 
-static int procnfile(PROGINFO *pip,cchar *vp,int vl) 
+local int procnfile(PROGINFO *pip,cchar *vp,int vl) 
 {
 	int		rs = SR_OK ;
 	int		w = 0 ;
@@ -2334,7 +2335,7 @@ static int procnfile(PROGINFO *pip,cchar *vp,int vl)
 /* end subroutine (procnfile) */
 
 
-static int procmaxpid(PROGINFO *pip,cchar *vp,int vl)
+local int procmaxpid(PROGINFO *pip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		w = 0 ;
@@ -2350,7 +2351,7 @@ static int procmaxpid(PROGINFO *pip,cchar *vp,int vl)
 /* end subroutine (procmaxpid) */
 
 
-static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
+local int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2368,7 +2369,7 @@ static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 }
 /* end subroutine (procout) */
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == nullptr) return SR_FAULT ;
@@ -2384,7 +2385,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 }
 /* end subroutine (locinfo_start) */
 
-static int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -2417,7 +2418,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -2453,7 +2454,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
+local int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 {
 
 	if (lip == nullptr) return SR_FAULT ;
@@ -2469,7 +2470,7 @@ static int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 /* end subroutine (locinfo_utfname) */
 
 
-static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache)
+local int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2491,7 +2492,7 @@ static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache)
 /* end subroutine (locinfo_flags) */
 
 
-static int locinfo_to(LOCINFO *lip,int to)
+local int locinfo_to(LOCINFO *lip,int to)
 {
 
 	if (to < 0) to = TO_CACHE ;
@@ -2502,7 +2503,7 @@ static int locinfo_to(LOCINFO *lip,int to)
 /* end subroutine (locinfo_to) */
 
 
-static int locinfo_defaults(LOCINFO *lip)
+local int locinfo_defaults(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2521,7 +2522,7 @@ static int locinfo_defaults(LOCINFO *lip)
 /* end subroutine (locinfo_defaults) */
 
 
-static int locinfo_gmtime(LOCINFO *lip)
+local int locinfo_gmtime(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -2533,7 +2534,7 @@ static int locinfo_gmtime(LOCINFO *lip)
 /* end subroutine (locinfo_gmtime) */
 
 
-static int locinfo_wtime(LOCINFO *lip)
+local int locinfo_wtime(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2575,7 +2576,7 @@ static int locinfo_wtime(LOCINFO *lip)
 /* end subroutine (locinfo_wtime) */
 
 
-static int locinfo_rtime(LOCINFO *lip,ulong *tp)
+local int locinfo_rtime(LOCINFO *lip,ulong *tp)
 {
 	PROGINFO	*pip = lip->pip ;
 	struct timespec	ts ;
@@ -2593,7 +2594,7 @@ static int locinfo_rtime(LOCINFO *lip,ulong *tp)
 /* end subroutine (locinfo_rtime) */
 
 
-static int locinfo_username(LOCINFO *lip)
+local int locinfo_username(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	cchar		*un = lip->username ;
@@ -2609,7 +2610,7 @@ static int locinfo_username(LOCINFO *lip)
 /* end subroutine (locinfo_username) */
 
 
-static int locinfo_hz(LOCINFO *lip)
+local int locinfo_hz(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2652,7 +2653,7 @@ static int locinfo_hz(LOCINFO *lip)
 /* end subroutine (locinfo_hz) */
 
 
-static int locinfo_uname(LOCINFO *lip)
+local int locinfo_uname(LOCINFO *lip)
 {
 	int		rs = 1 ; /* cache-hit indication */
 
@@ -2666,7 +2667,7 @@ static int locinfo_uname(LOCINFO *lip)
 /* end subroutine (locinfo_uname) */
 
 
-static int locinfo_uaux(LOCINFO *lip)
+local int locinfo_uaux(LOCINFO *lip)
 {
 	int		rs = 1 ; /* cache-hit indication */
 
@@ -2679,7 +2680,7 @@ static int locinfo_uaux(LOCINFO *lip)
 }
 /* end subroutine (locinfo_uaux) */
 
-static int locinfo_hostid(LOCINFO *lip) noex {
+local int locinfo_hostid(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		to = lip->to ;
@@ -2707,7 +2708,7 @@ static int locinfo_hostid(LOCINFO *lip) noex {
 /* end subroutine (locinfo_hostid) */
 
 
-static int locinfo_systypenum(LOCINFO *lip)
+local int locinfo_systypenum(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2724,7 +2725,7 @@ static int locinfo_systypenum(LOCINFO *lip)
 /* end subroutine (locinfo_systypenum) */
 
 
-static int locinfo_runlevel(LOCINFO *lip)
+local int locinfo_runlevel(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2763,7 +2764,7 @@ static int locinfo_runlevel(LOCINFO *lip)
 /* end subroutine (locinfo_runlevel) */
 
 
-static int locinfo_tz(LOCINFO *lip)
+local int locinfo_tz(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	cint	to = TO_TZ ;
@@ -2781,7 +2782,7 @@ static int locinfo_tz(LOCINFO *lip)
 /* end subroutine (locinfo_tz) */
 
 
-static int locinfo_nodename(LOCINFO *lip)
+local int locinfo_nodename(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -2803,7 +2804,7 @@ static int locinfo_nodename(LOCINFO *lip)
 /* end subroutine (locinfo_nodename) */
 
 
-static int locinfo_clustername(LOCINFO *lip)
+local int locinfo_clustername(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2830,7 +2831,7 @@ static int locinfo_clustername(LOCINFO *lip)
 /* end subroutine (locinfo_clustername) */
 
 
-static int locinfo_systemname(LOCINFO *lip)
+local int locinfo_systemname(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2861,7 +2862,7 @@ static int locinfo_systemname(LOCINFO *lip)
 }
 /* end subroutine (locinfo_systemname) */
 
-static int locinfo_sysdomain(LOCINFO *lip) noex {
+local int locinfo_sysdomain(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -2884,7 +2885,7 @@ static int locinfo_sysdomain(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_sysdomain) */
 
-static int locinfo_fsdir(LOCINFO *lip) noex {
+local int locinfo_fsdir(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	if (lip->fname == nullptr) {
 	    cint	hlen = MAXPATHLEN ;
@@ -2900,7 +2901,7 @@ static int locinfo_fsdir(LOCINFO *lip) noex {
 }
 /* end subroutine (locinfo_fsdir) */
 
-static int locinfo_netload(LOCINFO *lip,char *cbuf,int clen,cchar *vp,int vl)
+local int locinfo_netload(LOCINFO *lip,char *cbuf,int clen,cchar *vp,int vl)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2927,7 +2928,7 @@ static int locinfo_netload(LOCINFO *lip,char *cbuf,int clen,cchar *vp,int vl)
 /* end subroutine (locinfo_netload) */
 
 
-static int locinfo_pagesize(LOCINFO *lip)
+local int locinfo_pagesize(LOCINFO *lip)
 {
 	int		rs = lip->pagesize ;
 	if (lip->pagesize == 0) {
@@ -2939,7 +2940,7 @@ static int locinfo_pagesize(LOCINFO *lip)
 /* end subroutine (locinfo_pagesize) */
 
 
-static int locinfo_timeform(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_timeform(LOCINFO *lip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	if ((lip->timeform = matostr(timeforms,2,vp,vl)) < 0) {
@@ -2950,7 +2951,7 @@ static int locinfo_timeform(LOCINFO *lip,cchar *vp,int vl)
 /* end subroutine (locinfo_timeform) */
 
 
-static int getla(PROGINFO *pip)
+local int getla(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2967,7 +2968,7 @@ static int getla(PROGINFO *pip)
 /* end subroutine (getla) */
 
 
-static int getsysmisc(PROGINFO *pip)
+local int getsysmisc(PROGINFO *pip)
 {
 	int		rs ;
 
@@ -2982,7 +2983,7 @@ static int getsysmisc(PROGINFO *pip)
 /* end subroutine (getsysmisc) */
 
 
-static int getncpus(PROGINFO *pip)
+local int getncpus(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3018,7 +3019,7 @@ static int getncpus(PROGINFO *pip)
 /* end subroutine (getncpus) */
 
 
-static int getnprocs(PROGINFO *pip,int w)
+local int getnprocs(PROGINFO *pip,int w)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3070,7 +3071,7 @@ static int getnprocs(PROGINFO *pip,int w)
 /* end subroutine (getnprocs) */
 
 
-static int getnprocs_all(PROGINFO *pip)
+local int getnprocs_all(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3093,7 +3094,7 @@ static int getnprocs_all(PROGINFO *pip)
 /* end subroutine (getnprocs_all) */
 
 
-static int getbtime(PROGINFO *pip)
+local int getbtime(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3123,7 +3124,7 @@ static int getbtime(PROGINFO *pip)
 /* end subroutine (getbtime) */
 
 
-static int getnusers(PROGINFO *pip)
+local int getnusers(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3156,7 +3157,7 @@ static int getnusers(PROGINFO *pip)
 
 
 /* make a random number (is this already more than is ever needed?) */
-static int getrnum(PROGINFO *pip)
+local int getrnum(PROGINFO *pip)
 {
 	struct timeval	tod ;
 	LOCINFO		*lip = pip->lip ;
@@ -3209,7 +3210,7 @@ static int getrnum(PROGINFO *pip)
 }
 /* end subroutine (getrnum) */
 
-static int getmem(PROGINFO *pip) noex {
+local int getmem(PROGINFO *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		f_to ;
@@ -3238,7 +3239,7 @@ static int getmem(PROGINFO *pip) noex {
 }
 /* end subroutine (getmem) */
 
-static int cftime(PROGINFO *pip,char *cvtbuf,int cvtlen,ulong lv) noex {
+local int cftime(PROGINFO *pip,char *cvtbuf,int cvtlen,ulong lv) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_INVALID ;
 	switch (lip->timeform) {
@@ -3257,7 +3258,7 @@ static int cftime(PROGINFO *pip,char *cvtbuf,int cvtlen,ulong lv) noex {
 	    {
 		custime		t = lv ;
 		char		tbuf[TIMEBUFLEN+1] ;
-		timestr_logz(t,tbuf) ;
+		strtime_logz(t,tbuf) ;
 	        rs = sncpy1(cvtbuf,cvtlen,tbuf) ;
 	    }
 	    break ;
@@ -3267,7 +3268,7 @@ static int cftime(PROGINFO *pip,char *cvtbuf,int cvtlen,ulong lv) noex {
 /* end subroutine (cftime) */
 
 
-static int getam(cchar *vp,int vl)
+local int getam(cchar *vp,int vl)
 {
 	int		am = 0 ;
 	int		i ;
