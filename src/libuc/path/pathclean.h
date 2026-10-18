@@ -30,6 +30,12 @@ extern int pathclean(char *,cchar *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+inline int pathclean(char *dbuf,cchar *sp) noex {
+    	return pathclean(dbuf,sp,-1) ;
+} /* end */
+#endif /* __cplusplus */
+
 
 #endif /* PATHCLEAN_INCLUDE */
 
