@@ -52,7 +52,7 @@
 #include	<userinfo.h>
 #include	<mkpathx.h>
 #include	<strwcpy.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<char.h>
 #include	<mailmsgmatenv.h>
 #include	<mheader.h>		/* PCS */
@@ -263,7 +263,7 @@ int process(PI *pip,bfile *ofp,cchar *filename) noex {
 	                }
 
 	                if (datestr[0] == '\0')
-	                    timestr_edate(daytime,datestr) ;
+	                    strtime_edate(daytime,datestr) ;
 
 	                cp = me.address.p ;
 	                cl = me.address.len ;
@@ -296,7 +296,7 @@ int process(PI *pip,bfile *ofp,cchar *filename) noex {
 	                    if (pip->address_from == NULL)
 	                        pip->address_from = pip->up->username ;
 
-	                    cp = timestr_edate(filedate,timebuf) ;
+	                    cp = strtime_edate(filedate,timebuf) ;
 
 #if	CF_DEBUG
 	                    if (pip->debuglevel > 1)
@@ -305,7 +305,7 @@ int process(PI *pip,bfile *ofp,cchar *filename) noex {
 
 	                    bprintf(ofp,"From %s %s\n",
 	                        pip->address_from,
-	                        timestr_edate(filedate,timebuf)) ;
+	                        strtime_edate(filedate,timebuf)) ;
 
 	                } /* end if (adding envelope header) */
 
@@ -333,7 +333,7 @@ int process(PI *pip,bfile *ofp,cchar *filename) noex {
 #endif
 
 	                bprintf(ofp,"\t; %s\n",
-	                    timestr_hdate(daytime,timebuf)) ;
+	                    strtime_hdate(daytime,timebuf)) ;
 
 	            } /* end if (optional postmark) */
 
@@ -358,7 +358,7 @@ int process(PI *pip,bfile *ofp,cchar *filename) noex {
 	                f_date = TRUE ;
 	                bprintf(ofp,
 	                    "%s: %s\n",HK_DATE,
-	                    timestr_hdate(daytime,timebuf)) ;
+	                    strtime_hdate(daytime,timebuf)) ;
 
 	            } /* end if (adding "date" header) */
 
