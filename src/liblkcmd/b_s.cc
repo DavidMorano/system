@@ -72,12 +72,12 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<getusername.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -89,9 +89,9 @@
 #include	<strw.h>		/* |strwset(3uc)| */
 #include	<strx.h>
 #include	<strwcpy.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
-#include	<debug.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -194,9 +194,6 @@ extern int	isNotPresent(int) ;
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
-extern char	*timestr_std(time_t,char *) ;
-extern char	*timestr_log(time_t,char *) ;
-
 
 /* external variables */
 
@@ -246,36 +243,36 @@ struct termtype {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	process(PROGINFO *,cchar *) ;
-static int	processer(PROGINFO *,SHIO *) ;
-static int	procmailusers(PROGINFO *) ;
-static int	procmailuser(PROGINFO *,cchar *,int) ;
-static int	terminit(PROGINFO *,SHIO *,char *,int) ;
-static int	termclear(PROGINFO *,char *,int) ;
-static int	termdate(PROGINFO *,char *,int,cchar *) ;
-static int	termdatesd(PROGINFO *,SBUF *,cchar *) ;
-static int	termmailname(PROGINFO *,char *,int,int) ;
-static int	bufsd(PROGINFO *,int,SBUF *,int,cchar *,int) ;
-static int	bufdiv(PROGINFO *,int,SBUF *,int,int,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,cchar *) ;
+local int	processer(PROGINFO *,SHIO *) ;
+local int	procmailusers(PROGINFO *) ;
+local int	procmailuser(PROGINFO *,cchar *,int) ;
+local int	terminit(PROGINFO *,SHIO *,char *,int) ;
+local int	termclear(PROGINFO *,char *,int) ;
+local int	termdate(PROGINFO *,char *,int,cchar *) ;
+local int	termdatesd(PROGINFO *,SBUF *,cchar *) ;
+local int	termmailname(PROGINFO *,char *,int,int) ;
+local int	bufsd(PROGINFO *,int,SBUF *,int,cchar *,int) ;
+local int	bufdiv(PROGINFO *,int,SBUF *,int,int,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_columns(LOCINFO *) ;
-static int	locinfo_prpcs(LOCINFO *,cchar *) ;
-static int	locinfo_utfname(LOCINFO *,cchar *) ;
-static int	locinfo_termlines(LOCINFO *,SHIO *) ;
-static int	locinfo_termflags(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_columns(LOCINFO *) ;
+local int	locinfo_prpcs(LOCINFO *,cchar *) ;
+local int	locinfo_utfname(LOCINFO *,cchar *) ;
+local int	locinfo_termlines(LOCINFO *,SHIO *) ;
+local int	locinfo_termflags(LOCINFO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -327,7 +324,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"init",
 	"all",
 	"sd",
@@ -383,12 +380,12 @@ static const TERMTYPE	terms[] = {
 	{ NULL, 0 }
 } ;
 
-static const char	*s_ansiconform[] = {
+static cchar	*s_ansiconform[] = {
 	"\033 L",			/* ANSI conformance level 1 */
 	NULL
 } ;
 
-static const char	*s_basic[] = {
+static cchar	*s_basic[] = {
 	"\017",				/* shift-in (G0 to GL)*/
 	"\033>",			/* numeric keypad mode */
 	"\033[?1l",			/* regular cursor keys */
@@ -396,40 +393,40 @@ static const char	*s_basic[] = {
 } ;
 
 #ifdef	COMMENT
-static const char	*s_scroll[] = {
+static cchar	*s_scroll[] = {
 	"\033[1;24r",
 	NULL
 } ;
 #endif /* COMMENT */
 
-static const char	*s_ec[] = {
+static cchar	*s_ec[] = {
 	"\033[m",			/* all character attributes off */
 	"\033[4l",			/* insert-mode off */
 	NULL
 } ;
 
-static const char	*s_vcv[] = {
+static cchar	*s_vcv[] = {
 	TERMSTR_S_VCUR,			/* VT set cursor ON */
 	NULL
 } ;
 
-static const char	*s_acv[] = {
+static cchar	*s_acv[] = {
 	TERMSTR_S_ACUR,			/* ANSI set cursor ON */
 	NULL
 } ;
 
-static const char	*s_scv[] = {
+static cchar	*s_scv[] = {
 	TERMSTR_S_SCUR,			/* SCREEN set cursor ON */
 	NULL
 } ;
 
-static const char	*s_psf[] = {
+static cchar	*s_psf[] = {
 	"\033P1!uA\033\\",	/* designate ISO Latin-1 as supplimental */
 	NULL
 } ;
 
 #if	CF_ANSICSM
-static const char	*s_scs94[] = {
+static cchar	*s_scs94[] = {
 	"\033\050B",		/* ASCII (94) to G0 */
 	"\033*0",		/* DEC Special Graphic (94) as G2 */
 	"\033+>",		/* map DEC Technical (94) to G3 */
@@ -437,7 +434,7 @@ static const char	*s_scs94[] = {
 	NULL
 } ;
 #else /* CF_ANSICSM */
-static const char	*s_scs94[] = {
+static cchar	*s_scs94[] = {
 	"\033\050B",		/* ASCII (94) to G0 */
 	"\033\0510",		/* DEC Special Graphic (94) as G1 */
 	"\033+>",		/* map DEC Technical (94) to G3 */
@@ -449,13 +446,13 @@ static const char	*s_scs94[] = {
 /* this is the holding place for the failings of the SCREEN program! */
 /* the SCREEN program thinks that the ISO-Latin-1 set is a 94-char set! */
 #if	CF_ANSICSM
-static const char	*s_scs94a[] = {
+static cchar	*s_scs94a[] = {
 	"\033\051A",		/* map ISO Latin-1 (96) as G1 */
 	"\033~",		/* lock shift G1 into GR */
 	NULL
 } ;
 #else
-static const char	*s_scs94a[] = {
+static cchar	*s_scs94a[] = {
 	"\033*A",		/* map ISO Latin-1 (96) as G2 */
 	"\033\175",		/* lock shift G2 into GR */
 	NULL
@@ -463,30 +460,30 @@ static const char	*s_scs94a[] = {
 #endif /* CF_ANSICSM */
 
 #if	CF_ANSICSM
-static const char	*s_scs96[] = {
+static cchar	*s_scs96[] = {
 	"\033-A",		/* map ISO Latin-1 (96) as G1 */
 	"\033~",		/* lock shift G1 into GR */
 	NULL
 } ;
 #else
-static const char	*s_scs96[] = {
+static cchar	*s_scs96[] = {
 	"\033.A",		/* map ISO Latin-1 (96) as G2 */
 	"\033\175",		/* lock shift G2 into GR */
 	NULL
 } ;
 #endif /* CF_ANSICSM */
 
-static const char	*s_home[] = {
+static cchar	*s_home[] = {
 	"\033[H",			/* home screen */
 	NULL
 } ;
 
-static const char	*s_clear[] = {
+static cchar	*s_clear[] = {
 	"\033[J",			/* clear screen */
 	NULL
 } ;
 
-static const char	blanks[] = "        " ;
+static cchar	blanks[] = "        " ;
 
 
 /* exported subroutines */
@@ -523,7 +520,7 @@ int p_s(int argc,cchar **argv,cchar **envv,void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
+local int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -614,7 +611,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -814,7 +811,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1191,8 +1188,8 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
-	        const char	*ids = "main" ;
+	        cint	size = (10*sizeof(uint)) ;
+	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
 	        debugprintf("main: MIoutnummax=%u\n",mi[ucmallreg_outnummax]) ;
@@ -1235,7 +1232,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1260,7 +1257,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1445,7 +1442,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,cchar *ofn)
+local int process(PROGINFO *pip,cchar *ofn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs = SR_OK ;
@@ -1481,7 +1478,7 @@ static int process(PROGINFO *pip,cchar *ofn)
 /* end subroutine (process) */
 
 
-static int processer(PROGINFO *pip,SHIO *ofp)
+local int processer(PROGINFO *pip,SHIO *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1494,7 +1491,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 #endif
 
 	if ((rs = locinfo_termflags(lip)) >= 0) {
-	    const int	blen = BUFLEN ;
+	    cint	blen = BUFLEN ;
 	    int		tf = lip->termflags ;
 	    int		colx ;
 	    char	buf[BUFLEN + 1] ;
@@ -1563,7 +1560,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 
 	if ((rs >= 0) && lip->fl.date) {
 	    TMTIME	tm ;
-	    const int	tl = 16 ;
+	    cint	tl = 16 ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -1571,7 +1568,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 #endif
 
 	    if ((rs = tmtime_timelocal(&tm,pip->daytime)) >= 0) {
-	        const int	tlen = TIMEBUFLEN ;
+	        cint	tlen = TIMEBUFLEN ;
 	        cchar		*ts = "%a %e %b %R" ;
 	        char		tbuf[TIMEBUFLEN + 1] ;
 
@@ -1612,7 +1609,7 @@ static int processer(PROGINFO *pip,SHIO *ofp)
 /* end subroutine (processer) */
 
 
-static int procmailusers(PROGINFO *pip)
+local int procmailusers(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1626,7 +1623,7 @@ static int procmailusers(PROGINFO *pip)
 /* get our username */
 
 	if (pip->username == NULL) {
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
 	        cchar	**vpp = &pip->username ;
@@ -1684,7 +1681,7 @@ static int procmailusers(PROGINFO *pip)
 /* end subroutine (procmailusers) */
 
 
-static int procmailuser(PROGINFO *pip,cchar *sp,int sl)
+local int procmailuser(PROGINFO *pip,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1698,16 +1695,16 @@ static int procmailuser(PROGINFO *pip,cchar *sp,int sl)
 
 	lip->mnbuf[0] = '\0' ;
 	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
-	    const int	ulen = USERNAMELEN ;
-	    const int	flen = FROMBUFLEN ;
-	    const int	maxulen = MIN(USERNAMELEN,MAXUSERLEN) ;
+	    cint	ulen = USERNAMELEN ;
+	    cint	flen = FROMBUFLEN ;
+	    cint	maxulen = MIN(USERNAMELEN,MAXUSERLEN) ;
 	    int		ul ;
 	    char	ubuf[USERNAMELEN + 1] ;
 	    char	fbuf[FROMBUFLEN + 1] ;
 	    ul = strwcpy(ubuf,cp,MIN(cl,ulen)) - ubuf ;
 	    if ((rs = pcsmailcheck(lip->prpcs,fbuf,flen,ubuf)) > 0) {
-	        const int	maxlen = MIN(FROMBUFLEN,(lip->mnlen-2)) ;
-	        const int	f_us = (strcmp(pip->username,ubuf) == 0) ;
+	        cint	maxlen = MIN(FROMBUFLEN,(lip->mnlen-2)) ;
+	        cint	f_us = (strcmp(pip->username,ubuf) == 0) ;
 	        lip->nmsgs = rs ;
 
 #if	CF_DEBUG
@@ -1746,11 +1743,11 @@ static int procmailuser(PROGINFO *pip,cchar *sp,int sl)
 
 
 /* create the data to set (reset-fix) the terminal state */
-static int terminit(PROGINFO *pip,SHIO *ofp,char *tbuf,int tlen)
+local int terminit(PROGINFO *pip,SHIO *ofp,char *tbuf,int tlen)
 {
 	LOCINFO		*lip = pip->lip ;
 	SBUF		b ;
-	const int	clen = CODEBUFLEN ;
+	cint	clen = CODEBUFLEN ;
 	int		rs ;
 	int		cl ;
 	int		bl = 0 ;
@@ -1918,7 +1915,7 @@ static int terminit(PROGINFO *pip,SHIO *ofp,char *tbuf,int tlen)
 
 
 /* clear the terminal */
-static int termclear(PROGINFO *pip,char *rbuf,int rlen)
+local int termclear(PROGINFO *pip,char *rbuf,int rlen)
 {
 	LOCINFO		*lip = pip->lip ;
 	SBUF		b ;
@@ -1926,7 +1923,7 @@ static int termclear(PROGINFO *pip,char *rbuf,int rlen)
 	int		bl = 0 ;
 
 	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	    const int	clen = CODEBUFLEN ;
+	    cint	clen = CODEBUFLEN ;
 	    char	cbuf[CODEBUFLEN + 1] ;
 
 /* clear the main screen */
@@ -1962,7 +1959,7 @@ static int termclear(PROGINFO *pip,char *rbuf,int rlen)
 /* end subroutine (termclear) */
 
 
-static int termdate(PROGINFO *pip,char *rbuf,int rlen,cchar *timebuf)
+local int termdate(PROGINFO *pip,char *rbuf,int rlen,cchar *timebuf)
 {
 	LOCINFO		*lip = pip->lip ;
 	SBUF		b ;
@@ -1975,9 +1972,9 @@ static int termdate(PROGINFO *pip,char *rbuf,int rlen,cchar *timebuf)
 #endif
 
 	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	    const int	tf = lip->termflags ;
-	    const int	ntime = 16 ;
-	    const int	cols = lip->linelen ;
+	    cint	tf = lip->termflags ;
+	    cint	ntime = 16 ;
+	    cint	cols = lip->linelen ;
 
 	    if (tf & TCF_MSD) {
 
@@ -2010,11 +2007,11 @@ static int termdate(PROGINFO *pip,char *rbuf,int rlen,cchar *timebuf)
 /* end subroutine (termdate) */
 
 
-static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
+local int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 {
 	LOCINFO		*lip = pip->lip ;
 	SBUF		lb ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		ncols = 0 ;
@@ -2135,7 +2132,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 	        mcbuf[0] = '\0' ;
 	        rs1 = lip->nmsgs ;
 	        if (lip->fl.mailcheck && (rs1 > 0)) {
-	            const int	maxmsgs = 99 ;
+	            cint	maxmsgs = 99 ;
 
 	            if (rs1 > maxmsgs) rs1 = maxmsgs ;
 
@@ -2206,7 +2203,7 @@ static int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 /* end subroutine (termdatesd) */
 
 
-static int termmailname(PROGINFO *pip,char *tbuf,int tlen,int colx)
+local int termmailname(PROGINFO *pip,char *tbuf,int tlen,int colx)
 {
 	LOCINFO		*lip = pip->lip ;
 	SBUF		b ;
@@ -2237,7 +2234,7 @@ static int termmailname(PROGINFO *pip,char *tbuf,int tlen,int colx)
 	        strwset(lip->mnbuf,' ',MIN(nlen,ncols)) ;
 	        nl = ncols ;
 	    } else {
-	        const int	ml = strlen(lip->mnbuf) ;
+	        cint	ml = strlen(lip->mnbuf) ;
 	        strwset((lip->mnbuf+ml),' ',MIN(nlen,(ncols-ml))) ;
 	        nl = ncols ;
 	    }
@@ -2267,7 +2264,7 @@ static int termmailname(PROGINFO *pip,char *tbuf,int tlen,int colx)
 /* end subroutine (termmailname) */
 
 
-static int bufsd(pip,termflags,bufp,x,sp,sl)
+local int bufsd(pip,termflags,bufp,x,sp,sl)
 PROGINFO	*pip ;
 int		termflags ;
 SBUF		*bufp ;
@@ -2286,7 +2283,7 @@ int		sl ;
 	if (x < 0) x = 0 ;
 
 	if ((rs = sbuf_getlen(bufp)) >= 0) {
-	    const int	len_s = rs ;
+	    cint	len_s = rs ;
 	    int		len_e ;
 	    int		cf_adv = FALSE ;
 
@@ -2298,7 +2295,7 @@ int		sl ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    const int	f = (termflags & TCF_MVCV) ? 1 : 0 ;
+	    cint	f = (termflags & TCF_MVCV) ? 1 : 0 ;
 	    debugprintf("bufsd: TCF_MVCV=%u\n",f) ;
 	}
 #endif /* CF_DEBUG */
@@ -2316,7 +2313,7 @@ int		sl ;
 	sbuf_chr(bufp,'\r') ;
 
 	if (x > 0) {
-	    const int	clen = CODEBUFLEN ;
+	    cint	clen = CODEBUFLEN ;
 	    int		cl ;
 	    char	cbuf[CODEBUFLEN + 1] ;
 
@@ -2347,7 +2344,7 @@ int		sl ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    const int	cols = COLUMNS ;
+	    cint	cols = COLUMNS ;
 	    cchar	*bp ;
 	    if ((rs = sbuf_getbuf(bufp,&bp)) >= 0) {
 	        debugprintf("b_s/bufsd: buf bl=%u\n",rs) ;
@@ -2368,7 +2365,7 @@ int		sl ;
 /* end subroutine (bufsd) */
 
 
-static int bufdiv(pip,termflags,bufp,y,x,sp,sl)
+local int bufdiv(pip,termflags,bufp,y,x,sp,sl)
 PROGINFO	*pip ;
 int		termflags ;
 SBUF		*bufp ;
@@ -2395,7 +2392,7 @@ int		sl ;
 	if (y < 0) y = 0 ;
 
 	if ((rs = sbuf_getlen(bufp)) >= 0) {
-	    const int	len_s = rs ;
+	    cint	len_s = rs ;
 	    int		len_e ;
 
 /* status line */
@@ -2409,7 +2406,7 @@ int		sl ;
 	    sbuf_strw(bufp,TERMSTR_VCURS,-1) ;
 
 	    {
-	        const int	clen = CODEBUFLEN ;
+	        cint	clen = CODEBUFLEN ;
 	        int		cl ;
 	        char		cbuf[CODEBUFLEN + 1] ;
 
@@ -2442,9 +2439,9 @@ int		sl ;
 /* end subroutine (bufdiv) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
-	const int	mnlen = MNBUFLEN ;
+	cint	mnlen = MNBUFLEN ;
 	int		rs ;
 	char		*bp ;
 	memset(lip,0,sizeof(LOCINFO)) ;
@@ -2466,7 +2463,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2486,7 +2483,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -2522,7 +2519,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_columns(LOCINFO *lip)
+local int locinfo_columns(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2541,7 +2538,7 @@ static int locinfo_columns(LOCINFO *lip)
 /* end subroutine (locinfo_columns) */
 
 
-static int locinfo_prpcs(LOCINFO *lip,cchar *prpcs)
+local int locinfo_prpcs(LOCINFO *lip,cchar *prpcs)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2556,7 +2553,7 @@ static int locinfo_prpcs(LOCINFO *lip,cchar *prpcs)
 		    }
 		} /* end if (stat) */
 	    } else {
-	        const int	tlen = MAXPATHLEN ;
+	        cint	tlen = MAXPATHLEN ;
 	        cchar		*name = VARPRPCS ;
 	        cchar		*dn = pip->domainname ;
 	        char		tbuf[MAXPATHLEN+1] = { 0 } ;
@@ -2571,7 +2568,7 @@ static int locinfo_prpcs(LOCINFO *lip,cchar *prpcs)
 /* end subroutine (locinfo_prpcs) */
 
 
-static int locinfo_utfname(LOCINFO *lip,cchar *utfn)
+local int locinfo_utfname(LOCINFO *lip,cchar *utfn)
 {
 	int		rs = SR_OK ;
 	if (lip->fl.nusers && (lip->utfname == NULL)) {
@@ -2583,7 +2580,7 @@ static int locinfo_utfname(LOCINFO *lip,cchar *utfn)
 /* end subroutine (locinfo_utfname) */
 
 
-static int locinfo_termlines(LOCINFO *lip,SHIO *ofp)
+local int locinfo_termlines(LOCINFO *lip,SHIO *ofp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2610,7 +2607,7 @@ static int locinfo_termlines(LOCINFO *lip,SHIO *ofp)
 /* end subroutine (locinfo_termlines) */
 
 
-static int locinfo_termflags(LOCINFO *lip)
+local int locinfo_termflags(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	cchar		*termspec = lip->termspec ;
