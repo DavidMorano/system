@@ -1,4 +1,4 @@
-/* main SUPPORT (passwdv) */
+/* passwdv_main SUPPORT (passwdv) */
 /* charset=ISO8859-1 */
 /* lang=C++11 */
 
@@ -115,7 +115,7 @@ local int	locinfo_pwend(LI *) ;
 
 extern "C" {
     static void	ourfini() noex ;
-}
+} /* end extern (C) */
 
 
 /* local variables */
@@ -147,7 +147,7 @@ constexpr cpcchar	argopts[] = {
 	"ef",
 	"of",
 	"pf",
-	NULL
+	nullptr
 } ;
 
 constexpr PIVARS	initvars = {
@@ -173,15 +173,14 @@ constexpr mapex		mapexs[] = {
 enum aknopts {
 	aknopt_seven,
 	aknopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	aknopts[] = {
 	"seven",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 constexpr char		po_option[] = PO_OPTION ;
-
 constexpr bool		f_percache = CF_PERCACHE ;
 
 
@@ -207,20 +206,20 @@ int main(int argc,mainv argv,mainv envv) {
 	int		cl ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_usage = FALSE ;
-	int		f_version = FALSE ;
-	int		f_help = FALSE ;
-	int		f_passed = FALSE ;
+	int		f_usage = false ;
+	int		f_version = false ;
+	int		f_help = false ;
+	int		f_passed = false ;
 	int		f ;
 
 	cchar	*argp, *aop, *akp, *avp ;
-	cchar	*argval = NULL ;
-	cchar	*pr = NULL ;
-	cchar	*sn = NULL ;
-	cchar	*afname = NULL ;
-	cchar	*efname = NULL ;
-	cchar	*ofname = NULL ;
-	cchar	*pwfname = NULL ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*pwfname = nullptr ;
 	cchar	*cp ;
 
 
@@ -230,7 +229,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 /* early things to initialize */
@@ -255,7 +254,7 @@ int main(int argc,mainv argv,mainv envv) {
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -282,15 +281,15 @@ int main(int argc,mainv argv,mainv envv) {
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            f_optequal = false ;
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -322,7 +321,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -333,7 +332,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* temporary directory */
 	                case argopt_tmpdir:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->tmpdname = avp ;
 	                    } else {
@@ -354,9 +353,9 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* the user specified some options */
 	                case argopt_option:
-	                    cp = NULL ;
+	                    cp = nullptr ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            cp = avp ;
 	                            cl = avl ;
@@ -373,7 +372,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        } else
 	                            rs = SR_INVALID ;
 	                    }
-	                    if ((rs >= 0) && (cp != NULL)) {
+	                    if ((rs >= 0) && (cp != nullptr)) {
 	                        paramopt	*pop = &aparams ;
 	                        cchar		*po = po_option ;
 	                        rs = paramopt_loads(pop,po,cp,cl) ;
@@ -395,7 +394,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* argument file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -413,7 +412,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -431,7 +430,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* output file-name */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -449,7 +448,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* PASSWD file */
 	                case argopt_pf:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pwfname = avp ;
 	                    } else {
@@ -485,7 +484,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -531,7 +530,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -568,8 +567,8 @@ int main(int argc,mainv argv,mainv envv) {
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getenv(VAREFNAME) ;
-	if (efname == NULL) efname = BFILE_STDERR ;
+	if (efname == nullptr) efname = getenv(VAREFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = true ;
@@ -611,7 +610,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    usage(pip) ;
 
 	if (f_help)
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_help || f_usage)
 	    goto retearly ;
@@ -621,17 +620,17 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* check a few more things */
 
-	if (afname == NULL) afname = getenv(VARAFNAME) ;
+	if (afname == nullptr) afname = getenv(VARAFNAME) ;
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getenv(VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getenv(VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
 /* options? */
 
-	pfp = NULL ;
-	if (pwfname != NULL) {
+	pfp = nullptr ;
+	if (pwfname != nullptr) {
 
-	    rs = perm(pwfname,-1,-1,NULL,R_OK) ;
+	    rs = perm(pwfname,-1,-1,nullptr,R_OK) ;
 
 	    if (rs >= 0)
 	        rs = pwfile_open(&pf,pwfname) ;
@@ -710,15 +709,15 @@ retearly:
 	    bprintf(efp,"%s: exiting ex=%u (%d)\n",pip->progname,ex,rs) ;
 	}
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    bfile	*efp = (bfile *) pip->efp ;
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    bclose(efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.aparams) {
-	    pip->open.aparams = FALSE ;
+	    pip->open.aparams = false ;
 	    paramopt_finish(&aparams) ;
 	}
 
@@ -741,15 +740,14 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
 
 local voidourfini() noex {
 	percache_fini(&pc) ;
-}
+} /* end subroutine */
 
 local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
@@ -766,8 +764,7 @@ local int usage(PROGINFO *pip) noex {
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 local int procgather(PROGINFO *pip,paramopt *pop) noex {
 	paramopt_cur	cur ;
@@ -810,7 +807,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	    cchar	**argv = aip->argv ;
 	    for (ai = 1 ; ai < aip->argc ; ai += 1) {
 	        f = (ai <= aip->ai_max) && (bits_test(bop,ai) > 0) ;
-	        f = f || ((ai > aip->ai_pos) && (argv[ai] != NULL)) ;
+	        f = f || ((ai > aip->ai_pos) && (argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = argv[ai] ;
 		    if (cp[0] != '\0') {
@@ -822,7 +819,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	    } /* end for (looping through arguments) */
 	} /* end if (ok) */
 
-	if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
+	if ((rs >= 0) && (afn != nullptr) && (afn[0] != '\0')) {
 	    bfile	afile, *afp = &afile ;
 
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
@@ -867,8 +864,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
 
 local int procone(PROGINFO *pip,cchar *un)
@@ -881,8 +877,7 @@ local int procone(PROGINFO *pip,cchar *un)
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procone) */
+} /* end subroutine (procone) */
 
 local int procout_begin(PROGINFO *pip,cchar *ofn) noex {
 	LI		*lip = (LI *) pip->lip ;
@@ -891,7 +886,7 @@ local int procout_begin(PROGINFO *pip,cchar *ofn) noex {
 	    cint	oflen = szof(bfile) ;
 	    bfile	*ofbuf ;
 	    if ((rs = uc_malloc(oflen+1),&ofbuf)) >= 0) {
-	        if ((ofn == NULL) || (ofn[0] == '\0')) {
+	        if ((ofn == nullptr) || (ofn[0] == '\0')) {
 		    ofn = BFILE_STDOUT ;
 		}
 	        if ((rs = bopen(ofbuf,ofn,"dwct",0664)) >= 0) {
@@ -899,46 +894,43 @@ local int procout_begin(PROGINFO *pip,cchar *ofn) noex {
 	        }
 		if (rs < 0) {
 		    uc_free(ofbuf) ;
-		    pip->ofp = NULL ;
+		    pip->ofp = nullptr ;
 		}
 	    } /* end if (m-a) */
 	}
 	return rs ;
-}
-/* end subroutine (procout_begin) */
+} /* end subroutine (procout_begin) */
 
 local int procout_end(PROGINFO *pip) noex {
 	LI		*lip = (LI *) pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((! pip->fl.nooutput) && (lip->ofp != NULL)) {
+	if ((! pip->fl.nooutput) && (lip->ofp != nullptr)) {
 	    rs1 = bclose(lip->ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(lip->ofp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    lip->ofp = NULL ;
+	    lip->ofp = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (procout_end) */
+} /* end subroutine (procout_end) */
 
 local int locinfo_start(LI *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	memclear(lip) ;
 	lip->pip = pip ;
 
 	return rs ;
-}
-/* end subroutine (locinfo_start) */
+} /* end subroutine (locinfo_start) */
 
 local int locinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (lip == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
 
 	if_constexpr (f_percache) {	/* need registration? */
 	    if (lip->fl.percache) {
@@ -949,30 +941,29 @@ local int locinfo_finish(LI *lip) noex {
 	    }
 	} /* end if_constexpr (f_percache) */
 
-	if ((lip->fname != NULL) && lip->fl.allocfname) {
+	if ((lip->fname != nullptr) && lip->fl.allocfname) {
 	    rs1 = uc_free(lip->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    lip->fname = NULL ;
-	    lip->fl.allocfname = FALSE ;
+	    lip->fname = nullptr ;
+	    lip->fl.allocfname = false ;
 	}
 
 	if (lip->open.stores) {
-	    lip->open.stores = FALSE ;
+	    lip->open.stores = false ;
 	    rs1 = vecstr_finish(&lip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_finish) */
+} /* end subroutine (locinfo_finish) */
 
 local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
 	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (lip == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
+	if (lip == nullptr) return SR_FAULT ;
+	if (epp == nullptr) return SR_FAULT ;
 
 	slp = &lip->stores ;
 	if (! lip->open.stores) {
@@ -982,14 +973,14 @@ local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
 
 	if (rs >= 0) {
 	    int	oi = -1 ;
-	    if (*epp != NULL) {
+	    if (*epp != nullptr) {
 		oi = vecstr_findaddr(slp,*epp) ;
 	    }
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        len = strnlen(vp,vl) ;
 	        rs = vecstr_store(slp,vp,len,epp) ;
 	    } else {
-	        *epp = NULL ;
+	        *epp = nullptr ;
 	    }
 	    if ((rs >= 0) && (oi >= 0)) {
 	        vecstr_del(slp,oi) ;
@@ -997,19 +988,16 @@ local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_setentry) */
+} /* end subroutine (locinfo_setentry) */
 
 local int locinfo_pwbegin(LI *lip,cchar *pfn) noex {
 	int		rs = SR_OK ;
 	return rs ;
-}
-/* end subroutine (locinfo_pwbegin) */
+} /* end subroutine (locinfo_pwbegin) */
 
 local int locinfo_pwend(LI *lip) noex {
 	int		rs = SR_OK ;
 	return rs ;
-}
-/* end subroutine (locinfo_pwend) */
+} /* end subroutine (locinfo_pwend) */
 
 
