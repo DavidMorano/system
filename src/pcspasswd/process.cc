@@ -47,7 +47,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<pwd.h>
 
 #include	<bfile.h>
@@ -69,7 +69,7 @@
 /* external subroutines */
 
 extern int	checkpass() ;
-extern int	passwdok(const char *,const char *) ;
+extern int	passwdok(cchar *,cchar *) ;
 
 
 /* external variables */
@@ -80,7 +80,7 @@ extern int	passwdok(const char *,const char *) ;
 
 /* forward references */
 
-static int	userexists(struct proginfo *,PWFILE *,char *) ;
+local int	userexists(struct proginfo *,PWFILE *,char *) ;
 
 
 /* external variables */
@@ -211,7 +211,7 @@ PARAMOPT	*pp ;
 
 
 /* is the username present in the password database ? */
-static int userexists(gp,pfp,name)
+local int userexists(gp,pfp,name)
 struct proginfo	*gp ;
 PWFILE		*pfp ;
 char		name[] ;
