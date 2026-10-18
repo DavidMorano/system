@@ -83,6 +83,7 @@
 #include	<getax.h>
 #include	<getpwx.h>
 #include	<getusername.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -128,8 +129,8 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
 
@@ -148,7 +149,7 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	const char	*wtmpfname ;
+	cchar	*wtmpfname ;
 	LOCINFO_FL	have, f, changed, finval ;
 	int		records ;
 	char		username[USERNAMELEN + 1] ;
@@ -167,32 +168,32 @@ struct dead {
 
 /* forward references */
 
-static int	mainsub(int,const char **,const char **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,vecstr *,cchar *) ;
-static int	procloadnames(PROGINFO *,VECSTR *,const char *,int) ;
-static int	procloadname(PROGINFO *,vecstr *,const char *,int) ;
-static int	procout(PROGINFO *,const char *,vecstr *) ;
-static int	process(PROGINFO *,SHIO *,vecstr *) ;
-static int	procthemout(PROGINFO *,void *,vecobj *) ;
-static int	getrealname(char *,int,const char *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,vecstr *,cchar *) ;
+local int	procloadnames(PROGINFO *,VECSTR *,cchar *,int) ;
+local int	procloadname(PROGINFO *,vecstr *,cchar *,int) ;
+local int	procout(PROGINFO *,cchar *,vecstr *) ;
+local int	process(PROGINFO *,SHIO *,vecstr *) ;
+local int	procthemout(PROGINFO *,void *,vecobj *) ;
+local int	getrealname(char *,int,cchar *) ;
 
-static int	cmpname(struct user **,struct user **) ;
-static int	cmpdate(struct user **,struct user **) ;
-static int	cmpei(struct dead **,struct dead **) ;
-static int	utmatch(TMPX_ENT *,TMPX_ENT *) ;
+local int	cmpname(struct user **,struct user **) ;
+local int	cmpdate(struct user **,struct user **) ;
+local int	cmpei(struct dead **,struct dead **) ;
+local int	utmatch(TMPX_ENT *,TMPX_ENT *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-static int debugprintrecord(const char *, TMPX_ENT *) ;
+local int debugprintrecord(cchar *, TMPX_ENT *) ;
 #endif
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -246,7 +247,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"dotusers",
 	"hdr",
 	"header",
@@ -282,7 +283,7 @@ int b_loghist(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -306,7 +307,7 @@ int p_loghist(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -328,14 +329,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -388,7 +389,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -575,7 +576,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -807,8 +808,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	    vecstr	names ;
 	    if ((rs = vecstr_start(&names,10,0)) >= 0) {
-	        const char	*ofn = ofname ;
-	        const char	*afn = afname ;
+	        cchar	*ofn = ofname ;
+	        cchar	*afn = afname ;
 	        if ((rs = procargs(pip,&ainfo,&pargs,&names,afn)) >= 0) {
 	            rs = procout(pip,ofn,&names) ;
 	        }
@@ -896,12 +897,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-h] [<name(s)> ...] [-af <afile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -921,12 +922,12 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -937,7 +938,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int		oi ;
 	        int		kl, vl ;
-	        const char	*kp, *vp ;
+	        cchar	*kp, *vp ;
 
 	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
@@ -986,7 +987,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -995,7 +996,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 	int		c = 0 ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (rs >= 0) {
 	    int	ai ;
@@ -1026,7 +1027,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1068,7 +1069,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procloadnames(PROGINFO *pip,VECSTR *nlp,cchar *sp,int sl)
+local int procloadnames(PROGINFO *pip,VECSTR *nlp,cchar *sp,int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1078,7 +1079,7 @@ static int procloadnames(PROGINFO *pip,VECSTR *nlp,cchar *sp,int sl)
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	    int		fl ;
-	    const char	*fp ;
+	    cchar	*fp ;
 
 	    while ((fl = field_get(&fsb,aterms,&fp)) >= 0) {
 	        if (fl > 0) {
@@ -1097,10 +1098,10 @@ static int procloadnames(PROGINFO *pip,VECSTR *nlp,cchar *sp,int sl)
 /* end subroutine (procloadnames) */
 
 
-static int procloadname(PROGINFO *pip,vecstr *nlp,cchar *cp,int cl)
+local int procloadname(PROGINFO *pip,vecstr *nlp,cchar *cp,int cl)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	nch = MKCHAR(cp[0]) ;
+	cint	nch = MKCHAR(cp[0]) ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -1126,7 +1127,7 @@ static int procloadname(PROGINFO *pip,vecstr *nlp,cchar *cp,int cl)
 /* end subroutine (procloadname) */
 
 
-static int procout(PROGINFO *pip,cchar *ofn,vecstr *nlp)
+local int procout(PROGINFO *pip,cchar *ofn,vecstr *nlp)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1156,7 +1157,7 @@ static int procout(PROGINFO *pip,cchar *ofn,vecstr *nlp)
 
 
 /* process the names that we have */
-static int process(PROGINFO *pip,SHIO *ofp,vecstr *aup)
+local int process(PROGINFO *pip,SHIO *ofp,vecstr *aup)
 {
 	struct user	u, *rp ;
 	LOCINFO		*lip = pip->lip ;
@@ -1243,7 +1244,7 @@ static int process(PROGINFO *pip,SHIO *ofp,vecstr *aup)
 	                    up->ut_line,strlinelen(up->ut_line,TMPX_LLINE,12),
 	                    up->ut_pid,
 	                    up->ut_exit.e_exit,
-	                    timestr_log(up->ut_tv.tv_sec,timebuf)) ;
+	                    strtime_log(up->ut_tv.tv_sec,timebuf)) ;
 
 	                wlen += rs ;
 	            }
@@ -1269,7 +1270,7 @@ static int process(PROGINFO *pip,SHIO *ofp,vecstr *aup)
 
 	                        fcur = cur ;	/* from previous position */
 	                        while (rs >= 0) {
-	                            const char	*un = up->ut_user ;
+	                            cchar	*un = up->ut_user ;
 	                            ei = tmpx_fetchuser(&wt,&fcur,&fe,un) ;
 	                            if (ei == SR_NOTFOUND) break ;
 
@@ -1373,11 +1374,11 @@ ret0:
 /* end subroutine (process) */
 
 
-static int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
+local int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
 {
 	struct passwd	pw ;
 	LOCINFO		*lip = pip->lip ;
-	const int	pwlen = bufsizeget(bufsize_pw) ;
+	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1393,8 +1394,8 @@ static int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
 
 	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	    struct user	*rp ;
-	    const int	nrs = SR_NOTFOUND ;
-	    const int	rlen = REALNAMELEN ;
+	    cint	nrs = SR_NOTFOUND ;
+	    cint	rlen = REALNAMELEN ;
 	    int		i ;
 	    char	rbuf[REALNAMELEN+1] ;
 	    for (i = 0 ; vecobj_get(ulp,i,&rp) >= 0 ; i += 1) {
@@ -1424,11 +1425,11 @@ static int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
 	        }
 
 	        if (rs >= 0) {
-		    const int	nl = strnlen(rp->name,8) ;
+		    cint	nl = strnlen(rp->name,8) ;
 		    cchar	*np = rp->name ;
 	            char	tbuf[TIMEBUFLEN+1] ;
 		    fmt = "%-8t %8u %-23s %s\n" ;
-	            timestr_log(rp->date,tbuf),
+	            strtime_log(rp->date,tbuf),
 	            rs = shio_printf(ofp,fmt,np,nl,rp->count,tbuf,rbuf) ;
 	            wlen += rs ;
 	        }
@@ -1451,9 +1452,9 @@ static int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
 /* end subroutine (procthemout) */
 
 
-static int getrealname(char *nbuf,int nlen,cchar *gecosname)
+local int getrealname(char *nbuf,int nlen,cchar *gecosname)
 {
-	const int	glen = GNAMELEN ;
+	cint	glen = GNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
@@ -1492,7 +1493,7 @@ static int getrealname(char *nbuf,int nlen,cchar *gecosname)
 
 
 /* compare user names */
-static int cmpname(struct user **e1pp,struct user **e2pp)
+local int cmpname(struct user **e1pp,struct user **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -1510,7 +1511,7 @@ static int cmpname(struct user **e1pp,struct user **e2pp)
 
 
 /* compare record dates */
-static int cmpdate(struct user **e1pp,struct user **e2pp)
+local int cmpdate(struct user **e1pp,struct user **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -1528,7 +1529,7 @@ static int cmpdate(struct user **e1pp,struct user **e2pp)
 
 
 /* compare dead record entry indices */
-static int cmpei(struct dead **e1pp,struct dead **e2pp)
+local int cmpei(struct dead **e1pp,struct dead **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -1546,7 +1547,7 @@ static int cmpei(struct dead **e1pp,struct dead **e2pp)
 
 
 /* compare two records */
-static int utmatch(TMPX_ENT *u1p,TMPX_ENT *u2p)
+local int utmatch(TMPX_ENT *u1p,TMPX_ENT *u2p)
 {
 	int		f = TRUE ;
 	f = f && (u1p->ut_pid == u2p->ut_pid) ;
@@ -1559,7 +1560,7 @@ static int utmatch(TMPX_ENT *u1p,TMPX_ENT *u2p)
 
 
 #if	CF_DEBUGS || CF_DEBUG
-static int debugprintrecord(cchar *s,TMPX_ENT *up)
+local int debugprintrecord(cchar *s,TMPX_ENT *up)
 {
 	int		rs ;
 	rs = debugprintf("%s t=%u id=%-4t u=%-12t l=%-12t p=6u e=%2d\n",
