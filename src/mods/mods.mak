@@ -172,7 +172,7 @@ modstrw.dir:
 	makesubdir $@
 
 # MODSNCPY
-modsncpy.o:		modsncpy.dir
+modsncpy.o:		modsncpy.dir modmisc.o
 modsncpy.dir:
 	makesubdir $@
 
