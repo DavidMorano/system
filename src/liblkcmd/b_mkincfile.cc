@@ -126,28 +126,28 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
-static int	procfile(PROGINFO *,cchar *) ;
-static int	procdata(PROGINFO *,void *,cchar *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
+local int	procfile(PROGINFO *,cchar *) ;
+local int	procdata(PROGINFO *,void *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	mkincfname(char *,cchar *,int) ;
+local int	mkincfname(char *,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -195,7 +195,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"empty",
 	NULL
 } ;
@@ -240,7 +240,7 @@ int p_mkincfile(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -329,7 +329,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -466,7 +466,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -746,7 +746,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -771,7 +771,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -822,7 +822,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -866,7 +866,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 	    if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -914,7 +914,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 
 
 /* process a file */
-static int procfile(PROGINFO *pip,cchar *fname)
+local int procfile(PROGINFO *pip,cchar *fname)
 {
 	int		rs ;
 	int		rs1 ;
@@ -958,7 +958,7 @@ static int procfile(PROGINFO *pip,cchar *fname)
 /* end subroutine (procfile) */
 
 
-static int procdata(PROGINFO *pip,void *ofp,cchar *fname)
+local int procdata(PROGINFO *pip,void *ofp,cchar *fname)
 {
 	SHIO		ifile, *ifp = &ifile ;
 	int		rs ;
@@ -995,7 +995,7 @@ static int procdata(PROGINFO *pip,void *ofp,cchar *fname)
 	        }
 
 	        if (rs >= 0) {
-	            const int	olen = OUTBUFLEN ;
+	            cint	olen = OUTBUFLEN ;
 	            int		len ;
 	            int		i ;
 	            char	obuf[OUTBUFLEN+1] ;
@@ -1043,7 +1043,7 @@ static int procdata(PROGINFO *pip,void *ofp,cchar *fname)
 /* end subroutine (procdata) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1058,7 +1058,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1077,7 +1077,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1114,9 +1114,9 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int mkincfname(char *rbuf,cchar *sp,int sl)
+local int mkincfname(char *rbuf,cchar *sp,int sl)
 {
-	const int	rlen = MAXNAMELEN ;
+	cint	rlen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 
