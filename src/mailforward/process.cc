@@ -42,9 +42,10 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<sbuf.h>
-#include	<bfile.h>
 #include	<ctdec.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"lkmail.h"
 #include	"config.h"
@@ -691,7 +692,7 @@ int		buflen ;
 
 /* line 3 */
 
-	sbuf_strw(&b,timestr_logz(daytime,timebuf),-1) ;
+	sbuf_strw(&b,strtime_logz(daytime,timebuf),-1) ;
 
 	sbuf_chr(&b,' ') ;
 
