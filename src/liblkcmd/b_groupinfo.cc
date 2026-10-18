@@ -172,31 +172,31 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,void *,cchar *) ;
-static int	proclist(PROGINFO *,void *) ;
-static int	proclistfind(PROGINFO *,vecpstr *) ;
-static int	procqueries(PROGINFO *,void *,cchar *,int) ;
-static int	procquery(PROGINFO *,void *,cchar *,int) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,void *,cchar *) ;
+local int	proclist(PROGINFO *,void *) ;
+local int	proclistfind(PROGINFO *,vecpstr *) ;
+local int	procqueries(PROGINFO *,void *,cchar *,int) ;
+local int	procquery(PROGINFO *,void *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setgroup(LOCINFO *,cchar *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setgroup(LOCINFO *,cchar *) ;
 
 #ifdef	COMMENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif /* COMMENT */
 
-static int	mklist(char *,int,char **) ;
+local int	mklist(char *,int,char **) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -245,7 +245,7 @@ static const MAPEX	mapexs[] = {
 } ;
 
 /* define the query keywords */
-static const char	*qopts[] = {
+static cchar	*qopts[] = {
 	"gid",
 	"groupname",
 	"users",
@@ -307,7 +307,7 @@ int p_groupinfo(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -395,7 +395,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -564,7 +564,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -887,7 +887,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -935,7 +935,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -979,7 +979,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1020,7 +1020,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1067,7 +1067,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int proclist(PROGINFO *pip,void *ofp)
+local int proclist(PROGINFO *pip,void *ofp)
 {
 	vecpstr		gl ;
 	int		rs ;
@@ -1095,7 +1095,7 @@ static int proclist(PROGINFO *pip,void *ofp)
 /* end subroutine (proclist) */
 
 
-static int proclistfind(PROGINFO *pip,vecpstr *glp)
+local int proclistfind(PROGINFO *pip,vecpstr *glp)
 {
 	LOCINFO		*lip = pip->lip ;
 	const gid_t	sgid = lip->gr.gr_gid ;
@@ -1127,7 +1127,7 @@ static int proclistfind(PROGINFO *pip,vecpstr *glp)
 /* end subroutine (proclistfind) */
 
 
-static int procqueries(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
+local int procqueries(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1151,10 +1151,10 @@ static int procqueries(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 
 
 /* process a query specification */
-static int procquery(PROGINFO *pip,void *ofp,cchar np[],int nl)
+local int procquery(PROGINFO *pip,void *ofp,cchar np[],int nl)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	vlen = VBUFLEN ;
+	cint	vlen = VBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_NOENT ;
 	int		ci ;
@@ -1229,14 +1229,14 @@ static int procquery(PROGINFO *pip,void *ofp,cchar np[],int nl)
 /* end subroutine (procquery) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs ;
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
 	if ((rs = bufsizeget(bufsize_gr)) >= 0) {
-	    const int	grlen = rs ;
+	    cint	grlen = rs ;
 	    char	*grbuf ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
 	        lip->grbuf = grbuf ;
@@ -1249,7 +1249,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1275,7 +1275,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1312,7 +1312,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int locinfo_setgroup(LOCINFO *lip,cchar *gn)
+local int locinfo_setgroup(LOCINFO *lip,cchar *gn)
 {
 	gid_t		gid ;
 	int		rs = SR_OK ;
@@ -1365,7 +1365,7 @@ static int locinfo_setgroup(LOCINFO *lip,cchar *gn)
 /* end subroutine (locinfo_setgroup) */
 
 
-static int mklist(char rbuf[],int rlen,char **names)
+local int mklist(char rbuf[],int rlen,char **names)
 {
 	SBUF		b ;
 	int		rs ;
