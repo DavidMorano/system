@@ -63,7 +63,7 @@
 
 /* forward references */
 
-static int	headkey(cchar *,int) ;
+local int	headkey(cchar *,int) ;
 
 
 /* local variables */
@@ -104,7 +104,7 @@ cchar	fname[] ;
 	if ((fname[0] == '\0') || (fname[0] == '-')) fname = BFILE_STDIN ;
 
 	if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
@@ -171,7 +171,7 @@ cchar	fname[] ;
 
 #ifdef	COMMENT
 
-static int headkey(sp,sl)
+local int headkey(sp,sl)
 cchar	sp[] ;
 int		sl ;
 {
