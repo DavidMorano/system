@@ -97,20 +97,20 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	haswhite(const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	haswhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isalphalatin(int) ;
 extern int	isNotPresent(int) ;
@@ -121,10 +121,10 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -152,27 +152,27 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,SHIO *,const char *,int) ;
-static int	madump(PROGINFO *,const char *) ;
-static int	madprint(PROGINFO *,SHIO *,const char *,const char *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procname(PROGINFO *,SHIO *,cchar *,int) ;
+local int	madump(PROGINFO *,cchar *) ;
+local int	madprint(PROGINFO *,SHIO *,cchar *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"DEBUG",
@@ -225,7 +225,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"es",
 	NULL
 } ;
@@ -235,7 +235,7 @@ enum progopts {
 	progopt_overlast
 } ;
 
-static const char	blanks[] =
+static cchar	blanks[] =
 	"                    "
 	"                    " ;
 
@@ -250,7 +250,7 @@ int b_mailalias(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -274,7 +274,7 @@ int p_mailalias(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -296,17 +296,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*madomain = NULL ;
-	const char	*maprofile = NULL ;
-	const char	*dumpfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*madomain = NULL ;
+	cchar	*maprofile = NULL ;
+	cchar	*dumpfname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -363,7 +363,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optplus || f_optminus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -543,7 +543,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -778,9 +778,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	    if ((rs = ids_load(&lip->id)) >= 0) {
 	        const mode_t	om = 0666 ;
-	        const int	of = (O_RDWR|O_CREAT) ;
-	        const char	*pr = pip->pr ;
-	        const char	*ma = maprofile ;
+	        cint	of = (O_RDWR|O_CREAT) ;
+	        cchar	*pr = pip->pr ;
+	        cchar	*ma = maprofile ;
 	        if ((rs = mailalias_open(&lip->madb,pr,ma,of,om,0)) >= 0) {
 
 #if	CF_DEBUG
@@ -791,8 +791,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            if (dumpfname != NULL) {
 	                rs = madump(pip,dumpfname) ;
 	            } else {
-	                const char	*ofn = ofname ;
-	                const char	*afn = afname ;
+	                cchar	*ofn = ofname ;
+	                cchar	*afn = afname ;
 	                rs = procargs(pip,&ainfo,&pargs,ofn,afn) ;
 	            } /* end if */
 
@@ -872,12 +872,12 @@ badprogstart:
 
 
 /* print out (standard error) some short usage */
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	if (pip->efp != NULL) {
 
@@ -900,12 +900,12 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -951,7 +951,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -966,7 +966,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	if ((rs = shio_open(ofp,ofn,"r",0666)) >= 0) {
 	    int		pan = 0 ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (rs >= 0) {
 	        int	ai ;
@@ -1007,7 +1007,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1054,7 +1054,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 
 
 /* process a name */
-static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
+local int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs ;
@@ -1077,14 +1077,14 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 #endif
 
 	if ((rs = shio_printf(ofp,"%r:\n",np,nl)) >= 0) {
-	    const int	malen = nl ;
+	    cint	malen = nl ;
 	    char	*mabuf ;
 	    if ((rs = uc_malloc((malen+1),&mabuf)) >= 0) {
 		if ((rs = snwcpy(mabuf,malen,np,nl)) >= 0) {
 	            MAILALIAS		*map = &lip->madb ;
 	            MAILALIAS_CUR	cur ;
 	            if ((rs = mailalias_curbegin(map,&cur)) >= 0) {
-	                const int	vlen = VBUFLEN ;
+	                cint	vlen = VBUFLEN ;
 	                char		vbuf[VBUFLEN + 1] ;
 	                while (rs >= 0) {
 	                    rs1 = mailalias_fetch(map,0,mabuf,&cur,vbuf,vlen) ;
@@ -1109,7 +1109,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 /* end subroutine (procname) */
 
 
-static int madump(PROGINFO *pip,cchar *dumpfname)
+local int madump(PROGINFO *pip,cchar *dumpfname)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		dumpfile, *dfp = &dumpfile ;
@@ -1128,8 +1128,8 @@ static int madump(PROGINFO *pip,cchar *dumpfname)
 	if ((rs = shio_open(dfp,dumpfname,"rwct",0666)) >= 0) {
 	    MAILALIAS		*map = &lip->madb ;
 	    MAILALIAS_CUR	cur ;
-	    const int		klen = KBUFLEN ;
-	    const int		vlen = VBUFLEN ;
+	    cint		klen = KBUFLEN ;
+	    cint		vlen = VBUFLEN ;
 	    char		kbuf[KBUFLEN + 1] ;
 	    char		vbuf[VBUFLEN + 1] ;
 
@@ -1162,9 +1162,9 @@ static int madump(PROGINFO *pip,cchar *dumpfname)
 
 /* print out a "dump" mail-alias entry */
 /* ARGSUSED */
-static int madprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf)
+local int madprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf)
 {
-	const int	klen = strlen(kbuf) ;
+	cint	klen = strlen(kbuf) ;
 	int		rs ;
 	int		blen ;
 	int		ch = MKCHAR(vbuf[0]) ;
@@ -1186,7 +1186,7 @@ static int madprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf)
 /* end subroutine (madprint) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs ;
 
@@ -1200,7 +1200,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1214,7 +1214,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
