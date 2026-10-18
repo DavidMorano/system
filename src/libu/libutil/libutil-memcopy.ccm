@@ -39,13 +39,13 @@ export {
 	    if (sl < 0) {
 	        cchar *cp = charp(sp) ;
 	        sl = intconv(strlen(cp)) ;
-	    }
+	    } /* end */
 	    {
 	        csize	srcsize = size_t(sl) ;
 	        caddr_t	dst = caddr_t(dp) ;
 	        memcpy(dp,sp,srcsize) ;
 	        rp = (dst + sl) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return voidp(rp) ;
     } /* end subroutine (memcopy) */
@@ -68,11 +68,11 @@ export {
 	if (dp && sp) ylikely {
 	    if (dl < 0) {
 		dl = szof(T) ;
-	    }
+	    } /* end */
 	    if (sl < 0) {
 	        cchar *cp = ccharp(sp) ;
 	        sl = intconv(strlen(cp)) ;
-	    }
+	    } /* end */
 	    if (sl > dl) sl = dl ;
 	    {
 	        csize	srcsize = size_t(sl) ;
@@ -82,7 +82,7 @@ export {
 		if (sl < dl) {
 		    csize zsize = size_t(dl - sl) ;
 		    memset(rp,0,zsize) ;
-		}
+		} /* end */
 	    } /* end block */
 	} /* end if (non-null) */
 	return voidp(rp) ;
