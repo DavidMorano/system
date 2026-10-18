@@ -147,21 +147,21 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,SHIO *,cchar *,int) ;
-static int	procmxdump(PROGINFO *,cchar *) ;
-static int	procmxprint(PROGINFO *,SHIO *,cchar *,cchar *) ;
-static int	procvalprint(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procname(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procmxdump(PROGINFO *,cchar *) ;
+local int	procmxprint(PROGINFO *,SHIO *,cchar *,cchar *) ;
+local int	procvalprint(PROGINFO *,SHIO *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_outadd(LOCINFO *,cchar *,int) ;
-static int	locinfo_outprint(LOCINFO *,SHIO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_outadd(LOCINFO *,cchar *,int) ;
+local int	locinfo_outprint(LOCINFO *,SHIO *) ;
 
 
 /* local variables */
@@ -274,7 +274,7 @@ int p_mxalias(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -362,7 +362,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optplus || f_optminus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -565,7 +565,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -878,7 +878,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("b_mxalias: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -927,7 +927,7 @@ badarg:
 
 
 /* print out (standard error) some short usage */
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -955,7 +955,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs ;
 
@@ -972,7 +972,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -991,10 +991,10 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_outadd(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_outadd(LOCINFO *lip,cchar *vp,int vl)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	nrs = SR_NOTFOUND ;
+	cint	nrs = SR_NOTFOUND ;
 	int		rs ;
 
 	if (pip == NULL) return SR_FAULT ;
@@ -1006,7 +1006,7 @@ static int locinfo_outadd(LOCINFO *lip,cchar *vp,int vl)
 }
 /* end subroutine (locinfo_outadd) */
 
-static int locinfo_outprint(LOCINFO *lip,SHIO *ofp) noex {
+local int locinfo_outprint(LOCINFO *lip,SHIO *ofp) noex {
 	PROGINFO	*pip = lip->pip ;
 	HDBSTR_CUR	cur ;
 	int		rs ;
@@ -1035,7 +1035,7 @@ static int locinfo_outprint(LOCINFO *lip,SHIO *ofp) noex {
 /* end subroutine (locinfo_outprint) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -1109,7 +1109,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1166,7 +1166,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            afn= STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            int		sl ;
 	            cchar	*tp, *sp ;
@@ -1241,7 +1241,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 
 
 /* process a name */
-static int procname(PROGINFO *pip,SHIO *ofp,cchar np[],int nl)
+local int procname(PROGINFO *pip,SHIO *ofp,cchar np[],int nl)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -1306,7 +1306,7 @@ static int procname(PROGINFO *pip,SHIO *ofp,cchar np[],int nl)
 /* end subroutine (procname) */
 
 
-static int procmxdump(PROGINFO *pip,cchar dfname[])
+local int procmxdump(PROGINFO *pip,cchar dfname[])
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	SHIO		dumpfile, *dfp = &dumpfile ;
@@ -1351,7 +1351,7 @@ static int procmxdump(PROGINFO *pip,cchar dfname[])
 /* end subroutine (procmxdump) */
 
 /* print out a "dump" mail-alias entry */
-static int procmxprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf) noex {
+local int procmxprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf) noex {
 	cint		ch = MKCHAR(vbuf[0]) ;
 	int		rs ;
 	int		klen ;
@@ -1376,7 +1376,7 @@ static int procmxprint(PROGINFO *pip,SHIO *dfp,cchar *kbuf,cchar *vbuf) noex {
 /* end subroutine (procmxprint) */
 
 
-static int procvalprint(PROGINFO *pip,SHIO *ofp,cchar *vp,int vl)
+local int procvalprint(PROGINFO *pip,SHIO *ofp,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
