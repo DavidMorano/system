@@ -72,7 +72,7 @@ OBJC_VECSTRX= obj4_vecstrx.o obj5_vecstrx.o obj6_vecstrx.o
 OBJ_VECSTRX= obja_vecstrx.o objb_vecstrx.o objc_vecstrx.o
 
 # vecobj
-OBJA_VECOBJ= vecobj_prime.o
+OBJA_VECOBJ= vecobj_prime.o vecobj_hsort.o
 OBJB_VECOBJ= vecobj_recip.o vecobj_strsort.o
 
 OBJ_VECOBJ= obja_vecobj.o objb_vecobj.o
