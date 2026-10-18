@@ -61,7 +61,7 @@
 #include	<ascii.h>
 #include	<strpack.h>
 #include	<hdb.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -96,11 +96,11 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const PIVARS *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -128,45 +128,45 @@ struct xlocinfo {
 } ;
 
 struct wordent {
-	const char	*word ;
+	cchar	*word ;
 	int		count ;
 } ;
 
 
 /* forward references */
 
-int		p_lspell(int,const char **,const char **,void *) ;
+int		p_lspell(int,cchar **,cchar **,void *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_setentry(LOCINFO *,const char **,
-			const char *,int) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,
+			cchar *,int) ;
+local int	locinfo_finish(LOCINFO *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,PARAMOPT *,
-			void *,uchar *,const char *,const char *) ;
-static int	procfile(PROGINFO *,void *,uchar *,const char *) ;
-static int	procword(PROGINFO *,const char *,int) ;
-static int	procoutcounts(PROGINFO *,void *) ;
-static int	printuniq(PROGINFO *,SHIO *,const char *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,PARAMOPT *,
+			void *,uchar *,cchar *,cchar *) ;
+local int	procfile(PROGINFO *,void *,uchar *,cchar *) ;
+local int	procword(PROGINFO *,cchar *,int) ;
+local int	procoutcounts(PROGINFO *,void *) ;
+local int	printuniq(PROGINFO *,SHIO *,cchar *,int) ;
 
-static int	mkourterms(uchar *) ;
+local int	mkourterms(uchar *) ;
 
 #ifdef	COMMENT
-static int	isallalpha(const char *,int) ;
+local int	isallalpha(cchar *,int) ;
 #endif
 
-static void	sighand_int(int) ;
+local void	sighand_int(int) ;
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
-static const int	sigblocks[] = {
+static cint	sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -174,7 +174,7 @@ static const int	sigblocks[] = {
 	0
 } ;
 
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 #if	defined(SIGXFSZ)
@@ -183,14 +183,14 @@ static const int	sigignores[] = {
 	0
 } ;
 
-static const int	sigints[] = {
+static cint	sigints[] = {
 	SIGINT,
 	SIGTERM,
 	SIGQUIT,
 	0
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -242,7 +242,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"foldcase",
 	"uniq",
 	"counts",
@@ -262,7 +262,7 @@ enum akonames {
 
 int b_lspell(argc,argv,contextp)
 int		argc ;
-const char	*argv[] ;
+cchar	*argv[] ;
 void		*contextp ;
 {
 	int	rs = SR_OK ;
@@ -271,7 +271,7 @@ void		*contextp ;
 	if (contextp != NULL) rs = lib_initenviron() ;
 
 	if (rs >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = p_lspell(argc,argv,envv,contextp) ;
 	}
 
@@ -282,8 +282,8 @@ void		*contextp ;
 
 int p_lspell(argc,argv,envv,contextp)
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 void		*contextp ;
 {
 	PROGINFO	pi, *pip = &pi ;
@@ -310,15 +310,15 @@ void		*contextp ;
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*cp ;
 
 
 	if_exit = 0 ;
@@ -387,7 +387,7 @@ void		*contextp ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ch = MKCHAR(argp[1]) ;
+	        cint ch = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ch)) {
 
@@ -786,8 +786,8 @@ void		*contextp ;
 	if ((rs = shio_open(ofp,ofname,"wct",0666)) >= 0) {
 	    ARGINFO	*aip = &ainfo ;
 	    PARAMOPT	*app = &aparams ;
-	    const char	*afn = afname ;
-	    const char	*ifn = ifname ;
+	    cchar	*afn = afname ;
+	    cchar	*ifn = ifname ;
 	    uchar	*wt = wterms ;
 	    if ((rs = procopts(pip,&akopts)) >= 0) {
 	        if ((rs = procargs(pip,aip,&pargs,app,ofp,wt,ifn,afn)) >= 0) {
@@ -904,7 +904,7 @@ badsigman:
 /* local subroutines */
 
 
-static void sighand_int(sn)
+local void sighand_int(sn)
 int	sn ;
 {
 
@@ -924,12 +924,12 @@ int	sn ;
 /* end subroutine (sighand_int) */
 
 
-static int locinfo_start(lip,pip)
+local int locinfo_start(lip,pip)
 LOCINFO	*lip ;
 PROGINFO	*pip ;
 {
-	const int	n = (20*1024) ;
-	const int	ssize = (10*1024) ;
+	cint	n = (20*1024) ;
+	cint	ssize = (10*1024) ;
 
 	int	rs ;
 
@@ -949,7 +949,7 @@ PROGINFO	*pip ;
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(lip)
+local int locinfo_finish(lip)
 LOCINFO	*lip ;
 {
 	int	rs = SR_OK ;
@@ -993,8 +993,8 @@ LOCINFO	*lip ;
 
 int locinfo_setentry(lip,epp,vp,vl)
 LOCINFO	*lip ;
-const char	**epp ;
-const char	vp[] ;
+cchar	**epp ;
+cchar	vp[] ;
 int		vl ;
 {
 	int	rs = SR_OK ;
@@ -1031,9 +1031,9 @@ int		vl ;
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_storeword(lip,wp,wl)
+local int locinfo_storeword(lip,wp,wl)
 LOCINFO	*lip ;
-const char	*wp ;
+cchar	*wp ;
 int		wl ;
 {
 	PROGINFO	*pip = lip->pip ;
@@ -1041,12 +1041,12 @@ int		wl ;
 	HDB		*dbp = &lip->wdb ;
 	HDB_DATUM	k, v ;
 
-	const int	esize = sizeof(struct wordent) ;
+	cint	esize = sizeof(struct wordent) ;
 
 	int	rs ;
 	int	f = TRUE ;
 
-	const char	*sp ;
+	cchar	*sp ;
 
 	if (wl < 0) wl = strlen(wp) ;
 
@@ -1098,14 +1098,14 @@ int		wl ;
 /* end subroutine (locinfo_storeword) */
 
 
-static int usage(pip)
+local int usage(pip)
 PROGINFO	*pip ;
 {
 	int	rs = SR_OK ;
 	int	wlen = 0 ;
 
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 
 	fmt = "%s: USAGE> %s [<file(s)> ...] [-af <afile>]\n" ;
@@ -1122,7 +1122,7 @@ PROGINFO	*pip ;
 
 
 /* process the program ako-options */
-static int procopts(pip,kop)
+local int procopts(pip,kop)
 PROGINFO	*pip ;
 keyopt		*kop ;
 {
@@ -1131,7 +1131,7 @@ keyopt		*kop ;
 	int	rs = SR_OK ;
 	int	c = 0 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL)
@@ -1142,7 +1142,7 @@ keyopt		*kop ;
 	    if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	        int		oi ;
 	        int		kl, vl ;
-		const char	*kp, *vp ;
+		cchar	*kp, *vp ;
 
 	        while ((kl = keyopt_curenumkeys(kop,&kcur,&kp)) >= 0) {
 
@@ -1209,19 +1209,19 @@ keyopt		*kop ;
 /* end subroutine (procopts) */
 
 
-static int procargs(pip,aip,bop,app,ofp,wterms,ifname,afname)
+local int procargs(pip,aip,bop,app,ofp,wterms,ifname,afname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bits		*bop ;
 PARAMOPT	*app ;
 void		*ofp ;
 uchar		wterms[] ;
-const char	*ifname ;
-const char	*afname ;
+cchar	*ifname ;
+cchar	*afname ;
 {
 	int		rs = SR_OK ;
 	int		pan = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (rs >= 0) {
 	    int	ai ;
@@ -1256,7 +1256,7 @@ const char	*afname ;
 #endif
 
 	    if ((rs = shio_open(afp,afname,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1317,11 +1317,11 @@ const char	*afname ;
 /* end subroutine (procargs) */
 
 
-static int procfile(pip,ofp,wterms,fname)
+local int procfile(pip,ofp,wterms,fname)
 PROGINFO	*pip ;
 void		*ofp ;
 unsigned char	wterms[] ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	LOCINFO	*lip = pip->lip ;
 
@@ -1331,14 +1331,14 @@ const char	fname[] ;
 
 	SHIO	infile, *ifp = &infile ;
 
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 
 	int	rs ;
 	int	sl, cl ;
 	int	wlen = 0 ;
 
-	const char	*sp ;
-	const char	*cp ;
+	cchar	*sp ;
+	cchar	*cp ;
 
 	char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1365,7 +1365,7 @@ const char	fname[] ;
 
 	        if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
 	            int		fl ;
-	            const char	*fp ;
+	            cchar	*fp ;
 
 	            while ((fl = field_word(&fsb,wterms,&fp)) >= 0) {
 	                if (fl == 0) continue ;
@@ -1416,7 +1416,7 @@ const char	fname[] ;
 /* end subroutine (procfile) */
 
 
-static int procword(PROGINFO *pip,const char *wp,int wl)
+local int procword(PROGINFO *pip,cchar *wp,int wl)
 {
 	LOCINFO	*lip = pip->lip ;
 
@@ -1429,7 +1429,7 @@ static int procword(PROGINFO *pip,const char *wp,int wl)
 /* end subroutine (procword) */
 
 
-static int procoutcounts(PROGINFO *pip,void *ofp)
+local int procoutcounts(PROGINFO *pip,void *ofp)
 {
 	LOCINFO	*lip = pip->lip ;
 
@@ -1443,13 +1443,13 @@ static int procoutcounts(PROGINFO *pip,void *ofp)
 	dbp = &lip->wdb ;
 	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
 	    struct wordent	*ep ;
-	    const char	*fmt = "%-6u %r\n" ;
-	    const char	*wp ;
+	    cchar	*fmt = "%-6u %r\n" ;
+	    cchar	*wp ;
 	    int		wl ;
 	    int		count ;
 	    while ((rs = hdb_curenum(dbp,&cur,&k,&v)) >= 0) {
 	        ep = (struct wordent *) v.buf ;
-	        wp = (const char *) k.buf ;
+	        wp = (cchar *) k.buf ;
 	        wl = k.len ;
 	        count = ep->count ;
 	        rs = shio_printf(ofp,fmt,count,wp,wl) ;
@@ -1465,10 +1465,10 @@ static int procoutcounts(PROGINFO *pip,void *ofp)
 /* end subroutine (procoutcounts) */
 
 
-static int printuniq(pip,ofp,wp,wl)
+local int printuniq(pip,ofp,wp,wl)
 PROGINFO	*pip ;
 SHIO		*ofp ;
-const char	*wp ;
+cchar	*wp ;
 int		wl ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1485,7 +1485,7 @@ int		wl ;
 /* end subroutine (printuniq) */
 
 
-static int mkourterms(uchar *wterms)
+local int mkourterms(uchar *wterms)
 {
 	int	i ;
 
@@ -1509,8 +1509,8 @@ static int mkourterms(uchar *wterms)
 
 #ifdef	COMMENT
 
-static int isallalpha(s,slen)
-const char	s[] ;
+local int isallalpha(s,slen)
+cchar	s[] ;
 int		slen ;
 {
 	int	fl, i ;
