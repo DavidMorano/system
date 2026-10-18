@@ -60,7 +60,7 @@
 #include	<char.h>
 #include	<ascii.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<iserror.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
@@ -132,21 +132,21 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
-static int	procfile(PROGINFO *,void *,cchar *) ;
-static int	mkgeekout(PROGINFO *,char *,int,const char *,int) ;
-static int	procoutline(PROGINFO *,void *,const char *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+local int	procfile(PROGINFO *,void *,cchar *) ;
+local int	mkgeekout(PROGINFO *,char *,int,cchar *,int) ;
+local int	procoutline(PROGINFO *,void *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
 static bool	isOther(int) noex ;
@@ -239,7 +239,7 @@ int b_sanity(int argc,cchar *argv[],void *contextp) noex {
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    cchar	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -260,7 +260,7 @@ int p_sanity(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* local subroutines */
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -282,17 +282,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	int		f_usage = false ;
 	int		f_help = false ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*tos_open = NULL ;
-	const char	*tos_read = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*tos_open = NULL ;
+	cchar	*tos_read = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -349,7 +349,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -579,7 +579,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -851,9 +851,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*ifn = ifname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*ifn = ifname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,ofn,ifn,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -935,7 +935,7 @@ badarg:
 }
 /* end subroutine (mainsub) */
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == NULL) return SR_FAULT ;
@@ -951,7 +951,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 }
 /* end subroutine (locinfo_start) */
 
-static int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -969,7 +969,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1006,12 +1006,12 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<file(s)> ...] [-af <afile>] [-of <ofile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1030,12 +1030,12 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1109,13 +1109,13 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(pip,aip,bop,ofn,ifn,afn)
+local int procargs(pip,aip,bop,ofn,ifn,afn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bits		*bop ;
-const char	*ofn ;
-const char	*ifn ;
-const char	*afn ;
+cchar	*ofn ;
+cchar	*ifn ;
+cchar	*afn ;
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1166,7 +1166,7 @@ const char	*afn ;
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1226,11 +1226,11 @@ const char	*afn ;
 
 
 /* process a file */
-static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
+local int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	to_open = pip->to_open ;
-	const int	llen = LINEBUFLEN ;
+	cint	to_open = pip->to_open ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len ;
@@ -1238,7 +1238,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 	int		wlen = 0 ;
 	int		f_stdin = false ;
 	int		f_fifo = false ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 	char		geekbuf[LINEBUFLEN + 1] ;
 
@@ -1352,7 +1352,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 }
 /* end subroutine (procfile) */
 
-static int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen) noex {
+local int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen) noex {
 	LOCINFO		*lip = pip->lip ;
 	LINEFOLD	liner ;
 	int		rs ;
@@ -1361,8 +1361,8 @@ static int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen) noex {
 	int		ni ;
 	int		ll ;
 	int		wlen = 0 ;
-	const char	*fmt = "%r%r\n" ;
-	const char	*lp ;
+	cchar	*fmt = "%r%r\n" ;
+	cchar	*lp ;
 
 	n = lip->linelen ;
 	ni = MIN(NBLANKS,lip->indent) ;
@@ -1385,7 +1385,7 @@ static int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen) noex {
 }
 /* end if (procoutline) */
 
-static int mkgeekout(PROGINFO *pip,char *gbuf,int glen,cchar *sp,int sl) noex {
+local int mkgeekout(PROGINFO *pip,char *gbuf,int glen,cchar *sp,int sl) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		linelen ;
 	int		i ;
