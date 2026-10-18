@@ -183,29 +183,29 @@ struct config {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PI *) ;
+local int	usage(PI *) ;
 
-static int	config_start(CF *,PI *,cchar *) ;
-static int	config_check(CF *) ;
-static int	config_read(CF *) ;
-static int	config_finish(CF *) ;
-static int	config_files(CF *,vecstr *) ;
-static int	config_loadcooks(CF *) ;
+local int	config_start(CF *,PI *,cchar *) ;
+local int	config_check(CF *) ;
+local int	config_read(CF *) ;
+local int	config_finish(CF *) ;
+local int	config_files(CF *,vecstr *) ;
+local int	config_loadcooks(CF *) ;
 
-static int	procopts(PI *,keyopt *) ;
-static int	procspecs(PI *,cchar *,int) ;
-static int	procspec(PI *,vecstr *) ;
-static int	procnames(PI *,paramopt *) ;
+local int	procopts(PI *,keyopt *) ;
+local int	procspecs(PI *,cchar *,int) ;
+local int	procspec(PI *,vecstr *) ;
+local int	procnames(PI *,paramopt *) ;
 
-static int	procout(PI *,cchar *,int) ;
-static int	procoutline(PI *,int,cchar *,int) ;
+local int	procout(PI *,cchar *,int) ;
+local int	procoutline(PI *,int,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PI *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_deflinelen(LOCINFO *) ;
-static int	locinfo_nlookup(LOCINFO *,int,char *,int) ;
+local int	locinfo_start(LOCINFO *,PI *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_deflinelen(LOCINFO *) ;
+local int	locinfo_nlookup(LOCINFO *,int,char *,int) ;
 
 
 /* local variables */
@@ -350,7 +350,7 @@ int p_quote(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO	li, *lip = &li ;
@@ -1209,7 +1209,7 @@ badprogstart:
 /* end subroutine (mainsub) */
 
 
-static int locinfo_start(LOCINFO *lip,PI *pip)
+local int locinfo_start(LOCINFO *lip,PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1224,7 +1224,7 @@ static int locinfo_start(LOCINFO *lip,PI *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1241,7 +1241,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_deflinelen(LOCINFO *lip)
+local int locinfo_deflinelen(LOCINFO *lip)
 {
 	cint	def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
@@ -1270,7 +1270,7 @@ static int locinfo_deflinelen(LOCINFO *lip)
 /* end subroutine (locinfo_deflinelen) */
 
 
-static int locinfo_nlookup(LOCINFO *lip,int bi,char *buf,int buflen)
+local int locinfo_nlookup(LOCINFO *lip,int bi,char *buf,int buflen)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1313,7 +1313,7 @@ static int locinfo_nlookup(LOCINFO *lip,int bi,char *buf,int buflen)
 /* end subroutine (locinfo_nlookup) */
 
 
-static int usage(PI *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1338,7 +1338,7 @@ static int usage(PI *pip)
 
 
 /* configuration maintenance */
-static int config_start(cfp,pip,configfname)
+local int config_start(cfp,pip,configfname)
 CF	*cfp ;
 PROGINFO	*pip ;
 cchar	*configfname ;
@@ -1462,7 +1462,7 @@ bad0:
 /* end subroutine (config_start) */
 
 
-static int config_files(cfp,flp)
+local int config_files(cfp,flp)
 CF	*cfp ;
 vecstr		*flp ;
 {
@@ -1553,7 +1553,7 @@ ret0:
 /* end subroutine (config_files) */
 
 
-static int config_loadcooks(cfp)
+local int config_loadcooks(cfp)
 CF	*cfp ;
 {
 	PROGINFO	*pip = cfp->pip ;
@@ -1586,7 +1586,7 @@ CF	*cfp ;
 /* end subroutine (config_loadcooks) */
 
 
-static int config_check(cfp)
+local int config_check(cfp)
 CF	*cfp ;
 {
 	PROGINFO	*pip = cfp->pip ;
@@ -1605,7 +1605,7 @@ CF	*cfp ;
 /* end subroutine (config_check) */
 
 
-static int config_finish(cfp)
+local int config_finish(cfp)
 CF	*cfp ;
 {
 	PROGINFO	*pip = cfp->pip ;
@@ -1631,7 +1631,7 @@ CF	*cfp ;
 }
 /* end subroutine (config_finish) */
 
-static int config_read(CF *cfp) noex {
+local int config_read(CF *cfp) noex {
 	proginfo	*pip = cfp->pip ;
 	LOCINFO		*lip ;
 	paramfile	*pfp ;
@@ -1759,7 +1759,7 @@ ret0:
 /* end subroutine (config_read) */
 
 
-static int procnames(pip,app)
+local int procnames(pip,app)
 PROGINFO	*pip ;
 paramopt	*app ;
 {
@@ -1799,7 +1799,7 @@ ret0:
 
 
 /* process the program ako-names */
-static int procopts(PI *pip,keyopt *kop)
+local int procopts(PI *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1909,7 +1909,7 @@ static int procopts(PI *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procspecs(pip,sp,sl)
+local int procspecs(pip,sp,sl)
 PROGINFO	*pip ;
 cchar	*sp ;
 int		sl ;
@@ -1955,7 +1955,7 @@ int		sl ;
 /* end subroutine (procspecs) */
 
 
-static int procspec(pip,qsp)
+local int procspec(pip,qsp)
 PROGINFO	*pip ;
 vecstr		*qsp ;
 {
@@ -2018,7 +2018,7 @@ ret0:
 /* end subroutine (procspec) */
 
 
-static int procout(pip,buf,buflen)
+local int procout(pip,buf,buflen)
 PROGINFO	*pip ;
 cchar	buf[] ;
 int		buflen ;
@@ -2113,7 +2113,7 @@ ret0:
 }
 /* end subroutine (procout) */
 
-static int procoutline(PI *pip,int line,cchar *lp,int ll) noex {
+local int procoutline(PI *pip,int line,cchar *lp,int ll) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		indent ;
