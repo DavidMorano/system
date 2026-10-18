@@ -55,6 +55,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -75,10 +76,10 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -97,17 +98,17 @@ struct progdata {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,PROGDATA *,cchar *) ;
-static int	procfile(PROGINFO *,PROGDATA *,cchar *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,PROGDATA *,cchar *) ;
+local int	procfile(PROGINFO *,PROGDATA *,cchar *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -164,7 +165,7 @@ int b_fileolder(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -188,7 +189,7 @@ int p_fileolder(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGDATA	pd ;
 	PROGINFO	pi, *pip = &pi ;
@@ -212,14 +213,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*agespec = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*agespec = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -271,7 +272,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -405,7 +406,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -602,7 +603,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (DEBUGLEVEL(2)) {
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    debugprintf("b_fileolder: daytime=%s\n",
-	        timestr_logz(pd.daytime,timebuf)) ;
+	        strtime_logz(pd.daytime,timebuf)) ;
 	    debugprintf("b_fileolder: age=%d\n",
 	        pd.age) ;
 	}
@@ -616,7 +617,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*afn = afname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,&pd,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -705,12 +706,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s <file(s)> -<age>\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -725,13 +726,13 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 		PROGDATA *pdp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pan = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
@@ -761,7 +762,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 		int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -804,7 +805,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 
 
 /* process a file */
-static int procfile(PROGINFO *pip,PROGDATA *pdp,cchar *name)
+local int procfile(PROGINFO *pip,PROGDATA *pdp,cchar *name)
 {
 	ustat	usb ;
 	int		rs ;
@@ -817,7 +818,7 @@ static int procfile(PROGINFO *pip,PROGDATA *pdp,cchar *name)
 	    if (DEBUGLEVEL(2)) {
 	        char	timebuf[TIMEBUFLEN + 1] ;
 	        debugprintf("b/procfile: mtime=%s\n",
-	            timestr_logz(usb.st_mtime,timebuf)) ;
+	            strtime_logz(usb.st_mtime,timebuf)) ;
 	    }
 #endif /* CF_DEBUG */
 
