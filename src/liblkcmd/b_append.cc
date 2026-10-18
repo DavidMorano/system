@@ -129,20 +129,20 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
-static int	procfile(PROGINFO *,void *,cchar *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+local int	procfile(PROGINFO *,void *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"VERSION",
 	"VERBOSE",
 	"TMPDIR",
@@ -223,7 +223,7 @@ int p_append(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -319,7 +319,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -490,7 +490,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -844,7 +844,7 @@ badarg:
 /* end subroutine (p_append) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -868,11 +868,11 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 		cchar *ofn,cchar *ifn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
-	const int	to_open = pip->to_open ;
+	cint	to_open = pip->to_open ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -940,7 +940,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1003,7 +1003,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 /* end subroutine (procargs) */
 
 
-static int procfile(PROGINFO *pip,void *ofp,cchar fname[])
+local int procfile(PROGINFO *pip,void *ofp,cchar fname[])
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ifile, *ifp = &ifile ;
@@ -1029,7 +1029,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar fname[])
 #endif
 
 	if ((rs = shio_open(ifp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1083,7 +1083,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar fname[])
 /* end subroutine (procfile) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1096,7 +1096,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
