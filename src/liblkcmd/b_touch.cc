@@ -59,6 +59,7 @@
 #include	<keyopt.h>
 #include	<tmz.hh>
 #include	<tmtime.hh>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
@@ -154,7 +155,7 @@ local int	locinfo_finish(LOCINFO *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -213,7 +214,7 @@ int b_touch(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
-	    cchar	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -261,16 +262,16 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = false ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = nullptr ;
-	const char	*pr = nullptr ;
-	const char	*sn = nullptr ;
-	const char	*afname = nullptr ;
-	const char	*efname = nullptr ;
-	const char	*ofname = nullptr ;
-	const char	*reffname = nullptr ;
-	const char	*datespec = nullptr ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*reffname = nullptr ;
+	cchar	*datespec = nullptr ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUG || CF_DEBUG
@@ -843,9 +844,9 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (DEBUGLEVEL(4)) {
 	    char	timebuf[TIMEBUFLEN + 1] ;
 	    DEBUGPRINTF("b_touch: atime=%s\n",
-	        timestr_log(spi.atime,timebuf)) ;
+	        strtime_log(spi.atime,timebuf)) ;
 	    DEBUGPRINTF("b_touch: mtime=%s\n",
-	        timestr_log(spi.mtime,timebuf)) ;
+	        strtime_log(spi.mtime,timebuf)) ;
 	}
 #endif /* CF_DEBUG */
 
@@ -860,7 +861,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_continue = ai_continue ;
 
 	if (rs >= 0) {
-	    const char	*afn = afname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,&spi,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -945,8 +946,8 @@ local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [{-t [[CC]YY]MMDDhhmm[.ss]}|MMDDhhmm[YY]] "
 	    "<files(s)>\n" ;
