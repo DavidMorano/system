@@ -92,7 +92,7 @@
 #include	<spawner.h>
 #include	<opentmp.h>
 #include	<strwcpyx.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<rmdirfiles.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -109,7 +109,7 @@
 
 #ifndef	TYPEDEF_CCHAR
 #define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
+typedef cchar	cchar ;
 #endif
 
 
@@ -188,7 +188,7 @@ extern int	proginfo_rootname(PROGINFO *) ;
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
@@ -352,7 +352,7 @@ local int	locinfo_groupname(LOCINFO *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -437,7 +437,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 	SIGHUP,
@@ -574,7 +574,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -809,7 +809,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1450,7 +1450,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1625,7 +1625,7 @@ local int procmntcheck(PROGINFO *pip)
 
 local int procbacks(PROGINFO *pip)
 {
-	const int	elen = MAXPATHLEN ;
+	cint	elen = MAXPATHLEN ;
 	int		rs ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
@@ -1985,8 +1985,8 @@ local int proclockacquire(PROGINFO *pip,LFM *plp,int f)
 
 	    if (rs >= 0) {
 	        LFM_CHECK	lc ;
-	        const int	ltype = LFM_TRECORD ;
-	        const int	to = lip->to_lock ;
+	        cint	ltype = LFM_TRECORD ;
+	        cint	to = lip->to_lock ;
 	        cchar		*nn = pip->nodename ;
 	        cchar		*un = pip->username ;
 	        cchar		*bn = pip->banner ;
@@ -2094,7 +2094,7 @@ local int procserver(PROGINFO *pip,LFM *plp,int sfd) noex {
 	time_t		ti_run = pip->daytime ;
 	time_t		ti_wait = pip->daytime ;
 	time_t		ti_check = pip->daytime ;
-	const int	to = pip->intpoll ;
+	cint	to = pip->intpoll ;
 	int		rs ;
 	int		rs1 ;
 	int		nhandle = 0 ;
@@ -2117,13 +2117,13 @@ local int procserver(PROGINFO *pip,LFM *plp,int sfd) noex {
 	    while (rs >= 0) {
 
 	        if ((rs = u_poll(fds,1,pto)) > 0) {
-	            const int	re = fds[0].revents ;
+	            cint	re = fds[0].revents ;
 	            pip->daytime = time(NULL) ;
 
 	            if ((re & POLLIN) || (re & POLLPRI)) {
 	                struct strrecvfd	passer ;
 	                if ((rs = acceptpass(sfd,&passer,-1)) >= 0) {
-	                    const int	pfd = rs ;
+	                    cint	pfd = rs ;
 	                    nhandle += 1 ;
 	                    rs = prochandle(pip,&m,lip->keyname,pfd) ;
 	                    u_close(pfd) ;
@@ -2339,10 +2339,10 @@ local int procregouter(PROGINFO *pip,cchar **av,SHIO *ofp)
 	        lip->jobdname = lip->mdname ;
 	        if ((rs = locinfo_tmpcheck(lip)) >= 0) {
 	            const mode_t	om = 0664 ;
-	            const int		of = O_RDWR ;
+	            cint		of = O_RDWR ;
 	            cchar		*jobdname = lip->mdname ;
 	            if ((rs = opentmp(jobdname,of,om)) >= 0) {
-	                const int	fd = rs ;
+	                cint	fd = rs ;
 	                if ((rs = procissue(pip,lip->keyname,av,fd)) >= 0) {
 	                    int	mlen = rs ;
 	                    int	verlev = pip->verboselevel ;
@@ -2403,8 +2403,8 @@ local int procregouterterm(PROGINFO *pip,void *ofp,int fd) noex {
 local int procregouterfile(PROGINFO *pip,void *ofp,int fd)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	to = pip->to_read ;
-	const int	llen = LINEBUFLEN ;
+	cint	to = pip->to_read ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		len ;
 	int		wlen = 0 ;
@@ -2430,8 +2430,8 @@ local int procissue(PROGINFO *pip,cchar groupname[],cchar **av,int fd)
 {
 	LOCINFO		*lip = pip->lip ;
 	const mode_t	om = 0664 ;
-	const int	of = O_RDONLY ;
-	const int	llen = LINEBUFLEN ;
+	cint	of = O_RDONLY ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	cchar		*fn = "rightcore.txt" ;
@@ -2563,7 +2563,7 @@ local int proclockprint(PROGINFO *pip,LFM_CHECK *lcp)
 
 	    logfile_printf(&pip->lh,
 	        "%s lock %s\n",
-	        timestr_logz(pip->daytime,timebuf),
+	        strtime_logz(pip->daytime,timebuf),
 	        np) ;
 
 	    logfile_printf(&pip->lh,
@@ -2593,7 +2593,7 @@ local int proclockprint(PROGINFO *pip,LFM_CHECK *lcp)
 	    shio_printf(pip->efp,
 	        "%s: %s lock %s\n",
 	        pip->progname,
-	        timestr_logz(pip->daytime,timebuf),
+	        strtime_logz(pip->daytime,timebuf),
 	        np) ;
 
 	    shio_printf(pip->efp,
@@ -2682,7 +2682,7 @@ local int procloadadmin(PROGINFO *pip,VECPSTR *nlp,cchar np[],int nl)
 	        if (rs < INT_MAX) c += 1 ;
 	    } /* end if (locinfo_username) */
 	} else {
-	    const int	nch = MKCHAR(np[0]) ;
+	    cint	nch = MKCHAR(np[0]) ;
 	    cchar	*tp ;
 	    if ((tp = strnchr(np,nl,'+')) != NULL) {
 	        nl = (tp-np) ;
@@ -2691,7 +2691,7 @@ local int procloadadmin(PROGINFO *pip,VECPSTR *nlp,cchar np[],int nl)
 	        LOCINFO_RNCUR	rnc ;
 	        if ((rs = locinfo_rncurbegin(lip,&rnc)) >= 0) {
 	            if ((rs = locinfo_rnlook(lip,&rnc,np,nl)) > 0) {
-	                const int	ul = USERNAMELEN ;
+	                cint	ul = USERNAMELEN ;
 	                char		ub[USERNAMELEN+1] ;
 	                while ((rs = locinfo_rnread(lip,&rnc,ub,ul)) > 0) {
 	                    rs = vecpstr_adduniq(nlp,ub,rs) ;
@@ -2714,7 +2714,7 @@ local int procloadadmin(PROGINFO *pip,VECPSTR *nlp,cchar np[],int nl)
 		if (rs >= 0) {
 	            if ((rs = locinfo_gmcurbegin(lip,&gc)) >= 0) {
 	                if ((rs = locinfo_gmlook(lip,&gc,gnp,gnl)) > 0) {
-	                    const int	ul = USERNAMELEN ;
+	                    cint	ul = USERNAMELEN ;
 	                    char	ub[USERNAMELEN+1] ;
 	                    while ((rs = locinfo_gmread(lip,&gc,ub,ul)) > 0) {
 	                        rs = vecpstr_adduniq(nlp,ub,rs) ;
@@ -2948,7 +2948,7 @@ local int locinfo_loadids(LOCINFO *lip)
 	    } else {
 	        if ((rs = bufsizeget(bufsize_pw)) >= 0) {
 	            struct passwd	pw ;
-	            const int		pwlen = rs ;
+	            cint		pwlen = rs ;
 	            char		*pwbuf ;
 		    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	                if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,lip->un)) >= 0) {
@@ -2963,7 +2963,7 @@ local int locinfo_loadids(LOCINFO *lip)
 
 	    if (rs >= 0) {
 		const gid_t	gid = lip->gid_dirs ;
-	        const int	gnlen = GROUPNAMELEN ;
+	        cint	gnlen = GROUPNAMELEN ;
 	        rs = getgroupname(lip->gnbuf,gnlen,gid) ;
 	    }
 
@@ -3009,7 +3009,7 @@ local int locinfo_tmpcheck(LOCINFO *lip)
 local int locinfo_tmpmaint(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	to = TO_TMPFILES ;
+	cint	to = TO_TMPFILES ;
 	int		rs ;
 	int		c = 0 ;
 	int		f_need = lip->fl.maint ;
@@ -3018,10 +3018,10 @@ local int locinfo_tmpmaint(LOCINFO *lip)
 
 	if ((rs = mkpath2(tsfname,dname,TSFNAME)) >= 0) {
 	    const mode_t	om = 0666 ;
-	    const int		of = (O_WRONLY|O_CREAT) ;
+	    cint		of = (O_WRONLY|O_CREAT) ;
 	    if ((rs = u_open(tsfname,of,om)) >= 0) {
 	        ustat	usb ;
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 	        if ((rs = u_fstat(fd,&usb)) >= 0) {
 	            time_t	dt = pip->daytime ;
 	            if ((rs = locinfo_fchmodown(lip,fd,&usb,om)) >= 0) {
@@ -3031,7 +3031,7 @@ local int locinfo_tmpmaint(LOCINFO *lip)
 	                if (f_need) {
 	                    int		tl ;
 	                    char	timebuf[TIMEBUFLEN + 3] ;
-	                    timestr_log(dt,timebuf) ;
+	                    strtime_log(dt,timebuf) ;
 	                    tl = strlen(timebuf) ;
 	                    timebuf[tl++] = '\n' ;
 	                    rs = u_write(fd,timebuf,tl) ;
@@ -3078,7 +3078,7 @@ local int locinfo_fchmodown(LOCINFO *lip,int fd,ustat *sbp,mode_t mm)
 	            if ((rs = uc_fminmod(fd,mm)) >= 0) {
 	                const uid_t	uid_pr = lip->uid_pr ;
 	                const gid_t	gid_pr = lip->gid_pr ;
-	                const int	n = _PC_CHOWN_RESTRICTED ;
+	                cint	n = _PC_CHOWN_RESTRICTED ;
 	                if ((rs = u_fpathconf(fd,n,NULL)) == 0) {
 	                    f = TRUE ;
 	                    u_fchown(fd,uid_pr,gid_pr) ; /* may fail */
@@ -3104,13 +3104,13 @@ local int locinfo_getgid(LOCINFO *lip)
 	if (lip->gid_prog < 0) {
 	    if ((rs = bufsizeget(bufsize_pw)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = rs ;
+	        cint	pwlen = rs ;
 	        char		*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 
 	            if (lip->uid == lip->euid) {
 	                if ((rs = proginfo_rootname(pip)) >= 0) {
-	                    const int	nrs = SR_NOTFOUND ;
+	                    cint	nrs = SR_NOTFOUND ;
 		            cchar	*rn = pip->rootname ;
 	                    if ((rs1 = GETPW_NAME(&pw,pwbuf,pwlen,rn)) == nrs) {
 	                        char	ubuf[USERNAMELEN + 1] ;
@@ -3274,8 +3274,8 @@ int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
 	if (curp == NULL) return SR_FAULT ;
 
 	if (! lip->open.gm) {
-	    const int	max = 20 ;
-	    const int	ttl = (12*3600) ;
+	    cint	max = 20 ;
+	    cint	ttl = (12*3600) ;
 	    rs = grmems_start(&lip->gm,max,ttl) ;
 	    lip->open.gm = (rs >= 0) ;
 	}
@@ -3306,7 +3306,7 @@ int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp)
 
 int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
 {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if (curp == NULL) return SR_FAULT ;
@@ -3325,7 +3325,7 @@ int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
 
 int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char *ubuf,int ulen)
 {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if (curp == NULL) return SR_FAULT ;
@@ -3378,8 +3378,8 @@ int locinfo_rncurend(LOCINFO *lip,LOCINFO_RNCUR *curp)
 int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	rsn = SR_NOTFOUND ;
-	const int	fo = 0 ;
+	cint	rsn = SR_NOTFOUND ;
+	cint	fo = 0 ;
 	int		rs ;
 
 	if (curp == NULL) return SR_FAULT ;
@@ -3406,7 +3406,7 @@ int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
 int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char ubuf[],int ulen)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if (curp == NULL) return SR_FAULT ;
