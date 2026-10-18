@@ -49,7 +49,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<pcsnsc.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<localmisc.h>
 
 #include	"pcsmsg.h"
@@ -66,12 +66,12 @@
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isBadSend(int) ;
 
@@ -93,12 +93,12 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	pcscmder(PROGINFO *,PCSNSC *,SHIO *) ;
+local int	pcscmder(PROGINFO *,PCSNSC *,SHIO *) ;
 
-static int	pcscmd_status(PROGINFO *,PCSNSC *,SHIO *) ;
-static int	pcscmd_help(PROGINFO *,PCSNSC *,SHIO *) ;
-static int	pcscmd_mark(PROGINFO *,PCSNSC *,SHIO *) ;
-static int	pcscmd_exit(PROGINFO *,PCSNSC *,SHIO *) ;
+local int	pcscmd_status(PROGINFO *,PCSNSC *,SHIO *) ;
+local int	pcscmd_help(PROGINFO *,PCSNSC *,SHIO *) ;
+local int	pcscmd_mark(PROGINFO *,PCSNSC *,SHIO *) ;
+local int	pcscmd_exit(PROGINFO *,PCSNSC *,SHIO *) ;
 
 
 /* local variables */
@@ -139,7 +139,7 @@ int pcscmd(PROGINFO *pip,cchar *ofn)
 
 	    if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	        PCSNSC		c ;
-	        const int	to = TO_OPENSERVE ;
+	        cint	to = TO_OPENSERVE ;
 	        cchar		*pr = pip->pr ;
 	        if ((rs = pcsnsc_open(&c,pr,to)) >= 0) {
 	            {
@@ -167,7 +167,7 @@ int pcscmd(PROGINFO *pip,cchar *ofn)
 
 int pcscmd_svcname(PROGINFO *pip,int idx,cchar **rpp)
 {
-	const int	nidx = nelem(cmds) ;
+	cint	nidx = nelem(cmds) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -191,7 +191,7 @@ int pcscmd_svcname(PROGINFO *pip,int idx,cchar **rpp)
 /* local subroutines */
 
 
-static int pcscmder(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
+local int pcscmder(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
 	keyopt		*kop ;
@@ -203,7 +203,7 @@ static int pcscmder(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 	if ((rs = keyopt_curbegin(kop,&kcur)) >= 0) {
 	    int		ci ;
 	    int		kl ;
-	    const char	*kp ;
+	    cchar	*kp ;
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt ;
 
@@ -234,7 +234,7 @@ static int pcscmder(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 	                shio_printf(pip->efp,fmt,pn,kp,kl) ;
 	                {
 	                    char	tbuf[TIMEBUFLEN+1] ;
-	                    timestr_logz(pip->daytime,tbuf) ;
+	                    strtime_logz(pip->daytime,tbuf) ;
 	                    logprintf(pip,"%s unknown cmd=%r",tbuf,kp,kl) ;
 	                }
 	            } /* end if (valid) */
@@ -250,7 +250,7 @@ static int pcscmder(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 /* end subroutine (proccmd) */
 
 
-static int pcscmd_status(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
+local int pcscmd_status(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 {
 	PCSNSC_STATUS	stat ;
 	int		rs ;
@@ -290,9 +290,9 @@ static int pcscmd_status(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 /* end subroutine (pcscmd_status) */
 
 
-static int pcscmd_help(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
+local int pcscmd_help(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 {
-	const int	rlen = MAXNAMELEN ;
+	cint	rlen = MAXNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -316,7 +316,7 @@ static int pcscmd_help(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 /* end subroutine (pcscmd_help) */
 
 
-static int pcscmd_mark(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
+local int pcscmd_mark(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -337,7 +337,7 @@ static int pcscmd_mark(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 /* end subroutine (pcscmd_mark) */
 
 
-static int pcscmd_exit(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
+local int pcscmd_exit(PROGINFO *pip,PCSNSC *pcp,SHIO *ofp)
 {
 	int		rs ;
 	int		wlen = 0 ;
