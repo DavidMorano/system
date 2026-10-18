@@ -88,6 +88,7 @@
 #include	<grmems.h>
 #include	<sysrealname.h>
 #include	<namecache.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG */
@@ -256,7 +257,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -1813,7 +1814,7 @@ local int procout(PROGINFO *pip,SHIO *ofp,VECOBJ *elp)
 
 	            strwcpy(ut_hostbuf,up->ut_host,UTMPX_LHOST) ;
 
-	            timestr_log(up->ut_tv.tv_sec,timebuf),
+	            strtime_log(up->ut_tv.tv_sec,timebuf),
 	            rs = shio_printf(ofp,
 	                "%-8s %c %-12s %s %4s %6u %2u %s\n",
 	                ut_userbuf,tmch,
@@ -1845,7 +1846,7 @@ local int procout(PROGINFO *pip,SHIO *ofp,VECOBJ *elp)
 	                cchar	*tb = timebuf ;
 	                cchar	*ub = ut_userbuf ;
 	                cchar	*lb = ut_linebuf ;
-	                timestr_log(up->ut_tv.tv_sec,timebuf) ;
+	                strtime_log(up->ut_tv.tv_sec,timebuf) ;
 	                rs = shio_printf(ofp,fmt,ub,tmch,lb,tb,rp) ;
 	            }
 
