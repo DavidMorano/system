@@ -5,7 +5,7 @@
 /* program to return a user's home login directory */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 
@@ -40,24 +40,26 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<char.h>
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<baops.h>
-#include	<estrings.h>
-#include	<field.h>
-#include	<vecstr.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<field.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -75,23 +77,19 @@
 #define	LINEBUFLEN	2048
 #endif
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
-
-#define	SEARCHINFO	struct searchinfo
+#ifndef	PI
+#define	PI		proginfo
+#endif
+#define	LI		locinfo
+#define	LI_FL		locinfo_flags
+#define	AI		sarginfo
+#define	SI		searchinfo
 
 
 /* external subroutines */
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
 
 
 /* external variables */
@@ -105,54 +103,38 @@ struct locinfo_flags {
 	uint		stores:1 ;
 	uint		empty:1 ;
 	uint		onlyfirst:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
-	LOCINFO_FL	f ;
+	LI_FL		fl ;
 	vecstr		stores ;
-	PROGINFO	*pip ;
-} ;
+	PI	*pip ;
+} ; /* end struct */
 
 struct searchinfo {
-	const char	*searchstr ;
+	cchar	*searchstr ;
 	int		fn ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) noex ;
+local int	usage(PI *) noex ;
 
-static int	usage(PROGINFO *) ;
+local int	procargs(PI *,AI *,bits *,
+			SI *,cchar *,cchar *,cchar *) noex ;
+local int	procfile(PI *,SI *,void *,cchar *) noex ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,
-			SEARCHINFO *,cchar *,cchar *,cchar *) ;
-static int	procfile(PROGINFO *,SEARCHINFO *,void *,cchar *) ;
-
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LI *,PI *) noex ;
+local int	locinfo_finish(LI *) noex ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LI *,cchar **,cchar *,int) noex ;
 #endif
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"if",
-	"empty",
-	"onlyfirst",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -167,7 +149,22 @@ enum argopts {
 	argopt_empty,
 	argopt_onlyfirst,
 	argopt_overlast
-} ;
+} ; /* end enum */
+
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"if",
+	"empty",
+	"onlyfirst",
+	NULL
+} ; /* end array */
 
 static const PIVARS	initvars = {
 	VARPROGRAMROOT1,
@@ -175,7 +172,7 @@ static const PIVARS	initvars = {
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
 static const MAPEX	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -189,7 +186,7 @@ static const MAPEX	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 /* whitespace with also '=' */
 static const uchar	fterms[] = {
@@ -201,54 +198,49 @@ static const uchar	fterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int b_cutter(int argc,cchar *argv[],void *contextp)
-{
+int b_cutter(int argc,con mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ksh) */
 
-	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
-
+	if ((rs < 0) && (ex == EX_OK)) {
+	    ex = EX_DATAERR ;
+	}
 	return ex ;
-}
-/* end subroutine (b_cutter) */
+} /* end subroutine (b_cutter) */
 
-
-int p_cutter(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_cutter(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_cutter) */
+} /* end subroutine (p_cutter) */
 
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
-	SEARCHINFO	si ;
-	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
-	ARGINFO		ainfo ;
+local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
+	SI	si ;
+	PI	pi, *pip = &pi ;
+	LI		li, *lip = &li ;
+	AI		ainfo ;
 	bits		pargs ;
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -258,31 +250,31 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		fn = -1 ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*searchstr = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*searchstr = NULL ;
+	cchar	*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_cutter: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -329,7 +321,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -345,9 +337,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
@@ -366,7 +358,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -375,7 +367,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -386,7 +378,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -402,9 +394,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_empty:
-	                    lip->fl.empty = TRUE ;
+	                    lip->fl.empty = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->fl.empty = (rs > 0) ;
@@ -413,9 +405,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_onlyfirst:
-	                    lip->fl.empty = TRUE ;
+	                    lip->fl.empty = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->fl.onlyfirst = (rs > 0) ;
@@ -424,13 +416,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -448,7 +440,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* argument file name */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -466,7 +458,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -484,7 +476,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* output file name */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -502,7 +494,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* input file */
 	                case argopt_if:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ifname = avp ;
 	                    } else {
@@ -527,7 +519,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -535,7 +527,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -545,7 +537,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->fl.quiet = TRUE ;
+	                        pip->fl.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -562,7 +554,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* field to pick out */
@@ -614,7 +606,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -623,7 +615,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -655,8 +647,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (efname == NULL) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -750,9 +742,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    fn = rs ;
 	}
 
-	memset(&si,0,sizeof(SEARCHINFO)) ;
+	memset(&si,0,sizeof(SI)) ;
 	si.fn = fn ;
-	si.searchstr = (const char *) searchstr ;
+	si.searchstr = (cchar *) searchstr ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -760,7 +752,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        searchstr,fn) ;
 #endif
 
-	memset(&ainfo,0,sizeof(ARGINFO)) ;
+	memset(&ainfo,0,sizeof(AI)) ;
 	ainfo.argc = argc ;
 	ainfo.ai = ai ;
 	ainfo.argv = argv ;
@@ -769,9 +761,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_continue = ai_continue ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*ifn = ifname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*ifn = ifname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,&si,ofn,ifn,afn) ;
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
@@ -799,13 +791,13 @@ retearly:
 	}
 
 	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
 	    pip->efp = NULL ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -819,7 +811,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -828,21 +820,18 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
 	return ex ;
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
-
-static int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s {<pattern>|-} [<file(s)> ...] "
 	    "[-af <afile>] [-f <n>]\n" ;
@@ -854,19 +843,10 @@ static int usage(PROGINFO *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
-
-static int procargs(pip,aip,bop,sip,ofn,ifn,afn)
-PROGINFO	*pip ;
-ARGINFO		*aip ;
-bits		*bop ;
-SEARCHINFO	*sip ;
-const char	*ofn ;
-const char	*ifn ;
-const char	*afn ;
-{
+local int procargs(PI *pip,AI *aip,bits *bop,SI *sip,
+		cc *ofn,cc *ifn,cc *afn) noex {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -879,7 +859,7 @@ const char	*afn ;
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    int		pan = 0 ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (rs >= 0) {
 	        int	ai ;
@@ -908,7 +888,7 @@ const char	*afn ;
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -957,27 +937,23 @@ const char	*afn ;
 	}
 
 	return rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
-
-/* process a file */
-static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
-{
-	LOCINFO		*lip = pip->lip ;
+local int procfile(PI *pip,SI *sip,void *ofp,cchar *fname) noex {
+	LI		*lip = pip->lip ;
 	SHIO		ifile, *ifp = &ifile ;
 	int		rs ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if ((fname[0] == '\0') || (strcmp(fname,"-") == 0))
 	    fname = STDFNIN ;
 
 	if ((rs = shio_open(ifp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		sl, cl ;
-	    const char	*sp, *cp ;
+	    cchar	*sp, *cp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	    while ((rs = shio_readline(ifp,lbuf,llen)) > 0) {
@@ -1016,8 +992,8 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 /* skip forward past and field terminators or white space */
 
 	            while (sl > 0) {
-	                const int	sch = MKCHAR(*sp) ;
-			int		f_b = TRUE ;
+	                cint	sch = MKCHAR(*sp) ;
+			int	f_b = true ;
 			f_b = f_b && (! CHAR_ISWHITE(sch)) ;
 	                f_b = f_b && (! BATST(fterms,sch)) ;
 			if (f_b) break ;
@@ -1030,7 +1006,7 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 	            if (sip->fn > 0) {
 	                FIELD		fsb ;
 	                int		fl ;
-	                const char	*fp ;
+	                cchar	*fp ;
 	                if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	                    int	i = 0 ;
 
@@ -1045,20 +1021,18 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 
 	                        if (! lip->fl.empty) {
 	                            if (fl > 0) i += 1 ;
-	                        } else
+	                        } else {
 	                            i += 1 ;
-
+				}
 	                    } /* end while */
-
 	                    if (fl >= 0) {
-	                        f = TRUE ;
+	                        f = true ;
 	                        rs = shio_print(ofp,fp,fl) ;
 	                    }
-
 	                    field_finish(&fsb) ;
 	                } /* end if (field) */
 	            } else {
-	                f = TRUE ;
+	                f = true ;
 	                rs = shio_print(ofp,sp,sl) ;
 	            }
 
@@ -1073,26 +1047,20 @@ static int procfile(PROGINFO *pip,SEARCHINFO *sip,void *ofp,cchar fname[])
 	} /* end if (file-input) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (procfile) */
+} /* end subroutine (procfile) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+local int locinfo_start(LI *lip,PI *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == NULL) return SR_FAULT ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 	lip->pip = pip ;
 
 	return rs ;
-}
-/* end subroutine (locinfo_start) */
+} /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+local int locinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 = 0 ; /* lint */
 
@@ -1101,20 +1069,17 @@ static int locinfo_finish(LOCINFO *lip)
 #if	CF_LOCSETENT
 	rs1 = vecstr_finish(&lip->stores) ;
 	if (rs >= 0) rs = rs1 ;
-	lip->open.stores = FALSE ;
+	lip->open.stores = false ;
 #else
 	if (rs1 < 0) rs = rs1 ; /* lint */
 #endif
 
 	return rs ;
-}
-/* end subroutine (locinfo_finish) */
-
+} /* end subroutine (locinfo_finish) */
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
-	VECSTR		*slp ;
+local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
+	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -1144,7 +1109,6 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_setentry) */
+} /* end subroutine (locinfo_setentry) */
 #endif /* CF_LOCSETENT */
 
