@@ -72,7 +72,7 @@
 int progsvcargs(pip,alp,args)
 struct proginfo	*pip ;
 vecstr		*alp ;
-const char	args[] ;
+cchar	args[] ;
 {
 	FIELD	fsb ;
 
