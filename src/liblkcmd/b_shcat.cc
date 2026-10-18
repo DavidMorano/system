@@ -130,35 +130,35 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procsetcase(PROGINFO *,cchar *,int) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
-static int	procfile(PROGINFO *,void *,cchar *) ;
-static int	procfile_outer(PROGINFO *,SHIO *,char *,int,SHIO *) ;
-static int	procfile_reg(PROGINFO *,SHIO *,char *,int,SHIO *) ;
-static int	procdata(PROGINFO *,char *,int) ;
-static int	proclinebuf(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procsetcase(PROGINFO *,cchar *,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+local int	procfile(PROGINFO *,void *,cchar *) ;
+local int	procfile_outer(PROGINFO *,SHIO *,char *,int,SHIO *) ;
+local int	procfile_reg(PROGINFO *,SHIO *,char *,int,SHIO *) ;
+local int	procdata(PROGINFO *,char *,int) ;
+local int	proclinebuf(PROGINFO *,SHIO *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_termoutbegin(LOCINFO *,void *) ;
-static int	locinfo_termoutend(LOCINFO *) ;
-static int	locinfo_termoutprint(LOCINFO *,void *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_termoutbegin(LOCINFO *,void *) ;
+local int	locinfo_termoutend(LOCINFO *) ;
+local int	locinfo_termoutprint(LOCINFO *,void *,cchar *,int) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	findnl(cchar *,int) ;
+local int	findnl(cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -210,7 +210,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"cvtcase",
 	"cc",
 	"casecvt",
@@ -242,7 +242,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*cases[] = {
+static cchar	*cases[] = {
 	"upper",
 	"lower",
 	"fold",
@@ -284,7 +284,7 @@ int p_shcat(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -378,7 +378,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -588,7 +588,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -946,7 +946,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -971,7 +971,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1079,14 +1079,14 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procsetcase(PROGINFO *pip,cchar *vp,int vl)
+local int procsetcase(PROGINFO *pip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		ci ;
 
 	if ((ci = matostr(cases,1,vp,vl)) >= 0) {
 	    LOCINFO	*lip = pip->lip ;
-	    const int	ch = CHAR_TOLC(vp[0]) ;
+	    cint	ch = CHAR_TOLC(vp[0]) ;
 	    switch (ch) {
 	    case 'l':
 	        lip->fl.cvtlc = TRUE ;
@@ -1110,7 +1110,7 @@ static int procsetcase(PROGINFO *pip,cchar *vp,int vl)
 /* end subroutine (procsetcase) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 		cchar *ofn,cchar *ifn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
@@ -1170,7 +1170,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 	            if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	            if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
 	                while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1234,11 +1234,11 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,
 
 
 /* process a file */
-static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
+local int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		infile, *ifp = &infile ;
-	const int	to_open = pip->to_open ;
+	cint	to_open = pip->to_open ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1276,7 +1276,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 	    if (f_fifo) fbuf[i++] = 'n' ;
 	    fbuf[i] = '\0' ;
 	    if ((rs = shio_opene(ifp,fname,fbuf,0666,to_open)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        if ((rs >= 0) && f_fifo)
@@ -1314,7 +1314,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 	} /* end if (ok) */
 
 	if (pip->debuglevel > 0) {
-	    const int	v = ((rs >= 0) ? wlen : rs) ;
+	    cint	v = ((rs >= 0) ? wlen : rs) ;
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: file=%s (%d)\n" ;
 	    shio_printf(pip->efp,fmt,pn,fname,v) ;
@@ -1330,10 +1330,10 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 /* end subroutine (procfile) */
 
 
-static int procfile_outer(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
+local int procfile_outer(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	vlevel = pip->verboselevel ;
+	cint	vlevel = pip->verboselevel ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		wlen = 0 ;
@@ -1376,10 +1376,10 @@ static int procfile_outer(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
 /* end if (procfile_outer) */
 
 
-static int procfile_reg(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
+local int procfile_reg(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	vlevel = pip->verboselevel ;
+	cint	vlevel = pip->verboselevel ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		wlen = 0 ;
@@ -1441,7 +1441,7 @@ static int procfile_reg(PROGINFO *pip,SHIO *ofp,char *lbuf,int llen,SHIO *ifp)
 /* end subroutine (procfile_reg) */
 
 
-static int procdata(PROGINFO *pip,char *lbuf,int llen)
+local int procdata(PROGINFO *pip,char *lbuf,int llen)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1475,7 +1475,7 @@ static int procdata(PROGINFO *pip,char *lbuf,int llen)
 /* end subroutine (procdata) */
 
 
-static int proclinebuf(PROGINFO *pip,SHIO *ofp,cchar *sbuf,int slen)
+local int proclinebuf(PROGINFO *pip,SHIO *ofp,cchar *sbuf,int slen)
 {
 	int		rs = SR_OK ;
 	int		sl = slen ;
@@ -1513,7 +1513,7 @@ static int proclinebuf(PROGINFO *pip,SHIO *ofp,cchar *sbuf,int slen)
 /* end subroutine (proclinebuf) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	cchar		*varterm = VARTERM ;
@@ -1530,7 +1530,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1549,7 +1549,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1586,7 +1586,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
+local int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1625,7 +1625,7 @@ static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 /* end subroutine (locinfo_termoutbegin) */
 
 
-static int locinfo_termoutend(LOCINFO *lip)
+local int locinfo_termoutend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1641,7 +1641,7 @@ static int locinfo_termoutend(LOCINFO *lip)
 /* end subroutine (locinfo_termoutend) */
 
 
-static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar *lbuf,int llen)
+local int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar *lbuf,int llen)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
@@ -1686,7 +1686,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar *lbuf,int llen)
 /* end subroutine (locinfo_termoutprint) */
 
 
-static int findnl(cchar *sp,int sl)
+local int findnl(cchar *sp,int sl)
 {
 	int		i = 0 ;
 	int		f = FALSE ;
