@@ -150,7 +150,7 @@ local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -198,7 +198,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"linelen",
 	"indent",
 	NULL
@@ -221,7 +221,7 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"linefold",
 	"linefill",
 	"fmt",
@@ -402,7 +402,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -576,7 +576,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -807,8 +807,8 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if ((rs = locinfo_linelen(lip,argval)) >= 0) {
 	        if ((rs = locinfo_indent(lip)) >= 0) {
 		    if (pip->debuglevel > 0) {
-			const int	lw = lip->linelen ;
-			const int	ind = lip->indent ;
+			cint	lw = lip->linelen ;
+			cint	ind = lip->indent ;
 			cchar	*pn = pip->progname ;
 			cchar	*fmt ;
 			fmt = "%s: linelen=%u\n" ;
@@ -1036,7 +1036,7 @@ local int procopts(PROGINFO *pip,keyopt *kop)
 
 local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
-	const int	ilen = (8*LINEBUFLEN) ;
+	cint	ilen = (8*LINEBUFLEN) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1083,7 +1083,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	            if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
 	                while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1192,7 +1192,7 @@ local int procfill(PROGINFO *pip,void *ofp,char *ibuf,int ilen,cchar *fn)
 	    WORDFILL	w ;
 	    int		f_par = FALSE ;
 	    if ((rs = wordfill_start(&w,ibuf,0)) >= 0) {
-		const int	tcols = TABCOLS ;
+		cint	tcols = TABCOLS ;
 		int		icols = -1 ;
 	        int		cl ;
 	        cchar		*cp ;
@@ -1260,7 +1260,7 @@ local int procfill(PROGINFO *pip,void *ofp,char *ibuf,int ilen,cchar *fn)
 local int procfilldump(PROGINFO *pip,void *ofp,WORDFILL *wp,int icols)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	clen = CBUFLEN ;
+	cint	clen = CBUFLEN ;
 	int		rs = SR_OK ;
 	int		lcols ;
 	int		cl ;
@@ -1334,7 +1334,7 @@ local int procfold(PROGINFO *pip,void *ofp,char *ibuf,int ilen,cchar *fn)
 	if (fn[0] == '-') fn = STDFNIN ;
 
 	if ((rs = shio_open(ifp,fn,"r",0666)) >= 0) {
-	    const int	lw = lip->linelen ;
+	    cint	lw = lip->linelen ;
 	    while ((rs = shio_readline(ifp,ibuf,ilen)) > 0) {
 		int	len = rs ;
 		int	cols ;
@@ -1441,7 +1441,7 @@ local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 
 #ifdef	COMMENT
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1478,13 +1478,13 @@ local int procuserinfo_logid(PROGINFO *pip)
 	if ((rs = lib_runmode()) >= 0) {
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
