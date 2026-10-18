@@ -44,7 +44,10 @@ module ;
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modsnwcpy ;
@@ -90,13 +93,13 @@ int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	                rs = sncpy1(dp,dl,sp) ;
 	            } else {
 	                rs = intconv(strwcpy(dp,sp,sl) - dp) ;
-		    }
+		    } /* end */
 	        } else {
 	            rs = sncpy1(dp,dl,sp) ;
-	        }
+	        } /* end */
 	    } else {
 	        rs = intconv(strwcpy(dp,sp,sl) - dp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (snwcpy) */
