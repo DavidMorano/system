@@ -85,6 +85,7 @@
 #include	<vecobj.h>
 #include	<msfile.h>
 #include	<msflag.h>		/* |MSFLAG_{x}| */
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -158,51 +159,51 @@ struct lav {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,VECSTR *,cchar *) ;
-static int	procloads(PROGINFO *,vecstr *,cchar *,int) ;
-static int	procload(PROGINFO *,vecstr *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,VECSTR *,cchar *) ;
+local int	procloads(PROGINFO *,vecstr *,cchar *,int) ;
+local int	procload(PROGINFO *,vecstr *,cchar *,int) ;
 
-static int	procout(PROGINFO *,VECSTR *,int,int (*cmpfunc)(),
+local int	procout(PROGINFO *,VECSTR *,int,int (*cmpfunc)(),
 			cchar *,cchar *) ;
-static int	procmsfile(PROGINFO *,VECSTR *,VECOBJ *,void *,
+local int	procmsfile(PROGINFO *,VECSTR *,VECOBJ *,void *,
 			cchar *,int,int) ;
-static int	procnode(PROGINFO *,vecobj *,SHIO *,MSFILE *,int,cchar *) ;
-static int	printout(PROGINFO *,SHIO *,VECOBJ *) ;
-static int	printnode(PROGINFO *,void *,MSFILE_ENT *) ;
-static int	printnodeage(PROGINFO *,void *,MSFILE_ENT *) ;
+local int	procnode(PROGINFO *,vecobj *,SHIO *,MSFILE *,int,cchar *) ;
+local int	printout(PROGINFO *,SHIO *,VECOBJ *) ;
+local int	printnode(PROGINFO *,void *,MSFILE_ENT *) ;
+local int	printnodeage(PROGINFO *,void *,MSFILE_ENT *) ;
 
-static int	calcmu(uint,uint) ;
+local int	calcmu(uint,uint) ;
 
 #if	(CF_FLOAT == 0)
-static int	mklav(struct lav *,uint) ;
+local int	mklav(struct lav *,uint) ;
 #endif
 
-static int	cmp_utime(), cmpr_utime() ;
-static int	cmp_stime(), cmpr_stime() ;
-static int	cmp_dtime(), cmpr_dtime() ;
-static int	cmp_la1m(), cmpr_la1m() ;
-static int	cmp_speed(), cmpr_speed() ;
-static int	cmp_pmt(), cmpr_pmt() ;
-static int	cmp_pma(), cmpr_pma() ;
-static int	cmp_ncpu(), cmpr_ncpu() ;
+local int	cmp_utime(), cmpr_utime() ;
+local int	cmp_stime(), cmpr_stime() ;
+local int	cmp_dtime(), cmpr_dtime() ;
+local int	cmp_la1m(), cmpr_la1m() ;
+local int	cmp_speed(), cmpr_speed() ;
+local int	cmp_pmt(), cmpr_pmt() ;
+local int	cmp_pma(), cmpr_pma() ;
+local int	cmp_ncpu(), cmpr_ncpu() ;
 
 #if	CF_DEBUGS || CF_DEBUG
-static int	debugmse(MSFILE_ENT *) ;
+local int	debugmse(MSFILE_ENT *) ;
 #endif
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -270,7 +271,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"quiet",
 	"speedname",
 	"speedint",
@@ -290,7 +291,7 @@ enum progopts {
 	progopt_overlast
 } ;
 
-static const char	*sortkeys[] = {
+static cchar	*sortkeys[] = {
 	"none",
 	"utime",
 	"stime",
@@ -322,7 +323,7 @@ enum sortkeys {
 	sortkey_overlast
 } ;
 
-static const char	*prognames[] = {
+static cchar	*prognames[] = {
 	"msinfo",
 	"msage",
 	NULL
@@ -379,7 +380,7 @@ int p_msinfo(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -477,7 +478,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -729,7 +730,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1184,7 +1185,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1204,7 +1205,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1312,7 +1313,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,VECSTR *nnp,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,VECSTR *nnp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1347,7 +1348,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,VECSTR *nnp,cchar *afn)
 	    if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1387,7 +1388,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,VECSTR *nnp,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procloads(PROGINFO *pip,vecstr *nnp,cchar *lbuf,int llen)
+local int procloads(PROGINFO *pip,vecstr *nnp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1410,7 +1411,7 @@ static int procloads(PROGINFO *pip,vecstr *nnp,cchar *lbuf,int llen)
 /* end subroutine (procloads) */
 
 
-static int procload(PROGINFO *pip,vecstr *nnp,cchar *sp,int sl)
+local int procload(PROGINFO *pip,vecstr *nnp,cchar *sp,int sl)
 {
 	int		rs ;
 	rs = vecstr_adduniq(nnp,sp,sl) ;
@@ -1420,7 +1421,7 @@ static int procload(PROGINFO *pip,vecstr *nnp,cchar *sp,int sl)
 /* end subroutine (procload) */
 
 
-static int procout(pip,nnp,ski,cmpfunc,msfn,ofn)
+local int procout(pip,nnp,ski,cmpfunc,msfn,ofn)
 PROGINFO	*pip ;
 vecstr		*nnp ;
 int		ski ;
@@ -1438,7 +1439,7 @@ cchar		*ofn ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 	    VECOBJ	entries ;
-	    const int	esize = sizeof(MSFILE_ENT) ;
+	    cint	esize = sizeof(MSFILE_ENT) ;
 
 	    if ((rs = vecobj_start(&entries,esize,DEFNODES,0)) >= 0) {
 	        int	msflags = 0 ;
@@ -1496,7 +1497,7 @@ cchar		*ofn ;
 /* end subroutine (procout) */
 
 
-static int procmsfile(pip,nnp,elp,ofp,msfname,oflags,msflags)
+local int procmsfile(pip,nnp,elp,ofp,msfname,oflags,msflags)
 PROGINFO	*pip ;
 VECSTR		*nnp ;
 VECOBJ		*elp ;
@@ -1629,7 +1630,7 @@ int		oflags ;
 /* end subroutine (procmsfile) */
 
 
-static int procnode(pip,elp,ofp,msp,msflags,name)
+local int procnode(pip,elp,ofp,msp,msflags,name)
 PROGINFO	*pip ;
 vecobj		*elp ;
 SHIO		*ofp ;
@@ -1672,7 +1673,7 @@ cchar		name[] ;
 /* end subroutine (procnode) */
 
 
-static int printout(pip,ofp,elp)
+local int printout(pip,ofp,elp)
 PROGINFO	*pip ;
 SHIO		*ofp ;
 VECOBJ		*elp ;
@@ -1714,7 +1715,7 @@ VECOBJ		*elp ;
 /* end subroutine (printout) */
 
 
-static int printnodeage(pip,ofp,ep)
+local int printnodeage(pip,ofp,ep)
 PROGINFO	*pip ;
 void		*ofp ;
 MSFILE_ENT	*ep ;
@@ -1734,7 +1735,7 @@ MSFILE_ENT	*ep ;
 /* end subroutine (printnodeage) */
 
 
-static int printnode(pip,ofp,ep)
+local int printnode(pip,ofp,ep)
 PROGINFO	*pip ;
 void		*ofp ;
 MSFILE_ENT	*ep ;
@@ -1765,11 +1766,11 @@ MSFILE_ENT	*ep ;
 
 	    t = (time_t) ep->atime ;
 	    wl += shio_printf(ofp,"  access=%s\n",
-	        timestr_logz(t,timebuf)) ;
+	        strtime_logz(t,timebuf)) ;
 
 	    t = (time_t) ep->utime ;
 	    wl += shio_printf(ofp,"  update=%s\n",
-	        timestr_logz(t,timebuf)) ;
+	        strtime_logz(t,timebuf)) ;
 
 	} else if (pip->fl.nodeonly) {
 
@@ -1807,7 +1808,7 @@ MSFILE_ENT	*ep ;
 	        MIN(ep->pmtotal,999999),
 	        MIN(ep->pmavail,999999),
 	        mu,
-	        timestr_log(t,timebuf)) ;
+	        strtime_log(t,timebuf)) ;
 
 #else /* CF_FLOAT */
 	    {
@@ -1832,7 +1833,7 @@ MSFILE_ENT	*ep ;
 	            MIN(ep->pmtotal,999999),
 	            MIN(ep->pmavail,999999),
 	            mu,
-	            timestr_log(t,timebuf)) ;
+	            strtime_log(t,timebuf)) ;
 
 	    } /* end block */
 #endif /* CF_FLOAT */
@@ -1844,7 +1845,7 @@ MSFILE_ENT	*ep ;
 /* end subroutine (printnode) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1856,7 +1857,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1874,7 +1875,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1925,7 +1926,7 @@ int calcmu(uint t,uint a)
 
 #if	(CF_FLOAT == 0)
 
-static int mklav(struct lav *lp,uint v)
+local int mklav(struct lav *lp,uint v)
 {
 	uint		vint, vfract, vround ;
 	uint		mask ;
@@ -1961,7 +1962,7 @@ static int mklav(struct lav *lp,uint v)
 #endif /* (CF_FLOAT == 0) */
 
 
-static int cmp_utime(void **e1pp,void **e2pp)
+local int cmp_utime(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -1980,7 +1981,7 @@ static int cmp_utime(void **e1pp,void **e2pp)
 /* end subroutine (cmp_utime) */
 
 
-static int cmpr_utime(void **e1pp,void **e2pp)
+local int cmpr_utime(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -1999,7 +2000,7 @@ static int cmpr_utime(void **e1pp,void **e2pp)
 /* end subroutine (cmpr_utime) */
 
 
-static int cmp_stime(void **e1pp,void **e2pp)
+local int cmp_stime(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2018,7 +2019,7 @@ static int cmp_stime(void **e1pp,void **e2pp)
 /* end subroutine (cmp_stime) */
 
 
-static int cmpr_stime(void **e1pp,void **e2pp)
+local int cmpr_stime(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2037,7 +2038,7 @@ static int cmpr_stime(void **e1pp,void **e2pp)
 /* end subroutine (cmpr_stime) */
 
 
-static int cmp_dtime(void **e1pp,void **e2pp)
+local int cmp_dtime(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2056,7 +2057,7 @@ static int cmp_dtime(void **e1pp,void **e2pp)
 /* end subroutine (cmp_dtime) */
 
 
-static int cmpr_dtime(void **e1pp,void **e2pp)
+local int cmpr_dtime(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2075,7 +2076,7 @@ static int cmpr_dtime(void **e1pp,void **e2pp)
 /* end subroutine (cmpr_dtime) */
 
 
-static int cmp_la1m(void **e1pp,void **e2pp)
+local int cmp_la1m(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2094,7 +2095,7 @@ static int cmp_la1m(void **e1pp,void **e2pp)
 /* end subroutine (cmp_la1m) */
 
 
-static int cmpr_la1m(void **e1pp,void **e2pp)
+local int cmpr_la1m(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2114,7 +2115,7 @@ static int cmpr_la1m(void **e1pp,void **e2pp)
 /* end subroutine (cmpr_la1m) */
 
 
-static int cmp_speed(void **e1pp,void **e2pp)
+local int cmp_speed(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2133,7 +2134,7 @@ static int cmp_speed(void **e1pp,void **e2pp)
 /* end subroutine (cmp_speed) */
 
 
-static int cmpr_speed(void **e1pp,void **e2pp)
+local int cmpr_speed(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2152,7 +2153,7 @@ static int cmpr_speed(void **e1pp,void **e2pp)
 /* end subroutine (cmpr_speed) */
 
 
-static int cmp_pmt(void **e1pp,void **e2pp)
+local int cmp_pmt(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2171,7 +2172,7 @@ static int cmp_pmt(void **e1pp,void **e2pp)
 /* end subroutine (cmp_pmt) */
 
 
-static int cmpr_pmt(void **e1pp,void **e2pp)
+local int cmpr_pmt(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2190,7 +2191,7 @@ static int cmpr_pmt(void **e1pp,void **e2pp)
 /* end subroutine (cmpr_pmt) */
 
 
-static int cmp_pma(void **e1pp,void **e2pp)
+local int cmp_pma(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2209,7 +2210,7 @@ static int cmp_pma(void **e1pp,void **e2pp)
 /* end subroutine (cmp_pma) */
 
 
-static int cmpr_pma(void **e1pp,void **e2pp)
+local int cmpr_pma(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2228,7 +2229,7 @@ static int cmpr_pma(void **e1pp,void **e2pp)
 /* end subroutine (cmpr_pma) */
 
 
-static int cmp_ncpu(void **e1pp,void **e2pp)
+local int cmp_ncpu(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2247,7 +2248,7 @@ static int cmp_ncpu(void **e1pp,void **e2pp)
 /* end subroutine (cmp_ncpu) */
 
 
-static int cmpr_ncpu(void **e1pp,void **e2pp)
+local int cmpr_ncpu(void **e1pp,void **e2pp)
 {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
@@ -2267,7 +2268,7 @@ static int cmpr_ncpu(void **e1pp,void **e2pp)
 
 
 #if	CF_DEBUGS || CF_DEBUG
-static int debugmse(MSFILE_ENT *ep)
+local int debugmse(MSFILE_ENT *ep)
 {
 	debugprintf("b_msinfo/debugmse: node=%s ncpu=%d nproc=%d\n",
 	    ep->nodename,ep->ncpu,ep->nproc) ;
