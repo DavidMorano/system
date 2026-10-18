@@ -70,14 +70,14 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<tmtime.hh>
 #include	<sntmtime.h>
 #include	<bits.h>
@@ -99,8 +99,10 @@
 #include	<strwcpy.h>
 #include	<strx.h>
 #include	<char.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -190,17 +192,7 @@ extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	proguserlist_begin(PROGINFO *) ;
 extern int	proguserlist_end(PROGINFO *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 extern char	*strdcpycompact(char *,int,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 
 /* external variables */
@@ -265,82 +257,82 @@ struct outinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *,paramopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,cchar *) ;
-static int	procnames(PROGINFO *,paramopt *,cchar *,cchar *,int) ;
-static int	procmaildirs(PROGINFO *,paramopt *) ;
-static int	procmaildir(PROGINFO *,paramopt *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *,paramopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,cchar *) ;
+local int	procnames(PROGINFO *,paramopt *,cchar *,cchar *,int) ;
+local int	procmaildirs(PROGINFO *,paramopt *) ;
+local int	procmaildir(PROGINFO *,paramopt *,cchar *,int) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 
-static int	procourconf_begin(PROGINFO *,paramopt *,cchar *) ;
-static int	procourconf_end(PROGINFO *) ;
+local int	procourconf_begin(PROGINFO *,paramopt *,cchar *) ;
+local int	procourconf_end(PROGINFO *) ;
 
-static int	procmailusers(PROGINFO *,paramopt *) ;
-static int	procmailusers_env(PROGINFO *,cchar *) ;
-static int	procmailusers_arg(PROGINFO *,paramopt *) ;
-static int	procmailusers_def(PROGINFO *) ;
-static int	procmailusers_add(PROGINFO *,cchar *,int) ;
+local int	procmailusers(PROGINFO *,paramopt *) ;
+local int	procmailusers_env(PROGINFO *,cchar *) ;
+local int	procmailusers_arg(PROGINFO *,paramopt *) ;
+local int	procmailusers_def(PROGINFO *) ;
+local int	procmailusers_add(PROGINFO *,cchar *,int) ;
 
-static int	process(PROGINFO *pip,paramopt *,cchar *) ;
-static int	procmailboxes(PROGINFO *,paramopt *) ;
-static int	procmailbox(PROGINFO *,cchar *,cchar *) ;
-static int	procmailmsg(PROGINFO *,cchar *,MBCACHE *,int) ;
-static int	procout(PROGINFO *,void *) ;
-static int	procouter(PROGINFO *,void *,HDRDECODE *,MSGENTRY *) ;
+local int	process(PROGINFO *pip,paramopt *,cchar *) ;
+local int	procmailboxes(PROGINFO *,paramopt *) ;
+local int	procmailbox(PROGINFO *,cchar *,cchar *) ;
+local int	procmailmsg(PROGINFO *,cchar *,MBCACHE *,int) ;
+local int	procout(PROGINFO *,void *) ;
+local int	procouter(PROGINFO *,void *,HDRDECODE *,MSGENTRY *) ;
 
-static int	sfnormfrom(cchar *,int) ;
+local int	sfnormfrom(cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_nshow(LOCINFO *,cchar *) ;
-static int	locinfo_logprintf(LOCINFO *,cchar *,...) ;
-static int	locinfo_optdate(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_nshow(LOCINFO *,cchar *) ;
+local int	locinfo_logprintf(LOCINFO *,cchar *,...) ;
+local int	locinfo_optdate(LOCINFO *,cchar *,int) ;
 
 #if	CF_LOCEPRINTF
-static int	locinfo_eprintf(LOCINFO *,cchar *,...) ;
+local int	locinfo_eprintf(LOCINFO *,cchar *,...) ;
 #endif /* CF_LOCEPRINTF */
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif /* CF_LOCSETENT */
 
-static int	config_start(CONFIG *,PROGINFO *,paramopt *,cchar *) ;
-static int	config_findfile(CONFIG *,char *,cchar *) ;
-static int	config_cookbegin(CONFIG *) ;
-static int	config_cookend(CONFIG *) ;
-static int	config_read(CONFIG *) ;
-static int	config_finish(CONFIG *) ;
-static int	config_setlfname(CONFIG *,cchar *,int) ;
+local int	config_start(CONFIG *,PROGINFO *,paramopt *,cchar *) ;
+local int	config_findfile(CONFIG *,char *,cchar *) ;
+local int	config_cookbegin(CONFIG *) ;
+local int	config_cookend(CONFIG *) ;
+local int	config_read(CONFIG *) ;
+local int	config_finish(CONFIG *) ;
+local int	config_setlfname(CONFIG *,cchar *,int) ;
 
 #if	CF_CONFIGCHECK
-static int	config_check(CONFIG *) ;
+local int	config_check(CONFIG *) ;
 #endif /* CF_CONFIGCHECK */
 
-static int	msgentry_start(MSGENTRY *,cchar *,time_t,cchar *,
+local int	msgentry_start(MSGENTRY *,cchar *,time_t,cchar *,
 			cchar **,cint *) ;
-static int	msgentry_finish(MSGENTRY *) ;
-static int	msgentry_from(MSGENTRY *,cchar **) ;
-static int	msgentry_subj(MSGENTRY *,cchar **) ;
+local int	msgentry_finish(MSGENTRY *) ;
+local int	msgentry_from(MSGENTRY *,cchar **) ;
+local int	msgentry_subj(MSGENTRY *,cchar **) ;
 
-static int	outinfo_start(OUTINFO *,MSGENTRY *,int,int) ;
-static int	outinfo_finish(OUTINFO *) ;
-static int	outinfo_trans(OUTINFO *,HDRDECODE *) ;
-static int	outinfo_cvt(OUTINFO *,HDRDECODE *,char *,int,cchar *,int,int) ;
-static int	outinfo_calc(OUTINFO *) ;
-static int	outinfo_total(OUTINFO *) ;
-static int	outinfo_print(OUTINFO *,PROGINFO *,void *,int) ;
+local int	outinfo_start(OUTINFO *,MSGENTRY *,int,int) ;
+local int	outinfo_finish(OUTINFO *) ;
+local int	outinfo_trans(OUTINFO *,HDRDECODE *) ;
+local int	outinfo_cvt(OUTINFO *,HDRDECODE *,char *,int,cchar *,int,int) ;
+local int	outinfo_calc(OUTINFO *) ;
+local int	outinfo_total(OUTINFO *) ;
+local int	outinfo_print(OUTINFO *,PROGINFO *,void *,int) ;
 
-static int	mkmsfname(char *,cchar *,int,cchar *) ;
+local int	mkmsfname(char *,cchar *,int,cchar *) ;
 
-static int	vcmpfor(cvoid *,cvoid *) ;
-static int	vcmprev(cvoid *,cvoid *) ;
+local int	vcmpfor(cvoid *,cvoid *) ;
+local int	vcmprev(cvoid *,cvoid *) ;
 
 
 /* local variables */
@@ -504,7 +496,7 @@ int p_mailnew(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* local subroutines */
 
 /* ARGSUSED */
-static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
+local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -1259,7 +1251,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1280,7 +1272,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop,paramopt *app)
+local int procopts(PROGINFO *pip,keyopt *kop,paramopt *app)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1369,7 +1361,7 @@ static int procopts(PROGINFO *pip,keyopt *kop,paramopt *app)
 /* end subroutine (procopts) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1409,7 +1401,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1420,7 +1412,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -1447,7 +1439,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 /* end subroutine (procuserinfo_logid) */
 
 
-static int procourconf_begin(PROGINFO *pip,paramopt *app,cchar cfname[])
+local int procourconf_begin(PROGINFO *pip,paramopt *app,cchar cfname[])
 {
 	cint	csize = sizeof(CONFIG) ;
 	int		rs = SR_OK ;
@@ -1484,7 +1476,7 @@ static int procourconf_begin(PROGINFO *pip,paramopt *app,cchar cfname[])
 /* end subroutine (procourconf_begin) */
 
 
-static int procourconf_end(PROGINFO *pip)
+local int procourconf_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1509,7 +1501,7 @@ static int procourconf_end(PROGINFO *pip)
 /* end subroutine (procourconf_end) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
 		cchar *afn)
 {
 	int		rs = SR_OK ;
@@ -1581,7 +1573,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *app,
 /* end subroutine (procargs) */
 
 
-static int procnames(PROGINFO *pip,paramopt *app,cchar *po,cchar *lbuf,int llen)
+local int procnames(PROGINFO *pip,paramopt *app,cchar *po,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1605,7 +1597,7 @@ static int procnames(PROGINFO *pip,paramopt *app,cchar *po,cchar *lbuf,int llen)
 /* end subroutine (procnames) */
 
 
-static int process(PROGINFO *pip,paramopt *app,cchar *ofn)
+local int process(PROGINFO *pip,paramopt *app,cchar *ofn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1649,7 +1641,7 @@ static int process(PROGINFO *pip,paramopt *app,cchar *ofn)
 
 
 /* process the mailbox */
-static int procmailboxes(PROGINFO *pip,paramopt *app)
+local int procmailboxes(PROGINFO *pip,paramopt *app)
 {
 	LOCINFO		*lip = pip->lip ;
 	paramopt_cur	cur ;
@@ -1704,7 +1696,7 @@ static int procmailboxes(PROGINFO *pip,paramopt *app)
 /* end subroutine (procmailboxes) */
 
 
-static int procmailbox(PROGINFO *pip,cchar *un,cchar *msfname)
+local int procmailbox(PROGINFO *pip,cchar *un,cchar *msfname)
 {
 	MAILBOX		mb ;
 	cint	mbopts = MAILBOX_ORDONLY ;
@@ -1763,7 +1755,7 @@ static int procmailbox(PROGINFO *pip,cchar *un,cchar *msfname)
 /* end subroutine (procmailbox) */
 
 
-static int procmailmsg(PROGINFO *pip,cchar *un,MBCACHE *mcp,int mi)
+local int procmailmsg(PROGINFO *pip,cchar *un,MBCACHE *mcp,int mi)
 {
 	LOCINFO		*lip = pip->lip ;
 	MBCACHE_SCAN	*msp ;
@@ -1842,7 +1834,7 @@ static int procmailmsg(PROGINFO *pip,cchar *un,MBCACHE *mcp,int mi)
 /* end subroutine (procmailmsg) */
 
 
-static int procmaildirs(PROGINFO *pip,paramopt *pop)
+local int procmaildirs(PROGINFO *pip,paramopt *pop)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -1892,7 +1884,7 @@ static int procmaildirs(PROGINFO *pip,paramopt *pop)
 /* end subroutine (procmaildirs) */
 
 
-static int procmaildir(PROGINFO *pip,paramopt *pop,cchar *dp,int dl)
+local int procmaildir(PROGINFO *pip,paramopt *pop,cchar *dp,int dl)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -1920,7 +1912,7 @@ static int procmaildir(PROGINFO *pip,paramopt *pop,cchar *dp,int dl)
 /* end subroutine (procmaildir) */
 
 
-static int procmailusers(PROGINFO *pip,paramopt *app)
+local int procmailusers(PROGINFO *pip,paramopt *app)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1961,7 +1953,7 @@ static int procmailusers(PROGINFO *pip,paramopt *app)
 /* end subroutine (procmailusers) */
 
 
-static int procmailusers_env(PROGINFO *pip,cchar *var)
+local int procmailusers_env(PROGINFO *pip,cchar *var)
 {
 	int		rs = SR_OK ;
 	int		sl, cl ;
@@ -2004,7 +1996,7 @@ static int procmailusers_env(PROGINFO *pip,cchar *var)
 /* end subroutine (procmailusers_env) */
 
 
-static int procmailusers_arg(PROGINFO *pip,paramopt *app)
+local int procmailusers_arg(PROGINFO *pip,paramopt *app)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -2041,7 +2033,7 @@ static int procmailusers_arg(PROGINFO *pip,paramopt *app)
 /* end subroutine (procmailusers_arg) */
 
 
-static int procmailusers_def(PROGINFO *pip)
+local int procmailusers_def(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	vecstr		*mlp ;
@@ -2082,7 +2074,7 @@ static int procmailusers_def(PROGINFO *pip)
 /* end subroutine (procmailusers_def) */
 
 
-static int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
+local int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
 {
 	LOCINFO		*lip = pip->lip ;
 	vecstr		*mlp = &lip->mailusers ;
@@ -2105,7 +2097,7 @@ static int procmailusers_add(PROGINFO *pip,cchar *dp,int dl)
 /* end subroutine (procmailusers_add) */
 
 
-static int procout(PROGINFO *pip,void *ofp)
+local int procout(PROGINFO *pip,void *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2155,7 +2147,7 @@ static int procout(PROGINFO *pip,void *ofp)
 /* end subroutine (procout) */
 
 
-static int procouter(PROGINFO *pip,void *ofp,HDRDECODE *hdp,MSGENTRY *mep)
+local int procouter(PROGINFO *pip,void *ofp,HDRDECODE *hdp,MSGENTRY *mep)
 {
 	LOCINFO		*lip = pip->lip ;
 	OUTINFO		oi ;
@@ -2204,7 +2196,7 @@ static int procouter(PROGINFO *pip,void *ofp,HDRDECODE *hdp,MSGENTRY *mep)
 /* end subroutine (procouter) */
 
 
-static int outinfo_start(OUTINFO *oip,MSGENTRY *mep,int ll,int dl)
+local int outinfo_start(OUTINFO *oip,MSGENTRY *mep,int ll,int dl)
 {
 	int		rs = SR_OK ;
 
@@ -2218,7 +2210,7 @@ static int outinfo_start(OUTINFO *oip,MSGENTRY *mep,int ll,int dl)
 /* end subroutine (outinfo_start) */
 
 
-static int outinfo_finish(OUTINFO *oip)
+local int outinfo_finish(OUTINFO *oip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2253,7 +2245,7 @@ static int outinfo_finish(OUTINFO *oip)
 /* end subroutine (outinfo_finish) */
 
 
-static int outinfo_trans(OUTINFO *oip,HDRDECODE *hdp)
+local int outinfo_trans(OUTINFO *oip,HDRDECODE *hdp)
 {
 	MSGENTRY	*mep = oip->mep ;
 	int		rs = SR_OK ;
@@ -2323,7 +2315,7 @@ static int outinfo_trans(OUTINFO *oip,HDRDECODE *hdp)
 /* end subroutine (outinfo_trans) */
 
 
-static int outinfo_cvt(OUTINFO *oip,HDRDECODE *hdp,
+local int outinfo_cvt(OUTINFO *oip,HDRDECODE *hdp,
 		char *rbuf,int rlen,cchar *sp,int sl,int c) 
 {
 	cint	wsize = ((sl+1) * sizeof(wchar_t)) ;
@@ -2359,7 +2351,7 @@ static int outinfo_cvt(OUTINFO *oip,HDRDECODE *hdp,
 /* end if (outinfo_cvt) */
 
 
-static int outinfo_calc(OUTINFO *oip)
+local int outinfo_calc(OUTINFO *oip)
 {
 	MSGENTRY	*mep = oip->mep ;
 	int		rs = SR_OK ;
@@ -2424,7 +2416,7 @@ static int outinfo_calc(OUTINFO *oip)
 /* end if (outinfo_calc) */
 
 
-static int outinfo_total(OUTINFO *oip)
+local int outinfo_total(OUTINFO *oip)
 {
 	int	len = (1+3+3) ; /* non-field columns in output string */
 	len += (oip->dl+oip->ul+oip->fl+oip->sl) ;
@@ -2433,7 +2425,7 @@ static int outinfo_total(OUTINFO *oip)
 /* end if (outinfo_total) */
 
 
-static int outinfo_print(OUTINFO *oip,PROGINFO *pip,void *ofp,int olen)
+local int outinfo_print(OUTINFO *oip,PROGINFO *pip,void *ofp,int olen)
 {
 	int		rs ;
 	int		rs1 ;
@@ -2483,11 +2475,11 @@ static int outinfo_print(OUTINFO *oip,PROGINFO *pip,void *ofp,int olen)
 
 	        if (pip->debuglevel > 0) {
 		    fmt = "%s: %s u=%s date=%s\n" ;
-	            timestr_logz(pip->daytime,tbuf) ;
+	            strtime_logz(pip->daytime,tbuf) ;
 	            shio_printf(pip->efp,fmt,pn,tbuf,un,db) ;
 	        }
 
-	        timestr_logz(pip->daytime,tbuf) ;
+	        strtime_logz(pip->daytime,tbuf) ;
 	        locinfo_logprintf(lip,"%s u=%s time=%s",tbuf,un,db) ;
 	        locinfo_logprintf(lip,"  from=»%r«",fb,fl) ;
 	        locinfo_logprintf(lip,"  subj=»%r«",sb,sl) ;
@@ -2507,7 +2499,7 @@ static int outinfo_print(OUTINFO *oip,PROGINFO *pip,void *ofp,int olen)
 /* end subroutine (outinfo_print) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs ;
 
@@ -2537,7 +2529,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2580,7 +2572,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	vecstr		*slp ;
 	int		rs = SR_OK ;
@@ -2636,7 +2628,7 @@ int locinfo_nshow(LOCINFO *lip,cchar *sp)
 /* end subroutine (locinfo_nshow) */
 
 
-static int locinfo_optdate(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_optdate(LOCINFO *lip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	if (vl > 0) {
@@ -2655,7 +2647,7 @@ static int locinfo_optdate(LOCINFO *lip,cchar *vp,int vl)
 
 
 #if	CF_LOCEPRINTF
-static int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
+local int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2671,7 +2663,7 @@ static int locinfo_eprintf(LOCINFO *lip,cchar *fmt,...)
 #endif /* CF_LOCEPRINTF */
 
 
-static int locinfo_logprintf(LOCINFO *lip,cchar *fmt,...)
+local int locinfo_logprintf(LOCINFO *lip,cchar *fmt,...)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2687,7 +2679,7 @@ static int locinfo_logprintf(LOCINFO *lip,cchar *fmt,...)
 
 
 /* configuration management */
-static int config_start(CONFIG *csp,PROGINFO *pip,paramopt *app,cchar *cfname)
+local int config_start(CONFIG *csp,PROGINFO *pip,paramopt *app,cchar *cfname)
 {
 	int		rs = SR_OK ;
 	char		tbuf[MAXPATHLEN+1] = { 0 } ;
@@ -2738,7 +2730,7 @@ static int config_start(CONFIG *csp,PROGINFO *pip,paramopt *app,cchar *cfname)
 /* end subroutine (config_start) */
 
 
-static int config_findfile(CONFIG *op,char tbuf[],cchar cfname[])
+local int config_findfile(CONFIG *op,char tbuf[],cchar cfname[])
 {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
@@ -2789,7 +2781,7 @@ static int config_findfile(CONFIG *op,char tbuf[],cchar cfname[])
 /* end subroutine (config_findfile) */
 
 
-static int config_cookbegin(CONFIG *op)
+local int config_cookbegin(CONFIG *op)
 {
 	PROGINFO	*pip = op->pip ;
 	int		rs ;
@@ -2856,7 +2848,7 @@ static int config_cookbegin(CONFIG *op)
 /* end subroutine (config_cookbegin) */
 
 
-static int config_cookend(CONFIG *op)
+local int config_cookend(CONFIG *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2872,7 +2864,7 @@ static int config_cookend(CONFIG *op)
 /* end subroutine (config_cookend) */
 
 
-static int config_finish(CONFIG *csp)
+local int config_finish(CONFIG *csp)
 {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
@@ -2901,7 +2893,7 @@ static int config_finish(CONFIG *csp)
 
 
 #if	CF_CONFIGCHECK
-static int config_check(CONFIG *op)
+local int config_check(CONFIG *op)
 {
 	PROGINFO	*pip = op->pip ;
 	int		rs = SR_OK ;
@@ -2918,7 +2910,7 @@ static int config_check(CONFIG *op)
 #endif /* CF_CONFIGCHECK */
 
 
-static int config_read(CONFIG *op)
+local int config_read(CONFIG *op)
 {
 	PROGINFO	*pip = op->pip ;
 	LOCINFO		*lip ;
@@ -3020,7 +3012,7 @@ static int config_read(CONFIG *op)
 /* end subroutine (config_read) */
 
 
-static int config_setlfname(CONFIG *cfp,cchar *vp,int vl)
+local int config_setlfname(CONFIG *cfp,cchar *vp,int vl)
 {
 	PROGINFO	*pip = cfp->pip ;
 	cchar	*pr ;
@@ -3046,7 +3038,7 @@ static int config_setlfname(CONFIG *cfp,cchar *vp,int vl)
 /* end subroutine (config_setlfname) */
 
 
-static int msgentry_start(mep,userp,t,datep,vs,vl)
+local int msgentry_start(mep,userp,t,datep,vs,vl)
 MSGENTRY	*mep ;
 cchar	*userp ;
 time_t		t ;
@@ -3110,7 +3102,7 @@ cint	vl[] ;
 /* end subroutine (msgentry_start) */
 
 
-static int msgentry_finish(MSGENTRY *mep)
+local int msgentry_finish(MSGENTRY *mep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -3126,7 +3118,7 @@ static int msgentry_finish(MSGENTRY *mep)
 /* end subroutine (msgentry_finish) */
 
 
-static int msgentry_from(MSGENTRY *mep,cchar **rpp)
+local int msgentry_from(MSGENTRY *mep,cchar **rpp)
 {
 	int		rs = SR_OK ;
 	int		cl ;
@@ -3146,7 +3138,7 @@ static int msgentry_from(MSGENTRY *mep,cchar **rpp)
 /* end subroutine (msgentry_from) */
 
 
-static int msgentry_subj(MSGENTRY *mep,cchar **rpp)
+local int msgentry_subj(MSGENTRY *mep,cchar **rpp)
 {
 	int		rs = SR_OK ;
 	int		cl ;
@@ -3166,7 +3158,7 @@ static int msgentry_subj(MSGENTRY *mep,cchar **rpp)
 /* end subroutine (msgentry_subj) */
 
 
-static int mkmsfname(char rbuf[],cchar mbuf[],int mlen,cchar *mup)
+local int mkmsfname(char rbuf[],cchar mbuf[],int mlen,cchar *mup)
 {
 	cint	rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
@@ -3192,7 +3184,7 @@ static int mkmsfname(char rbuf[],cchar mbuf[],int mlen,cchar *mup)
 /* end subroutine (mkmsfname) */
 
 
-static int sfnormfrom(cchar *fp,int fl)
+local int sfnormfrom(cchar *fp,int fl)
 {
 	cchar	*tp ;
 	if ((tp = strnchr(fp,fl,',')) != nullptr) {
@@ -3204,7 +3196,7 @@ static int sfnormfrom(cchar *fp,int fl)
 /* end subroutine (sfnormfrom) */
 
 
-static int vcmpfor(cvoid *v1pp,cvoid *v2pp)
+local int vcmpfor(cvoid *v1pp,cvoid *v2pp)
 {
 	MSGENTRY	**e1pp = (MSGENTRY **) v1pp ;
 	MSGENTRY	**e2pp = (MSGENTRY **) v2pp ;
@@ -3223,7 +3215,7 @@ static int vcmpfor(cvoid *v1pp,cvoid *v2pp)
 /* end subroutine (vcmpfor) */
 
 
-static int vcmprev(cvoid *v1pp,cvoid *v2pp)
+local int vcmprev(cvoid *v1pp,cvoid *v2pp)
 {
 	MSGENTRY	**e1pp = (MSGENTRY **) v1pp ;
 	MSGENTRY	**e2pp = (MSGENTRY **) v2pp ;
