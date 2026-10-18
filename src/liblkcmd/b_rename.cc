@@ -372,7 +372,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -498,7 +498,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -756,7 +756,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (rs >= 0) {
 	    vecstr	names ;
-	    const int	opts = VECSTR_OSTATIONARY | VECSTR_OREUSE ;
+	    cint	opts = VECSTR_OSTATIONARY | VECSTR_OREUSE ;
 	    if ((rs = vecstr_start(&names,20,opts)) >= 0) {
 	        if ((rs = procargs(pip,&ainfo,&pargs,&names,afname)) > 0) {
 	            if ((rs = vecstr_count(&names)) > 0) {
@@ -962,7 +962,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 		int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1035,7 +1035,7 @@ local int procnewnames(PROGINFO *pip,ARGVALS *avsp,vecstr *nlp)
 {
 	LOCINFO		*lip = pip->lip ;
 	vecstr		newnames ;
-	const int	opts = VECSTR_OSTATIONARY | VECSTR_OREUSE ;
+	cint	opts = VECSTR_OSTATIONARY | VECSTR_OREUSE ;
 	int		rs ;
 	int		rs1 ;
 
@@ -1143,7 +1143,7 @@ local int parsesort(PROGINFO *pip,cchar *vp,int vl)
 local int makefname(PROGINFO *pip,ARGVALS *sip,cchar *np,char *tbuf)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	dlen = DBUFLEN ;
+	cint	dlen = DBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		prec = sip->prec ;
@@ -1157,7 +1157,7 @@ local int makefname(PROGINFO *pip,ARGVALS *sip,cchar *np,char *tbuf)
 
 	if ((rs = locinfo_cvtstr(lip,dbuf,dlen,prec)) >= 0) {
 	    SBUF	pbuf ;
-	    const int	tlen = MAXPATHLEN ;
+	    cint	tlen = MAXPATHLEN ;
 	    int		dl = rs ;
 	    int		sl = -1 ;
 	    cchar	*tp ;
@@ -1268,7 +1268,7 @@ local int locinfo_setsuf(LOCINFO *lip,cchar *suf)
 	if (suf == NULL) {
 	    lip->suftype = suf_null ;
 	} else {
-	    const int	ch = MKCHAR(suf[0]) ;
+	    cint	ch = MKCHAR(suf[0]) ;
 	    switch (ch) {
 	    case 0:
 	        lip->suftype = suf_empty ;
@@ -1443,7 +1443,7 @@ local int zombiename_rename(ZOMBIENAME *op,cchar *fname,char *tmpfname)
 	}
 
 	if (rs >= 0) {
-	    const int	nrs = SR_NOTFOUND ;
+	    cint	nrs = SR_NOTFOUND ;
 
 	    for (n = op->n ; n < nprec ; n += 1) {
 	        if ((rs = mkfnamenum(tmpfname,op->prefix,DEFPREC,n)) >= 0) {
@@ -1484,7 +1484,7 @@ local int zombiename_finish(ZOMBIENAME *op)
 
 local int mkfnamenum(char *tmpfname,cchar *prefix,int prec,int fn)
 {
-	const int	dlen = DBUFLEN ;
+	cint	dlen = DBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	char		dbuf[DBUFLEN + 1] ;
