@@ -202,7 +202,7 @@ local int	hasweird(cchar *,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -260,7 +260,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"set",
 	"list",
 	"dump",
@@ -300,7 +300,7 @@ static const uchar	fterms[32] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char	*wstrs[] = {
+static cchar	*wstrs[] = {
 	"TZ",
 	"LANG",
 	"UMASK",
@@ -308,7 +308,7 @@ static const char	*wstrs[] = {
 	NULL
 } ;
 
-static const char	*pstrs[] = {
+static cchar	*pstrs[] = {
 	"LC_",
 	NULL
 } ;
@@ -444,7 +444,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -675,7 +675,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1060,7 +1060,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar		*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -1279,7 +1279,7 @@ cchar		*gfn ;
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1583,8 +1583,8 @@ local int procoutall(PROGINFO *pip,VAR *svp,void *ofp)
 
 	if ((rs = vecstr_start(klp,0,0)) >= 0) {
 	    VAR_CUR	cur ;
-	    const int	klen = KBUFLEN ;
-	    const int	vlen = VBUFLEN ;
+	    cint	klen = KBUFLEN ;
+	    cint	vlen = VBUFLEN ;
 	    int		kl ;
 	    int		vl ;
 	    char	kbuf[KBUFLEN + 1] ;
@@ -1659,7 +1659,7 @@ local int procgetfile(PROGINFO *pip,void *ofp,VAR *vfp,cchar gfname[])
 {
 	FIELD		fsb ;
 	SHIO		getfile, *gfp = &getfile ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len ;
@@ -1722,7 +1722,7 @@ local int procqkey(PROGINFO *pip,void *ofp,VAR *vfp,cchar *kp,int kl)
 {
 	LOCINFO		*lip = pip->lip ;
 	VAR_CUR		cur ;
-	const int	vlen = VBUFLEN ;
+	cint	vlen = VBUFLEN ;
 	int		rs = SR_OK ;
 	int		vl ;
 	int		n = 0 ;
@@ -1803,8 +1803,8 @@ local int procseter(PROGINFO *pip,cchar dbname[],gid_t gid)
 	HDBSTR_CUR	cur ;
 	VARMK		svars ;
 	const mode_t	om = 0664 ;
-	const int	n = DEFVARS ;
-	const int	of = 0 ;
+	cint	n = DEFVARS ;
+	cint	of = 0 ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -2105,7 +2105,7 @@ local int hasweird(cchar *sp,int sl)
 	int		f = FALSE ;
 
 	for (i = 0 ; (i != sl) && (sp[i] != '\0') ; i += 1) {
-	    const int	ch = MKCHAR(sp[i]) ;
+	    cint	ch = MKCHAR(sp[i]) ;
 	    f = ((! isalnumlatin(ch)) && (ch != '_')) ;
 	    if (f) break ;
 	} /* end if */
