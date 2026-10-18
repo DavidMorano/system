@@ -95,28 +95,33 @@ static maxpather	getrlen ;
 
 /* exported subroutines */
 
-int mknpath1w(char *pp,int pl,cc *s1,int sl) noex {
+int mknpath1w(char *pp,int pl,
+		cc *s1,int sl) noex {
 	return mknpathxw(pp,pl,1,s1,sl) ;
 } /* end subroutine (mknpath1w) */
 
-int mknpath2w(char *pp,int pl,cc *s1,cc *s2,int sl) noex {
+int mknpath2w(char *pp,int pl,
+		cc *s1,cc *s2,int sl) noex {
 	return mknpathxw(pp,pl,2,s1,s2,sl) ;
 } /* end subroutine (mknpath2w) */
 
-int mknpath3w(char *pp,int pl,cc *s1,cc *s2,cc *s3,int sl) noex {
+int mknpath3w(char *pp,int pl,
+		cc *s1,cc *s2,cc *s3,int sl) noex {
 	return mknpathxw(pp,pl,3,s1,s2,s3,sl) ;
 } /* end subroutine (mknpath3w) */
 
-int mknpath4w(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
+int mknpath4w(char *pp,int pl,
+		cc *s1,cc *s2,cc *s3,cc *s4,int sl) noex {
 	return mknpathxw(pp,pl,4,s1,s2,s3,s4,sl) ;
 } /* end subroutine (mknpath4w) */
 
-int mknpath5w(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
+int mknpath5w(char *pp,int pl,
+		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl) noex {
 	return mknpathxw(pp,pl,5,s1,s2,s3,s4,s5,sl) ;
 } /* end subroutine (mknpath5w) */
 
-int mknpath6w(char *pp,int pl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,
-		int sl) noex {
+int mknpath6w(char *pp,int pl,
+		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl) noex {
 	return mknpathxw(pp,pl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end subroutine (mknpath6w) */
 
