@@ -77,7 +77,7 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 
@@ -109,7 +109,7 @@ local int	mainsub(int,cchar **,cchar **,void *) ;
 
 local int	usage(PROGINFO *) ;
 
-local int	procoutopen(PROGINFO *,void *,const char *) ;
+local int	procoutopen(PROGINFO *,void *,cchar *) ;
 local int	procoutclose(PROGINFO *,void *) ;
 
 local int	procargs(PROGINFO *,ARGINFO *,bits *,paramopt *,
@@ -129,7 +129,7 @@ local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 
 /* local variables */
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"inetping",
 	NULL
 } ;
@@ -139,7 +139,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -191,7 +191,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"nooutput",
 	"scan",
 	NULL
@@ -272,15 +272,15 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pm = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*efname = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pm = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -336,7 +336,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -557,7 +557,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -588,7 +588,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 					paramopt	*pop = &aparams ;
-	                                const char	*po = PO_OPTION ;
+	                                cchar	*po = PO_OPTION ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
 	                        } else
@@ -761,7 +761,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (rs >= 0) {
 	if ((rs = paramopt_havekey(&aparams,PO_OPTION)) > 0) {
 	    paramopt_cur	cur ;
-	    const char		*po = PO_OPTION ;
+	    cchar		*po = PO_OPTION ;
 	    if ((rs = paramopt_curbegin(&aparams,&cur)) >= 0) {
 	        while (paramopt_curenumval(&aparams,po,&cur,&cp) >= 0) {
 	            if (cp == NULL) continue ;
@@ -901,8 +901,8 @@ local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<host(s)>] [-af <afile>] [-t <to>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -917,7 +917,7 @@ local int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-local int procoutopen(PROGINFO *pip,void *ofp,const char *ofname)
+local int procoutopen(PROGINFO *pip,void *ofp,cchar *ofname)
 {
 	int		rs = SR_OK ;
 	if (pip->verboselevel > 0) {
@@ -989,7 +989,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,paramopt *pop,
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
