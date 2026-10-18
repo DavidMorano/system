@@ -75,15 +75,15 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -97,22 +97,22 @@ extern char	**environ ;		/* definition required by AT&T AST */
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
 int		b_hexing(int,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procfiles(PROGINFO *,SHIO *,cchar *,int) ;
-static int	procfile(PROGINFO *,SHIO *,cchar *,int) ;
-static int	procencode(PROGINFO *,SHIO *,cchar *) ;
-static int	procdecode(PROGINFO *,SHIO *,cchar *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procfiles(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procfile(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procencode(PROGINFO *,SHIO *,cchar *) ;
+local int	procdecode(PROGINFO *,SHIO *,cchar *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -145,7 +145,7 @@ enum argopts {
 } ;
 
 #ifdef	COMMENT
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"follow",
 	"nofollow",
 	NULL
@@ -180,7 +180,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"hexing",
 	"hex",
 	"dehex",
@@ -271,7 +271,7 @@ int p_hexing(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
+local int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	ARGINFO		ainfo ;
@@ -294,15 +294,15 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	cchar		*pm = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -352,7 +352,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -561,7 +561,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -862,12 +862,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-pm <mode>] [<file(s)>] [-e]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -882,7 +882,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -931,7 +931,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -992,7 +992,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procfiles(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
+local int procfiles(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1015,7 +1015,7 @@ static int procfiles(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
 /* end subroutine (procfiles) */
 
 
-static int procfile(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
+local int procfile(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 {
 	NULSTR		n ;
 	int		rs ;
@@ -1058,7 +1058,7 @@ static int procfile(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 /* end subroutine (procfile) */
 
 
-static int procencode(PROGINFO *pip,SHIO *ofp,cchar *fn)
+local int procencode(PROGINFO *pip,SHIO *ofp,cchar *fn)
 {
 	SHIO		ifile, *ifp = &ifile ;
 	int		rs ;
@@ -1066,7 +1066,7 @@ static int procencode(PROGINFO *pip,SHIO *ofp,cchar *fn)
 	int		wlen = 0 ;
 	if ((fn == NULL) || (fn[0] == '-')) fn = STDFNIN ;
 	if ((rs = shio_open(ifp,fn,"r",0666)) >= 0) {
-	    const int	clen = pip->linelen ;
+	    cint	clen = pip->linelen ;
 	    int		ilen ;
 	    int		size = 0 ;
             char	*ibuf ;
@@ -1096,10 +1096,10 @@ static int procencode(PROGINFO *pip,SHIO *ofp,cchar *fn)
 /* end subroutine (procencode) */
 
 
-static int procdecode(PROGINFO *pip,SHIO *ofp,cchar *fn)
+local int procdecode(PROGINFO *pip,SHIO *ofp,cchar *fn)
 {
-	const int	llen = LINEBUFLEN ;
-	const int	olen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
+	cint	olen = LINEBUFLEN ;
 	int		size = 0 ;
 	int		rs ;
 	int		rs1 ;
