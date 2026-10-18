@@ -109,11 +109,11 @@ so:			$(T).so
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 
-$(T).so:		$(T).o
-	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(RUNINFO) $(LIBINFO)
-
 $(T).o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
+
+$(T).so:		$(T).o
+	$(CXX) -shared $(LDFLAGS) -o $@ $^ $(RUNINFO) $(LIBINFO)
 
 $(T).nm:		$(T).o
 	$(NM) $(NMFLAGS) $(T).o > $(T).nm
