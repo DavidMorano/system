@@ -94,14 +94,14 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -142,36 +142,36 @@ struct procout {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
 #if	CF_MAKEDATE
-static int	makedate_get(const char *,const char **) ;
+local int	makedate_get(cchar *,cchar **) ;
 #endif /* CF_MAKEDATE */
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
-static int	procfile(PROGINFO *,PROCOUT *,cchar *) ;
-static int	procdata(PROGINFO *,PROCOUT *,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
+local int	procfile(PROGINFO *,PROCOUT *,cchar *) ;
+local int	procdata(PROGINFO *,PROCOUT *,int) ;
 
-static int	procout_begin(PROGINFO *,PROCOUT *) ;
-static int	procout_write(PROGINFO *,PROCOUT *,cchar *,int) ;
-static int	procout_end(PROGINFO *,PROCOUT *) ;
-static int	procout_open(PROGINFO *,PROCOUT *) ;
-static int	procout_close(PROGINFO *,PROCOUT *) ;
+local int	procout_begin(PROGINFO *,PROCOUT *) ;
+local int	procout_write(PROGINFO *,PROCOUT *,cchar *,int) ;
+local int	procout_end(PROGINFO *,PROCOUT *) ;
+local int	procout_open(PROGINFO *,PROCOUT *) ;
+local int	procout_close(PROGINFO *,PROCOUT *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_defaults(LOCINFO *,cchar *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_defaults(LOCINFO *,cchar *) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"DEBUG",
@@ -260,7 +260,7 @@ int p_chunk(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -280,13 +280,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_makedate = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -339,7 +339,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -503,7 +503,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -831,7 +831,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -859,7 +859,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	PROCOUT		po ;
 	int		rs ;
@@ -902,7 +902,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -960,7 +960,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procfile(PROGINFO *pip,PROCOUT *pop,cchar *fn)
+local int procfile(PROGINFO *pip,PROCOUT *pop,cchar *fn)
 {
 	int		rs = SR_OK ;
 	int		ifd = FD_STDIN ;
@@ -1008,7 +1008,7 @@ static int procfile(PROGINFO *pip,PROCOUT *pop,cchar *fn)
 /* end subroutine (procfile) */
 
 
-static int procdata(PROGINFO *pip,PROCOUT *pop,int ifd)
+local int procdata(PROGINFO *pip,PROCOUT *pop,int ifd)
 {
 	ustat	sb ;
 	LOCINFO		*lip = pip->lip ;
@@ -1098,7 +1098,7 @@ static int procdata(PROGINFO *pip,PROCOUT *pop,int ifd)
 /* end subroutine (procdata) */
 
 
-static int procout_begin(PROGINFO *pip,PROCOUT *pop)
+local int procout_begin(PROGINFO *pip,PROCOUT *pop)
 {
 
 	if (pip == NULL) return SR_FAULT ;
@@ -1112,7 +1112,7 @@ static int procout_begin(PROGINFO *pip,PROCOUT *pop)
 /* end subroutine (procout_begin) */
 
 
-static int procout_end(PROGINFO *pip,PROCOUT *pop)
+local int procout_end(PROGINFO *pip,PROCOUT *pop)
 {
 	int		rs ;
 
@@ -1123,7 +1123,7 @@ static int procout_end(PROGINFO *pip,PROCOUT *pop)
 /* end subroutine (procout_end) */
 
 
-static int procout_write(PROGINFO *pip,PROCOUT *pop,cchar *obuf,int olen)
+local int procout_write(PROGINFO *pip,PROCOUT *pop,cchar *obuf,int olen)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1151,16 +1151,16 @@ static int procout_write(PROGINFO *pip,PROCOUT *pop,cchar *obuf,int olen)
 /* end subroutine (procout_write) */
 
 
-static int procout_open(PROGINFO *pip,PROCOUT *pop)
+local int procout_open(PROGINFO *pip,PROCOUT *pop)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	olen = MAXPATHLEN ;
+	cint	olen = MAXPATHLEN ;
 	int		rs ;
 	int		acount ;
-	const char	*pre ;
-	const char	*suf ;
-	const char	*fmt ;
-	const char	*cp ;
+	cchar	*pre ;
+	cchar	*suf ;
+	cchar	*fmt ;
+	cchar	*cp ;
 	char		obuf[MAXPATHLEN+1] ;
 
 	{
@@ -1189,7 +1189,7 @@ static int procout_open(PROGINFO *pip,PROCOUT *pop)
 /* end subroutine (procout_open) */
 
 
-static int procout_close(PROGINFO *pip,PROCOUT *pop)
+local int procout_close(PROGINFO *pip,PROCOUT *pop)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1208,7 +1208,7 @@ static int procout_close(PROGINFO *pip,PROCOUT *pop)
 /* end subroutine (procout_close) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1222,7 +1222,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1241,7 +1241,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1278,7 +1278,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int locinfo_defaults(LOCINFO *lip,cchar *argval)
+local int locinfo_defaults(LOCINFO *lip,cchar *argval)
 {
 	int		rs = SR_OK ;
 
@@ -1310,11 +1310,11 @@ static int locinfo_defaults(LOCINFO *lip,cchar *argval)
 
 
 /* get the date out of the ID string */
-static int makedate_get(cchar *md,cchar **rpp)
+local int makedate_get(cchar *md,cchar **rpp)
 {
 	int		ch ;
-	const char	*sp ;
-	const char	*cp ;
+	cchar	*sp ;
+	cchar	*cp ;
 
 	if (rpp != NULL) *rpp = NULL ;
 
