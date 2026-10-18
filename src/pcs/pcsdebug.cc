@@ -81,8 +81,8 @@
 /* external subroutines */
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strllen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strllen(cchar *,int,int) ;
 #endif
 
 
@@ -113,12 +113,12 @@ int pcsdebug_lockprint(PROGINFO *pip,cchar *place) noex {
 	    LOCINFO	*lip = pip->lip ;
 	    bfile	lf ;
 	    int		rs1 ;
-	    const char	*lockfname = lip->pidfname ;
+	    cchar	*lockfname = lip->pidfname ;
 	    if (place != NULL)
 	        debugprintf("pcsdebug_lockprint: place=%s\n",place) ;
 	    debugprintf("pcsdebug_lockprint: lockfname=%s\n",lockfname) ;
 	    if ((rs1 = bopen(&lf,lockfname,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN+1] ;
 	        while ((rs1 = breadln(&lf,lbuf,llen)) > 0) {
 	            int	ll = strllen(lbuf,rs1,60) ;
