@@ -202,71 +202,71 @@ struct locnote {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procmesg(PROGINFO *,SHIO *) ;
-static int	procmesgout(PROGINFO *,SHIO *,cchar *,ustat *) ;
-static int	procnotes(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *) ;
-static int	procnotesout(PROGINFO *,SHIO *) ;
-static int	procnoteouter(PROGINFO *,SHIO *,LOCNOTE *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
-static int	procargers(PROGINFO *,OSETSTR *) ;
-static int	procloadnames(PROGINFO *,OSETSTR *,cchar *,int) ;
-static int	procloadname(PROGINFO *,OSETSTR *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procmesg(PROGINFO *,SHIO *) ;
+local int	procmesgout(PROGINFO *,SHIO *,cchar *,ustat *) ;
+local int	procnotes(PROGINFO *,ARGINFO *,bits *,SHIO *,cchar *) ;
+local int	procnotesout(PROGINFO *,SHIO *) ;
+local int	procnoteouter(PROGINFO *,SHIO *,LOCNOTE *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
+local int	procargers(PROGINFO *,OSETSTR *) ;
+local int	procloadnames(PROGINFO *,OSETSTR *,cchar *,int) ;
+local int	procloadname(PROGINFO *,OSETSTR *,cchar *,int) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
-static int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_logid(PROGINFO *) ;
 
-static int	proclog_info(PROGINFO *) ;
+local int	proclog_info(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_defs(LOCINFO *) ;
-static int	locinfo_username(LOCINFO *) ;
-static int	locinfo_groupname(LOCINFO *) ;
-static int	locinfo_gmcurbegin(LOCINFO *,LOCINFO_GMCUR *) ;
-static int	locinfo_gmcurend(LOCINFO *,LOCINFO_GMCUR *) ;
-static int	locinfo_gmlook(LOCINFO *,LOCINFO_GMCUR *,cchar *,int) ;
-static int	locinfo_gmread(LOCINFO *,LOCINFO_GMCUR *,char *,int) ;
-static int	locinfo_rncurbegin(LOCINFO *,LOCINFO_RNCUR *) ;
-static int	locinfo_rncurend(LOCINFO *,LOCINFO_RNCUR *) ;
-static int	locinfo_rnlook(LOCINFO *,LOCINFO_RNCUR *,cchar *,int) ;
-static int	locinfo_rnread(LOCINFO *,LOCINFO_RNCUR *,char *,int) ;
-static int	locinfo_typesadds(LOCINFO *,cchar *,int) ;
-static int	locinfo_typesadder(LOCINFO *,cchar *,int) ;
-static int	locinfo_types(LOCINFO *) ;
-static int	locinfo_typesbegin(LOCINFO *) ;
-static int	locinfo_typesend(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_defs(LOCINFO *) ;
+local int	locinfo_username(LOCINFO *) ;
+local int	locinfo_groupname(LOCINFO *) ;
+local int	locinfo_gmcurbegin(LOCINFO *,LOCINFO_GMCUR *) ;
+local int	locinfo_gmcurend(LOCINFO *,LOCINFO_GMCUR *) ;
+local int	locinfo_gmlook(LOCINFO *,LOCINFO_GMCUR *,cchar *,int) ;
+local int	locinfo_gmread(LOCINFO *,LOCINFO_GMCUR *,char *,int) ;
+local int	locinfo_rncurbegin(LOCINFO *,LOCINFO_RNCUR *) ;
+local int	locinfo_rncurend(LOCINFO *,LOCINFO_RNCUR *) ;
+local int	locinfo_rnlook(LOCINFO *,LOCINFO_RNCUR *,cchar *,int) ;
+local int	locinfo_rnread(LOCINFO *,LOCINFO_RNCUR *,char *,int) ;
+local int	locinfo_typesadds(LOCINFO *,cchar *,int) ;
+local int	locinfo_typesadder(LOCINFO *,cchar *,int) ;
+local int	locinfo_types(LOCINFO *) ;
+local int	locinfo_typesbegin(LOCINFO *) ;
+local int	locinfo_typesend(LOCINFO *) ;
 #if	CF_TYPESCOUNT
-static int	locinfo_typescount(LOCINFO *) ;
+local int	locinfo_typescount(LOCINFO *) ;
 #endif
-static int	locinfo_typesmatch(LOCINFO *,int) ;
-static int	locinfo_termdevbegin(LOCINFO *) ;
-static int	locinfo_termdevend(LOCINFO *) ;
-static int	locinfo_notesbegin(LOCINFO *) ;
-static int	locinfo_notesend(LOCINFO *) ;
-static int	locinfo_notesfins(LOCINFO *) ;
-static int	locinfo_notes(LOCINFO *) ;
-static int	locinfo_notesarrange(LOCINFO *) ;
-static int	locinfo_noteload(LOCINFO *,KSHLIB_NOTE *) ;
-static int	locinfo_userbegin(LOCINFO *,OSETSTR *) ;
-static int	locinfo_userend(LOCINFO *) ;
-static int	locinfo_usermatch(LOCINFO *,OSETSTR *,cchar *) ;
-static int	locinfo_noteadm(LOCINFO *) ;
-static int	locinfo_setsort(LOCINFO *,cchar *,int) ;
-static int	locinfo_optdate(LOCINFO *,cchar *,int) ;
+local int	locinfo_typesmatch(LOCINFO *,int) ;
+local int	locinfo_termdevbegin(LOCINFO *) ;
+local int	locinfo_termdevend(LOCINFO *) ;
+local int	locinfo_notesbegin(LOCINFO *) ;
+local int	locinfo_notesend(LOCINFO *) ;
+local int	locinfo_notesfins(LOCINFO *) ;
+local int	locinfo_notes(LOCINFO *) ;
+local int	locinfo_notesarrange(LOCINFO *) ;
+local int	locinfo_noteload(LOCINFO *,KSHLIB_NOTE *) ;
+local int	locinfo_userbegin(LOCINFO *,OSETSTR *) ;
+local int	locinfo_userend(LOCINFO *) ;
+local int	locinfo_usermatch(LOCINFO *,OSETSTR *,cchar *) ;
+local int	locinfo_noteadm(LOCINFO *) ;
+local int	locinfo_setsort(LOCINFO *,cchar *,int) ;
+local int	locinfo_optdate(LOCINFO *,cchar *,int) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif /* CF_LOCSETENT */
 
-static int 	locnote_start(LOCNOTE *,KSHLIB_NOTE *) ;
-static int 	locnote_finish(LOCNOTE *) ;
+local int 	locnote_start(LOCNOTE *,KSHLIB_NOTE *) ;
+local int 	locnote_finish(LOCNOTE *) ;
 
 extern "C" {
     static void	ourfini() noex ;
@@ -477,7 +477,7 @@ int p_notes(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -1279,11 +1279,11 @@ badarg:
 /* end subroutine (mainsub) */
 
 /* execute this on module (shared-object) un-load */
-static void ourfini() noex {
+local void ourfini() noex {
 	percache_fini(&pc) ;
 }
 
-static int usage(PROGINFO *pip) noex {
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar	*pn = pip->progname ;
@@ -1307,7 +1307,7 @@ static int usage(PROGINFO *pip) noex {
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1403,7 +1403,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1446,7 +1446,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 
 
 /* process (sort out) this mesg */
-static int procmesg(PROGINFO *pip,SHIO *ofp)
+local int procmesg(PROGINFO *pip,SHIO *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1467,7 +1467,7 @@ static int procmesg(PROGINFO *pip,SHIO *ofp)
 /* end subroutine (procmesg) */
 
 
-static int procmesgout(PROGINFO *pip,SHIO *ofp,cchar *td,ustat *usbp)
+local int procmesgout(PROGINFO *pip,SHIO *ofp,cchar *td,ustat *usbp)
 {
 	LOCINFO		*lip = pip->lip ;
 	mode_t		newmode = usbp->st_mode ;
@@ -1583,7 +1583,7 @@ static int procmesgout(PROGINFO *pip,SHIO *ofp,cchar *td,ustat *usbp)
 /* end subroutine (procmesgout) */
 
 
-static int procnotes(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
+local int procnotes(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	cint	cmd = kshlibcmd_notecount ;
@@ -1617,7 +1617,7 @@ static int procnotes(PROGINFO *pip,ARGINFO *aip,bits *bop,SHIO *ofp,cchar *afn)
 /* end subroutine (procnotes) */
 
 
-static int procnotesout(PROGINFO *pip,SHIO *ofp)
+local int procnotesout(PROGINFO *pip,SHIO *ofp)
 {
 	LOCINFO		*lip = pip->lip ;
 	VECHAND		*klp ;
@@ -1652,7 +1652,7 @@ static int procnotesout(PROGINFO *pip,SHIO *ofp)
 /* end subroutine (procnoteeout) */
 
 
-static int procnoteouter(PROGINFO *pip,SHIO *ofp,LOCNOTE *onp)
+local int procnoteouter(PROGINFO *pip,SHIO *ofp,LOCNOTE *onp)
 {
 	LOCINFO		*lip = pip->lip ;
 	TMTIME		tm ;
@@ -1696,7 +1696,7 @@ static int procnoteouter(PROGINFO *pip,SHIO *ofp,LOCNOTE *onp)
 /* end subroutine (procnoteouter) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	OSETSTR		ss ;
 	cint	n = 20 ;
@@ -1793,7 +1793,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procargers(PROGINFO *pip,OSETSTR *osp)
+local int procargers(PROGINFO *pip,OSETSTR *osp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -1839,7 +1839,7 @@ static int procargers(PROGINFO *pip,OSETSTR *osp)
 /* end subroutine (procargers) */
 
 
-static int procloadnames(PROGINFO *pip,OSETSTR *nlp,cchar *sp,int sl)
+local int procloadnames(PROGINFO *pip,OSETSTR *nlp,cchar *sp,int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1868,7 +1868,7 @@ static int procloadnames(PROGINFO *pip,OSETSTR *nlp,cchar *sp,int sl)
 /* end subroutine (procloadnames) */
 
 
-static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
+local int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1966,7 +1966,7 @@ static int procloadname(PROGINFO *pip,OSETSTR *nlp,cchar np[],int nl)
 /* end subroutine (procloadname) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -2008,7 +2008,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2019,7 +2019,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PROGINFO *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -2050,7 +2050,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 /* end subroutine (procuserinfo_logid) */
 
 
-static int proclog_info(PROGINFO *pip)
+local int proclog_info(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2068,7 +2068,7 @@ static int proclog_info(PROGINFO *pip)
 /* end subroutine (proclog_info) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2084,7 +2084,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-static int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -2130,7 +2130,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -2167,7 +2167,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int locinfo_defs(LOCINFO *lip)
+local int locinfo_defs(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2196,7 +2196,7 @@ static int locinfo_defs(LOCINFO *lip)
 /* end subroutine (locinfo_defs) */
 
 
-static int locinfo_username(LOCINFO *lip)
+local int locinfo_username(LOCINFO *lip)
 {
 	int		rs ;
 	if (lip == nullptr) return SR_FAULT ;
@@ -2210,7 +2210,7 @@ static int locinfo_username(LOCINFO *lip)
 /* end subroutine (locinfo_username) */
 
 
-static int locinfo_groupname(LOCINFO *lip)
+local int locinfo_groupname(LOCINFO *lip)
 {
 	int		rs ;
 	if (lip == nullptr) return SR_FAULT ;
@@ -2224,7 +2224,7 @@ static int locinfo_groupname(LOCINFO *lip)
 /* end subroutine (locinfo_groupname) */
 
 
-static int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
+local int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
 {
 	int		rs = SR_OK ;
 
@@ -2246,7 +2246,7 @@ static int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
 /* end subroutine (locinfo_gmcurbegin) */
 
 
-static int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp)
+local int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2261,7 +2261,7 @@ static int locinfo_gmcurend(LOCINFO *lip,LOCINFO_GMCUR *curp)
 /* end subroutine (locinfo_gmcurend) */
 
 
-static int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
+local int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
 {
 	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
@@ -2280,7 +2280,7 @@ static int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
 /* end subroutine (locinfo_gmlook) */
 
 
-static int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char *ubuf,int ulen)
+local int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char *ubuf,int ulen)
 {
 	cint	rsn = SR_NOTFOUND ;
 	int		rs ;
@@ -2297,7 +2297,7 @@ static int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char *ubuf,int ulen)
 /* end subroutine (locinfo_gmread) */
 
 
-static int locinfo_rncurbegin(LOCINFO *lip,LOCINFO_RNCUR *curp)
+local int locinfo_rncurbegin(LOCINFO *lip,LOCINFO_RNCUR *curp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2328,7 +2328,7 @@ static int locinfo_rncurbegin(LOCINFO *lip,LOCINFO_RNCUR *curp)
 /* end subroutine (locinfo_rncurbegin) */
 
 
-static int locinfo_rncurend(LOCINFO *lip,LOCINFO_RNCUR *curp)
+local int locinfo_rncurend(LOCINFO *lip,LOCINFO_RNCUR *curp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2343,7 +2343,7 @@ static int locinfo_rncurend(LOCINFO *lip,LOCINFO_RNCUR *curp)
 /* end subroutine (locinfo_rncurend) */
 
 
-static int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
+local int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
 {
 	PROGINFO	*pip = lip->pip ;
 	cint	rsn = SR_NOTFOUND ;
@@ -2372,7 +2372,7 @@ static int locinfo_rnlook(LOCINFO *lip,LOCINFO_RNCUR *curp,cchar *gnp,int gnl)
 /* end subroutine (locinfo_rnlook) */
 
 
-static int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char ubuf[],int ulen)
+local int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char ubuf[],int ulen)
 {
 	PROGINFO	*pip = lip->pip ;
 	cint	rsn = SR_NOTFOUND ;
@@ -2399,7 +2399,7 @@ static int locinfo_rnread(LOCINFO *lip,LOCINFO_RNCUR *curp,char ubuf[],int ulen)
 /* end subroutine (locinfo_rnread) */
 
 
-static int locinfo_typesadds(LOCINFO *lip,cchar *argp,int argl)
+local int locinfo_typesadds(LOCINFO *lip,cchar *argp,int argl)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -2427,7 +2427,7 @@ static int locinfo_typesadds(LOCINFO *lip,cchar *argp,int argl)
 /* end subroutine (locinfo_typesadds) */
 
 
-static int locinfo_typesadder(LOCINFO *lip,cchar *sp,int sl)
+local int locinfo_typesadder(LOCINFO *lip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -2455,7 +2455,7 @@ static int locinfo_typesadder(LOCINFO *lip,cchar *sp,int sl)
 /* end subroutine (locinfo_typesadder) */
 
 
-static int locinfo_types(LOCINFO *lip)
+local int locinfo_types(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.types) {
@@ -2466,7 +2466,7 @@ static int locinfo_types(LOCINFO *lip)
 /* end subroutine (locinfo_types) */
 
 
-static int locinfo_typesbegin(LOCINFO *lip)
+local int locinfo_typesbegin(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.types) {
@@ -2479,7 +2479,7 @@ static int locinfo_typesbegin(LOCINFO *lip)
 /* end subroutine (locinfo_typesbegin) */
 
 
-static int locinfo_typesend(LOCINFO *lip)
+local int locinfo_typesend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2494,7 +2494,7 @@ static int locinfo_typesend(LOCINFO *lip)
 
 
 #if	CF_TYPESCOUNT
-static int locinfo_typescount(LOCINFO *lip)
+local int locinfo_typescount(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (lip->open.types) {
@@ -2506,7 +2506,7 @@ static int locinfo_typescount(LOCINFO *lip)
 #endif /* CF_TYPESCOUNT */
 
 
-static int locinfo_typesmatch(LOCINFO *lip,int v)
+local int locinfo_typesmatch(LOCINFO *lip,int v)
 {
 	int		rs = SR_OK ;
 	int		f = true ;
@@ -2521,7 +2521,7 @@ static int locinfo_typesmatch(LOCINFO *lip,int v)
 /* end subroutine (locinfo_typesmatch) */
 
 
-static int locinfo_termdevbegin(LOCINFO *lip)
+local int locinfo_termdevbegin(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -2553,7 +2553,7 @@ static int locinfo_termdevbegin(LOCINFO *lip)
 /* end subroutine (locinfo_termdevbegin) */
 
 
-static int locinfo_termdevend(LOCINFO *lip)
+local int locinfo_termdevend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (lip == nullptr) return SR_FAULT ;
@@ -2562,7 +2562,7 @@ static int locinfo_termdevend(LOCINFO *lip)
 /* end subroutine (locinfo_termdevend) */
 
 
-static int locinfo_notesbegin(LOCINFO *lip)
+local int locinfo_notesbegin(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.notes) {
@@ -2575,7 +2575,7 @@ static int locinfo_notesbegin(LOCINFO *lip)
 /* end subroutine (locinfo_notesbegin) */
 
 
-static int locinfo_notesend(LOCINFO *lip)
+local int locinfo_notesend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2591,7 +2591,7 @@ static int locinfo_notesend(LOCINFO *lip)
 /* end subroutine (locinfo_notesend) */
 
 
-static int locinfo_notesfins(LOCINFO *lip)
+local int locinfo_notesfins(LOCINFO *lip)
 {
 	vechand		*nlp = &lip->notes ;
 	LOCNOTE		*onp ;
@@ -2609,7 +2609,7 @@ static int locinfo_notesfins(LOCINFO *lip)
 /* end subroutine (locinfo_notesfins) */
 
 
-static int locinfo_notes(LOCINFO *lip)
+local int locinfo_notes(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (! lip->open.notes) {
@@ -2620,7 +2620,7 @@ static int locinfo_notes(LOCINFO *lip)
 /* end subroutine (locinfo_notes) */
 
 
-static int locinfo_noteload(LOCINFO *lip,KSHLIB_NOTE *knp)
+local int locinfo_noteload(LOCINFO *lip,KSHLIB_NOTE *knp)
 {
 	PROGINFO	*pip = lip->pip ;
 	LOCNOTE		*onp ;
@@ -2657,7 +2657,7 @@ static int locinfo_noteload(LOCINFO *lip,KSHLIB_NOTE *knp)
 /* end subroutine (locinfo_noteload) */
 
 
-static int locinfo_notesarrange(LOCINFO *lip)
+local int locinfo_notesarrange(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	if (lip->open.notes && lip->have.sort) {
@@ -2677,7 +2677,7 @@ static int locinfo_notesarrange(LOCINFO *lip)
 /* end subroutine (locinfo_notesarrange) */
 
 
-static int locinfo_userbegin(LOCINFO *lip,OSETSTR *osp)
+local int locinfo_userbegin(LOCINFO *lip,OSETSTR *osp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2698,7 +2698,7 @@ static int locinfo_userbegin(LOCINFO *lip,OSETSTR *osp)
 /* end subroutine (locinfo_userbegin) */
 
 
-static int locinfo_userend(LOCINFO *lip)
+local int locinfo_userend(LOCINFO *lip)
 {
 	if (lip == nullptr) return SR_FAULT ;
 	lip->nusers = 0 ;
@@ -2707,7 +2707,7 @@ static int locinfo_userend(LOCINFO *lip)
 /* end subroutine (locinfo_userend) */
 
 
-static int locinfo_usermatch(LOCINFO *lip,OSETSTR *osp,cchar *un)
+local int locinfo_usermatch(LOCINFO *lip,OSETSTR *osp,cchar *un)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2734,7 +2734,7 @@ static int locinfo_usermatch(LOCINFO *lip,OSETSTR *osp,cchar *un)
 /* end subroutine (locinfo_usermatch) */
 
 
-static int locinfo_noteadm(LOCINFO *lip)
+local int locinfo_noteadm(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -2779,7 +2779,7 @@ static int locinfo_noteadm(LOCINFO *lip)
 /* end subroutine (locinfo_noteadm) */
 
 
-static int locinfo_setsort(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_setsort(LOCINFO *lip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	if (! lip->done.sort) {
@@ -2800,7 +2800,7 @@ static int locinfo_setsort(LOCINFO *lip,cchar *vp,int vl)
 }
 /* end subroutine (locinfo_setsort) */
 
-static int locinfo_optdate(LOCINFO *lip,cchar *vp,int vl) noex {
+local int locinfo_optdate(LOCINFO *lip,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	if (vl > 0) {
 	    if (int oi ; (oi = matpstr(datetypes,1,vp,vl)) >= 0) {
@@ -2816,7 +2816,7 @@ static int locinfo_optdate(LOCINFO *lip,cchar *vp,int vl) noex {
 /* end subroutine (locinfo_optdate) */
 
 
-static int locnote_start(LOCNOTE *onp,KSHLIB_NOTE *knp)
+local int locnote_start(LOCNOTE *onp,KSHLIB_NOTE *knp)
 {
 	cint	ulen = SESMSG_USERLEN ;
 	int		rs ;
@@ -2833,7 +2833,7 @@ static int locnote_start(LOCNOTE *onp,KSHLIB_NOTE *knp)
 /* end subroutine (locnote_start) */
 
 
-static int locnote_finish(LOCNOTE *onp)
+local int locnote_finish(LOCNOTE *onp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2847,7 +2847,7 @@ static int locnote_finish(LOCNOTE *onp)
 /* end subroutine (locnote_finish) */
 
 
-static int vcmpfor(cvoid *v1pp,cvoid *v2pp)
+local int vcmpfor(cvoid *v1pp,cvoid *v2pp)
 {
 	LOCNOTE		**e1pp = (LOCNOTE **) v1pp ;
 	LOCNOTE		**e2pp = (LOCNOTE **) v2pp ;
@@ -2866,7 +2866,7 @@ static int vcmpfor(cvoid *v1pp,cvoid *v2pp)
 /* end subroutine (vcmpfor) */
 
 
-static int vcmprev(cvoid *v1pp,cvoid *v2pp)
+local int vcmprev(cvoid *v1pp,cvoid *v2pp)
 {
 	LOCNOTE		**e1pp = (LOCNOTE **) v1pp ;
 	LOCNOTE		**e2pp = (LOCNOTE **) v2pp ;
