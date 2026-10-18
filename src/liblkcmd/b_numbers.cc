@@ -100,7 +100,7 @@ enum numtypes {
 	numtype_overlast
 } ;
 
-static const char	*keys[] = {
+static cchar	*keys[] = {
 	"e",
 	"p",
 	"mp",
@@ -113,7 +113,7 @@ static const char	*keys[] = {
 } ;
 
 /* these map the above keys to their "numtypes" ('enum' farther above) */
-static const int	numkeys[] = {
+static cint	numkeys[] = {
 	numtype_exponetial,
 	numtype_permutations,
 	numtype_multipermutations,
@@ -220,23 +220,23 @@ int numpair::loadkey(cchar *sp,int sl) {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,SHIO *,cchar *,int) ;
-static int	procspec(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procspec(PROGINFO *,SHIO *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setotype(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setotype(LOCINFO *,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -260,7 +260,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"otype",
 	"output",
 	"hex",
@@ -314,7 +314,7 @@ enum otypes {
 	otype_overlast
 } ;
 
-static const char	*otypes[] = {
+static cchar	*otypes[] = {
 	"decimal",
 	"hexadecimal",
 	NULL
@@ -355,7 +355,7 @@ int p_numbers(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -442,7 +442,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -594,7 +594,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -917,7 +917,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	SHIO		*efp = (SHIO *) pip->efp ;
 	int		rs = SR_OK ;
@@ -939,7 +939,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
@@ -1004,7 +1004,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1050,7 +1050,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1111,7 +1111,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procspecs(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
+local int procspecs(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1135,7 +1135,7 @@ static int procspecs(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
 
 
 /* process a specification name */
-static int procspec(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
+local int procspec(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	numpair		query ;
@@ -1233,7 +1233,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 /* end subroutine (procspec) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	if (lip == NULL) return SR_FAULT ;
@@ -1245,7 +1245,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	if (lip == NULL) return SR_FAULT ;
 	return SR_OK ;
@@ -1253,7 +1253,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setotype(LOCINFO *lip,cchar *vp,int vl)
+local int locinfo_setotype(LOCINFO *lip,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	if (vp && vl) {
