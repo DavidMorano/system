@@ -1,12 +1,10 @@
-/* proghandle */
+/* proghandle SUPPORT */
 
 /* handle a connect request for a service */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time print-outs */
 #define	CF_DEBUG	0		/* run-time print-outs */
-
 
 /* revision history:
 
@@ -19,12 +17,13 @@
 
 /*******************************************************************************
 
-        This subrotuine processes a new connection that just came in. This
-        connection may have been passed to us by our own daemon or it may have
-        been passed to us by executing us with the connection on standard input.
+  	Description:
+	This subrotuine processes a new connection that just came
+	in. This connection may have been passed to us by our own
+	daemon or it may have been passed to us by executing us
+	with the connection on standard input.
 
 	We:
-
 	1) read the finer query
 	2) check if it is in our service table
 	3) check if it is a local username
@@ -33,12 +32,9 @@
         Note: Note (carefully) that zero-length service strings *are*
         acceptable. They cause a default service to be invoked.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -46,19 +42,22 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<csignal>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<vecstr.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
+#include	<isfd.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -104,26 +103,24 @@
 
 /* external subroutines */
 
-extern int	sisub(const char *,int,const char *) ;
+extern int	sisub(cchar *,int,cchar *) ;
 extern int	field_svcargs(FIELD *,VECSTR *) ;
-extern int	isasocket(int) ;
 
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
-			const char *,const char **) ;
+			cchar *,cchar **) ;
 
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* external variables */
@@ -131,8 +128,8 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	procsvcspec(struct proginfo *,struct clientinfo *,
-			char *,int,vecstr *,const char *,int) ;
+local int	procsvcspec(struct proginfo *,struct clientinfo *,
+			char *,int,vecstr *,cchar *,int) ;
 
 
 /* local variables */
@@ -161,7 +158,7 @@ struct clientinfo	*cip ;
 {
 	vecstr		svcargs ;
 
-	const int	svclen = SVCBUFLEN ;
+	cint	svclen = SVCBUFLEN ;
 
 	int	rs = SR_OK ;
 	int	ifd = cip->fd_input ;
@@ -171,15 +168,15 @@ struct clientinfo	*cip ;
 	int	to ;
 	int	f_socket = FALSE ;
 
-	const char	**sav ;
-	const char	*cp ;
+	cchar	**sav ;
+	cchar	*cp ;
 
 	char	svcspec[SVCSPECLEN + 1] ;
 	char	svcbuf[SVCBUFLEN + 1] ;
 
 
 	to = TO_READSVC ;
-	f_socket = isasocket(ifd) ;
+	f_socket = isfdsocket(ifd) ;
 
 /* pop off the service name */
 
@@ -257,13 +254,13 @@ bad0:
 /* local subroutines */
 
 
-static int procsvcspec(pip,cip,snbuf,snlen,sap,svcbuf,svclen)
+local int procsvcspec(pip,cip,snbuf,snlen,sap,svcbuf,svclen)
 struct proginfo		*pip ;
 struct clientinfo	*cip ;
 char			snbuf[] ;
 int			snlen ;
 vecstr			*sap ;
-const char		svcbuf[] ;
+cchar		svcbuf[] ;
 int			svclen ;
 {
 	FIELD	fsb ;
@@ -273,8 +270,8 @@ int			svclen ;
 	int	fl ;
 	int	len = 0 ;
 
-	const char	*ols = "/w" ;
-	const char	*fp ;
+	cchar	*ols = "/w" ;
+	cchar	*fp ;
 
 	char	fbuf[SVCSPECLEN + 1] ;
 
