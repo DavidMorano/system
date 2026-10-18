@@ -67,11 +67,11 @@
 
 /* external subroutines */
 
-extern int	securefile(const char *,uid_t,gid_t) ;
+extern int	securefile(cchar *,uid_t,gid_t) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -257,7 +257,7 @@ int progconf_read(PROGINFO *pip)
 	int		tl ;
 	int		v ;
 	int		f ;
-	const char	*kp, *vp ;
+	cchar	*kp, *vp ;
 	cchar		*pr = pip->pr ;
 	char		tbuf[MAXPATHLEN + 1] ;
 	char		pbuf[PBUFLEN + 1] ;
