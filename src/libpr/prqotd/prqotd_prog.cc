@@ -41,34 +41,34 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* system types |pid_t| */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strchr(3c)| */
-#include	<utility>		/* |pair(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<ucopen.h>
-#include	<ucdesc.h>
-#include	<ucfileop.h>
-#include	<vecstr.h>
-#include	<ascii.h>
-#include	<spawner.h>
-#include	<filer.h>
-#include	<logfile.h>
-#include	<ctdec.h>
-#include	<sfx.h>			/* |sfbasename(3uc)| */
-#include	<strn.h>		/* |strnwcpy(3uc)| */
-#include	<strx.h>
-#include	<strwcpy.h>
-#include	<isch.h>		/* |ispm(3uc)| */
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® system types |pid_t| */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<utility>		/* C++STD |pair(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
+#include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<spawner.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<sfx.h>			/* LIBUC |sfbasename(3uc)| */
+#include	<strn.h>		/* LIBUC |strnwcpy(3uc)| */
+#include	<strx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 #include	<libpr.h>		/* LIBPR */
 #include	<libdebug.h>		/* LIBDEBUG */
 
@@ -314,7 +314,7 @@ local int checker_findprog(CK *chp,char *rbuf,cchar *pp,int pl) noex {
 	DEBUGPRINTF("ent\n") ;
 	rbuf[0] = '\0' ;
 	if (pp[0] != '/') {
-	    if (ispm(pp[0]) || (pp[0] == '\0')) {
+	    if (ischpm(pp[0]) || (pp[0] == '\0')) {
 	        pp = PRQOTD_PROG ;
 	        pl = -1 ;
 	    }
@@ -393,7 +393,7 @@ int progrunner::proc() noex {
             cmode   om = 0664 ;
             cchar   *ap = av[0] ;
             if (ap) {
-                if (ispm(ap[0]) || (ap[0] == '\0')) {
+                if (ischpm(ap[0]) || (ap[0] == '\0')) {
 		    int		blen = maxname ;
                     char    *bp = argz ;
                     if (ap[0] == '-') {
