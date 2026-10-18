@@ -47,7 +47,7 @@
 #include	<vecstr.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
 #include	<pingstatdb.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"config.h"
@@ -125,7 +125,7 @@ int proghost(PI *pip,cc *name,int mpint,int to) noex {
 	    debugprintf("proghost: host=%s to=%d f_update=%d daytime=%s\n",
 	        name,to,
 	        f_update,
-	        timestr_log(pip->daytime,timebuf)) ;
+	        strtime_log(pip->daytime,timebuf)) ;
 	    debugprintf("proghost: mpint=%d\n",mpint) ;
 	}
 #endif
@@ -178,7 +178,7 @@ int proghost(PI *pip,cc *name,int mpint,int to) noex {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
 	            debugprintf("proghost: lastcheck=%s\n",
-	                timestr_log(lastcheck,timebuf)) ;
+	                strtime_log(lastcheck,timebuf)) ;
 #endif
 
 	        if ((pip->daytime - lastcheck) < mpint)
@@ -286,7 +286,7 @@ int proghost(PI *pip,cc *name,int mpint,int to) noex {
 
 		    if (pip->open.logprog) {
 	                logfile_printf(&pip->lh,"%s %s %s\n",
-	                    timestr_logz(pip->daytime,timebuf),
+	                    strtime_logz(pip->daytime,timebuf),
 	                    ((f_state1) ? "U" : "D"),
 	                    name) ;
 		    }
@@ -295,7 +295,7 @@ int proghost(PI *pip,cc *name,int mpint,int to) noex {
 
 	            if (pip->sumfp != nullptr) {
 	                rs = bprintf(pip->sumfp,"%s %s %s\n",
-	                    timestr_logz(pip->daytime,timebuf),
+	                    strtime_logz(pip->daytime,timebuf),
 	                    ((f_state1) ? "U" : "D"), name) ;
 	            } /* end if (summary file entry) */
 
@@ -338,13 +338,13 @@ int proghost(PI *pip,cc *name,int mpint,int to) noex {
 			et[0] = '\0' ;
 			if (pip->verboselevel >= 3) {
 			    fmt = "%*d %s %s (%s)\n",
-	                    timestr_elapsed(e,et) ;
+	                    strtime_elapsed(e,et) ;
 			}
 
 			rs = bprintf(pip->ofp,fmt,
 	                        RF_NUMDIGITS,pe.count,
-	                        timestr_log(pe.ti_change,ct),
-	                        timestr_log(pe.ti_ping,pt),
+	                        strtime_log(pe.ti_change,ct),
+	                        strtime_log(pe.ti_ping,pt),
 	                        et) ;
 
 	            } /* end if */
