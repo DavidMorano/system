@@ -72,6 +72,7 @@
 #include	<pwfile.h>
 #include	<grmems.h>
 #include	<sysrealname.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
@@ -1642,13 +1643,13 @@ cchar		hbuf[] ;
 	    debugprintf("display: ubuf=%s\n",ubuf) ;
 #endif
 
-	timestr_logz(ti_log,timebuf) ;
+	strtime_logz(ti_log,timebuf) ;
 	rs = shio_printf(ofp,fmt,ubuf,timebuf,line,hbuf) ;
 	wlen += rs ;
 
 	if ((rs >= 0) && (pip->verboselevel > 0)) {
 	    time_t	ti_diff = (time_t) (pip->daytime - ti_log) ;
-	    timestr_elapsed(ti_diff,timebuf) ;
+	    strtime_elapsed(ti_diff,timebuf) ;
 	    rs = shio_printf(ofp," (%s)",timebuf) ;
 	    wlen += rs ;
 	}
