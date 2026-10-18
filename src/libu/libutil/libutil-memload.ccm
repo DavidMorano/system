@@ -42,7 +42,7 @@ export {
 	    if (sl < 0) {
 	        cchar *cp = charp(sp) ;
 	        sl = intconv(strlen(cp)) ;
-	    }
+	    } /* end */
 	    if (sl > 0) {
 	        csize srcsize = size_t(sl) ;
 	        memcpy(dp,sp,srcsize) ;
