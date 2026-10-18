@@ -114,11 +114,11 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -146,7 +146,7 @@ struct locinfo {
 	TERMOUT		outer ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
-	const char	*termtype ;
+	cchar	*termtype ;
 	int		to ;
 	int		linelen ;
 } ;
@@ -162,41 +162,41 @@ struct liner {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procsetcase(PROGINFO *,const char *,int) ;
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procline(PROGINFO *,void *,cchar *,int) ;
-static int	procword(PROGINFO *,void *,const char *) ;
-static int	procdata(PROGINFO *,char *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procsetcase(PROGINFO *,cchar *,int) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procline(PROGINFO *,void *,cchar *,int) ;
+local int	procword(PROGINFO *,void *,cchar *) ;
+local int	procdata(PROGINFO *,char *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setlinelen(LOCINFO *) ;
-static int	locinfo_termoutbegin(LOCINFO *,void *) ;
-static int	locinfo_termoutend(LOCINFO *) ;
-static int	locinfo_termoutprint(LOCINFO *,void *,const char *,int) ;
-static int	locinfo_printd(LOCINFO *,void *,char *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setlinelen(LOCINFO *) ;
+local int	locinfo_termoutbegin(LOCINFO *,void *) ;
+local int	locinfo_termoutend(LOCINFO *) ;
+local int	locinfo_termoutprint(LOCINFO *,void *,cchar *,int) ;
+local int	locinfo_printd(LOCINFO *,void *,char *,int) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,const char **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	liner_start(LINER *,LOCINFO *,void *) ;
-static int	liner_finish(LINER *) ;
-static int	liner_addword(LINER *,const char *,int) ;
+local int	liner_start(LINER *,LOCINFO *,void *) ;
+local int	liner_finish(LINER *) ;
+local int	liner_addword(LINER *,cchar *,int) ;
 
 #if	CF_LINERCLEAR
-static int	liner_clear(LINER *) ;
+local int	liner_clear(LINER *) ;
 #endif
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -248,7 +248,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"cvtcase",
 	"cc",
 	"casecvt",
@@ -284,7 +284,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*cases[] = {
+static cchar	*cases[] = {
 	"upper",
 	"lower",
 	NULL
@@ -302,7 +302,7 @@ int b_dhtext(int argc,cchar *argv[],void *contextp) noex {
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -326,7 +326,7 @@ int p_dhtext(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -351,16 +351,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*tos_open = NULL ;
-	const char	*tos_read = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*tos_open = NULL ;
+	cchar	*tos_read = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -419,7 +419,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -630,7 +630,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -990,12 +990,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<word(s)> ...] [-af <afile>] [-of <ofile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1011,12 +1011,12 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1140,14 +1140,14 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procsetcase(PROGINFO *pip,cchar *vp,int vl)
+local int procsetcase(PROGINFO *pip,cchar *vp,int vl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		ci ;
 
 	if ((ci = matostr(cases,1,vp,vl)) >= 0) {
-	    const int	ch = CHAR_TOLC(vp[0]) ;
+	    cint	ch = CHAR_TOLC(vp[0]) ;
 	    switch (ch) {
 	    case 'l':
 	        lip->fl.cvtlc = TRUE ;
@@ -1167,10 +1167,10 @@ static int procsetcase(PROGINFO *pip,cchar *vp,int vl)
 /* end subroutine (procsetcase) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	SHIO		ofile, *ofp = &ofile ;
-	const int	to = pip->to_open ;
+	cint	to = pip->to_open ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1234,7 +1234,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	                afn = STDFNIN ;
 
 	            if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
 	                while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1286,7 +1286,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procline(PROGINFO *pip,void *ofp,cchar *lp,int ll)
+local int procline(PROGINFO *pip,void *ofp,cchar *lp,int ll)
 {
 	LOCINFO		*lip = pip->lip ;
 	LINER		l ;
@@ -1319,13 +1319,13 @@ static int procline(PROGINFO *pip,void *ofp,cchar *lp,int ll)
 
 
 /* process a file */
-static int procword(PROGINFO *pip,void *ofp,cchar *fname)
+local int procword(PROGINFO *pip,void *ofp,cchar *fname)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		infile, *ifp = &infile ;
-	const int	to_open = pip->to_open ;
-	const int	to_read = pip->to_read ;
-	const int	llen = LINEBUFLEN ;
+	cint	to_open = pip->to_open ;
+	cint	to_read = pip->to_read ;
+	cint	llen = LINEBUFLEN ;
 	volatile int	*intarr[3] ;
 	int		rs = SR_OK ;
 	int		len ;
@@ -1470,7 +1470,7 @@ ret0:
 /* end subroutine (procword) */
 
 
-static int procdata(PROGINFO *pip,char *bufline,int len)
+local int procdata(PROGINFO *pip,char *bufline,int len)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1502,10 +1502,10 @@ static int procdata(PROGINFO *pip,char *bufline,int len)
 /* end subroutine (procdata) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	const char	*varterm = VARTERM ;
+	cchar	*varterm = VARTERM ;
 
 	if (lip == NULL) return SR_FAULT ;
 
@@ -1521,7 +1521,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1540,7 +1540,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1577,7 +1577,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int locinfo_setlinelen(LOCINFO *lip)
+local int locinfo_setlinelen(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1599,7 +1599,7 @@ static int locinfo_setlinelen(LOCINFO *lip)
 /* end subroutine (locinfo_setlinelen) */
 
 
-static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
+local int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1625,7 +1625,7 @@ static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 /* end subroutine (locinfo_termoutbegin) */
 
 
-static int locinfo_termoutend(LOCINFO *lip)
+local int locinfo_termoutend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1641,7 +1641,7 @@ static int locinfo_termoutend(LOCINFO *lip)
 /* end subroutine (locinfo_termoutend) */
 
 
-static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
+local int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1662,7 +1662,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
-	                const int	maxcols = COLUMNS ;
+	                cint	maxcols = COLUMNS ;
 	                debugprintf("b_dhtext/locinfo_termoutprint: "
 	                    "maxcols=%u ll=%u\n",
 	                    maxcols,ll) ;
@@ -1694,7 +1694,7 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 /* end subroutine (locinfo_termoutprint) */
 
 
-static int locinfo_printd(LOCINFO *lip,void *ofp,char lbuf[],int llen)
+local int locinfo_printd(LOCINFO *lip,void *ofp,char lbuf[],int llen)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1725,7 +1725,7 @@ static int locinfo_printd(LOCINFO *lip,void *ofp,char lbuf[],int llen)
 /* end subroutine (locinfo_printd) */
 
 
-static int liner_start(LINER *lrp,LOCINFO *lip,void *ofp)
+local int liner_start(LINER *lrp,LOCINFO *lip,void *ofp)
 {
 	int		rs = SR_OK ;
 	int		llen ;
@@ -1749,7 +1749,7 @@ static int liner_start(LINER *lrp,LOCINFO *lip,void *ofp)
 /* end subroutine (liner_start) */
 
 
-static int liner_finish(LINER *lrp)
+local int liner_finish(LINER *lrp)
 {
 	LOCINFO		*lip = lrp->lip ;
 	int		rs = SR_OK ;
@@ -1774,7 +1774,7 @@ static int liner_finish(LINER *lrp)
 
 
 #if	CF_LINERCLEAR
-static int liner_clear(LINER *lrp)
+local int liner_clear(LINER *lrp)
 {
 	int		rs = SR_OK ;
 
@@ -1789,7 +1789,7 @@ static int liner_clear(LINER *lrp)
 #endif /* CF_LINERCLEAR */
 
 
-static int liner_addword(LINER *lrp,cchar *wp,int wl)
+local int liner_addword(LINER *lrp,cchar *wp,int wl)
 {
 	LOCINFO		*lip = lrp->lip ;
 	void		*ofp = lrp->ofp ;
