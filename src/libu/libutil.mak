@@ -52,7 +52,7 @@ OBJPART06= libutil-strcopy.o libutil-strcpy.o
 OBJPART07= libutil-memload.o libutil-strcmp.o
 
 OBJPART08= libutil-getbyte.o
-OBJPART09= libutil-memncpy.o libutil-memnset.o
+OBJPART09= libutil-memb.o
 OBJPART10= libutil-operators.o
 OBJPART11=
 
@@ -287,8 +287,7 @@ libutil-strcpy.o:	libutil-strcpy.ccm		$(DEPS)	$(INCS)
 libutil-strcopy.o:	libutil-strcopy.ccm		$(DEPS)	$(INCS)
 libutil-strcmp.o:	libutil-strcmp.ccm		$(DEPS)	$(INCS)
 libutil-getbyte.o:	libutil-getbyte.ccm		$(DEPS)	$(INCS)
-libutil-memncpy.o:	libutil-memncpy.ccm		$(DEPS)	$(INCS)
-libutil-memnset.o:	libutil-memnset.ccm		$(DEPS)	$(INCS)
+libutil-memb.o:		libutil-memb.ccm		$(DEPS)	$(INCS)
 libutil-operators.o:	libutil-operators.ccm		$(DEPS)	$(INCS)
 
 modcstring.o:		modcstring.dir
