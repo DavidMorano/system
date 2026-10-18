@@ -133,7 +133,7 @@ extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
@@ -511,7 +511,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -687,7 +687,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1108,7 +1108,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            cchar	**cd = caldirs ;
 	            cchar	**cn = calnames ;
 	            if ((rs = calyear_open(&lip->holdb,pr,cd,cn)) >= 0) {
-	                const int	ncalendars = rs ;
+	                cint	ncalendars = rs ;
 	                cchar		*of = ofname ;
 	                cchar		*af = afname ;
 
@@ -1226,7 +1226,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -1521,7 +1521,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	            afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1555,7 +1555,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	    } /* end if (afile arguments) */
 
 	    if ((rs >= 0) && (! f_a) && lip->fl.apm) {
-		const int	f_apm = lip->fl.apm ;
+		cint	f_apm = lip->fl.apm ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(2))
@@ -1569,7 +1569,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	    } /* end if */
 
 	    if ((rs >= 0) && (! f_a) && (lip->ncites == 0) && lip->fl.defnull) {
-		const int	aval = lip->nitems ;
+		cint	aval = lip->nitems ;
 	        int		edays = 0 ;
 
 	        if (aval > 1) edays = (aval-1) ;
@@ -1588,7 +1588,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	        char		cbuf[COMBUFLEN + 1] ;
 
 	        if ((rs = calyear_curbegin(&lip->holdb,&cur)) >= 0) {
-	            const int	clen = COMBUFLEN ;
+	            cint	clen = COMBUFLEN ;
 
 	            while (rs >= 0) {
 
@@ -1688,7 +1688,7 @@ local int procspecs(PROGINFO *pip,cchar *sp,int sl)
 	if (sl < 0) sl = strlen(sp) ;
 
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	    const int	flen = sl ;
+	    cint	flen = sl ;
 	    char	*fbuf ;
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	        int	fl ;
@@ -1733,11 +1733,11 @@ local int procspec(PROGINFO *pip,cchar sp[],int sl)
 	}
 
 	if ((sp[0] == '+') || (sp[0] == '-')) {
-	    const int	f_plus = (sp[0] == '+') ;
+	    cint	f_plus = (sp[0] == '+') ;
 	    int		v = (lip->nitems-1) ;
 
 	    if (sl > 1) {
-	        const int	cl = (sl - 1) ;
+	        cint	cl = (sl - 1) ;
 	        cchar	*cp = (sp + 1) ;
 	        rs = cfdeci(cp,cl,&v) ;
 	    }
@@ -1894,7 +1894,7 @@ local int procquery(PROGINFO *pip,CALYEAR_CITE *qp)
 	calp = &lip->holdb ;
 	if ((rs = calyear_curbegin(calp,&cur)) >= 0) {
 	    if ((rs = calyear_lookcite(calp,&cur,qp)) >= 0) {
-	        const int	vlen = VBUFLEN ;
+	        cint	vlen = VBUFLEN ;
 	        int		vl ;
 	        char		vbuf[VBUFLEN + 1] ;
 	        while (rs >= 0) {
@@ -1936,7 +1936,7 @@ local int procoutcite(PROGINFO *pip,CALYEAR_CITE *qp,cchar vbuf[],int vlen)
 {
 	LOCINFO		*lip = pip->lip ;
 	WORDFILL	w ;
-	const int	clen = COLBUFLEN ;
+	cint	clen = COLBUFLEN ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		cbl ;
@@ -1995,7 +1995,7 @@ local int procoutcite(PROGINFO *pip,CALYEAR_CITE *qp,cchar vbuf[],int vlen)
 	        rs = bufprintf(citebuf,CITEBUFLEN,"%r-%02u",mon,3,qp->d) ;
 	        cl = rs ;
 	    } else {
-	        const int	m = (qp->m + 1) ;
+	        cint	m = (qp->m + 1) ;
 	        rs = bufprintf(citebuf,CITEBUFLEN,"%02u-%02u",m,qp->d) ;
 	        cl = rs ;
 	    }
@@ -2141,7 +2141,7 @@ local int locinfo_finish(LOCINFO *lip)
 
 local int locinfo_deflinelen(LOCINFO *lip)
 {
-	const int	def = (DEFPRECISION + 2) ;
+	cint	def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
 	if (lip->linelen < def) {
 	    PROGINFO	*pip = lip->pip ;
@@ -2702,7 +2702,7 @@ local int config_filefind(CONFIG *cfp,vecstr *flp)
 
 	if ((rs = vecstr_start(&sv,4,0)) >= 0) {
 	    if ((rs = vecstr_addourkeys(&sv,pip)) >= 0) {
-	        const int	tlen = MAXPATHLEN ;
+	        cint	tlen = MAXPATHLEN ;
 	        cchar	**sc = schedconf ;
 	        char		tbuf[MAXPATHLEN+1] ;
 
@@ -2766,7 +2766,7 @@ local int config_cooksload(CONFIG *cfp)
 {
 	PROGINFO	*pip = cfp->pip ;
 	EXPCOOK		*ckp = &cfp->cooks ;
-	const int	hlen = MAXHOSTNAMELEN ;
+	cint	hlen = MAXHOSTNAMELEN ;
 	int		rs = SR_OK ;
 	int		kch ;
 	int		i ;
@@ -2865,7 +2865,7 @@ local int config_read(CONFIG *cfp)
 
 	if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
 	    EXPCOOK	*ckp = &cfp->cooks ;
-	    const int	plen = PBUFLEN ;
+	    cint	plen = PBUFLEN ;
 	    int		i ;
 	    int		el ;
 	    int		kl, vl ;
