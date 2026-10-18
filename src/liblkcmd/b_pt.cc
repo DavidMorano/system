@@ -72,7 +72,7 @@
 #include	<fsdir.h>
 #include	<strn.h>
 #include	<strx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<iserror.h>
 #include	<isnot.h>
 #include	<exitcodes.h>
