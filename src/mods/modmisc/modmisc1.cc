@@ -52,8 +52,10 @@ module ;
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
-#include	<usupport.h>		/* LIBU |sncpy(3usys)| */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modmisc ;
@@ -62,8 +64,6 @@ module modmisc ;
 
 
 /* imported namespaces */
-
-using usys::sncpy ;			/* subroutine */
 
 
 /* local typedefs */
