@@ -1,0 +1,241 @@
+/* usigx SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* UNIX® signal handling */
+/* translation layer interface for UNIX® equivalents */
+
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services (RNS).
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Names:
+	u_alarm
+	u_kill
+	u_killpg
+	u_raise
+	u_sigaction
+	u_sigaltstack
+	u_sigpending
+	u_sigprocmask
+	u_sigsuspend
+	u_sigsend
+	u_sigsendset
+	u_sigmask
+	u_sigwait
+
+	Name:
+	u_sigprocmask
+
+	Descrption:
+	This module provides UNIX® process signal mangement.
+
+	Notes:
+	|u_sigprocmask(3u)|
+	Set the process signal mask (to something).  This sets the
+	signal mask for the whole process.  this system call is the
+	call |u_sigmask(3u)|, which is supposed to be for thread
+	specific use.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"usigx.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int u_alarm(int secs) noex {
+    	uint		usecs = uint(secs) ;
+	int		rs = SR_INVALID ;
+	if (secs >= 0) {
+	    if (uint uret = alarm(usecs) ; uret == uint(-1)) {
+	        rs = (neg errno) ;
+	    } else {
+		rs = intconv(usecs & INT_MAX) ;
+	    }
+	} /* end if (valid) */
+	return rs ;
+} /* end subroutine (u_alarm) */
+
+int u_kill(pid_t pid,int sig) noex {
+	int		rs ;
+	if ((rs = kill(pid,sig)) < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_kill) */
+
+int u_killpg(pid_t pid,int sig) noex {
+	int		rs ;
+	if ((rs = killpg(pid,sig)) < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_killpg) */
+
+int u_raise(int sn) noex {
+	int		rs ;
+	if ((rs = raise(sn)) < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_raise) */
+
+int u_sigaction(int sn,con SIGACTION *nsp,mut SIGACTION *osp) noex {
+	int		rs ;
+	if ((rs = sigaction(sn,nsp,osp)) < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_sigaction) */
+
+int u_sigaltstack(const stack_t *ssp,stack_t *ossp) noex {
+	int		rs ;
+	if ((rs = sigaltstack(ssp,ossp)) < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_sigaltstack) */
+
+int u_sigpending(mut sigset_t *ssp) noex {
+	int		rs = SR_FAULT ;
+	if (ssp) ylikely {
+	    if ((rs = sigpending(ssp)) < 0) {
+	        rs = (neg errno) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (u_sigpending) */
+
+int u_sigprocmask(int how,con sigset_t *setp,mut sigset_t *osetp) noex {
+	int		rs = SR_INVALID ;
+	if (how >= 0) {
+	    if ((rs = sigprocmask(how,setp,osetp)) < 0) {
+	        rs = (neg errno) ;
+	    }
+	} /* end if (valid) */
+	return rs ;
+} /* end subroutine (u_sigprocmask) */
+
+int u_sigsuspend(con sigset_t *ssp) noex {
+	int		rs = SR_FAULT ;
+	if (ssp) ylikely {
+	    rs = SR_OK ;
+	    if (sigsuspend(ssp) < 0) {
+		if ((rs = (neg errno)) == SR_INTR) {
+		    rs = SR_OK ;
+		}
+	    } /* end if (error) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (u_sigsuspend) */
+
+int u_pause() noex {
+	int		rs = SR_OK ;
+	if (pause() < 0) {
+	    if ((rs = (neg errno)) == SR_INTR) {
+		rs = SR_OK ;
+	    }
+	} /* end if (pause) */
+	return rs ;
+} /* end subroutine (u_pause) */
+
+int u_sigmask(int how,con sigset_t *setp,mut sigset_t *osetp) noex {
+	int		rs = SR_INVALID ;
+	if (how >= 0) {
+	    rs = SR_OK ;
+	    if (errno_t ec ; (ec = pthread_sigmask(how,setp,osetp)) > 0) {
+	        rs = (neg ec) ;
+	    }
+	} /* end if (valid) */
+	return rs ;
+} /* end subroutine (u_sigmask) */
+
+int u_sigwait(con sigset_t *ssp,mut int *rp) noex {
+	int		rs = SR_FAULT ;
+	int		sig = 0 ; /* return-value */
+	if (ssp) ylikely {
+	    bool fexit = false ;
+	    repeat {
+	        if ((rs = sigwait(ssp,&sig)) < 0) {
+	            rs = (neg errno) ;
+		    switch (rs) {
+		    case SR_AGAIN:
+			break ;
+		    case SR_INTR:
+			rs = SR_OK ;
+			break ;
+		    default:
+			fexit = true ;
+			break ;
+		    } /* end switch */
+	        } /* end if (sigwait) */
+	    } until ((rs >= 0) || fexit) ;
+	    if (rp) *rp = sig ;
+	    sig &= INT_MAX ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? sig : rs ;
+} /* end subroutine (u_sigwait) */
+
+
+/* these below are NOT on all systems (like MacOS Darwin!) */
+
+int u_sigsend(idtype_t idtype,id_t id,int sig) noex {
+	int		rs ;
+	if ((rs = sigsend(idtype,id,sig)) < 0) { 
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_sigsend) */
+
+int u_sigsendset(procset_t *psp,int sig) noex {
+	int		rs ;
+	if ((rs = sigsendset(psp,sig)) < 0) {
+	    rs = (neg errno) ;
+	}
+	return rs ;
+} /* end subroutine (u_sigsendset) */
+
+
