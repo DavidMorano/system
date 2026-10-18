@@ -31,6 +31,8 @@ TOUCH		?= touch
 LINT		?= lint
 
 
+DEPS_FORK=	uproc.o
+
 DEFS +=
 
 INCS += libu.h
@@ -38,7 +40,7 @@ INCS += libu.h
 MODS += valuelims.o digbufsizes.o uconstants.o 
 MODS += libutil.o chrset.o bitgrp.o
 MODS += digtab.o xxtostr.o
-MODS += usigsets.o usigblock.o umisc.o
+MODS += usigsets.o umisc.o
 MODS += constdiv.o
 MODS += usysbasic.o ureserve.cmm vecbool.o
 
@@ -53,7 +55,7 @@ OBJ03= libutil.o usysconf.o umods.o utimezone.o
 OBJ04= utimeutil.o
 OBJ05= ulogerror.o ulimits.o
 OBJ06= ulibvals.o uconstants.o usupport.o
-OBJ07= umem.o usigsets.o usigblock.o umisc.o
+OBJ07= umem.o usigsets.o umisc.o
 
 OBJ08= usys.o usyscallbase.o usysutility.o 
 OBJ09= uregfork.o uatfork.o uopen.o 
@@ -393,12 +395,12 @@ usyscallbase.o:		usyscallbase.cc	usyscallbase.hh		$(INCS)
 usysutility.o:		usysutility.cc	usysutility.hh		$(INCS)
 usysdata.o:		usysdata.cc	usysdata.h		$(INCS)
 ulogerror.o:		ulogerror.cc	ulogerror.h		$(INCS)
+ucodenames.o:		ucodenames.cc	ucodenames.h		$(INCS)
 
 # requires USYSBASIC
-uatfork.o:		umods.o usigblock.o
-uatfork.o:		uatfork.cc uatfork.h umods.o		$(INCS)
-uregfork.o:		umods.o uregfork.cc uregfork.hh		$(INCS)
-uobjlock.o:		umods.o uobjlock.cc uobjlock.cc		$(INCS)
+uatfork.o:		uatfork.cc uatfork.h umods.o	$(DEPS_FORK)	$(INCS)
+uregfork.o:		uregfork.cc uregfork.hh umods.o	$(DEPS_FORK)	$(INCS)
+uobjlock.o:		uobjlock.cc uobjlock.cc umods.o			$(INCS)
 
 # UTIMEUTIL
 utimeutil.o:		utimeutil.dir
@@ -431,12 +433,12 @@ utimezone.dir:
 	makesubdir $@
 
 # UPROC
-uproc.o:		uproc.dir
+uproc.o:		uproc.dir usigsets.o
 uproc.dir:
 	makesubdir $@
 
 # UFDLOCK
-uopen.o:		uopen.dir
+uopen.o:		uopen.dir uproc.o
 uopen.dir:
 	makesubdir $@
 
@@ -461,7 +463,7 @@ usysauxinfo.dir:
 	makesubdir $@
 
 # UPT
-upt.o:		upt.dir
+upt.o:			upt.dir uproc.o
 upt.dir:
 	makesubdir $@
 
@@ -524,11 +526,6 @@ ustream.dir:
 ucmpx.o:		ucmpx.dir
 ucmpx.dir:
 	makesubdir $@
-
-usigblock.o:		usigblock.ccm			$(INCS)
-	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
-
-ucodenames.o:		ucodenames.cc	ucodenames.h	$(INCS)
 
 # POSIX® synchronization mechanisms
 ptx.o:			ptx.dir
