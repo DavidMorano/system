@@ -37,7 +37,10 @@ module ;
 #include	<cstdarg>		/* CSTD */
 #include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modmisc ;
@@ -71,6 +74,7 @@ module modmisc ;
 
 /* exported subroutines */
 
+namespace umisc_ns {
     char *strwcpy(char *dp,cchar *sp,int sl) noex {
     	if (dp && sp) ylikely {
 	    if (sl >= 0) {
@@ -84,5 +88,6 @@ module modmisc ;
 	} /* end if (non-null) */
 	return dp ;
     } /* end subroutine (strwcpy) */
+} /* end namespace (umisc_ns) */
 
 
