@@ -37,7 +37,10 @@ module ;
 #include	<cstdarg>		/* CSTD */
 #include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modmisc ;
@@ -108,6 +111,7 @@ local char *strbcpy_neg(char *dp,int dl,cchar *sp,int sl) noex {
     	return dp ;
 } /* end subroutine (strbcpy_neg) */
 
+namespace umisc_ns {
     char *strbcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	char *rp = nullptr ;
     	if (dp && sp) ylikely {
@@ -119,5 +123,6 @@ local char *strbcpy_neg(char *dp,int dl,cchar *sp,int sl) noex {
 	} /* end if (non-null) */
 	return rp ;
     } /* end subroutine (strbcpy) */
+} /* end namespace (umisc_ns) */
 
 
