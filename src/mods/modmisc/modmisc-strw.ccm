@@ -35,11 +35,19 @@ module ;
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 export module modmisc:strw ;
 
 
-char *strwcpy(char *,cchar *,int = -1) noex ;
+export {
+    namespace modmisc_ns {
+        char *strwcpy(char *,cchar *,int = -1) noex ;
+    } /* end namespace (modmisc_ns) */
+} /* end export */
 
 
