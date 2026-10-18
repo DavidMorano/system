@@ -45,24 +45,27 @@ module ;
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_list(3c)| + |va_arg(3c)| */
-#include	<cstring>		/* CSTD |strbcpy(3c)| */
+#include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
-#include	<usys.h>		/* LIBU |strbcpy(3usys)| */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modsncpy ;
 
+import modmisc ;			/* |strbcpy()| */
 
 /* local defines */
 
 
 /* imported namespaces */
 
+using namespace modmisc_ns ;		/* |strbcpy()| */
+
 
 /* local typedefs */
-
-using usys::strbcpy ;			/* subroutine */
 
 
 /* external subroutines */
