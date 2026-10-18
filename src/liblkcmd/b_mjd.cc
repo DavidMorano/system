@@ -113,11 +113,11 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUG || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -154,8 +154,8 @@ struct locinfo {
 	dayspec		curspec ;
 	vecstr		stores ;
 	PROGINFO	*pip ;
-	const char	*termtype ;
-	const char	*qfname ;
+	cchar	*termtype ;
+	cchar	*qfname ;
 	int		to ;
 	int		year ;
 	int		ttl ;
@@ -171,7 +171,7 @@ local int	usage(PROGINFO *) ;
 
 local int	procopts(PROGINFO *,keyopt *) ;
 local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-local int	procquery(PROGINFO *,void *,const char *,int) ;
+local int	procquery(PROGINFO *,void *,cchar *,int) ;
 
 local int	locinfo_start(LOCINFO *,PROGINFO *) ;
 local int	locinfo_finish(LOCINFO *) ;
@@ -186,7 +186,7 @@ local int	locinfo_curdate(LOCINFO *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -240,7 +240,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"bufwhole",
 	"bufline",
 	"bufnone",
@@ -283,7 +283,7 @@ int b_mjd(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -331,17 +331,17 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = false ;
 	int		f_help = false ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*qfname = NULL ;
-	const char	*tos_open = NULL ;
-	const char	*tos_read = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*qfname = NULL ;
+	cchar	*tos_open = NULL ;
+	cchar	*tos_read = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUG || CF_DEBUG
@@ -401,7 +401,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -623,7 +623,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1041,8 +1041,8 @@ local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<day(s)>] [-af <afile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1071,7 +1071,7 @@ local int procopts(PROGINFO *pip,keyopt *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1193,7 +1193,7 @@ local int procopts(PROGINFO *pip,keyopt *kop)
 local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 {
 	SHIO		ofile, *ofp = &ofile ;
-	const int	to_open = pip->to_open ;
+	cint	to_open = pip->to_open ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1206,7 +1206,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 	if ((rs = shio_opene(ofp,ofn,"wct",0666,to_open)) >= 0) {
 	    int		pan = 0 ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (pip->have.bufnone)
 	        shio_control(ofp,SHIO_CSETBUFNONE,true) ;
@@ -1247,7 +1247,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(&afile,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1360,7 +1360,7 @@ local int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
-	const char	*varterm = VARTERM ;
+	cchar	*varterm = VARTERM ;
 
 	if (lip == NULL) return SR_FAULT ;
 
@@ -1450,7 +1450,7 @@ local int locinfo_getdefyear(LOCINFO *lip)
 /* end subroutine (locinfo_getdefyear) */
 
 
-local int locinfo_qfname(LOCINFO *lip,const char *qfname)
+local int locinfo_qfname(LOCINFO *lip,cchar *qfname)
 {
 	int		rs = SR_OK ;
 
