@@ -33,12 +33,14 @@
 #include	<fcntl.h>
 #include	<ctime>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<bfile.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -63,7 +65,7 @@
 
 /* forward references */
 
-static int	procupdate(struct proginfo *) ;
+local int	procupdate(struct proginfo *) ;
 
 
 /* local variables */
@@ -107,7 +109,7 @@ int progstampcheck(proginfo *pip) noex {
 /* local subroutines */
 
 
-static int procupdate(pip)
+local int procupdate(pip)
 struct proginfo	*pip ;
 {
 	bfile	tsfile, *tfp = &tsfile ;
@@ -124,7 +126,7 @@ struct proginfo	*pip ;
 	    if ((rs = sncpy3(ebuf,elen,nn,"!",un)) >= 0) {
 		cchar	*name = pip->name ;
 		cchar	*fmt = "%s %s\n" ;
-	        timestr_logz(pip->daytime,timebuf) ;
+	        strtime_logz(pip->daytime,timebuf) ;
 		if ((name != NULL) && (name[0] != '\0'))
 	            fmt = "%s %s (%s)\n" ;
 	        rs = bprintf(tfp,fmt,timebuf,ebuf,name) ;
