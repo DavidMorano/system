@@ -140,6 +140,7 @@
 #include	<strx.h>
 #include	<strwcpy.h>
 #include	<rmdirfiles.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
@@ -795,7 +796,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ; /* end array */
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"imail",
 	"rmailnote",
 	nullptr
@@ -807,7 +808,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"log",
 	"folder",
 	"deliver",
@@ -878,7 +879,7 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ; /* end array */
 
-static const char	*schedconf[] = {
+static cchar	*schedconf[] = {
 	"%r/etc/%n/%n.%f",
 	"%r/etc/%n/%f",
 	"%r/etc/%n.%f",
@@ -886,7 +887,7 @@ static const char	*schedconf[] = {
 	nullptr
 } ; /* end array */
 
-static const char	*params[] = {
+static cchar	*params[] = {
 	"postmail",
 	"sendmail",
 	"folder",
@@ -924,7 +925,7 @@ enum params {
 	param_overlast
 } ;
 
-static const char	*skiphdrs[] = {
+static cchar	*skiphdrs[] = {
 	"message-id",
 	"return-path",
 	"received",
@@ -967,7 +968,7 @@ static const char	*skiphdrs[] = {
 	nullptr
 } ; /* end array */
 
-static const char	*chewhdrs[] = {
+static cchar	*chewhdrs[] = {
 	"references",
 	"in-reply-to",
 	"content-type",
@@ -982,13 +983,13 @@ static cint	msghdrsingles[] = {
 	-1
 } ; /* end array */
 
-static const char	*prbins[] = {
+static cchar	*prbins[] = {
 	"bin",
 	"sbin",
 	nullptr
 } ; /* end array */
 
-static const char	*ematypes[] = {
+static cchar	*ematypes[] = {
 	"",
 	"­£p",
 	"­£a",
@@ -1007,7 +1008,7 @@ enum msgpris {
 	msgpri_overlast
 } ;
 
-static const char	*msgpris[] = {
+static cchar	*msgpris[] = {
 	"none",
 	"high",
 	"moderate",
@@ -7418,7 +7419,7 @@ local int locinfo_mkenvdate(LI *lip) noex {
 	if (lip->envdate == nullptr) {
 	    cchar	**vpp = &lip->envdate ;
 	    char	tbuf[TIMEBUFLEN + 1] ;
-	    timestr_edate(lip->msgtime,tbuf) ;
+	    strtime_edate(lip->msgtime,tbuf) ;
 	    len = lenstr(tbuf) ;
 	    rs = locinfo_setentry(lip,vpp,tbuf,len) ;
 	} else {
@@ -7621,7 +7622,7 @@ local int locinfo_mkhdrdate(LI *lip)
 	if (lip->hdrdate == nullptr) {
 	    cchar	**vpp = &lip->hdrdate ;
 	    char	tbuf[TIMEBUFLEN + 1] ;
-	    timestr_hdate(lip->msgtime,tbuf) ;
+	    strtime_hdate(lip->msgtime,tbuf) ;
 	    len = lenstr(tbuf) ;
 	    rs = locinfo_setentry(lip,vpp,tbuf,len) ;
 	} else {
@@ -7909,7 +7910,7 @@ local int locinfo_tmpmaint(LI *lip)
 	                if (f_need) {
 	                    int		tl ;
 	                    char	timebuf[TIMEBUFLEN + 3] ;
-	                    timestr_log(dt,timebuf) ;
+	                    strtime_log(dt,timebuf) ;
 	                    tl = lenstr(timebuf) ;
 	                    timebuf[tl++] = '\n' ;
 	                    rs = u_write(fd,timebuf,tl) ;
