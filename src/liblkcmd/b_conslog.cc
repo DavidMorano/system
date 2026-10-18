@@ -67,6 +67,7 @@
 #include	<linefold.h>
 #include	<strn.h>
 #include	<strx.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -164,34 +165,34 @@ struct sepstrs {
 
 /* forward references */
 
-static int	mainsub(int,cchar *[],cchar *[],void *) ;
+local int	mainsub(int,cchar *[],cchar *[],void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procisexit(PROGINFO *) ;
-static int	proclog(PROGINFO *,cchar *) ;
-static int	process(PROGINFO *,CONSLOG *,cchar *) ;
-static int	processer(PROGINFO *,CONSLOG *,EXPCOOK *,cchar *) ;
-static int	procline(PROGINFO *,CONSLOG *,cchar *,int) ;
-static int	procsubs(PROGINFO *,EXPCOOK *,char *,int,cchar *,int) ;
-static int	loadcooks(PROGINFO *,EXPCOOK *) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procisexit(PROGINFO *) ;
+local int	proclog(PROGINFO *,cchar *) ;
+local int	process(PROGINFO *,CONSLOG *,cchar *) ;
+local int	processer(PROGINFO *,CONSLOG *,EXPCOOK *,cchar *) ;
+local int	procline(PROGINFO *,CONSLOG *,cchar *,int) ;
+local int	procsubs(PROGINFO *,EXPCOOK *,char *,int,cchar *,int) ;
+local int	loadcooks(PROGINFO *,EXPCOOK *) ;
 
-static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-static int	procuserinfo_end(PROGINFO *) ;
+local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
+local int	procuserinfo_end(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-static int	locinfo_logparams(LOCINFO *,cchar *,cchar *) ;
-static int	locinfo_logvals(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_logparams(LOCINFO *,cchar *,cchar *) ;
+local int	locinfo_logvals(LOCINFO *) ;
 
-static int	sepstrs_load(struct sepstrs *,cchar *,int) ;
+local int	sepstrs_load(struct sepstrs *,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -235,7 +236,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"fac",
 	"pri",
 	"ignore",
@@ -288,7 +289,7 @@ int p_conslog(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -388,7 +389,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -532,7 +533,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -912,7 +913,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -941,7 +942,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-names */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1043,7 +1044,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procisexit(PROGINFO *pip)
+local int procisexit(PROGINFO *pip)
 {
 	if (pip == NULL) return SR_FAULT ;
 	return lib_sigterm() ;
@@ -1051,7 +1052,7 @@ static int procisexit(PROGINFO *pip)
 /* end subroutine (procisexit) */
 
 
-static int proclog(PROGINFO *pip,cchar *ifname)
+local int proclog(PROGINFO *pip,cchar *ifname)
 {
 	LOCINFO		*lip = pip->lip ;
 	CONSLOG		ls, *lsp = &ls ;
@@ -1090,7 +1091,7 @@ static int proclog(PROGINFO *pip,cchar *ifname)
 /* end subroutine (proclog) */
 
 
-static int process(PROGINFO *pip,CONSLOG *lsp,cchar *ifn)
+local int process(PROGINFO *pip,CONSLOG *lsp,cchar *ifn)
 {
 	EXPCOOK		ck ;
 	int		rs ;
@@ -1121,12 +1122,12 @@ static int process(PROGINFO *pip,CONSLOG *lsp,cchar *ifn)
 /* end subroutine (process) */
 
 
-static int processer(PROGINFO *pip,CONSLOG *lsp,EXPCOOK *ckp,cchar ifn[])
+local int processer(PROGINFO *pip,CONSLOG *lsp,EXPCOOK *ckp,cchar ifn[])
 {
 	LOCINFO		*lip = pip->lip ;
 	time_t		ti_lastcheck = pip->daytime ;
-	const int	to = lip->to_read ;
-	const int	intf = INTFLUSH ;
+	cint	to = lip->to_read ;
+	cint	intf = INTFLUSH ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		eofstrlen ;
@@ -1160,8 +1161,8 @@ static int processer(PROGINFO *pip,CONSLOG *lsp,EXPCOOK *ckp,cchar ifn[])
 	if (rs >= 0) {
 	    SHIO	infile, *ifp = &infile ;
 	    if ((rs = shio_open(ifp,ifn,os,0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
-	        const int	olen = OUTBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
+	        cint	olen = OUTBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 	        char		obuf[OUTBUFLEN + 1] ;
 
@@ -1228,11 +1229,11 @@ static int processer(PROGINFO *pip,CONSLOG *lsp,EXPCOOK *ckp,cchar ifn[])
 /* end subroutine (processer) */
 
 
-static int procline(PROGINFO *pip,CONSLOG *lsp,cchar obuf[],int olen)
+local int procline(PROGINFO *pip,CONSLOG *lsp,cchar obuf[],int olen)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	cols = LOGCOLS ;
-	const int	indent = 2 ;
+	cint	cols = LOGCOLS ;
+	cint	indent = 2 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ol = olen ;
@@ -1250,7 +1251,7 @@ static int procline(PROGINFO *pip,CONSLOG *lsp,cchar obuf[],int olen)
 
 	if ((*op == '<') && ((tp = strnchr(op,ol,'>')) != NULL)) {
 	    cchar	*cp = (op+1) ;
-	    const int	cl = (tp-(op+1)) ;
+	    cint	cl = (tp-(op+1)) ;
 	    ol -= ((op+ol)-(tp+1)) ;
 	    op = (tp+1) ;
 	    rs = getsyslogpri(cp,cl) ;
@@ -1280,7 +1281,7 @@ static int procline(PROGINFO *pip,CONSLOG *lsp,cchar obuf[],int olen)
 /* end subroutine (procline) */
 
 
-static int procsubs(PROGINFO *pip,EXPCOOK *ckp,char obuf[],int olen,
+local int procsubs(PROGINFO *pip,EXPCOOK *ckp,char obuf[],int olen,
 			cchar lbuf[],int llen)
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1293,7 +1294,7 @@ static int procsubs(PROGINFO *pip,EXPCOOK *ckp,char obuf[],int olen,
 
 	    if (lip->timebuf[0] == '\0') {
 	        pip->daytime = dt ;
-	        timestr_logz(dt,lip->timebuf) ;
+	        strtime_logz(dt,lip->timebuf) ;
 	        rs = expcook_add(ckp,"T",lip->timebuf,-1) ;
 	    }
 
@@ -1321,7 +1322,7 @@ static int procsubs(PROGINFO *pip,EXPCOOK *ckp,char obuf[],int olen,
 /* end subroutine (procsubs) */
 
 
-static int loadcooks(PROGINFO *pip,EXPCOOK *ckp)
+local int loadcooks(PROGINFO *pip,EXPCOOK *ckp)
 {
 	int		rs = SR_OK ;
 
@@ -1338,7 +1339,7 @@ static int loadcooks(PROGINFO *pip,EXPCOOK *ckp)
 	    rs = expcook_add(ckp,"NAME",pip->name,-1) ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    int		rs1 ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1353,7 +1354,7 @@ static int loadcooks(PROGINFO *pip,EXPCOOK *ckp)
 /* end subroutine (loadcooks) */
 
 
-static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -1374,7 +1375,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1389,7 +1390,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-static int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1400,7 +1401,7 @@ static int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1414,7 +1415,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1436,7 +1437,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
@@ -1472,7 +1473,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
-static int locinfo_logparams(LOCINFO *lip,cchar *facspec,cchar *prispec)
+local int locinfo_logparams(LOCINFO *lip,cchar *facspec,cchar *prispec)
 {
 	struct sepstrs	seps ;
 	int		rs = SR_OK ;
@@ -1535,7 +1536,7 @@ static int locinfo_logparams(LOCINFO *lip,cchar *facspec,cchar *prispec)
 /* end subroutine (locinfo_logparams) */
 
 
-static int locinfo_logvals(LOCINFO *lip)
+local int locinfo_logvals(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	cchar		*pri = lip->pri ;
@@ -1552,7 +1553,7 @@ static int locinfo_logvals(LOCINFO *lip)
 /* end subroutine (locinfo_logvals) */
 
 
-static int sepstrs_load(struct sepstrs *ssp,cchar sp[],int sl)
+local int sepstrs_load(struct sepstrs *ssp,cchar sp[],int sl)
 {
 	int		n = 0 ;
 
