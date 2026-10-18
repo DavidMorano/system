@@ -185,7 +185,7 @@ local int	locinfo_mjd(LOCINFO *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -239,7 +239,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"bufwhole",
 	"bufline",
 	"bufnone",
@@ -401,7 +401,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -619,7 +619,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -987,7 +987,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        if ((rs = procuserinfo_begin(pip,&u)) >= 0) {
 	 	    if ((rs = proglog_begin(pip,&u)) >= 0) {
 	    	        if (lip->fl.dgram) {
-	    	            const int	nfd = FD_STDIN ;
+	    	            cint	nfd = FD_STDIN ;
 			    rs = procdgram(pip,nfd) ;
 			    wlen = rs ;
 	    	        } else {
@@ -1273,7 +1273,7 @@ local int procdgram(PROGINFO *pip,int nfd)
 	int		wlen = 0 ;
 	int		c = 0 ;
 	if ((rs = msgdata_init(&m,0)) >= 0) {
-	    const int	to = lip->intrun ;
+	    cint	to = lip->intrun ;
 	    while ((rs = msgdata_recvto(&m,nfd,to)) >= 0) {
 	        if ((rs = procdgramer(pip,&m)) >= 0) {
 		    if (lip->rate > 0) sleep(lip->rate) ;
@@ -1321,8 +1321,8 @@ local int procdgramer(PROGINFO *pip,MSGDATA *mip)
 	    mjd = rs ;
 	}
 	if (rs >= 0) {
-	    const int	of = O_RDONLY ;
-	    const int	to_open = pip->to_open ;
+	    cint	of = O_RDONLY ;
+	    cint	to_open = pip->to_open ;
 	    if (pip->debuglevel > 0) {
 	        cchar	*pn = pip->progname ;
 	        cchar	*fmt = "%s: mjd=%u\n" ;
@@ -1330,7 +1330,7 @@ local int procdgramer(PROGINFO *pip,MSGDATA *mip)
 	    }
 	    proglog_printf(pip,"mjd=%u",mjd) ;
 	    if ((rs = openqotd(pip->pr,mjd,of,to_open)) >= 0) {
-	        const int	qfd = rs ;
+	        cint	qfd = rs ;
 		if ((rs = msgdata_getbuf(mip,&mbuf)) >= 0) {
 		    int		ml = rs ;
 		    char	*mp = mbuf ;
@@ -1355,7 +1355,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
-	const int	to_open = pip->to_open ;
+	cint	to_open = pip->to_open ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1384,7 +1384,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 	        cchar	*cp ;
 
 	        if (rs >= 0) {
-	            const int	argc = aip->argc ;
+	            cint	argc = aip->argc ;
 	            int		ai ;
 	            int		f ;
 	            cchar	**argv = aip->argv ;
@@ -1413,7 +1413,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn,cchar *ofn)
 	            if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	            if ((rs = shio_open(&afile,afn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
 	                while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1519,7 +1519,7 @@ local int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	    if (lip->qfname != nullptr) {
 	        rs = procqueryload(pip,mjd) ;
 	    } else {
-	        const int	n = MAX(pip->n,1) ;
+	        cint	n = MAX(pip->n,1) ;
 	        int		i ;
 	        for (i = 0 ; i < n ; i += 1) {
 	            if (lip->fl.separate && (i > 0)) {
@@ -1545,21 +1545,21 @@ local int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 local int procqueryload(PROGINFO *pip,int mjd)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	to_open = pip->to_open ;
-	const int	of = (O_CREAT|O_WRONLY|O_TRUNC) ;
+	cint	to_open = pip->to_open ;
+	cint	of = (O_CREAT|O_WRONLY|O_TRUNC) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
 	if ((rs = openqotd(pip->pr,mjd,of,to_open)) >= 0) {
 	    SHIO	ifile, *ifp = &ifile ;
-	    const int	qfd = rs ;
+	    cint	qfd = rs ;
 	    cchar	*qfname = lip->qfname ;
 
 	    if (qfname[0] == '-') qfname = STDFNIN ;
 
 	    if ((rs = shio_open(ifp,qfname,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN+1] ;
 
 	        while ((rs = shio_read(ifp,lbuf,llen)) > 0) {
@@ -1616,16 +1616,16 @@ local int procqueryout_remote(PROGINFO *pip,void *ofp,int mjd)
 #endif
 
 	if ((rs = procopenquery(pip,mjd)) >= 0) {
-	    const int	to = pip->to_read ;
-	    const int	qlen = QBUFLEN ;
-	    const int	qfd = rs ;
+	    cint	to = pip->to_read ;
+	    cint	qlen = QBUFLEN ;
+	    cint	qfd = rs ;
 	    char	qbuf[QBUFLEN+1] ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
 	        debugprintf("b_qotd/procqueryout_remote: uc_recve()\n") ;
 #endif
 	    if ((rs = uc_recve(qfd,qbuf,qlen,0,to,0)) >= 0) {
-		const int	ql = rs ;
+		cint	ql = rs ;
 	        if (pip->verboselevel > 0) {
 	            if (lip->open.outer) {
 	                if (ql > 0) {
@@ -1669,7 +1669,7 @@ local int procqueryout_local(PROGINFO *pip,void *ofp,int mjd)
 #endif
 
 	if ((rs = procopenquery(pip,mjd)) >= 0) {
-	    const int	qfd = rs ;
+	    cint	qfd = rs ;
 
 	    if (pip->verboselevel > 0) {
 	        if (lip->open.outer) {
@@ -1721,7 +1721,7 @@ local int procopenquery(PROGINFO *pip,int mjd)
 local int procopenqueryhost(PROGINFO *pip,int mjd)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	hlen = MAXHOSTNAMELEN ;
+	cint	hlen = MAXHOSTNAMELEN ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 	cchar		*tp ;
@@ -1736,8 +1736,8 @@ local int procopenqueryhost(PROGINFO *pip,int mjd)
 	    ps = PORTSPEC_QUOTE ;
 	}
 	if (hs[0] != '\0') {
-	    const int	to_open = pip->to_open ;
-	    const int	af = lip->af ;
+	    cint	to_open = pip->to_open ;
+	    cint	af = lip->af ;
 	    if ((rs = dialudp(hs,ps,af,to_open,0)) >= 0) {
 	        fd = rs ;
 	        if ((rs = ctdeci(hbuf,hlen,mjd)) >= 0) {
@@ -1755,7 +1755,7 @@ local int procopenqueryhost(PROGINFO *pip,int mjd)
 
 local int procqueryouter(PROGINFO *pip,void *ofp,int qfd)
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		len ;
 	int		wlen = 0 ;
@@ -1841,7 +1841,7 @@ local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1881,13 +1881,13 @@ local int procuserinfo_logid(PROGINFO *pip)
 #endif
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mklogidpre(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mklogidsub(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
