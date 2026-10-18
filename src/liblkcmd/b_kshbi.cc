@@ -60,6 +60,7 @@
 #include	<char.h>
 #include	<tmtime.hh>
 #include	<upt.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -208,7 +209,7 @@ local int	vecstr_loadnamers(vecstr *,cchar *) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -256,7 +257,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"lib",
 	"maint",
 	"pr",
@@ -283,7 +284,7 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const char	*exts[] = {
+static cchar	*exts[] = {
 	"so",
 	"o",
 	"",
@@ -410,7 +411,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -584,7 +585,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1125,7 +1126,7 @@ local int procprint(PROGINFO *pip,void *ofp)
 	debugprintf("b_kshbi/procprint: ent\n") ;
 #endif
 	if ((rs = locinfo_libdirfind(lip,rbuf)) >= 0) {
-	    const int	rl = rs ;
+	    cint	rl = rs ;
 	    if (pip->debuglevel > 0) {
 		cchar	*pn = pip->progname ;
 		cchar	*fmt = "%s: shlib=%r\n" ;
@@ -1153,7 +1154,7 @@ local int procall(PROGINFO *pip,void *ofp)
 	if ((rs = procsfn(pip,sfname)) >= 0) {
 	    SHIO	sfile, *sfp = &sfile ;
 	    if ((rs = shio_open(sfp,sfname,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        cchar		*y = "YES" ;
 	        char		lbuf[LINEBUFLEN+1] ;
@@ -1186,7 +1187,7 @@ local int procsfn(PROGINFO *pip,char *sfname)
 	if (lip->libfname != NULL) {
 	    char	rbuf[MAXPATHLEN+1] ;
 	    if ((rs = locinfo_libdirfind(lip,rbuf)) > 0) {
-		const int	rl = rs ;
+		cint	rl = rs ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
 	            debugprintf("b_kshbi/procall: sfn=%s\n",rbuf) ;
@@ -1219,7 +1220,7 @@ local int procsfner(PROGINFO *pip,char *sfname,cchar *rbuf)
 	            cchar	*sdname = lip->storedname ;
 	            if ((rs = mkpath2w(sfname,sdname,cp,cl)) >= 0) {
 	                ustat	sb ;
-	                const int	rsn = SR_NOENT ;
+	                cint	rsn = SR_NOENT ;
 	                pl = rs ;
 	                if ((rs = uc_stat(sfname,&sb)) >= 0) {
 	                    ustat	lsb ;
@@ -1250,7 +1251,7 @@ local int procsfnmk(PROGINFO *pip,cchar *sfname,cchar *rbuf)
 	if ((rs = locinfo_storedirtmp(lip,tbuf)) >= 0) {
 	    SHIO	sfile, *sfp = &sfile ;
 	    if ((rs = shio_open(sfp,tbuf,"wc",0666)) >= 0) {
-	        const int	of = O_RDONLY ;
+	        cint	of = O_RDONLY ;
 	        int		i = 0 ;
 	        cchar		*av[5] ;
 	        cchar		**ev = pip->envv ;
@@ -1380,7 +1381,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,
 	        afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1424,7 +1425,7 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,void *ofp,
 	        ifn = STDFNIN ;
 
 	    if ((rs = shio_open(ifp,ifn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = shio_readline(ifp,lbuf,llen)) > 0) {
@@ -1494,7 +1495,7 @@ local int procnames(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 local int procname(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 {
 	LOCINFO		*lip = pip->lip ;
-	const int	nlen = MAXNAMELEN ;
+	cint	nlen = MAXNAMELEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	char		nbuf[MAXNAMELEN + 1] ;
@@ -1840,8 +1841,8 @@ local int locinfo_libdiradd(LOCINFO *lip,cchar *libdir)
 	    vecstr	*ldp = &lip->libdirs ;
 	    char	rbuf[MAXPATHLEN+1] ;
 	    if ((rs = pathclean(rbuf,libdir,-1)) >= 0) {
-	        const int	rsn = SR_NOTFOUND ;
-	        const int	rl = rs ;
+	        cint	rsn = SR_NOTFOUND ;
+	        cint	rl = rs ;
 	        if ((rs = vecstr_findn(ldp,rbuf,rs)) == rsn) {
 	            rs = vecstr_add(ldp,rbuf,rl) ;
 	        }
@@ -1931,7 +1932,7 @@ local int locinfo_libset(LOCINFO *lip,cchar *vp,int vl)
 local int locinfo_libopen(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	dlflags = (RTLD_LAZY|RTLD_LOCAL) ;
+	cint	dlflags = (RTLD_LAZY|RTLD_LOCAL) ;
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ;
@@ -2066,7 +2067,7 @@ local int locinfo_storedir(LOCINFO *lip)
 	            cchar	*sn = pip->searchname ;
 	            char	sbuf[MAXPATHLEN+1] ;
 	            if ((rs = mkpath2(sbuf,tbuf,sn)) >= 0) {
-	                const int	pl = rs ;
+	                cint	pl = rs ;
 	                if ((rs = locinfo_dircheck(lip,sbuf)) >= 0) {
 	                    cchar	**vpp = &lip->storedname ;
 	                    rs = locinfo_setentry(lip,vpp,sbuf,pl) ;
@@ -2094,7 +2095,7 @@ local int locinfo_dircheck(LOCINFO *lip,cchar *dname)
 	    ustat	sb ;
 	    const uid_t		euid = pip->euid ;
 	    const mode_t	dm = (0777 | S_ISGID) ;
-	    const int		rsn = SR_NOENT ;
+	    cint		rsn = SR_NOENT ;
 	    if ((rs = u_stat(dname,&sb)) >= 0) {
 	        if (sb.st_uid == euid) {
 	            rs = locinfo_minmod(lip,dname,dm) ;
@@ -2174,7 +2175,7 @@ local int locinfo_tmpcheck(LOCINFO *lip)
 local int locinfo_tmpmaint(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
-	const int	to = TO_TMPFILES ;
+	cint	to = TO_TMPFILES ;
 	int		rs ;
 	int		c = 0 ;
 	int		f_need = lip->fl.maint ;
@@ -2183,10 +2184,10 @@ local int locinfo_tmpmaint(LOCINFO *lip)
 
 	if ((rs = mkpath2(tsfname,dname,TSFNAME)) >= 0) {
 	    const mode_t	om = 0666 ;
-	    const int		of = (O_WRONLY|O_CREAT) ;
+	    cint		of = (O_WRONLY|O_CREAT) ;
 	    if ((rs = u_open(tsfname,of,om)) >= 0) {
 	        ustat	usb ;
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 	        if ((rs = u_fstat(fd,&usb)) >= 0) {
 	            time_t	dt = pip->daytime ;
 	            if ((rs = locinfo_fchmodown(lip,fd,&usb,om)) >= 0) {
@@ -2196,7 +2197,7 @@ local int locinfo_tmpmaint(LOCINFO *lip)
 	                if (f_need) {
 	                    int		tl ;
 	                    char	timebuf[TIMEBUFLEN + 3] ;
-	                    timestr_logz(dt,timebuf) ;
+	                    strtime_logz(dt,timebuf) ;
 	                    tl = strlen(timebuf) ;
 	                    timebuf[tl++] = '\n' ;
 	                    rs = u_write(fd,timebuf,tl) ;
@@ -2224,7 +2225,7 @@ local int locinfo_chown(LOCINFO *lip,cchar *fname)
 	if ((rs = locinfo_loadprids(lip)) >= 0) {
 	    const uid_t		uid_pr = lip->uid_pr ;
 	    const gid_t		gid_pr = lip->gid_pr ;
-	    const int		n = _PC_CHOWN_RESTRICTED ;
+	    cint		n = _PC_CHOWN_RESTRICTED ;
 	    if ((rs = u_pathconf(fname,n,NULL)) == 0) {
 	        f = TRUE ;
 	        u_chown(fname,uid_pr,gid_pr) ; /* may fail */
@@ -2248,7 +2249,7 @@ local int locinfo_fchmodown(LOCINFO *lip,int fd,ustat *sbp,mode_t mm)
 	            if ((rs = uc_fminmod(fd,mm)) >= 0) {
 	                const uid_t	uid_pr = lip->uid_pr ;
 	                const gid_t	gid_pr = lip->gid_pr ;
-	                const int	n = _PC_CHOWN_RESTRICTED ;
+	                cint	n = _PC_CHOWN_RESTRICTED ;
 	                if ((rs = u_fpathconf(fd,n,NULL)) == 0) {
 	                    f = TRUE ;
 	                    u_fchown(fd,uid_pr,gid_pr) ; /* may fail */
@@ -2287,7 +2288,7 @@ local int vecstr_loadnames(vecstr *nlp,cchar *name)
 	if ((rs = vecstr_loadnamers(nlp,name)) >= 0) {
 	    c += rs ;
 	    if (strncmp(name,"lib",3) != 0) {
-	        const int	nlen = MAXNAMELEN ;
+	        cint	nlen = MAXNAMELEN ;
 	        char		nbuf[MAXNAMELEN+1] ;
 	        if ((rs = sncpy2(nbuf,nlen,"lib",name)) >= 0) {
 	            rs = vecstr_loadnamers(nlp,nbuf) ;
@@ -2302,7 +2303,7 @@ local int vecstr_loadnames(vecstr *nlp,cchar *name)
 
 local int vecstr_loadnamers(vecstr *nlp,cchar *name)
 {
-	const int	nlen = MAXNAMELEN ;
+	cint	nlen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (strchr(name,'.') == NULL) {
