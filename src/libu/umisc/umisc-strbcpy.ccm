@@ -40,6 +40,10 @@ module ;
 export module umisc:strbcpy ;
 
 
-char *strbcpy(char *,int,cchar *,int = -1) noex ;
+export {
+    namespace umisc_ns {
+        char *strbcpy(char *,int,cchar *,int = -1) noex ;
+    } /* end namespace (umisc_ns) */
+} /* end export */
 
 
