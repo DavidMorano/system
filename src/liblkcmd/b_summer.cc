@@ -78,14 +78,14 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -120,30 +120,30 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
-static int	procout(PROGINFO *,void *,PROCESSOR *,int) ;
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+local int	procout(PROGINFO *,void *,PROCESSOR *,int) ;
 
-static int	processor_start(PROCESSOR *,int) ;
-static int	processor_finish(PROCESSOR *) ;
-static int	processor_add(PROCESSOR *,const char *,int) ;
-static int	processor_result(PROCESSOR *,int,double *) ;
+local int	processor_start(PROCESSOR *,int) ;
+local int	processor_finish(PROCESSOR *) ;
+local int	processor_add(PROCESSOR *,cchar *,int) ;
+local int	processor_result(PROCESSOR *,int,double *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif /* CF_LOCSETENT */
 
 
 /* local variables */
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"asum",
 	"amean",
 	"hmean",
@@ -159,7 +159,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -191,7 +191,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"type",
 	"sum",
 	"asum",
@@ -233,7 +233,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*whiches[] = {
+static cchar	*whiches[] = {
 	"sum",
 	"amean",
 	"hmean",
@@ -340,7 +340,7 @@ int p_speedup(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
+local int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -359,16 +359,16 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pm = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pm = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -420,7 +420,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -644,7 +644,7 @@ static int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -998,12 +998,12 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<value(s)> ...] [-o <calculation>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1022,7 +1022,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1106,7 +1106,7 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 			cchar *ifn)
 {
 	SHIO		ofile, *ofp = &ofile ;
@@ -1156,7 +1156,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 	            if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	            if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                int		len ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1195,7 +1195,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 	                ifn = STDFNIN ;
 
 	            if ((rs = shio_open(ifp,ifn,"r",0666)) >= 0) {
-	                const int	llen = LINEBUFLEN ;
+	                cint	llen = LINEBUFLEN ;
 	                int		len ;
 	                char		lbuf[LINEBUFLEN + 1] ;
 
@@ -1251,7 +1251,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 /* end subroutine (process) */
 
 
-static int procout(PROGINFO *pip,void *ofp,PROCESSOR *pp,int pan)
+local int procout(PROGINFO *pip,void *ofp,PROCESSOR *pp,int pan)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1289,7 +1289,7 @@ static int procout(PROGINFO *pip,void *ofp,PROCESSOR *pp,int pan)
 	    }
 
 	    if (lip->fl.speedup) {
-	        const int	size = pan * sizeof(double) ;
+	        cint	size = pan * sizeof(double) ;
 	        double		*fa ;
 	        if ((rs = uc_malloc(size,&fa)) >= 0) {
 	            wi = which_speedup ;
@@ -1322,7 +1322,7 @@ static int procout(PROGINFO *pip,void *ofp,PROCESSOR *pp,int pan)
 /* end subroutine (procout) */
 
 
-static int processor_start(PROCESSOR *op,int n)
+local int processor_start(PROCESSOR *op,int n)
 {
 	int		rs ;
 	int		size ;
@@ -1346,7 +1346,7 @@ static int processor_start(PROCESSOR *op,int n)
 /* end subroutine (processor_start) */
 
 
-static int processor_finish(PROCESSOR *op)
+local int processor_finish(PROCESSOR *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1368,12 +1368,12 @@ static int processor_finish(PROCESSOR *op)
 /* end subroutine (processor_finish) */
 
 
-static int processor_add(PROCESSOR *op,cchar *sp,int sl)
+local int processor_add(PROCESSOR *op,cchar *sp,int sl)
 {
 	double		fnum ;
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*tp, *cp ;
+	cchar	*tp, *cp ;
 
 	if (! op->open)
 	    return SR_NOTOPEN ;
@@ -1405,7 +1405,7 @@ static int processor_add(PROCESSOR *op,cchar *sp,int sl)
 /* end subroutine (processor_add) */
 
 
-static int processor_result(PROCESSOR *op,int which,double *rp)
+local int processor_result(PROCESSOR *op,int which,double *rp)
 {
 	int		rs = SR_OK ;
 
@@ -1429,7 +1429,7 @@ static int processor_result(PROCESSOR *op,int which,double *rp)
 
 	if (op->fa == NULL) {
 	    if ((rs = vecobj_count(&op->numbers)) >= 0) {
-	    	const int	size = ((rs + 1) * sizeof(double)) ;
+	    	cint	size = ((rs + 1) * sizeof(double)) ;
 	        int		n = rs ;
 	        void		*p ;
 
@@ -1481,7 +1481,7 @@ static int processor_result(PROCESSOR *op,int which,double *rp)
 /* end subroutine (processor_result) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1493,7 +1493,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1512,7 +1512,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
