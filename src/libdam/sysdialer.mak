@@ -158,6 +158,11 @@ sysdialer_prime.o:	sysdialer_prime.cc		$(INCS)
 sysdialer_entry.o:	sysdialer_entry.cc		$(INCS)
 sysdialer_prcache.o:	sysdialer_prcache.cc		$(INCS)
 
-cm.o:			cm.cc		cm.h		$(INCS)
+# CM
+cm_prime.o:		cm_prime.cc	cm.h		$(INCS)
+cm_try.o:		cm_try.cc	cm.h		$(INCS)
+
+cm.o:			cm_ptime.o cm_try.o
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
