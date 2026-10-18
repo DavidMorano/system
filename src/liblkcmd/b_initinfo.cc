@@ -80,13 +80,13 @@
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	nusers(const char *) ;
+extern int	nusers(cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -115,23 +115,23 @@ struct locinfo {
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procspec(PROGINFO *,void *, const char *) ;
+local int	procspec(PROGINFO *,void *, cchar *) ;
 
-static int	getla(PROGINFO *) ;
-static int	getnusers(PROGINFO *) ;
-static int	getnprocs(PROGINFO *) ;
+local int	getla(PROGINFO *) ;
+local int	getnusers(PROGINFO *) ;
+local int	getnprocs(PROGINFO *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -160,7 +160,7 @@ enum argopts {
 } ;
 
 /* define the configuration keywords */
-static const char	*reqopts[] = {
+static cchar	*reqopts[] = {
 	"btime",
 	"path",
 	"supath",
@@ -210,7 +210,7 @@ int b_initinfo(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -234,7 +234,7 @@ int p_initinfo(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -261,15 +261,15 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*efname = NULL ;
-	const char	*utfname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*utfname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -326,7 +326,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -493,7 +493,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -669,7 +669,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	    if ((rs = shio_open(afp,afname,"r",0666)) >= 0) {
 	        FIELD		fsb ;
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 	        int		ml ;
 		int		fl ;
 		cont char	*fp ;
@@ -808,13 +808,13 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		i ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<reqopts(s)> ...] [-af <afile>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -857,7 +857,7 @@ static int usage(PROGINFO *pip)
 
 
 /* process a specification name */
-static int procspec(PROGINFO *pip,void *ofp,cchar name[])
+local int procspec(PROGINFO *pip,void *ofp,cchar name[])
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -939,7 +939,7 @@ static int procspec(PROGINFO *pip,void *ofp,cchar name[])
 /* end subroutine (procspec) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	memset(lip,0,sizeof(LOCINFO)) ;
@@ -950,7 +950,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 
 	lip->pip = NULL ;
@@ -959,7 +959,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int getla(pip)
+local int getla(pip)
 PROGINFO	*pip ;
 {
 	LOCINFO	*lip = pip->lip ;
@@ -975,7 +975,7 @@ PROGINFO	*pip ;
 /* end subroutine (getla) */
 
 
-static int getnusers(pip)
+local int getnusers(pip)
 PROGINFO	*pip ;
 {
 	LOCINFO	*lip = pip->lip ;
@@ -994,7 +994,7 @@ PROGINFO	*pip ;
 /* end subroutine (getnusers) */
 
 
-static int getnprocs(PROGINFO *pip)
+local int getnprocs(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
