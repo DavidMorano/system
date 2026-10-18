@@ -58,6 +58,7 @@
 #include	<keyopt.h>
 #include	<field.h>
 #include	<cvtdater.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -945,14 +946,14 @@ local int procinfo(PI *pip,void *ofp) noex {
 	            if (rs >= 0) {
 	                ti = bi.wtime ;
 	                t = (t & (~ UINT_MAX)) | (((time_t) ti) & UINT_MAX) ;
-	                timestr_log(t,tbuf) ;
+	                strtime_log(t,tbuf) ;
 	                rs = shio_printf(ofp,"wtime=%s\n",tbuf) ;
 	                wlen += rs ;
 	            }
 	            if (rs >= 0) {
 	                ti = bi.atime ;
 	                t = (t & (~ UINT_MAX)) | (((time_t) ti) & UINT_MAX) ;
-	                timestr_log(t,tbuf) ;
+	                strtime_log(t,tbuf) ;
 	                rs = shio_printf(ofp,"atime=%s\n",tbuf) ;
 	                wlen += rs ;
 	            }
