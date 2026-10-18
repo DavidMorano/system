@@ -110,10 +110,10 @@ extern "C" int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern "C" int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern "C" int	debugopen(const char *) ;
-extern "C" int	debugprintf(const char *,...) ;
+extern "C" int	debugopen(cchar *) ;
+extern "C" int	debugprintf(cchar *,...) ;
 extern "C" int	debugclose() ;
-extern "C" int	strlinelen(const char *,int,int) ;
+extern "C" int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -141,32 +141,32 @@ struct locinfo {
 } ;
 
 struct baserecord {
-	const char	*name ;
+	cchar	*name ;
 	int		base ;
 } ;
 
 
 /* forward references */
 
-static int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) ;
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	findbase(PROGINFO *,const BASERECORD *,cchar *,int) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
-static int	procspecs(PROGINFO *,SHIO *,cchar *,int) ;
-static int	procspec(PROGINFO *,SHIO *,cchar *,int) ;
+local int	findbase(PROGINFO *,const BASERECORD *,cchar *,int) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *,cchar *) ;
+local int	procspecs(PROGINFO *,SHIO *,cchar *,int) ;
+local int	procspec(PROGINFO *,SHIO *,cchar *,int) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_base(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_base(LOCINFO *,cchar *,int) ;
 
-static int	isNotValidBase(int) ;
+local int	isNotValidBase(int) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -257,7 +257,7 @@ int b_numcvt(int argc,cchar *argv[],void *contextp) noex {
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -281,7 +281,7 @@ int p_numcvt(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
+local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
@@ -303,17 +303,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = nullptr ;
-	const char	*pr = nullptr ;
-	const char	*sn = nullptr ;
-	const char	*afname = nullptr ;
-	const char	*ifname = STDFNIN ;
-	const char	*ofname = nullptr ;
-	const char	*efname = nullptr ;
-	const char	*basei = nullptr ;
-	const char	*baseo = nullptr ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*ifname = STDFNIN ;
+	cchar	*ofname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*basei = nullptr ;
+	cchar	*baseo = nullptr ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -370,7 +370,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -576,7 +576,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -838,9 +838,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	ainfo.ai_pos = ai_pos ;
 
 	if (rs >= 0) {
-	    const char	*ofn = ofname ;
-	    const char	*ifn = ifname ;
-	    const char	*afn = afname ;
+	    cchar	*ofn = ofname ;
+	    cchar	*ifn = ifname ;
+	    cchar	*afn = afname ;
 	    rs = procargs(pip,&ainfo,&pargs,ofn,ifn,afn) ;
 	} else if (ex == EX_OK) {
 	    SHIO	*efp = (SHIO *) pip->efp ;
@@ -932,13 +932,13 @@ badargs:
 /* end subroutine (mainsub) */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	SHIO		*efp = (SHIO *) pip->efp ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<value(s)> ...] [-af {<afile>|-}]\n" ;
 	if (rs >= 0) rs = shio_printf(efp,fmt,pn,pn) ;
@@ -958,13 +958,13 @@ static int usage(PROGINFO *pip)
 
 
 /* find the base from a name */
-static int findbase(PROGINFO *pip,const BASERECORD *basemap,
+local int findbase(PROGINFO *pip,const BASERECORD *basemap,
 		cchar *bname,int blen)
 {
 	int		rs ; /* initialization (here) not needed */
 	int		cl ;
 	int		base ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 2) {
@@ -1001,7 +1001,7 @@ static int findbase(PROGINFO *pip,const BASERECORD *basemap,
 /* end subroutine (findbase) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *ifn,
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *ifn,
 		cchar *afn)
 {
 	SHIO		*efp = (SHIO *) pip->efp ;
@@ -1050,7 +1050,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *ifn,
 	        if (strcmp(afn,"-") == 0) afn = STDFNIN ;
 
 	        if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN+1] ;
 
@@ -1093,7 +1093,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *ifn,
 	        SHIO	infile, *ifp = &infile ;
 
 	        if ((rs = shio_open(ifp,ifn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN+1] ;
 
@@ -1145,7 +1145,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *ifn,
 /* end subroutine (procargs) */
 
 
-static int procspecs(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
+local int procspecs(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1168,13 +1168,13 @@ static int procspecs(PROGINFO *pip,SHIO *ofp,cchar *lbuf,int llen)
 /* end subroutine (procspecs) */
 
 
-static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
+local int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 {
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	unsigned int	value = 0 ;
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (name == nullptr) return SR_FAULT ;
 
@@ -1243,7 +1243,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 	    } /* end if (trying bases straight) */
 
 	    if (isNotValid(rs) && (cl > 2) && (cp[0] == '0')) {
-		const char	ch1 = MKCHAR(cp[1]) ;
+		cchar	ch1 = MKCHAR(cp[1]) ;
 
 	        if (tolc(ch1) == 'b') {
 
@@ -1314,7 +1314,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 #endif
 
 	if (rs >= 0) {
-	    const int	olen = OUTBUFLEN ;
+	    cint	olen = OUTBUFLEN ;
 	    int		ol = -1 ;
 	    cchar	*obufp = nullptr ;
 	    char	obuf[OUTBUFLEN + 1] ;
@@ -1381,7 +1381,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *name,int namelen)
 /* end subroutine (procspec) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 
 	if (lip == nullptr)
@@ -1398,7 +1398,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1410,7 +1410,7 @@ static int locinfo_finish(LOCINFO *lip)
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_base(LOCINFO *lip,cchar *sp,int sl)
+local int locinfo_base(LOCINFO *lip,cchar *sp,int sl)
 {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
@@ -1454,7 +1454,7 @@ static int locinfo_base(LOCINFO *lip,cchar *sp,int sl)
 /* end subroutine (locinfo_base) */
 
 
-static int isNotValidBase(int b)
+local int isNotValidBase(int b)
 {
 	int	f = FALSE ;
 	switch (b) {
