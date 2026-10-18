@@ -73,11 +73,11 @@ int vecobj_hsort(vecobj *op,vecobj_vcf cmpfunc) noex {
 	        if (! op->fl.issorted) {
 	            op->fl.issorted = true ;
 	            if (op->c > 1) {
-			csize	alen = size_t(op->i) ;
-			csize	esize = size_t(op->esz) ;
-			qsort_f	hcf = qsort_f(cmpfunc) ;
+			csize	alen	= size_t(op->i) ;
+			csize	esize	= size_t(op->esz) ;
+			qsort_f	hcf	= qsort_f(cmpfunc) ;
 	                qsort(op->va,alen,esize,hcf) ;
-	            }
+	            } /* end if (needed) */
 	        } /* end if (sorting needed) */
 		rs = op->c ;
 	    } /* end if (open) */
