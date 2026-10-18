@@ -42,7 +42,7 @@ LIBS +=
 
 OBJPART00= modutil-lenstr.o modutil-memclear.o
 OBJPART01= modutil-memcopy.o modutil-memload.o
-OBJPART02= modutil-memncpy.o modutil-memnset.o 
+OBJPART02= modutil-memb.o
 OBJPART03= modutil-resumelife.o
 
 OBJPART04= 
@@ -246,8 +246,7 @@ modutil-lenstr.o:	modutil-lenstr.ccm			$(INCS)
 modutil-memclear.o:	modutil-memclear.ccm			$(INCS)
 modutil-memcopy.o:	modutil-memcopy.ccm			$(INCS)
 modutil-memload.o:	modutil-memload.ccm			$(INCS)
-modutil-memncpy.o:	modutil-memncpy.ccm			$(INCS)
-modutil-memnset.o:	modutil-memnset.ccm			$(INCS)
+modutil-memb.o:		modutil-memb.ccm			$(INCS)
 modutil-resumelife.o:	modutil-resumelife.ccm			$(INCS)
 
 # implementaiton
