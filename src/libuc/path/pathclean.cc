@@ -57,7 +57,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 #define	PATHBUF_BUFP	pbuf
 #define	PATHBUF_BUFPL	plen
-#define	PATHBUF_IDX	i
+#define	PATHBUF_IDX	idx
 
 
 /* imported namespaces */
@@ -78,7 +78,7 @@ namespace {
     struct pathbuf {
 	char		*pbuf{} ;
 	int		plen{} ;
-	int		i{} ;
+	int		idx{} ;
 	int start	(char *,int) noex ;
 	int chr		(int) noex ;
 	int strw	(cchar *,int) noex ;
@@ -189,10 +189,10 @@ local int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
 int pathbuf::start(char *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (pbuf) ylikely {
-	    rs = SR_OK ;
-	    PATHBUF_BUFP = sp ;
-	    PATHBUF_BUFPL = sl ;
-	    PATHBUF_IDX = 0 ;
+	    rs			= SR_OK ;
+	    PATHBUF_BUFP	= sp ;
+	    PATHBUF_BUFPL	= sl ;
+	    PATHBUF_IDX		= 0 ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pathbuf_start) */
@@ -204,9 +204,9 @@ int pathbuf::finish() noex {
 	    char	*bp = (PATHBUF_BUFP + PATHBUF_IDX) ;
 	    len = PATHBUF_IDX ;
 	    *bp = eos ;			/* NUL-terminate */
-	    PATHBUF_BUFP = nullptr ;
-	    PATHBUF_BUFPL = 0 ;
-	    PATHBUF_IDX = SR_NOTOPEN ;
+	    PATHBUF_BUFP	= nullptr ;
+	    PATHBUF_BUFPL	= 0 ;
+	    PATHBUF_IDX		= SR_NOTOPEN ;
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
 } /* end method (pathbuf::finish) */
@@ -245,7 +245,7 @@ int pathbuf::strw(cchar *sp,int sl) noex {
 	        } /* end if */
 	    } /* end if */
 	    if (rs >= 0) {
-	        *bp = '\0' ;
+	        *bp = eos ;
 	        len = intconv(bp - (PATHBUF_BUFP + PATHBUF_IDX)) ;
 	        PATHBUF_IDX = intconv(bp - PATHBUF_BUFP) ;
 	    } /* end if (ok) */
@@ -256,7 +256,7 @@ int pathbuf::strw(cchar *sp,int sl) noex {
 int pathbuf::chr(int ch) noex {
 	char		buf[2] ;
 	buf[0] = char(ch) ;
-	buf[1] = '\0' ;
+	buf[1] = eos ;
 	return strw(buf,1) ;
 } /* end method (pathbuf::chr) */
 
@@ -297,7 +297,7 @@ local int nextname(cchar *sp,int sl,cchar **rpp) noex {
 	rl = intconv(sp - rp) ;
 	if (rpp) {
 	    *rpp = rp ;
-	}
+	} /* end */
 	return rl ;
 } /* end subroutine (nextname) */
 
