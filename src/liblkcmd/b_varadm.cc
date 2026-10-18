@@ -79,25 +79,26 @@
 #include	<fcntl.h>
 #include	<utmpx.h>
 #include	<netdb.h>
-#include	<climits>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<climits>		/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<uclibmem.h>
 #include	<getsysmisc.h>
 #include	<estrings.h>
 #include	<sigman.h>
-#include	<baops.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<tmpx.h>
-#include	<kinfo.h>
 #include	<field.h>
 #include	<ctdec.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<kinfo.h>		/* Solaris® */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -119,34 +120,25 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	statvfsdir(const char *,STATVFS *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	statvfsdir(cchar *,STATVFS *) ;
 
-extern int	proginfo_setpiv(struct proginfo *,const char *,
+extern int	proginfo_setpiv(struct proginfo *,cchar *,
 			const struct pivars *) ;
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	nusers(const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
+extern int	nusers(cchar *) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -206,8 +198,8 @@ struct locinfo {
 	struct locinfo_flags	init, open ;
 	vecstr		stores ;
 	struct proginfo	*pip ;
-	const char	*utfname ;
-	const char	*fname ;
+	cchar	*utfname ;
+	cchar	*fname ;
 	double		fla[3] ;	/* floating load-averages */
 	time_t		btime ;		/* machine boot-time */
 	time_t		ti_mem ;
@@ -228,48 +220,48 @@ struct locinfo {
 
 /* forward references */
 
-static int	usage(struct proginfo *) ;
+local int	usage(struct proginfo *) ;
 
-static int	procopts(struct proginfo *,keyopt *) ;
-static int	procspec(struct proginfo *,void *, const char *) ;
-static int	procla(struct proginfo *,SHIO *,char *,int) ;
-static int	procout(struct proginfo *,SHIO *,const char *) ;
+local int	procopts(struct proginfo *,keyopt *) ;
+local int	procspec(struct proginfo *,void *, cchar *) ;
+local int	procla(struct proginfo *,SHIO *,char *,int) ;
+local int	procout(struct proginfo *,SHIO *,cchar *) ;
 
-static int	getla(struct proginfo *) ;
-static int	getnusers(struct proginfo *) ;
-static int	getnprocs(struct proginfo *) ;
-static int	getncpus(struct proginfo *) ;
-static int	getbtime(struct proginfo *) ;
-static int	getrnum(struct proginfo *) ;
-static int	getmem(struct proginfo *) ;
+local int	getla(struct proginfo *) ;
+local int	getnusers(struct proginfo *) ;
+local int	getnprocs(struct proginfo *) ;
+local int	getncpus(struct proginfo *) ;
+local int	getbtime(struct proginfo *) ;
+local int	getrnum(struct proginfo *) ;
+local int	getmem(struct proginfo *) ;
 
-static int	locinfo_start(struct locinfo *,struct proginfo *) ;
-static int	locinfo_utfname(struct locinfo *,const char *) ;
-static int	locinfo_flags(struct locinfo *,int,int) ;
-static int	locinfo_to(struct locinfo *,int) ;
-static int	locinfo_setentry(struct locinfo *,const char **,
-			const char *,int) ;
-static int	locinfo_defaults(struct locinfo *) ;
-static int	locinfo_finish(struct locinfo *) ;
+local int	locinfo_start(struct locinfo *,struct proginfo *) ;
+local int	locinfo_utfname(struct locinfo *,cchar *) ;
+local int	locinfo_flags(struct locinfo *,int,int) ;
+local int	locinfo_to(struct locinfo *,int) ;
+local int	locinfo_setentry(struct locinfo *,cchar **,
+			cchar *,int) ;
+local int	locinfo_defaults(struct locinfo *) ;
+local int	locinfo_finish(struct locinfo *) ;
 
-static int	loadkinfo(struct sysmisc *,time_t) ;
+local int	loadkinfo(struct sysmisc *,time_t) ;
 
 #if	CF_PERCACHE
-static int	percache_start(struct percache *,time_t,const char *,int) ;
-static int	percache_getnusers(struct percache *) ;
-static int	percache_getsysmisc(struct percache *,struct sysmisc *) ;
-static int	percache_finish(struct percache *) ;
+local int	percache_start(struct percache *,time_t,cchar *,int) ;
+local int	percache_getnusers(struct percache *) ;
+local int	percache_getsysmisc(struct percache *,struct sysmisc *) ;
+local int	percache_finish(struct percache *) ;
 #endif /* CF_PERCACHE */
 
-static void	sighand_int(int) ;
+local void	sighand_int(int) ;
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
-static const int	sigblocks[] = {
+static cint	sigblocks[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGHUP,
@@ -277,7 +269,7 @@ static const int	sigblocks[] = {
 	0
 } ;
 
-static const int	sigignores[] = {
+static cint	sigignores[] = {
 	SIGPIPE,
 	SIGPOLL,
 #if	defined(SIGXFSZ)
@@ -286,14 +278,14 @@ static const int	sigignores[] = {
 	0
 } ;
 
-static const int	sigints[] = {
+static cint	sigints[] = {
 	SIGINT,
 	SIGTERM,
 	SIGQUIT,
 	0
 } ;
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -345,7 +337,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char *akonames[] = {
+static cchar *akonames[] = {
 	"utf",
 	"db",
 	NULL
@@ -358,7 +350,7 @@ enum akonames {
 } ;
 
 /* define the configuration keywords */
-static const char *qopts[] = {
+static cchar *qopts[] = {
 	"la1min",
 	"la5min",
 	"la15min",
@@ -433,7 +425,7 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const int	timeouts[] = {
+static cint	timeouts[] = {
 	5, 	/* nusers */
 	2, 	/* kinfo */
 	0
@@ -484,16 +476,16 @@ void	*contextp ;
 	int	f_nocache = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
 	char	argpresent[MAXARGGROUPS] ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*efname = NULL ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*utfname = NULL ;
-	const char	*cp ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*utfname = NULL ;
+	cchar	*cp ;
 
 
 	if (contextp != NULL) lib_initenviron() ;
@@ -1003,10 +995,10 @@ void	*contextp ;
 
 	    if ((rs = shio_open(afp,afname,"r",0666)) >= 0) {
 	        FIELD	fsb ;
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 	        int	ml ;
 	        int	fl ;
-	        const char	*fp ;
+	        cchar	*fp ;
 	        char	lbuf[LINEBUFLEN + 1] ;
 	        char	name[MAXNAMELEN + 1] ;
 
@@ -1156,7 +1148,7 @@ badarg:
 /* local subroutines */
 
 
-static void sighand_int(sn)
+local void sighand_int(sn)
 int	sn ;
 {
 
@@ -1167,7 +1159,7 @@ int	sn ;
 /* end subroutine (sighand_int) */
 
 
-static int usage(pip)
+local int usage(pip)
 struct proginfo	*pip ;
 {
 	int	rs ;
@@ -1224,7 +1216,7 @@ struct proginfo	*pip ;
 
 
 /* process the program ako-options */
-static int procopts(pip,kop)
+local int procopts(pip,kop)
 struct proginfo	*pip ;
 keyopt		*kop ;
 {
@@ -1237,8 +1229,8 @@ keyopt		*kop ;
 	int	kl, vl ;
 	int	c = 0 ;
 
-	const char	*kp, *vp ;
-	const char	*cp ;
+	cchar	*kp, *vp ;
+	cchar	*cp ;
 
 
 	if ((cp = getenv(VAROPTS)) != NULL)
@@ -1293,10 +1285,10 @@ ret0:
 
 
 /* process a specification name */
-static int procspec(pip,ofp,req)
+local int procspec(pip,ofp,req)
 struct proginfo	*pip ;
 void		*ofp ;
-const char	req[] ;
+cchar	req[] ;
 {
 	struct locinfo	*lip = pip->lip ;
 
@@ -1306,7 +1298,7 @@ const char	req[] ;
 	int	reqlen ;
 	int	wlen = 0 ;
 
-	const char	*vp, *tp ;
+	cchar	*vp, *tp ;
 
 	char	cvtbuf[CVTBUFLEN + 1] ;
 	char	*cbp = NULL ;
@@ -1555,7 +1547,7 @@ const char	req[] ;
 /* end subroutine (procspec) */
 
 
-static int procla(pip,ofp,cvtbuf,ri)
+local int procla(pip,ofp,cvtbuf,ri)
 struct proginfo	*pip ;
 SHIO		*ofp ;
 char		cvtbuf[] ;
@@ -1608,10 +1600,10 @@ int		ri ;
 /* end subroutine (procla) */
 
 
-static int procout(pip,ofp,buf)
+local int procout(pip,ofp,buf)
 struct proginfo	*pip ;
 SHIO		*ofp ;
-const char	*buf ;
+cchar	*buf ;
 {
 	int	rs = SR_OK ;
 	int	wlen = 0 ;
@@ -1629,7 +1621,7 @@ ret0:
 /* end subroutine (procout) */
 
 
-static int locinfo_start(lip,pip)
+local int locinfo_start(lip,pip)
 struct locinfo	*lip ;
 struct proginfo	*pip ;
 {
@@ -1650,7 +1642,7 @@ struct proginfo	*pip ;
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(lip)
+local int locinfo_finish(lip)
 struct locinfo	*lip ;
 {
 	int	rs = SR_OK ;
@@ -1676,9 +1668,9 @@ struct locinfo	*lip ;
 /* end subroutine (locinfo_finish) */
 
 
-static int locinfo_utfname(lip,utfname)
+local int locinfo_utfname(lip,utfname)
 struct locinfo	*lip ;
-const char	*utfname ;
+cchar	*utfname ;
 {
 
 
@@ -1696,7 +1688,7 @@ const char	*utfname ;
 /* end subroutine (locinfo_utfname) */
 
 
-static int locinfo_flags(lip,f_init,f_nocache)
+local int locinfo_flags(lip,f_init,f_nocache)
 struct locinfo	*lip ;
 int		f_init ;
 int		f_nocache ;
@@ -1713,7 +1705,7 @@ int		f_nocache ;
 /* end subroutine (locinfo_flags) */
 
 
-static int locinfo_to(lip,to)
+local int locinfo_to(lip,to)
 struct locinfo	*lip ;
 int		to ;
 {
@@ -1727,7 +1719,7 @@ int		to ;
 /* end subroutine (locinfo_to) */
 
 
-static int locinfo_defaults(lip)
+local int locinfo_defaults(lip)
 struct locinfo	*lip ;
 {
 	int	rs = SR_OK ;
@@ -1738,7 +1730,7 @@ struct locinfo	*lip ;
 
 
 	if ((lip->utfname == NULL) && (! lip->finval.utfname)) {
-	    const char	*cp = getenv(VARUTFNAME) ;
+	    cchar	*cp = getenv(VARUTFNAME) ;
 	    if (cp != NULL)
 		rs = locinfo_setentry(lip,&lip->utfname,cp,-1);
 	}
@@ -1750,8 +1742,8 @@ struct locinfo	*lip ;
 
 int locinfo_setentry(lip,epp,vp,vl)
 struct locinfo	*lip ;
-const char	**epp ;
-const char	vp[] ;
+cchar	**epp ;
+cchar	vp[] ;
 int		vl ;
 {
 	int	rs = SR_OK ;
@@ -1789,7 +1781,7 @@ int		vl ;
 	    rs = vecstr_add(&lip->stores,vp,vnlen) ;
 	    i = rs ;
 	    if (rs >= 0) {
-	        const char	*cp ;
+	        cchar	*cp ;
 
 	        rs = vecstr_get(&lip->stores,i,&cp) ;
 	        if (rs >= 0)
@@ -1811,10 +1803,10 @@ int		vl ;
 
 #if	CF_PERCACHE
 
-static int percache_start(pcp,daytime,utfname,f_init)
+local int percache_start(pcp,daytime,utfname,f_init)
 struct percache	*pcp ;
 time_t		daytime ;
-const char	*utfname ;
+cchar	*utfname ;
 int		f_init ;
 {
 	int	rs = SR_OK ;
@@ -1857,7 +1849,7 @@ int		f_init ;
 
 
 /* this is only called if the "no-cache" option was specified */
-static int percache_finish(struct percache *pcp)
+local int percache_finish(struct percache *pcp)
 {
 
 
@@ -1871,7 +1863,7 @@ static int percache_finish(struct percache *pcp)
 /* end subroutine (percache_finish) */
 
 
-static int percache_getnusers(struct percache *pcp)
+local int percache_getnusers(struct percache *pcp)
 {
 	time_t	span ;
 
@@ -1911,7 +1903,7 @@ static int percache_getnusers(struct percache *pcp)
 /* end subroutine (percache_getnusers) */
 
 
-static int percache_getsysmisc(struct percache *pcp,struct sysmisc *smp)
+local int percache_getsysmisc(struct percache *pcp,struct sysmisc *smp)
 {
 	time_t	span ;
 
@@ -1951,7 +1943,7 @@ static int percache_getsysmisc(struct percache *pcp,struct sysmisc *smp)
 #endif /* CF_PERCACHE */
 
 
-static int getla(pip)
+local int getla(pip)
 struct proginfo	*pip ;
 {
 	struct locinfo	*lip = pip->lip ;
@@ -1973,7 +1965,7 @@ struct proginfo	*pip ;
 /* end subroutine (getla) */
 
 
-static int getnusers(pip)
+local int getnusers(pip)
 struct proginfo	*pip ;
 {
 	struct locinfo	*lip = pip->lip ;
@@ -2011,7 +2003,7 @@ struct proginfo	*pip ;
 /* end subroutine (getnusers) */
 
 
-static int getnprocs(pip)
+local int getnprocs(pip)
 struct proginfo	*pip ;
 {
 	struct locinfo	*lip = pip->lip ;
@@ -2059,7 +2051,7 @@ struct proginfo	*pip ;
 /* end subroutine (getnprocs) */
 
 
-static int getncpus(pip)
+local int getncpus(pip)
 struct proginfo	*pip ;
 {
 
@@ -2069,7 +2061,7 @@ struct proginfo	*pip ;
 /* end subroutine (getncpus) */
 
 
-static int getbtime(pip)
+local int getbtime(pip)
 struct proginfo	*pip ;
 {
 
@@ -2080,7 +2072,7 @@ struct proginfo	*pip ;
 
 
 /* make a random number (is this already more than is ever needed?) */
-static int getrnum(pip)
+local int getrnum(pip)
 struct proginfo	*pip ;
 {
 	struct locinfo	*lip = pip->lip ;
@@ -2153,7 +2145,7 @@ ret0:
 /* end subroutine (getrnum) */
 
 
-static int getmem(PROGIKNFO *pip) noex {
+local int getmem(PROGIKNFO *pip) noex {
 	struct locinfo	*lip = pip->lip ;
 
 	long	ppm ;
@@ -2205,7 +2197,7 @@ ret0:
 
 
 /* find the number of processes on the system */
-static int loadkinfo(smp,daytime)
+local int loadkinfo(smp,daytime)
 struct sysmisc	*smp ;
 time_t		daytime ;
 {
