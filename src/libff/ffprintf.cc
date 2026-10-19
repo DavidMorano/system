@@ -36,7 +36,7 @@
 /* exported subroutines */
 
 
-int ffprintf(FFILE *fp,const char *fmt,...)
+int ffprintf(FFILE *fp,cchar *fmt,...)
 {
 	FILE	*sfp ;
 
