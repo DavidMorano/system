@@ -28,7 +28,7 @@
 
 
 struct strtab_chunk {
-	char		*cdata ;
+	charp		cdata ;
 	int		csz ;		/* allocated extent */
 	int		cl ;		/* amount used */
 	int		count ;		/* number of items */
