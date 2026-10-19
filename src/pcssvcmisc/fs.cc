@@ -30,12 +30,12 @@
 
 	Synopsis:
 	int opensvc_fshome(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -112,11 +112,11 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -137,19 +137,19 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_procuser(SUBINFO *,char *,int,const char *) ;
+local int	subinfo_start(SUBINFO *) ;
+local int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_procuser(SUBINFO *,char *,int,cchar *) ;
 #if	CF_SETENTRY
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
+local int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	mkfsline(char *,int,int,const char *,STATVFS *) ;
+local int	mkfsline(char *,int,int,cchar *,STATVFS *) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"sn",
 	NULL
@@ -166,12 +166,12 @@ enum argopts {
 
 
 int opensvc_fshome(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
@@ -190,9 +190,9 @@ int		to ;
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_akopts = FALSE ;
 	int		f ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*un = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*un = NULL ;
 	char		ubuf[USERNAMELEN+1] ;
 	char		lbuf[LINEBUFLEN+1] ;
 
@@ -401,7 +401,7 @@ int		to ;
 	    nprintf(NDF,"opensvc_fshome: MOTD-un=%s\n",un) ;
 #endif
 	    if ((un == NULL) || (un[0] == '\0')) {
-	        const char	*uidp = getourenv(envv,VARMOTDUID) ;
+	        cchar	*uidp = getourenv(envv,VARMOTDUID) ;
 #if	CF_DEBUGN
 	        nprintf(NDF,"opensvc_fshome: MOTD-uid=%s\n",uidp) ;
 #endif
@@ -478,7 +478,7 @@ badsubstart:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip)
+local int subinfo_start(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 
@@ -492,7 +492,7 @@ static int subinfo_start(SUBINFO *sip)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -550,7 +550,7 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (subinfo_setentry) */
 #endif /* CF_SETENTRY */
 
-static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un) noex {
+local int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un) noex {
 	PASSWDENT	pw ;
 	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		f_blocks = sip->fl.blocks ;
@@ -599,7 +599,7 @@ static int subinfo_procuser(SUBINFO *sip,char *lbuf,int llen,cchar *un) noex {
 /* end subroutine (subinfo_procuser) */
 
 
-static int mkfsline(char *lbuf,int llen,int f_blocks,cchar *fpath,
+local int mkfsline(char *lbuf,int llen,int f_blocks,cchar *fpath,
 		STATVFS	*fssp)
 {
 	LONG		vt, va, vu ;
@@ -624,11 +624,11 @@ static int mkfsline(char *lbuf,int llen,int f_blocks,cchar *fpath,
 /* we go through some trouble here to get a snuggled-up floating number */
 
 	{
-	    const char	*dp ;
+	    cchar	*dp ;
 	    char	digbuf[DIGBUFLEN+1] ;
 	    if (per < 0) per = 99.9 ;
 	    if ((rs = bufprintf(digbuf,DIGBUFLEN,"%4.1f",per)) >= 0) {
-	        const char *fmt ;
+	        cchar *fmt ;
 	        if (f_blocks) {
 	            fmt = "%s avail=%llu partition=%llu util=%s%%\n" ;
 	        } else {
