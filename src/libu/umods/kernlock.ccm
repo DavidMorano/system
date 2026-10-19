@@ -75,24 +75,24 @@ export {
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
-	int init() noex ;
-	int fini() noex ;
-	int forkbefore() noex ;
-	int forkafter() noex ;
+	int init	() noex ;
+	int fini	() noex ;
+	int forkbefore	() noex ;
+	int forkafter	() noex ;
 	virtual int kernbegin() noex ;
 	virtual int kernen() noex ;
     private:
 	void iforkbefore() noex {
 	    mx.lockbegin() ;
-	} ;
+	} ; /* end */
 	void iforkafter() noex {
 	    mx.lockend() ;
-	} ;
+	} ; /* end */
 	destruct kernlock () {
             if (cint rs = fini() ; rs < 0) {
                 ulogerror("kernlock",rs,"dtor-fini") ;
             }
-	} ;
+	} ; /* end */
     } ; /* end struct (kernlock) */
 } /* end namespace */
 
@@ -156,7 +156,7 @@ int kernlocker::init() noex {
 	                if ((rs = uc_atexit(e)) >= 0) {
 	    	            finitdone = true ;
 		            f = true ;
-		        }
+		        } /* end if */
 		        if (rs < 0) {
 		            uc_atforkexp(b,a,a) ;
 			} /* end if (error) */
@@ -194,11 +194,11 @@ int kernlocker::fini() noex {
 	        void_f	a = kernlock_atforkafter ;
 	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit = false ;
 	    finitdone = false ;
 	} /* end if (atexit registered) */
