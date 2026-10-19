@@ -45,7 +45,7 @@
 
 int ffwrite(fp,buf,len)
 FFILE		*fp ;
-const void	*buf ;
+cvoid	*buf ;
 int		len ;
 {
 	FILE	*sfp ;
