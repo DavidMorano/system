@@ -44,6 +44,7 @@
 
 
 #define DEBOPEN(fn)	debopen(fn)
+#define DEBFD(fn)	debfd(fn)
 #define DEBCLOSE	debclose()
 
 #define DEBPRINTF(FMT, ...)	({ 					\
