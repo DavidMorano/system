@@ -23,6 +23,7 @@ extern int storebuf_buf		(char *,int,int,cchar *,int)	noex ;
 extern int storebuf_strw	(char *,int,int,cchar *,int)	noex ;
 extern int storebuf_chr		(char *,int,int,int)		noex ;
 extern int storebuf_chrs	(char *,int,int,int,int)	noex ;
+extern int storebuf_remslash	(char *,int,int)		noex ;
 
 extern int storebuf_bini	(char *,int,int,int)		noex ;
 extern int storebuf_binl	(char *,int,int,long)		noex ;
@@ -146,12 +147,25 @@ inline int storebuf_hex(char *bp,int bl,int i,ulonglong uv)	noex {
 	return storebuf_hexull(bp,bl,i,uv) ;
 } /* end */
 
+struct storebuf ;
+struct storebuf_co {
+    	storebuf	*op ;
+	int		w ;
+	void operator () (storebuf *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ; /* end methodd */
+	operator int () noex ;
+} ; /* end struct (storebuf_co) */
 struct storebuf {
+    	storebuf_co	remslash ;
 	charp		bufp ;
 	int		bufl ;
 	int		idx ;
-	storebuf() noex : bufp(nullptr), bufl(0), idx(0) { } ;
-	storebuf(char *p,int l,int i = 0) noex : bufp(p), bufl(l), idx(i) { } ;
+	storebuf(char *p,int l,int i = 0) noex : bufp(p), bufl(l), idx(i) { 
+	    remslash	(this,0) ;
+	} ; /* end ctor */
+	storebuf() noex : storebuf(nullptr,0,0) { } ;
 	int chrs	(int ch,int n) noex ;
 	int chr		(int ch) noex ;
 	int strw	(cchar *sp,int sl = -1) noex ;
@@ -167,7 +181,7 @@ struct storebuf {
                     idx += rs ;
 	        } else {
 	            idx = rs ;
-	        }
+	        } /* end if */
             } /* end if (ok) */
 	    return rs ;
 	} ; /* end method (xxx) */
