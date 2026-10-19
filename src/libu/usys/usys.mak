@@ -68,7 +68,7 @@ OBJ19_USYS= usys_execname.o usys_termios.o
 OBJ20_USYS= usys_strxbrk.o 
 OBJ21_USYS= usys_stpcpy.o usys_stpncpy.o
 OBJ22_USYS= usys_strbcpy.o
-OBJ23_USYS= usys_lenstr.o
+OBJ23_USYS= usys_lenstr.o usys_hasx.o
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
@@ -266,6 +266,7 @@ usys_darwinargz.o:	usys_darwinargz.cc	usys_darwinargz.h	$(INCS)
 usys_linux.o:		usys_linux.cc		usys_linux.h		$(INCS)
 
 # utilities
+usys_hasx.o:		usys_hasx.cc		usys_hasx.h		$(INCS)
 usys_ufcntl.o:		usys_ufcntl.cc		usys_ufcntl.h		$(INCS)
 usys_ugetdents.o:	usys_ugetdents.cc	usys_ugetdents.h	$(INCS)
 usys_ugetnisdom.o:	usys_ugetnisdom.cc	usys_ugetnisdom.h	$(INCS)
