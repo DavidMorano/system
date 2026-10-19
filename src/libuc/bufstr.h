@@ -42,7 +42,7 @@
 
 
 struct bufstr_head {
-	char		*dbuf ;		/* dynamic- buffer */
+	charp		dbuf ;		/* dynamic- buffer */
 	int		dlen ;		/* extent */
 	int		len ;		/* index (active length) */
 	char		sbuf[BUFSTR_LEN + 1] ; /* static-buffer */
@@ -62,11 +62,11 @@ struct bufstr_co {
 	void operator () (bufstr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (bufstr_co) */
 struct bufstr : bufstr_head {
 	bufstr_co	start ;
@@ -76,7 +76,7 @@ struct bufstr : bufstr_head {
 	    start	(this,bufstrmem_start) ;
 	    strsize	(this,bufstrmem_strsize) ;
 	    finish	(this,bufstrmem_finish) ;
-	    dbuf = nullptr ;
+	    dbuf	= nullptr ;
 	} ; /* end ctor */
 	bufstr(const bufstr &) = delete ;
 	bufstr &operator = (const bufstr &) = delete ;
@@ -90,7 +90,7 @@ struct bufstr : bufstr_head {
 	void dtor() noex ;
 	destruct bufstr() {
 	    if (dbuf) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (bufstr) */
 #else	/* __cplusplus */
 typedef BUFSTR		bufstr ;
@@ -139,96 +139,96 @@ EXTERNC_end
 
 inline int bufstr_bin(bufstr *op,int v) noex {
 	return bufstr_bini(op,v) ;
-}
+} /* end */
 inline int bufstr_bin(bufstr *op,long v) noex {
 	return bufstr_binl(op,v) ;
-}
+} /* end */
 inline int bufstr_bin(bufstr *op,longlong v) noex {
 	return bufstr_binll(op,v) ;
-}
+} /* end */
 
 inline int bufstr_bin(bufstr *op,uint v) noex {
 	return bufstr_binui(op,v) ;
-}
+} /* end */
 inline int bufstr_bin(bufstr *op,ulong v) noex {
 	return bufstr_binul(op,v) ;
-}
+} /* end */
 inline int bufstr_bin(bufstr *op,ulonglong v) noex {
 	return bufstr_binull(op,v) ;
-}
+} /* end */
 
 inline int bufstr_oct(bufstr *op,int v) noex {
 	return bufstr_octi(op,v) ;
-}
+} /* end */
 inline int bufstr_oct(bufstr *op,long v) noex {
 	return bufstr_octl(op,v) ;
-}
+} /* end */
 inline int bufstr_oct(bufstr *op,longlong v) noex {
 	return bufstr_octll(op,v) ;
-}
+} /* end */
 
 inline int bufstr_oct(bufstr *op,uint v) noex {
 	return bufstr_octui(op,v) ;
-}
+} /* end */
 inline int bufstr_oct(bufstr *op,ulong v) noex {
 	return bufstr_octul(op,v) ;
-}
+} /* end */
 inline int bufstr_oct(bufstr *op,ulonglong v) noex {
 	return bufstr_octull(op,v) ;
-}
+} /* end */
 
 inline int bufstr_dec(bufstr *op,int v) noex {
 	return bufstr_deci(op,v) ;
-}
+} /* end */
 inline int bufstr_dec(bufstr *op,long v) noex {
 	return bufstr_decl(op,v) ;
-}
+} /* end */
 inline int bufstr_dec(bufstr *op,longlong v) noex {
 	return bufstr_decll(op,v) ;
-}
+} /* end */
 
 inline int bufstr_dec(bufstr *op,uint v) noex {
 	return bufstr_decui(op,v) ;
-}
+} /* end */
 inline int bufstr_dec(bufstr *op,ulong v) noex {
 	return bufstr_decul(op,v) ;
-}
+} /* end */
 inline int bufstr_dec(bufstr *op,ulonglong v) noex {
 	return bufstr_decull(op,v) ;
-}
+} /* end */
 
 inline int bufstr_hex(bufstr *op,int v) noex {
 	return bufstr_hexi(op,v) ;
-}
+} /* end */
 inline int bufstr_hex(bufstr *op,long v) noex {
 	return bufstr_hexl(op,v) ;
-}
+} /* end */
 inline int bufstr_hex(bufstr *op,longlong v) noex {
 	return bufstr_hexll(op,v) ;
-}
+} /* end */
 
 inline int bufstr_hex(bufstr *op,uint v) noex {
 	return bufstr_hexui(op,v) ;
-}
+} /* end */
 inline int bufstr_hex(bufstr *op,ulong v) noex {
 	return bufstr_hexul(op,v) ;
-}
+} /* end */
 inline int bufstr_hex(bufstr *op,ulonglong v) noex {
 	return bufstr_hexull(op,v) ;
-}
+} /* end */
 
 template<typename Binary> int bufstr::bin(Binary v) noex {
 	return bufstr_bin(this,v) ;
-}
+} /* end */
 template<typename Octal> int bufstr::oct(Octal v) noex {
 	return bufstr_oct(this,v) ;
-}
+} /* end */
 template<typename Decimal> int bufstr::dec(Decimal v) noex {
 	return bufstr_dec(this,v) ;
-}
+} /* end */
 template<typename Hexadecimal> int bufstr::hex(Hexadecimal v) noex {
 	return bufstr_hex(this,v) ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
