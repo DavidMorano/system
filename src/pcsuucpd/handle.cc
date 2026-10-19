@@ -48,7 +48,7 @@
 ***************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -59,7 +59,7 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -72,6 +72,7 @@
 #include	<inetaddr.h>
 #include	<pwfile.h>
 #include	<srvtab.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"srventry.h"
@@ -122,11 +123,10 @@ extern int	handle_srventry(struct proginfo *,
 			SRVTAB_ENT *) ;
 extern int	inputlogin(struct proginfo *,
 			struct clientinfo *,int,char *,int,char *,int) ;
-extern int	passwdok(const char *,const char *) ;
+extern int	passwdok(cchar *,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -162,7 +162,7 @@ struct clientinfo	*cip ;
 	int	rs, i, sl, len, si ;
 	int	slen ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	peername[MAXHOSTNAMELEN + 1] ;
 	char	timebuf[TIMEBUFLEN + 1] ;
@@ -264,7 +264,7 @@ struct clientinfo	*cip ;
 	if (rs < 0) {
 
 	    logfile_printf(&pip->lh,"%s bad write rs=%d\n",
-	        timestr_logz(pip->daytime,timebuf),rs) ;
+	        strtime_logz(pip->daytime,timebuf),rs) ;
 
 	    goto badwrite ;
 	}
@@ -320,7 +320,7 @@ struct clientinfo	*cip ;
 	fsb.lp[fsb.rlen] = '\0' ;
 
 	logfile_printf(&pip->lh,"%s login=%s\n",
-	    timestr_logz(pip->daytime,timebuf),
+	    strtime_logz(pip->daytime,timebuf),
 	    netuser) ;
 
 
@@ -572,7 +572,7 @@ badlogin1:
 	pip->daytime = time(NULL) ;
 
 	logfile_printf(&pip->lh,"%s incomplete login >%c%c< (%d)\n",
-	    timestr_logz(pip->daytime,timebuf),
+	    strtime_logz(pip->daytime,timebuf),
 	    ((svcspec[0]) ? 'l' : ' '),
 	    ((netpass[0]) ? 'p' : ' '),
 	    rs) ;
@@ -602,7 +602,7 @@ badlogin2:
 
 	cp = (rs == SR_ACCESS) ? "incorrect password" : "no login" ;
 	logfile_printf("%s login=%s -> %s\n",
-	    timestr_logz(pip->daytime,timebuf),
+	    strtime_logz(pip->daytime,timebuf),
 	    service,cp) ;
 
 #if	CF_DEBUG
