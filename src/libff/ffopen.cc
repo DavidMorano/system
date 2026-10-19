@@ -22,8 +22,8 @@
 
 	int ffopen(FFILE *,fname,modestr)
 	FFILE		*fp ;
-	const char	fname[] ;
-	const char	modestr[] ;
+	cchar	fname[] ;
+	cchar	modestr[] ;
 
 	Arguments:
 
@@ -56,13 +56,13 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
 
 
 /* local variables */
 
-const char	*ffile_fnames[] = {
+cchar	*ffile_fnames[] = {
 	"*STDIN*",
 	"*STDOUT*",
 	"*STDERR*",
@@ -76,8 +76,8 @@ const char	*ffile_fnames[] = {
 
 int ffopen(fp,fname,modestr)
 FFILE		*fp ;
-const char	fname[] ;
-const char	modestr[] ;
+cchar	fname[] ;
+cchar	modestr[] ;
 {
 	FILE	*sfp ;
 
