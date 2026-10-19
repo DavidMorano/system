@@ -58,9 +58,9 @@
 #define	TO_AGAIN	(5*60)
 
 #if	CF_FGETS
-static int ffreadln_gets(FFILE *,char *,int) ;
+local int ffreadln_gets(FFILE *,char *,int) ;
 #else
-static int ffreadln_getc(FFILE *,char *,int) ;
+local int ffreadln_getc(FFILE *,char *,int) ;
 #endif /* CF_FGETS */
 
 
@@ -111,7 +111,7 @@ again:
 
 #if	CF_FGETS
 
-static int ffreadln_gets(fp,buf,len)
+local int ffreadln_gets(fp,buf,len)
 FFILE		*fp ;
 char		*buf ;
 int		len ;
@@ -140,7 +140,7 @@ int		len ;
 
 #else /* CF_FGETS */
 
-static int ffreadln_getc(fp,buf,len)
+local int ffreadln_getc(fp,buf,len)
 FFILE		*fp ;
 char		*buf ;
 int		len ;
