@@ -22,7 +22,7 @@
 
 	Description:
 	This is an email address handling module object.  It can
-	parse out and store hierarchically organized EMAs.
+	parse out hierarchically organized EMAs.
 
 *******************************************************************************/
 
@@ -33,7 +33,7 @@ module ;
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
