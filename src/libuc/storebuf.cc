@@ -61,11 +61,12 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU |str{x}cpy(3usys)| */
 #include	<ctbin.h>		/* LIBUC */
 #include	<ctoct.h>		/* LIBUC */
 #include	<ctdec.h>		/* LIBUC */
 #include	<cthex.h>		/* LIBUC */
-#include	<strwcpy.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"storebuf.h"
@@ -75,6 +76,16 @@
 import libutil ;			/* |memcopy(3u)| */
 
 /* local defines */
+
+#define	STOREBUF_BUFP	rbuf
+#define	STOREBUF_BUFL	rlen
+#define	STOREBUF_IDX	idx
+
+
+/* imported names */
+
+using usys::strwcpy ;			/* subroutine */
+using usys::strbcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -156,6 +167,84 @@ local inline int storebuf_hexx(char *bp,int bl,int i,T v) noex {
 
 /* exported subroutines */
 
+int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rbuf && sp) ylikely {
+	    rs = SR_INVALID ;
+	    if (i >= 0) ylikely {
+	        charp bp = (rbuf + i) ;
+		rs = SR_OK ;
+	        if (rlen >= 0) {
+	            if (sl >= 0) {
+		        if ((rlen - i) >= sl) {
+	                    memcopy(bp,sp,sl) ;
+	                    bp += sl ;
+		        } else {
+		            rs = SR_OVERFLOW ;
+			} /* end if (error) */
+	            } else {
+			charp ep = (rbuf + rlen) ;
+	                while ((bp < ep) && *sp) {
+	                    *bp++ = *sp++ ;
+		        } /* end while */
+		        if ((bp == ep) && *sp) {
+		            rs = SR_OVERFLOW ;
+		        } /* end if (error) */
+	            } /* end if */
+	        } else {
+	            if (sl >= 0) {
+	                memcopy(bp,sp,sl) ;
+	                bp += sl ;
+	            } else {
+			while (*sp) {
+			    *bp++ = *sp++ ;
+			} /* end while */
+	            } /* end if */
+	        } /* end if */
+	        *bp = eos ;
+		len = intconv(bp - (rbuf + i)) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (storebuf_buf) */
+
+int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rbuf && sp) ylikely {
+	    rs = SR_INVALID ;
+ 	    if (i >= 0) ylikely {	
+	        charp bp = (rbuf + i) ;
+	        rs = SR_OK ;
+	        if (rlen >= 0) ylikely {
+		    charp ep = (rbuf + rlen) ;
+	            if (sl >= 0) {
+	                while ((bp < ep) && hassome(sp,sl)) {
+	                    *bp++ = *sp++ ;
+	                    sl -= 1 ;
+	                } /* end while */
+		        if ((bp == ep) && hassome(sp,sl)) {
+		            rs = SR_OVERFLOW ;
+		        } /* end if (error) */
+		    } else {
+	                while ((bp < ep) && *sp) {
+	                    *bp++ = *sp++ ;
+		        } /* end while */
+		        if ((bp == ep) && *sp) {
+		            rs = SR_OVERFLOW ;
+		        } /* end if (error) */
+	            } /* end if */
+	            *bp = eos ;
+		} else {
+		    bp = strwcpy(bp,sp,sl) ;
+	        } /* end if */
+		len = intconv(bp - (rbuf + i)) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (storebuf_strw) */
+
 int storebuf_chrs(char *rbuf,int rlen,int idx,int ch,int n) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) ylikely {
@@ -194,89 +283,28 @@ int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 	return (rs >= 0) ? 1 : rs ;
 } /* end subroutine (storebuf_chr) */
 
-int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
+int storebuf_remslash(char *rbuf,int rlen,int idx) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (rbuf && sp) ylikely {
-	    rs = SR_INVALID ;
-	    if (i >= 0) ylikely {
-	        char	*bp = (rbuf + i) ;
-		rs = SR_OK ;
-	        if (rlen < 0) {
-	            if (sl < 0) {
-	                while (*sp) {
-	                    *bp++ = *sp++ ;
-	 	        } /* end while */
-	            } else {
-	                memcopy(bp,sp,sl) ;
-	                bp += sl ;
-	            } /* end if */
-	        } else {
-	            if (sl < 0) {
-	                while ((bp < (rbuf + rlen)) && *sp) {
-	                    *bp++ = *sp++ ;
-		        } /* end while */
-		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
-		            rs = SR_OVERFLOW ;
-		        } /* end if (error) */
-	            } else {
-		        if ((rlen - i) >= sl) {
-	                    memcopy(bp,sp,sl) ;
-	                    bp += sl ;
-		        } else {
-		            rs = SR_OVERFLOW ;
-			} /* end if (error) */
-	            } /* end if */
+	if (rbuf) ylikely {
+	    if ((rs = STOREBUF_IDX) >= 0) ylikely {
+	        charp bp = (STOREBUF_BUFP + STOREBUF_IDX) ;
+	        if ((STOREBUF_BUFL > 0) && (bp[-1] == '/')) {
+	            STOREBUF_BUFL -= 1 ;
+	            bp -= 1 ;
 	        } /* end if */
-	        *bp = eos ;
-		len = intconv(bp - (rbuf + i)) ;
+	        while ((STOREBUF_BUFL > 0) && (bp[-1] != '/')) {
+	            STOREBUF_BUFL -= 1 ;
+	            bp -= 1 ;
+	        } /* end while */
+	        if ((STOREBUF_BUFL > 0) && (bp[-1] == '/')) {
+	            STOREBUF_BUFL -= 1 ;
+	            bp -= 1 ;
+	        } /* end if */
+	        STOREBUF_IDX = intconv(bp - STOREBUF_BUFP) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
-} /* end subroutine (storebuf_buf) */
-
-int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	int		len = 0 ;
-	if (rbuf && sp) ylikely {
- 	    if (i >= 0) ylikely {	
-	        char	*bp = (rbuf + i) ;
-	        rs = SR_OK ;
-	        if (rlen < 0) ylikely {
-	            if (sl < 0) {
-	                while (*sp) {
-	                    *bp++ = *sp++ ;
-		        } /* end while */
-	            } else {
-	                while (sl && *sp) {
-	                    *bp++ = *sp++ ;
-	                    sl -= 1 ;
-	                } /* end while */
-	            } /* end if */
-	        } else {
-	            if (sl < 0) {
-	                while ((bp < (rbuf + rlen)) && *sp) {
-	                    *bp++ = *sp++ ;
-		        } /* end while */
-		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
-		            rs = SR_OVERFLOW ;
-		        } /* end if (error) */
-	            } else {
-	                while ((bp < (rbuf + rlen)) && sl && *sp) {
-	                    *bp++ = *sp++ ;
-	                    sl -= 1 ;
-	                } /* end while */
-		        if ((bp == (rbuf + rlen)) && sl) {
-		            rs = SR_OVERFLOW ;
-		        } /* end if (error) */
-	            } /* end if */
-	        } /* end if */
-	        *bp = eos ;
-		len = intconv(bp - (rbuf + i)) ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
-} /* end subroutine (storebuf_strw) */
+	return rs ;
+} /* end method (storebuf_remslash) */
 
 int storebuf_bini(char *rbuf,int rlen,int i,int v) noex {
 	uint		uv = uint(v) ;
@@ -489,5 +517,19 @@ storebuf &storebuf::operator << (long		v) noex {
 storebuf &storebuf::operator << (longlong	v) noex {
 	return opval(this,v) ;
 } /* end method */
+
+storebuf_co::operator int () noex {
+    	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    if (op->bufp) ylikely {
+	        switch (w) {
+	        case 0:
+	            rs = storebuf_remslash(op->bufp,op->bufl,op->idx) ;
+		    break ;
+	        } /* end switch */
+	    } /* end if (non-null) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (storebuf_co::operator) */
 
 
