@@ -41,7 +41,7 @@
 
 
 struct strmgr_head {
-	char		*dbuf ;
+	charp		dbuf ;
 	int		dlen ;
 	int		dl ;
 } ; /* end struct (strmgr_head) */
@@ -49,6 +49,7 @@ struct strmgr_head {
 #ifdef	__cplusplus
 enum strmgrmems {
     	strmgrmem_avail,
+	strmgrmem_remslash,
 	strmgrmem_rem,
 	strmgrmem_len,
 	strmgrmem_reset,
@@ -70,17 +71,19 @@ struct strmgr_co {
 } ; /* end struct (strmgr_co) */
 struct strmgr : strmgr_head {
 	strmgr_co	avail ;
+	strmgr_co	remslash ;
 	strmgr_co	rem ;
 	strmgr_co	len ;
 	strmgr_co	reset ;
 	strmgr_co	finish ;
 	strmgr() noex {
 	    avail	(this,strmgrmem_avail) ;
+	    remslash	(this,strmgrmem_remslash) ;
 	    rem		(this,strmgrmem_rem) ;
 	    len		(this,strmgrmem_len) ;
 	    reset	(this,strmgrmem_reset) ;
 	    finish	(this,strmgrmem_finish) ;
-	    dbuf = nullptr ;
+	    dbuf	= nullptr ;
 	} ; /* end ctor */
 	strmgr(const strmgr &) = delete ;
 	strmgr &operator = (const strmgr &) = delete ;
@@ -88,8 +91,8 @@ struct strmgr : strmgr_head {
 	int str		(cchar *,int = -1) noex ;
 	int chr		(int) noex ;
 	int get		(ccharpp) noex ;
-	void dtor() noex ;
-	operator int () noex ;
+	void dtor	() noex ;
+	operator int 	() noex ;
 	destruct strmgr() {
 	    if (dbuf) dtor() ;
 	} ; /* end */
@@ -106,6 +109,7 @@ extern int strmgr_rem		(strmgr *) noex ;
 extern int strmgr_lenrem	(strmgr *) noex ;
 extern int strmgr_str		(strmgr *,cchar *,int) noex ;
 extern int strmgr_chr		(strmgr *,int) noex ;
+extern int strmgr_remslash	(strmgr *) noex ;
 extern int strmgr_get		(strmgr *,ccharpp) noex ;
 extern int strmgr_len		(strmgr *) noex ;
 extern int strmgr_reset		(strmgr *) noex ;
