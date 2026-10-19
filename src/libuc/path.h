@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* add a c-string to the end of an existing path c-string */
+/* file-path manipulation */
 /* version %I% last-modified %G% */
 
 
