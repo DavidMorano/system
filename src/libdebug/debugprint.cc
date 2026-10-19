@@ -753,7 +753,7 @@ local int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		dl = 0 ; /* return-value */
 	for (int ch ; dlen-- && sl && ((ch = MKCHAR(*sp))) ; sp += 1) {
-	    if (isprintbad(ch)) {
+	    if (ischprintbad(ch)) {
 	        if (ch == '\n') {
 		    ch = '¬' ;
 	        } else {
@@ -774,7 +774,7 @@ local int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 local bool hasprintbad(cchar *sp,int sl) noex {
 	bool		f = false ;
 	while (sl && *sp) {
-	    f = isprintbad(sp[0] & UCHAR_MAX) ;
+	    f = ischprintbad(sp[0] & UCHAR_MAX) ;
 	    if (f) break ;
 	    sp += 1 ;
 	    sl -= 1 ;
