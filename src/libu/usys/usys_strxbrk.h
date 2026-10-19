@@ -28,8 +28,8 @@
 
 *******************************************************************************/
 
-#ifndef	USYSSTRXCBRK_INCLUDE
-#define	USYSSTRXCBRK_INCLUDE
+#ifndef	USYSSTRXBRK_INCLUDE
+#define	USYSSTRXBRK_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -47,6 +47,6 @@ extern char	*strrbrk(cchar *,cchar *) noex ;
 EXTERNC_end
 
 
-#endif /* USYSSTRXCBRK_INCLUDE */
+#endif /* USYSSTRXBRK_INCLUDE */
 
 
