@@ -1,4 +1,4 @@
-/* modmisc%strw MODULE */
+/* umisc%strw MODULE */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -21,7 +21,7 @@
 /*******************************************************************************
 
   	Module:
-	modmisc
+	umisc
 
 	Description:
 	This module provides miscellaneous UNIX® or other
@@ -43,7 +43,7 @@ module ;
 #include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-module modmisc ;
+module umisc ;
 
 /* local defines */
 
