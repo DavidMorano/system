@@ -59,11 +59,11 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
 
@@ -72,7 +72,7 @@ extern int	nprintf(const char *,const char *,...) ;
 
 /* forward references */
 
-static int	getuser(cchar **,char *,int) ;
+local int	getuser(cchar **,char *,int) ;
 
 
 /* local variables */
@@ -123,7 +123,7 @@ int subpcs_all(SUBPCS *sip,FILER *ofp)
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = sysusernames_open(&u,NULL)) >= 0) {
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    while ((rs = sysusernames_readent(&u,ubuf,ulen)) > 0) {
 		rs = subpcs_user(sip,ofp,ubuf,rs) ;
@@ -142,7 +142,7 @@ int subpcs_all(SUBPCS *sip,FILER *ofp)
 int subpcs_args(SUBPCS *sip,FILER *ofp,ARGINFO *aip,bits *bop,
 		cchar *afn)
 {
-	const int	argc = aip->argc ;
+	cint	argc = aip->argc ;
 	int		rs = SR_OK ;
 	int		ai ;
 	int		wlen = 0 ;
@@ -220,7 +220,7 @@ int subpcs_af(SUBPCS *sip,FILER *ofp,cchar *afn) noex {
 
 int subpcs_def(SUBPCS *sip,FILER *ofp)
 {
-	const int	ulen = USERNAMELEN ;
+	cint	ulen = USERNAMELEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	cchar		**envv = sip->envv ;
@@ -260,13 +260,13 @@ int subpcs_users(SUBPCS *sip,FILER *ofp,cchar *lbuf,int llen)
 int subpcs_user(SUBPCS *sip,FILER *ofp,cchar *sp,int sl)
 {
 	NULSTR		n ;
-	const int	w = sip->w ;
+	cint	w = sip->w ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	cchar		*un ;
 	if ((rs = nulstr_start(&n,sp,sl,&un)) >= 0) {
-	    const int	rlen = REALNAMELEN ;
+	    cint	rlen = REALNAMELEN ;
 	    char	rbuf[REALNAMELEN+1] ;
 	    if ((rs = pcsns_get(&sip->ns,rbuf,rlen,un,w)) >= 0) {
 	        rs = filer_println(ofp,rbuf,rs) ;
@@ -280,7 +280,7 @@ int subpcs_user(SUBPCS *sip,FILER *ofp,cchar *sp,int sl)
 /* end subroutine (subpcs_user) */
 
 
-static int getuser(cchar **envv,char *ubuf,int ulen)
+local int getuser(cchar **envv,char *ubuf,int ulen)
 {
 	int		rs = SR_OK ;
 	cchar		*un = getourenv(envv,VARMOTDUSER) ;
