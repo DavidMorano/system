@@ -76,10 +76,10 @@ using libuc::libmem ;			/* variable */
 int pq_start(pq *qhp) noex {
 	int		rs = SR_FAULT ;
 	if (qhp) ylikely {
-	    rs = SR_OK ;
-	    qhp->head = nullptr ;
-	    qhp->tail = nullptr ;
-	    qhp->cnt = 0 ;
+	    rs		= SR_OK ;
+	    qhp->head	= nullptr ;
+	    qhp->tail	= nullptr ;
+	    qhp->cnt	= 0 ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pq_start) */
@@ -93,7 +93,7 @@ int pq_finish(pq *qhp) noex {
 	        qhp->tail = nullptr ;
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pq_finish) */
@@ -143,7 +143,7 @@ int pq_insgroup(pq *qhp,pq_ent *gp,int esz,int n) noex {
 		    } else {
 	                ep->prev = nullptr ;
 	                qhp->head = ep ;
-		    }
+		    } /* end */
 	        } else {
 		    if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	        } /* end if */
@@ -184,7 +184,7 @@ int pq_gethead(pq *qhp,pq_ent **epp) noex {
 	    } /* end if (not empty) */
 	    if (epp) {
 		*epp = (rs >= 0) ? ep : nullptr ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (pq_gethead) */
@@ -202,13 +202,13 @@ int pq_gettail(pq *qhp,pq_ent **epp) noex {
 		    rs = SR_BADFMT ;
 		} else {
 	            rc = qhp->cnt ;
-		}
+		} /* end */
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (not empty) */
 	    if (epp) {
 		*epp = (rs >= 0) ? ep : nullptr ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (pq_gettail) */
@@ -244,7 +244,7 @@ int pq_rem(pq *qhp,pq_ent **epp) noex {
 	    } /* end if (not-empty) */
 	    if (epp) {
 		*epp = (rs >= 0) ? ep : nullptr ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (pq_rem) */
@@ -282,7 +282,7 @@ int pq_remtail(pq *qhp,pq_ent **epp) noex {
 	    } /* end if (not empty) */
 	    if (epp) {
 		*epp = (rs >= 0) ? ep : nullptr ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (pq_remtail) */
@@ -347,7 +347,7 @@ int pq_count(pq *qhp) noex {
 	        rc = qhp->cnt ;
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 } /* end subroutine (pq_count) */
@@ -377,7 +377,7 @@ int pq_audit(pq *qhp) noex {
 	        } /* end if (ok) */
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pq_audit) */
@@ -416,10 +416,10 @@ int pq_curenum(pq *qhp,pq_cur *curp,pq_ent **rpp) noex {
 	        curp->entp = nep ;
 		if (rpp) {
 		    *rpp = (rs >= 0) ? nep : nullptr ;
-		}
+		} /* end */
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (pq_curenum) */
@@ -467,7 +467,7 @@ int pq::curenum(pq_cur *curp,pq_ent **rpp) noex {
 void pq::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("pq",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (pq::dtor) */
 
 pq::operator int () noex {
