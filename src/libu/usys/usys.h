@@ -47,7 +47,9 @@
 
 /* utilities */
 #include	<usys_execname.hh>
+#include	<usys_hasx.h>
 #include	<usys_lenstr.hh>
+#include	<usys_umaxmsglen.h>
 #include	<usys_onc.hh>
 #include	<usys_pathpid.h>
 #include	<usys_plock.h>		/* defines |usys_plock()| */
@@ -55,11 +57,10 @@
 #include	<usys_strbcpy.hh>
 #include	<usys_strw.hh>
 #include	<usys_ufcntl.h>
+#include	<usys_ufstype.h>
 #include	<usys_ugetdents.h>
 #include	<usys_ugetnisdom.h>
 #include	<usys_usendfile.h>
-#include	<usys_ufstype.h>
-#include	<usys_umaxmsglen.h>
 
 /* missing operating system calls or facilities */
 #include	<usys_atox.h>
