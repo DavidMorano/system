@@ -42,8 +42,8 @@
 
 /* external subroutines */
 
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	bufvprintf(char *,int,const char *,va_list) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	bufvprintf(char *,int,cchar *,va_list) ;
 
 extern int	fbwrite(FILE *,cchar *,int) ;
 
@@ -53,7 +53,7 @@ extern int	fbwrite(FILE *,cchar *,int) ;
 
 int fbprintf(FILE *fp,cchar *fmt,...)
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		flen ;
 	int		wlen = 0 ;
