@@ -41,14 +41,14 @@ LIBS +=
 
 
 OBJ0= pathadd.o pathclean.o
-OBJ1= 
+OBJ1= pathbuf.o
 OBJ2= 
 OBJ3= 
 OBJ4= 
 OBJ5= 
 
-OBJA= obj0.o
-OBJB= obj3.o obj4.o obj5.o
+OBJA= obj0.o obj1.o
+OBJB=
 
 OBJ= obja.o
 
@@ -141,5 +141,6 @@ objb.o:			$(OBJB)
 
 pathadd.o:		pathadd.cc	pathadd.h		$(INCS)
 pathclean.o:		pathclean.cc	pathclean.h		$(INCS)
+pathbuf.o:		pathbuf.cc	pathbuf.hh		$(INCS)
 
 
