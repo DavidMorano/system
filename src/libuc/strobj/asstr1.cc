@@ -22,7 +22,7 @@
 
 	Description:
 	This is an email address handling module object.  It can
-	parse out and store hierarchically organized EMAs.
+	parse out hierarchically organized EMAs.
 
 *******************************************************************************/
 
