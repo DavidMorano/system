@@ -5,6 +5,7 @@
 /* cleanup a path */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -41,23 +42,29 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<aflag.hh>		/* LIBU */
 #include	<bufsizevar.hh>		/* LIBUC */
-#include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU |DPRINTF(3u)| */
 
+#include	"pathbuf.hh"
 #include	"pathclean.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import deb ;
 
 /* local defines */
 
-#define	PATHBUF_BUFP	pbuf
-#define	PATHBUF_BUFPL	plen
-#define	PATHBUF_IDX	idx
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
+#define	VARPATHCLEAN	"PATHCLEAN_DEBFN"
 
 
 /* imported namespaces */
@@ -75,16 +82,10 @@ import libutil ;			/* |lenstr(3u)| */
 /* local structures */
 
 namespace {
-    struct pathbuf {
-	char		*pbuf{} ;
-	int		plen{} ;
-	int		idx{} ;
-	int start	(char *,int) noex ;
-	int chr		(int) noex ;
-	int strw	(cchar *,int) noex ;
-	int remslash	() noex ;
-	int finish	() noex ;
-    } ; /* end struct (pathbuf) */
+    struct initer {
+	aflag		finit{} ;
+	operator int () noex ;
+    } ; /* end struct (initer) */
 } /* end namespace */
 
 
@@ -98,7 +99,9 @@ local int	nextname(cchar *,int,cchar **) noex ;
 
 /* local variables */
 
-static bufsizevar	maxpathlen(bufsize_mp) ;
+static initer		init ;
+static bufsizevar	maxpathlen	(bufsize_mp) ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -106,31 +109,52 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 
 /* exported subroutines */
 
-local int pathnclean(char *,int,cc *,int) noex ;
+local int pathncleanx(char *,int,ccp,int) noex ;
 
 int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf && spathbuf) ylikely {
 	    rbuf[0] = eos ;
-	    if ((rs = maxpathlen) >= 0) ylikely {
-	        rs = pathnclean(rbuf,rs,spathbuf,spathlen) ;
-		len = rs ;
-	    } /* end if (maxpathlen) */
+	    if (static cint rsi = init ; (rs = rsi) >= 0) {
+	        if ((rs = maxpathlen) >= 0) ylikely {
+	            rs = pathncleanx(rbuf,rs,spathbuf,spathlen) ;
+		    len = rs ;
+	        } /* end if (maxpathlen) */
+	    } /* end if (initer) */
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (pathclean) */
+
+int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (rbuf && sp) ylikely {
+	    rbuf[0] = eos ;
+	    rs = SR_INVALID ;
+	    if (rlen > 0) ylikely {
+	       if (static cint rsi = init ; (rs = rsi) >= 0) {
+	           rs = pathnclean(rbuf,rlen,sp,sl) ;
+		   len = rs ;
+	       } /* end if (initer) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (pathnclean) */
 
 
 /* local subroutines */
 
-local int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
+local int pathncleanx(char *rbuf,int rlen,cc *sp,int sl) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
         int     	nc = 0 ;
         bool    	f_prev = false ;
         cchar   	*pp = sp ;
+	DEBPRINTF("ent sp=%s\n",sp) ;
         if (int pl ; (pl = lenstr(sp,sl)) > 0) ylikely {
             if (pathbuf pb ; (rs = pb.start(rbuf,rlen)) >= 0) ylikely {
                 if (*pp == '/') {
@@ -147,13 +171,13 @@ local int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
                         if (cp[0] == '.') {
                             if ((cp[1] == '.') && (cl == 2)) {
                                 if (nc > 0) {
-                                    rs = pb.remslash() ;
+                                    rs = pb.remslash ;
                                     nc -= 1 ;
                                 } else {
                                     if (f_prev) {
                                         pb.chr('/') ;
                                     }
-                                    rs = pb.strw(cp,2) ;
+                                    rs = pb.str(cp,2) ;
                                     f_prev = true ;
                                     nc = 0 ;
                                 } /* end if */
@@ -161,7 +185,7 @@ local int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
                                 if (f_prev) {
                                     pb.chr('/') ;
                                 }
-                                rs = pb.strw(cp,cl) ;
+                                rs = pb.str(cp,cl) ;
                                 f_prev = true ;
                                 nc += 1 ;
                             } /* end if */
@@ -169,7 +193,7 @@ local int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
                             if (f_prev) {
                                 pb.chr('/') ;
                             }
-                            rs = pb.strw(cp,cl) ;
+                            rs = pb.str(cp,cl) ;
                             f_prev = true ;
                             nc += 1 ;
                         } /* end if */
@@ -183,103 +207,9 @@ local int pathnclean(char *rbuf,int rlen,cc *sp,int sl) noex {
                 len = rs1 ;
             } /* end if (pathbuf) */
         } /* end if (positive) */
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
         return (rs >= 0) ? len : rs ;
-} /* end subroutine (pathnclean) */
-
-int pathbuf::start(char *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (pbuf) ylikely {
-	    rs			= SR_OK ;
-	    PATHBUF_BUFP	= sp ;
-	    PATHBUF_BUFPL	= sl ;
-	    PATHBUF_IDX		= 0 ;
-	} /* end if (non-null) */
-	return rs ;
-} /* end subroutine (pathbuf_start) */
-
-int pathbuf::finish() noex {
-	int		rs ;
-	int		len = 0 ;
-	if ((rs = PATHBUF_IDX) >= 0) ylikely {
-	    char	*bp = (PATHBUF_BUFP + PATHBUF_IDX) ;
-	    len = PATHBUF_IDX ;
-	    *bp = eos ;			/* NUL-terminate */
-	    PATHBUF_BUFP	= nullptr ;
-	    PATHBUF_BUFPL	= 0 ;
-	    PATHBUF_IDX		= SR_NOTOPEN ;
-	} /* end if */
-	return (rs >= 0) ? len : rs ;
-} /* end method (pathbuf::finish) */
-
-int pathbuf::strw(cchar *sp,int sl) noex {
-	int		rs ;
-	int		len = 0 ;
-	if ((rs = PATHBUF_IDX) >= 0) ylikely {
-	    char	*bp = (PATHBUF_BUFP + PATHBUF_IDX) ;
-	    if (PATHBUF_BUFPL < 0) {
-	        if (sl < 0) {
-	            while (*sp) {
-	                *bp++ = *sp++ ;
-		    } /* end while */
-	        } else {
-	            while (*sp && (sl > 0)) {
-	                *bp++ = *sp++ ;
-	                sl -= 1 ;
-	            } /* end while */
-	        } /* end if */
-	    } else {
-	        if (sl < 0) {
-	            while (*sp && (bp < (PATHBUF_BUFP + PATHBUF_BUFPL - 1))) {
-	                *bp++ = *sp++ ;
-		    } /* end while */
-	        } else {
-	            while (*sp && (sl > 0) && 
-	                (bp < (PATHBUF_BUFP + PATHBUF_BUFPL - 1))) {
-	                *bp++ = *sp++ ;
-	                sl -= 1 ;
-	            } /* end while */
-	        } /* end if */
-	        if (bp >= (PATHBUF_BUFP + PATHBUF_BUFPL - 1)) {
-	            PATHBUF_IDX = SR_TOOBIG ;
-	            rs = SR_TOOBIG ;
-	        } /* end if */
-	    } /* end if */
-	    if (rs >= 0) {
-	        *bp = eos ;
-	        len = intconv(bp - (PATHBUF_BUFP + PATHBUF_IDX)) ;
-	        PATHBUF_IDX = intconv(bp - PATHBUF_BUFP) ;
-	    } /* end if (ok) */
-	} /* end if (ok) */
-	return (rs >= 0) ? len : rs ;
-} /* end method (pathbuf::strw) */
-
-int pathbuf::chr(int ch) noex {
-	char		buf[2] ;
-	buf[0] = char(ch) ;
-	buf[1] = eos ;
-	return strw(buf,1) ;
-} /* end method (pathbuf::chr) */
-
-int pathbuf::remslash() noex {
-	int		rs ;
-	if ((rs = PATHBUF_IDX) >= 0) ylikely {
-	    char	*bp = (PATHBUF_BUFP + PATHBUF_IDX) ;
-	    if ((PATHBUF_BUFPL > 0) && (bp[-1] == '/')) {
-	        PATHBUF_BUFPL -= 1 ;
-	        bp -= 1 ;
-	    } /* end if */
-	    while ((PATHBUF_BUFPL > 0) && (bp[-1] != '/')) {
-	        PATHBUF_BUFPL -= 1 ;
-	        bp -= 1 ;
-	    } /* end while */
-	    if ((PATHBUF_BUFPL > 0) && (bp[-1] == '/')) {
-	        PATHBUF_BUFPL -= 1 ;
-	        bp -= 1 ;
-	    } /* end if */
-	    PATHBUF_IDX = intconv(bp - PATHBUF_BUFP) ;
-	} /* end if (ok) */
-	return rs ;
-} /* end method (pathbuf::remslash) */
+} /* end subroutine (pathncleanx) */
 
 local int nextname(cchar *sp,int sl,cchar **rpp) noex {
     	int		rl = 0 ;
@@ -300,5 +230,19 @@ local int nextname(cchar *sp,int sl,cchar **rpp) noex {
 	} /* end */
 	return rl ;
 } /* end subroutine (nextname) */
+
+initer::operator int () noex {
+    	int		rs = SR_OK ;
+	if_constexpr (f_debug) {
+	    if (! finit.testandset) {
+	        if (ccharp dfn = getenv(VARPATHCLEAN)) {
+		    if (cint rs1 = DEBOPEN(dfn) ; rs1 >= 0) {
+		        DEBPRINTF("debinit fd=%d\n",rs1) ;
+		    } /* end if (DEBOPEN) */
+	        } /* end if (getenv) */
+	    } /* end if (needed) */
+	} /* end if_constexpr (f_debug) */
+	return rs ;
+} /* end method (initer::operator) */
 
 
