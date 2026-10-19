@@ -31,7 +31,7 @@
 
 	Synopses:
 	int pathnaddw	(char *pbuf,int plen,int pl,cchar *sp) noex
-	int pathnaddx	(char *pbuf,int plen,int pl,cchar *sp) noex
+	int pathnaddx	(char *pbuf,int plen,int pl,int n,cchar *sp ...) noex
 	int pathaddw	(char *pbuf,int pl,cchar *sp,int sl) noex
 	int pathaddx	(char *pbuf,int pl,int n,cchar *sp ...) noex
 
