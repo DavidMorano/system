@@ -27,12 +27,12 @@
 	Synopsis:
 
 	int opensvc_mailmsgs(pr,prn,of,om,argv,envv,to)
-	const char	*pr ;
-	const char	*prn ;
+	cchar	*pr ;
+	cchar	*prn ;
 	int		of ;
 	mode_t		om ;
-	const char	**argv ;
-	const char	**envv ;
+	cchar	**argv ;
+	cchar	**envv ;
 	int		to ;
 
 	Arguments:
@@ -97,33 +97,11 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	statvfsdir(const char *,STATVFS *) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	pcsgetnames(const char *,char *,int,const char *,int) ;
-extern int	pcsmailcheck(const char *,char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	isdigitlatin(int) ;
-extern int	isOneOf(const int *,int) ;
-
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* local structures */
@@ -143,18 +121,18 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
+local int	subinfo_start(SUBINFO *) ;
+local int	subinfo_finish(SUBINFO *) ;
 #if	CF_SETENTRY
-static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
+local int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	isNoMail(int) ;
+local int	isNoMail(int) ;
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"sn",
 	NULL
@@ -166,7 +144,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const int	rschecks[] = {
+static cint	rschecks[] = {
 	SR_OVERFLOW,
 	SR_NOENT,
 	SR_ACCESS,
@@ -179,20 +157,20 @@ static const int	rschecks[] = {
 
 /* ARGSUSED */
 int opensvc_mailmsgs(pr,prn,of,om,argv,envv,to)
-const char	*pr ;
-const char	*prn ;
+cchar	*pr ;
+cchar	*prn ;
 int		of ;
 mode_t		om ;
-const char	**argv ;
-const char	**envv ;
+cchar	**argv ;
+cchar	**envv ;
 int		to ;
 {
 	SUBINFO		si, *sip = &si ;
-	BITS		pargs ;
-	KEYOPT		akopts ;
-	const int	ulen = USERNAMELEN ;
-	const int	llen = LINEBUFLEN ;
-	const int	flen = MAILADDRLEN ;
+	bits		pargs ;
+	keyopt		akopts ;
+	cint	ulen = USERNAMELEN ;
+	cint	llen = LINEBUFLEN ;
+	cint	flen = MAILADDRLEN ;
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs = SR_OK ;
@@ -207,10 +185,10 @@ int		to ;
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_akopts = FALSE ;
 	int		f ;
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*varcols ;
-	const char	*un = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*varcols ;
+	cchar	*un = NULL ;
 	char		ubuf[USERNAMELEN+1] ;
 	char		lbuf[LINEBUFLEN+1] ;
 	char		fbuf[MAILADDRLEN+1] ;
@@ -244,7 +222,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int ach = MKCHAR(argp[1]) ;
+		cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -317,7 +295,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -432,7 +410,7 @@ int		to ;
 	if ((rs >= 0) && ((un == NULL) || (un[0] == '\0'))) {
 	     un = getourenv(envv,VARMOTDUSER) ;
 	     if ((un == NULL) || (un[0] == '\0')) {
-		const char	*uidp = getourenv(envv,VARMOTDUID) ;
+		cchar	*uidp = getourenv(envv,VARMOTDUID) ;
 		if ((uidp != NULL) && (uidp[0] != '\0')) {
 		    int		v ;
 		    uid_t	uid ;
@@ -484,7 +462,7 @@ int		to ;
 		rs = ctdeci(lbuf,llen,nmsgs) ;
 		ll = rs ;
 	    } else {
-	        const char	*fmt ;
+	        cchar	*fmt ;
 	        if (nmsgs > 0) {
 	            fmt = "mail u=%s msgs=%u from=>%s<" ;
 	        } else
@@ -546,7 +524,7 @@ badsubstart:
 /* local subroutines */
 
 
-static int subinfo_start(SUBINFO *sip)
+local int subinfo_start(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 
@@ -560,7 +538,7 @@ static int subinfo_start(SUBINFO *sip)
 /* end subroutine (subinfo_start) */
 
 
-static int subinfo_finish(SUBINFO *sip)
+local int subinfo_finish(SUBINFO *sip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -618,7 +596,7 @@ int subinfo_setentry(SUBINFO *sip,cchar **epp,char *vp,int vl)
 #endif /* CF_SETENTRY */
 
 
-static int isNoMail(int rs)
+local int isNoMail(int rs)
 {
 	return isOneOf(rschecks,rs) ;
 }
