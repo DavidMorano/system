@@ -21,7 +21,7 @@
 
 
 struct strop_head {
-	cchar		*sp ;
+	ccharp		sp ;
 	int		sl ;
 } ; /* end struct (strop_head) */
 
@@ -65,7 +65,7 @@ struct strop : strop_head {
 	    whitedash	(this,stropmem_whitedash) ;
 	    whitecolon	(this,stropmem_whitecolon) ;
 	    finish	(this,stropmem_finish) ;
-	    sp = nullptr ;
+	    sp		= nullptr ;
 	} ; /* end ctor */
 	strop(const strop &) = delete ;
 	strop &operator = (const strop &) = delete ;
