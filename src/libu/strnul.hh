@@ -55,10 +55,10 @@ class strnul {
 	ccharp operator () (const strview &) noex ;
 	operator ccharp () const noex {
 	    return rp ;
-	} ;
+	} ; /* end */
 	operator bool	() const noex {
 	    return fok ;
-	} ;
+	} ; /* end */
 	destruct strnul() {
 	    if (as) dtor() ;
 	} ; /* end dtor */
