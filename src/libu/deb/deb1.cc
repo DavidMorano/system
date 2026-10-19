@@ -102,12 +102,15 @@ int debopen(cchar *fn) noex {
 	if (fn) ylikely {
 	    rs = SR_INVALID ;
 	    if (fn[0]) ylikely {
-		cint of = (O_WRONLY | O_TRUNC) ;
-		if ((rs = open(fn,of,0666)) < 0) {
-		    rs = (neg errno) ;
-		} else {
-		    dfd = rs ;
-		} /* end if (open) */
+		rs = SR_OK ;
+		if (dfd < 0) ylikely {
+		    cint of = (O_WRONLY | O_TRUNC) ;
+		    if ((rs = open(fn,of,0666)) < 0) {
+		        rs = (neg errno) ;
+		    } else {
+		        dfd = rs ;
+		    } /* end if (open) */
+		} /* end if (needed) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -127,7 +130,9 @@ int debfd(int fd) noex {
     	int		rs = SR_INVALID ;
 	if (fd >= 0) ylikely {
 	    rs = SR_OK ;
-    	    dfd = fd ;
+	    if (dfd < 0) ylikely {
+    	        dfd = fd ;
+	    } /* end if (needed) */
 	} /* end if (valid) */
 	return rs ;
 } /* end subroutine (debfd) */
@@ -139,7 +144,7 @@ int debprintf(cchar *func,cchar *fmt,...) noex {
 	int		len = 0 ; /* return-value */
 	if (func && fmt) ylikely {
 	    rs = SR_OK ;
-	    if (dfd >= 0) {
+	    if (dfd >= 0) ylikely {
 	        va_begin(ap,fmt) ;
     	        rs = SR_NOMEM ;
 	        if (char *fbuf = new(nt) char[flen + 1]) ylikely {
