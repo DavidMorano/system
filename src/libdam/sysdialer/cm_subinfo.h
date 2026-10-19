@@ -27,13 +27,22 @@
 
 *******************************************************************************/
 
+#ifndef	CMSUBINFO_INCLUDE
+#define	CMSUBINFO_INCLUDE
+
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
 
-struct cm_subinfo {
-	int		argslen ;
-} ; /* end struct */
+namespace cm_ns {
+    struct cm_subinfo {
+	int	argslen ;
+    } ; /* end struct */
+} /* end namespace (cm_ns) */
+
+
+#endif /* CMSUBINFO_INCLUDE */
 
 
