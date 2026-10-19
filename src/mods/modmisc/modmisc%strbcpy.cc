@@ -41,6 +41,7 @@ module ;
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
+#include	<usys_hasx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 module modmisc ;
@@ -74,10 +75,6 @@ module modmisc ;
 
 /* exported subroutines */
 
-local inline bool hasgot(cchar *sp,int sl) noex {
-    	return (sl || *sp) ;
-} /* end subroutine (hasgot) */
-
 local char *strbcpy_pos(char *dp,int dl,cchar *sp,int sl) noex {
 	if (sl >= 0) {
 	    while (dl && sl && *sp) {
@@ -85,14 +82,14 @@ local char *strbcpy_pos(char *dp,int dl,cchar *sp,int sl) noex {
 		sl -= 1 ;
 		dl -= 1 ;
 	    } /* end while */
-	    *dp = '\0' ;
-	    if ((dl == 0) && hasgot(sp,sl)) dp = nullptr ;
+	    *dp = eos ;
+	    if ((dl == 0) && hassome(sp,sl)) dp = nullptr ;
 	} else {
 	    while (dl && *sp) {
 	        *dp++ = *sp++ ;
 		dl -= 1 ;
 	    } /* end while */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    if ((dl == 0) && *sp) dp = nullptr ;
 	} /* end if */
 	return dp ;
@@ -104,14 +101,14 @@ local char *strbcpy_neg(char *dp,int dl,cchar *sp,int sl) noex {
 	    while (sl-- && *sp) {
 	        *dp++ = *sp++ ;
 	    } /* end while */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = stpcpy(dp,sp) ;
 	} /* end if */
     	return dp ;
 } /* end subroutine (strbcpy_neg) */
 
-namespace umisc_ns {
+namespace modmisc_ns {
     char *strbcpy(char *dp,int dl,cchar *sp,int sl) noex {
 	char *rp = nullptr ;
     	if (dp && sp) ylikely {
@@ -123,6 +120,6 @@ namespace umisc_ns {
 	} /* end if (non-null) */
 	return rp ;
     } /* end subroutine (strbcpy) */
-} /* end namespace (umisc_ns) */
+} /* end namespace (modmisc_ns) */
 
 
