@@ -38,8 +38,15 @@
 
 #include	"strmgr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
+
+#define	STRMGR_BUFP	op->dbuf
+#define	STRMGR_BUFL	op->dlen
+#define	STRMGR_IDX	op->dl
 
 
 /* external subroutines */
@@ -66,6 +73,7 @@ int strmgr_start(strmgr *op,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && dbuf) ylikely {
 	    rs = SR_INVALID ;
+	    dbuf[0] = eos ;
 	    if (dlen >= 0) {
 	        op->dbuf = dbuf ;
 	        op->dlen = dlen ;
@@ -80,10 +88,9 @@ int strmgr_finish(strmgr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = op->dl ;
-	    op->dbuf[0] = '\0' ;
-	    op->dbuf = nullptr ;
-	    op->dlen = 0 ;
-	    op->dl = 0 ;
+	    op->dbuf	= nullptr ;
+	    op->dlen	= 0 ;
+	    op->dl	= 0 ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (strmgr_finish) */
@@ -92,7 +99,7 @@ int strmgr_avail(strmgr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = (op->dlen - op->dl) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (strmgr_avail) */
 
@@ -106,36 +113,66 @@ int strmgr_lenrem(strmgr *op) noex {
 
 int strmgr_str(strmgr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	int		tl = 0 ;
 	if (op && sp) ylikely {
-	    cint	rlen = (op->dlen - op->dl) ;
-	    rs = SR_OK ;
-	    while ((rs >= 0) && sl-- && *sp) {
-	        if (tl < rlen) ylikely {
-	            op->dbuf[op->dl + tl++] = *sp++ ;
+	    if ((rs = op->dl) >= 0) {
+	        charp bp = (op->dbuf + op->dl) ;
+	        charp ep = (op->dbuf + op->dlen) ;
+	        rs = SR_OVERFLOW ;
+	        while ((bp < ep) && sl && *sp) {
+		    *bp++ = *sp++ ;
+		    sl-- ;
+	        } /* end for */
+	        *bp = eos ;
+	        if ((bp < ep) || isvalzero(sl) || isvalzero(*sp)) {
+		    rs = intconv(bp - (op->dbuf + op->dl)) ;
+	            op->dl += rs ;
 	        } else {
-	            rs = SR_OVERFLOW ;
-	        }
-	    } /* end for */
-	    if (rs >= 0) ylikely {
-	        op->dl += tl ;
-	    }
+		    op->dl = rs ;
+	        } /* end if (ok) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? tl : rs ;
+	return rs ;
 } /* end subroutine (strmgr_str) */
 
 int strmgr_chr(strmgr *op,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    rs = SR_OK ;
-	    if (op->dl < op->dlen) ylikely {
-	        op->dbuf[op->dl++] = char(ch) ;
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
+	    if ((rs = op->dl) >= 0) {
+	        rs = SR_OVERFLOW  ;
+	        if (op->dl < op->dlen) ylikely {
+	            charp bp = (op->dbuf + op->dl) ;
+	            *bp++ = char(ch) ;
+		    *bp = eos ;
+		    rs = 1 ; /* number of bytes stored */
+	            op->dl += rs ;
+		} else {
+		    op->dl = rs ;
+	        } /* end if (good) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? 1 : rs ;
+	return rs ;
 } /* end subroutine (strmgr_chr) */
+
+int strmgr_remslash(strmgr *op) noex {
+	int		rs ;
+	if ((rs = STRMGR_IDX) >= 0) ylikely {
+	    char	*bp = (STRMGR_BUFP + STRMGR_IDX) ;
+	    if ((STRMGR_BUFL > 0) && (bp[-1] == '/')) {
+	        STRMGR_BUFL -= 1 ;
+	        bp -= 1 ;
+	    } /* end if */
+	    while ((STRMGR_BUFL > 0) && (bp[-1] != '/')) {
+	        STRMGR_BUFL -= 1 ;
+	        bp -= 1 ;
+	    } /* end while */
+	    if ((STRMGR_BUFL > 0) && (bp[-1] == '/')) {
+	        STRMGR_BUFL -= 1 ;
+	        bp -= 1 ;
+	    } /* end if */
+	    STRMGR_IDX = intconv(bp - STRMGR_BUFP) ;
+	} /* end if (ok) */
+	return rs ;
+} /* end method (strmgr_remslash) */
 
 int strmgr_get(strmgr *op,ccharpp rpp) noex {
 	int		rs = SR_FAULT ;
@@ -185,7 +222,7 @@ int strmgr::get(ccharpp rpp) noex {
 void strmgr::dtor() noex {
     	if (cint rs = finish ; rs < 0) {
 	    ulogerror("strmgr",rs,"dtor-finish") ;
-	}
+	} /* end */
 } /* end method (strmgr::dtor) */
 
 strmgr_co::operator int () noex {
@@ -194,6 +231,9 @@ strmgr_co::operator int () noex {
 	    switch (w) {
 	    case strmgrmem_avail:
 	        rs = strmgr_avail(op) ;
+	        break ;
+	    case strmgrmem_remslash:
+	        rs = strmgr_remslash(op) ;
 	        break ;
 	    case strmgrmem_rem:
 	        rs = strmgr_rem(op) ;
