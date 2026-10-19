@@ -25,12 +25,12 @@
 
 
 EXTERNC_begin
-
 extern int pathclean(char *,cchar *,int) noex ;
-
 EXTERNC_end
 
+
 #ifdef	__cplusplus
+extern int pathnclean(char *,int,cchar *,int = -1) noex ;
 inline int pathclean(char *dbuf,cchar *sp) noex {
     	return pathclean(dbuf,sp,-1) ;
 } /* end */
