@@ -34,7 +34,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -45,7 +45,7 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
@@ -71,10 +71,10 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,char **) ;
+extern int	sfshrink(cchar *,int,char **) ;
 
 extern char	*strbasename(char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -83,7 +83,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* forward references */
 
 #if	CF_NPRINTF
-static char	*strhex(const char *,char *) ;
+static char	*strhex(cchar *,char *) ;
 #endif
 
 
@@ -91,7 +91,7 @@ static char	*strhex(const char *,char *) ;
 
 #if	CF_NPRINTF
 
-static const char	hextable[] = {
+static cchar	hextable[] = {
 	'0', '1', '2', '3', '4', '5', '6', '7',
 	'8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
 } ;
@@ -299,7 +299,7 @@ badtries:
 #if	CF_NPRINTF
 
 static char *strhex(s,buf)
-const char	s[] ;
+cchar	s[] ;
 char		buf[] ;
 {
 	int	i, j ;
