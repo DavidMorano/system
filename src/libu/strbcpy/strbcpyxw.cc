@@ -69,6 +69,8 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<usys_hasx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strbcpyxw.h"
 
@@ -89,8 +91,6 @@
 
 
 /* forward references */
-
-local bool hasgot(ccp,int) noex ;
 
 
 /* local variables */
@@ -145,12 +145,12 @@ local char *strbcpyxw_pos(char *dp,int dl,int n,va_list ap) noex {
 	if ((! fbad) && (n > 0)) ylikely {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    int	sl = (int)	va_arg(ap,int) ;
-	    while ((dl > 0) && hasgot(sp,sl)) {
+	    while ((dl > 0) && hassome(sp,sl)) {
 		*dp++ = *sp++ ;
 		sl -= 1 ;
 		dl -= 1 ;
 	    } /* end while */
-	    fbad = ((dl == 0) && hasgot(sp,sl)) ;
+	    fbad = ((dl == 0) && hassome(sp,sl)) ;
 	} /* end if */
 	*dp = '\0' ;
 	if (fbad) dp = nullptr ;
@@ -165,7 +165,7 @@ local char *strbcpyxw_neg(char *dp,int,int n,va_list ap) noex {
 	if (n > 0) ylikely {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    int	sl = (int)	va_arg(ap,int) ;
-	    while (hasgot(sp,sl)) {
+	    while (hassome(sp,sl)) {
 		*dp++ = *sp++ ;
 		sl -= 1 ;
 	    } /* end while */
@@ -190,9 +190,5 @@ char *strbcpyxw(char *dp,int dl,int n,...) noex {
 
 
 /* local subroutines */
-
-local bool hasgot(ccp sp,int sl) noex {
-    	return (sl && *sp) ;
-} /* end subroutine (hasgot) */
 
 
