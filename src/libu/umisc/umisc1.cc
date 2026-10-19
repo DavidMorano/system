@@ -53,7 +53,6 @@ module ;
 #include	<cstdarg>		/* CSTD |va_list(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usupport.h>		/* LIBU |sncpy(3usys)| */
 #include	<localmisc.h>		/* LIBU */
 
 module umisc ;
@@ -62,8 +61,6 @@ module umisc ;
 
 
 /* imported namespaces */
-
-using usys::sncpy ;			/* subroutine */
 
 
 /* local typedefs */
