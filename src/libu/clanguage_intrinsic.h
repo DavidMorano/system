@@ -53,10 +53,6 @@
 #define	isnull(a)		((a) == nullptr)
 #endif
 
-#ifndef	iszval
-#define	iszval(a)		((a) == 0)
-#endif
-
 
 #endif /* CLANGUAGEINTRINSIC_INCLUDE */
 
