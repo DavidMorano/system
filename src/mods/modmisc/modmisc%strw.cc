@@ -74,7 +74,7 @@ module modmisc ;
 
 /* exported subroutines */
 
-namespace umisc_ns {
+namespace modmisc_ns {
     char *strwcpy(char *dp,cchar *sp,int sl) noex {
     	if (dp && sp) ylikely {
 	    if (sl >= 0) {
@@ -88,6 +88,6 @@ namespace umisc_ns {
 	} /* end if (non-null) */
 	return dp ;
     } /* end subroutine (strwcpy) */
-} /* end namespace (umisc_ns) */
+} /* end namespace (modmisc_ns) */
 
 
