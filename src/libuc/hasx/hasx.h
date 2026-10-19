@@ -51,21 +51,33 @@ EXTERNC_begin
 
 local inline bool hascontent(cchar *fp,int fl) noex {
 	return hasnotempty(fp,fl) ;
-}
+} /* end */
 local inline bool hasValidMagic(cchar *sp,int sl,cchar *ms) noex  {
 	return hasvalidmagic(sp,sl,ms) ;
-}
+} /* end */
 local inline bool hasEOH(cchar *sp,int sl) noex {
 	return haseoh(sp,sl) ;
-}
+} /* end */
 local inline bool hasDotDir(cchar *sp,int sl) noex {
 	return hasdots(sp,sl) ;
-}
+} /* end */
 local inline bool hasINET4AddrStr(cchar *sp,int sl) noex {
 	return hasinet4addrstr(sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
+
+#ifndef	SUBROUTINE_HASXX
+#define	SUBROUTINE_HASXX
+EXTERNC_begin
+local inline bool hassome(cchar *sp,int sl) noex {
+    	return (sl && *sp) ;
+} /* end */
+local inline bool hasnone(cchar *sp,int sl) noex {
+    	return ((sl == 0) || (*sp == '\0')) ;
+} /* end */
+EXTERNC_end
+#endif /* SUBROUTINE_HASXX */
 
 
 #endif /* HASX_INCLUDE */
