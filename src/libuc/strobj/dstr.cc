@@ -78,7 +78,7 @@ int dstr_start(dstr *sop,cchar *sp,int sl) noex {
 	    if (cchar *rp ; (rs = lm_strw(sp,sl,&rp)) >= 0) ylikely {
 		sop->slen = rs ;
 		sop->sbuf = charp(rp) ;
-	    }
+	    } /* end if (memory-acquire) */
 	} /* end if */
 	return rs ;
 } /* end subroutine (dstr_start) */
@@ -92,7 +92,7 @@ int dstr_finish(dstr *sop) noex {
 	        rs1 = lm_free(sop->sbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        sop->sbuf = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    sop->slen = 0 ;
 	} /* end if (non-null) */
 	return rs ;
@@ -103,7 +103,7 @@ int dstr_assign(dstr *sop,dstr *sop2) noex {
 	if (sop && sop2) ylikely {
 	    if ((rs = dstr_finish(sop)) >= 0) {
 	        rs = dstr_start(sop,sop2->sbuf,sop2->slen) ;
-	    }
+	    } /* end if (assignment) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (dstr_assign) */
