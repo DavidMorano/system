@@ -28,13 +28,13 @@
 	for not writing a whole new daemon program just to poll for
 	machine status.  I hope this works out! :-)
 
-
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*****************************************************************************
 
+  	Description:
 	This subroutine is responsible for listening on the given
 	socket and spawning off a program to handle any incoming
 	connection.  Some of the "internal" messages are handled here
@@ -43,17 +43,12 @@
 	'standing' object module.
 
 	Synopsis:
-
-	int watch(pip,bip)
-	struct proginfo	*pip ;
-	BUILTIN		*bip ;
+	int watch(PI *pip,BUILTIN *bip) noex
 
 	Arguments:
-
 	pip	program information pointer
 
 	Returns:
-
 	>=0	does not really matter in the current implementation
 	<0	error code (system-return)
 
@@ -68,18 +63,18 @@
 #include	<sys/uio.h>
 #include	<sys/msg.h>
 #include	<netinet/in.h>
+#include	<dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<csignal>
-#include	<dirent.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<time.h>
-#include	<usystem.h>
-#include	<baops.h>
-#include	<bfile.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<field.h>
 #include	<logfile.h>
 #include	<varsub.h>
@@ -88,8 +83,11 @@
 #include	<srvtab.h>
 #include	<acctab.h>
 #include	<opentmp.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"jobdb.h"
 #include	"builtin.h"
@@ -124,11 +122,11 @@
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 extern int	mktmpdir(struct proginfo *,char *) ;
 extern int	dupup(int,int) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
@@ -139,10 +137,7 @@ extern int	handle(struct proginfo *,
 			BUILTIN *,STANDING *, struct clientinfo *) ;
 extern int	checkdirs(struct proginfo *,char *,int,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 #if	CF_DEBUG
 extern char	*d_reventstr() ;
@@ -157,29 +152,29 @@ extern char	*d_reventstr() ;
 
 /* forward references */
 
-static int	openipc(struct proginfo *,char *) ;
-static int	closeipc(struct proginfo *,char *) ;
-static int	writeout() ;
-static int	watch_newjob(struct proginfo *,
+local int	openipc(struct proginfo *,char *) ;
+local int	closeipc(struct proginfo *,char *) ;
+local int	writeout() ;
+local int	watch_newjob(struct proginfo *,
 			BUILTIN *, STANDING *, struct clientinfo *,int,int) ;
 
 #if	CF_DEBUG
-static int	printsubs(struct proginfo *,const char *) ;
+local int	printsubs(struct proginfo *,cchar *) ;
 #endif
 
 #ifdef	COMMENT
-static int	write_mqid() ;
+local int	write_mqid() ;
 #endif
 
-static void	int_exit(int) ;
-static void	int_child(int) ;
+local void	int_exit(int) ;
+local void	int_child(int) ;
 
 
 /* local variables */
 
 /* writable */
 
-static int	f_exit, f_child ;
+local int	f_exit, f_child ;
 
 
 /* exported subroutines */
@@ -216,7 +211,9 @@ BUILTIN		*bip ;
 	time_t		ti_pidcheck = 1 ;
 	time_t		ti_lastmark = 0 ;
 
-	int	rs = SR_BAD, rs1, i, len, blen ;
+	int	rs = SR_BADE ;
+	int	rs1 ;
+	int	i, len, blen ;
 	int	re, ns ;
 	int	size, cl ;
 	int	to_pollidle = TI_POLL ;
@@ -458,7 +455,7 @@ BUILTIN		*bip ;
 	    if (rs1 >= 0)
 	        cip->salen = fromlen ;
 
-	    ofd = (isasocket(ifd)) ? ifd : FD_STDOUT ;
+	    ofd = (isfdsocket(ifd)) ? ifd : FD_STDOUT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -884,13 +881,13 @@ top:
 
 	            rs = SR_OK ;
 	            logfile_printf(&pip->lh, "%s server exit, ex=%d\n",
-	                timestr_logz(pip->daytime,timebuf),
+	                strtime_logz(pip->daytime,timebuf),
 	                child_stat & 255) ;
 
 	            writeout(pip,efd,"standard error") ;
 
 	            logfile_printf(&pip->lh,"elapsed time %s\n",
-	                timestr_elapsed((pip->daytime - jep->atime),timebuf)) ;
+	                strtime_elapsed((pip->daytime - jep->atime),timebuf)) ;
 
 	            u_close(efd) ;
 
@@ -937,7 +934,7 @@ top:
 
 	            logfile_printf(&pip->lh,
 	                "%s lock file conflict, other PID=%d\n",
-	                timestr_logz(pip->daytime,timebuf),
+	                strtime_logz(pip->daytime,timebuf),
 	                ci.pid) ;
 
 	            goto badlockfile ;
@@ -959,7 +956,7 @@ top:
 
 	            logfile_printf(&pip->lh,
 	                "%s PID file conflict, other PID=%d\n",
-	                timestr_logz(pip->daytime,timebuf),
+	                strtime_logz(pip->daytime,timebuf),
 	                rs) ;
 
 	            goto badpidfile ;
@@ -1023,7 +1020,7 @@ top:
 
 		f_logchange = TRUE ;
 	        logfile_printf(&pip->lh,"%s server table file changed\n",
-	            timestr_logz(pip->daytime,timebuf)) ;
+	            strtime_logz(pip->daytime,timebuf)) ;
 
 	    }
 
@@ -1033,7 +1030,7 @@ top:
 
 		    f_logchange = TRUE ;
 	            logfile_printf(&pip->lh,"%s mark> %s\n",
-	                timestr_logz(pip->daytime,timebuf),
+	                strtime_logz(pip->daytime,timebuf),
 	                pip->nodename) ;
 
 		    logfile_flush(&pip->lh) ;
@@ -1056,7 +1053,7 @@ top:
 
 		f_logchange = TRUE ;
 	        logfile_printf(&pip->lh,"%s access table file changed\n",
-	            timestr_logz(pip->daytime,timebuf)) ;
+	            strtime_logz(pip->daytime,timebuf)) ;
 
 	    }
 
@@ -1114,7 +1111,7 @@ top:
 	if (pip->fl.daemon) {
 
 	    logfile_printf(&pip->lh,"%s daemon exiting\n",
-	        timestr_logz(pip->daytime,timebuf)) ;
+	        strtime_logz(pip->daytime,timebuf)) ;
 
 	}
 
@@ -1208,7 +1205,7 @@ baderr:
 
 
 
-static void int_exit(sn)
+local void int_exit(sn)
 int	sn ;
 {
 
@@ -1218,7 +1215,7 @@ int	sn ;
 /* end subroutine (int_exit) */
 
 
-static void int_child(sn)
+local void int_child(sn)
 int	sn ;
 {
 
@@ -1228,7 +1225,7 @@ int	sn ;
 
 
 /* write out the output files from the executed program */
-static int writeout(pip,fd,s)
+local int writeout(pip,fd,s)
 struct proginfo	*pip ;
 int	fd ;
 char	s[] ;
@@ -1276,7 +1273,7 @@ char	s[] ;
 #ifdef	COMMENT
 
 /* write our MSGQ ID to the MSGQ ID file */
-static int write_mqid(pip,mqid)
+local int write_mqid(pip,mqid)
 struct proginfo	*pip ;
 int		mqid ;
 {
@@ -1307,7 +1304,7 @@ int		mqid ;
 
 
 /* spawn a job */
-static int watch_newjob(pip,bip,ourp,cip,nsi,nso)
+local int watch_newjob(pip,bip,ourp,cip,nsi,nso)
 struct proginfo		*pip ;
 BUILTIN			*bip ;
 STANDING		*ourp ;
@@ -1521,7 +1518,7 @@ int	nsi, nso ;
 
 	    cip->ctime = pip->daytime ;
 	    logfile_printf(&pip->lh,"%s request pid=%d\n",
-	        timestr_logz(cip->ctime,timebuf),(int) cip->pid) ;
+	        strtime_logz(cip->ctime,timebuf),(int) cip->pid) ;
 
 	    rs = handle(pip,bip,ourp,cip) ;
 
@@ -1556,7 +1553,7 @@ bad0:
 
 
 /* open up the MSG portal */
-static int openipc(pip,fname)
+local int openipc(pip,fname)
 struct proginfo	*pip ;
 char		fname[] ;
 {
@@ -1711,7 +1708,7 @@ char		fname[] ;
 /* end subroutine (openipc) */
 
 
-static int closeipc(pip,fname)
+local int closeipc(pip,fname)
 struct proginfo	*pip ;
 char		fname[] ;
 {
@@ -1771,9 +1768,9 @@ char		fname[] ;
 
 #if	CF_DEBUG
 
-static int printsubs(pip,s)
+local int printsubs(pip,s)
 struct proginfo	*pip ;
-const char	s[] ;
+cchar	s[] ;
 {
 	int	rs1, i ;
 
