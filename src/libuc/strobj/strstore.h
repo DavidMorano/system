@@ -40,7 +40,7 @@ struct strstore_cursor {
 } ; /* end struct (strstore_cursor) */
 
 struct strstore_chunk {
-	char		*cdata ;
+	charp		cdata ;
 	int		csz ;		/* allocated buffer length */
 	int		i ;		/* index length */
 	int		c ;		/* item count within chunk */
