@@ -21,7 +21,7 @@
 
 
 struct dstr_head {
-	char		*sbuf ;
+	charp	 	sbuf ;
 	int		slen ;
 } ; /* end struct (dstr_head) */
 
