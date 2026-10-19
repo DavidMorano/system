@@ -32,10 +32,10 @@
 	Synopsis:
 
 	int pcsinfoset(pr,nbuf,nlen,un,type)
-	const char	*pr ;
-	const char	*nbuf ;
+	cchar	*pr ;
+	cchar	*nbuf ;
 	int		nlen ;
-	const char	*un ;
+	cchar	*un ;
 	int		type ;
 
 	Arguments:
@@ -74,27 +74,27 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	getuserhome(char *,int,const char *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	getuserhome(char *,int,cchar *) ;
 extern int	removes(cchar *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -105,13 +105,13 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	rmnames(const char *,const char *) ;
-static int	setnames(const char *,const char *,const char *,int) ;
+local int	rmnames(cchar *,cchar *) ;
+local int	setnames(cchar *,cchar *,cchar *,int) ;
 
 
 /* local variables */
 
-static const char	*nfnames[] = {
+static cchar	*nfnames[] = {
 	".name",
 	".fullname",
 	".project",
@@ -125,7 +125,7 @@ static const char	*nfnames[] = {
 
 int pcsinfoset(cchar *pr,cchar *nbuf,int nlen,cchar *un,int nt)
 {
-	const int	nnt = (nelem(nfnames)-1) ;
+	cint	nnt = (nelem(nfnames)-1) ;
 	int		rs = SR_OK ;
 	int		f_set ;
 	char		uh[MAXPATHLEN+1] ;
@@ -159,7 +159,7 @@ int pcsinfoset(cchar *pr,cchar *nbuf,int nlen,cchar *un,int nt)
 /* local subroutines */
 
 
-static int rmnames(cchar *pr,cchar *nfname)
+local int rmnames(cchar *pr,cchar *nfname)
 {
 	ustat	sb ;
 	int		rs = SR_OK ;
@@ -182,11 +182,11 @@ static int rmnames(cchar *pr,cchar *nfname)
 /* end subroutine (rmnames) */
 
 
-static int setnames(cchar *pr,cchar *nfname,cchar *nbuf,int nlen)
+local int setnames(cchar *pr,cchar *nfname,cchar *nbuf,int nlen)
 {
 	const mode_t	om = 0664 ;
-	const int	of = (O_CREAT|O_TRUNC|O_WRONLY) ;
-	const int	to = -1 ;
+	cint	of = (O_CREAT|O_TRUNC|O_WRONLY) ;
+	cint	to = -1 ;
 	int		rs ;
 	int		size ;
 	char		*p ;
@@ -197,13 +197,13 @@ static int setnames(cchar *pr,cchar *nfname,cchar *nbuf,int nlen)
 
 	size = (nlen+2) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    const char	*np = (const char *) p ;
+	    cchar	*np = (cchar *) p ;
 	    char	*bp = (char *) p ;
 
 	    if ((rs = sncpy2(bp,(size-1),nbuf,"\n")) >= 0) {
 	        int	nl = rs ;
 	        if ((rs = uc_opene(nfname,of,om,to)) >= 0) {
-	            const int	fd = rs ;
+	            cint	fd = rs ;
 	            if ((rs = u_write(fd,np,nl)) >= 0) {
 	                rs = uc_fminmod(fd,0644) ;
 		    }
