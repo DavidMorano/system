@@ -21,7 +21,7 @@
 
 
 struct strman_head {
-	cchar		*sp ;
+	ccharp		sp ;
 	int		sl ;
 } ; /* end struct (strman_head) */
 
