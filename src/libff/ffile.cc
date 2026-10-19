@@ -60,7 +60,7 @@
 
 /* exported variables */
 
-const char	*ffile_fnames[] = {
+cchar	*ffile_fnames[] = {
 	"*STDIN*",
 	"*STDOUT*",
 	"*STDERR*",
