@@ -144,7 +144,7 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 		            }
 	                    if ((rs = uptcreate(&tid,np,thrsub,sip)) >= 0) {
 	                        op->tid = tid ;
-			    }
+			    } /* end if */
 		            if (rs < 0) {
 		                lm_free(sip) ;
 			    } /* end if (error) */
@@ -156,7 +156,7 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 	    } /* end if (thrcomm-start) */
 	    if (rs < 0) {
 		thrbase_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (thrbase_ctor) */
 	return rs ;
 } /* end subroutine (thrbase_start) */
