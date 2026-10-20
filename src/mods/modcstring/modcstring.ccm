@@ -30,7 +30,7 @@ module ;
 export module modcstring ;
 
 export {
-    consteval int cstrlen(cchar *sp) noex {
+    consteval int cstrlen(ccharp sp) noex {
     	int len = -1 ;
 	if (sp) ylikely {
     	    len = 0 ;
@@ -58,7 +58,7 @@ export {
 } /* end export */
 
 export {
-    consteval voidp cmemset(void *dp,int ch,int sl) noex {
+    consteval voidp cmemset(voidp dp,int ch,int sl) noex {
     	void *rp = nullptr ;
 	if (dp) ylikely {
 	    if (sl >= 0) ylikely {
