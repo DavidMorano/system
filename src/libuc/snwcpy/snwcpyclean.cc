@@ -147,7 +147,7 @@ int snwcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 	        } /* end while */
 	        if (sl && *sp) rs = SR_OVERFLOW ;
 	    } /* end if (valid) */
-	    dbuf[dl] = '\0' ;
+	    dbuf[dl] = eos ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
 } /* end subroutine (snwcpyclean) */
