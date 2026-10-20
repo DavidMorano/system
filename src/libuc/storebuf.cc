@@ -66,7 +66,7 @@
 #include	<ctoct.h>		/* LIBUC */
 #include	<ctdec.h>		/* LIBUC */
 #include	<cthex.h>		/* LIBUC */
-#include	<hasx.h>		/* LIBUC */
+#include	<hasx.h>		/* LIBUC |hasmore(3uc)| */
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"storebuf.h"
@@ -220,11 +220,11 @@ int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	        if (rlen >= 0) ylikely {
 		    charp ep = (rbuf + rlen) ;
 	            if (sl >= 0) {
-	                while ((bp < ep) && hassome(sp,sl)) {
+	                while ((bp < ep) && hasmore(sp,sl)) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
 	                } /* end while */
-		        if ((bp == ep) && hassome(sp,sl)) {
+		        if ((bp == ep) && hasmore(sp,sl)) {
 		            rs = SR_OVERFLOW ;
 		        } /* end if (error) */
 		    } else {
