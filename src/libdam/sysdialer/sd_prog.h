@@ -21,11 +21,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysbase.h>
-#include	<sysdialer.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sysdialer.h>		/* LIBUC */
 
 
 #define	SDPROG		struct sdprog_head
@@ -35,7 +33,7 @@
 
 struct sdprog_flags {
 	uint		log:1 ;
-} ;
+} ; /* end struct */
 
 struct sdprog_head {
 	logfile		*lhp ;
@@ -45,7 +43,7 @@ struct sdprog_head {
 	int		fd ;
 	int		tlen ;
 	char		efname[MAXPATHLEN + 1] ;
-} ;
+} ; /* end struct */
 
 typedef SDPROG		sdprog ;
 
