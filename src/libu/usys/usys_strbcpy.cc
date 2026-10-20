@@ -48,14 +48,14 @@ local char *strbcpy_pos(char *dp,int dl,cchar *sp,int sl) noex {
 		sl -= 1 ;
 		dl -= 1 ;
 	    } /* end while */
-	    *dp = '\0' ;
-	    if ((dl == 0) && hassome(sp,sl)) dp = nullptr ;
+	    *dp = eos ;
+	    if ((dl == 0) && hasmore(sp,sl)) dp = nullptr ;
 	} else {
 	    while (dl && *sp) {
 	        *dp++ = *sp++ ;
 		dl -= 1 ;
 	    } /* end while */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    if ((dl == 0) && *sp) dp = nullptr ;
 	} /* end if */
 	return dp ;
@@ -67,7 +67,7 @@ local char *strbcpy_neg(char *dp,int dl,cchar *sp,int sl) noex {
 	    while (sl-- && *sp) {
 	        *dp++ = *sp++ ;
 	    } /* end while */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = stpcpy(dp,sp) ;
 	} /* end if */
