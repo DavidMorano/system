@@ -46,7 +46,7 @@
 #include	<logfile.h>		/* LIBUC */
 #include	<dater.h>		/* LIBUC */
 #include	<msgbuf.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
@@ -340,7 +340,7 @@ int procdatagram(PI *pip,int fd) noex {
 	            time_t	daytime = time(nullptr) ;
 	            char	timebuf[TIMEBUFLEN + 1] ;
 	            nprintf(DEBFNAME,"%s pid=%u recve rs=%d\n",
-	                timestr_log(daytime,timebuf),pid,rs) ;
+	                strtime_log(daytime,timebuf),pid,rs) ;
 	        }
 #endif /* CF_DEBUGN */
 
@@ -626,7 +626,7 @@ local int procentry(PI *pip,cchar *hostname,PSD_UP *up) noex {
 
 	        fmt = (f_present) ? "%s %s %s\n" : "%s %s %s (new)\n" ;
 	        logfile_printf(&pip->lh,fmt,
-	            timestr_logz(timestamp,timebuf),
+	            strtime_logz(timestamp,timebuf),
 	            ((f_state1) ? "U" : "D"),
 	            hostname) ;
 
@@ -635,7 +635,7 @@ local int procentry(PI *pip,cchar *hostname,PSD_UP *up) noex {
 	        if (pip->sumfp != nullptr) {
 
 	            bprintf(pip->sumfp,fmt,
-	                timestr_logz(timestamp,timebuf),
+	                strtime_logz(timestamp,timebuf),
 	                ((f_state1) ? "U" : "D"),
 	                hostname) ;
 
