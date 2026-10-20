@@ -46,20 +46,9 @@
 /****/
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
-#include	"cm_subinfo.h"
+#include	"cm_defs.h"
+#include	"cm_subinfo.hh"
 #include	"cm.h"
-
-
-#define	TI_FILECHECK	3
-
-#define	EC		expcook
-#define	SY		systems
-#define	SY_ENT		systems_ent
-#define	ST_CUR		systems_cur
-#define	SD		sysdialer
-#define	SD_ARGS		sysdialer_args
-#define	SD_ENT		sysdialer_ent
-#define	SI		cm_subinfo
 
 
 namespace cm_ns {
@@ -83,9 +72,8 @@ namespace cm_ns {
 	operator int () noex ;
 	int procargs	() noex ;
 	int loadcooks	() noex ;
-	int procargs	() noex ;
-	int tryfind	() noex ;
-	int trysave	() noex ;
+	int tryfind	(SY_ENT **) noex ;
+	int trysave	(SY_ENT *) noex ;
     } ; /* end struct (opener) */
 } /* end namespace (cm_ns) */
 
