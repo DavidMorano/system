@@ -113,13 +113,13 @@ local char *strbcpyxc(chtoxc_f cvt,char *dp,int dl,cchar *sp) noex {
 		ds = cvtcpy(cvt,dp,dl,sp) ;
 		dp = ds.dp ;
 		dl = ds.dl ;
-	        *dp = '\0' ;
+	        *dp = eos ;
 	        if ((dl == 0) && *sp) dp = nullptr ;
 	    } else {
 	        while (*sp) {
 	            *dp++ = cvt(*sp++) ;
 	        } /* end while */
-	        *dp = '\0' ;
+	        *dp = eos ;
 	    } /* end if */
 	} else {
 	    dp = nullptr ;
@@ -154,7 +154,7 @@ charp cvter::cvtpos(int na,va_list ap) noex {
 	    dl = ds.dl ;
 	    if ((fbad = ((dl == 0) && *sp))) break ;
 	} /* end for */
-	*dp = '\0' ;
+	*dp = eos ;
 	if (fbad) dp = nullptr ;
 	return dp ;
 } /* end method (cvter:cvtpos) */
