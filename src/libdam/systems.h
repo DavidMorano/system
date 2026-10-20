@@ -29,13 +29,13 @@ struct systems_cursor {
 } ; /* end struct */
 
 struct systems_entry {
-	cchar		*sysname ;
-	cchar		*dialername ;
-	cchar		*dialerargs ;
+	ccharp		sysnamep ;
+	ccharp		dialernamep ;
+	ccharp		dialerargsp ;
 	int		fi ;
-	int		sysnamelen ;
-	int		dialernamelen ;
-	int		dialerargslen ;
+	int		sysnamel ;
+	int		dialernamel ;
+	int		dialerargsl ;
 } ; /* end struct */
 
 struct systems_head {
