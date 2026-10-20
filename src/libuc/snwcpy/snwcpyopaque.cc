@@ -106,7 +106,7 @@ int snwcpyopaque(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	            sl -= 1 ;
 	        } /* end while */
 	        if (sl && *sp) rs = SR_OVERFLOW ;
-	        dbuf[dl] = '\0' ;
+	        dbuf[dl] = eos ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
