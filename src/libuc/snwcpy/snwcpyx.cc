@@ -81,7 +81,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<usupport.h>		/* LIBU |strbcpt(2usys)| */
+#include	<strbcpy.h>		/* LIBU */
 #include	<sncpyx.h>		/* LIBUC |sncpy(3uc)| */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -93,8 +93,6 @@
 
 
 /* imported namespaces */
-
-using usys::strbcpy ;			/* subroutine */
 
 
 /* local typedefs */
@@ -214,7 +212,7 @@ int snwcpyx(char *dp,int dl,int na,...) noex {
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
 	    va_begin(ap,na) ;
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    if (dl >= 0) {
 		rs = snwcpyx_pos(dp,dl,na,ap) ;
 	    } else {
