@@ -46,7 +46,6 @@
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<bfile.h>
 #include	<vecstr.h>
 #include	<pcsconf.h>
 #include	<userinfo.h>
@@ -55,9 +54,11 @@
 #include	<baops.h>
 #include	<strx.h>
 #include	<isx.h>
-#include	<exitcodes.h>
 #include	<mallocstuff.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"getpfopts.h"
 #include	"config.h"
@@ -190,7 +191,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -547,7 +548,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 #endif
 
 	    logfile_printf(&lh,"%s %-14s %s/%s\n",
-	        timestr_log(pip->daytime,timebuf),
+	        strtime_log(pip->daytime,timebuf),
 	        pip->progname,
 	        VERSION,(u.f.sysv_ct) ? "SYSV" : "BSD") ;
 
