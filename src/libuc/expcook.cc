@@ -63,7 +63,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	EX		expcook
+#define	EX	expcook
 
 
 /* imported namespaces */
@@ -262,7 +262,7 @@ int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 	                        rs = snwcpy(rbuf,rlen,bp,bl) ;
 			    }
 	                }
-	            }
+	            } /* end if (expcook_expbuf) */
 	            rs1 = bo.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (buffer) */
@@ -431,7 +431,7 @@ int expcook::expbuf(int wch,buffer *bufp,cchar *sp,int sl) noex {
 void expcook::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("expcook",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (expcook::dtor) */
 
 expcook_co::operator int () noex {
