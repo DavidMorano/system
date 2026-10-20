@@ -133,8 +133,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat digtab	constdiv builtin bitop valuelims
-	rmsubpat digbufsizes usysbasic numbasedigs
+	rmsubpat 
 	rmobj
 
 control:
