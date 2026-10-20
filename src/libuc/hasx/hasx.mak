@@ -48,7 +48,7 @@ OBJ3= hasuniq.o haslead.o hasnon.o
 OBJ4= hasbasename.o hasmodname.o
 OBJ5= hasinet.o hasext.o
 OBJ6= hasallof.o hasourmjd.o
-OBJ7= haspath.o hasneed.o
+OBJ7= haspath.o hasneed.o hasxx.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o 
 OBJB= obj4.o obj5.o obj6.o obj7.o
@@ -171,6 +171,7 @@ haseol.o:		haseol.cc	haseol.h		$(INCS)
 hasext.o:		hasext.cc	hasext.h		$(INCS)
 hasneed.o:		hasneed.cc	hasneed.h		$(INCS)
 haspath.o:		haspath.cc	haspath.h		$(INCS)
+hasxx.o:		hasxx.cc	hasxx.h			$(INCS)
 
 hasallof.o:		hasallof.cc	hasallof.h		$(INCS)
 
