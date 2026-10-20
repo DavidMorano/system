@@ -1082,36 +1082,32 @@ local int msfile_filecheck(MSF *op) noex {
 	return (rs >= 0) ? f_changed : rs ;
 } /* end subroutine (msfile_filecheck) */
 
-local int msfile_filetopwrite(MSF *op) noex {
-	off_t	poff = 0L ;
-	int		ml ;
-	int		rs = SR_OK ;
-	int		bl ;
-	char		*bp = op->topbuf ;
 	/* write the file header stuff */
-	ml = mkmagic(bp,MSF_FILEMAGICSIZE,MSF_FILEMAGIC) ;
-	bp += ml ;
-
-	*bp++ = MSF_FILEVERSION ;
-	*bp++ = MSF_ENDIAN ;
-	*bp++ = 0 ;		/* file type */
-	*bp++ = 0 ;		/* unused */
-
-	/* next is the header (we just write zeros here) */
-
-	memnset(bp,MSF_HEADTABLEN,0) ;
-	bp += MSF_HEADTABLEN ;
-
-	bl = bp - op->topbuf ;
-	op->fileversion = MSF_FILEVERSION ;
-	op->filetype = 0 ;
-	op->h = {} ;
-	if ((rs = u_writep(op->fd,op->topbuf,bl,poff)) >= 0) {
-	    op->filesize = rs ;
-	    op->topsize = rs ;
-	    op->fl.fileinit = true ;
-	}
-
+local int msfile_filetopwrite(MSF *op) noex {
+	int		rs ;
+	char		*bp = op->topbuf ;
+	if ((rs = mkmagic(bp,MSF_FILEMAGICSIZE,MSF_FILEMAGIC)) >= 0) {
+	    coff poff = 0z ;
+	    cint ml = rs ;
+	    int bl ;
+	    bp += rs ;
+	    *bp++ = MSF_FILEVERSION ;
+	    *bp++ = MSF_ENDIAN ;
+	    *bp++ = 0 ;		/* file type */
+	    *bp++ = 0 ;		/* unused */
+	    /* next is the header (we just write zeros here) */
+	    memclear(bp,MSF_HEADTABLEN) ;
+	    bp += MSF_HEADTABLEN ;
+	    bl = conv<int>(bp - op->topbuf) ;
+	    op->fileversion = MSF_FILEVERSION ;
+	    op->filetype = 0 ;
+	    op->h = {} ;
+	    if ((rs = u_writep(op->fd,op->topbuf,bl,poff)) >= 0) {
+	        op->filesize = rs ;
+	        op->topsize = rs ;
+	        op->fl.fileinit = true ;
+	    } /* end if (u_write) */
+	} /* end if (mkmagic) */
 	return rs ;
 } /* end subroutine (msfile_filetopwrite) */
 
