@@ -27,14 +27,14 @@
 #include	<usysrets.h>		/* LIBU */
 #include	<mapstrint.h>		/* LIBUC */
 
-#include	<msfilee.h>		/* LIBDAM */
+#include	<msent.h>		/* LIBDAM */
 #include	<entbuf.h>		/* LIBDAM */
 
 
 /* object defines */
 #define	MSFILE			struct msfile_head
 #define	MSFILE_CUR		struct msfile_cursor
-#define	MSFILE_ENT		msfilee
+#define	MSFILE_ENT		msent
 #define	MSFILE_FL		struct msfile_flags
 #define	MSFILE_H		struct msfile_her
 /* other */
@@ -43,7 +43,7 @@
 #define	MSFILE_FILEMAGICSIZE	16
 #define	MSFILE_FILEMAGICLEN	szof(MSFILE_FILEMAGIC)
 #define	MSFILE_FILEVERSION	0
-#define	MSFILE_NODENAMELEN	MSFILEE_LNODENAME
+#define	MSFILE_NODENAMELEN	MSENT_LNODENAME
 #define	MSFILE_IDLEN		(16 + szof(uint))
 #define	MSFILE_HEADTABLEN	(3 * szof(uint))
 #define	MSFILE_TOPLEN		(MSFILE_IDLEN + MSFILE_HEADTABLEN)
@@ -72,9 +72,9 @@ struct msfile_flags {
 } ; /* end struct */
 
 struct msfile_head {
+	ccharp		fname ;
 	entbuf		ebm ;		/* entry-buffer-manager */
 	mapstrint	ni ;		/* nodename index */
-	cchar		*fname ;
 	MSFILE_H	h ;
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
@@ -87,7 +87,9 @@ struct msfile_head {
 	int		topsize ;
 	int		fd ;
 	int		ncursors ;
-	int		fileversion, fileencoding, filetype ;
+	int		fileversion ;
+	int		fileencoding ;
+	int		filetype ;
 	mode_t		operm ;
 	char		topbuf[MSFILE_TOPLEN + 1] ;	/* top-buffer */
 } ; /* end struct */
