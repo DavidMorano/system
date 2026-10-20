@@ -46,22 +46,22 @@ extern bool hasallset	(cchar *,int,cchar *) noex ;
 
 local inline bool hasalldig(cchar *sp,int sl) noex {
     	return hasalldigit(sp,sl) ;
-}
+} /* end */
 local inline bool hasalloct(cchar *sp,int sl) noex {
     	return hasalloctal(sp,sl) ;
-}
+} /* end */
 local inline bool hasalldec(cchar *sp,int sl) noex {
     	return hasalldigit(sp,sl) ;
-}
+} /* end */
 local inline bool hasallhex(cchar *sp,int sl) noex {
     	return hasalldigex(sp,sl) ;
-}
+} /* end */
 local inline bool hasallwht(cchar *sp,int sl) noex {
     	return hasallwhite(sp,sl) ;
-}
+} /* end */
 local inline bool hasallblk(cchar *sp,int sl) noex {
     	return hasallblank(sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
 
