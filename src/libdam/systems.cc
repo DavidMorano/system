@@ -51,6 +51,7 @@
 #include	<absfn.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<vecobj.h>		/* LIBUC */
+#include	<fieldterms.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<ismatstar.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
@@ -178,7 +179,7 @@ static vars		var ;
 
 
 /* entry field terminators */
-constexpr cchar		fterms[32] = {
+constexpr char		fterms[fieldterms_termsize] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x08, 0x10, 0x00, 0x24,
 	0x00, 0x00, 0x00, 0x00,
@@ -187,10 +188,10 @@ constexpr cchar		fterms[32] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 /* entry argument terminators (just '#' to provide "remainder" function) */
-constexpr cchar		remterms[] = {
+constexpr char		remterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x08, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -210,8 +211,7 @@ constexpr cchar		remterms[] = {
 int systems_open(systems *op,cchar *sysfname) noex {
 	int		rs ;
 	if ((rs = systems_ctor(op)) >= 0) ylikely {
-	    static cint		rsv = var ;
-	    if ((rs = rsv) >= 0) ylikely {
+	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 	        int	sz = szof(SYS_FILE) ;
 	        int	vn = 10 ;
 	        int	vo = vecobjm.reuse ;
@@ -349,6 +349,7 @@ int systems_curenum(systems *op,CUR *curp,ENT **depp) noex {
 } /* end subroutine (systems_curenum) */
 
 int systems_fetch(systems *op,cchar *name,CUR *curp,ENT **depp) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		ei = 0 ;
 	if ((rs = systems_magic(op,name,curp,depp)) >= 0) ylikely {
@@ -356,9 +357,9 @@ int systems_fetch(systems *op,cchar *name,CUR *curp,ENT **depp) noex {
 	    void	*vp{} ;
 	    ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	    while ((rs = elp->get(ei,&vp)) >= 0) {
-	        *depp = (ENT *) vp ;
-	        if (vp) {
-	            if (ismatstar((*depp)->sysname,name)) {
+	        if ((*depp = (ENT *) vp) != np) {
+		    ENT *ep = *depp ;
+	            if (ismatstar(ep->sysnamep,name)) {
 	                break ;
 	            }
 	            ei += 1 ;
@@ -599,8 +600,8 @@ local int entry_start(ENT *ep,int fi,cchar *sp,int sl) noex {
 	    memclear(ep) ;
 	    ep->fi = fi ;
 	    if (cchar *cp ; (rs = lm_strw(sp,sl,&cp)) >= 0) ylikely {
-	        ep->sysnamelen = sl ;
-	        ep->sysname = cp ;
+	        ep->sysnamel = sl ;
+	        ep->sysnamep = cp ;
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
@@ -609,8 +610,8 @@ local int entry_start(ENT *ep,int fi,cchar *sp,int sl) noex {
 local int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 	int		rs ;
 	if (cchar *cp ; (rs = lm_strw(dp,dl,&cp)) >= 0) ylikely {
-	    ep->dialernamelen = dl ;
-	    ep->dialername = cp ;
+	    ep->dialernamel = dl ;
+	    ep->dialernamep = cp ;
 	} /* end if (memory-acquire) */
 	return rs ;
 } /* end subroutine (entry_dialer) */
@@ -618,9 +619,9 @@ local int entry_dialer(ENT *ep,cchar *dp,int dl) noex {
 local int entry_args(ENT *ep,cchar *argp,int argl) noex {
 	int		rs = SR_OK ;
 	if (argl > 0) {
-	    ep->dialerargslen = argl ;
 	    if (cchar *cp ; (rs = lm_strw(argp,argl,&cp)) >= 0) ylikely {
-		ep->dialerargs = cp ;
+		ep->dialerargsp = cp ;
+	        ep->dialerargsl = argl ;
 	    } /* end if (memory-acquire) */
 	} /* end if */
 	return (rs >= 0) ? argl : rs ;
@@ -631,27 +632,27 @@ local int entry_finish(ENT *ep) noex {
 	int		rs1 ;
 	if (ep) ylikely {
 	    rs = SR_OK ;
-	    if (ep->sysnamelen > 0) ylikely {
+	    if (ep->sysnamel > 0) ylikely {
 		void *vp ;
-	        if (ep->dialerargs) ylikely {
-	            vp = voidp(ep->dialerargs) ;
+	        if (ep->dialerargsp) ylikely {
+	            vp = voidp(ep->dialerargsp) ;
 	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
-		    ep->dialerargs = nullptr ;
+		    ep->dialerargsp = nullptr ;
 	        } /* end if (memory-release) */
-	        if (ep->dialername) ylikely {
-	            vp = voidp(ep->dialername) ;
+	        if (ep->dialernamep) ylikely {
+	            vp = voidp(ep->dialernamep) ;
 	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
-	            ep->dialername = nullptr ;
+	            ep->dialernamep = nullptr ;
 	        } /* end if (memory-release) */
-	        if (ep->sysname) ylikely {
-	            vp = voidp(ep->sysname) ;
+	        if (ep->sysnamep) ylikely {
+	            vp = voidp(ep->sysnamep) ;
 	            rs1 = lm_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
-	            ep->sysname = nullptr ;
+	            ep->sysnamep = nullptr ;
 	        } /* end if (memory-release) */
-	        ep->sysnamelen = 0 ;
+	        ep->sysnamel = 0 ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
