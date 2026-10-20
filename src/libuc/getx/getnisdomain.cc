@@ -38,7 +38,7 @@
 
 	We try to find the NIS domain in the following order:
 	1. envionment variable 'NISDOMAIN'
-	2. from the kernel (using |ugetnisdom(2usys)|)
+	2. from the kernel (using |ugetnisdom(3usys)|)
 	3. from reading the file '/etc/defaultdomain'
 
 *******************************************************************************/
