@@ -56,10 +56,10 @@ extern bool hasinet6addrstr(cchar *,int) noex ;
 
 local inline bool hasINET4addrstr(cchar *sp,int sl) noex {
     	return hasinet4addrstr(sp,sl) ;
-}
+} /* end */
 local inline bool hasINET6addrstr(cchar *sp,int sl) noex {
     	return hasinet6addrstr(sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
 
