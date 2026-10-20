@@ -65,10 +65,11 @@
 #include	<dater.h>		/* LIBUC */
 #include	<sockaddress.h>		/* LIBUC */
 #include	<lfm.h>			/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<bfile.h>		/* LIBB */
 #include	<libdebug.h>		/* LIBDEBUG */
+#include	<bfile.h>		/* LIBB */
 
 #include	<proguserlist.h>
 #include	<pinghost.h>
@@ -1394,7 +1395,7 @@ local int processing(PI *pip,AI *aip,bits *bop,cc *ofn,cchar *afn) noex {
 
 	if (pip->fl.input) {
 	    int		fd = FD_STDIN ;
-	    if ((! pip->fl.daemon) && (! pip->fl.dgram) && isasocket(fd)) {
+	    if ((! pip->fl.daemon) && (! pip->fl.dgram) && isfdsocket(fd)) {
 		if ((rs = uc_getsocktype(fd)) >= 0) {
 	            pip->fl.dgram = (rs == SOCK_DGRAM) ;
 		}
