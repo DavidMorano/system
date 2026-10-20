@@ -53,7 +53,7 @@ using libuc::libmem ;			/* variable */
 
 /* local typedefs */
 
-typedef vecsorthand_cmpf		cmp_f ; /* Cmp-Function */
+typedef vecsorthand_cmpf	cmp_f ; /* Cmp-Function */
 
 
 /* external subroutines */
