@@ -46,7 +46,7 @@
 
 /* local typedefs */
 
-typedef char (*chtoxc_f)(int) ;
+typedef char (*chtoxc_f)(int) noex ;
 
 
 /* external subroutines */
@@ -68,8 +68,8 @@ local int snwcpyxc(chtoxc_f cvt,char *dbuf,int dlen,cchar *sp,int sl) noex {
 	        *dp++ = cvt(sp[i++]) ;
 	        sl -= 1 ;
 	    } /* end while */
-	    *dp = '\0' ;
-	    if ((sl == 0) || (sp[i] == '\0')) {
+	    *dp = eos ;
+	    if ((sl == 0) || (sp[i] == eos)) {
 	        rs = intconv(dp - dbuf) ;
 	    } /* end if (ok) */
 	} /* end if (non-null) */
