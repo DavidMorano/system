@@ -31,14 +31,16 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS=
+DEFS +=
 
-INCS= ctx.h
+INCS += ctx.h
 
-MODS += uconstants.o digtab.o cvtdig.o cvtfloat.o
+MODS += cvtdig.o cvtfloat.o
 
-LIBS=
+LIBS +=
 
+
+DEPS= $(MODS)
 
 OBJ0_CTX= cvtdig.o cvtfloat.o convertx.o
 OBJ1_CTX= ctbin.o 
@@ -153,18 +155,18 @@ objb_ctx.o:		$(OBJB_CTX)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-ctchars.o:		mods.o ctchars.cc ctchars.h	$(INCS)
-ctbin.o:		mods.o ctbin.cc ctbin.h		$(INCS)
-ctoct.o:		mods.o ctoct.cc ctoct.h		$(INCS)
-ctdec.o:		mods.o ctdec.cc ctdec.h		$(INCS)
-ctdecp.o:		mods.o ctdecp.cc ctdecp.h	$(INCS)
-ctdecf.o:		mods.o ctdecf.cc ctdecf.h	$(INCS)
-cthex.o:		mods.o cthex.cc cthex.h		$(INCS)
-cthexstr.o:		mods.o cthexstr.cc cthexstr.h	$(INCS)
-cta26.o:		mods.o cta26.cc cta26.h		$(INCS)
-ctxxx.o:		mods.o ctxxx.cc ctxxx.h		$(INCS)
-ctroman.o:		mods.o ctroman.cc ctroman.h	$(INCS)
-ctwords.o:		mods.o ctwords.cc ctwords.hh	$(INCS)
+ctchars.o:		mods.o ctchars.cc ctchars.h	$(DEPS) $(INCS)
+ctbin.o:		mods.o ctbin.cc ctbin.h		$(DEPS) $(INCS)
+ctoct.o:		mods.o ctoct.cc ctoct.h		$(DEPS) $(INCS)
+ctdec.o:		mods.o ctdec.cc ctdec.h		$(DEPS) $(INCS)
+ctdecp.o:		mods.o ctdecp.cc ctdecp.h	$(DEPS) $(INCS)
+ctdecf.o:		mods.o ctdecf.cc ctdecf.h	$(DEPS) $(INCS)
+cthex.o:		mods.o cthex.cc cthex.h		$(DEPS) $(INCS)
+cthexstr.o:		mods.o cthexstr.cc cthexstr.h	$(DEPS) $(INCS)
+cta26.o:		mods.o cta26.cc cta26.h		$(DEPS) $(INCS)
+ctxxx.o:		mods.o ctxxx.cc ctxxx.h		$(DEPS) $(INCS)
+ctroman.o:		mods.o ctroman.cc ctroman.h	$(DEPS) $(INCS)
+ctwords.o:		mods.o ctwords.cc ctwords.hh	$(DEPS) $(INCS)
 
 MOBJ += uconstants.o umods.o cvtdig.o cvtfloat.o
 
