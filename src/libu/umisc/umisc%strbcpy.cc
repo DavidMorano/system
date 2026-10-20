@@ -83,7 +83,7 @@ local char *strbcpy_pos(char *dp,int dl,cchar *sp,int sl) noex {
 		dl -= 1 ;
 	    } /* end while */
 	    *dp = eos ;
-	    if ((dl == 0) && hassome(sp,sl)) dp = nullptr ;
+	    if ((dl == 0) && hasmore(sp,sl)) dp = nullptr ;
 	} else {
 	    while (dl && *sp) {
 	        *dp++ = *sp++ ;
