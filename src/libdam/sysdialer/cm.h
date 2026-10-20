@@ -77,21 +77,21 @@ typedef	CM_INFO		cm_info ;
 
 EXTERNC_begin
 
-extern int cm_open(cm *,cm_args *,cchar *,cchar *,con mainv) noex ;
-extern int cm_getinfo(cm *,char *,int,cm_info *) noex ;
-extern int cm_reade(cm *,char *,int,int,int) noex ;
-extern int cm_recve(cm *,char *,int,int,int,int) noex ;
-extern int cm_recvfrome(cm *,char *,int,int,void *,int *,int,int) noex ;
-extern int cm_recvmsge(cm *,MSGHDR *,int,int,int) noex ;
-extern int cm_write(cm *,cchar *,int) noex ;
-extern int cm_send(cm *,cchar *,int,int) noex ;
-extern int cm_sendto(cm *,cchar *,int,int,void *,int) noex ;
-extern int cm_sendmsg(cm *,MSGHDR *,int) noex ;
-extern int cm_poll(cm *,int) noex ;
-extern int cm_localname(cm *,char *,int) noex ;
-extern int cm_peername(cm *,char *,int) noex ;
-extern int cm_shutdown(cm *,int) noex ;
-extern int cm_close(cm *) noex ;
+extern int cm_open	(cm *,cm_args *,cchar *,cchar *,con mainv) noex ;
+extern int cm_getinfo	(cm *,char *,int,cm_info *) noex ;
+extern int cm_reade	(cm *,char *,int,int,int) noex ;
+extern int cm_recve	(cm *,char *,int,int,int,int) noex ;
+extern int cm_recvfrome	(cm *,char *,int,int,void *,int *,int,int) noex ;
+extern int cm_recvmsge	(cm *,MSGHDR *,int,int,int) noex ;
+extern int cm_write	(cm *,cchar *,int) noex ;
+extern int cm_send	(cm *,cchar *,int,int) noex ;
+extern int cm_sendto	(cm *,cchar *,int,int,void *,int) noex ;
+extern int cm_sendmsg	(cm *,MSGHDR *,int) noex ;
+extern int cm_poll	(cm *,int) noex ;
+extern int cm_localname	(cm *,char *,int) noex ;
+extern int cm_peername	(cm *,char *,int) noex ;
+extern int cm_shutdown	(cm *,int) noex ;
+extern int cm_close	(cm *) noex ;
 
 EXTERNC_end
 
