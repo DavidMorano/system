@@ -67,7 +67,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usys.h>		/* LIBU */
-#include	<hasx.h>		/* LIBU */
+#include	<hasx.h>		/* LIBU |hasmore(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"snaddw.h"
@@ -116,11 +116,11 @@ int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	        if (rlen >= 0) ylikely {
 		    charp ep = (rbuf + rlen) ;
 	            if (sl >= 0) {
-	                while ((bp < ep) && hassome(sp,sl)) {
+	                while ((bp < ep) && hasmore(sp,sl)) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
 	                } /* end while */
-		        if ((bp == ep) && hassome(sp,sl)) {
+		        if ((bp == ep) && hasmore(sp,sl)) {
 		            rs = SR_OVERFLOW ;
 		        } /* end if (error) */
 		    } else {
