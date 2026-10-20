@@ -80,15 +80,16 @@ int snwcpyrev(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf && sp) ylikely {
 	    rs = SR_INVALID ;
+	    if (sl < 0) sl = lenstr(sp) ;
+	    dbuf[0] = eos ;
 	    if (dlen >= 0) ylikely {
 	        rs = SR_OVERFLOW ;
-	        if (sl < 0) sl = lenstr(sp) ;
-	        if ((dlen < 0) || (dlen >= sl)) ylikely {
+	        if (sl < dlen) ylikely {
 	            int	i ; /* used-afterwards */
 	            for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
 	                dbuf[i] = sp[sl-i-1] ;
 	            } /* end for */
-	            dbuf[i] = '\0' ;
+	            dbuf[i] = eos ;
 		    rs = i ;
 	        } /* end if */
 	    } /* end if (valid) */
