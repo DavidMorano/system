@@ -145,14 +145,14 @@ local char *strbcpyxw_pos(char *dp,int dl,int n,va_list ap) noex {
 	if ((! fbad) && (n > 0)) ylikely {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    int	sl = (int)	va_arg(ap,int) ;
-	    while ((dl > 0) && hassome(sp,sl)) {
+	    while ((dl > 0) && hasmore(sp,sl)) {
 		*dp++ = *sp++ ;
 		sl -= 1 ;
 		dl -= 1 ;
 	    } /* end while */
-	    fbad = ((dl == 0) && hassome(sp,sl)) ;
+	    fbad = ((dl == 0) && hasmore(sp,sl)) ;
 	} /* end if */
-	*dp = '\0' ;
+	*dp = eos ;
 	if (fbad) dp = nullptr ;
 	return dp ;
 } /* end subroutine (strbcpyxw_pos) */
@@ -165,12 +165,12 @@ local char *strbcpyxw_neg(char *dp,int,int n,va_list ap) noex {
 	if (n > 0) ylikely {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    int	sl = (int)	va_arg(ap,int) ;
-	    while (hassome(sp,sl)) {
+	    while (hasmore(sp,sl)) {
 		*dp++ = *sp++ ;
 		sl -= 1 ;
 	    } /* end while */
 	} /* end if */
-	*dp = '\0' ;
+	*dp = eos ;
 	return dp ;
 } /* end subroutine (strbcpyxw_neg) */
 
