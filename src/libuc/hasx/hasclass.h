@@ -43,22 +43,22 @@ extern bool hasuc(cchar *,int) noex ;
 
 local inline bool hasdig(cchar *sp,int sl) noex {
     	return hasdigit(sp,sl) ;
-}
+} /* end */
 local inline bool hasoct(cchar *sp,int sl) noex {
     	return hasoctal(sp,sl) ;
-}
+} /* end */
 local inline bool hasdec(cchar *sp,int sl) noex {
     	return hasdigit(sp,sl) ;
-}
+} /* end */
 local inline bool hashex(cchar *sp,int sl) noex {
     	return hasdigex(sp,sl) ;
-}
+} /* end */
 local inline bool haswht(cchar *sp,int sl) noex {
     	return haswhite(sp,sl) ;
-}
+} /* end */
 local inline bool hasblk(cchar *sp,int sl) noex {
     	return hasblank(sp,sl) ;
-}
+} /* end */
 
 EXTERNC_end
 
