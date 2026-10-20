@@ -35,12 +35,12 @@ DEFS +=
 
 INCS += libutil.hh
 
-MODS += modcstring.o
+MODS +=
 
 LIBS +=
 
 
-DEPS += modcstring.o
+DEPS +=
 
 OBJPART00= libutil-strlen.o libutil-strxspn.o
 OBJPART01= libutil-cvtconst.o libutil-getlen.o 
@@ -69,8 +69,8 @@ OBJPART+= objparte.o objpartf.o
 OBJPRIME= libutil0.o
 
 OBJ00= libutil1.o
-OBJ01= $(DEPS)
-OBJ02=
+OBJ01= libutil%memb.o
+OBJ02= $(DEPS)
 OBJ03=
 
 OBJIMPL= obj00.o obj01.o
@@ -271,14 +271,16 @@ libutil10.o:		libutil10.cc libutil.o		$(DEPS) $(INCS)
 libutil11.o:		libutil11.cc libutil.o		$(DEPS) $(INCS)
 
 libutil-cvtconst.o:	libutil-cvtconst.ccm		$(DEPS)	$(INCS)
+libutil-getbyte.o:	libutil-getbyte.ccm		$(DEPS)	$(INCS)
 libutil-getlen.o:	libutil-getlen.ccm		$(DEPS)	$(INCS)
 libutil-lenstr.o:	libutil-lenstr.ccm		$(DEPS)	$(INCS)
 libutil-lenstrarr.o:	libutil-lenstrarr.ccm		$(DEPS)	$(INCS)
 libutil-loadstrs.o:	libutil-loadstrs.ccm		$(DEPS) $(INCS)
+libutil-memb.o:		libutil-memb.ccm		$(DEPS)	$(INCS)
 libutil-memclear.o:	libutil-memclear.ccm		$(DEPS)	$(INCS)
-libutil-memload.o:	libutil-memload.ccm		$(DEPS)	$(INCS)
 libutil-memcopy.o:	libutil-memcopy.ccm		$(DEPS)	$(INCS)
 libutil-memcpy.o:	libutil-memcpy.ccm		$(DEPS)	$(INCS)
+libutil-memload.o:	libutil-memload.ccm		$(DEPS)	$(INCS)
 libutil-resumelife.o:	libutil-resumelife.ccm		$(DEPS)	$(INCS)
 libutil-strlen.o:	libutil-strlen.ccm		$(DEPS)	$(INCS)
 libutil-strxspn.o:	libutil-strxspn.ccm		$(DEPS)	$(INCS)
@@ -286,9 +288,10 @@ libutil-stpcpy.o:	libutil-stpcpy.ccm		$(DEPS)	$(INCS)
 libutil-strcpy.o:	libutil-strcpy.ccm		$(DEPS)	$(INCS)
 libutil-strcopy.o:	libutil-strcopy.ccm		$(DEPS)	$(INCS)
 libutil-strcmp.o:	libutil-strcmp.ccm		$(DEPS)	$(INCS)
-libutil-getbyte.o:	libutil-getbyte.ccm		$(DEPS)	$(INCS)
-libutil-memb.o:		libutil-memb.ccm		$(DEPS)	$(INCS)
 libutil-operators.o:	libutil-operators.ccm		$(DEPS)	$(INCS)
+
+libutil%memb.o:		libutil%memb.cc libutil.o		$(INCS)
+	$(COMPILE.cc) $<
 
 modcstring.o:		modcstring.dir
 modcstring.dir:
