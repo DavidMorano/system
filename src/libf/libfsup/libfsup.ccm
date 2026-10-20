@@ -37,7 +37,7 @@ export import :lenstr ;
 export import :memclear ;
 export import :memload ;
 export import :memcopy ;
-export import :memnset ;
+export import :memb ;
 export import :resumelife ;
 
 
