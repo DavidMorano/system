@@ -36,19 +36,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<uclibmem.h>
 #include	<gethz.h>
-#include	<baops.h>
 #include	<ids.h>
 #include	<userinfo.h>
 #include	<keyopt.h>
@@ -58,17 +59,16 @@
 #include	<buffer.h>
 #include	<expcook.h>
 #include	<paramfile.h>
-#include	<nulstr.h>
 #include	<logfile.h>
-#include	<strx.h>
-#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<strx.h>		/* LIBUC */
+#include	<vstrcmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<envs.h>
+#include	<sysvar.h>
+#include	<sysdialer.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"sysdialer.h"
 #include	"sd_prog.h"
-#include	"envs.h"
-#include	"sysvar.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -475,7 +475,7 @@ constexpr cpcchar	envbad[] = {
 	nullptr
 } ;
 
-static constexpr cpcchar	envsys[] = {
+constexpr cpcchar	envsys[] = {
 	"SYSNAME",
 	"RELEASE",
 	"VERSION",
@@ -509,7 +509,7 @@ constexpr cpcchar	envdialers[] = {
 
 /* exported variables */
 
-const SYSDIALER_INFO	sd_prog = {
+constexpr SYSDIALER_INFO	sd_prog = {
 	PROG_MNAME,
 	PROG_VERSION,
 	PROG_INAME,
@@ -2445,12 +2445,12 @@ local int procenvsys(sip,sysvardb)
 SUBINFO		*sip ;
 cchar		sysvardb[] ;
 {
-	SYSVAR		sv ;
-	SYSVAR_CUR	cur ;
 	vecstr		*elp = &sip->exports ;
 	int		rs ;
 
+	SYSVAR sv ;
 	if ((rs = sysvar_open(&sv,sip->pr,sysvardb)) >= 0) {
+	    SYSVAR_CUR	cur ;
 	    cint	vlen = VBUFLEN ;
 	    int		vl ;
 	    char	kbuf[KBUFLEN + 1] ;
