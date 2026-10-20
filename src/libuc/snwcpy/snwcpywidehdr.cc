@@ -135,7 +135,7 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int µwsl) noex {
 	        rs1 = m.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (strmgr) */
-	    dbuf[dl] = '\0' ;
+	    dbuf[dl] = eos ;
 	} /* end if (wsnlen) */
 	return (rs >= 0) ? dl : rs ;
 } /* end subroutine (snwcpywidehdr) */
