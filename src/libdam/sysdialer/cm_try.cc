@@ -43,15 +43,21 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getusername.h>		/* LIBUC */
-#include	<expcook.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<systems.h>		/* LIBUC */
+#include	<sysdialer.h>		/* LIBUC */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<buffer.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
-#include	"cm_subinfo.h"
+#include	"cm_defs.h"
+#include	"cm_vars.hh"
+#include	"cm_caller.hh"
+#include	"cm_subinfo.hh"
+#include	"cm_opener.hh"
 #include	"cm.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -59,18 +65,6 @@
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
-
-#define	TI_FILECHECK	3
-
-#define	EC		expcook
-#define	SI		cm_subinfo
-#define	SY		systems
-#define	SY_ENT		systems_ent
-#define	ST_CUR		systems_cur
-#define	SD		sysdialer
-#define	SD_ARGS		sysdialer_args
-#define	SD_ENT		sysdialer_ent
-#define	VS		vecstr
 
 
 /* imported namespaces */
@@ -82,38 +76,14 @@ using libuc::libmem ;			/* variable */
 
 typedef mainv		mv ;
 
-extern "C" {
-    typedef int (*open_f)	(void *) noex ;
-    typedef int (*close_f)	(void *) noex ;
-    typedef int (*shutdown_f)	(void *,int) noex ;
-    typedef int (*reade_f)	(void *,void *,int,int,int) noex ;
-    typedef int (*recve_f)	(void *,void *,int,int,int,int) noex ;
-    typedef int (*write_f)	(void *,cvoid *,int) noex ;
-} /* end extern (C) */
-
 
 /* external subroutines */
 
 
 /* external variables */
 
-namespace cm_ns {
-    extern char		terms[fieldterms_termsize] ;
-} /* end namespace (cm_ns) */
-
 
 /* local structures */
-
-namespace {
-    struct caller {
-    	open_f		open ;
-    	close_f		close ;
-    	shutdown_f	shutdown ;
-    	reade_f		reade ;
-    	revve_f		recve ;
-    	wtite_f		write ;
-    } ; /* end struct (caller) */
-} /* end namespace */
 
 
 /* forward references */
@@ -124,6 +94,8 @@ namespace cm_ns {
     extern int cm_trysysargs(CM *,SI *,vecstr *,cc *,int) noex ;
 } /* end namespace */
 
+local void cm_trysyserr(cm *) noex ;
+
 
 /* local variables */
 
@@ -133,44 +105,17 @@ namespace cm_ns {
 
 /* exported subroutines */
 
-namespace {
-    struct opener {
-	cm		*op ;
-	cm_args		*argp ;
-	cchar		*hn ;
-	cchar		*sn ;
-	mainv		av ;
-	SD_ARGS		da{} ;
-	expcook		cooks ;
-	int		arglen ;
-	opener(cm *ªop,cm_args *ªap,ccp ªhn,ccp ªsn,mainv ªav) noex {
-	    op		= ªop ;
-	    argp	= ªap ;
-	    hn		= ªhn ;
-	    sn		= ªsn ;
-	    av		= ªav ;
-	} ; /* end ctor */
-	operator int () noex ;
-	int procargs	() noex ;
-	int loadcooks	() noex ;
-	int procargs	() noex ;
-	int tryfind	() noex ;
-	int trysave	() noex ;
-    } ; /* end struct (opener) */
-} /* end namespace */
-
 namespace cm_ns {
     int cm_trysys(cm *op,SI *sip,SD *dp,SD_ARGS *dap,
 	    EC *cookp,SY_ENT *sep,cc *sysname,cc *svcname,mainv av) noex {
-	SD_ENT		*dep ;
-	vecstr		args ;
-	buffer		barg ;
 	int		rs ;
+	int		rs1 ;
 	bool		f_loaded = false ;
 	bool		f_args = false ;
 
 	op->dobj = nullptr ;
-	rs = sysdialer_loadin(dp,sep->dialername,&dep) ;
+	SD_ENT *dep ;
+	rs = sysdialer_loadin(dp,sep->dialernamep,&dep) ;
 	f_loaded = (rs >= 0) ;
 
 	/* does this module have our attributes */
@@ -186,74 +131,75 @@ namespace cm_ns {
 	    rs = lm_mall(dep->osz,&op->dobj) ;
 	}
 
+	vecstr args ;
 	if (rs >= 0) {
 	    rs = vecstr_start(&args,5,0) ;
 	    f_args = (rs >= 0) ? true : false ;
 	}
 
-	if ((rs >= 0) && ((rs = buffer_start(&barg,sip->argslen)) >= 0)) {
+	buffer barg ;
+	if ((rs >= 0) && ((rs = barg.start(sip->argslen)) >= 0)) {
+	    rs = SR_BUGCHECK ;
+	    if (caller *callp = resumelife<caller>(op->callp)) {
+		cint csz = szof(caller) ;
+	    cint	dnl = sep->dialernamel ;
+	    ccharp	dnp = sep->dialernamep ;
 	    cchar	*abuf = nullptr ;
 	    int		alen = 0 ;
-
 	    memclear(op->dobj,op->dsz) ;
-
-	    op->c = dep->c ;
-
-	    rs = vecstr_add(&args,sep->dialername,-1) ;
-
-	/* expand out the dialer arguments */
-	    if ((rs >= 0) && (sep->dialerargs != nullptr)) {
-		cint	dal = sep->dialerargslen ;
-		cchar		*dap = sep->dialerargs ;
-
-	    	if ((rs = expcook_expbuf(cookp,0,&barg,dap,dal)) >= 0) {
-		    rs = buffer_get(&barg,&abuf) ;
-		    alen = rs ;
-		}
-
-	    } /* end if */
-
-	/* separate the individual arguments out */
-
+	    memcopy(op->callp,dep->callp,csz) ;
+	    /* expand out the dialer arguments */
+	    if ((rs = args.add(dnp,dnl)) >= 0) {
+	        if (sep->dialerargsp) {
+		    cint	dargl = sep->dialerargsl ;
+		    ccharp	dargp = sep->dialerargsp ;
+		    if ((rs = cookp->expbuf(0,&barg,dargp,dargl)) >= 0) {
+		        rs = barg.get(&abuf) ;
+		        alen = rs ;
+		    } /* end if (expcook_expbuf) */
+		} /* end if (non-null) */
+	    } /* end if (vecstr_add) */
+	    /* separate the individual arguments out */
 	    if ((rs >= 0) && (alen > 0)) {
 		rs = cm_trysysargs(op,sip,&args,abuf,alen) ;
-	    }
-
+	    } /* end if (ok) */
 	    if (rs >= 0) {
-		if (op->c.open != nullptr) {
- 	            if (mainv tav ; (rs = vecstr_getvec(&args,&tav)) >= 0) {
-	                dap->argv = tav ;
-	                rs = (op->c.open)(op->dobj,dap,sysname,svcname,av) ;
-		    }
-		} else {
 	            rs = SR_LIBACC ;
-		}
-	    }
-
-	    buffer_finish(&barg) ;
+		if (cauto fun = callp->open) {
+ 	            if (mainv tav ; (rs = args.getvec(&tav)) >= 0) {
+	                dap->argv = tav ;
+	                rs = fun(op->dobj,dap,sysname,svcname,av) ;
+		    } /* end */
+		} /* end if (ok) */
+	    } /* end if (ok) */
+	    } /* end if (non-null) */
+	    rs1 = barg.finish() ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open the module) */
 
 	if (f_args) {
-	    vecstr_finish(&args) ;
+	    args.finish() ;
 	}
 
 	if (rs < 0) {
-	    if (op->dobj) {
-	        lm_free(op->dobj) ;
-		op->dobj = nullptr ;
-	    } /* end if (memory-release) */
+	    cm_trysyserr(op) ;
 	    if (f_loaded) {
 	        sysdialer_loadout(dp,sysname) ;
-	    }
-	} /* end if */
-
+	    } /* end */
+	} /* end if (error) */
 	return rs ;
     } /* end subroutine (cm_trysys) */
 } /* end namespace (cm_ns) */
 
+local void cm_trysyserr(cm *op) noex {
+	    if (op->dobj) {
+	        lm_free(op->dobj) ;
+		op->dobj = nullptr ;
+	    } /* end if (memory-release) */
+} /* end subroutine (cmd_trysyserr) */
+
 namespace cm_ns {
     int cm_trysysargs(cm *op,SI *sip,VS *alp,char *abuf,int alen) noex {
-	using		cm_ns::terms ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op && sip) ylikely {
