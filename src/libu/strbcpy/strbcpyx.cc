@@ -60,7 +60,8 @@
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>		/* CSTD |stpcpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU |strbcpy(3usys)| */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strbcpyx.h"
 
@@ -136,7 +137,7 @@ char *strbcpyx_pos(char *dp,int dl,int na,va_list ap) noex {
 	    } /* end while */
 	    if ((fbad = ((dl == 0) && *sp))) break ;
 	} /* end for */
-	*dp = '\0' ;
+	*dp = eos ;
 	if (fbad) dp = nullptr ;
 	return dp ;
 } /* end subroutine (strbcpyx_pos) */
