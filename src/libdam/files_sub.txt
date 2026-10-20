@@ -57,7 +57,5 @@ quickselecti
 naturalwords
 rtags
 ktag
-funmode
-entbuf
-msgbuf
 msgidx
+sysdialer
