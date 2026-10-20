@@ -44,7 +44,7 @@
 #ifndef	SUBROUTINE_HASXX
 #define	SUBROUTINE_HASXX
 EXTERNC_begin
-local inline bool hassome(cchar *sp,int sl) noex {
+local inline bool hasmore(cchar *sp,int sl) noex {
     	return (sl && *sp) ;
 } /* end */
 local inline bool hasnone(cchar *sp,int sl) noex {
