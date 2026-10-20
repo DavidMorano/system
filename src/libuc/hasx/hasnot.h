@@ -33,11 +33,17 @@ extern bool hasnotempty(cchar *,int) noex ;
 
 local inline bool hasNotDots(cchar *sp,int sl) noex {
 	return hasnotdots(sp,sl) ;
-}
+} /* end */
 local inline bool hasNotEmpty(cchar *sp,int sl) noex {
 	return hasnotempty(sp,sl) ;
-}
+} /* end */
 
+EXTERNC_end
+
+EXTERNC_begin
+local inline bool hascontent(cchar *fp,int fl) noex {
+	return hasnotempty(fp,fl) ;
+} /* end */
 EXTERNC_end
 
 
