@@ -880,23 +880,23 @@ fsdir.o:		fsdir.dir
 fsdir.dir:
 	makesubdir $@
 
-# FMTFLAG		(in-order from FMTFLAG)
+# FMTFLAG
 fmtflag.o:		fmtflag.dir
 fmtflag.dir:
 	makesubdir $@
 
 # FMTSTR		(in-order from FMTFLAG)
-fmtstr.o:		fmtstr.dir
+fmtstr.o:		fmtstr.dir fmtflag.o
 fmtstr.dir:
 	makesubdir $@
 
 # CTX			(in-order from FMTFLAG)
-ctx.o:			ctx.dir
+ctx.o:			ctx.dir fmtflag.o
 ctx.dir:
 	makesubdir $@
 
 # CFX			(in-order from FMTFLAG)
-cfx.o:			cfx.dir
+cfx.o:			cfx.dir fmtflag.o
 cfx.dir:
 	makesubdir $@
 
