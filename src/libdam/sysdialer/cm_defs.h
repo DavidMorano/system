@@ -35,19 +35,22 @@
 #include	<stddef.h>		/* POSIX® */
 #include	<stdlib.h>		/* POSIX® */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<expcook.h>		/* LIBUC */
+#include	<systems.h>		/* LIBUC */
+#include	<sysdialer.h>		/* LIBUC */
 
 
+#define	VS		vecstr
 #define	EC		expcook
-#define	SI		cm_subinfo
 #define	SY		systems
 #define	SY_ENT		systems_ent
-#define	ST_CUR		systems_cur
+#define	SY_CUR		systems_cur
 #define	SD		sysdialer
 #define	SD_ARGS		sysdialer_args
 #define	SD_ENT		sysdialer_ent
+#define	SI		cm_subinfo
 
 
 #endif /* CMDEFS_INCLUDE */
