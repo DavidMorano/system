@@ -28,7 +28,7 @@
 *********************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -36,14 +36,16 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<ctype.h>
-
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<baops.h>
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -58,7 +60,7 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,char **) ;
+extern int	sfshrink(cchar *,int,char **) ;
 
 extern char	*strshrink(char *) ;
 
@@ -75,11 +77,11 @@ ustate {
 
 /* forward references */
 
-static int	procfree() ;
+local int	procfree() ;
 
-static void	procinit() ;
-static void	procopen(), procclose() ;
-static void	procitem() ;
+local void	procinit() ;
+local void	procopen(), procclose() ;
+local void	procitem() ;
 
 
 /* local variables */
@@ -210,7 +212,7 @@ badinfile:
 
 
 
-static void procinit(gp,sp)
+local void procinit(gp,sp)
 struct proginfo	*gp ;
 ustate	*sp ;
 {
@@ -225,7 +227,7 @@ ustate	*sp ;
 /* end subroutine (procinit) */
 
 
-static int procfree(gp,sp)
+local int procfree(gp,sp)
 struct proginfo	*gp ;
 ustate	*sp ;
 {
@@ -237,7 +239,7 @@ ustate	*sp ;
 /* end subroutine (procfree) */
 
 
-static void procopen(gp,sp)
+local void procopen(gp,sp)
 struct proginfo	*gp ;
 ustate	*sp ;
 {
@@ -255,7 +257,7 @@ ustate	*sp ;
 	bprintf(&sp->outfile,"x-mailer: %s\n",gp->mailername) ;
 
 	bprintf(&sp->outfile,"Date: %s\n",
-	    timestr_hdate(gp->daytime,timebuf)) ;
+	    strtime_hdate(gp->daytime,timebuf)) ;
 
 	bprintf(&sp->outfile,"Subject: factoid\n") ;
 
@@ -270,7 +272,7 @@ ustate	*sp ;
 /* end subroutine (procopen) */
 
 
-static void procclose(gp,sp)
+local void procclose(gp,sp)
 struct proginfo	*gp ;
 ustate	*sp ;
 {
@@ -337,7 +339,7 @@ ustate	*sp ;
 /* end subroutine (procclose) */
 
 
-static void procitem(gp,sp,linebuf)
+local void procitem(gp,sp,linebuf)
 struct proginfo	*gp ;
 ustate	*sp ;
 char		linebuf[] ;
