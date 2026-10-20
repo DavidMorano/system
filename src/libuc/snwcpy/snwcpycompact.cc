@@ -119,7 +119,7 @@ int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	        rs1 = m.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (strmgr) */
-	    dbuf[dl] = '\0' ;
+	    dbuf[dl] = eos ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
 } /* end subroutine (snwcpycompact) */
