@@ -118,9 +118,9 @@ int ba_finish(ba *op) noex {
 int ba_setones(ba *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    int		asz = op->nwords * szof(BA_DIGIT) ;
+	    cint asz = op->nwords * szof(BA_DIGIT) ;
 	    rs = SR_OK ;
-	    memnset(op->a,asz,UCHAR_MAX) ;
+	    membset(op->a,asz,UCHAR_MAX) ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ba_setones) */
@@ -128,7 +128,7 @@ int ba_setones(ba *op) noex {
 int ba_zero(ba *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cint	asz = op->nwords * szof(BA_DIGIT) ;
+	    cint asz = op->nwords * szof(BA_DIGIT) ;
 	    rs = memclear(op->a,asz) ;
 	} /* end if (non-null) */
 	return rs ;
