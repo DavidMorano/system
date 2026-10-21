@@ -18,11 +18,9 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdarg>		/* CSTD */
-#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<cstring>		/* CSTD |memcpy(3c)| */
 #include	<algorithm>		/* C++STD |min(C++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
@@ -34,7 +32,7 @@ module ;
 module libutil ;
 
 
-int membcpy(void *dp,int dl,cvoid *sp,int sl) noex {
+int membcpy(voidp dp,int dl,cvoidp sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
 	if (dp && sp) ylikely {
@@ -63,33 +61,19 @@ int membcpy(void *dp,int dl,cvoid *sp,int sl) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (membcpy) */
 
-int membcpyz(voidp dp,int dl,cvoid *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+int membcpyz(voidp dp,int dl,cvoidp sp,int sl) noex {
+	int		rs ;
     	int		len = 0 ; /* return-value */
-	if (dp && sp) ylikely {
-	    rs = SR_INVALID ;
-	    if (dl >= 0) ylikely {
-	        if (sl > 0) ylikely {
-		    rs = SR_OVERFLOW ;
-		    if (sl <= dl) ylikely {
-	                caddr_t	dst = caddr_t(dp) ;
-		        rs = SR_OK ;
-	                    csize srcsize = size_t(sl) ;
-		            memcpy(dst,sp,srcsize) ;
-	                    len = sl ;
-		        dst += sl ;
-		        if (sl < dl) {
-		            csize zsize = size_t(dl - sl) ;
-		                memset(dst,0,zsize) ;
-		        } /* end if (zero-fill) */
-		    } /* end if (no-overflow) */
-	        } /* end if (non-zero positive) */
-	    } /* end if (valid) */
-	} /* end if (non-null) */
+	if ((rs = membcpy(dp,dl,sp,sl)) >= 0) {
+	    if ((len = rs) < dl) {
+		caddr_t zp = cast_static<caddr_t>(dp) ;
+		rs = memclear((zp + len),(dl - len)) ;
+	    } /* end if (zero-out) */
+	} /* end if (membcpy) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (membcpyz) */
 
-int membset(void *dp,int dl,int ch,int n) noex {
+int membset(voidp dp,int dl,int ch,int n) noex {
 	int		rs = SR_FAULT ;
 	int		rl = -1 ; /* return-value */
 	if (dp) ylikely {
