@@ -90,7 +90,7 @@ local char *strcpyxc(chtoxc_f chtoxc,char *dp,cchar *sp) noex {
 	    while (*sp) {
 	        *dp++ = chtoxc(*sp++) ;
 	    } /* end while */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = nullptr ;
 	} /* end if (non-null) */
@@ -104,7 +104,7 @@ local char *strcpyxcx(chtoxc_f chtoxc,char *dp,int na,va_list ap) noex {
 	        *dp++ = chtoxc(*sp++) ;
 	    } /* end while */
 	} /* end for */
-	*dp = '\0' ;
+	*dp = eos ;
 	return dp ;
 } /* end subroutine (strcpyxcx) */
 
