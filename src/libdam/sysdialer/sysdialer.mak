@@ -42,7 +42,8 @@ LIBS +=
 
 OBJ0_CM= cm_defs.o cm_prime.o
 OBJ1_CM= cm_subinfo.o cm_vars.o cm_caller.o
-OBJ2_CM= cm_opener.o cm_try.o
+OBJ2_CM= cm_opener.o cm_loadcooks.o cm_try.o
+OBJ3_CM=
 
 OBJ_CM= obj0_cm.o obj1_cm.o obj2_cm.o
 
@@ -188,5 +189,7 @@ cm_try.o:		cm_try.cc	cm.h			$(INCS)
 cm_subinfo.o:		cm_subinfo.cc	cm_subinfo.hh		$(INCS)
 cm_vars.o:		cm_vars.cc	cm_vars.hh		$(INCS)
 cm_caller.o:		cm_caller.cc	cm_caller.hh		$(INCS)
+cm_opener.o:		cm_opener.cc	cm_opener.hh		$(INCS)
+cm_loadcooks.o:		cm_loadcooks.cc	cm_opener.hh		$(INCS)
 
 
