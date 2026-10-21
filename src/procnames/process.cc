@@ -30,7 +30,7 @@
 #include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -52,7 +52,7 @@
 
 /* external subroutines */
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -77,7 +77,7 @@ struct record {
 
 /* forward references */
 
-static int	process_record(PROGINFO *,bfile *,struct record *) ;
+local int	process_record(PROGINFO *,bfile *,struct record *) ;
 
 
 /* local variables */
@@ -128,15 +128,15 @@ int process(PROGINFO *pip,cchar *fname)
 /* local subroutine */
 
 
-static int process_record(pip,ifp,ep)
+local int process_record(pip,ifp,ep)
 PROGINFO	*pip ;
 bfile		*ifp ;
 struct record	*ep ;
 {
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		ll, sl, cl ;
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
 	while ((ll = breadln(ifp,lbuf,llen)) > 0) {
