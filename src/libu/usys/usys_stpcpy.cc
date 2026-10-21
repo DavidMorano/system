@@ -41,6 +41,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_stpcpy.h"
 
@@ -103,7 +104,7 @@ char *usys_stpcpy(char *dp,int n,...) noex {
 	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
 		dp = stpcpy(dp,sp) ;
 	    } /* end for */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
