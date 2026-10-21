@@ -314,7 +314,7 @@ namespace {
 		    val[i] = uchar(i - 'a' + 10) ;
 		} else {
 		    val[i] = uchar(UCHAR_MAX) ;
-		}
+		} /* end */
 	    } /* end for */
 	} ; /* end method (mkvals) */
 	consteval charbase() noex {
