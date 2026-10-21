@@ -128,7 +128,7 @@ int fmtsub::floater(char *tb,int tl,int fc,int fg,int wi,int pr,T dv) noex {
 	int		rs ;
 	if ((rs = cvtfloat(tb,tl,fc,fg,wi,pr,dv)) >= 0) {
 	    rs = strw(tb,rs) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (fmtsub::floater) */
 
