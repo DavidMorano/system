@@ -1,19 +1,18 @@
-/* passwdok */
+/* passwdok SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* check a password for validity */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_FCRYPT	1		/* use 'des_fcrypt()' */
-
+#define	CF_DEBUG	0		/* compile-time debugging */
+#define	CF_FCRYPT	0		/* use |des_fcrypt(3des)| */
 
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
-	The subroutine was written from scratch to do what the previous
-	program by the same name did.
-
+	The subroutine was written from scratch to do what the
+	previous program by the same name did.
 
 */
 
@@ -21,30 +20,45 @@
 
 /*******************************************************************************
 
-	This subroutine will take as input a cleartext passwd and an
-	encypted password.  It will return a boolean about whether or
-	not the password is valid on the current system.
+  	Name:
+	passwdok
 
+	Description:
+	This subroutine will take as input a cleartext passwd and
+	an encypted password.  It will return a boolean about whether
+	or not the password is valid on the current system.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<des.h>			/* ?? */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	"passwdok.h"
 
-#include	<des.h>
-#include	<localmisc.h>
+#pragma		GCC dependency		"mod/libutil.ccm"
 
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 #ifndef	BUFLEN
 #define	BUFLEN	MAXPATHLEN
+#endif
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* compile-time debugging */
+#endif
+#ifndef	CF_FCRYPT
+#define	CF_FCRYPT	0		/* use |des_fcrypt(3des)| */
 #endif
 
 
@@ -62,54 +76,55 @@
 
 /* local variables */
 
+cbool		f_debug		= CF_DEBUG ;
+cbool		f_fcrypt	= CF_FCRYPT ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int passwdok(password,pw_stored)
-cchar	password[] ;
-cchar	pw_stored[] ;
-{
+int passwdok(cchar *password,cchar *pw_stored) noex {
 	int	c1, c2 ;
-	int	f_passed = FALSE ;
-	int	f_cmp ;
+	cchar	*pw_given ;
+	bool	f_passed = false ; /* return-value */
+	bool	f_cmp ;
 
-	char	cryptbuf[40] ;
-	char	*pw_given ;
-
-
-#if	CF_DEBUGS
-	debugprintf("passwdok: password=>%s<\n",password) ;
-	debugprintf("passwdok: pw_stored=>%s<\n",pw_stored) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("password=>%s<\n",password) ;
+	DEBUGPRINTF("pw_stored=>%s<\n",pw_stored) ;
 #endif
 
-	c1 = strlen(password) ;
-
-	c2 = strlen(pw_stored) ;
+	c1 = lenstr(password) ;
+	c2 = lenstr(pw_stored) ;
 
 #if	CF_FCRYPT
-	pw_given = des_fcrypt(password, pw_stored,cryptbuf) ;
+	{
+	    char	cryptbuf[40] ;
+	    pw_given = des_fcrypt(password,pw_stored,cryptbuf) ;
+	}
 #else
-	pw_given = crypt(password, pw_stored) ;
+	pw_given = crypt(password,pw_stored) ;
 #endif /* CF_FCRYPT */
 
-#if	CF_DEBUGS
-	debugprintf("passwdok: pw_given=>%s<\n",pw_given) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("pw_given=>%s<\n",pw_given) ;
 #endif
 
-	f_cmp = (strcmp(pw_stored, pw_given) == 0) ;
+	f_cmp = (strcmp(pw_stored,pw_given) == 0) ;
 
 /* if both the supplied and the stored passwords are zero length, allow it */
 
-	if (f_cmp || ((c1 == 0) && (c2 == 0)))
-	    f_passed = TRUE ;
+	if (f_cmp || ((c1 == 0) && (c2 == 0))) {
+	    f_passed = true ;
+	}
 
-#if	CF_DEBUGS
-	debugprintf("passwdok: ret f_passed=%u\n",f_passed) ;
+#if	CF_DEBUG
+	DEBUGPRINTF("ret f_passed=%u\n",f_passed) ;
 #endif
 
 	return f_passed ;
-}
-/* end subroutine (passwdok) */
+} /* end subroutine (passwdok) */
 
 
