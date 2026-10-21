@@ -123,7 +123,7 @@ namespace libu {
     	int		rc = 0 ;
 	if (s1 && s2) ylikely {
 	    rc = strcmp(s1,s2) ;
-	}
+	} /* end */
 	return rc ;
     } /* end subroutine (strbasecmp) */
     int strcasecmp(cchar *s1,cchar *s2) noex {
@@ -155,55 +155,55 @@ namespace libu {
 namespace libu {
     int strbasecmpo(cchar *s1,cchar *s2) noex {
 	return (+ strbasecmp(s1,s2)) ;
-    }
+    } /* end */
     int strbasecmpr(cchar *s1,cchar *s2) noex {
 	return (- strbasecmp(s1,s2)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strcasecmpo(cchar *s1,cchar *s2) noex {
 	return (+ strcasecmp(s1,s2)) ;
-    }
+    } /* end */
     int strcasecmpr(cchar *s1,cchar *s2) noex {
 	return (- strcasecmp(s1,s2)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strfoldcmpo(cchar *s1,cchar *s2) noex {
 	return (+ strfoldcmp(s1,s2)) ;
-    }
+    } /* end */
     int strfoldcmpr(cchar *s1,cchar *s2) noex {
 	return (- strfoldcmp(s1,s2)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strxbasecmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strbasecmp,s1,s2,cmporder_obverse) ;
-    }
+    } /* end */
     int strxbasecmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strbasecmp,s1,s2,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strxcasecmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strcasecmp,s1,s2,cmporder_obverse) ;
-    }
+    } /* end */
     int strxcasecmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strcasecmp,s1,s2,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strxfoldcmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strfoldcmp,s1,s2,cmporder_obverse) ;
-    }
+    } /* end */
     int strxfoldcmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strfoldcmp,s1,s2,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 
