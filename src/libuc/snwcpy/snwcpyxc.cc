@@ -46,7 +46,9 @@
 
 /* local typedefs */
 
-typedef char (*chtoxc_f)(int) noex ;
+extern "C" {
+    typedef char (*chtoxc_f)(int) noex ;
+} /* extern (C) */
 
 
 /* external subroutines */
