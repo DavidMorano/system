@@ -84,10 +84,6 @@ using libu::umem ;			/* variable */
 
 /* local typedefs */
 
-extern "C" {
-    typedef int (*vs_f)(cchar **,cchar **) noex ;
-} /* end extern */
-
 
 /* external subroutines */
 
@@ -178,19 +174,19 @@ int vecstr_envfiler(vecstr *op,cchar *fname) noex {
 	if (subinfo si(op,fterms) ; (rs = si.start()) >= 0) ylikely {
             cmode   om = 0666 ;
             if (ccfile cf ; (rs = cf.open(fname,np,om)) >= 0) ylikely {
-                    cint    to = utimeout[uto_read] ;
-                    cint    llen = si.llen ;
-                    char    *lbuf = si.lbuf ;
-	            DPRINTF("filer_start() rs=%d\n",rs) ;
-                    while ((rs = cf.readlns(lbuf,llen,to,np)) > 0) {
-			cchar	*cp{} ;
-			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
-                            rs = si.line(cp,cl) ;
-                            c += rs ;
-                        }
-                        if (rs < 0) break ;
-                    } /* end while (reading lines) */
-	            DPRINTF("while-out rs=%d\n",rs) ;
+                cint    to = utimeout[uto_read] ;
+                cint    llen = si.llen ;
+                char    *lbuf = si.lbuf ;
+	        DPRINTF("filer_start() rs=%d\n",rs) ;
+                while ((rs = cf.readlns(lbuf,llen,to,np)) > 0) {
+		    cchar	*cp{} ;
+		    if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+                        rs = si.line(cp,cl) ;
+                        c += rs ;
+                    } /* end */
+                    if (rs < 0) break ;
+                } /* end while (reading lines) */
+	        DPRINTF("while-out rs=%d\n",rs) ;
                 rs1 = cf.close ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (ccfile) */
@@ -295,7 +291,7 @@ vars::operator int () noex {
 	int		rs ;
 	if ((rs = usysconfval(cmd)) >= 0) ylikely {
 	    linebuflen = (rs * LINEBUFMULT) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (vars::operator) */
 
@@ -304,7 +300,7 @@ local int mkinit() noex {
 	DPRINTF("ent\n") ;
 	if ((rs = mkterms()) >= 0) ylikely {
 	    rs = var ;
-	}
+	} /* end */
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (mkinit) */
