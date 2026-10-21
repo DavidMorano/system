@@ -85,7 +85,9 @@ using libu::chtofc ;			/* subroutine */
 
 /* local typedefs */
 
-typedef char (*chtoxc_f)(int) noex ;
+extern "C" {
+    typedef char (*chtoxc_f)(int) noex ;
+} /* end extern (C) */
 
 
 /* external subroutines */
@@ -109,8 +111,8 @@ local int sncpyxc(chtoxc_f cvt,char *dbuf,int dlen,cchar *sp) noex {
 	    while ((i < dlen) && sp[i]) {
 	        *dp++ = cvt(sp[i++]) ;
 	    } /* end while */
-	    *dp = '\0' ;
-	    if (sp[i] == '\0') {
+	    *dp = eos ;
+	    if (sp[i] == eos) {
 	        rs = intconv(dp - dbuf) ;
 	    } /* end if */
 	} /* end if (non-null) */
