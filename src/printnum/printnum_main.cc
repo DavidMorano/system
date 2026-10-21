@@ -30,7 +30,7 @@
 #include	<cstdio>
 #include	<usystem.h>
 #include	<cfdec.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 
