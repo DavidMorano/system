@@ -290,7 +290,7 @@ libutil-strcopy.o:	libutil-strcopy.ccm		$(DEPS)	$(INCS)
 libutil-strcmp.o:	libutil-strcmp.ccm		$(DEPS)	$(INCS)
 libutil-operators.o:	libutil-operators.ccm		$(DEPS)	$(INCS)
 
-libutil%memb.o:		libutil%memb.cc libutil.o		$(INCS)
+libutil%memb.o:		libutil%memb.cc libutil0.o		$(INCS)
 	$(COMPILE.cc) $<
 
 modcstring.o:		modcstring.dir
