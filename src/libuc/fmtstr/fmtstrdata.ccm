@@ -52,7 +52,7 @@ export {
     struct fmtstrdata_flags {
 	uint		wint:1 ;
 	uint		wchar:1 ;
-    } ;
+    } ; /* end struct */
     struct fmtstrdata_head {
 	const wint_t	*lsp{} ;
 	const wchar_t	*wsp{} ;
