@@ -80,12 +80,6 @@ typedef mainv		mv ;
 
 /* external subroutines */
 
-namespace cm_ns {
-    extern int cm_trysys(CM *,SI *,SD *,SD_ARGS *,
-			EC *,SY_ENT *,cc *,cc *,mv) noex ;
-    extern int cm_trysysargs(CM *,SI *,vecstr *,cc *,int) noex ;
-} /* end namespace (cm_ns) */
-
 
 /* external variables */
 
@@ -142,10 +136,6 @@ local inline int cm_magic(cm *op,Args ... args) noex {
 	} /* end */
 	return rs ;
 } /* end subroutine (cm_magic) */
-
-#ifdef	COMMENT
-local int cm_loadcooks(CM *,SI *,EC *,cm_args *,cc *,cc *,mv) noex ;
-#endif
 
 
 /* local variables */
