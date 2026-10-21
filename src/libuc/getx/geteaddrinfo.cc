@@ -108,7 +108,6 @@ import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 /* imported namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
