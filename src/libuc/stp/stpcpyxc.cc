@@ -95,7 +95,7 @@ local char *stpcpyxc(chtoxc_f chtoxc,char *dp,cchar *sp) noex {
 	    while (*sp) {
 	        *dp++ = chtoxc(*sp++) ;
 	    } /* end while */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = nullptr ;
 	} /* end if (non-null) */
