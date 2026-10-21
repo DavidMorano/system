@@ -49,6 +49,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"usupport_strwcpy.hh"
 #include	"usupport_snadd.hh"
 
 
@@ -93,44 +94,39 @@ namespace libu {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
     } /* end subroutine (snaddx) */
+} /* end namespace (libu) */
+
+namespace libu {
     int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf && sp) ylikely {
 	    rs = SR_INVALID ;
  	    if (i >= 0) ylikely {	
-	        char	*bp = (rbuf + i) ;
+	        charp bp = (rbuf + i) ;
 	        rs = SR_OK ;
-	        if (rlen < 0) {
-	            if (sl < 0) {
-	                while (*sp) {
-	                    *bp++ = *sp++ ;
-		        } /* end while */
-	            } else {
-	                while (sl && *sp) {
+	        if (rlen >= 0) ylikely {
+		    charp ep = (rbuf + rlen) ;
+	            if (sl >= 0) {
+	                while ((bp < ep) && hasmore(sp,sl)) {
 	                    *bp++ = *sp++ ;
 	                    sl -= 1 ;
 	                } /* end while */
-	            } /* end if */
-	        } else {
-	            if (sl < 0) {
-	                while ((bp < (rbuf + rlen)) && *sp) {
+		        if ((bp == ep) && hasmore(sp,sl)) {
+		            rs = SR_OVERFLOW ;
+		        } /* end if (error) */
+		    } else {
+	                while ((bp < ep) && *sp) {
 	                    *bp++ = *sp++ ;
 		        } /* end while */
-		        if ((bp == (rbuf + rlen)) && (*sp != '\0')) {
-		            rs = SR_OVERFLOW ;
-		        } /* end if (error) */
-	            } else {
-	                while ((bp < (rbuf + rlen)) && sl && *sp) {
-	                    *bp++ = *sp++ ;
-	                    sl -= 1 ;
-	                } /* end while */
-		        if ((bp == (rbuf + rlen)) && sl) {
+		        if ((bp == ep) && *sp) {
 		            rs = SR_OVERFLOW ;
 		        } /* end if (error) */
 	            } /* end if */
+	            *bp = eos ;
+		} else {
+		    bp = strwcpy(bp,sp,sl) ;
 	        } /* end if */
-	        *bp = '\0' ;
 		len = intconv(bp - (rbuf + i)) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
