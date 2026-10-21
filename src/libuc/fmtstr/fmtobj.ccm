@@ -136,11 +136,11 @@ export {
 	void operator () (fmtobj *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (fmtobj_co) */
     struct fmtobj {
 	friend		fmtobj_co ;
