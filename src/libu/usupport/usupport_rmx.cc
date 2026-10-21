@@ -99,28 +99,28 @@ namespace {
 	rmtrailer(iscond_f fun) noex : ourcond(fun) { } ;
 	virtual bool iscond(int ch) const noex {
 	    return ourcond(ch) ;
-	} ;
+	} ; /* end */
 	int operator () (cchar *,int) noex ;
     } ; /* end struct (rmtrailer) */
     struct rmtrailer_class : rmtrailer {
 	cchar	*ss ;
 	rmtrailer_class(cchar *s) noex {
 	    ss = s ;
-	} ;
+	} ; /* end */
 	bool iscond(int ch) const noex override final {
 	    ch &= UCHAR_MAX ;
     	    return (strchr(ss,ch) != nullptr) ;
-	} ;
+	} ; /* end */
     } ; /* end struct (rmtrailer_class) */
     struct rmtrailer_chr : rmtrailer {
 	int	chx_s ;
 	rmtrailer_chr(int c) noex {
 	    chx_s = c ;
-	} ;
+	} ; /* end */
 	bool iscond(int ch) const noex override final {
 	    ch &= UCHAR_MAX ;
 	    return (ch == chx_s) ;
-	} ;
+	} ; /* end */
     } ; /* end struct (rmtrail_chr) */
 } /* end namespace */
 
@@ -132,7 +132,7 @@ local int rmxchr(strnx_f sx,cchar *sp,int sl,int ch) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    if (cchar *tp ; (tp = sx(sp,sl,ch)) != nullptr) {
 	        sl = intconv(tp - sp) ;
-	    }
+	    } /* end */
 	} else {
 	    sl = -1 ;
 	} /* end if */
@@ -188,10 +188,10 @@ int rmtrailer::operator () (cchar *sp,int sl) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    while (sl && iscond(sp[sl - 1])) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	} else {
 	    sl = -1 ;
-	}
+	} /* end */
 	return sl ;
 } /* end method (rmtrailer::operator) */
 
