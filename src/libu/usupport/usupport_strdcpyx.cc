@@ -133,6 +133,7 @@ namespace libu {
 	    if (dl >= 0) {
 	        for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
 	            ccharp sp = (cchar *) va_arg(ap,char *) ;
+		    if (! sp) break ;
 	            while ((dl > 0) && sp[0]) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
@@ -141,6 +142,7 @@ namespace libu {
 	    } else {
 	        for (int i = 0 ; i < n ; i += 1) {
 	            ccharp sp = (cchar *) va_arg(ap,char *) ;
+		    if (! sp) break ;
 		    dp = stpcpy(dp,sp) ;
 	        } /* end for */
 	    } /* end if */
