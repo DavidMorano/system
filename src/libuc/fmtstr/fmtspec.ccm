@@ -103,7 +103,7 @@ export {
 	void operator () (fmtspec *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
     } ; /* end struct (fmtspec_co) */
     struct fmtspec : fmtspec_head {
