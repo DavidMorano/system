@@ -74,17 +74,17 @@ export {
 	constexpr chrset &operator = (chrset &&) = delete ;
 	constexpr chrset(cchar *ss) noex {
 	    load(ss) ;
-	} ;
+	} ; /* end */
 	constexpr chrset(int ch) noex {
 	    BASETL(bs,ch) ;
-	} ;
+	} ; /* end */
 	constexpr int load(cchar *) noex ;
 	constexpr int set(int) noex ;
 	constexpr int clr(int) noex ;
 	constexpr int tst(int) const noex ;
 	int operator [] (int ch) const noex {
 	    return tst(ch) ;
-	} ;
+	} ; /* end */
     } ; /* end struct (chrset) */
 } /* end export */
 
@@ -104,7 +104,7 @@ constexpr int chrset::set(int ch) noex {
 	if ((ch >= 0) && (ch < nbits)) {
 	    rs = SR_OK ;
 	    BASETL(bs,ch) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (chrset::set) */
 
@@ -113,7 +113,7 @@ constexpr int chrset::clr(int ch) noex {
 	if ((ch >= 0) && (ch < nbits)) {
 	    rs = SR_OK ;
 	    BACLRL(bs,ch) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (chrset::clr) */
 
@@ -121,7 +121,7 @@ constexpr int chrset::tst(int ch) const noex {
     	int rs = SR_INVALID ;
 	if ((ch >= 0) && (ch < nbits)) {
 	    rs = bool(BATSTL(bs,ch)) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (chrset::tst) */
 
