@@ -135,6 +135,7 @@ local char *strbcpyxw_pos(char *dp,int dl,int n,va_list ap) noex {
     	bool fbad = false ;
 	for (int i = 0 ; (dl > 0) && (i < (n - 1)) ; i += 1) {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    if (! sp) break ;
 	    while ((dl > 0) && *sp) {
 		*dp++ = *sp++ ;
 		dl -= 1 ;
@@ -145,12 +146,14 @@ local char *strbcpyxw_pos(char *dp,int dl,int n,va_list ap) noex {
 	if ((! fbad) && (n > 0)) ylikely {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    int	sl = (int)	va_arg(ap,int) ;
-	    while ((dl > 0) && hasmore(sp,sl)) {
-		*dp++ = *sp++ ;
-		sl -= 1 ;
-		dl -= 1 ;
-	    } /* end while */
-	    fbad = ((dl == 0) && hasmore(sp,sl)) ;
+	    if (sp) {
+	        while ((dl > 0) && hasmore(sp,sl)) {
+		    *dp++ = *sp++ ;
+		    sl -= 1 ;
+		    dl -= 1 ;
+	        } /* end while */
+	        fbad = ((dl == 0) && hasmore(sp,sl)) ;
+	    } /* end if (non-null) */
 	} /* end if */
 	*dp = eos ;
 	if (fbad) dp = nullptr ;
@@ -160,15 +163,18 @@ local char *strbcpyxw_pos(char *dp,int dl,int n,va_list ap) noex {
 local char *strbcpyxw_neg(char *dp,int,int n,va_list ap) noex {
 	for (int i = 0 ; i < (n - 1) ; i += 1) {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
+	    if (! sp) break ;
 	    dp = stpcpy(dp,sp) ;
 	} /* end for */
 	if (n > 0) ylikely {
 	    ccp sp = (cchar *)	va_arg(ap,char *) ;
 	    int	sl = (int)	va_arg(ap,int) ;
-	    while (hasmore(sp,sl)) {
-		*dp++ = *sp++ ;
-		sl -= 1 ;
-	    } /* end while */
+	    if (sp) {
+	        while (hasmore(sp,sl)) {
+		    *dp++ = *sp++ ;
+		    sl -= 1 ;
+	        } /* end while */
+	    } /* end if (non-null) */
 	} /* end if */
 	*dp = eos ;
 	return dp ;
