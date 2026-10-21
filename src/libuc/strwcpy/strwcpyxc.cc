@@ -94,7 +94,7 @@ local char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
 		    *dp++ = chtoxc(*sp++) ;
 	        } /* end while */
 	    } /* end if */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = nullptr ;
 	} /* end if (non-null) */
