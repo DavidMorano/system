@@ -405,7 +405,7 @@ local int getxusername_µtryer(getxuser *xup) noex {
             } /* end if (vecstr) */
             if ((rs >= 0) && (len == 0)) {
 		rs = SR_NOTFOUND ;
-	    }
+	    } /* end if (error) */
 	    {
                 delete nlp ;
                 xup->nlp = nullptr ;
