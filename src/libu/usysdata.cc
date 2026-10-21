@@ -111,7 +111,7 @@ using usysauxinfo::ugetauxinfo ;	/* subroutine */
 
 /* local typedefs */
 
-typedef int (*uname_f)(utsname *) noex ;
+typedef int (*uname_f)(utsname *) noex ; /* <- C++ linkage */
 
 
 /* external subroutines */
