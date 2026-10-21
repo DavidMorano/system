@@ -89,7 +89,7 @@
 #include	<linehist.h>
 #include	<mkchar.h>
 #include	<char.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<isbad.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
