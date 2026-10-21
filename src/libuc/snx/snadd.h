@@ -55,6 +55,10 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
+local inline int snadd(char *dbuf,int dlen,int dl,cchar *sp,int sl) noex {
+	return snaddw(dbuf,dlen,dl,sp,sl) ;
+} /* end subroutine */
+
 template<typename ... Args>
 inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
