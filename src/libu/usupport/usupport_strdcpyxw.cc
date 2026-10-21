@@ -131,22 +131,25 @@ namespace libu {
 	if (dp) ylikely {
 	    va_begin(ap,n) ;
 	    if (dl < 0) dl = INT_MAX ;
-	    for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
-	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
-	        if (i == (n - 1)) {
-	            int	sl = (int) va_arg(ap,int) ;
-	            while ((dl > 0) && sl && sp[0]) {
+	    for (int i = 0 ; (dl > 0) && (i < (n - 1)) ; i += 1) {
+	        ccp sp = (cchar *)	va_arg(ap,char *) ;
+		if (! sp) break ;
+	        while ((dl > 0) && *sp) {
+		    *dp++ = *sp++ ;
+		    dl -= 1 ;
+	        } /* end while */
+	    } /* end for */
+	    if ((n > 0) && (dl > 0)) {
+	        ccp sp = (cchar *)	va_arg(ap,char *) ;
+	        int sl = (int)		va_arg(ap,int) ;
+		if (sp) {
+	            while ((dl > 0) && sl && *sp) {
 		        *dp++ = *sp++ ;
 		        dl -= 1 ;
 		        sl -= 1 ;
 	            } /* end while */
-	        } else {
-	            while ((dl > 0) && sp[0]) {
-		        *dp++ = *sp++ ;
-		        dl -= 1 ;
-	            } /* end while */
-	        } /* end if */
-	    } /* end for */
+		} /* end if (non-null) */
+	    } /* end if */
 	    *dp = eos ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
