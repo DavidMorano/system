@@ -88,7 +88,6 @@ cchar varnames::columns[]	= "COLUMNS" ;
 cchar varnames::display[]	= "DISPLAY" ;
 cchar varnames::term[]		= "TERM" ;
 cchar varnames::termprogram[]	= "TERM_PROGRAM" ;
-cchar varnames::termdev[]	= "TERMDEV" ;
 cchar varnames::tz[]		= "TZ" ;
 cchar varnames::printer[]	= "PRINTER" ;
 cchar varnames::printerbin[]	= "PRINTERBIN" ;
@@ -111,6 +110,8 @@ cchar varnames::nisdomain[]	= "NISDOMAIN" ;
 cchar varnames::systat[]	= "SYSTAT" ;
 cchar varnames::netload[]	= "NETLOCAL" ;
 cchar varnames::provider[]	= "PROVIDER" ;
+cchar varnames::termdev[]	= "TERMDEV" ;
+cchar varnames::audiodev[]	= "AUDIODEV" ;
 cchar varnames::folder[]	= "folder" ;
 
 
