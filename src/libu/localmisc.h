@@ -28,6 +28,7 @@
 
 #include	<localmisc_conmsghdr.h>
 #include	<localmisc_conv.h>
+#include	<localmisc_defs.h>
 #include	<localmisc_ends.h>
 #include	<localmisc_funmacs.h>
 #include	<localmisc_integer.h>
