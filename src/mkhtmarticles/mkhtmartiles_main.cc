@@ -57,14 +57,6 @@
 #define	MAXARGINDEX	100
 #define	MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
 
 /* external subroutines */
 
