@@ -44,6 +44,7 @@
 #include	<ucmem.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<getusername.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
@@ -238,20 +239,43 @@ int loader::argvals() noex {
 } /* end method (loader::argvals) */
 
 int loader::inetname() noex {
-    	cint		ilen = min(mlen,var.hostnamelen) ;
+    	cnullptr	np{} ;
     	int		rs ;
-	ccharp		cnp = names.n[cookname_inetname] ;
-	if (ccharp inet = argp->hostname) {
-		cchar *nnp = nullptr ;
-		cchar *dnp = nullptr ;
-	        if ((rs = snsds(mbuf,ilen,nnp,dnp)) >= 0) {
-	            rs = cookp->add(cnp,mbuf,rs) ;
+	int		rs1 ;
+	if (charp nbuf ; (rs = mem.nn(&nbuf)) >= 0) {
+    	    cint	ilen = min(mlen,var.hostnamelen) ;
+    	    ccp		nn_cnp = names.n[cookname_nodename] ;
+    	    ccp		dn_cnp = names.n[cookname_domainname] ;
+	    ccp		hn_cnp = names.n[cookname_inetname] ;
+	    ccp		nnp = argp->nodename ;
+	    ccp		dnp = argp->domainname ;
+	    if (nnp && dnp) {
+		if ((rs = cookp->add(nn_cnp,nnp)) >= 0) {
+		    rs = cookp->add(dn_cnp,dnp) ;
 		} /* end */
-	} else {
-	        rs = cookp->add(cnp,inet) ;
-	} /* end */
+	    } else {
+	        nnp = nbuf ;
+		dnp = mbuf ;
+	        if ((rs = getnodedomain(nbuf,mbuf)) >= 0) {
+		    if ((rs = cookp->add(nn_cnp,nnp)) >= 0) {
+		        rs = cookp->add(dn_cnp,dnp) ;
+		    } /* end */
+		} /* end if (getnodedomain) */
+	    } /* end if */
+	    if (rs >= 0) {
+		if (ccp hnp = argp->hostname ; hnp == np) {
+	            if ((rs = snsds(mbuf,ilen,nnp,dnp)) >= 0) {
+	                rs = cookp->add(hn_cnp,mbuf,rs) ;
+		    } /* end */
+	        } else {
+	            rs = cookp->add(hn_cnp,hnp) ;
+		} /* end if */
+	    } /* end if (ok) */
+	    rs1 = mem.free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
-} /* end method (loader::inetname) */
+} /* end method (loaderinetname) */
 
 int loader::username() noex {
     	int		rs ;
@@ -316,120 +340,6 @@ int loader::argsz() noex {
 	} /* end if */
 	return (rs >= 0) ? sz : rs ;
 } /* end method (loader::argsz) */
-
-
-#ifdef	COMMENT
-	int		rs = SR_OK ;
-	int		sz ;
-	int		cl ;
-	char		*argsbuf = nullptr ;
-
-	if ((rs >= 0) && argp->searchname) {
-	    rs = cooks.add("S",argp->searchname) ;
-	}
-
-	if ((rs >= 0) && (argp->pr != nullptr)) {
-	    rs = expcook_add(cookp,"R",argp->pr,-1) ;
-	}
-
-	if ((rs >= 0) && (argp->prn != nullptr)) {
-	    rs = expcook_add(cookp,"RN",argp->prn,-1) ;
-	}
-
-	if (rs >= 0) {
-	    cchar	*nnp, *dnp ;
-	    char	domainname[MAXHOSTNAMELEN + 1] ;
-	    char	nodename[NODENAMELEN + 1] ;
-
-	    if ((argp->nodename == nullptr) || (argp->domainname == nullptr)) {
-	        nnp = nodename ;
-	        dnp = domainname ;
-	        if ((rs = getnodedomain(nodename,domainname)) >= 0) {
-	            if ((rs = expcook_add(cookp,"N",nodename,-1)) >= 0) {
-	        	rs = expcook_add(cookp,"D",domainname,-1) ;
-		    }
-		} 
-	    } else {
-	        nnp = argp->nodename ;
-	        dnp = argp->domainname ;
-	        if ((rs = expcook_add(cookp,"N",argp->nodename,-1)) >= 0) {
-	            rs = expcook_add(cookp,"D",argp->domainname,-1) ;
-		}
-	    } /* end if */
-
-	    if ((rs >= 0) && (argp->hostname == nullptr)) {
-	        char	hbuf[MAXHOSTNAMELEN + 1] ;
-	        sz = snsds(hbuf,MAXHOSTNAMELEN,nnp,dnp) ;
-	        rs = expcook_add(cookp,"H",hbuf,sz) ;
-	    } else {
-	        rs = expcook_add(cookp,"H",argp->hostname,-1) ;
-	    }
-
-	} /* end if */
-
-	if ((rs >= 0) && (argp->username == nullptr)) {
-	    char	ubuf[USERNAMELEN + 1] ;
-	    if ((rs = getusername(ubuf,USERNAMELEN,-1)) >= 0) {
-	        rs = expcook_add(cookp,"U",ubuf,-1) ;
-	    }
-	} else {
-	    rs = expcook_add(cookp,"U",argp->username,-1) ;
-	}
-
-	if (rs >= 0) {
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    cl = ctdecui(timebuf,TIMEBUFLEN,argp->timeout) ;
-	    rs = expcook_add(cookp,"t",timebuf,cl) ;
-	} /* end block */
-
-	if (rs >= 0) {
-	    rs = expcook_add(cookp,"h",hostname,-1) ;
-	}
-
-	if (rs >= 0) {
-	    rs = expcook_add(cookp,"s",svcname,-1) ;
-	}
-
-	sz = 1 ;
-	if ((rs >= 0) && av) {
-	    for (int i = 0 ; av[i] ; i += 1) {
-		sz += (lenstr(av[i]) + 1) ;
-	    } /* end for */
-	} /* end if */
-
-	sip->argslen = (sz - 1) ;
-	if ((rs >= 0) && ((rs = mem_mall(sz,&argsbuf)) >= 0)) {
-	    int		alen = 0 ;
-	    argsbuf[0] = eos ;
-	    if (av) {
-	        sbuf ab ;
-	        if ((rs = sbuf_start(&ab,argsbuf,sip->argslen)) >= 0) {
-	            for (int i = 0 ; av[i] ; i += 1) {
-	                if (i > 0) sbuf_chr(&ab,' ') ;
-	                sbuf_strw(&ab,av[i],-1) ;
-	            } /* end for */
-	            alen = sbuf_finish(&ab) ;
-		    if (rs >= 0) rs = alen ;
-		} /* end if (sbuf) */
-	    } /* end if (had some arguments) */
-	    if (rs >= 0) {
-	        rs = expcook_add(cookp,"a",argsbuf,alen) ;
-	    } /* end if (ok) */
-	    mem_free(argsbuf) ;
-	} /* end if (memory_allocation) */
-
-	return rs ;
-    } /* end method (opener::loadcooks) */
-} /* end namespace (cm_ns) */
-#endif /* COMMENT */
-
-#ifdef	COMMENT
-namespace cm_ns {
-    int opener::loadcooks() noex {
-    	return SR_OK ;
-    } /* end method (opener::loadcooks) */
-} /* end namespce (cm_ns) */
-#endif /* COMMENT */
 
 lener::operator int () noex {
     	int		rs = 0 ;
