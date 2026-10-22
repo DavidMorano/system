@@ -71,6 +71,8 @@ struct syswords {
 	static cchar w_devnull[] ;
 	static cchar w_devzero[] ;
 	static cchar w_devrandom[] ;
+	static cchar w_devtty[] ;
+	static cchar w_devaudio[] ;
 	static cchar w_maildir[] ;
 	static cchar w_vartmpdir[] ;
 	static cchar w_usrlocaldir[] ;
