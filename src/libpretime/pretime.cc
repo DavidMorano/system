@@ -49,10 +49,6 @@
 
 #define	VARBASETIME	"LIBPRETIME_BASETIME"
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	NDF		"libpretime.nd"
 
 
