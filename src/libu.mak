@@ -408,8 +408,8 @@ utimeutil.dir:
 	makesubdir $@
 
 # UCONSTANTS
-uconstants.o:		uconstants.dir
-uconstants.dir:
+uconstants.o:		uconstants.dir 
+uconstants.dir:		umods.o
 	makesubdir $@
 
 # USYS
