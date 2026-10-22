@@ -71,6 +71,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
@@ -161,7 +162,7 @@ int wdt(cchar *basedir,int wopts,wdt_f auf,void *uarg) noex {
 				    } else if (rs == rsn) {
 					rs = SR_OK ;
 					break ;
-	                            }
+	                            } /* end if */
 	                        } /* end while */
 	                    } /* end if (subinfo_procdir) */
 	                } /* end if (mkpath) */
@@ -212,7 +213,7 @@ local int subinfo_procdir(SI *sip,char *dbuf,int dlen) noex {
 	    if (ustat sb ; (rs = uc_stat(dbuf,&sb)) >= 0) {
 	        rs = subinfo_procout(sip,dbuf,&sb) ;
 		c += rs ;
-	    }
+	    } /* end if */
 	} /* end if (subinfo_procdirents) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (subinfo_procdir) */
@@ -232,7 +233,7 @@ local int subinfo_procdirents(SI *sip,char *dbuf,int dlen) noex {
 	                    rs = subinfo_procname(sip,dbuf,rs) ;
 	                    c += rs ;
 	                }
-	            }
+	            } /* end if */
 	            if (sip->f_exit) break ;
 	            if (rs < 0) break ;
 	        } /* end while */
@@ -258,14 +259,14 @@ local int subinfo_procname(SI *sip,cchar *dbuf,int dlen) noex {
 	                    rs = fifostr_add(&sip->fs,dbuf,dlen) ;
 	                } else {
 	                    rs = subinfo_procout(sip,dbuf,&sbb) ;
-	                }
+	                } /* end if */
 	            } else if (isNotAccess(rs)) {
 	                sb = {} ;
 	                rs = subinfo_procout(sip,dbuf,&sb) ;
-	            }
+	            } /* end if */
 	        } else {
 	            rs = subinfo_procout(sip,dbuf,&sb) ;
-	        }
+	        } /* end if */
 	    } else {
 	            rs = subinfo_procout(sip,dbuf,&sb) ;
 	    } /* end if */
@@ -284,8 +285,8 @@ local int subinfo_procout(SI *sip,cchar *dbuf,ustat *sbp) noex {
 	    if ((rs = uf(dbuf,sbp,sip->uarg)) >= 0) {
 		c = 1 ;
 	        if (rs > 0) sip->f_exit = true ;
-	    }
-	}
+	    } /* end if */
+	} /* end if */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (subinfo_procout) */
 
