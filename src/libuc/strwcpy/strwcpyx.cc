@@ -152,6 +152,7 @@ char *strwcpyx(char *dp,int n,...) noex {
 	    if (n > 1) {
 	        for (int i = 0 ; i < (n - 1) ; i += 1) {
 	            ccp sp = (cchar *)	va_arg(ap,char *) ;
+		    if (! sp) break ;
 		    dp = stpcpy(dp,sp) ;
 		} /* end for */
 	    } /* end if */
@@ -159,10 +160,12 @@ char *strwcpyx(char *dp,int n,...) noex {
 		{
 	            ccp sp = (cchar *)	va_arg(ap,char *) ;
 	            int	sl = (int)	va_arg(ap,int) ;
-		    dp = srscpy(dp,sp,sl) ;
+		    if (sp) {
+		        dp = srscpy(dp,sp,sl) ;
+		    }
 		} /* end */
 	    } /* end for */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
