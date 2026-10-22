@@ -76,10 +76,6 @@
 #define	INETXADDRLEN	sizeof(struct in_addr)
 #endif
 
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
 #ifndef	SVCBUFLEN
 #define	SVCBUFLEN	(2*LINEBUFLEN)
 #endif
@@ -88,17 +84,11 @@
 #define	SVCSPECLEN	MAXNAMELEN
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 #ifndef	TO_SVC
 #define	TO_SVC		30
 #endif
-
-#define	ISEOL(c)	(((c) == '\n') || ((c) == '\r'))
 
 
 /* external subroutines */
