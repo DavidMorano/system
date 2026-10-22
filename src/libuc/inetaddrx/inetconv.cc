@@ -139,7 +139,7 @@ int inetnetpton(void *dbuf,int dlen,int af,cchar *srcbuf,int srclen) noex {
 	            strwcpy(astr,sp,min(sl,astrlen)) ;
 	            if (af == AF_UNSPEC) {
 	                af = getaf(sp,sl) ;
-	            }
+	            } /* end */
 	            rs = uc_inetnetpton(dbuf,dlen,af,astr) ;
 		} /* end if (sfshrink) */
 	    } /* end if (valid) */
@@ -160,7 +160,7 @@ int inetpton(void *addrbuf,int addrlen,int af,cchar *srcbuf,int srclen) noex {
 	            strwcpy(astr,sp,min(sl,astrlen)) ;
 	            if (af == AF_UNSPEC) {
 	                af = getaf(sp,sl) ;
-	            }
+	            } /* end */
 		    switch (af) {
 	            case AF_INET4:
 	                if (addrlen >= inet4addrlen) {
@@ -170,13 +170,13 @@ int inetpton(void *addrbuf,int addrlen,int af,cchar *srcbuf,int srclen) noex {
 				rs = inet4addrlen ;
 			    } else {
 				rs = SR_INVALID ;
-		            }
-		        }
+		            } /* end */
+		        } /* end */
 			break ;
 		    case AF_INET6:
 	                if (addrlen >= inet6addrlen) {
 	                    rs = uc_inetpton(addrbuf,af,astr) ;
-		        }
+		        } /* end */
 			break ;
 		    default:
 			rs = SR_AFNOSUPPORT ;
