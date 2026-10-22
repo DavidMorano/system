@@ -1,4 +1,4 @@
-/* linefilter HEADER */
+/* linefilter HEADER (Line-Filter) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
