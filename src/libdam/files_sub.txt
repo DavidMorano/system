@@ -6,16 +6,8 @@ cpuspeed
 dayofmonth
 dirdb
 dispatcher
-dw
-filecounts
-getclusters
-getfiledirs
-getprogroot
-getprovider
-getsrcname
-gettid
-holidayer
-holidays
+get
+holidayx
 htm
 inetping
 issue
@@ -39,7 +31,7 @@ statmsg
 statvfsdir
 sysnamedb
 systems
-termtrans
+term
 ts
 useraccdb
 userinfo
@@ -50,7 +42,6 @@ defvar
 satcount
 hostequiv
 prognamevar
-termout
 deprecated
 quickselect
 quickselecti
@@ -59,3 +50,5 @@ rtags
 ktag
 msgidx
 sysdialer
+mathx
+mailgroup
