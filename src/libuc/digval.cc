@@ -88,6 +88,8 @@
 
 /* local defines */
 
+#define	TOLC(ch)	CHAR_TOLC(ch)
+
 
 /* imported namespaces */
 
@@ -125,7 +127,7 @@ consteval void decoder::mkhextab() noex {
                 hextab[ch] = uchar((ch - 'a') + 10) ; /* <- '10' */
             } else {
                 hextab[ch] = UCHAR_MAX ;
-            }
+            } /* end */
         } /* end for */
 } /* end method (decoder::mkhextab) */
 
@@ -133,10 +135,10 @@ consteval void decoder::mkhextab() noex {
 /* forward references */
 
 local inline int digvalx(int chx_m,int ch) noex {
-	int		v = SR_DOM ;
+	int v = SR_DOM ;
 	if ((ch >= '0') && (ch <= chx_m)) {
 	    v = (ch - '0') ;
-	}
+	} /* end */
 	return v ;
 } /* end subroutine (digvalx) */
 
@@ -152,7 +154,7 @@ constexpr decoder	hexdecode ;
 /* exported subroutines */
 
 int digval(int ch) noex {
-	int		v = char_toval(ch) ; /* base-64 decode */
+	int v = char_toval(ch) ; /* base-64 decode */
 	if (v == UCHAR_MAX) v = SR_DOM ;
 	return v ;
 } /* end subroutine (digval) */
@@ -170,21 +172,21 @@ int digvaldec(int ch) noex {
 } /* end subroutine (digvaldec) */
 
 int digvalhex(int ch) noex {
-	int		v = hexdecode.hextab[ch & UCHAR_MAX] ;
+	int v = hexdecode.hextab[ch & UCHAR_MAX] ;
 	if (v == UCHAR_MAX) v = SR_DOM ;
 	return v ;
 } /* end subroutine (digvalhex) */
 
 #ifdef	COMMENT /* previous code */
 int digvalhex(int ch) noex {
-	int		v = SR_DOM ;
+	int v = SR_DOM ;
 	if ((ch >= '0') && (ch <= '9')) {
 	    v = (ch - '0') ;
 	} else {
-	    if (cint lch = CHAR_TOLC(ch) ; (lch >= 'a') && (lch <= 'f')) {
+	    if (cint lch = TOLC(ch) ; (lch >= 'a') && (lch <= 'f')) {
 	        v = ((lch - 'a') + 10) ;
-	    }
-	}
+	    } /* end */
+	} /* end if */
 	return v ;
 } /* end subroutine (digvalhex) */
 #endif /* COMMENT */
