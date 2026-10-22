@@ -1,4 +1,4 @@
-/* lineclean HEADER */
+/* lineclean HEADER (Line-Clean) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -47,25 +47,25 @@ struct lineclean_co {
 	void operator () (lineclean *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (lineclean_co) */
 struct lineclean : lineclean_head {
     	linecleanoptms	om ;
 	lineclean_co	finish ;
 	lineclean() noex {
 	    finish	(this,linecleanmem_finish) ;
-	    cbuf = nullptr ;
-	    magval = 0 ;
+	    cbuf	= nullptr ;
+	    magval	= 0 ;
 	} ; /* end ctor */
 	int start(cchar *,int,int,cchar **) noex ;
 	void dtor() noex ;
 	destruct lineclean() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (lineclean) */
 #else
 typedef	LINECLEAN		lineclean ;
