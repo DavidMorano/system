@@ -97,15 +97,7 @@
 #define	SVCSPECLEN	62
 #endif
 
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 #ifndef	TO_SVC
 #define	TO_SVC		30
@@ -114,7 +106,6 @@
 
 /* external subroutines */
 
-extern int	field_svcargs(FIELD *,VECSTR *) ;
 extern int	processargs(char *,VECSTR *) ;
 extern int	execute(struct proginfo *,int,char *,char *,
 			VECSTR *,VECSTR *) ;
@@ -123,10 +114,7 @@ extern int	handle_srventry(struct proginfo *,
 			SRVTAB_ENT *) ;
 extern int	inputlogin(struct proginfo *,
 			struct clientinfo *,int,char *,int,char *,int) ;
-extern int	passwdok(cchar *,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
+extern int	passwdok(cchar *,cchar *) noex ;
 
 
 /* external variables */
