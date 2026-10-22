@@ -69,7 +69,7 @@ import libutil ;			/* |lenstr(3u)| */
 #endif
 
 #define	LOGBUFLEN	(LOGNAMELEN + 20)
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 
 /* external subroutines */
