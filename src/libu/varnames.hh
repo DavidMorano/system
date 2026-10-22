@@ -92,7 +92,6 @@ struct varnames {
 	static cchar display[] ;
 	static cchar term[] ;
 	static cchar termprogram[] ;
-	static cchar termdev[] ;
 	static cchar tz[] ;
 	static cchar printer[] ;
 	static cchar printerbin[] ;
@@ -115,6 +114,8 @@ struct varnames {
 	static cchar systat[] ;
 	static cchar netload[] ;
 	static cchar provider[] ;
+	static cchar termdev[] ;
+	static cchar audiodev[] ;
 	static cchar folder[] ;
 } ; /* end struct (varnames) */
 
