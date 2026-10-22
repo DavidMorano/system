@@ -86,8 +86,8 @@ import uconstants ;			/* |sysword(3u)| */
 #define	NOFILE		20
 #endif
 
-#undef	O_FLAGS
-#define	O_FLAGS		(O_WRONLY | O_NOCTTY)
+#undef	OX_FL
+#define	OX_FL		(O_WRONLY | O_NOCTTY)
 
 
 /* external subroutines */
@@ -1503,7 +1503,7 @@ local int proconce(PROGINFO *pip,cchar ofname[])
 local int procout(PROGINFO *pip,cchar ofname[],gid_t gid)
 {
 	const mode_t	om = 0666 ;
-	cint	of = O_FLAGS ;
+	cint	of = OX_FL ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
