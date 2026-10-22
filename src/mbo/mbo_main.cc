@@ -89,7 +89,7 @@
 
 #define	TO_LOCK		5
 
-#define	O_FLAGS		(O_RDWR)
+#define	OX_FL		(O_RDWR)
 
 
 /* external subroutines */
@@ -1092,7 +1092,7 @@ char	*envv[] ;
 	ifd = FD_STDIN ;
 	if ((ifname != nullptr) && (ifname[0] != '-')) {
 
-	    rs = uc_open(ifname,O_FLAGS,0666) ;
+	    rs = uc_open(ifname,OX_FL,0666) ;
 	    ifd = rs ;
 	    if (rs < 0) {
 		ex = EX_NOINPUT ;
