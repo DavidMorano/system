@@ -52,6 +52,7 @@
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
@@ -153,7 +154,7 @@ int syshelper_open(SH *op,cchar *filename) noex {
 		        }
 	            } /* end if (closeonexec) */
 	            if (rs < 0) {
-		        u_close(op->fd) ;
+		        uc_close(op->fd) ;
 		        op->fd = -1 ;
 		    } /* end if (error) */
 	        } /* end if (dialuss) */
@@ -170,14 +171,14 @@ int syshelper_close(SH *op) noex {
 	int		rs1 ;
 	if ((rs = syshelper_magic(op)) >= 0) ylikely {
 	    if (op->fd >= 0) ylikely {
-	        rs1 = u_close(op->fd) ;
+	        rs1 = uc_close(op->fd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fd = -1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = syshelper_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
