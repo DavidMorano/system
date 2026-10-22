@@ -108,8 +108,16 @@
 #define	VARGROUPNAME	"GROUPNAME"
 #endif
 
+#ifndef	VARPROJNAME
+#define	VARPROJNAME	"PROJNAME"
+#endif
+
 #ifndef	VARLOGNAME
 #define	VARLOGNAME	"LOGNAME"
+#endif
+
+#ifndef	VARUSER
+#define	VARUSER		"USER"
 #endif
 
 #ifndef	VARPWD
@@ -210,6 +218,14 @@
 
 #ifndef	VARFULLNAME
 #define	VARFULLNAME	"FULLNAME"
+#endif
+
+#ifndef	VARLINES
+#define	VARLINES	"LINES"
+#endif
+
+#ifndef	VARCOLUMNS
+#define	VARCOLUMNS	"COLUMNS"
 #endif
 
 
