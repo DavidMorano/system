@@ -42,24 +42,24 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<pwd.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucmem.h>
-#include	<bfile.h>
-#include	<passwdent.h>
-#include	<pwfile.h>
-#include	<getax.h>
-#include	<getusername.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<pwd.h>			/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<passwdent.h>		/* LIBUC */
+#include	<pwfile.h>		/* LIBUC */
+#include	<getax.h>		/* LIBUC */
+#include	<getusername.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -91,7 +91,7 @@ using libuc::mem ;			/* variable */
 
 /* forward references */
 
-local int	userexists(PI *,PWFILE *,cchar *) ;
+local int	userexists(PI *,PWFILE *,cchar *) noex ;
 
 
 /* local variables */
