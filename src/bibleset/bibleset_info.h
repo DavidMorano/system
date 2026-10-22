@@ -40,14 +40,6 @@
 #define	FD_STDERR	2
 #endif
 
-#ifndef	MAXPATHLEN
-#define	MAXPATHLEN	2048
-#endif
-
-#ifndef	MAXNAMELEN
-#define	MAXNAMELEN	256
-#endif
-
 #ifndef	MSGBUFLEN
 #define	MSGBUFLEN	2048
 #endif
@@ -57,69 +49,8 @@
 #define	SVCNAMELEN	32
 #endif
 
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
-#ifndef	USERNAMELEN
-#ifndef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
-#ifndef	GROUPNAMELEN
-#ifndef	LOGNAME_MAX
-#define	GROUPNAMELEN	LOGNAME_MAX
-#else
-#define	GROUPNAMELEN	32
-#endif
-#endif
-
-#ifndef	LOGNAMELEN
-#ifndef	LOGNAME_MAX
-#define	LOGNAMELEN	LOGNAME_MAX
-#else
-#define	LOGNAMELEN	32
-#endif
-#endif
-
-#ifndef	PROJNAMELEN
-#ifndef	LOGNAME_MAX
-#define	PROJNAMELEN	LOGNAME_MAX
-#else
-#define	PROJNAMELEN	32
-#endif
-#endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-/* timezone (zoneinfo) name */
-#ifndef	TZLEN
-#define	TZLEN		60
-#endif
-
-#ifndef	LOGIDLEN
-#define	LOGIDLEN	15
-#endif
-
 #ifndef	MAILADDRLEN
 #define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
-
-#ifndef	NYEARS_CENTURY
-#define	NYEARS_CENTURY	100
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
 #endif
 
 #ifndef	DEBUGLEVEL
