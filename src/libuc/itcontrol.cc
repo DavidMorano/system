@@ -1,4 +1,4 @@
-/* itcontrol SUPPORT */
+/* itcontrol SUPPORT (Internval-Timer-Control) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
