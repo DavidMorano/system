@@ -59,14 +59,10 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 #define	NLOGINS		4
 #define	NPASSWORDS	2
 #define	DEBUGFILE	"/tmp/uucpd.deb"
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
 
 
 /* external subroutines */
