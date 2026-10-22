@@ -5,7 +5,7 @@
 /* open-dialer (hello) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -89,6 +89,10 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
+#endif
+
 
 /* external subroutines */
 
@@ -104,6 +108,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -112,7 +118,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 int opendialer_hello(cc *pr,cc *prn,cc *svc,
 		int of,mode_t om,con mainv argv,con mainv envv,int to) noex {
-	int		rs = SR_OK ;
+	int		rs ;
+	int		rs1 ;
 	int		pipes[2] ;
 	int		fd = -1 ;
 	int		sl = -1 ;
@@ -121,15 +128,16 @@ int opendialer_hello(cc *pr,cc *prn,cc *svc,
 	if ((rs = u_pipe(pipes)) >= 0) {
 	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
-
-	    if (sl < 0) sl = lenstr(sp) ;
-
-	    rs = u_write(wfd,sp,sl) ;
-
-	    u_close(wfd) ;
-	    if (rs < 0) u_close(fd) ;
-	} /* end if */
-
+	    {
+	        if (sl < 0) sl = lenstr(sp) ;
+	        rs = u_write(wfd,sp,sl) ;
+	    }
+	    rs1 = u_close(wfd) ;
+	    if (rs >= 0) rs = rs1 ;
+	    if (rs < 0) {
+		u_close(fd) ;
+	    } /* end if (error) */
+	} /* end if (u_pipe) */
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (opendialer_hello) */
 
