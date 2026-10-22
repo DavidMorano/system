@@ -67,10 +67,6 @@
 #define	ORGCODELEN	MAXNAMELEN
 #endif
 
-#ifndef	ORGCODELEN
-#define	ORGCODELEN	USERNAMELEN
-#endif
-
 #define	HELLO_CSIZE	100 	/* default arg-chuck size */
 
 
