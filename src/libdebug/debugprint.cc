@@ -163,7 +163,7 @@ import ureserve ;			/* |is{x}(3u)| */
 
 #define	DEBUGMGR	debugmgr_head
 
-#define	O_FLAGS		(O_WRONLY | O_APPEND)
+#define	OX_FL		(O_WRONLY | O_APPEND)
 
 #ifndef	LINEBUFLEN
 #define	LINEBUFLEN	(2 * 1024)
@@ -530,7 +530,7 @@ int debugopen(cchar *fname) noex {
 	                fd = v ;
 	            }
 	        } else {
-	            if ((rs = u_open(fname,O_FLAGS,0666)) >= 0) {
+	            if ((rs = u_open(fname,OX_FL,0666)) >= 0) {
 	                fd = rs ;
 	                if ((rs = uc_moveup(fd,3)) >= 0) {
 	                    fd = rs ;
