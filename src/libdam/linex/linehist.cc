@@ -1,4 +1,4 @@
-/* linehist SUPPORT */
+/* linehist SUPPORT (Line-History) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -80,10 +80,10 @@ namespace {
 	item(int aln,int ait) noex : ln(aln), it(ait) { } ;
 	int type() const { 
 	    return it ; 
-	} ;
+	} ; /* end */
 	int line() const { 
 	    return ln ; 
-	} ;
+	} ; /* end */
     } ; /* end struct (item) */
 } /* end namespace */
 
@@ -116,7 +116,7 @@ local int linehist_dtor(linehist *op) noex {
 	    if (op->lsp) ylikely {
 		delete op->lsp ;
 		op->lsp = nullptr ;
-	    }
+	    } /* end if (delete-langstate) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (linehist_dtor) */
@@ -126,7 +126,7 @@ local inline int linehist_magic(linehist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == LINEHIST_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (linehist_magic) */
 
@@ -160,7 +160,7 @@ int linehist_start(linehist *op,cchar *ss) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		linehist_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (linehist_ctor) */
 	return rs ;
 } /* end subroutine (linehist_start) */
@@ -173,15 +173,15 @@ int linehist_finish(linehist *op) noex {
 	        ivec *lvp = ivecp(op->lvp) ;
 	        delete lvp ;
 	        op->lvp = nullptr ;
-	    }
+	    } /* end if (delete-ivec) */
 	    if (op->lsp) {
 	        rs1 = langstate_finish(op->lsp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = linehist_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -209,15 +209,15 @@ int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 			                f = false ;
 			                lvp->pop_back() ;
 			            }
-		                }
+		                } /* end */
 		                if (f) {
 		                    item	a(ln,1) ;
 		                    lvp->push_back(a) ;
-		                }
+		                } /* end */
 		            } /* end if */
 			} catch (...) {
 			    rs = SR_NOMEM ;
-			}
+			} /* end if (error) */
 		    } /* end if (langstate_proc) */
 		    sp += 1 ;
 		    sl -= 1 ;
@@ -225,7 +225,7 @@ int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 	        c = intconv(lvp->size()) ;
 	    } else {
 	        rs = SR_BUGCHECK ;
-	    }
+	    } /* end if (error) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (linehist_proc) */
@@ -258,7 +258,7 @@ int linehist_get(linehist *op,int i,int *lnp) noex {
 		        if (lnp) {
 		            *lnp = vi.line() ;
 		        }
-	            }
+	            } /* end if */
 	        } /* end if (non-null) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
