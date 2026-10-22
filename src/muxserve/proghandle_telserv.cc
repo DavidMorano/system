@@ -148,18 +148,6 @@
 #define	VARTERM		"TERM"
 #endif
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
 #ifndef	SVCLEN
 #define	SVCLEN		MAXNAMELEN
 #endif
