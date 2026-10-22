@@ -96,7 +96,7 @@
 #include	<inetaddrx.h>
 #include	<initnow.h>
 #include	<inttypesx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<isfiledesc.h>
 #include	<ismisc.h>
 #include	<isort.h>
