@@ -184,7 +184,7 @@ char *strwcpychrs(char *dp,int ch,int n) noex {
 	    while (n-- > 0) {
 	        *dp++ = char(ch) ;
 	    } /* end while */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} /* end if (non-null) */
 	return dp ;
 } /* end subroutine (strwcpychrs) */
@@ -201,7 +201,7 @@ char *strwcpycompact(char *dp,cchar *sp,int sl) noex {
 	        sl -= intconv((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
 	    } /* end for (looping through string pieces) */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = nullptr ;
 	} /* end if (non-null) */
@@ -222,7 +222,7 @@ char *strwcpyopaque(char *dp,cchar *sp,int sl) noex {
 		    sp += 1 ;
 	        } /* end while */
 	    } /* end if */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = nullptr ;
 	} /* end */
@@ -235,7 +235,7 @@ char *strwcpyrev(char *dp,cchar *sp,int sl) noex {
 	    for (int i = (sl - 1) ; i >= 0 ; i += 1) {
 	        *dp++ = sp[i] ;
 	    } /* end for */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = nullptr ;
 	} /* end */
@@ -256,7 +256,7 @@ char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex {
 	            *dp++ = char(ch) ;
 	        } /* end while */
 	    } /* end if */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	} else {
 	    dp = nullptr ;
 	} /* end */
