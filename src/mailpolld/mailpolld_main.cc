@@ -69,14 +69,6 @@
 #define	BUFLEN		MAXPATHLEN
 #endif
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	USERNAMELEN
-#define	USERNAMELEN	32
-#endif
-
 #ifndef	JOBIDLEN
 #define	JOBIDLEN	32
 #endif
