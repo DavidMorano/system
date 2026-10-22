@@ -50,6 +50,7 @@
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
@@ -150,7 +151,7 @@ int egs_open(egs *op,cchar *filename) noex {
 		        }
 	            } /* end if (closeonexec) */
 	            if (rs < 0) {
-		        u_close(op->fd) ;
+		        uc_close(op->fd) ;
 		        op->fd = -1 ;
 		    } /* end if (error) */
 	        } /* end if (dialuss) */
@@ -167,14 +168,14 @@ int egs_close(egs *op) noex {
 	int		rs1 ;
 	if ((rs = egs_magic(op)) >= 0) ylikely {
 	    if (op->fd >= 0) {
-	        rs1 = u_close(op->fd) ;
+	        rs1 = uc_close(op->fd) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->fd = -1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = egs_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -199,7 +200,7 @@ int egs_read(egs *op,char *rbuf,int rlen) noex {
 	            len = rs ;
 		    rlen -= len ;
 		    rl += len ;
-	        }
+	        } /* end */
 	        if ((rs < 0) || (len == 0)) break ;
 	    } /* end for */
 	} /* end if (magic) */
@@ -229,7 +230,7 @@ int egs_write(egs *op,cchar *wbuf,int wlen) noex {
 		    len = rs ;
 	            wlen -= len ;
 		    wl += len ;
-	        }
+	        } /* end */
 		if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (magic) */
@@ -295,7 +296,7 @@ local int egs_opencheck(egs *op) noex {
 		    } /* end if (uc_reade) */
 		} else {
 		    rs = SR_PROTO ;
-		}
+		} /* end */
 	    } /* end if (uc_reade) */
 	} /* end if (uc_writen) */
 	return rs ;
