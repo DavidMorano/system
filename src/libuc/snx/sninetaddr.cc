@@ -142,7 +142,7 @@ local int snunix(char *dbuf,int dlen,cchar *addr) noex {
 	    rs = intconv(strdcpy(dbuf,dlen,addr) - dbuf) ;
 	} else {
 	    rs = sncpy(dbuf,dlen,addr) ;
-	}
+	} /* end if_constexpr (f_cthexuc) */
 	return rs ;
 } /* end subroutine (snunix) */
 
@@ -186,7 +186,7 @@ local int sninet6(char *dbuf,int dlen,cchar *addr) noex {
 	} else {
 	    rs = SR_OVERFLOW ;
 	} /* end if */
-	dbuf[pl] = '\0' ;
+	dbuf[pl] = eos ;
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (sninet6) */
 
