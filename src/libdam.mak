@@ -226,7 +226,7 @@ OBJ113=
 OBJ114= 
 OBJ115=
 OBJ116=
-OBJ117= msfile.o msfilee.o entbuf.o
+OBJ117= msfile.o msent.o entbuf.o
 OBJ118= cksum.o sha1.o ipasswd.o
 OBJ119=
 
@@ -624,50 +624,32 @@ zoffparts.o:		zoffparts.c zoffparts.h
 dayspec.o:		dayspec.c dayspec.h
 gecos.o:		gecos.c gecos.h
 kinfo.o:		kinfo.c kinfo.h
-msfile.o:		msfile.c msfile.h msfilee.h
-msfilee.o:		msfilee.c msfilee.h
-
+msfile.o:		msfile.c msfile.h msent.h
+msent.o:		msent.c msent.h
+configfile.o:		configfile.cc	configfile.h	kvparse.o	$(INCS)
+ba.o:			ba.cc ba.h
 entbuf.o:		entbuf.cc entbuf.h
 ts.o:			ts.cc ts.h tse.hh entbuf.h
 tse.o:			tse.cc tse.hh
-
 mapstrint.o:		mapstrint.c mapstrint.h
-
 srvreg.o:		srvreg.c srvreg.h srvrege.h
-
 srvrege.o:		srvrege.c srvrege.h
-
 openport.o:		openport.c openport.h
-
 openportmsg.o:		openportmsg.c openportmsg.h
-
 fmq.o:			fmq.cc fmq.h
-
 sigblock.o:		sigblock.c sigblock.h
 sigman.o:		sigman.c sigman.h
 sighand.o:		sighand.c sighand.h
-
 paramfile.o:		paramfile.cc paramfile.h
 srvtab.o:		srvtab.cc srvtab.h
 acctab.o:		acctab.cc acctab.h
-
 memfile.o:		memfile.cc memfile.h
-
-baops.o:		baops.cc baops.h
-
-rijndael.o:		rijndael.cc	rijndael.h		$(INCS)
-librandom.o:		librandom.cc	librandom.h		$(INCS)
-
-optval.o:		optval.cc optval.h
-mesg.o:			mesg.cc mesg.h
-
-td.o:			td.cc		td.h			$(INCS)
+lfm.o:			lfm.cc		lfm.h
 dialtab.o:		dialtab.cc dialtab.h
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
 hostent.o:		hostent.cc hostent.h
 inetaddr.o:		inetaddr.c inetaddr.h
-lfm.o:			lfm.cc lfm.h
 codebal.o:		codebal.cc codebal.h
 strpack.o:		strpack.cc strpack.h
 userattr.o:		userattr.c userattr.h
@@ -893,10 +875,22 @@ get.o:			get.dir
 get.dir:
 	makesubdir $@
 
-ba.o:			ba.cc ba.h
+# MAILGROUP
+mailgroup.o:		mailgroup.dir
+mailgroup.dir:
+	makesubdir $@
+
+# HOLIDAYX
+holidayx.o:		holidayx.dir
+holidayx.dir:
+	makesubdir $@
 
 # GROUPS
-
+baops.o:		baops.cc baops.h
+rijndael.o:		rijndael.cc	rijndael.h		$(INCS)
+librandom.o:		librandom.cc	librandom.h		$(INCS)
+optval.o:		optval.cc optval.h
+mesg.o:			mesg.cc mesg.h
 
 # SINGLES
 printhelp.o:		printhelp.cc printhelp.hh
