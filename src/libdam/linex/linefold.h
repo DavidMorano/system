@@ -1,4 +1,4 @@
-/* linefold HEADER */
+/* linefold HEADER (Line-Fold) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -58,14 +58,14 @@ struct linefold_iter {
 		op = oit.op ;
 		i = oit.i ;
 	    }
-	} ;
+	} ; /* end */
 	linefold_iter &operator = (const linefold_iter &oit) noex {
 	    if (this != &oit) {
 		op = oit.op ;
 		i = oit.i ;
 	    }
 	    return *this ;
-	} ;
+	} ; /* end */
 	bool operator != (const linefold_iter &) noex ;
 	bool operator == (const linefold_iter &) noex ;
 	cchar *operator * () noex ;
@@ -75,7 +75,7 @@ struct linefold_iter {
 	linefold_iter operator ++ (int) noex ; /* post */
 	void idx(int ai) noex {
 	    i = ai ;
-	} ;
+	} ; /* end */
 	void increment(int = 1) noex ;
 } ; /* end struct linefold_iter) */
 struct linefold_co {
@@ -84,40 +84,40 @@ struct linefold_co {
 	void operator () (linefold *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (linefold_co) */
 struct linefold : linefold_head {
 	linefold_co	count ;
 	linefold_co	finish ;
 	linefold() noex {
-	    count(this,linefoldmem_count) ;
-	    finish(this,linefoldmem_finish) ;
-	    magval = 0 ;
-	} ;
+	    count	(this,linefoldmem_count) ;
+	    finish	(this,linefoldmem_finish) ;
+	    magval	= 0 ;
+	} ; /* end */
 	linefold(const linefold &) = delete ;
 	linefold &operator = (const linefold &) = delete ;
-	int start(int,int,cchar *,int = -1) noex ;
-	int get(int,cchar **) noex ;
-	int getln(int,cchar **) noex ;
+	int start	(int,int,cchar *,int = -1) noex ;
+	int get		(int,cchar **) noex ;
+	int getln	(int,cchar **) noex ;
 	linefold_iter begin() noex {
 	    linefold_iter	it(this,0) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	linefold_iter end() noex {
 	    linefold_iter	it(this,0) ;
 	    if (int rs ; (rs = count) >= 0) {
 		it.idx(rs) ;
 	    }
 	    return it ;
-	} ;
+	} ; /* end */
 	void dtor() noex ;
 	destruct linefold() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (linefold) */
 #else	/* __cplusplus */
 typedef LINEFOLD	linefold ;
