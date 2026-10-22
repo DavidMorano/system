@@ -1,4 +1,4 @@
-/* linefilter SUPPORT */
+/* linefilter SUPPORT (Line-Filter) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -53,7 +53,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -104,11 +103,11 @@ local int linefilter_dtor(linefilter *op) noex {
 	    if (op->sxlp) {
 		delete op->sxlp ;
 		op->sxlp = nullptr ;
-	    }
+	    } /* end if (delete-vecstr) */
 	    if (op->sslp) {
 		delete op->sslp ;
 		op->sslp = nullptr ;
-	    }
+	    } /* end if (delete-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (linefilter_dtor) */
@@ -145,7 +144,7 @@ int linefilter_start(linefilter *op,cchar *ssfname,cchar *sxfname) noex {
 	                    vecstr_finish(op->sxlp) ;
 		        } /* end if (error) */
 	            }
-	        }
+	        } /* end if */
 	        if (rs < 0) {
 	            vecstr_finish(op->sslp) ;
 	        } /* end if (error) */
@@ -166,16 +165,16 @@ int linefilter_finish(linefilter *op) noex {
 	        op->fl.sxlist = false ;
 	        rs1 = vecstr_finish(op->sxlp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->fl.sslist) {
 	        op->fl.sslist = false ;
 	        rs1 = vecstr_finish(op->sslp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = linefilter_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (linefilter_finish) */
@@ -196,7 +195,7 @@ int linefilter_check(linefilter *op,cchar *lbuf,int llen) noex {
 	                    f = true ;
 	                    break ;
 	                }
-		    }
+		    } /* end if */
 	        } /* end for */
 	    } /* end if */
 	    if (f && op->fl.sxlist) {
@@ -207,7 +206,7 @@ int linefilter_check(linefilter *op,cchar *lbuf,int llen) noex {
 	                    f = false ;
 	                    break ;
 	                }
-		    }
+		    } /* end if */
 	        } /* end for */
 	    } /* end if */
 	} /* end if (non-null) */
@@ -219,16 +218,16 @@ int linefilter_check(linefilter *op,cchar *lbuf,int llen) noex {
 
 int linefilter::start(cchar *ssfname,cchar *sxfname) noex {
 	return linefilter_start(this,ssfname,sxfname) ;
-}
+} /* end */
 
 int linefilter::check(cchar *lbuf,int llen) noex {
 	return linefilter_check(this,lbuf,llen) ;
-}
+} /* end */
 
 void linefilter::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("linefilter",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (linefilter_co::dtor) */
 
 linefilter_co::operator int () noex {
