@@ -105,14 +105,6 @@ typedef unsigned int	in_addr_t ;
 
 /* local defines */
 
-#ifndef	LOGNAMELEN
-#ifdef	TMPX_LUSER
-#define	LOGNAMELEN	TMPX_LUSER
-#else
-#define	LOGNAMELEN	32
-#endif
-#endif
-
 #ifndef	ENVBUFLEN
 #define	ENVBUFLEN	2048
 #endif
