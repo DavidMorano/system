@@ -1,4 +1,4 @@
-/* lineclean SUPPORT */
+/* lineclean SUPPORT (Line-Clean) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -144,7 +144,7 @@ int lineclean_finish(LC *op) noex {
 	    {
 	        rs1 = lineclean_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -160,7 +160,7 @@ int lineclean::start(cchar *sp,int sl,int m,cchar **rpp) noex {
 void lineclean::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("lineclean",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (lineclean::dtor) */
 
 lineclean_co::operator int () noex {
