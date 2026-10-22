@@ -27,34 +27,34 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usupport.h>		/* |getustime(3u)| */
-#include	<uclibmem.h>
-#include	<getnodedomain.h>
-#include	<vecstr.h>
-#include	<fsdir.h>
-#include	<dirseen.h>
-#include	<strn.h>		/* |strnrchr(3uc)| */
-#include	<strx.h>
-#include	<sncpyx.h>
-#include	<strwcpy.h>
-#include	<mkpathx.h>
-#include	<mkshlibname.h>
-#include	<isoneof.h>
-#include	<isch.h>
+#include	<dlfcn.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<new>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU |getustime(3u)| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<getnodedomain.h>	/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<fsdir.h>		/* LIBUC */
+#include	<dirseen.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC |strnrchr(3uc)| */
+#include	<strx.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strwcpy.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mkshlibname.h>		/* LIBUC */
+#include	<isoneof.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<isnot.h>		/* |isNotPresent(3uc)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"sysdialer.h"
 
@@ -146,7 +146,7 @@ constexpr cpcchar	subs[] = {
 	nullptr
 } ; /* end array (subs) */
 
-cchar				soprefix[] = "sd" ;
+cchar			soprefix[] = "sd" ;
 
 
 /* exported variables */
@@ -208,29 +208,31 @@ namespace sysdialer_util {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->name = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (ep->itype != nullptr) ylikely {
 	        void *vp = voidp(ep->itype) ;
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ep->itype = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (ep->mp != nullptr) ylikely {
 	        SD_MOD	*mp = ep->mp ;
 	        if (mp->count-- == 1) {
 	            if ((mp->dhp != nullptr) && (mp->dhp != RTLD_DEFAULT)) {
 	                dlclose(mp->dhp) ;
 		    }
+		    {
 	            rs1 = lm_free(mp) ;
 		    if (rs >= 0) rs = rs1 ;
 		    ep->mp = nullptr ;
+		    } /* end block (memory-release) */
 	        } /* end if (cleanup) */
 	    } /* end if */
 	    if (ep->callp) {
 		rs1 = lm_free(ep->callp) ;
 		if (rs >= 0) rs = rs1 ;
 		ep->callp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    memclear(ep) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -241,18 +243,18 @@ namespace sysdialer_util {
 
 namespace {
     struct checkdirer {
-	ent	*ep ;		/* argument */
-	cchar	*libdname ;	/* argument */
-	cchar	*name ;		/* argument */
-	char	* dname	;
-	char	* dlfname ;
-	char	* fname	;
+	ent		*ep ;		/* argument */
+	cchar		*libdname ;	/* argument */
+	cchar		*name ;		/* argument */
+	char		* dname	;
+	char		* dlfname ;
+	char		*fname	;
 	checkdirer(ent *e,cc *l,cc *n) noex : ep(e), libdname(l) {
 	    name = n ;
 	} ; /* end ctor */
 	operator int () noex ;
-	int vecer() noex ;
-	int looper(vecstr *) noex ;
+	int vecer	() noex ;
+	int looper	(vecstr *) noex ;
     } ; /* end struct (checkdirer) */
 } /* end namespace */
 
@@ -402,7 +404,7 @@ namespace sysdialer_util {
 	} /* end if (m-a-f) */
 	if ((rs >= 0) && (callp->open == nullptr)) {
 	    rs = SR_LIBACC ;
-	}
+	} /* end if (error) */
 	return rs ;
     } /* end subroutine (entry_loadcalls) */
 } /* end namespace (sysdialer_util) */
@@ -414,7 +416,7 @@ namespace sysdialer_util {
 	if ((dip != nullptr) && (strcmp(dip->name,name) == 0)) {
 	    ep->osz = dip->osz ;
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
     } /* end subroutine (entry_hasname) */
 } /* end namespace (sysdialer_util) */
