@@ -167,7 +167,7 @@ local int inetaddr_startbin(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    cint ml = (addrl >= 0) ? min(addrl,inet4addrlen) : inet4addrlen ;
 	    char *ep = charp(memcopy(ip->straddr,addrp,ml)) ;
 	    rs = intconv(ep - ip->straddr) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (inetaddr_startbin) */
 
@@ -185,7 +185,7 @@ local int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    if (hasaddrspecial(ap,addrl)) {
 	        if (uint uiw ; (rs = cfinet(ap,addrl,&uiw)) >= 0) {
 	            ip->a.s_addr = htonl(uiw) ;
-		}
+		} /* end */
 	    } else {
 	        while ((addrl > 0) && ISWHT(ap[addrl - 1])) {
 	            addrl -= 1 ;
@@ -194,15 +194,15 @@ local int inetaddr_startstr(inetaddr *ip,cchar *addrp,int addrl) noex {
 	            if (ap != addrp) {
 	                strwcpy(abuf,ap,addrl) ;
 	                ap = abuf ;
-	            }
+	            } /* end */
 		    if (in4_addr_t a ; (a = inet_addr(ap)) != inaddrbad) {
 	                ip->a.s_addr = a ;
 		    } else {
 	                rs = SR_INVALID ;
-		    }
+		    } /* end */
 	        } else {
 	            rs = SR_INVALID ;
-	        }
+	        } /* end */
 	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
@@ -221,20 +221,20 @@ local int inetaddr_startdot(inetaddr *ip,cchar *addrp,int addrl) noex {
 	    } /* end while */
 	    while ((addrl > 0) && ISWHT(ap[addrl-1])) {
 	        addrl -= 1 ;
-	    }
+	    } /* end while */
 	    if (addrl > 0) {
 	        if (ap != addrp) {
 	            strwcpy(abuf,ap,addrl) ;
 	            ap = abuf ;
-	        }
+	        } /* end */
 		if (in4_addr_t a ; (a = inet_addr(ap)) != inaddrbad) {
 	            ip->a.s_addr = a ;
 		} else {
 	            rs = SR_INVALID ;
-	        }
+	        } /* end */
 	    } else {
 	        rs = SR_INVALID ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (inetaddr_startdot) */
@@ -244,7 +244,7 @@ int inetaddr_finish(inetaddr *ip) noex {
 	if (ip) ylikely {
 	    rs = SR_OK ;
 	    ip->a = {} ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (inetaddr_finish) */
 
@@ -254,7 +254,7 @@ int inetaddr_gethexaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	if (ip && rbuf) ylikely {
 	    cint	rlenmin = ((inet4addrlen * 2) + 0) ;
 	    rs = SR_OK ;
-	    rbuf[0] = '\0' ;
+	    rbuf[0] = eos ;
 	    if ((rlen < 0) || (rlen >= rlenmin)) {
 	        for (int i = 0 ; i < inet4addrlen ; i += 1) {
 	            cuint	v = mkchar(ip->straddr[i]) ;
@@ -263,8 +263,8 @@ int inetaddr_gethexaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	        } /* end for */
 	    } else {
 	        rs = SR_OVERFLOW ;
-	    }
-	    rbuf[j] = '\0' ;
+	    } /* end */
+	    rbuf[j] = eos ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? j : rs ;
 } /* end subroutine (inetaddr_gethexaddr) */
@@ -275,7 +275,7 @@ int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	if (ip && rbuf) ylikely {
 	    cint	rlenmin = ((inet4addrlen * 3) + 3) ;
 	    char	*bp = rbuf ;
-	    rbuf[0] = '\0' ;
+	    rbuf[0] = eos ;
 	    rs = SR_OK ;
 	    if ((rlen < 0) || (rlen >= rlenmin)) {
 	        uint	v ;
@@ -288,8 +288,8 @@ int inetaddr_getdotaddr(inetaddr *ip,char *rbuf,int rlen) noex {
 	        } /* end for */
 	    } else {
 	        rs = SR_OVERFLOW ;
-	    }
-	    *bp = '\0' ;
+	    } /* end */
+	    *bp = eos ;
 	    rl = intconv(bp - rbuf) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
