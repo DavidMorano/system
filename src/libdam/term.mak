@@ -45,14 +45,14 @@ OBJ1= termdisp.o termenq.o
 OBJ2= terment.o termnote.o
 OBJ3= termout.o termtrans.o
 OBJ4= termwritable.o
-OBJ5= 
+OBJ5= termstore.o
 OBJ6= 
 OBJ7= 
 
 OBJ8= 
 
 OBJA= obj0.o obj1.o obj2.o obj3.o 
-OBJB= obj4.o
+OBJB= obj4.o obj5.o
 OBJC= obj8.o
 
 OBJ= obja.o objb.o
@@ -172,5 +172,6 @@ termnote.o:		termnote.cc	termnote.h			$(INCS)
 termout.o:		termout.cc	termout.h			$(INCS)
 termtrans.o:		termtrans.cc	termtrans.h			$(INCS)
 termwritable.o:		termwritable.cc	termwritable.h			$(INCS)
+termstore.o:		termstore.cc	termstore.h			$(INCS)
 
 
