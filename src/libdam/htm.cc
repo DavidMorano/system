@@ -153,7 +153,7 @@ int htm_finish(htm *op) noex {
 	int		wlen = 0 ;
 	if ((rs = htm_magic(op)) >= 0) ylikely {
 	    {
-	        rs1 = htm_printline(op,"</html>",-1) ;
+	        rs1 = htm_println(op,"</html>",-1) ;
 	        if (rs >= 0) rs = rs1 ;
 		wlen += rs ;
 		op->wlen += wlen ;
@@ -525,7 +525,7 @@ int htm_write(htm *op,cvoid *lbuf,int llen) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (htm_write) */
 
-int htm_printline(htm *op,cchar *lbuf,int llen) noex {
+int htm_println(htm *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = htm_magic(op,lbuf)) >= 0) ylikely {
@@ -534,7 +534,7 @@ int htm_printline(htm *op,cchar *lbuf,int llen) noex {
 	    op->wlen += wlen ;
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
-} /* end subroutine (htm_printline) */
+} /* end subroutine (htm_println) */
 
 int htm_printf(htm *op,cchar *fmt,...) noex {
 	va_list		ap ;
