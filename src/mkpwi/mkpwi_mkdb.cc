@@ -50,6 +50,7 @@
 #include	<realname.h>
 #include	<strtab.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -60,17 +61,6 @@
 
 
 /* local defines */
-
-#undef	USERNAMELEN
-#ifdef	IPASSWD_USERNAME
-#define	USERNAMELEN	IPASSWD_USERNAMELEN
-#else
-#define	USERNAMELEN	32
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* real name length */
-#endif
 
 #define	NREC_GUESS	100		/* guess of number of records */
 
@@ -106,15 +96,6 @@ extern int	mkgecosname(char *,int,cchar *) ;
 extern int	getgecosname(cchar *,int,cchar **) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	iceil(int,int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
