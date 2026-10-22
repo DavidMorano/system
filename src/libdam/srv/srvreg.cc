@@ -90,10 +90,6 @@ import libutil ;			/* |memclear(3u)| */
 #define	SRVREG_OPENTIME	30		/* seconds */
 #define	TI_MINUPDATE	4		/* minimum time between updates */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	NENTRIES	100
 #define	FBUFLEN		(SRVREG_FLTOP + 9)
 
