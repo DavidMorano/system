@@ -111,7 +111,7 @@ int progout_end(PROGINFO *pip)
 /* end subroutine (progout_end) */
 
 
-int progout_printline(PROGINFO *pip,cchar *sp,int sl)
+int progout_println(PROGINFO *pip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -125,7 +125,7 @@ int progout_printline(PROGINFO *pip,cchar *sp,int sl)
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (progout_printline) */
+/* end subroutine (progout_println) */
 
 
 int progout_printf(PROGINFO *pip,cchar *fmt,...)
