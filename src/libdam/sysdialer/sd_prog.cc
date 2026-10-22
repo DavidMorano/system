@@ -48,22 +48,22 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<baops.h>		/* LIBU */
 #include	<nulstr.h>		/* LIBU */
-#include	<uclibmem.h>
-#include	<gethz.h>
-#include	<ids.h>
-#include	<userinfo.h>
-#include	<keyopt.h>
-#include	<vecstr.h>
-#include	<vechand.h>
-#include	<sbuf.h>
-#include	<buffer.h>
-#include	<expcook.h>
-#include	<paramfile.h>
-#include	<logfile.h>
+#include	<uclibmem.h>		/* LIBUC */
+#include	<gethz.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<buffer.h>		/* LIBUC */
+#include	<expcook.h>		/* LIBUC */
+#include	<paramfile.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
 #include	<strx.h>		/* LIBUC */
 #include	<vstrcmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
-#include	<envs.h>
-#include	<sysvar.h>
+#include	<envs.h>		/* LIBUC */
+#include	<sysvar.h>		/* LIBUC */
 #include	<sysdialer.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -234,7 +234,7 @@ struct subinfo {
 	cchar		*logid ;
 	cchar		*defprog ;
 	PROG		*op ;
-	SD_ARGS	*ap ;
+	SD_ARGS		*ap ;
 	ids		id ;
 	vecstr		aenvs ;
 	vecstr		stores ;
@@ -246,7 +246,7 @@ struct subinfo {
 	ENVS		xenvs ;
 	USERINFO	u ;
 	SUBINFO_ALLOCS	a ;
-	SUBINFO_FL	f ;
+	SUBINFO_FL	fl ;
 	uid_t		uid ;
 	gid_t		gid ;
 	int		argc ;
@@ -707,9 +707,7 @@ ret0:
 bad0:
 
 	return (rs >= 0) ? op->fd : rs ;
-}
-/* end subroutine (prog_open) */
-
+} /* end subroutine (prog_open) */
 
 int prog_reade(op,buf,buflen,to,opts)
 PROG		*op ;
@@ -729,9 +727,7 @@ int		to, opts ;
 	    op->tlen += rs ;
 
 	return rs ;
-}
-/* end subroutine (prog_reade) */
-
+} /* end subroutine (prog_reade) */
 
 int prog_recve(op,buf,buflen,flags,to,opts)
 PROG		*op ;
@@ -752,9 +748,7 @@ int		to, opts ;
 	    op->tlen += rs ;
 
 	return rs ;
-}
-/* end subroutine (prog_recve) */
-
+} /* end subroutine (prog_recve) */
 
 int prog_recvfrome(op,buf,buflen,flags,sap,salenp,to,opts)
 PROG		*op ;
@@ -777,9 +771,7 @@ int		to, opts ;
 	    op->tlen += rs ;
 
 	return rs ;
-}
-/* end subroutine (prog_recvfrom) */
-
+} /* end subroutine (prog_recvfrom) */
 
 int prog_recvmsge(op,msgp,flags,to,opts)
 PROG		*op ;
@@ -799,9 +791,7 @@ int		to, opts ;
 	    op->tlen += rs ;
 
 	return rs ;
-}
-/* end subroutine (prog_recvmsge) */
-
+} /* end subroutine (prog_recvmsge) */
 
 int prog_write(op,buf,buflen)
 PROG		*op ;
@@ -820,9 +810,7 @@ int		buflen ;
 	    op->tlen += rs ;
 
 	return rs ;
-}
-/* end subroutine (prog_write) */
-
+} /* end subroutine (prog_write) */
 
 int prog_send(op,buf,buflen,flags)
 PROG		*op ;
@@ -842,9 +830,7 @@ int		flags ;
 	    op->tlen += rs ;
 
 	return rs ;
-}
-/* end subroutine (prog_send) */
-
+} /* end subroutine (prog_send) */
 
 int prog_sendto(op,buf,buflen,flags,sap,salen)
 PROG		*op ;
@@ -866,8 +852,7 @@ int		salen ;
 	    op->tlen += rs ;
 
 	return rs ;
-}
-/* end subroutine (prog_sendto) */
+} /* end subroutine (prog_sendto) */
 
 int prog_sendmsg(PROG *op,MSGHDR *msgp,int flags) noex {
 	int		rs ;
@@ -882,9 +867,7 @@ int prog_sendmsg(PROG *op,MSGHDR *msgp,int flags) noex {
 	    op->tlen += rs ;
 
 	return rs ;
-}
-/* end subroutine (prog_sendmsg) */
-
+} /* end subroutine (prog_sendmsg) */
 
 int prog_shutdown(PROG *op,int cmd)
 {
@@ -897,9 +880,7 @@ int prog_shutdown(PROG *op,int cmd)
 	rs = u_shutdown(op->fd,cmd) ;
 
 	return rs ;
-}
-/* end subroutine (prog_shutdown) */
-
+} /* end subroutine (prog_shutdown) */
 
 /* close the connection */
 int prog_close(PROG *op)
@@ -942,12 +923,10 @@ int prog_close(PROG *op)
 
 	op->magval = 0 ;
 	return rs ;
-}
-/* end subroutine (prog_close) */
+} /* end subroutine (prog_close) */
 
 
 /* private subroutines */
-
 
 local int subinfo_start(sip,op,ap,hostname,svcname)
 SUBINFO		*sip ;
@@ -984,10 +963,8 @@ cchar		svcname[] ;
 		}
 	    } /* end if (stores) */
 	} /* end if (getnprocessors) */
-
 	return rs ;
-}
-/* end subroutine (subinfo_start) */
+} /* end subroutine (subinfo_start) */
 
 
 local int subinfo_finish(SI *sip)
@@ -1028,9 +1005,7 @@ local int subinfo_finish(SI *sip)
 	}
 
 	return rs ;
-}
-/* end subroutine (subinfo_finish) */
-
+} /* end subroutine (subinfo_finish) */
 
 local int subinfo_procargs(SI *sip)
 {
@@ -1328,9 +1303,7 @@ ret1:
 ret0:
 
 	return rs ;
-}
-/* end subroutine (subinfo_procargs) */
-
+} /* end subroutine (subinfo_procargs) */
 
 local int subinfo_procopts(SI *sip,keyopt *kop)
 {
@@ -1368,9 +1341,7 @@ local int subinfo_procopts(SI *sip,keyopt *kop)
 	} /* end if (keyopt-cur) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (subinfo_procopts) */
-
+} /* end subroutine (subinfo_procopts) */
 
 local int subinfo_setentry(SI *sip,cchar **epp,cchar v[],int vlen)
 {
@@ -1416,9 +1387,7 @@ local int subinfo_setentry(SI *sip,cchar **epp,cchar v[],int vlen)
 	}
 
 	return (rs >= 0) ? vnlen : rs ;
-}
-/* end subroutine (subinfo_setentry) */
-
+} /* end subroutine (subinfo_setentry) */
 
 local int subinfo_defaults(SI *sip)
 {
@@ -1495,9 +1464,7 @@ local int subinfo_defaults(SI *sip)
 	}
 
 	return rs ;
-}
-/* end subroutine (subinfo_defaults) */
-
+} /* end subroutine (subinfo_defaults) */
 
 local int subinfo_userinfo(SI *sip)
 {
@@ -1533,9 +1500,7 @@ local int subinfo_userinfo(SI *sip)
 ret0:
 bad0:
 	return rs ;
-}
-/* end subroutine (subinfo_userinfo) */
-
+} /* end subroutine (subinfo_userinfo) */
 
 local int subinfo_findprog(SI *sip,char progfname[])
 {
@@ -1561,9 +1526,7 @@ local int subinfo_findprog(SI *sip,char progfname[])
 
 ret0:
 	return rs ;
-}
-/* end subroutine (subinfo_findprog) */
-
+} /* end subroutine (subinfo_findprog) */
 
 local int subinfo_search(SI *sip,vecstr *elp,char progfname[],cchar pn[])
 {
@@ -1588,9 +1551,7 @@ local int subinfo_search(SI *sip,vecstr *elp,char progfname[],cchar pn[])
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (subinfo_search) */
-
+} /* end subroutine (subinfo_search) */
 
 local int subinfo_envdialer(SI *sip)
 {
@@ -1636,9 +1597,7 @@ local int subinfo_envdialer(SI *sip)
 	}
 
 	return rs ;
-}
-/* end subroutine (subinfo_envdialer) */
-
+} /* end subroutine (subinfo_envdialer) */
 
 local int subinfo_sasize(SI *sip)
 {
@@ -1657,9 +1616,7 @@ local int subinfo_sasize(SI *sip)
 	} /* end for */
 
 	return (rs >= 0) ? size : rs ;
-}
-/* end subroutine (subinfo_sasize) */
-
+} /* end subroutine (subinfo_sasize) */
 
 local int subinfo_sabuild(SI *sip,char sabuf[])
 {
@@ -1680,9 +1637,7 @@ local int subinfo_sabuild(SI *sip,char sabuf[])
 
 	*bp = '\0' ;
 	return (rs >= 0) ? (bp - sabuf) : rs ;
-}
-/* end subroutine (subinfo_sabuild) */
-
+} /* end subroutine (subinfo_sabuild) */
 
 local int subinfo_exec(SI *sip,cchar *progfname,cchar **dav)
 {
@@ -1802,9 +1757,7 @@ ret1:
 
 ret0:
 	return rs ;
-}
-/* end subroutine (subinfo_exec) */
-
+} /* end subroutine (subinfo_exec) */
 
 local int subinfo_logfile(SI *sip)
 {
@@ -1852,9 +1805,7 @@ local int subinfo_logfile(SI *sip)
 
 ret0:
 	return rs ;
-}
-/* end subroutine (subinfo_logfile) */
-
+} /* end subroutine (subinfo_logfile) */
 
 local int subinfo_dirok(SI *sip,cchar d[],int dlen)
 {
@@ -1885,9 +1836,7 @@ local int subinfo_dirok(SI *sip,cchar d[],int dlen)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (subinfo_dirok) */
-
+} /* end subroutine (subinfo_dirok) */
 
 local int loadgroupname(SI *sip)
 {
@@ -1902,9 +1851,7 @@ local int loadgroupname(SI *sip)
 	}
 
 	return (rs >= 0) ? gnlen : rs ;
-}
-/* end subroutine (loadgroupname) */
-
+} /* end subroutine (loadgroupname) */
 
 local int loadarchitecture(SI *sip)
 {
@@ -1928,8 +1875,7 @@ local int loadarchitecture(SI *sip)
 	}
 
 	return rs ;
-}
-/* end subroutine (loadarchitecture) */
+} /* end subroutine (loadarchitecture) */
 
 local int loadhz(SI *sip) noex {
 	int		rs ;
@@ -1942,9 +1888,7 @@ local int loadhz(SI *sip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (loadhz) */
-
+} /* end subroutine (loadhz) */
 
 local int loadcooks(SI *sip)
 {
@@ -2047,9 +1991,7 @@ local int loadcooks(SI *sip)
 	} /* end for */
 
 	return rs ;
-}
-/* end subroutine (loadcooks) */
-
+} /* end subroutine (loadcooks) */
 
 local int sched_begin(SI *sip)
 {
@@ -2078,9 +2020,7 @@ local int sched_begin(SI *sip)
 
 ret0:
 	return rs ;
-}
-/* end subroutine (sched_begin) */
-
+} /* end subroutine (sched_begin) */
 
 local int sched_end(SI *sip)
 {
@@ -2094,9 +2034,7 @@ local int sched_end(SI *sip)
 	}
 
 	return rs ;
-}
-/* end subroutine (sched_end) */
-
+} /* end subroutine (sched_end) */
 
 local int loadparams(SI *sip)
 {
@@ -2191,9 +2129,7 @@ local int loadparams(SI *sip)
 ret0:
 
 	return rs ;
-}
 /* end subroutine (loadparams) */
-
 
 local int loaddefsfile(SI *sip,cchar *dfname)
 {
@@ -2214,9 +2150,7 @@ local int loaddefsfile(SI *sip,cchar *dfname)
 	    rs = defproc(&sip->defs,envv,&sip->cooks,dfname) ;
 
 	return rs ;
-}
-/* end subroutine (loaddefsfile) */
-
+} /* end subroutine (loaddefsfile) */
 
 local int loaddefs(SI *sip,cchar **sched)
 {
@@ -2233,9 +2167,7 @@ local int loaddefs(SI *sip,cchar **sched)
 	}
 
 	return rs ;
-}
-/* end subroutine (loaddefs) */
-
+} /* end subroutine (loaddefs) */
 
 local int loadxfile(SI *sip,cchar *xfname)
 {
@@ -2260,8 +2192,7 @@ local int loadxfile(SI *sip,cchar *xfname)
 	}
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (loadxfile) */
+} /* end subroutine (loadxfile) */
 
 
 local int loadxsched(sip,sched)
@@ -2285,8 +2216,7 @@ cchar		*sched[] ;
 	}
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (loadxsched) */
+} /* end subroutine (loadxsched) */
 
 
 local int pvars_begin(sip,pathvars,fname)
@@ -2310,8 +2240,7 @@ cchar		fname[] ;
 	    rs = loadpvarsdef(sip,pathvars) ;
 
 	return rs ;
-}
-/* end subroutine (pvars_begin) */
+} /* end subroutine (pvars_begin) */
 
 
 local int pvars_end(sip)
@@ -2329,8 +2258,7 @@ SUBINFO		*sip ;
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;
-}
-/* end subroutine (pvars_end) */
+} /* end subroutine (pvars_end) */
 
 
 local int procenvextra(sip)
@@ -2371,9 +2299,7 @@ SUBINFO		*sip ;
 	} /* end for */
 
 	return rs ;
-}
-/* end subroutine (procenvextra) */
-
+} /* end subroutine (procenvextra) */
 
 local int procenvdef(sip)
 SUBINFO		*sip ;
@@ -2437,9 +2363,7 @@ SUBINFO		*sip ;
 	} /* end for */
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (procenvdef) */
-
+} /* end subroutine (procenvdef) */
 
 local int procenvsys(sip,sysvardb)
 SUBINFO		*sip ;
@@ -2474,9 +2398,7 @@ cchar		sysvardb[] ;
 	} /* end if (sysvar) */
 
 	return rs ;
-}
-/* end subroutine (procenvsys) */
-
+} /* end subroutine (procenvsys) */
 
 int procdefprog(sip,rpp)
 SUBINFO		*sip ;
@@ -2498,9 +2420,7 @@ cchar		**rpp ;
 	}
 
 	return rs ;
-}
-/* end subroutine (procdefprog) */
-
+} /* end subroutine (procdefprog) */
 
 local int loadpvars(sip,sched,fname)
 SUBINFO		*sip ;
@@ -2523,9 +2443,7 @@ cchar		fname[] ;
 	} /* end if */
 
 	return (rs >= 0) ? (rs1 >= 0) : rs ;
-}
-/* end subroutine (loadpvars) */
-
+} /* end subroutine (loadpvars) */
 
 local int loadpvarsdef(sip,pnames)
 SUBINFO		*sip ;
@@ -2546,9 +2464,7 @@ cchar		*pnames[] ;
 	} /* end if (loading default names) */
 
 	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (loadpvarsdef) */
-
+} /* end subroutine (loadpvarsdef) */
 
 local int loadpathlist(sip,plp,elp)
 SUBINFO		*sip ;
@@ -2570,9 +2486,7 @@ vecstr		*elp ;
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (loadpathlist) */
-
+} /* end subroutine (loadpathlist) */
 
 local int loadpathcomp(sip,lp,pp)
 SUBINFO		*sip ;
@@ -2616,9 +2530,7 @@ cchar		*pp ;
 	} /* end if (trailing one) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (loadpathcomp) */
-
+} /* end subroutine (loadpathcomp) */
 
 #ifdef	COMMENT
 
@@ -2649,9 +2561,7 @@ cchar		pr[] ;
 	    rs = vecstr_add(lp,ubp,-1) ;
 
 	return rs ;
-}
 /* end subroutine (createsearchpath) */
-
 
 local int loadpath(vecstr *lp,cchar *pp)
 {
@@ -2691,9 +2601,7 @@ local int loadpath(vecstr *lp,cchar *pp)
 	} /* end if (trailing one) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (loadpath) */
-
+} /* end subroutine (loadpath) */
 
 local int setdefpath(vecstr *elp,cchar *pvp)
 {
@@ -2707,8 +2615,7 @@ local int setdefpath(vecstr *elp,cchar *pvp)
 	rs = vecstr_envadd(elp,pvp,vp,-1) ;
 
 	return rs ;
-}
-/* end subroutine (setdefpath) */
+} /* end subroutine (setdefpath) */
 
 #endif /* COMMENT */
 
@@ -2721,23 +2628,20 @@ local int xfile(IDS *idp,cchar *fname) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (xfile) */
+} /* end subroutine (xfile) */
 
 local bool haspmz(cchar *s) noex {
-	bool	f ;
-	f = (s[0] == '+') || (s[0] == '-') ;
+	bool	f = true ;
+	f = f && (s[0] == '+') || (s[0] == '-') ;
 	f = f && (s[1] == '\0') ;
 	return f ;
-}
-/* end subroutine (haspmz) */
+} /* end subroutine (haspmz) */
 
 local bool hasmz(cchar *s) noex {
-	bool f ;
-	f = (s[0] == '-') ;
+	bool  f = true ;
+	f = f && (s[0] == '-') ;
 	f = f && (s[1] == '\0') ;
 	return f ;
-}
-/* end subroutine (hasmz) */
+} /* end subroutine (hasmz) */
 
 
