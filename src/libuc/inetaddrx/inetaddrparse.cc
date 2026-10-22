@@ -86,7 +86,7 @@ int inetaddrparse_load(inetaddrparse *ap,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
 	    rs = memclear(ap) ;
 	    n += 1 ;
-	    if (cchar *tp ; (tp = strnchr(sp,sl,':')) != nullptr) {
+	    if (cchar *tp = strnchr(sp,sl,':')) {
 	        int	cl ;
 	        cchar	*cp ;
 	        n += 1 ;
