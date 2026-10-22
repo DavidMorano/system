@@ -105,13 +105,13 @@ int snclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 		        dbuf[dl++] = char(ch) ;
 		    } else {
 		        dbuf[dl++] = char(ch_sub) ;
-		    }
+		    } /* end */
 		    sp += 1 ;
 		    sl -= 1 ;
 		} /* end while */
 		if (sl && *sp) rs = SR_OVERFLOW ;
 	    } /* end if (valid) */
-	    dbuf[dl] = '\0' ;
+	    dbuf[dl] = eos ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? dl : rs ;
 } /* end subroutine (snclean) */
