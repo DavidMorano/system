@@ -113,13 +113,13 @@ int snabbrname(char *dp,int dl,cchar *sp,int sl) noex {
 	                dp[i++] = chtouc(cp[0]) ;
 	            } else {
 		        rs = SR_OVERFLOW ;
-	            }
+	            } /* end */
 	            sl -= intconv((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
 	        } /* end for */
 	    } /* end if (non-null) */
-	    dp[i] = '\0' ;
+	    dp[i] = eos ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 } /* end subroutine (snabbrname) */
