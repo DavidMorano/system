@@ -1,4 +1,4 @@
-/* linefold SUPPORT */
+/* linefold SUPPORT (Line-Fold) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -70,8 +70,6 @@ import uconstants ;			/* |varname(3u)| */
 
 /* imported namespaces */
 
-using std::nothrow ;			/* constant */
-
 
 /* local typedefs */
 
@@ -84,16 +82,17 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
-struct params {
+namespace {
+    struct params {
 	int		cols ;
 	int		ind ;
 	int		nline ;
-} ; /* end struct */
-
-struct liner {
+    } ; /* end struct */
+    struct liner {
 	cchar		*lp ;
 	int		ll ;
-} ; /* end struct */
+    } ; /* end struct */
+} /* end namespace */
 
 typedef liner *		linerp ;
 
@@ -103,11 +102,12 @@ typedef liner *		linerp ;
 template<typename ... Args>
 local int linefold_ctor(linefold *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(op) ;
-	    if ((op->llp = new(nothrow) vecobj) != np) ylikely {
+	    if ((op->llp = new(nt) vecobj) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
@@ -189,11 +189,11 @@ int linefold_finish(linefold *op) noex {
 	    if (op->llp) {
 	        rs1 = vecobj_finish(op->llp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = linefold_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -211,12 +211,12 @@ int linefold_get(linefold *op,int li,cchar **rpp) noex {
 	            liner	*lep = linerp(vp) ;
 	            ll = lep->ll ;
 	            rp = lep->lp ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? rp : nullptr ;
-	}
+	} /* end */
 	return (rs >= 0) ? ll : rs ;
 } /* end subroutine (linefold_get) */
 
@@ -234,12 +234,12 @@ int linefold_getln(linefold *op,int li,cchar **rpp) noex {
 	            rp = lep->lp ;
 	        } else if (rs == SR_NOTFOUND) {
 	            rs = SR_OK ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	if (rpp) {
 	    *rpp = ((rs >= 0) && (ll > 0)) ? rp : nullptr ;
-	}
+	} /* end */
 	return (rs >= 0) ? ll : rs ;
 } /* end subroutine (linefold_getln) */
 
@@ -277,7 +277,7 @@ local int linefold_process(linefold *op,int cols,int ind,
 	    } /* end for */
 	    if (rs >= 0) {
 	        nline = params_nline(&p) ;
-	    }
+	    } /* end */
 	} /* end if (params_load) */
 	return (rs >= 0) ? nline : rs ;
 } /* end subroutine (linefold_process) */
@@ -310,7 +310,7 @@ local int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
 	    if ((ncol + ncs) > pp->cols) {
 		if (ll == 0) ll = pl ;
 	        break ;
-	    }
+	    } /* end */
 	    ll += pl ;
 	    ncol += ncs ;
 	    sp += pl ;
@@ -318,7 +318,7 @@ local int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
 	} /* end while */
 	if ((rs >= 0) && (ll > 0)) {
 	    pp->nline += 1 ;
-	}
+	} /* end */
 	return (rs >= 0) ? ll : rs ;
 } /* end subroutine (params_nextline) */
 
@@ -333,10 +333,10 @@ local int argcols(int cols) noex {
 	    static cchar	*vcols = getenver(vncols) ;
 	    if (int v ; vcols && (cfdeci(vcols,-1,&v) >= 0)) {
 	        cols = v ;
-	    }
+	    } /* end */
 	    if (cols <= 0) {
 	        cols = COLUMNS ;
-	    }
+	    } /* end */
 	} /* end if (default cols) */
 	return (rs >= 0) ? cols : rs ;
 } /* end subroutine (argcols) */
@@ -371,20 +371,20 @@ local int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 
 int linefold::start(int cols,int ind,cchar *sp,int sl) noex {
 	return linefold_start(this,cols,ind,sp,sl) ;
-}
+} /* end */
 
 int linefold::get(int ai,cchar **rpp) noex {
 	return linefold_get(this,ai,rpp) ;
-}
+} /* end */
 
 int linefold::getln(int ai,cchar **rpp) noex {
 	return linefold_getln(this,ai,rpp) ;
-}
+} /* end */
 
 void linefold::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("linefold",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (linefold_co::dtor) */
 
 linefold_co::operator int () noex {
@@ -404,39 +404,39 @@ linefold_co::operator int () noex {
 
 bool linefold_iter::operator == (const linefold_iter &oit) noex {
 	return (i == oit.i) ;
-}
+} /* end */
 
 bool linefold_iter::operator != (const linefold_iter &oit) noex {
 	return (i != oit.i) ;
-}
+} /* end */
 
 linefold_iter linefold_iter::operator + (int n) const noex {
 	linefold_iter	rit(op,i) ;
 	rit.i = ((i + n) >= 0) ? (i + n) : 0 ;
 	return rit ;
-}
+} /* end */
 
 linefold_iter linefold_iter::operator += (int n) noex {
 	linefold_iter	rit(op,i) ;
 	i = ((i + n) >= 0) ? (i + n) : 0 ;
 	rit.i = i ;
 	return rit ;
-}
+} /* end */
 
 linefold_iter linefold_iter::operator ++ () noex { /* pre */
 	increment() ;
 	return (*this) ;
-}
+} /* end */
 
 linefold_iter linefold_iter::operator ++ (int) noex { /* post */
 	linefold_iter	pre(*this) ;
 	increment() ;
 	return pre ;
-}
+} /* end */
 
 void linefold_iter::increment(int n) noex {
 	i += n ;
-}
+} /* end */
 /* end method (linefold_iter::increment) */
 
 cchar *linefold_iter::operator * () noex {
