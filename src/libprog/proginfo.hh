@@ -1,4 +1,4 @@
-/* proginfo HEADER */
+/* proginfo HEADER (Program-Information) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -29,7 +29,7 @@
 enum proginfomems {
 	proginfomem_ncpu,
 	proginfomem_overlast
-} ;
+} ; /* end enum (proginfomems) */
 
 struct proginfo ;
 
@@ -83,11 +83,11 @@ struct proginfo_co {
 	void operator () (proginfo *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (proginfo_co) */
 
 struct proginfo_vals {
@@ -175,7 +175,7 @@ struct proginfo : proginfo_vals {
 	proginfo_co	rootdname ;
 	vecstr		*sdp ;		/* store-data-pointer */
 	ids		*idp ;
-	logfile		*lhp ;
+	logfile		*lfp ;
 	mainv		argv ;
 	mainv		envv ;
 	ulong		randvar ;
@@ -189,19 +189,19 @@ struct proginfo : proginfo_vals {
 	PI_FL		pfchanged{} ;
 	PI_FL		pfopen{} ;
 	int		argc ;
-	void args(int ac,mainv av,mainv ev) noex ;
-	int start(mainv,mainv,cchar *) noex ;
-	int setprogroot(cchar *,int) noex ;
+	void args	(int ac,mainv av,mainv ev) noex ;
+	int start	(mainv,mainv,cchar *) noex ;
+	int setprogroot	(cchar *,int) noex ;
 	int rootexecname(cchar *) noex ;
-	int setent(cchar **,cchar *,int) noex ;
-	int setversion(cchar *) noex ;
-	int setbanner(cchar *) noex ;
+	int setent	(cchar **,cchar *,int) noex ;
+	int setversion	(cchar *) noex ;
+	int setbanner	(cchar *) noex ;
 	int setsearchname(cchar *,cchar *) noex ;
-	int setprogname(cchar *) noex ;
-	int setexecname(cchar *) noex ;
-	int getpwd(char *,int) noex ;
-	int getename(char *,int) noex ;
-	int expand(char *,int,cchar *,int) noex ;
+	int setprogname	(cchar *) noex ;
+	int setexecname	(cchar *) noex ;
+	int getpwd	(char *,int) noex ;
+	int getename	(char *,int) noex ;
+	int expand	(char *,int,cchar *,int) noex ;
    private:
 	int incpu	() noex ;
 	int irootdname	() noex ;
