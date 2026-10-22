@@ -95,11 +95,11 @@ import logfile_mag ;
 #define	TMPBUFLEN	((2*LOGFILE_USERLEN)+40)
 
 #if	CF_CREATE
-#define	O_FLAGS1	(O_RDWR | O_APPEND | O_CREAT)
-#define	O_FLAGS2	(O_RDWR | O_TRUNC | O_CREAT)
+#define	OX_FL1	(O_RDWR | O_APPEND | O_CREAT)
+#define	OX_FL2	(O_RDWR | O_TRUNC | O_CREAT)
 #else /* CF_CREATE */
-#define	O_FLAGS1	(O_RDWR | O_APPEND)
-#define	O_FLAGS2	(O_RDWR | O_TRUNC)
+#define	OX_FL1	(O_RDWR | O_APPEND)
+#define	OX_FL2	(O_RDWR | O_TRUNC)
 #endif /* CF_CREATE */
 
 #define	TO_OPEN		(10 * 60)
@@ -504,7 +504,7 @@ local int logfile_fixlogid(logfile *op,int cl) noex {
 local int logfile_fileopen(logfile *op) noex {
 	int		rs = SR_OK ;
 	if (op->lfd < 0) {
-	    cint	of = (op->oflags | O_FLAGS1) ;
+	    cint	of = (op->oflags | OX_FL1) ;
 	    if ((rs = uc_open(op->fname,of,op->operm)) >= 0) {
 		op->lfd = rs ;
 		if (op->lfd < 3) {
