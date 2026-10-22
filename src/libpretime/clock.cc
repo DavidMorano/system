@@ -73,10 +73,6 @@
 #define	CLOCK_REALTIME0	0		/* this is a special Solaris® thing */
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	NDF		"libpretime.nd"
 
 
