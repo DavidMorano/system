@@ -96,6 +96,7 @@
 #include	<keyopt.h>
 #include	<sysmemutil.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"opensvc_motdblurb.h"
 #include	"defs.h"
@@ -127,14 +128,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS || CF_DEBUGN
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
 
 
 /* external variables */
