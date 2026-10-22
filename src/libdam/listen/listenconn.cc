@@ -52,7 +52,7 @@
 
 /* local defines */
 
-#define	O_FLAGS1	(O_RDWR | O_NONBLOCK)
+#define	OX_FL1	(O_RDWR | O_NONBLOCK)
 
 
 /* imported namespaces */
