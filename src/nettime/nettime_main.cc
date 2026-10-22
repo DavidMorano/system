@@ -81,7 +81,7 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 extern int	progout_begin(PROGINFO *,cchar *) ;
-extern int	progout_printline(PROGINFO *,cchar *,int) ;
+extern int	progout_println(PROGINFO *,cchar *,int) ;
 extern int	progout_printf(PROGINFO *,cchar *,...) ;
 extern int	progout_end(PROGINFO *) ;
 
@@ -1420,11 +1420,11 @@ local int procserver(PROGINFO *pip,vecobj *rlp,cchar *np,int nl)
 	            bl = rs ;
 
 	            if (rs >= 0) {
-	                rs = progout_printline(pip,buf,bl) ;
+	                rs = progout_println(pip,buf,bl) ;
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(2))
 	                    debugprintf("main/procserver: "
-	                        "progout_printline() rs=%d\n",rs) ;
+	                        "progout_println() rs=%d\n",rs) ;
 #endif
 	            }
 
