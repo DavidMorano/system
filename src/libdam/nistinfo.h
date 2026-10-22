@@ -19,10 +19,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<clanguage.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| */
 
 
 #define	NISTINFO		struct nistinfo
@@ -36,7 +37,7 @@ struct nistinfo {
 	int		h ;
 	int		adv ;
 	char		org[NISTINFO_ORGLEN+1] ;
-} ;
+} ; /* end struct (nistinfo) */
 
 
 #endif /* NISTINFO_INCLUDE */
