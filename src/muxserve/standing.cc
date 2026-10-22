@@ -103,10 +103,6 @@
 #define	TO_SPEED	30
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
