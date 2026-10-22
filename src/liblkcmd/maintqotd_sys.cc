@@ -388,7 +388,7 @@ cchar	*ap ;
 	                            rs = locinfo_termoutprint(lip,ofp,cbuf,cl) ;
 	                            wlen += rs ;
 	                        } else {
-	                            rs = shio_printline(ofp,cbuf,cl) ;
+	                            rs = shio_println(ofp,cbuf,cl) ;
 	                            wlen += rs ;
 	                        }
 	                    }
