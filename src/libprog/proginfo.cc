@@ -1,11 +1,12 @@
-/* proginfo SUPPORT */
+/* proginfo SUPPORT (Program-Information) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* program information */
 /* version %I% last-modified %G% */
 
-#define	CF_GETEXECNAME	1		/* use 'getexecname()' */
+#define	CF_DEBUG	0		/* debugging */
+#define	CF_GETEXECNAME	1		/* use |getexecname()| */
 
 /* revision history:
 
@@ -33,7 +34,7 @@
 #include	<unistd.h>		/* POSIX |gethostid(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strnlen(3c)| */
+#include	<cstring>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -42,6 +43,7 @@
 #include	<getnodename.h>		/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
 #include	<shellunder.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<snx.h>			/* LIBUC */
@@ -63,10 +65,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#ifndef	NODENAMELEN
-#define	NODENAMELEN	256
-#endif
-
 #define	NOPROGNAME	"NP"
 
 #ifndef	VAREXECFNAME
@@ -77,13 +75,15 @@ import libutil ;			/* |memclear(3u)| */
 #define	VARUNDER	"_"
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
@@ -99,13 +99,15 @@ using std::nothrow ;			/* constant */
 
 template<typename ... Args>
 local int proginfo_ctor(proginfo *op,Args ... args) noex {
+    	cnullptr	np{} ;
+    	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    if ((op->sdp = new(nothrow) vecstr) != np) {
-	        if ((op->idp = new(nothrow) ids) != np) {
-	            if ((op->lhp = new(nothrow) ids) != np) {
+	    if ((op->sdp = new(nt) vecstr) != np) {
+	        if ((op->idp = new(nt) ids) != np) {
+	            if ((op->lfp = new(nt) logfile) != np) {
 			rs = SR_OK ;
 		    } /* end if (new-logfile) */
 		    if (rs < 0) {
@@ -126,18 +128,18 @@ local int proginfo_dtor(proginfo *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->lhp) {
-		delete op->lhp ;
-		op->lhp = nullptr ;
-	    }
+	    if (op->lfp) {
+		delete op->lfp ;
+		op->lfp = nullptr ;
+	    } /* end if (delete-logfile) */
 	    if (op->idp) {
 		delete op->idp ;
 		op->idp = nullptr ;
-	    }
+	    } /* end if (delete-ids) */
 	    if (op->sdp) {
 		delete op->sdp ;
 		op->sdp = nullptr ;
-	    }
+	    } /* end if (delete-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (proginfo_dtor) */
@@ -195,8 +197,8 @@ int proginfo::start(mainv av,mainv ev,cc *ver) noex {
 int proginfo::ifinish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (lhp) {
-	    rs1 = logfile_finish(lhp) ;
+	if (lfp) {
+	    rs1 = logfile_finish(lfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (idp) {
@@ -226,7 +228,7 @@ int proginfo::setent(cchar **epp,cchar *valp,int vall) noex {
 	            oi = sdp->findaddr(*epp) ;
 	        }
 	        if (vap) {
-	            len = strnlen(valp,vall) ;
+	            len = lenstr(valp,vall) ;
 	            rs = sdp->store(valp,len,epp) ;
 	        } else {
 	            *epp = nullptr ;
@@ -611,8 +613,7 @@ local int proginfo_setdefnames(proginfo *pip) noex {
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (proginfo_setdefnames) */
+} /* end subroutine (proginfo_setdefnames) */
 
 
 #ifdef	COMMENT
@@ -633,8 +634,7 @@ local int proginfo_setdefdn(proginfo *pip) noex {
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (proginfo_setdefdn) */
+} /* end subroutine (proginfo_setdefdn) */
 
 /* Set Default Program-Name */
 local int proginfo_setdefpn(proginfo *pip) noex {
@@ -665,19 +665,19 @@ local int proginfo_setdefpn(proginfo *pip) noex {
 
 proginfo_vals::proginfo_vals() noex {
 	memclear(this) ;
-}
+} /* end */
 
 void proginfo.hhwser::operator () (proginfo.hhead *p) noex {
 	op = p ;
 	val = 0 ;
-}
+} /* end */
 
 proginfo.hhwser::operator uint () noex {
 	if (val == 0) {
 	    val = (uint) gethostid() ;
 	}
 	return val ;
-}
+} /* end */
 
 proginfo.hhead::proginfo.hhead() noex {
 	argc = 0 ;
@@ -686,17 +686,17 @@ proginfo.hhead::proginfo.hhead() noex {
 	pwd = nullptr ;
 	sdp = nullptr ;
 	idp = nullptr ;
-	lhp = nullptr ;
+	lfp = nullptr ;
 	now = {} ;
 	hwserial(this) ;
 	ncpu(this,proginfomem_ncpu) ;
-}
+} /* end */
 
 void proginfo.hhead::args(int ac,mainv av,mainv ev) noex {
 	argc = ac ;
 	argv = av ;
 	envv = ev ;
-}
+} /* end */
 
 int proginfo_co::operator () (int) noex {
 	int		rs = SR_BADFMT ;
@@ -706,10 +706,9 @@ int proginfo_co::operator () (int) noex {
 		rs = op->incpu() ;
 		break ;
 	    } /* end switch */
-	}
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end method (proginfo_co::operator) */
+} /* end method (proginfo_co::operator) */
 
 int proginfo.hhead::incpu() noex {
 	int		rs = ncpus ;
