@@ -172,16 +172,16 @@ local int fsdirtree_dtor(fsdirtree *op) noex {
 	    rs = SR_OK ;
 	    if (op->dip) ylikely {
 		delete op->dip ;
-		op->dirp = nullptr ;
-	    }
+		op->dip = nullptr ;
+	    } /* end if (delete-hdb) */
 	    if (op->dirp) ylikely {
 		delete op->dirp ;
 		op->dirp = nullptr ;
-	    }
+	    } /* end if (delete-fsdir) */
 	    if (op->dqp) ylikely {
 		delete op->dqp ;
 		op->dqp = nullptr ;
-	    }
+	    } /* end if (delete-fifostr) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (fsdirtree_dtor) */
@@ -251,7 +251,7 @@ int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex {
 				op->bnlen = rs ;
 			        if ((rs = fsdirtree_sel(op)) >= 0) {
 			            rs = fsdirtree_opener(op,dname) ;
-			        }
+			        } /* end */
 				if (rs < 0) {
 				    lm_free(op->bnbuf) ;
 				    op->bnbuf = nullptr ;
@@ -295,7 +295,7 @@ local int fsdirtree_opener(fsdirtree *op,cchar *dname) noex {
                 if (bdp[0] != '\0') {
                     op->bnbuf[op->bndlen++] = '/' ;
 		}
-            }
+            } /* end */
         } /* end if */
         if (rs >= 0) ylikely {
             if (bdp[0] != '\0') {
@@ -308,11 +308,11 @@ local int fsdirtree_opener(fsdirtree *op,cchar *dname) noex {
                     op->fl.dir = true ;
                     if (op->bnbuf[op->bndlen - 1] != '/') {
                         op->bnbuf[op->bndlen++] = '/' ;
-                    }
+                    } /* end */
 		    if ((rs = fsdirtree_trackbeg(op)) >= 0) {
                         op->cdnlen = op->bndlen ;
                         op->magval = FSDIRTREE_MAGIC ;
-                    }
+                    } /* end */
                     if (rs < 0) {
                         fsdir_close(op->dirp) ;
                     } /* end if (error) */
@@ -329,12 +329,12 @@ int fsdirtree_close(fsdirtree *op) noex {
 	    {
 	    	rs1 = fsdirtree_trackend(op) ;
                 if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
             if (op->fl.dir) ylikely {
                 op->fl.dir = false ;
                 rs1 = fsdir_close(op->dirp) ;
                 if (rs >= 0) rs = rs1 ;
-            }
+            } /* end */
             if (op->bnbuf) ylikely {
                 rs1 = lm_free(op->bnbuf) ;
                 if (rs >= 0) rs = rs1 ;
@@ -408,9 +408,9 @@ reader::operator int () noex {
 	        cchar	*enp = op->nbuf ;
 	        bool	f_proc = true ;
 	        if (hasNotDots(enp,enl)) {
-		    if (op->prunearr != nullptr) {
+		    if (op->prunearr) {
 			f_proc = (matstr(op->prunearr,enp,enl) < 0) ;
-		    }
+		    } /* end */
 		    if (f_proc) {
 	            if ((op->cdnlen > 0) && 
 	                (op->bnbuf[op->cdnlen - 1] != '/')) {
@@ -440,7 +440,7 @@ reader::operator int () noex {
 		    } /* end if (not pruned) */
 	        } else {
 	            f_proc = false ;
-		}
+		} /* end if */
 	        if ((rs >= 0) && f_proc) {
 		    cbool	f_uniq = (op->opts & FSDIRTREE_MUNIQFILE) ;
 	            if (S_ISDIR(sbp->st_mode) && f_uniq) {
@@ -453,7 +453,7 @@ reader::operator int () noex {
 	                    rs = fsdirtree_diradd(op,dev,ino) ;
 	                } else {
 	                    rs = rs1 ;
-			}
+			} /* end if */
 	            } /* end if (directory-uniqueness check) */
 	        } /* end if (directory-uniqueness check) */
 	        if ((rs >= 0) && f_proc) {
@@ -476,7 +476,7 @@ reader::operator int () noex {
 	        rs = fsdir_close(op->dirp) ;
 	        if ((op->bndlen > 0) && (op->bnbuf[op->bndlen - 1] != '/')) {
 	            op->bnbuf[op->bndlen++] = '/' ;
-		}
+		} /* end if */
 	        while (rs >= 0) {
 	            cdnp = op->bnbuf + op->bndlen ;
 	            mlen = var.maxpathlen - op->bndlen ;
@@ -489,7 +489,7 @@ reader::operator int () noex {
 	                len = 0 ;
 	                op->fl.feof = true ;
 	                break ;
-	            }
+	            } /* end if */
 	            cdnp[len] = '\0' ; /* not needed? */
 	            op->cdnlen = op->bndlen + len ;
 	            if ((rs = fsdir_open(op->dirp,op->bnbuf)) >= 0) {
@@ -497,7 +497,7 @@ reader::operator int () noex {
 	                break ;
 	            } else if (isNotPresent(rs)) {
 	                rs = SR_OK ;
-	            }
+	            } /* end if */
 	        } /* end while */
 	    } /* end if (directory-read) */
 	} /* end while (outer) */
@@ -505,7 +505,7 @@ reader::operator int () noex {
 	if ((rs >= 0) && (cdnp != nullptr) && (! op->fl.feof)) {
 	    rs = mknpath1(rbuf,rlen,cdnp) ;
 	    len = rs ;
-	}
+	} /* end if */
 	return (rs >= 0) ? len : rs ;
 } /* end method (reader::operator) */
 
@@ -598,13 +598,12 @@ local int fsdirtree_dirend(fsdirtree *op) noex {
 	    if (hdb_cur	cur ; (rs1 = hdb_curbegin(dbp,&cur)) >= 0) ylikely {
 	        dirid	*dip ;
 	        while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
-	            dip = (dirid *) val.buf ;
-	            if (dip != nullptr) {
+	            if (dip = (dirid *) val.buf ; dip) {
 	                rs1 = dirid_finish(dip) ;
 	                if (rs >= 0) rs = rs1 ;
 	                rs1 = lm_free(dip) ;
 	                if (rs >= 0) rs = rs1 ;
-	            }
+	            } /* end if */
 	        } /* end while */
 	        hdb_curend(dbp,&cur) ;
 	    } /* end if (cursor) */
@@ -730,7 +729,7 @@ local uint hashdirid(cvoid *vp,int vl) noex {
 	            h = h ^ ((sa[6] << 16) | sa[7]) ;
 	        }
 	    }
-	}
+	} /* end */
 	return h ;
 } /* end subroutine (hashdirid) */
 
@@ -740,14 +739,14 @@ local int cmpdirid(dirid *e1p,dirid *e2p,int len) noex {
 	(void) len ;
 	if (d == 0) {
 	    d = (e1p->ino - e2p->ino) ;
-	}
+	} /* end if */
 	{
 	    if (d > 0) {
 		rc = 1 ;
 	    } else if (d < 0) {
 		rc = -1 ;
 	    }
-	}
+	} /* end block */
 	return rc ;
 } /* end subroutine (cmpdirid) */
 
