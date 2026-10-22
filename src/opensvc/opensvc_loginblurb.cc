@@ -100,6 +100,7 @@
 #include	<keyopt.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"opensvc_loginblurb.h"
 #include	"defs.h"
@@ -137,12 +138,6 @@
 /* external subroutines */
 
 extern int	lib_callfunc(int(*)(),int,cchar **,cchar **,void *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
 
 
 /* external variables */
