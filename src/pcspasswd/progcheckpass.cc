@@ -113,11 +113,11 @@ struct passdata {
 
 /* forward references */
 
-local int	try_start(PD *,char *,cchar *) noex ;
-local int	try_pwd(PD *) noex ;
-local int	try_spw(PD *) noex ;
-local int	try_nisplus(PD *) noex ;
-local int	try_finish(PD *) noex ;
+local int	try_start	(PD *,char *,cchar *) noex ;
+local int	try_pwd		(PD *) noex ;
+local int	try_spw		(PD *) noex ;
+local int	try_nisplus	(PD *) noex ;
+local int	try_finish	(PD *) noex ;
 
 local int	readpass(int,char *,int) noex ;
 
@@ -152,7 +152,7 @@ int progcheckpass(PI *pip,cc *username,cc *password,int f_useshadow) noex {
 	int		rs1 = 0 ;
 	int		i ;
 	int		passlen = 0 ;
-	int		f_valid = FALSE ;
+	int		f_valid = false ;
 	char		passbuf[PASSWDLEN + 1] ;
 
 	if (username == nullptr) return SR_FAULT ;
