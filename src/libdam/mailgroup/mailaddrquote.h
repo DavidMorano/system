@@ -1,0 +1,50 @@
+/* mailaddrquote HEADER */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* quote mail-addresses */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	MAILADDRQUOTE_INCLUDE
+#define	MAILADDRQUOTE_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<bufstr.h>		/* LIBUC */
+
+
+#define	MAILADDRQUOTE		struct mailaddrquote_head
+#define	MAILADDRQUOTE_FL	struct mailaddrquote_flags
+#define	MAILADDRQUOTE_MAGIC	0x08938725	/* magic */
+#define	MAILADDRQUOTE_LEN	100		/* default value */
+
+
+struct mailaddrquote_flags {
+	uint		qaddr:1 ;
+} ; /* end struct */
+
+struct mailaddrquote_head {
+	bufstr			*bsp ;	/* buffer-string-pointer */
+	MAILADDRQUOTE_FL	fl ;
+	uint			magval ;
+} ; /* end struct */
+
+typedef	MAILADDRQUOTE		mailaddrquote ;
+typedef	MAILADDRQUOTE_FL	mailaddrquote_fl ;
+
+EXTERNC_begin
+
+extern int mailaddrquote_start(mailaddrquote *,cchar *,int,cchar **) noex ;
+extern int mailaddrquote_finish(mailaddrquote *) noex ;
+
+EXTERNC_end
+
+
+#endif /* MAILADDRQUOTE_INCLUDE */
+
+
