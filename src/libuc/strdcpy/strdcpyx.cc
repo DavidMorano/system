@@ -67,6 +67,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strdcpyx.h"
 
@@ -145,7 +146,7 @@ char *strdcpyx(char *dp,int dl,int n,...) noex {
 		    dp = stpcpy(dp,sp) ;
 	        } /* end for */
 	    } /* end if */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
