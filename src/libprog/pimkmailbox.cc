@@ -81,7 +81,7 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_WRONLY | O_CREAT)
+#define	OX_FL		(O_WRONLY | O_CREAT)
 
 
 /* imported namespaces */
@@ -123,7 +123,7 @@ int pimkmailbox(PROGINFO *pip,cchar *mbname) noex {
 			    rl = rs ;
 	                    rs = u_stat(mbfname,&sb) ;
 	                    if (rs < 0) {
-				cint	of = O_FLAGS ;
+				cint	of = OX_FL ;
 				cmode	om = 0664 ;
 	                        if ((rs = u_open(mbfname,of,om)) >= 0) {
 	                            cint	fd = rs ;
