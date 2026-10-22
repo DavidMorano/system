@@ -1,4 +1,4 @@
-/* linehist HEADER */
+/* linehist HEADER (Line-History) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
