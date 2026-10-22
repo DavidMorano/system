@@ -91,7 +91,7 @@ namespace libu {
     	if (dp && sp) ylikely {
 	    if (sl >= 0) {
 	        while (sl-- && *sp) *dp++ = *sp++ ;
-	        *dp = '\0' ;
+	        *dp = eos ;
 	    } else {
 	        dp = stpcpy(dp,sp) ;
 	    } /* end if */
