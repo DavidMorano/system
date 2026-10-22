@@ -63,10 +63,6 @@
 
 #define	NIOVECS		1
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
