@@ -1,4 +1,4 @@
-/* itcontrol HEADER */
+/* itcontrol HEADER (Internval-Timer-Control) */
 /* charset=ISO8859-1 */
 /* lang=C99 */
 
