@@ -66,7 +66,7 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_CREAT | O_EXCL | O_RDWR)
+#define	OX_FL		(O_CREAT | O_EXCL | O_RDWR)
 #define	MAXNLOOP	100
 
 
@@ -195,7 +195,7 @@ int tryer::looper() noex {
 	        cint	fl = (rl + rs) ;
 		if ((rs = sncpy((rbuf + fl),(rlen - fl),".",ext)) >= 0) {
 		    len = (fl + rs) ;
-	            if ((rs = u_open(rbuf,O_FLAGS,om)) >= 0) {
+	            if ((rs = u_open(rbuf,OX_FL,om)) >= 0) {
 		        u_close(rs) ;
 	            } else if (isNotAccess(rs)) {
 		        rs = SR_OK ;
