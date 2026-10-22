@@ -27,14 +27,6 @@
 #include	<localmisc.h>		/* |LOGNAMELEN| + ... */
 
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	NODENAMELEN
-#define	NODENAMELEN	257		/* System V */
-#endif
-
 #ifndef	MAILADDRLEN
 #define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
 #endif
