@@ -51,6 +51,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<char.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strdcpy.h"
 
