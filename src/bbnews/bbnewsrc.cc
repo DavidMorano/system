@@ -71,10 +71,6 @@
 #define	DATE1970	(24 * 3600)
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
