@@ -57,10 +57,6 @@
 #define	MAXARGINDEX	100
 #define	MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
 #ifndef	DEBUGLEVEL
 #define	DEBUGLEVEL(n)	(pip->debuglevel >= (n))
 #endif
