@@ -91,10 +91,6 @@
 #define	MAXMSGLINELEN	76
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	BASE64LINELEN	72
 
 #define	BASE64BUFLEN	((BASE64LINELEN / 4) * 3)
