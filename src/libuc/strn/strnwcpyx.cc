@@ -189,6 +189,7 @@ local char *strnwcpyx_pos(char *dp,int dl,int n,int len,va_list ap) noex {
 	if (n > 1) {
 	    for (int i = 0 ; (dl > 0) && (i < (n - 1)) ; i += 1) {
 	        ccharp sp = (cchar *) va_arg(ap,char *) ;
+		if (! sp) break ;
 		rp = dstcpy(dp,dl,sp) ;
 		dl -= intconv(rp - dp) ;
 		dp = rp ;
@@ -197,9 +198,11 @@ local char *strnwcpyx_pos(char *dp,int dl,int n,int len,va_list ap) noex {
 	if (n > 0) {
 	    if (dl > 0) {
 	        ccharp sp = (cchar *) va_arg(ap,char *) ;
-		rp = dstcpy(dp,dl,sp,len) ;
-		dl -= intconv(rp - dp) ;
-		dp = rp ;
+		if (sp) {
+		    rp = dstcpy(dp,dl,sp,len) ;
+		    dl -= intconv(rp - dp) ;
+		    dp = rp ;
+		}
 	    } /* end block */
 	} /* end for */
 	if (dl > 0) {
@@ -213,13 +216,16 @@ local char *strnwcpyx_neg(char *dp,int dl,int n,int len,va_list ap) noex {
 	if (n > 1) {
 	    for (int i = 0 ; i < (n - 1) ; i += 1) {
 	        ccharp sp = (cchar *) va_arg(ap,char *) ;
+		if (! sp) break ;
 		dp = stpcpy(dp,sp) ;
 	    } /* end for */
 	} /* end if */
 	if (n > 0) {
 	    {
 	        ccharp sp = (cchar *) va_arg(ap,char *) ;
-		dp = dstcpy(dp,len,sp) ;
+		if (sp) {
+		    dp = dstcpy(dp,len,sp) ;
+		}
 	    }
 	} /* end for */
 	*dp = '\0' ;
