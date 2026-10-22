@@ -72,7 +72,7 @@
 #define	LINEBUFLEN	MAX((MAXPATHLEN + 10),2048)
 #endif
 
-#define	O_FLAGS		(O_RDONLY | O_NONBLOCK | O_NOCTTY)
+#define	OX_FL		(O_RDONLY | O_NONBLOCK | O_NOCTTY)
 
 
 /* external subroutines */
@@ -168,7 +168,7 @@ cchar	name[] ;
 #endif
 
 	    if (rs >= 0) {
-	        if ((rs = u_open(bdp,O_FLAGS,0666)) >= 0) {
+	        if ((rs = u_open(bdp,OX_FL,0666)) >= 0) {
 	            sfd = rs ;
 
 	            rs = lister(pip,ofp,sfd) ;
