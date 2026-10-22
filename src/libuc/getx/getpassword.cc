@@ -51,10 +51,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
 #ifndef	TTYFNAME
 #define	TTYFNAME	"/dev/tty"
 #endif
