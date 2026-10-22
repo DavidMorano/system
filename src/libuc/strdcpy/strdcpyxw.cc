@@ -69,6 +69,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"strdcpyxw.h"
 
@@ -176,7 +177,7 @@ char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	    } else {
 		dp = strdcpyxw_neg(dp,dl,n,ap) ;
 	    } /* end if */
-	    *dp = '\0' ;
+	    *dp = eos ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return dp ;
