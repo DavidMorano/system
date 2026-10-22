@@ -67,7 +67,7 @@
 #include	<acctab.h>
 #include	<cq.h>
 #include	<sfx.h>
-#include	<timestr.h>
+#include	<strtime.h>
 #include	<prognamevar.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -125,34 +125,34 @@ struct procinfo {
 
 /* forward references */
 
-static int	process_name() ;
-static int	process_service(struct proginfo *,struct procinfo *,
+local int	process_name() ;
+local int	process_service(struct proginfo *,struct procinfo *,
 			SRVTAB_ENT *,PROGENTRY_ARGS *) ;
-static int	process_progentrynew(struct proginfo *,
+local int	process_progentrynew(struct proginfo *,
 			struct procinfo *,PROGENTRY **) ;
-static int	process_progentryfree(struct proginfo *, 
+local int	process_progentryfree(struct proginfo *, 
 			struct procinfo *,PROGENTRY *) ;
-static int	process_deljob(struct proginfo *,struct procinfo *,int,
+local int	process_deljob(struct proginfo *,struct procinfo *,int,
 			PROGENTRY *) ;
-static int	process_cycle(struct proginfo *,struct procinfo *) ;
-static int	process_findpid() ;
-static int	process_startjob() ;
-static int	process_check(struct proginfo *,struct procinfo *) ;
-static int	process_jobactive(struct proginfo *,struct procinfo *,
+local int	process_cycle(struct proginfo *,struct procinfo *) ;
+local int	process_findpid() ;
+local int	process_startjob() ;
+local int	process_check(struct proginfo *,struct procinfo *) ;
+local int	process_jobactive(struct proginfo *,struct procinfo *,
 			char *,PROGENTRY **) ;
-static int	process_checkaccess(struct proginfo *,struct procinfo *,
+local int	process_checkaccess(struct proginfo *,struct procinfo *,
 			char *) ;
-static int	writeout(struct proginfo *,int,cchar *) ;
-static int	findprog(struct proginfo *,cchar *,char *,int *) ;
+local int	writeout(struct proginfo *,int,cchar *) ;
+local int	findprog(struct proginfo *,cchar *,char *,int *) ;
 
-static int xfile(proginfo *pip,cchar *fname) noex {
+local int xfile(proginfo *pip,cchar *fname) noex {
 
-static void	int_all(int) ;
+local void	int_all(int) ;
 
 
 /* local variables */
 
-static int	f_exit ;
+local int	f_exit ;
 
 
 /* exported variables */
@@ -600,7 +600,7 @@ int watch(proginfo *pip,vecstr *snp) noex {
 
 	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,cp,
-	            timestr_logz(pi.daytime,timebuf)) ;
+	            strtime_logz(pi.daytime,timebuf)) ;
 
 	} /* end if (daemon mode exit stuff) */
 
@@ -734,7 +734,7 @@ bad0:
 
 
 
-static int process_name(pip,pcp,pap,name)
+local int process_name(pip,pcp,pap,name)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 PROGENTRY_ARGS	*pap ;
@@ -861,7 +861,7 @@ PROGENTRY	*pep ;
 
 
 /* do a cycle of work */
-static int process_cycle(pip,pcp)
+local int process_cycle(pip,pcp)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 {
@@ -991,7 +991,7 @@ struct procinfo	*pcp ;
 
 	        if (pip->fl.log)
 	            logfile_printf(&pip->lh, "%s server exit ex=%u\n",
-	                timestr_logz(pcp->daytime,timebuf),
+	                strtime_logz(pcp->daytime,timebuf),
 	                (child_stat & 255)) ;
 
 /* process this guy's termination */
@@ -1016,7 +1016,7 @@ struct procinfo	*pcp ;
 
 	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,"elapsed time %s\n",
-	                    timestr_elapsed((pcp->daytime - pep->atime),
+	                    strtime_elapsed((pcp->daytime - pep->atime),
 	                    timebuf)) ;
 
 	            u_close(efd) ;
@@ -1067,7 +1067,7 @@ struct procinfo	*pcp ;
 	            if (pip->fl.log)
 	                logfile_printf(&pip->lh,
 	                    "%s lost PIDLOCK other PID=%d\n",
-	                    timestr_logz(pcp->daytime,timebuf),
+	                    strtime_logz(pcp->daytime,timebuf),
 	                    lc.pid) ;
 
 	        rs = SR_ALREADY ;
@@ -1090,7 +1090,7 @@ struct procinfo	*pcp ;
 	        if (pip->fl.log)
 	            logfile_printf(&pip->lh,
 			"%s server table file changed\n",
-	                timestr_logz(pcp->daytime,timebuf)) ;
+	                strtime_logz(pcp->daytime,timebuf)) ;
 
 	    }
 
@@ -1110,7 +1110,7 @@ struct procinfo	*pcp ;
 
 	        if (pip->fl.log)
 	            logfile_printf(&pip->lh,"%s access table file changed\n",
-	                timestr_logz(pcp->daytime,timebuf)) ;
+	                strtime_logz(pcp->daytime,timebuf)) ;
 
 	    }
 
@@ -1136,7 +1136,7 @@ ret0:
 
 
 /* spawn a job */
-static int process_startjob(pip,pcp,pep)
+local int process_startjob(pip,pcp,pep)
 proginfo	*pip ;
 procinfo	*pcp ;
 PROGENTRY	*pep ;
@@ -1346,7 +1346,7 @@ PROGENTRY	*pep ;
 	    if (pip->fl.log) {
 
 	        logfile_printf(&pip->lh,"%s server=%s\n",
-	            timestr_logz(pcp->daytime,timebuf), arg0) ;
+	            strtime_logz(pcp->daytime,timebuf), arg0) ;
 
 		if (! f_secure) {
 	    	    logfile_printf(&pip->lh,"security reset uid=%d\n",
@@ -1358,7 +1358,7 @@ PROGENTRY	*pep ;
 	    if (pip->debuglevel > 0) {
 	        bprintf(pip->efp,"%s: %s server=%s\n",
 	            pip->progname,
-	            timestr_logz(pcp->daytime,timebuf),arg0) ;
+	            strtime_logz(pcp->daytime,timebuf),arg0) ;
 	    }
 
 	} /* end block */
@@ -1392,7 +1392,7 @@ bad0:
 
 
 /* find a job by its PID */
-static int process_findpid(pip,pcp,pid,pepp)
+local int process_findpid(pip,pcp,pid,pepp)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 pid_t		pid ;
@@ -1421,7 +1421,7 @@ PROGENTRY	**pepp ;
 
 
 /* delete a job and free up the progentry */
-static int process_deljob(pip,pcp,ji,pep)
+local int process_deljob(pip,pcp,ji,pep)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 int		ji ;
@@ -1443,7 +1443,7 @@ PROGENTRY	*pep ;
 
 
 /* check on program intervals when in daemon mode */
-static int process_check(pip,pcp)
+local int process_check(pip,pcp)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 {
@@ -1516,7 +1516,7 @@ struct procinfo	*pcp ;
 
 
 /* check the interval of a service entry */
-static int process_service(pip,pcp,sep,pap)
+local int process_service(pip,pcp,sep,pap)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 SRVTAB_ENT	*sep ;
@@ -1676,9 +1676,9 @@ PROGENTRY_ARGS	*pap ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2)) {
 	                debugprintf("process_service: daytime=%s\n",
-	                    timestr_logz(pcp->daytime,timebuf)) ;
+	                    strtime_logz(pcp->daytime,timebuf)) ;
 	                debugprintf("process_service: mtime=%s\n",
-	                    timestr_logz(sb.st_mtime,timebuf)) ;
+	                    strtime_logz(sb.st_mtime,timebuf)) ;
 	            }
 #endif /* CF_DEBUG */
 
@@ -1723,19 +1723,19 @@ PROGENTRY_ARGS	*pap ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
 	        debugprintf("process_service: %s service=%s\n",
-	            timestr_logz(pcp->daytime,timebuf),
+	            strtime_logz(pcp->daytime,timebuf),
 	            pep->name) ;
 #endif
 
 	    if (pip->fl.log)
 	        logfile_printf(&pip->lh,"%s service=%s\n",
-	            timestr_logz(pcp->daytime,timebuf),
+	            strtime_logz(pcp->daytime,timebuf),
 	            pep->name) ;
 
 	    if (pip->debuglevel > 0)
 	        bprintf(pip->efp,"%s: %s service=%s\n",
 	            pip->progname,
-	            timestr_logz(pcp->daytime,timebuf),
+	            strtime_logz(pcp->daytime,timebuf),
 	            pep->name) ;
 
 #if	CF_DEBUG
@@ -1773,7 +1773,7 @@ PROGENTRY_ARGS	*pap ;
 /* update the time stamp by writing to it */
 
 	        bprintf(&tsfile,"%s\n",
-	            timestr_logz(pcp->daytime,timebuf)) ;
+	            strtime_logz(pcp->daytime,timebuf)) ;
 
 	    } else {
 
@@ -1831,7 +1831,7 @@ bad0:
 
 
 /* is a named job active in the system already? */
-static int process_jobactive(proginfo *pip,proginfo *pcp,name,pepp)
+local int process_jobactive(proginfo *pip,proginfo *pcp,name,pepp)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 char		name[] ;
@@ -1885,7 +1885,7 @@ PROGENTRY	**pepp ;
 
 
 /* check if this connection is allowed based on the service access */
-static int process_checkaccess(pip,pcp,access)
+local int process_checkaccess(pip,pcp,access)
 struct proginfo	*pip ;
 struct procinfo	*pcp ;
 char		access[] ;
@@ -2090,7 +2090,7 @@ char		access[] ;
 
 
 /* write out the output files from the executed program */
-static int writeout(pip,fd,s)
+local int writeout(pip,fd,s)
 struct proginfo	*pip ;
 int		fd ;
 cchar	s[] ;
@@ -2143,7 +2143,7 @@ cchar	s[] ;
 
 
 /* find a program server and evaluate its security */
-static int findprog(pip,program,progpath,sp)
+local int findprog(pip,program,progpath,sp)
 struct proginfo	*pip ;
 cchar	program[] ;
 char		progpath[] ;
@@ -2265,7 +2265,7 @@ int		*sp ;			/* secure path? */
 }
 /* end subroutine (findprog) */
 
-static int xfile(proginfo *pip,cchar *fname) noex {
+local int xfile(proginfo *pip,cchar *fname) noex {
 	int	rs ;
 	if (ustat sb ; (rs = u_stat(fname,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
@@ -2281,7 +2281,7 @@ static int xfile(proginfo *pip,cchar *fname) noex {
 }
 /* end subroutine (xfile) */
 
-static void int_all(int sn) noex {
+local void int_all(int sn) noex {
 	f_exit = true ;
 }
 /* end subroutine (int_all) */
