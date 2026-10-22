@@ -10,10 +10,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<netdb.h>
-
 #include	<localmisc.h>
 
 
