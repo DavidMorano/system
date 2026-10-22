@@ -62,7 +62,7 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_WRONLY | O_CREAT | O_TRUNC)
+#define	OX_FL		(O_WRONLY | O_CREAT | O_TRUNC)
 #define	NCLOSEFD	3
 #define	MAXOUTLEN	62
 
@@ -631,9 +631,9 @@ SRVTAB		*sfp ;
 
 	    u_close(ifd) ;
 
-	    fd1 = u_open(ofname,O_FLAGS,0600) ;
+	    fd1 = u_open(ofname,OX_FL,0600) ;
 
-	    fd2 = u_open(efname,O_FLAGS,0600) ;
+	    fd2 = u_open(efname,OX_FL,0600) ;
 
 	    {
 		cchar	**eav = (cchar **) args.va ;
