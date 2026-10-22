@@ -59,10 +59,6 @@
 
 /* local defines */
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
 #undef	HDRBUFLEN
 #define	HDRBUFLEN	200
 
