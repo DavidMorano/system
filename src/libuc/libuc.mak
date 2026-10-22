@@ -846,7 +846,7 @@ ucterm.dir:
 	makesubdir $@
 
 # SETX
-setx.o:			setx.dir
+setx.o:			setx.dir retstat.o
 setx.dir:
 	makesubdir $@
 
@@ -1097,6 +1097,9 @@ find.dir:
 sysdbfiles.o:		sysdbfiles.cc	sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc	sysdbfn.h
 
+# OBJECTS
+itcontrol.o:		itcontrol.cc	itcontrol.h		$(INCS)
+
 # SINGLES
 termtypemat.o:		termtypemat.cc	termtypemat.h
 termcmd.o:		termcmd.cc	termcmd.h
@@ -1120,7 +1123,7 @@ nonpath.o:		nonpath.cc	nonpath.h		$(INCS)
 conallof.o:		conallof.cc	conallof.h		$(INCS)
 nchr.o:			nchr.cc		nchr.h			$(INCS)
 inaddrbad.o:		inaddrbad.cc	inaddrbad.hh		$(INCS)
-retstat.o:		retstat.cc	retstat.hh		$(INCS)
+retstat.o:		retstat.ccm	retstat.hh		$(INCS)
 msghdr.o:		msghdr.cc	msghdr.h		$(INCS)
 conmsghdr.o:		conmsghdr.cc	conmsghdr.h		$(INCS)
 
