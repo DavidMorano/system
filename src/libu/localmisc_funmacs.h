@@ -23,6 +23,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<localmisc_isval.h>	/* LIBU */
+#include	<localmisc_isx.h>	/* LIBU */
 
 
 #endif /* LOCALMISCFUNMACS_INCLUDE */
