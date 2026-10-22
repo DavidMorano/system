@@ -51,7 +51,7 @@
 
 /* local defines */
 
-#define	O_FLAGS1	(O_RDWR | O_NONBLOCK)
+#define	OX_FL1	(O_RDWR | O_NONBLOCK)
 
 
 /* imported namespaces */
@@ -87,7 +87,7 @@ int listenpass(cchar *passfname,mode_t om,int opts) noex {
 	if (passfname) ylikely {
 	    rs = SR_INVALID ;
 	    if (passfname[0]) ylikely {
-	        if ((rs = uc_open(passfname,O_FLAGS1,om)) >= 0) {
+	        if ((rs = uc_open(passfname,OX_FL1,om)) >= 0) {
 	            fd = rs ;
 	            if (ustat sb ; (rs = u_fstat(fd,&sb)) >= 0) {
 	                if ((sb.st_mode & S_IWOTH) == 0) {
@@ -99,7 +99,7 @@ int listenpass(cchar *passfname,mode_t om,int opts) noex {
 	        } else if (isNotPresent(rs)) {
 	            u_unlink(passfname) ;
 	            if ((rs = uc_mkfifo(passfname,om)) >= 0) {
-	                rs = u_open(passfname,O_FLAGS1,om) ;
+	                rs = u_open(passfname,OX_FL1,om) ;
 	                fd = rs ;
 	            }
 	        } /* end if */
