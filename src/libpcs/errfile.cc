@@ -49,7 +49,7 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_WRONLY | O_APPEND | O_CREAT)
+#define	OX_FL		(O_WRONLY | O_APPEND | O_CREAT)
 
 #ifndef	BUFLEN
 #define	BUFLEN		(2 * 1024)
@@ -92,7 +92,7 @@ local char	buf[BUFLEN + 1] ;
 int erropen(cchar *errfname,cchar *logid) noex {
     	int		rs = SR_FAULT ;
 	if (errfname && logid) {
-	    cint 	of = O_FLAGS ;
+	    cint 	of = OX_FL ;
 	    cmode	om = 0666 ;
 	    if ((rs = u_open(errfname,of,om)) >= 0) {
 		efd = rs ;
