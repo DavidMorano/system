@@ -80,7 +80,7 @@
 
 #define	MINCHUNK	1
 
-#define	O_FLAGS		(O_WRONLY | O_CREAT | O_TRUNC)
+#define	OX_FL		(O_WRONLY | O_CREAT | O_TRUNC)
 
 #ifndef	BCEIL		/* just a little honey of ours */
 #define	BCEIL(v,m)	(((v) + ((m) - 1)) & (~ ((m) - 1)))
@@ -1172,7 +1172,7 @@ local int procout_open(PROGINFO *pip,PROCOUT *pop)
 	fmt = "%r%03u%s%r" ;
 	cp = ((suf[0] != '\0') ? "." : "") ;
 	if ((rs = bufprintf(obuf,olen,fmt,pre,11,acount,cp,suf,11)) >= 0) {
-	    if ((rs = u_open(obuf,O_FLAGS,0666)) >= 0) {
+	    if ((rs = u_open(obuf,OX_FL,0666)) >= 0) {
 	        pop->ofd = rs ;
 	        pop->lenrem = lip->chunklen ;
 	        lip->acount += 1 ;
