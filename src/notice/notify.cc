@@ -79,10 +79,6 @@
 
 /* local defines */
 
-#ifndef	USERNAMELEN
-#define	USERNAMELEN	100
-#endif
-
 #ifndef	DEVDNAME
 #define	DEVDNAME	"/dev"
 #endif
