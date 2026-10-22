@@ -96,6 +96,7 @@
 #include	<statmsg.h>
 #include	<opentmp.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"opensvc_statmsg.h"
 #include	"defs.h"
@@ -133,14 +134,6 @@ import libutil ;
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS || CF_DEBUGN
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
 
 
 /* external variables */
