@@ -65,7 +65,7 @@
 #define	NCOLSFROM	50
 #define	NCOLSMSGID	78
 
-#define	O_FLAGS		O_RDONLY
+#define	OX_FL		O_RDONLY
 
 #define	LI		struct locinfo
 #define	LI_FL	struct locinfo_flags
@@ -1039,7 +1039,7 @@ local int process(PI *pip,cchar *dbfname,bfile *ofp,vecstr *rlp) noex {
 	MSGID		db ;
 	MSGID_CUR	cur ;
 	MSGID_ENT	e, *ep ;
-	oflags = O_FLAGS ;
+	oflags = OX_FL ;
 	f = FALSE ;
 	f = f || ((oflags & O_RDWR) == O_RDWR) ;
 	rs = msgid_open(&db,dbfname,oflags,0666,0) ;
