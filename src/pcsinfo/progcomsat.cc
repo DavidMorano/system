@@ -55,6 +55,7 @@
 #include	<sbuf.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"recip.h"
 #include	"config.h"
@@ -80,11 +81,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
