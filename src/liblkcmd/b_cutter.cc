@@ -69,14 +69,6 @@
 
 /* local defines */
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
 #ifndef	PI
 #define	PI		proginfo
 #endif
