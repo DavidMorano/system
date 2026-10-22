@@ -114,21 +114,13 @@
 #define	INETX_ADDRSTRLEN	MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
 #endif
 
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
 #ifndef	STEBUFLEN
 #define	STEBUFLEN	MAXNAMELEN
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	LOGBUFLEN	(LOGNAMELEN + 20)
 
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 #define	SHLIBENTRY	"main"
 
