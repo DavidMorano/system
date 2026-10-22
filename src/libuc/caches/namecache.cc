@@ -56,10 +56,6 @@ import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 #define	NC_ENT		namecache_ent
 #define	NC_ST		namecache_st
 
-#ifndef	GNAMELEN
-#define	GNAMELEN	REALNAMELEN	/* GECOS name length */
-#endif
-
 #ifndef	CF_FULLNAME
 #define	CF_FULLNAME	0		/* use fullname? */
 #endif
@@ -477,11 +473,11 @@ local int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 
 /* make a real name from a GECOS name */
 local int mkaname(char *nbuf,int nlen,cchar *gecos) noex {
-	cint		glen = GNAMELEN ;
+	cint		glen = REALNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	char		gbuf[GNAMELEN+1] ;
+	char		gbuf[REALNAMELEN +1] ;
 	nbuf[0] = '\0' ;
 	if ((rs = mkgecosname(gbuf,glen,gecos)) >= 0) ylikely {
 	    cint	gl = rs ;
