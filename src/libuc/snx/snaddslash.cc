@@ -90,7 +90,6 @@
 
 int snaddslash(char *rbuf,int rlen,int rl) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
 	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && (rl >= 0)) ylikely {
@@ -98,14 +97,14 @@ int snaddslash(char *rbuf,int rlen,int rl) noex {
 		if ((rl > 0) && (rbuf[rl - 1] != '/')) {
 		    rs = SR_OVERFLOW ;
 		    if (rl < rlen) {
-	                rs = SR_OK ;
-		        rbuf[rl] = '/' ;
-		        len += 1 ;
+		        rbuf[rl++] = '/' ;
+		        rbuf[rl] = eos ;
+	                rs = 1 ; /* <- good return-value */
 		    } /* end if (not-overflow) */
 		} /* end if (needed) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+	return rs ;
 } /* end subroutine (snaddslash) */
 
 
