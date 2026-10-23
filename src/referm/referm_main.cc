@@ -44,12 +44,12 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<logfile.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<userinfo.h>		/* LIBUC */
-#include	<baops.h>		/* LIBUC */
 #include	<varsub.h>		/* LIBUC */
 #include	<hdb.h>			/* LIBUC */
 #include	<field.h>		/* LIBUC */
@@ -57,8 +57,8 @@
 #include	<eigendb.h>		/* LIBUC */
 #include	<varsub.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<prognamevar.hh>	/* LIBDAM */
 #include	<bibdb.h>		/* LIBDAM */
 #include	<mapex.h>		/* LIBU */
@@ -258,7 +258,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 0) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (argl > 1) {
 
@@ -1125,7 +1125,7 @@ int main(int argc,mainv argv,mainv envv) {
 #endif
 
 	    logfile_printf(&g.lh,"%s %s\n",
-	        timestr_log(daytime,timebuf),
+	        strtime_log(daytime,timebuf),
 	        BANNER) ;
 
 	    logfile_printf(&g.lh,"%-14s %s/%s\n",
