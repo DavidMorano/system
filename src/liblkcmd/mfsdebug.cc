@@ -5,7 +5,6 @@
 /* MFS-debug */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable at invocation */
 
 /* revision history:
@@ -41,22 +40,19 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"mfsmain.h"
 #include	"mfsconfig.h"
 #include	"mfslocinfo.h"
 #include	"mfslog.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local typedefs */
 
 
 /* local defines */
-
-#ifndef	POLL_INTMULT
-#define	POLL_INTMULT	1000
-#endif
 
 #ifndef	PBUFLEN
 #define	PBUFLEN		(4 * MAXPATHLEN)
@@ -70,34 +66,10 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #define	NDF		"/tmp/mfs.deb"
 
 
 /* external subroutines */
-
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -117,7 +89,7 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* exported subroutines */
 
-int mfsdebug_lockprint(PROGINFO *pip,cchar *place) noex {
+int mfsdebug_lockprint(PI *pip,cchar *place) noex {
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ;
