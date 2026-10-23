@@ -49,10 +49,6 @@ import ureserve ;			/* |char_toval(3u)| */
 
 #define	PRINTBUFLEN	(COLUMNS + 2)
 
-#ifndef	HEXBUFLEN
-#define	HEXBUFLEN	100
-#endif
-
 
 /* imported namespaces */
 
