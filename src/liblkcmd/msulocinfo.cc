@@ -78,10 +78,6 @@
 #define	GETPW_NAME	getpw_name
 #endif /* CF_UGETPW */
 
-#ifndef	POLL_INTMULT
-#define	POLL_INTMULT	1000
-#endif
-
 #ifndef	PBUFLEN
 #define	PBUFLEN		(4 * MAXPATHLEN)
 #endif
@@ -94,48 +90,16 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #ifndef	IPCBUFLEN
 #define	IPCBUFLEN	MSGBUFLEN
 #endif
 
 #define	DEBUGFNAME	"/tmp/msu.deb"
 
-#ifndef	TTYFNAME
-#define	TTYFNAME	"/dev/tty"
-#endif
-
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	isNotPresent(int) ;
-
-extern int	proginfo_rootname(PROGINFO *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
+extern int	proginfo_rootname(PI *) ;
 
 
 /* external variables */
@@ -152,10 +116,12 @@ local int locinfo_lockbeginone(LOCINFO *,LFM *,cchar *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+int locinfo_start(LOCINFO *lip,PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -245,7 +211,7 @@ int locinfo_defs(LOCINFO *lip)
 {
 
 	if (lip->msnode == NULL) {
-	    PROGINFO	*pip = lip->pip ;
+	    PI	*pip = lip->pip ;
 	    lip->msnode = pip->nodename ;
 	}
 
@@ -266,7 +232,7 @@ int locinfo_defreg(LOCINFO *lip)
 
 int locinfo_defdaemon(LOCINFO *lip)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 
 	if (lip->intspeed == 0) lip->intspeed = TO_SPEED ;
 
@@ -283,7 +249,7 @@ int locinfo_defdaemon(LOCINFO *lip)
 
 int locinfo_lockbegin(LOCINFO *lip)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 	LFM		*lfp ;
 	int		rs = SR_OK ;
 	cchar		*pidcname = "pid" ;
@@ -321,7 +287,7 @@ int locinfo_lockbegin(LOCINFO *lip)
 
 int locinfo_lockcheck(LOCINFO *lip)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 	LFM_CHECK	ci ;
 	int		rs = SR_OK ;
 
@@ -382,7 +348,7 @@ int locinfo_lockend(LOCINFO *lip)
 
 int locinfo_tmpourdname(LOCINFO *lip)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 	mode_t		dm = 0775 ;
 	int		rs = SR_OK ;
 	int		pl = 0 ;
@@ -465,7 +431,7 @@ int locinfo_tmpourdname(LOCINFO *lip)
 
 int locinfo_msfile(LOCINFO *lip)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 	const mode_t	msmode = 0666 ;
 	int		rs = SR_OK ;
 	int		mfl = -1 ;
@@ -567,7 +533,7 @@ int locinfo_reqfname(LOCINFO *lip)
 
 int locinfo_ipcpid(LOCINFO *lip,int f)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 	cint	of = (O_CREAT | O_WRONLY | O_TRUNC) ;
 	int		rs = SR_OK ;
 	cchar		*pidcname = PIDCNAME ;
@@ -643,7 +609,7 @@ int locinfo_ipcpid(LOCINFO *lip,int f)
 
 int locinfo_gidrootname(LOCINFO *lip)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -678,7 +644,7 @@ int locinfo_gidrootname(LOCINFO *lip)
 
 int locinfo_reqexit(LOCINFO *lip,cchar *reason)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 	int		rs ;
 	cchar		*fmt = "reqexit · reason=%s" ;
 	if (reason == NULL) reason = "" ;
@@ -702,7 +668,7 @@ int locinfo_isreqexit(LOCINFO *lip)
 
 local int locinfo_lockbeginone(LOCINFO *lip,LFM *lfp,cchar *lockfname)
 {
-	PROGINFO	*pip = lip->pip ;
+	PI	*pip = lip->pip ;
 	const mode_t	dmode = 0777 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
