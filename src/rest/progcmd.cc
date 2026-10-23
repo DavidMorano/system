@@ -61,20 +61,16 @@
 
 #define	NIOVECS		1
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	isBadSend(int) ;
 extern int	isBadRecv(int) ;
 extern int	isBadMsg(int) ;
@@ -93,15 +89,15 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* forward references */
 
-static int	progcmder(PROGINFO *,ARGINFO *,bfile *,
+local int	progcmder(PROGINFO *,ARGINFO *,bfile *,
 			int,SOCKADDRESS *,int) ;
-static int	progcmder_status(PROGINFO *,ARGINFO *,bfile *,
+local int	progcmder_status(PROGINFO *,ARGINFO *,bfile *,
 			int,SOCKADDRESS *,int) ;
-static int	progcmder_listeners(PROGINFO *,ARGINFO *,bfile *,
+local int	progcmder_listeners(PROGINFO *,ARGINFO *,bfile *,
 			int,SOCKADDRESS *,int) ;
-static int	progcmder_mark(PROGINFO *,ARGINFO *,bfile *,
+local int	progcmder_mark(PROGINFO *,ARGINFO *,bfile *,
 			int,SOCKADDRESS *,int) ;
-static int	progcmder_help(PROGINFO *,ARGINFO *,bfile *,
+local int	progcmder_help(PROGINFO *,ARGINFO *,bfile *,
 			int,SOCKADDRESS *,int) ;
 
 
@@ -163,15 +159,15 @@ int progcmd(PROGINFO *pip,ARGINFO *aip)
 
 	            if (rs >= 0) {
 	                const mode_t	om = 0666 ;
-	                const int	of = (O_RDWR | O_CREAT) ;
+	                cint	of = (O_RDWR | O_CREAT) ;
 
 /* create our socket */
 
 	                if ((rs = opentmpusd(template,of,om,fname)) >= 0) {
 	                    SOCKADDRESS	sa ;
-	                    const int	af = AF_UNIX ;
+	                    cint	af = AF_UNIX ;
 	                    int		fd = rs ;
-	                    const char	*rf = pip->reqfname ;
+	                    cchar	*rf = pip->reqfname ;
 
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(3))
@@ -182,7 +178,7 @@ int progcmd(PROGINFO *pip,ARGINFO *aip)
 /* create the socket-address to the server request socket */
 
 	                    if ((rs = sockaddress_start(&sa,af,rf,0,0)) >= 0) {
-	                        const int	sal = rs ;
+	                        cint	sal = rs ;
 
 	                        rs = progcmder(pip,aip,ofp,fd,&sa,sal) ;
 
@@ -214,7 +210,7 @@ int progcmd(PROGINFO *pip,ARGINFO *aip)
 
 int progcmdname(PROGINFO *pip,int idx,cchar **rpp)
 {
-	const int	nidx = nelements(cmds) ;
+	cint	nidx = nelements(cmds) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
@@ -236,7 +232,7 @@ int progcmdname(PROGINFO *pip,int idx,cchar **rpp)
 /* local subroutines */
 
 
-static int progcmder(pip,aip,ofp,fd,sap,sal)
+local int progcmder(pip,aip,ofp,fd,sap,sal)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bfile		*ofp ;
@@ -295,7 +291,7 @@ int		sal ;
 /* end subroutine (progcmd) */
 
 
-static int progcmder_help(pip,aip,ofp,fd,sap,sal)
+local int progcmder_help(pip,aip,ofp,fd,sap,sal)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bfile		*ofp ;
@@ -307,7 +303,7 @@ int		sal ;
 	struct muximsg_help	i14 ;
 	struct msghdr	ipcmsg ;
 	struct iovec	vecs[NIOVECS + 1] ;
-	const int	to = TO_RECVMSG ;
+	cint	to = TO_RECVMSG ;
 	int		rs = SR_OK ;
 	int		size ;
 	int		mlen ;
@@ -411,7 +407,7 @@ int		sal ;
 /* end subroutine (progcmder_help) */
 
 
-static int progcmder_status(pip,aip,ofp,fd,sap,sal)
+local int progcmder_status(pip,aip,ofp,fd,sap,sal)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bfile		*ofp ;
@@ -423,7 +419,7 @@ int		sal ;
 	struct muximsg_noop	i1 ;
 	struct msghdr	ipcmsg ;
 	struct iovec	vecs[NIOVECS + 1] ;
-	const int	to = TO_RECVMSG ;
+	cint	to = TO_RECVMSG ;
 	int		rs ;
 	int		size ;
 	int		len ;
@@ -504,7 +500,7 @@ int		sal ;
 /* end subroutine (progcmder_status) */
 
 
-static int progcmder_listeners(pip,aip,ofp,fd,sap,sal)
+local int progcmder_listeners(pip,aip,ofp,fd,sap,sal)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bfile		*ofp ;
@@ -516,7 +512,7 @@ int		sal ;
 	struct muximsg_listener		i10 ;
 	struct msghdr	ipcmsg ;
 	struct iovec	vecs[NIOVECS + 1] ;
-	const int	to = TO_RECVMSG ;
+	cint	to = TO_RECVMSG ;
 	int		rs = SR_OK ;
 	int		size ;
 	int		mlen ;
@@ -592,8 +588,8 @@ int		sal ;
 			    uint	rc = i10.rc ;
 	            	    if (rc == muximsgrc_ok) {
 	                	if (i10.name[0] != '\0') {
-	                    	const int	ls = i10.ls ;
-	                    	const char	*sn ;
+	                    	cint	ls = i10.ls ;
+	                    	cchar	*sn ;
 				f_alive = TRUE ;
 	                    if (i10.ls & LISTENSPEC_MDELPEND) {
 	                        sn = "D" ;
@@ -670,7 +666,7 @@ int		sal ;
 /* end subroutine (progcmder_listeners) */
 
 
-static int progcmder_mark(pip,aip,ofp,fd,sap,sal)
+local int progcmder_mark(pip,aip,ofp,fd,sap,sal)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bfile		*ofp ;
@@ -682,8 +678,8 @@ int		sal ;
 	struct muximsg_mark	i11 ;
 	struct msghdr	ipcmsg ;
 	struct iovec	vecs[NIOVECS + 1] ;
-	const int	to = TO_RECVMSG ;
-	const int	ipclen = IPCBUFLEN ;
+	cint	to = TO_RECVMSG ;
+	cint	ipclen = IPCBUFLEN ;
 	int		rs ;
 	int		size ;
 	int		len ;
