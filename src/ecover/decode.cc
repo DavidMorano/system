@@ -51,7 +51,7 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_WRONLY | O_CREAT | O_TRUNC)
+#define	OX_FL		(O_WRONLY | O_CREAT | O_TRUNC)
 
 #undef	BLOCKLEN
 #define	BLOCKLEN	(NOPWORDS * sizeof(ULONG))
@@ -217,7 +217,7 @@ int		ifd, ofd ;
 	        debugprintf("decode: message file=%s\n",pip->msgfname) ;
 #endif
 
-	    rs = uc_open(pip->msgfname,O_FLAGS,0666) ;
+	    rs = uc_open(pip->msgfname,OX_FL,0666) ;
 
 	    if (rs < 0)
 	        goto retearly ;
