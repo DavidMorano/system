@@ -84,7 +84,7 @@
 #include	<snwcpy.h>
 #include	<strwcpy.h>
 #include	<char.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<iserror.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -204,9 +204,6 @@ extern int	strlinelen(cchar *,int,int) ;
 
 extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*strdcpyclean(char *,int,int,cchar *,int) ;
-extern char	*timestr_edate(time_t,char *) ;
-extern char	*timestr_hdate(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -254,86 +251,86 @@ struct procdata {
 
 /* forward references */
 
-static int	procmsg(PROGINFO *, PROCDATA *,int) ;
-static int	procmsgct(PROGINFO *,PROCDATA *,MAILMSG *) ;
-static int	procmsgce(PROGINFO *,PROCDATA *,MAILMSG *) ;
-static int	procmsghdrval(PROGINFO *,PROCDATA *,MAILMSG *,cchar *,int *) ;
-static int	procspam(PROGINFO *,PROCDATA *,MAILMSG *) ;
+local int	procmsg(PROGINFO *, PROCDATA *,int) ;
+local int	procmsgct(PROGINFO *,PROCDATA *,MAILMSG *) ;
+local int	procmsgce(PROGINFO *,PROCDATA *,MAILMSG *) ;
+local int	procmsghdrval(PROGINFO *,PROCDATA *,MAILMSG *,cchar *,int *) ;
+local int	procspam(PROGINFO *,PROCDATA *,MAILMSG *) ;
 
-static int	procmailmsg_spamflag(PROGINFO *,MAILMSG *) ;
-static int	procmailmsg_spamstatus(PROGINFO *,MAILMSG *) ;
-static int	procmailmsg_bogosity(PROGINFO *,MAILMSG *) ;
+local int	procmailmsg_spamflag(PROGINFO *,MAILMSG *) ;
+local int	procmailmsg_spamstatus(PROGINFO *,MAILMSG *) ;
+local int	procmailmsg_bogosity(PROGINFO *,MAILMSG *) ;
 
-static int	procmsger(PROGINFO *,PROCDATA *) ;
+local int	procmsger(PROGINFO *,PROCDATA *) ;
 
-static int	procmsgenv(PROGINFO *,PROCDATA *) ;
-static int	procmsghdrs(PROGINFO *,PROCDATA *) ;
-static int	procmsgout(PROGINFO *,PROCDATA *) ;
-static int	procmsglog(PROGINFO *,PROCDATA *) ;
+local int	procmsgenv(PROGINFO *,PROCDATA *) ;
+local int	procmsghdrs(PROGINFO *,PROCDATA *) ;
+local int	procmsgout(PROGINFO *,PROCDATA *) ;
+local int	procmsglog(PROGINFO *,PROCDATA *) ;
 
-static int	procmsgenver(PROGINFO *,PROCDATA *,char *,int) ;
-static int	procmsgenvdate(PROGINFO *,char *,int,cchar *,int) ;
-static int	procmsgenveraddr(PROGINFO *,PROCDATA *,
+local int	procmsgenver(PROGINFO *,PROCDATA *,char *,int) ;
+local int	procmsgenvdate(PROGINFO *,char *,int,cchar *,int) ;
+local int	procmsgenveraddr(PROGINFO *,PROCDATA *,
 			STACKADDR *,cchar *,int,cchar *,int) ;
-static int	procmsgenvmk(PROGINFO *,PROCDATA *,char *,int) ;
+local int	procmsgenvmk(PROGINFO *,PROCDATA *,char *,int) ;
 
-static int	procmsghdr_messageid(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_articleid(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_newsgroups(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_clen(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_clines(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_xmailer(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_received(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_replyto(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_errorsto(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_sender(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_deliveredto(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_xoriginalto(PROGINFO *,PROCDATA *) ;
-static int	procmsghdr_xpriority(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_messageid(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_articleid(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_newsgroups(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_clen(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_clines(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_xmailer(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_received(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_replyto(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_errorsto(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_sender(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_deliveredto(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_xoriginalto(PROGINFO *,PROCDATA *) ;
+local int	procmsghdr_xpriority(PROGINFO *,PROCDATA *) ;
 
-static int	procmsgoutenv(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdrs(PROGINFO *,PROCDATA *) ;
-static int	procmsgouteol(PROGINFO *,PROCDATA *) ;
-static int	procmsgoutbody(PROGINFO *,PROCDATA *) ;
-static int	procmsgoutback(PROGINFO *,PROCDATA *) ;
+local int	procmsgoutenv(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdrs(PROGINFO *,PROCDATA *) ;
+local int	procmsgouteol(PROGINFO *,PROCDATA *) ;
+local int	procmsgoutbody(PROGINFO *,PROCDATA *) ;
+local int	procmsgoutback(PROGINFO *,PROCDATA *) ;
 
-static int	procmsgouthdr_xenv(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_returnpath(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_received(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_clen(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_clines(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_messageid(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_remaining(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_status(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_references(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_from(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_to(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_cc(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_bcc(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_date(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_subject(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_expires(PROGINFO *,PROCDATA *) ;
-static int	procmsgouthdr_articleid(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_xenv(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_returnpath(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_received(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_clen(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_clines(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_messageid(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_remaining(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_status(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_references(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_from(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_to(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_cc(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_bcc(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_date(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_subject(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_expires(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_articleid(PROGINFO *,PROCDATA *) ;
 #if	CF_NEWSGROUPS
-static int	procmsgouthdr_newsgroups(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_newsgroups(PROGINFO *,PROCDATA *) ;
 #endif
 
 #ifdef	COMMENT
-static int	procmsgouthdr_deliveredto(PROGINFO *,PROCDATA *) ;
+local int	procmsgouthdr_deliveredto(PROGINFO *,PROCDATA *) ;
 #endif
 
-static int	proclogenv(PROGINFO *,int,MAILMSG_ENVER *) ;
-static int	procmsglogaddr(PROGINFO *,cchar *,
+local int	proclogenv(PROGINFO *,int,MAILMSG_ENVER *) ;
+local int	procmsglogaddr(PROGINFO *,cchar *,
 			cchar *,int) ;
-static int	procmsglogema(PROGINFO *,cchar *,EMA *) ;
-static int	procmsglog_date(PROGINFO *,cchar *,int) ;
+local int	procmsglogema(PROGINFO *,cchar *,EMA *) ;
+local int	procmsglog_date(PROGINFO *,cchar *,int) ;
 
-static int	cheapspamcheck(PROGINFO *,cchar *,int) ;
-static int	vcmpheadname(cchar **,cchar **) ;
+local int	cheapspamcheck(PROGINFO *,cchar *,int) ;
+local int	vcmpheadname(cchar **,cchar **) ;
 
-static int	mkarticlefile(PROGINFO *,PROCDATA *,char *,
+local int	mkarticlefile(PROGINFO *,PROCDATA *,char *,
 			cchar *) ;
-static int	mknewhdrname(char *,int,cchar *) ;
+local int	mknewhdrname(char *,int,cchar *) ;
 
 
 /* local variables */
@@ -344,7 +341,7 @@ static cchar	atypes[] = "LUIR" ;	/* address types */
 
 static cchar	blanks[] = "                    " ;
 
-static int (*msghdrgets[])(PROGINFO *,PROCDATA *) = {
+local int (*msghdrgets[])(PROGINFO *,PROCDATA *) = {
 	procmsghdr_messageid,
 	procmsghdr_articleid,
 	procmsghdr_newsgroups,
@@ -361,7 +358,7 @@ static int (*msghdrgets[])(PROGINFO *,PROCDATA *) = {
 	NULL
 } ;
 
-static int (*msgouthdrs[])(PROGINFO *,PROCDATA *) = {
+local int (*msgouthdrs[])(PROGINFO *,PROCDATA *) = {
 	procmsgouthdr_xenv,
 	procmsgouthdr_returnpath,
 	procmsgouthdr_received,
@@ -555,7 +552,7 @@ vecstr		*nlp ;
 
 
 /* process the current message */
-static int procmsg(pip,pdp,f_eoh)
+local int procmsg(pip,pdp,f_eoh)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 int		f_eoh ;
@@ -624,7 +621,7 @@ int		f_eoh ;
 /* end subroutine (procmsg) */
 
 
-static int procmsger(pip,pdp)
+local int procmsger(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -694,7 +691,7 @@ PROCDATA	*pdp ;
 
 
 /* process the envelope information */
-static int procmsgenv(pip,pdp)
+local int procmsgenv(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -754,7 +751,7 @@ PROCDATA	*pdp ;
 
 
 /* process MAILMSG envelope information */
-static int procmsgenver(pip,pdp,abuf,alen)
+local int procmsgenver(pip,pdp,abuf,alen)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 char		abuf[] ;
@@ -862,7 +859,7 @@ int		alen ;
 /* end subroutine (procmsgenver) */
 
 
-static int procmsgenveraddr(pip,pdp,sap,hp,hl,up,ul)
+local int procmsgenveraddr(pip,pdp,sap,hp,hl,up,ul)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 STACKADDR	*sap ;
@@ -895,7 +892,7 @@ int		ul ;
 /* end subroutine (procmsgenveraddr) */
 
 
-static int procmsgenvdate(pip,dbuf,dlen,ep,el)
+local int procmsgenvdate(pip,dbuf,dlen,ep,el)
 PROGINFO	*pip ;
 char		dbuf[] ;
 int		dlen ;
@@ -920,7 +917,7 @@ int		el ;
 /* end subroutine (procmsgenvdate) */
 
 
-static int procmsgenvmk(PROGINFO *pip,PROCDATA *pdp,char *sabuf,int salen)
+local int procmsgenvmk(PROGINFO *pip,PROCDATA *pdp,char *sabuf,int salen)
 {
 	int		rs = SR_OK ;
 	int		sal = 0 ;
@@ -945,7 +942,7 @@ static int procmsgenvmk(PROGINFO *pip,PROCDATA *pdp,char *sabuf,int salen)
 /* end subroutine (procmsgenvmk) */
 
 
-static int procmsghdrs(PROGINFO *pip,PROCDATA *pdp)
+local int procmsghdrs(PROGINFO *pip,PROCDATA *pdp)
 {
 	ARTICLE		*aip = pdp->aip ;
 	MAILMSG		*msgp = pdp->msgp ;
@@ -963,7 +960,7 @@ static int procmsghdrs(PROGINFO *pip,PROCDATA *pdp)
 
 
 /* mailmsg message-ID */
-static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
+local int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 {
 	ARTICLE		*aip = pdp->aip ;
 	MAILMSG		*msgp = pdp->msgp ;
@@ -1058,7 +1055,7 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 
 
 /* article-ID */
-static int procmsghdr_articleid(PROGINFO *pip,PROCDATA *pdp)
+local int procmsghdr_articleid(PROGINFO *pip,PROCDATA *pdp)
 {
 	ARTICLE		*aip = pdp->aip ;
 	MAILMSG		*msgp = pdp->msgp ;
@@ -1092,7 +1089,7 @@ static int procmsghdr_articleid(PROGINFO *pip,PROCDATA *pdp)
 
 
 /* news-groups */
-static int procmsghdr_newsgroups(pip,pdp)
+local int procmsghdr_newsgroups(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1125,7 +1122,7 @@ PROCDATA	*pdp ;
 
 
 /* mailmsg content-length */
-static int procmsghdr_clen(pip,pdp)
+local int procmsghdr_clen(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1161,7 +1158,7 @@ PROCDATA	*pdp ;
 
 
 /* mailmsg content-lines */
-static int procmsghdr_clines(pip,pdp)
+local int procmsghdr_clines(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1201,7 +1198,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsghdr_clines) */
 
 
-static int procmsghdr_xmailer(pip,pdp)
+local int procmsghdr_xmailer(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1244,7 +1241,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsghdr_xmailer) */
 
 
-static int procmsghdr_received(pip,pdp)
+local int procmsghdr_received(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1371,7 +1368,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsghdr_received) */
 
 
-static int procmsghdr_replyto(pip,pdp)
+local int procmsghdr_replyto(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1398,7 +1395,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsghdr_replyto) */
 
 
-static int procmsghdr_errorsto(pip,pdp)
+local int procmsghdr_errorsto(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1425,7 +1422,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsghdr_errorsto) */
 
 
-static int procmsghdr_sender(pip,pdp)
+local int procmsghdr_sender(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1452,7 +1449,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsghdr_sender) */
 
 
-static int procmsghdr_deliveredto(pip,pdp)
+local int procmsghdr_deliveredto(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1479,7 +1476,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsghdr_deliveredto) */
 
 
-static int procmsghdr_xoriginalto(pip,pdp)
+local int procmsghdr_xoriginalto(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1506,7 +1503,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsghdr_xoriginal) */
 
 
-static int procmsghdr_xpriority(pip,pdp)
+local int procmsghdr_xpriority(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1578,7 +1575,7 @@ PROCDATA	*pdp ;
 
 
 /* start writing the output file */
-static int procmsgout(pip,pdp)
+local int procmsgout(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1672,7 +1669,7 @@ PROCDATA	*pdp ;
 
 
 /* write out our own (new) envelope */
-static int procmsgoutenv(pip,pdp)
+local int procmsgoutenv(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1741,7 +1738,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgoutenv) */
 
 
-static int procmsgouthdrs(pip,pdp)
+local int procmsgouthdrs(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1774,7 +1771,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdrs) */
 
 
-static int procmsgouthdr_xenv(pip,pdp)
+local int procmsgouthdr_xenv(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1841,7 +1838,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_xenv) */
 
 
-static int procmsgouthdr_returnpath(pip,pdp)
+local int procmsgouthdr_returnpath(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1886,7 +1883,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_returnpath) */
 
 
-static int procmsgouthdr_received(pip,pdp)
+local int procmsgouthdr_received(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1923,7 +1920,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_received) */
 
 
-static int procmsgouthdr_clen(pip,pdp)
+local int procmsgouthdr_clen(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -1960,7 +1957,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_clen) */
 
 
-static int procmsgouthdr_clines(pip,pdp)
+local int procmsgouthdr_clines(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2006,7 +2003,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_clines) */
 
 
-static int procmsgouthdr_messageid(pip,pdp)
+local int procmsgouthdr_messageid(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2041,7 +2038,7 @@ PROCDATA	*pdp ;
 
 
 /* put out all remaining headers */
-static int procmsgouthdr_remaining(pip,pdp)
+local int procmsgouthdr_remaining(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2103,7 +2100,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_remaining) */
 
 
-static int procmsgouthdr_status(pip,pdp)
+local int procmsgouthdr_status(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2152,7 +2149,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_status) */
 
 
-static int procmsgouthdr_references(pip,pdp)
+local int procmsgouthdr_references(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2172,7 +2169,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_references) */
 
 
-static int procmsgouthdr_from(pip,pdp)
+local int procmsgouthdr_from(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2210,7 +2207,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_from) */
 
 
-static int procmsgouthdr_to(pip,pdp)
+local int procmsgouthdr_to(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2237,7 +2234,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_to) */
 
 
-static int procmsgouthdr_cc(pip,pdp)
+local int procmsgouthdr_cc(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2264,7 +2261,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_cc) */
 
 
-static int procmsgouthdr_bcc(pip,pdp)
+local int procmsgouthdr_bcc(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2291,7 +2288,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_bcc) */
 
 
-static int procmsgouthdr_date(pip,pdp)
+local int procmsgouthdr_date(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2374,7 +2371,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_date) */
 
 
-static int procmsgouthdr_subject(pip,pdp)
+local int procmsgouthdr_subject(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2472,7 +2469,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_subject) */
 
 
-static int procmsgouthdr_expires(pip,pdp)
+local int procmsgouthdr_expires(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2496,7 +2493,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouthdr_expires) */
 
 
-static int procmsgouthdr_articleid(pip,pdp)
+local int procmsgouthdr_articleid(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2529,7 +2526,7 @@ PROCDATA	*pdp ;
 
 
 #if	CF_NEWSGROUPS
-static int procmsgouthdr_newsgroups(pip,pdp)
+local int procmsgouthdr_newsgroups(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2626,7 +2623,7 @@ PROCDATA	*pdp ;
 
 
 #ifdef	COMMENT
-static int procmsgouthdr_deliveredto(pip,pdp)
+local int procmsgouthdr_deliveredto(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2734,7 +2731,7 @@ PROCDATA	*pdp ;
 #endif /* COMMENT */
 
 
-static int procmsgouteol(pip,pdp)
+local int procmsgouteol(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2757,7 +2754,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgouteol) */
 
 
-static int procmsgoutbody(pip,pdp)
+local int procmsgoutbody(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -2946,7 +2943,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgoutbody) */
 
 
-static int procmsgoutback(pip,pdp)
+local int procmsgoutback(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -3013,7 +3010,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsgoutback) */
 
 
-static int procmsglog(pip,pdp)
+local int procmsglog(pip,pdp)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 {
@@ -3048,7 +3045,7 @@ PROCDATA	*pdp ;
 /* end subroutine (procmsglog) */
 
 
-static int procmsgct(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
+local int procmsgct(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -3101,7 +3098,7 @@ static int procmsgct(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 /* end subroutine (procmsgct) */
 
 
-static int procmsgce(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
+local int procmsgce(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -3153,7 +3150,7 @@ static int procmsgce(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 /* end subroutine (procmsgce) */
 
 
-static int procmsghdrval(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp,
+local int procmsghdrval(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp,
 		cchar *hname,int *valp)
 {
 	int		rs ;
@@ -3182,7 +3179,7 @@ static int procmsghdrval(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp,
 
 
 #ifdef	COMMENT
-static int procmsgaddr(pip,at,hdrname,ap,al)
+local int procmsgaddr(pip,at,hdrname,ap,al)
 PROGINFO	*pip ;
 int		at ;
 cchar	hdrname[] ;
@@ -3294,7 +3291,7 @@ ret0:
 #endif /* COMMENT */
 
 
-static int procspam(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
+local int procspam(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 {
 	int		rs = SR_OK ;
 	int		f_spam = FALSE ;
@@ -3359,7 +3356,7 @@ static int procspam(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 /* end subroutine (procspam) */
 
 
-static int procmsglogaddr(pip,hdrname,ap,al)
+local int procmsglogaddr(pip,hdrname,ap,al)
 PROGINFO	*pip ;
 cchar	hdrname[] ;
 cchar	*ap ;
@@ -3394,7 +3391,7 @@ int		al ;
 /* end subroutine (procmsglogaddr) */
 
 
-static int procmsglogema(pip,hdrname,emap)
+local int procmsglogema(pip,hdrname,emap)
 PROGINFO	*pip ;
 cchar	hdrname[] ;
 EMA		*emap ;
@@ -3476,7 +3473,7 @@ EMA		*emap ;
 /* end subroutine (procmsglogema) */
 
 
-static int procmsglog_date(pip,vp,vl)
+local int procmsglog_date(pip,vp,vl)
 PROGINFO	*pip ;
 cchar	*vp ;
 int		vl ;
@@ -3528,7 +3525,7 @@ int		vl ;
 /* end subroutine (procmsglog_date) */
 
 
-static int procmailmsg_spamflag(pip,msgp)
+local int procmailmsg_spamflag(pip,msgp)
 PROGINFO	*pip ;
 MAILMSG		*msgp ;
 {
@@ -3569,7 +3566,7 @@ MAILMSG		*msgp ;
 /* end subroutine (procmailmsg_spamflag) */
 
 
-static int procmailmsg_spamstatus(pip,msgp)
+local int procmailmsg_spamstatus(pip,msgp)
 PROGINFO	*pip ;
 MAILMSG		*msgp ;
 {
@@ -3610,7 +3607,7 @@ MAILMSG		*msgp ;
 /* end subroutine (procmailmsg_spamstatus) */
 
 
-static int procmailmsg_bogosity(pip,msgp)
+local int procmailmsg_bogosity(pip,msgp)
 PROGINFO	*pip ;
 MAILMSG		*msgp ;
 {
@@ -3651,7 +3648,7 @@ MAILMSG		*msgp ;
 /* end subroutine (procmailmsg_bogosity) */
 
 
-static int proclogenv(PROGINFO *pip,int ei,MAILMSG_ENVER *mep)
+local int proclogenv(PROGINFO *pip,int ei,MAILMSG_ENVER *mep)
 {
 	int		rs = SR_OK ;
 	int		cl ;
@@ -3709,7 +3706,7 @@ static int proclogenv(PROGINFO *pip,int ei,MAILMSG_ENVER *mep)
 
 #if	CF_SPAMSUBJECT
 
-static int cheapspamcheck(pip,buf,buflen)
+local int cheapspamcheck(pip,buf,buflen)
 PROGINFO	*pip ;
 cchar	buf[] ;
 int		buflen ;
@@ -3753,7 +3750,7 @@ int		buflen ;
 
 
 #if	CF_MKARTFILE
-static int mkarticlefile(pip,pdp,afname,tdname)
+local int mkarticlefile(pip,pdp,afname,tdname)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 char		afname[] ;
@@ -3786,7 +3783,7 @@ cchar	tdname[] ;
 }
 /* end subroutine (mkarticlefile) */
 #else /* CF_MKARTFILE */
-static int mkarticlefile(pip,pdp,afname,tdname)
+local int mkarticlefile(pip,pdp,afname,tdname)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 char		afname[] ;
@@ -3828,7 +3825,7 @@ cchar	tdname[] ;
 
 
 /* make (really clean-up) a header key-name */
-static int mknewhdrname(hbuf,hlen,hdrname)
+local int mknewhdrname(hbuf,hlen,hdrname)
 char		hbuf[] ;
 int		hlen ;
 cchar	hdrname[] ;
@@ -3859,7 +3856,7 @@ cchar	hdrname[] ;
 /* end subroutine (mknewhdrname) */
 
 
-static int vcmpheadname(cchar **e1pp,cchar  **e2pp) noex {
+local int vcmpheadname(cchar **e1pp,cchar  **e2pp) noex {
 	if ((*e1pp == NULL) && (*e2pp == NULL))
 	    return 0 ;
 
