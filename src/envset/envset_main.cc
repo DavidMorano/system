@@ -2581,9 +2581,9 @@ local int loadtz(PROGINFO *pip)
 
 	if ((pip->tz == nullptr) || (pip->tz[0] == '\0') || (sid == pip->pid)) {
 	    USERATTR	ua ;
-	    cint	alen = TZLEN ;
+	    cint	alen = TZNAMELEN ;
 	    int		al = 0 ;
-	    char	abuf[TZLEN+1] = { 0 } ;
+	    char	abuf[TZNAMELEN+1] = { 0 } ;
 
 	    if ((rs = userattrdb_open(&ua,pip->username)) >= 0) {
 	        if ((rs = userattrdb_lookup(&ua,abuf,alen,UA_TZ)) >= 0) {
