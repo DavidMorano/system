@@ -1,4 +1,5 @@
 /* proginfo_nameid SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* utility for KSH built-in commands */
