@@ -95,7 +95,6 @@
 
 /* external subroutines */
 
-extern int	expander(PROGINFO *,char *,int,char *,int) ;
 extern int	procfileenv(char *,char *,vecstr *) ;
 extern int	procfilepaths(char *,char *,vecstr *) ;
 extern int	process_input(PROGINFO *,int) ;
@@ -1089,7 +1088,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cf.root,
 	            -1,buf,BUFLEN)) > 0) &&
-	            ((l2 = expander(pip,buf,sl,buf2,BUFLEN)) > 0)) {
+	            ((l2 = expander(pip,buf2,BUFLEN,buf,sl)) > 0)) {
 
 	            pip->pr = mallocstrw(buf2,l2) ;
 
@@ -1109,7 +1108,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cp,
 	            -1,buf,BUFLEN)) > 0) &&
-	            ((l2 = expander(pip,buf,sl,buf2,BUFLEN)) > 0)) {
+	            ((l2 = expander(pip,buf2,BUFLEN,buf,sl)) > 0)) {
 
 #if	CF_DEBUG
 	            if (pip->debuglevel > 1)
@@ -1144,7 +1143,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cf.workdir,
 	            -1,buf,BUFLEN)) > 0) &&
-	            ((l2 = expander(pip,buf,sl,buf2,BUFLEN)) > 0)) {
+	            ((l2 = expander(pip,buf2,BUFLEN,buf,sl)) > 0)) {
 
 	            pip->workdname = mallocstrw(buf2,l2) ;
 
@@ -1164,7 +1163,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	            if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cf.pidfname,
 	                -1,buf,BUFLEN)) > 0) &&
-	                ((l2 = expander(pip,buf,sl, buf2,BUFLEN)) > 0)) {
+	                ((l2 = expander(pip,buf,BUFLEN,buf,sl)) > 0)) {
 
 	                strwcpy(pidfname,buf2,l2) ;
 
@@ -1191,7 +1190,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	            if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cf.lockfname,
 	                -1,buf,BUFLEN)) > 0) &&
-	                ((l2 = expander(pip,buf,sl, buf2,BUFLEN)) > 0)) {
+	                ((l2 = expander(pip,buf2,BUFLEN,buf,sl)) > 0)) {
 
 	                strwcpy(lockfname,buf2,l2) ;
 
@@ -1223,7 +1222,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cf.logfname,
 	            -1,buf,BUFLEN)) > 0) &&
-	            ((l2 = expander(pip,buf,sl,buf2,BUFLEN)) > 0)) {
+	            ((l2 = expander(pip,buf2,BUFLEN,buf,sl)) > 0)) {
 
 	            strwcpy(logfname,buf2,l2) ;
 
@@ -1252,7 +1251,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cf.timeout,
 	            -1,buf,BUFLEN)) > 0) &&
-	            ((l2 = expander(pip,buf,sl,buf2,BUFLEN)) > 0)) {
+	            ((l2 = expander(pip,buf2,lBUFLEN,buf,sl)) > 0)) {
 
 	            if (cfdeci(buf2,l2,&val) >= 0)
 	                to = val ;
@@ -1318,7 +1317,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cf.options,
 	            -1,buf,BUFLEN)) > 0) &&
-	            ((sl2 = expander(pip,buf,sl,buf2,BUFLEN)) > 0)) {
+	            ((sl2 = expander(pip,buf2,BUFLEN,buf,sl)) > 0)) {
 
 	            field_start(&fsb,buf2,sl2) ;
 
@@ -1466,7 +1465,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	        if (((sl = varsub_subbuf(&vsh_d,&vsh_e,cp,
 	            -1,buf,BUFLEN)) > 0) &&
-	            ((l2 = expander(pip,buf,sl,buf2,BUFLEN)) > 0)) {
+	            ((l2 = expander(pip,buf2,BUFLEN,buf,sl)) > 0)) {
 
 #if	CF_DEBUG
 	            if (pip->debuglevel > 1)
