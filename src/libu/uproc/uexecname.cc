@@ -75,9 +75,9 @@ using usys::usys_execname ;		/* subroutine */
 
 int u_execname(char *rbuf,int rlen) noex {
     	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen > 0) {
+	    if (rlen > 0) ylikely {
 		rs = usys_execname(rbuf,rlen) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
