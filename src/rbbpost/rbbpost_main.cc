@@ -58,7 +58,7 @@
 #include	<keyopt.h>		/* LIBUC */
 #include	<tmz.hh>		/* LIBUC */
 #include	<tmtime.hh>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC */
 #include	<userinfo.h>		/* LIBUC */
@@ -117,7 +117,7 @@ extern int	broadcast(PROGINFO *,vecitem *,BBHOSTS *,BBHOSTS *) ;
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
+extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
@@ -216,7 +216,7 @@ local int	pcsconf_mkdir() ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"TMPDIR",
@@ -284,7 +284,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"squery",
 	"expires",
 	"maint",
@@ -413,7 +413,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -711,7 +711,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -811,7 +811,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                                if (argp[0] == '+') {
 	                                    lip->fl.def_from = TRUE ;
 	                                } else if (argp[0] != '-') {
-					    const int	al = argl ;
+					    cint	al = argl ;
 					    cchar	*ap = argp ;
 	                                    rs = locinfo_hdrfrom(lip,ap,al) ;
 	                                }
@@ -981,7 +981,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	pip->newsdname = ndname ;
 
-	timestr_logz(pip->daytime,pip->stamp) ;
+	strtime_logz(pip->daytime,pip->stamp) ;
 
 /* argument information */
 
@@ -1119,7 +1119,7 @@ badprogstart:
 	    if (mdiff > 0) {
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
-	        const int	size = (10*sizeof(uint)) ;
+	        cint	size = (10*sizeof(uint)) ;
 	        cchar		*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
@@ -1306,7 +1306,7 @@ local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->gid_pcs = -1 ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1361,8 +1361,8 @@ local int procpcsconf_begin(PROGINFO *pip,PCSCONF *pcp)
 	    if (DEBUGLEVEL(3)) {
 	        PCSCONF_CUR	cur ;
 	        if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
-	            const int	klen = KBUFLEN ;
-	            const int	vlen = VBUFLEN ;
+	            cint	klen = KBUFLEN ;
+	            cint	vlen = VBUFLEN ;
 	            int		vl ;
 	            char	kbuf[KBUFLEN+1] ;
 	            char	vbuf[VBUFLEN+1] ;
@@ -1485,7 +1485,7 @@ cchar		*ifn ;
 	        if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	        if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1667,7 +1667,7 @@ vecstr		*nlp ;
 {
 	ARTICLE		*aip ;
 	EMA		*emap ;
-	const int	at = articleaddr_newsgroups ;
+	cint	at = articleaddr_newsgroups ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ai ;
@@ -1729,7 +1729,7 @@ cchar		*np ;
 int		nl ;
 {
 	LI		*lip = pip->lip ;
-	const int	st = articlestr_articleid ;
+	cint	st = articlestr_articleid ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*pn = pip->progname ;
@@ -1747,7 +1747,7 @@ int		nl ;
 	        char	ngdname[MAXPATHLEN+1] ;
 
 	        if ((rs = locinfo_ngdname(lip,ngdname,np,nl)) > 0) {
-	            const int	ngdlen = rs ;
+	            cint	ngdlen = rs ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4))
@@ -1836,7 +1836,7 @@ cchar		*sp ;
 
 local int procartdel(PROGINFO *pip,TDINFO *tip,ARTICLE *aip)
 {
-	const int	st = articlestr_articleid ;
+	cint	st = articlestr_articleid ;
 	int		rs ;
 	cchar		*sp ;
 
@@ -1918,7 +1918,7 @@ local int procnewsdname(PROGINFO *pip)
 	if ((pip->newsdname == NULL) && pip->open.pcsconf) {
 	    PCSCONF	*pcp = pip->pcsconf ;
 	    PCSCONF_CUR	cur ;
-	    const int	vlen = VBUFLEN ;
+	    cint	vlen = VBUFLEN ;
 	    char	vbuf[VBUFLEN+1] ;
 	    if ((rs = pcsconf_curbegin(pcp,&cur)) >= 0) {
 	        cchar	*k = "bb:newsdir" ;
@@ -2307,8 +2307,8 @@ local int locinfo_ngdname(LI *lip,char *ngdname,cchar *np,int nl)
 	if (nl < 0) nl = strlen(np) ;
 
 	if (! lip->open.ngmap) {
-	    const int	f = (pip->fl.artmaint || pip->fl.artexpires) ;
-	    const int	n = ((f) ? 1024 : 1) ;
+	    cint	f = (pip->fl.artmaint || pip->fl.artexpires) ;
+	    cint	n = ((f) ? 1024 : 1) ;
 	    rs = hdbstr_start(mlp,n) ;
 	    lip->open.ngmap = (rs >= 0) ;
 	}
@@ -2362,7 +2362,7 @@ int progexpiration(PROGINFO *pip,cchar **rpp) noex {
 	if (pip == NULL) return SR_FAULT ;
 	if (pip->ti_expires > 0) {
 	    if (pip->expdate[0] == '\0') {
-	        timestr_msg(pip->ti_expires,pip->expdate) ;
+	        strtime_msg(pip->ti_expires,pip->expdate) ;
 	    }
 	    rs = strlen(pip->expdate) ;
 	} /* end if (have expiration date) */
