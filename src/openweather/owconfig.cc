@@ -1,18 +1,16 @@
-/* owconfig */
+/* owconfig SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* handle open-weather (OW) configuration functions */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	1		/* non-switchable debug print-outs */
-
+#define	CF_DEBUG	1		/* non-switchable debug print-outs */
 
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-
 	This code was originally written.  
-
 
 */
 
@@ -20,28 +18,26 @@
 
 /**************************************************************************
 
+  	Description:
 	These subroutines form part of the OW subroutine (yes, getting
 	a little bit more complicated every day now).
 
-
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctype.h>
-#include	<ctime>
 #include	<netdb.h>
-
-#include	<usystem.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<csysbase.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
@@ -51,16 +47,13 @@
 #include	<getusername.h>
 #include	<getutmpent.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"ow.h"
 #include	"owconfig.h"
 
 
 /* local defines */
-
-#ifndef	TO_POLL_INTMULT
-#define	TO_POLL_INTMULT	1000
-#endif
 
 #ifndef	PBUFLEN
 #define	PBUFLEN		(4 * MAXPATHLEN)
@@ -74,10 +67,6 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #ifndef	IPCBUFLEN
 #define	IPCBUFLEN	MSGBUFLEN
 #endif
@@ -85,48 +74,14 @@
 #define	CMSGBUFLEN	256
 #define	NIOVECS		1
 
-#ifndef	TTYFNAME
-#define	TTYFNAME	"/dev/tty"
-#endif
-
 #undef	TMPDMODE
 #define	TMPDMODE	0777
 
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	getutmpterm(char *,int,pid_t) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	securefile(cchar *,uid_t,gid_t) ;
-extern int	getserial(cchar *) ;
-
 extern int	ow_setfname(OW *,char *,cchar *,int,
 			int,cchar *,cchar *,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -201,7 +156,7 @@ cchar	*cfname ;
 	memset(cfp,0,sizeof(OWCONFIG)) ;
 	cfp->lip = lip ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	{
 	    debugprintf("owconfig_start: cfname=%s\n",cfname) ;
 	    debugprintf("owconfig_start: nodename=%s\n",lip->nodename) ;
@@ -234,7 +189,7 @@ cchar	*cfname ;
 
 ret0:
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("owconfig_start: ret rs=%d \n",rs) ;
 #endif
 
@@ -304,13 +259,13 @@ OWCONFIG	*cfp ;
 
 	if (cfp->fl.p) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msumain/owconfig_check: paramfile_check()\n") ;
 #endif
 
 	    rs = paramfile_check(&cfp->p,lip->daytime) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msumain/owconfig_check: paramfile_check() rs=%d\n",rs) ;
 #endif
 
@@ -319,7 +274,7 @@ OWCONFIG	*cfp ;
 	        f = TRUE ;
 	        rs = owconfig_read(cfp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msumain/owconfig_check: owconfig_read() rs=%d\n",rs) ;
 #endif
 
@@ -357,7 +312,7 @@ OWCONFIG	*cfp ;
 	cchar	*ep ;
 
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("owconfig_read: f_p=%u\n",cfp->fl.p) ;
 #endif
 
@@ -395,7 +350,7 @@ OWCONFIG	*cfp ;
 	            ebuf[el] = '\0' ;
 	    } /* end if */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    {
 	        debugprintf("progconfigread: ebuf=>%r<\n",ebuf,el) ;
 	        debugprintf("progconfigread: param=%s(%u)\n",
