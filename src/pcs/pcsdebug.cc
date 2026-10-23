@@ -5,7 +5,6 @@
 /* PCS-debug */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable at invocation */
 
 /* revision history:
@@ -40,17 +39,18 @@
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"pcsmain.h"
 #include	"pcslocinfo.h"
 #include	"pcslog.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
 
-#ifndef	PROGINFO
-#define	PROGINFO	struct proginfo
+#ifndef	PI
+#define	PI		proginfo
 #endif
 
 #ifndef	PBUFLEN
@@ -65,10 +65,6 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #define	NDF		"/tmp/pcs.deb"
 
 
@@ -79,11 +75,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strllen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -103,7 +94,7 @@ extern int	strllen(cchar *,int,int) ;
 
 /* exported subroutines */
 
-int pcsdebug_lockprint(PROGINFO *pip,cchar *place) noex {
+int pcsdebug_lockprint(PI *pip,cchar *place) noex {
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ;
