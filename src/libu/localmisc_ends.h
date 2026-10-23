@@ -32,10 +32,10 @@
 
 
 #ifndef	eol
-#define	eol		'\n'
+#define	eol		'\n'		/* end-of-line */
 #endif
 #ifndef	eos
-#define	eos		'\0'
+#define	eos		'\0'		/* end-of-string */
 #endif
 
 
