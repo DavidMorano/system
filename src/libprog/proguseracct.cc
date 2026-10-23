@@ -5,7 +5,6 @@
 /* handle some login-based stuff */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_LINEFOLD	0		/* use 'linefold(3dam)' */
 #define	CF_CLEAN	0		/* clean lines */
