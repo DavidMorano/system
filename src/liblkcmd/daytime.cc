@@ -40,20 +40,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strlen(3c)| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<estrings.h>
 #include	<modload.h>
 #include	<nistinfo.h>		/* LIBUC */
 #include	<strtime.h>		/* LIBUC */
-#include	<localmisc.h>		/* |REALNAMELEN| */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"mfserve.h"
 #include	"daytime.h"
@@ -66,10 +66,6 @@ import libutil ;			/* |memclear(3u)| */
 
 #define	DT		daytime
 
-#ifndef	ORGCODELEN
-#define	ORGCODELEN	REALNAMELEN
-#endif
-
 #define	DAYTIME_CSIZE	100 	/* default arg-chuck size */
 
 
@@ -80,7 +76,7 @@ import libutil ;			/* |memclear(3u)| */
 
 extern "C" {
     typedef int	(*thrsub_f)(void *) noex ;
-}
+} /* end extern (C) */
 
 typedef mainv	mv ;
 
@@ -103,8 +99,7 @@ local int daytime_ctor(lfm *op,Args ... args) noex {
 	    rs = memclear(op) ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (daytime_ctor) */
+} /* end subroutine (daytime_ctor) */
 
 local int daytime_dtor(lfm *op) noex {
 	int		rs = SR_FAULT ;
@@ -112,8 +107,7 @@ local int daytime_dtor(lfm *op) noex {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (daytime_dtor) */
+} /* end subroutine (daytime_dtor) */
 
 template<typename ... Args>
 local inline int daytime_magic(lfm *op,Args ... args) noex {
@@ -122,8 +116,7 @@ local inline int daytime_magic(lfm *op,Args ... args) noex {
 	    rs = (op->magic == DAYTIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
-}
-/* end subroutine (daytime_magic) */
+} /* end subroutine (daytime_magic) */
 
 local int daytime_argsbegin(DT *,cchar **) noex ;
 local int daytime_argsend(DT *) noex ;
@@ -135,11 +128,11 @@ local int daytime_worker(DT *) noex ;
 
 /* exported variables */
 
-DAYTIME_OBJ	daytime_modinfo = {
+const DAYTIME_OBJ	daytime_modinfo = {
 	"daytime",
 	szof(daytime),
 	0
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -170,8 +163,7 @@ int daytime_start(DT *op,cc *pr,SREQ *jep,mv argv,mv envv) noex {
 	    }
 	} /* end if (daytime_ctor) */
 	return rs ;
-}
-/* end subroutine (daytime_start) */
+} /* end subroutine (daytime_start) */
 
 int daytime_finish(DT *op) noex {
 	int		rs ;
@@ -198,8 +190,7 @@ int daytime_finish(DT *op) noex {
 	    op->magic = 0 ;
 	} /* end if (daytime_magic) */
 	return rs ;
-}
-/* end subroutine (daytime_finish) */
+} /* end subroutine (daytime_finish) */
 
 int daytime_check(DT *op) noex {
 	int		rs = SR_OK ;
@@ -225,8 +216,7 @@ int daytime_check(DT *op) noex {
 	    } /* end if (working) */
 	} /* end if (daytime_magic) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (daytime_check) */
+} /* end subroutine (daytime_check) */
 
 int daytime_abort(DT *op) noex {
     	int		rs ;
@@ -236,8 +226,7 @@ int daytime_abort(DT *op) noex {
 	    op->f_abort = true ;
 	} /* end if (magic) */
 	return f ;
-}
-/* end subroutine (daytime_abort) */
+} /* end subroutine (daytime_abort) */
 
 
 /* provate subroutines */
@@ -288,7 +277,7 @@ local int daytime_worker(DT *op) noex {
 	                strdcpy1(ni.org,NISTINFO_ORGLEN,obuf) ;
 	                strtime_nist(dt,ntbuf,&ni) ;
 	                {
-	                    int		tl = strlen(ntbuf) ;
+	                    int tl = lenstr(ntbuf) ;
 			    ntbuf[tl++] = '\n' ;
 			    ntbuf[tl] = '\0' ;
 	                    if ((rs = uc_writen(op->ofd,ntbuf,tl)) >= 0) {
