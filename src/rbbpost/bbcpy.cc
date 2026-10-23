@@ -50,9 +50,9 @@
 
 int bbcpy(s2,s1)
 char		*s2 ;
-const char	*s1 ;
+cchar	*s1 ;
 {
-	const char	*cp = s1 ;
+	cchar	*cp = s1 ;
 
 	while (*s1) {
 	    if (*s1 == '/') {
