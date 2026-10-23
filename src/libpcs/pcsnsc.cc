@@ -53,10 +53,12 @@
 #include	<ctdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"pcsnsc.h"
 #include	"pcsmsg.h"
 #include	"pcsnsreq.h"
+#define		"proginfo.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -135,7 +137,7 @@ constexpr cpcchar	prbins[] = {
 
 /* exported variables */
 
-constexpr PCSNSC_OBJ	pcsnsc_modinfo = {
+const PCSNSC_OBJ	pcsnsc_modinfo = {
 	"pcsnsc",
 	szof(PCSNSC),
 	0
