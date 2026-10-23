@@ -1,19 +1,18 @@
-/* pcs-log */
+/* pcs-log SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* utility to support logging */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
 	= 2011-01-25, David A­D­ Morano
-        This code was seperated out for for more modularity. This was in turn
-        needed to fix the AST-code sockets library definition problems (see
-        notes elsewhere).
+	This code was seperated out for for more modularity. This
+	was in turn needed to fix the AST-code sockets library
+	definition problems (see notes elsewhere).
 
 */
 
@@ -21,23 +20,22 @@
 
 /*******************************************************************************
 
-        This modeule contains code to support logging of various bit of
-        information.
-
+  	Description:
+	This modeule contains code to support logging of various
+	bit of information.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
 #include	<cstdarg>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<csysbase.h>
 #include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
@@ -45,7 +43,7 @@
 #include	"pcsmain.h"
 #include	"pcslocinfo.h"
 #include	"pcslog.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
@@ -60,10 +58,6 @@
 
 #ifndef	EBUFLEN
 #define	EBUFLEN		(3 * MAXPATHLEN)
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 
@@ -82,10 +76,12 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int logbegin(PROGINFO *pip,USERINFO *uip)
+int logbegin(PI *pip,USERINFO *uip)
 {
 	int		rs = SR_OK ;
 
@@ -108,7 +104,7 @@ int logbegin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (logbegin) */
 
 
-int logend(PROGINFO *pip)
+int logend(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -121,7 +117,7 @@ int logend(PROGINFO *pip)
 /* end subroutine (logend) */
 
 
-int logflush(PROGINFO *pip)
+int logflush(PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -134,7 +130,7 @@ int logflush(PROGINFO *pip)
 /* end subroutine (logflush) */
 
 
-int logcheck(PROGINFO *pip)
+int logcheck(PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -147,7 +143,7 @@ int logcheck(PROGINFO *pip)
 /* end subroutine (logcheck) */
 
 
-int logprint(PROGINFO *pip,cchar *sp,int sl)
+int logprint(PI *pip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 
@@ -160,7 +156,7 @@ int logprint(PROGINFO *pip,cchar *sp,int sl)
 /* end subroutine (logprint) */
 
 
-int logprintf(PROGINFO *pip,cchar *fmt,...)
+int logprintf(PI *pip,cchar *fmt,...)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -178,7 +174,7 @@ int logprintf(PROGINFO *pip,cchar *fmt,...)
 /* end subroutine (logprintf) */
 
 
-int logmark(PROGINFO *pip,int rem)
+int logmark(PI *pip,int rem)
 {
 	int		rs = SR_OK ;
 
@@ -234,7 +230,7 @@ int logmark(PROGINFO *pip,int rem)
 /* end subroutine (logmark) */
 
 
-int logreport(PROGINFO *pip)
+int logreport(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -259,7 +255,7 @@ int logreport(PROGINFO *pip)
 /* end subroutine (logreport) */
 
 
-int loginvalidcmd(PROGINFO *pip,cchar *cmd)
+int loginvalidcmd(PI *pip,cchar *cmd)
 {
 	int		rs = SR_OK ;
 
@@ -276,7 +272,7 @@ int loginvalidcmd(PROGINFO *pip,cchar *cmd)
 /* end subroutine (loginvalidcmd) */
 
 
-int loginfo(PROGINFO *pip)
+int loginfo(PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -316,7 +312,7 @@ int loginfo(PROGINFO *pip)
 /* end subroutine (loginfo) */
 
 
-int loglock(PROGINFO *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np)
+int loglock(PI *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np)
 {
 	int		rs = SR_OK ;
 	char		timebuf[TIMEBUFLEN + 1] ;
