@@ -5,7 +5,6 @@
 /* progexec the execution request */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
 #define	CF_DEBUGE	0		/* debug 'u_execve(2)' */
 #define	CF_FANCYSHUN	1		/* put fancy shell-under in environ */
@@ -46,21 +45,19 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<buffer.h>
+#include	<envs.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG */
 
 #include	"config.h"
-#include	"defs.h"
-#include	"envs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
 
+#ifndef	PI
 #define	PI		proginfo
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 #undef	SHUNLEN
