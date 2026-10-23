@@ -615,7 +615,6 @@ local int proginfo_setdefnames(proginfo *pip) noex {
 	return rs ;
 } /* end subroutine (proginfo_setdefnames) */
 
-
 #ifdef	COMMENT
 
 /* Set Default (program) Directory-Name */
@@ -667,19 +666,19 @@ proginfo_vals::proginfo_vals() noex {
 	memclear(this) ;
 } /* end */
 
-void proginfo.hhwser::operator () (proginfo.hhead *p) noex {
+void proginfo_hwser::operator () (proginfo *p) noex {
 	op = p ;
 	val = 0 ;
 } /* end */
 
-proginfo.hhwser::operator uint () noex {
+proginfo_hwser::operator uint () noex {
 	if (val == 0) {
 	    val = (uint) gethostid() ;
 	}
 	return val ;
 } /* end */
 
-proginfo.hhead::proginfo.hhead() noex {
+proginfo::proginfo() noex {
 	argc = 0 ;
 	argv = nullptr ;
 	envv = nullptr ;
@@ -690,13 +689,13 @@ proginfo.hhead::proginfo.hhead() noex {
 	now = {} ;
 	hwserial(this) ;
 	ncpu(this,proginfomem_ncpu) ;
-} /* end */
+} /* end ctor (proginfo::proginfo) */
 
-void proginfo.hhead::args(int ac,mainv av,mainv ev) noex {
+void proginfo::args(int ac,mainv av,mainv ev) noex {
 	argc = ac ;
 	argv = av ;
 	envv = ev ;
-} /* end */
+} /* end method (proginfo::args) */
 
 int proginfo_co::operator () (int) noex {
 	int		rs = SR_BADFMT ;
@@ -710,13 +709,13 @@ int proginfo_co::operator () (int) noex {
 	return rs ;
 } /* end method (proginfo_co::operator) */
 
-int proginfo.hhead::incpu() noex {
+int proginfo::incpu() noex {
 	int		rs = ncpus ;
 	if (rs == 0) {
 	    rs = 1 ;
 	}
 	return rs ;
-} /* end method (proginfo.hhead::incpu) */
+} /* end method (proginfo::incpu) */
 
 local bool hasourbad(cchar *sp,int sl) noex {
 	bool		f = true ;
