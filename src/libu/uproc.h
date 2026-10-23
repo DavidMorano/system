@@ -37,6 +37,7 @@
 #include	<uexecname.h>
 #include	<unanosleep.h>
 #include	<uprocess.h>
+#include	<uprogname.h>
 #include	<usigx.h>
 
 
