@@ -5,7 +5,6 @@
 /* main subroutine for the 'daytime' INET server program */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCSETENT	0		/* allow |locinfo_setentry()| */
@@ -72,8 +71,7 @@
 #include	<bfile.h>		/* LIBB */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"daytie_config.h"
 #include	"proglog.h"
 
 
@@ -81,10 +79,6 @@
 
 #ifndef	AFNAMELEN
 #define	AFNAMELEN	12
-#endif
-
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
 #endif
 
 #ifndef	DBUFLEN
@@ -294,7 +288,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 	keyopt		akopts ;
 	bfile		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -331,14 +325,14 @@ int main(int argc,con mainv argv,con mainv envv) {
 	if (rs < 0) goto badsighand ;
 #endif /* CF_SIGHAND */
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -967,7 +961,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mi[12] ;
 	    uint	mo ;
@@ -1004,7 +998,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -1487,7 +1481,7 @@ local int server(PI *pip) noex {
 
 	} /* end if (localgetorgcode) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("server: ret rs=%d\n",rs) ;
 #endif
 
