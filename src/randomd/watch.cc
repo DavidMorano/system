@@ -1,19 +1,17 @@
-/* watch */
+/* watch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* watch (listen on) the specified socket */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1
 #define	CF_STALE	0
-
 
 /* revision history:
 
 	= 1991-09-01, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
-
 
 */
 
@@ -21,11 +19,12 @@
 
 /*****************************************************************************
 
+  	Description:
 	This subroutine is responsible for listening on the given
 	socket and spawning off a program to handle any incoming
-	connection.
+	connection.  This subroutine is called with the folowing
+	arguments:
 
-	This subroutine is called with the folowing arguments :
 	gp	global data pointer
 	s	socket to listen on
 	ssp	varsub substitutions to be made on server table stuff
@@ -37,7 +36,6 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -45,26 +43,29 @@
 #include	<sys/time.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
+#include	<dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<csignal>
-#include	<dirent.h>
-#include	<climits>
-#include	<cstring>
 #include	<poll.h>
-
-#include	<usystem.h>
-#include	<baops.h>
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<estrings.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<logfile.h>
 #include	<varsub.h>
 #include	<vecstr.h>
 #include	<srvtab.h>
 #include	<acctab.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"jobdb.h"
 #include	"builtin.h"
@@ -87,27 +88,20 @@ extern int	checklockfile() ;
 extern int	handle(struct proginfo *,
 			int,int,varsub *,vecstr *,SRVTAB *,ACCTAB *,BUILTIN *) ;
 
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
-
-#if	CF_DEBUG
-extern char	*d_reventstr() ;
-#endif
-
 
 /* externals variables */
 
 
 /* forward references */
 
-static int	writeout() ;
+local int	writeout() ;
 
-static void	int_all(int) ;
+local void	int_all(int) ;
 
 
 /* external variables */
 
-static int	f_exit ;
+local int	f_exit ;
 
 
 /* local structures */
@@ -388,13 +382,13 @@ top:
 	            (void) time(&daytime) ;
 
 	            logfile_printf(&gp->lh, "%s server exit, es=%d\n",
-	                timestr_log(daytime,timebuf),
+	                strtime_log(daytime,timebuf),
 	                child_stat & 255) ;
 
 	            writeout(gp,efd,"* standard error *") ;
 
 		    logfile_printf(&gp->lh,"elapsed time %s\n",
-			timestr_elapsed((daytime - jep->atime),timebuf)) ;
+			strtime_elapsed((daytime - jep->atime),timebuf)) ;
 
 			u_close(efd) ;
 
@@ -430,7 +424,7 @@ top:
 
 	        logfile_printf(&gp->lh,
 	            "%s another program has my lock file, other PID=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            rs) ;
 
 	        goto badlockfile ;
@@ -450,7 +444,7 @@ top:
 
 	        logfile_printf(&gp->lh,
 	            "%s another program has my PID file, other PID=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            rs) ;
 
 	        goto badpidfile ;
@@ -465,7 +459,7 @@ top:
 
 	if ((rs = srvtab_check(sfp,daytime,NULL)) > 0)
 		logfile_printf(&gp->lh,"%s server table file changed\n",
-			timestr_log(daytime,timebuf)) ;
+			strtime_log(daytime,timebuf)) ;
 
 
 /* check if the access table has changed, if we have one */
@@ -474,7 +468,7 @@ top:
 
 	if ((rs = acctab_check(atp,NULL)) > 0)
 		logfile_printf(&gp->lh,"%s access table file changed\n",
-			timestr_log(daytime,timebuf)) ;
+			strtime_log(daytime,timebuf)) ;
 
 	}
 
@@ -501,7 +495,7 @@ top:
 	(void) time(&daytime) ;
 
 	logfile_printf(&gp->lh,"%s daemon exiting\n",
-	    timestr_log(daytime,timebuf)) ;
+	    strtime_log(daytime,timebuf)) ;
 
 	return OK ;
 
@@ -653,13 +647,13 @@ BUILTIN		*bip ;
 	        (void) time(&daytime) ;
 
 	        logfile_printf(&gp->lh, "%s server exit, es=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            child_stat & 255) ;
 
 	        writeout(gp,efd,"* standard error *") ;
 
 		logfile_printf(&gp->lh,"elapsed time %s\n",
-			timestr_elapsed(daytime - jep->atime,timebuf)) ;
+			strtime_elapsed(daytime - jep->atime,timebuf)) ;
 
 		u_close(efd) ;
 
@@ -699,7 +693,7 @@ local void int_all(int sn) noex {
 } /* end subroutine (int_all) */
 
 /* write out the output files from the executed program */
-static int writeout(gp,fd,s)
+local int writeout(gp,fd,s)
 struct proginfo	*gp ;
 int	fd ;
 char	s[] ;
