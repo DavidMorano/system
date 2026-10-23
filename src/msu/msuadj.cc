@@ -5,7 +5,6 @@
 /* MSU adjunct subroutines */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_IPCPID	0		/* do not do this stuff */
 
@@ -51,6 +50,7 @@
 #include	<msfile.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"msumain.h"
 #include	"msulocinfo.h"
@@ -62,8 +62,8 @@
 
 /* local defines */
 
-#ifndef	PROGINFO
-#define	PROGINFO	PROGINFO
+#ifndef	PI
+#define	PI		proginfo
 #endif
 
 #define	IPCMSGINFO	struct ipcmsginfo
@@ -84,10 +84,6 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #ifndef	IPCBUFLEN
 #define	IPCBUFLEN	MSGBUFLEN
 #endif
@@ -99,10 +95,6 @@
 #define	NIOVECS		1
 
 #define	DEBUGFNAME	"/tmp/msu.deb"
-
-#ifndef	TTYFNAME
-#define	TTYFNAME	"/dev/tty"
-#endif
 
 
 /* external subroutines */
@@ -131,16 +123,16 @@ struct ipcmsginfo {
 
 /* forward references */
 
-local int	procipcreqother(PROGINFO *,int) ;
-local int	procipcreqmsg(PROGINFO *,int,MSFILE_ENT *) ;
-local int	procipcreqmsger(PROGINFO *,IPCMSGINFO *,MSFILE_ENT *,uint) ;
+local int	procipcreqother(PI *,int) ;
+local int	procipcreqmsg(PI *,int,MSFILE_ENT *) ;
+local int	procipcreqmsger(PI *,IPCMSGINFO *,MSFILE_ENT *,uint) ;
 
-local int	procipcreqmsg_getstatus(PROGINFO *,IPCMSGINFO *) ;
-local int	procipcreqmsg_getsysmisc(PROGINFO *,IPCMSGINFO *,MSFILE_ENT *) ;
-local int	procipcreqmsg_exit(PROGINFO *,IPCMSGINFO *) ;
-local int	procipcreqmsg_mark(PROGINFO *,IPCMSGINFO *) ;
-local int	procipcreqmsg_report(PROGINFO *,IPCMSGINFO *) ;
-local int	procipcreqmsg_invalid(PROGINFO *,IPCMSGINFO *) ;
+local int	procipcreqmsg_getstatus(PI *,IPCMSGINFO *) ;
+local int	procipcreqmsg_getsysmisc(PI *,IPCMSGINFO *,MSFILE_ENT *) ;
+local int	procipcreqmsg_exit(PI *,IPCMSGINFO *) ;
+local int	procipcreqmsg_mark(PI *,IPCMSGINFO *) ;
+local int	procipcreqmsg_report(PI *,IPCMSGINFO *) ;
+local int	procipcreqmsg_invalid(PI *,IPCMSGINFO *) ;
 
 local int	ipcmsginfo_init(struct ipcmsginfo *) ;
 
@@ -148,10 +140,12 @@ local int	ipcmsginfo_init(struct ipcmsginfo *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int procipcbegin(PROGINFO *pip)
+int procipcbegin(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -212,7 +206,7 @@ int procipcbegin(PROGINFO *pip)
 /* end subroutine (procipcbegin) */
 
 
-int procipcend(PROGINFO *pip)
+int procipcend(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -241,7 +235,7 @@ int procipcend(PROGINFO *pip)
 /* end subroutine (procipcend) */
 
 
-int procipcreq(PROGINFO *pip,int re,MSFILE_ENT *mep)
+int procipcreq(PI *pip,int re,MSFILE_ENT *mep)
 {
 	int		rs = SR_OK ;
 
@@ -261,7 +255,7 @@ int procipcreq(PROGINFO *pip,int re,MSFILE_ENT *mep)
 /* local subroutines */
 
 
-local int procipcreqother(PROGINFO *pip,int re)
+local int procipcreqother(PI *pip,int re)
 {
 	int		rs = SR_OK ;
 	int		f_logged = FALSE ;
@@ -289,7 +283,7 @@ local int procipcreqother(PROGINFO *pip,int re)
 /* end subroutine (procipcreqother) */
 
 
-local int procipcreqmsg(PROGINFO *pip,int re,MSFILE_ENT *mep)
+local int procipcreqmsg(PI *pip,int re,MSFILE_ENT *mep)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -358,7 +352,7 @@ local int procipcreqmsg(PROGINFO *pip,int re,MSFILE_ENT *mep)
 /* end subroutine (procipcreqmsg) */
 
 
-local int procipcreqmsger(PROGINFO *pip,IPCMSGINFO *mip,MSFILE_ENT *mep,
+local int procipcreqmsger(PI *pip,IPCMSGINFO *mip,MSFILE_ENT *mep,
 		uint mt)
 {
 	int		rs = SR_OK ;
@@ -391,7 +385,7 @@ local int procipcreqmsger(PROGINFO *pip,IPCMSGINFO *mip,MSFILE_ENT *mep,
 /* end subroutine (procipcreqmsger) */
 
 
-local int procipcreqmsg_getstatus(PROGINFO *pip,struct ipcmsginfo *mip)
+local int procipcreqmsg_getstatus(PI *pip,struct ipcmsginfo *mip)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_getstatus	m1 ;
@@ -428,7 +422,7 @@ local int procipcreqmsg_getstatus(PROGINFO *pip,struct ipcmsginfo *mip)
 /* end subroutine (procipcreqmsg_getstatus) */
 
 
-local int procipcreqmsg_exit(PROGINFO *pip,struct ipcmsginfo *mip)
+local int procipcreqmsg_exit(PI *pip,struct ipcmsginfo *mip)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_exit	m3 ;
@@ -463,7 +457,7 @@ local int procipcreqmsg_exit(PROGINFO *pip,struct ipcmsginfo *mip)
 /* end subroutine (procipcreqmsg_exit) */
 
 
-local int procipcreqmsg_mark(PROGINFO *pip,struct ipcmsginfo *mip)
+local int procipcreqmsg_mark(PI *pip,struct ipcmsginfo *mip)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_mark	m4 ;
@@ -504,7 +498,7 @@ local int procipcreqmsg_mark(PROGINFO *pip,struct ipcmsginfo *mip)
 /* end subroutine (procipcreqmsg_mark) */
 
 
-local int procipcreqmsg_report(PROGINFO *pip,struct ipcmsginfo *mip)
+local int procipcreqmsg_report(PI *pip,struct ipcmsginfo *mip)
 {
 	struct msumsg_status	m0 ;
 	struct msumsg_report	m5 ;
@@ -544,7 +538,7 @@ local int procipcreqmsg_report(PROGINFO *pip,struct ipcmsginfo *mip)
 
 
 local int procipcreqmsg_getsysmisc(pip,mip,mep)
-PROGINFO		*pip ;
+PI		*pip ;
 struct ipcmsginfo	*mip ;
 MSFILE_ENT		*mep ;
 {
@@ -589,7 +583,7 @@ MSFILE_ENT		*mep ;
 
 
 local int procipcreqmsg_invalid(pip,mip)
-PROGINFO		*pip ;
+PI		*pip ;
 struct ipcmsginfo	*mip ;
 {
 	struct msumsg_status	m0 ;
