@@ -19,11 +19,11 @@
 /*******************************************************************************
 
 	Names:
-	u_execve
+	u_execname
 
 	Description:
-	All of the UNIX® system calls that use (operate on) a
-	UNIX® process.
+	Try to retrieve the (si-called) "exec" name of the current
+	process.
 
 *******************************************************************************/
 
