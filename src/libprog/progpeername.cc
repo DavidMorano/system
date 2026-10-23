@@ -1,4 +1,5 @@
 /* progpeername SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* try to divine a peer-hostname from a socket address */
