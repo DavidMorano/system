@@ -29,6 +29,7 @@
 #include	<localmisc_conmsghdr.h>
 #include	<localmisc_conv.h>
 #include	<localmisc_defs.h>
+#include	<localmisc_dev.h>
 #include	<localmisc_ends.h>
 #include	<localmisc_funmacs.h>
 #include	<localmisc_integer.h>
@@ -39,6 +40,7 @@
 #include	<localmisc_mem.h>
 #include	<localmisc_minmax.h>
 #include	<localmisc_nums.h>
+#include	<localmisc_org.h>
 #include	<localmisc_rets.h>
 #include	<localmisc_truth.h>
 #include	<localmisc_typealiases.h>
