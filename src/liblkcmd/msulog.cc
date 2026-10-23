@@ -31,29 +31,27 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstdarg>
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<csysbase.h>
 #include	<logfile.h>
 #include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"msumain.h"
 #include	"msulocinfo.h"
 #include	"msulog.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
 
-#ifndef	PROGINFO
-#define	PROGINFO	PROGINFO
-#endif
-
-#ifndef	POLL_INTMULT
-#define	POLL_INTMULT	1000
+#ifndef	PI
+#define	PI		proginfo
 #endif
 
 #ifndef	PBUFLEN
@@ -68,27 +66,14 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #ifndef	IPCBUFLEN
 #define	IPCBUFLEN	MSGBUFLEN
 #endif
 
 #define	DEBUGFNAME	"/tmp/msu.deb"
 
-#ifndef	TTYFNAME
-#define	TTYFNAME	"/dev/tty"
-#endif
-
 
 /* external subroutines */
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -99,7 +84,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-local int	logfind(PROGINFO *) ;
+local int	logfind(PI *) ;
 
 
 /* local variables */
@@ -110,7 +95,7 @@ local int	logfind(PROGINFO *) ;
 
 /* exported subroutines */
 
-int logbegin(PROGINFO *pip) noex {
+int logbegin(PI *pip) noex {
 	int		rs = SR_OK ;
 
 	if (pip->fl.logprog) {
@@ -133,7 +118,7 @@ int logbegin(PROGINFO *pip) noex {
 }
 /* end subroutine (logbegin) */
 
-int logend(PROGINFO *pip) noex {
+int logend(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pip->open.logprog) {
@@ -145,7 +130,7 @@ int logend(PROGINFO *pip) noex {
 }
 /* end subroutine (logend) */
 
-int logflush(PROGINFO *pip) noex {
+int logflush(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
 	    rs = logfile_flush(&pip->lh) ;
@@ -155,7 +140,7 @@ int logflush(PROGINFO *pip) noex {
 }
 /* end subroutine (logflush) */
 
-int logcheck(PROGINFO *pip) noex {
+int logcheck(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
 	    rs = logfile_check(&pip->lh,pip->daytime) ;
@@ -165,7 +150,7 @@ int logcheck(PROGINFO *pip) noex {
 }
 /* end subroutine (logflush) */
 
-int logprintf(PROGINFO *pip,cchar *fmt,...) noex {
+int logprintf(PI *pip,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -179,7 +164,7 @@ int logprintf(PROGINFO *pip,cchar *fmt,...) noex {
 }
 /* end subroutine (logprintf) */
 
-int logprogname(PROGINFO *pip) noex {
+int logprogname(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
 	    cchar	*a = getourenv(pip->envv,VARARCHITECTURE) ;
@@ -224,7 +209,7 @@ int logprogname(PROGINFO *pip) noex {
 }
 /* end subroutine (logprogname) */
 
-int logmark(PROGINFO *pip,int rem) noex {
+int logmark(PI *pip,int rem) noex {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
 	    cchar	*nn = pip->nodename ;
@@ -265,7 +250,7 @@ int logmark(PROGINFO *pip,int rem) noex {
 }
 /* end subroutine (logmark) */
 
-int logreport(PROGINFO *pip) noex {
+int logreport(PI *pip) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	char		timebuf[TIMEBUFLEN + 1] ;
@@ -286,7 +271,7 @@ int logreport(PROGINFO *pip) noex {
 }
 /* end subroutine (logreport) */
 
-int loginvalidcmd(PROGINFO *pip,cchar *cmd) noex {
+int loginvalidcmd(PI *pip,cchar *cmd) noex {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
 	    cint	cl = strnlen(cmd,40) ;
@@ -300,7 +285,7 @@ int loginvalidcmd(PROGINFO *pip,cchar *cmd) noex {
 }
 /* end subroutine (loginvalidcmd) */
 
-int loginfo(PROGINFO *pip) noex {
+int loginfo(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->open.logprog) {
 	    long	lw ;
@@ -333,7 +318,7 @@ int loginfo(PROGINFO *pip) noex {
 }
 /* end subroutine (loginfo) */
 
-int loglock(PROGINFO *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np) noex {
+int loglock(PI *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np) noex {
 	int		rs = SR_OK ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
@@ -363,7 +348,7 @@ int loglock(PROGINFO *pip,LFM_CHECK *lcp,cchar *lfname,cchar *np) noex {
 
 /* local subroutines */
 
-local int logfind(PROGINFO *pip) noex {
+local int logfind(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->lfname == nullptr) {
 	    cchar	*sn = pip->searchname ;
