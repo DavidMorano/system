@@ -5,7 +5,6 @@
 /* update the machine status for the current machine */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGZ	0		/* special extra debug print-outs */
@@ -124,17 +123,13 @@
 #include	"mfsadj.h"
 #include	"mfscmd.h"
 #include	"mfslog.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local typedefs */
 
 
 /* local defines */
-
-#ifndef	POLL_INTMULT
-#define	POLL_INTMULT	1000
-#endif
 
 #ifndef	PBUFLEN
 #define	PBUFLEN		(4 * MAXPATHLEN)
@@ -152,10 +147,6 @@
 #define	ENVBUFLEN	2048
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #ifndef	REQCNAME
 #define	REQCNAME	"req"
 #endif
@@ -166,8 +157,8 @@
 /* external subroutines */
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	proginfo_rootname(PROGINFO *) ;
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
+extern int	proginfo_rootname(PI *) ;
 
 #if	CF_DEBUGZ
 extern int	zprintf(cchar *,cchar *,...) ;
@@ -186,50 +177,50 @@ extern char	**environ ;
 
 local int	mfsmain(int,mainv,mainv,void *) ;
 
-local int	usage(PROGINFO *) ;
+local int	usage(PI *) ;
 
-local int	procopts(PROGINFO *,keyopt *) ;
-local int	procdefargs(PROGINFO *) ;
+local int	procopts(PI *,keyopt *) ;
+local int	procdefargs(PI *) ;
 
-local int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
-local int	procuserinfo_end(PROGINFO *) ;
-local int	procuserinfo_hostname(PROGINFO *) ;
-local int	procuserinfo_other(PROGINFO *) ;
-local int	procuserinfo_aux(PROGINFO *) ;
-local int	procuserinfo_hz(PROGINFO *) ;
-local int	procuserinfo_groupname(PROGINFO *) ;
-local int	procuserinfo_org(PROGINFO *) ;
-local int	procuserinfo_orgcode(PROGINFO *) ;
-local int	procuserinfo_logid(PROGINFO *) ;
+local int	procuserinfo_begin(PI *,USERINFO *) ;
+local int	procuserinfo_end(PI *) ;
+local int	procuserinfo_hostname(PI *) ;
+local int	procuserinfo_other(PI *) ;
+local int	procuserinfo_aux(PI *) ;
+local int	procuserinfo_hz(PI *) ;
+local int	procuserinfo_groupname(PI *) ;
+local int	procuserinfo_org(PI *) ;
+local int	procuserinfo_orgcode(PI *) ;
+local int	procuserinfo_logid(PI *) ;
 
-local int	proclisten_begin(PROGINFO *) ;
-local int	proclisten_end(PROGINFO *) ;
+local int	proclisten_begin(PI *) ;
+local int	proclisten_end(PI *) ;
 
-local int	procourconf_begin(PROGINFO *) ;
-local int	procourconf_find(PROGINFO *) ;
-local int	procourconf_end(PROGINFO *) ;
+local int	procourconf_begin(PI *) ;
+local int	procourconf_find(PI *) ;
+local int	procourconf_end(PI *) ;
 
-local int	procourdefs(PROGINFO *) ;
+local int	procourdefs(PI *) ;
 
-local int	process(PROGINFO *,cchar *) ;
-local int	procourcmds(PROGINFO *,cchar *) ;
-local int	procregular(PROGINFO *) ;
-local int	procbackinfo(PROGINFO *) ;
-local int	procback(PROGINFO *) ;
-local int	procbacks(PROGINFO *) ;
-local int	procbackcheck(PROGINFO *) ;
-local int	procbacker(PROGINFO *,cchar *,cchar **) ;
-local int	procbackenv(PROGINFO *,SPAWNER *) ;
-local int	procmntcheck(PROGINFO *) ;
-local int	procdaemon(PROGINFO *) ;
-local int	procdaemoncheck(PROGINFO *) ;
+local int	process(PI *,cchar *) ;
+local int	procourcmds(PI *,cchar *) ;
+local int	procregular(PI *) ;
+local int	procbackinfo(PI *) ;
+local int	procback(PI *) ;
+local int	procbacks(PI *) ;
+local int	procbackcheck(PI *) ;
+local int	procbacker(PI *,cchar *,cchar **) ;
+local int	procbackenv(PI *,SPAWNER *) ;
+local int	procmntcheck(PI *) ;
+local int	procdaemon(PI *) ;
+local int	procdaemoncheck(PI *) ;
 
-local int	procbackdefs(PROGINFO *) ;
-local int	procdaemondefs(PROGINFO *) ;
-local int	procpidfname(PROGINFO *) ;
-local int	procservice(PROGINFO *) ;
-local int	procfcmd(PROGINFO *) ;
-local int	procexecname(PROGINFO *,char *,int) ;
+local int	procbackdefs(PI *) ;
+local int	procdaemondefs(PI *) ;
+local int	procpidfname(PI *) ;
+local int	procservice(PI *) ;
+local int	procfcmd(PI *) ;
+local int	procexecname(PI *,char *,int) ;
 
 
 /* local variables */
@@ -457,13 +448,13 @@ int p_mfserve(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* ARGSUSED */
 local int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
-	PROGINFO	pi, *pip = &pi ;
+	PI	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	bits		pargs ;
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -493,14 +484,14 @@ local int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	zprintf(NDF,"mfsmain: hello world!\n") ;
 #endif
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("mfsmain: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -547,7 +538,7 @@ local int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    argp = argv[ai] ;
 	    argl = strlen(argp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("mfsmain: a[%u]=%s\n",ai,argp) ;
 #endif
 
@@ -1306,7 +1297,7 @@ local int mfsmain(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* continue with prepatory initialization */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsmain: pid=%d\n",pip->pid) ;
 #endif
 
@@ -1479,7 +1470,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mi[12] ;
 	    uint	mo ;
@@ -1516,7 +1507,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	CF_DEBUG
 	debugclose() ;
 #endif
 
@@ -1537,7 +1528,7 @@ badarg:
 /* local subroutines */
 
 
-local int usage(PROGINFO *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1557,7 +1548,7 @@ local int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-local int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PI *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1869,7 +1860,7 @@ local int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-local int procdefargs(PROGINFO *pip)
+local int procdefargs(PI *pip)
 {
 	int		rs = SR_OK ;
 	cchar		**envv = pip->envv ;
@@ -1892,7 +1883,7 @@ local int procdefargs(PROGINFO *pip)
 /* end subroutine (procdefargs) */
 
 
-local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
+local int procuserinfo_begin(PI *pip,USERINFO *uip)
 {
 	int		rs ;
 
@@ -1942,7 +1933,7 @@ local int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 /* end subroutine (procuserinfo_begin) */
 
 
-local int procuserinfo_end(PROGINFO *pip)
+local int procuserinfo_end(PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -1953,7 +1944,7 @@ local int procuserinfo_end(PROGINFO *pip)
 /* end subroutine (procuserinfo_end) */
 
 
-local int procuserinfo_hostname(PROGINFO *pip)
+local int procuserinfo_hostname(PI *pip)
 {
 	cint	hlen = MAXHOSTNAMELEN ;
 	int		rs ;
@@ -1969,7 +1960,7 @@ local int procuserinfo_hostname(PROGINFO *pip)
 /* end subroutine (procuserinfo_hostname) */
 
 
-local int procuserinfo_other(PROGINFO *pip)
+local int procuserinfo_other(PI *pip)
 {
 	int		rs ;
 	if ((rs = procuserinfo_aux(pip)) >= 0) {
@@ -1989,7 +1980,7 @@ local int procuserinfo_other(PROGINFO *pip)
 /* end subroutine (procuserinfo_other) */
 
 
-local int procuserinfo_aux(PROGINFO *pip)
+local int procuserinfo_aux(PI *pip)
 {
 	UINFO_AUX	aux ;
 	int		rs ;
@@ -2005,7 +1996,7 @@ local int procuserinfo_aux(PROGINFO *pip)
 /* end subroutine (procuserinfo_aux) */
 
 
-local int procuserinfo_hz(PROGINFO *pip)
+local int procuserinfo_hz(PI *pip)
 {
 	cint	dlen = DIGBUFLEN ;
 	int		rs = SR_OK ;
@@ -2045,7 +2036,7 @@ local int procuserinfo_hz(PROGINFO *pip)
 /* end subroutine (procuserinfo_hz) */
 
 
-local int procuserinfo_groupname(PROGINFO *pip)
+local int procuserinfo_groupname(PI *pip)
 {
 	int		rs ;
 	int		gnlen = GROUPNAMELEN ;
@@ -2059,7 +2050,7 @@ local int procuserinfo_groupname(PROGINFO *pip)
 /* end subroutine (procuserinfo_groupname) */
 
 
-local int procuserinfo_org(PROGINFO *pip)
+local int procuserinfo_org(PI *pip)
 {
 	cint	orglen = MAXNAMELEN ;
 	int		rs = SR_OK ;
@@ -2088,7 +2079,7 @@ local int procuserinfo_org(PROGINFO *pip)
 /* end subroutine (procuserinfo_org) */
 
 
-local int procuserinfo_orgcode(PROGINFO *pip)
+local int procuserinfo_orgcode(PI *pip)
 {
 	int		rs = SR_OK ;
 	if ((pip->orgcode == NULL) || (pip->orgcode[0] == '\0')) {
@@ -2112,7 +2103,7 @@ local int procuserinfo_orgcode(PROGINFO *pip)
 /* end subroutine (procuserinfo_orgcode) */
 
 
-local int procuserinfo_logid(PROGINFO *pip)
+local int procuserinfo_logid(PI *pip)
 {
 	int		rs ;
 	if ((rs = lib_runmode()) >= 0) {
@@ -2146,7 +2137,7 @@ local int procuserinfo_logid(PROGINFO *pip)
 
 
 /* this initialization must precede the configuration-file initializaton */
-local int proclisten_begin(PROGINFO *pip)
+local int proclisten_begin(PI *pip)
 {
 	int		rs = SR_OK ;
 	if (pip->fl.daemon) {
@@ -2157,7 +2148,7 @@ local int proclisten_begin(PROGINFO *pip)
 /* end subroutine (proclisten_begin) */
 
 
-local int proclisten_end(PROGINFO *pip)
+local int proclisten_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2170,7 +2161,7 @@ local int proclisten_end(PROGINFO *pip)
 /* end subroutine (proclisten_end) */
 
 
-local int procourconf_begin(PROGINFO *pip)
+local int procourconf_begin(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -2210,7 +2201,7 @@ local int procourconf_begin(PROGINFO *pip)
 /* end subroutine (procourconf_begin) */
 
 
-local int procourconf_find(PROGINFO *pip)
+local int procourconf_find(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
@@ -2274,7 +2265,7 @@ local int procourconf_find(PROGINFO *pip)
 /* end subroutine (procourconf_find) */
 
 
-local int procourconf_end(PROGINFO *pip)
+local int procourconf_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2300,7 +2291,7 @@ local int procourconf_end(PROGINFO *pip)
 /* end subroutine (procourconf_end) */
 
 
-local int procourdefs(PROGINFO *pip)
+local int procourdefs(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2335,7 +2326,7 @@ local int procourdefs(PROGINFO *pip)
 /* end subroutine (procourdefs) */
 
 
-local int procbackdefs(PROGINFO *pip)
+local int procbackdefs(PI *pip)
 {
 	int		rs = SR_OK ;
 
@@ -2354,7 +2345,7 @@ local int procbackdefs(PROGINFO *pip)
 /* end subroutine (procbackdefs) */
 
 
-local int procdaemondefs(PROGINFO *pip)
+local int procdaemondefs(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2408,7 +2399,7 @@ local int procdaemondefs(PROGINFO *pip)
 /* end subroutine (procdaemondefs) */
 
 
-local int procpidfname(PROGINFO *pip)
+local int procpidfname(PI *pip)
 {
 	cint	clen = MAXNAMELEN ;
 	int		rs = SR_OK ;
@@ -2471,7 +2462,7 @@ local int procpidfname(PROGINFO *pip)
 /* end subroutine (procpidfname) */
 
 
-local int process(PROGINFO *pip,cchar *ofn)
+local int process(PI *pip,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -2522,7 +2513,7 @@ local int process(PROGINFO *pip,cchar *ofn)
 /* end subroutine (process) */
 
 
-local int procbackinfo(PROGINFO *pip)
+local int procbackinfo(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2560,7 +2551,7 @@ local int procbackinfo(PROGINFO *pip)
 /* end subroutine (procbackinfo) */
 
 
-local int procback(PROGINFO *pip)
+local int procback(PI *pip)
 {
 	int		rs ;
 
@@ -2588,7 +2579,7 @@ local int procback(PROGINFO *pip)
 /* end subroutine (procback) */
 
 
-local int procbackcheck(PROGINFO *pip)
+local int procbackcheck(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -2624,7 +2615,7 @@ local int procbackcheck(PROGINFO *pip)
 /* end subroutine (procbackcheck) */
 
 
-local int procmntcheck(PROGINFO *pip)
+local int procmntcheck(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2650,7 +2641,7 @@ local int procmntcheck(PROGINFO *pip)
 /* end subroutine (procmntcheck) */
 
 
-local int procbacks(PROGINFO *pip)
+local int procbacks(PI *pip)
 {
 	cint	elen = MAXPATHLEN ;
 	int		rs ;
@@ -2724,7 +2715,7 @@ local int procbacks(PROGINFO *pip)
 /* end subroutine (procbacks) */
 
 
-local int procbacker(PROGINFO *pip,cchar *pf,cchar **av)
+local int procbacker(PI *pip,cchar *pf,cchar **av)
 {
 	SPAWNER		s ;
 	int		rs ;
@@ -2772,7 +2763,7 @@ local int procbacker(PROGINFO *pip,cchar *pf,cchar **av)
 /* end subroutine (procbacker) */
 
 
-local int procbackenv(PROGINFO *pip,SPAWNER *srp)
+local int procbackenv(PI *pip,SPAWNER *srp)
 {
 	LOCINFO		*lip = pip->lip ;
 	BUFFER		b ;
@@ -2911,7 +2902,7 @@ local int procbackenv(PROGINFO *pip,SPAWNER *srp)
 /* end subroutine (procbackenv) */
 
 
-local int procdaemon(PROGINFO *pip)
+local int procdaemon(PI *pip)
 {
 	int		rs ;
 	int		rs1 ;
@@ -2972,7 +2963,7 @@ local int procdaemon(PROGINFO *pip)
 /* end subroutine (procdaemon) */
 
 
-local int procdaemoncheck(PROGINFO *pip)
+local int procdaemoncheck(PI *pip)
 {
 	int		rs ;
 
@@ -2993,7 +2984,7 @@ local int procdaemoncheck(PROGINFO *pip)
 /* end subroutine (procdaemoncheck) */
 
 
-local int procourcmds(PROGINFO *pip,cchar *ofn)
+local int procourcmds(PI *pip,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -3005,7 +2996,7 @@ local int procourcmds(PROGINFO *pip,cchar *ofn)
 /* end subroutine (procourcmds) */
 
 
-local int procregular(PROGINFO *pip)
+local int procregular(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -3031,7 +3022,7 @@ local int procregular(PROGINFO *pip)
 /* end subroutine (procregular) */
 
 
-local int procservice(PROGINFO *pip)
+local int procservice(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -3117,7 +3108,7 @@ local int procservice(PROGINFO *pip)
 /* end subroutine (procservice) */
 
 
-local int procfcmd(PROGINFO *pip)
+local int procfcmd(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -3155,7 +3146,7 @@ local int procfcmd(PROGINFO *pip)
 /* end if (procfcmd) */
 
 
-local int procexecname(PROGINFO *pip,char *rbuf,int rlen)
+local int procexecname(PI *pip,char *rbuf,int rlen)
 {
 	int		rs ;
 	if ((rs = proginfo_progdname(pip)) >= 0) {
