@@ -5,7 +5,6 @@
 /* MFS-locinfo (extra code) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_TMPGROUP	1		/* change-group on TMP directory */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
@@ -63,13 +62,14 @@
 #include	<rmdirfiles.h>
 #include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"mfsmain.h"
 #include	"mfslocinfo.h"
 #include	"mfslisten.h"
 #include	"mfslog.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
@@ -79,10 +79,6 @@
 #else
 #define	GETPW_NAME	getpw_name
 #endif /* CF_UGETPW */
-
-#ifndef	POLL_INTMULT
-#define	POLL_INTMULT	1000
-#endif
 
 #ifndef	PBUFLEN
 #define	PBUFLEN		(4 * MAXPATHLEN)
@@ -96,19 +92,10 @@
 #define	EBUFLEN		(5 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 
 /* external subroutines */
 
 extern int	proginfo_rootname(PROGINFO *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -148,7 +135,7 @@ local int	locinfo_chids(LOCINFO *,cchar *) ;
 local int	locinfo_cookargsload(LOCINFO *,cchar **) ;
 local int	locinfo_maintourtmper(LOCINFO *,int) ;
 
-#if	CF_DEBUGS && CF_DEBUGDUMP
+#if	CF_DEBUG && CF_DEBUGDUMP
 local int	vecstr_dump(vecstr *,cchar *) ;
 #endif
 
@@ -305,7 +292,7 @@ int locinfo_finish(LOCINFO *lip)
 
 	if (pip == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS && CF_DEBUGDUMP
+#if	CF_DEBUG && CF_DEBUGDUMP
 	if (lip->open.stores) {
 	    vecstr_dump(&lip->stores,"finish") ;
 	}
@@ -370,10 +357,10 @@ int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 	    }
 	} /* end if */
 
-#if	CF_DEBUGS && CF_DEBUGDUMP
+#if	CF_DEBUG && CF_DEBUGDUMP
 	vecstr_dump(slp,"after") ;
 #endif
-#if	CF_DEBUGS 
+#if	CF_DEBUG 
 	debugprintf("locinfo_setentry: ret rs=%d l=%u\n",rs,len) ;
 #endif
 
@@ -1847,7 +1834,7 @@ local int locinfo_maintourtmper(LOCINFO *lip,int to_client)
 /* end subroutine (locinfo_maintourtmper) */
 
 
-#if	CF_DEBUGS && CF_DEBUGDUMP
+#if	CF_DEBUG && CF_DEBUGDUMP
 local int vecstr_dump(vecstr *dlp,cchar *id)
 {
 	int		rs = SR_OK ;
@@ -1862,6 +1849,6 @@ local int vecstr_dump(vecstr *dlp,cchar *id)
 	if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	return rs ;
 }
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 
