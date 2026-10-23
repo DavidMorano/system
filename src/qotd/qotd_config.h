@@ -91,7 +91,7 @@
 #define	TO_READ		5
 #define	TO_RECVMSG	(5*60)
 
-#define	OPT_LOGPROG	TRUE
+#define	OPT_LOGPROG	true
 
 
 #endif /* QOTDCONFIG_INCLUDE */
