@@ -5,7 +5,6 @@
 /* program to switch programs */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGN	0		/* special debugging */
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
@@ -48,20 +47,22 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<ids.h>
-#include	<permx.h>
-#include	<vecstr.h>
-#include	<userinfo.h>
-#include	<varsub.h>
-#include	<sbuf.h>
-#include	<kvsfile.h>
-#include	<strx.h>
-#include	<rmx.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ids.h>			/* LIBUC */
+#include	<permx.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<varsub.h>		/* LIBUC */
+#include	<sbuf.h>		/* LIBUC */
+#include	<kvsfile.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
@@ -71,16 +72,8 @@
 
 /* local defines */
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
-#ifndef	PROGINFO
-#define	PROGINFO	PROGINFO
+#ifndef	PI
+#define	PI	PI
 #endif
 
 #define	NDF		"progswitch.deb"
@@ -109,16 +102,8 @@ extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
 extern int	vecstr_envfile(vecstr *,cchar *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 #if	CF_DEBUGN
 extern int	nprintf(cchar *,cchar *,...) ;
@@ -133,34 +118,34 @@ extern int	nprintf(cchar *,cchar *,...) ;
 
 /* forward references */
 
-local int	procfindprog(PROGINFO *,char *) ;
-local int	procdevinfo(PROGINFO *) ;
+local int	procfindprog(PI *,char *) noex ;
+local int	procdevinfo(PI *) noex ;
 
-local int	procfindfiles(PROGINFO *) ;
-local int	procfindcooks(PROGINFO *,vecstr *) ;
-local int	procfindsched(PROGINFO *,cchar **,vecstr *,cchar **,cchar *) ;
-local int	procdefsadd(PROGINFO *,varsub *) ;
-local int	procinfo(PROGINFO *,cchar *) ;
+local int	procfindfiles(PI *) noex ;
+local int	procfindcooks(PI *,vecstr *) noex ;
+local int	procfindsched(PI *,cchar **,vecstr *,cchar **,cchar *) noex ;
+local int	procdefsadd(PI *,varsub *) noex ;
+local int	procinfo(PI *,cchar *) noex ;
 
-local int	procids_begin(PROGINFO *) ;
-local int	procids_end(PROGINFO *) ;
+local int	procids_begin(PI *) noex ;
+local int	procids_end(PI *) noex ;
 
-local int	procfind_withmap(PROGINFO *,char *) ;
-local int	procfind_withmapper(PROGINFO *,varsub *,char *) ;
-local int	procfind_withpath(PROGINFO *,char *) ;
+local int	procfind_withmap(PI *,char *) noex ;
+local int	procfind_withmapper(PI *,varsub *,char *) noex ;
+local int	procfind_withpath(PI *,char *) noex ;
 
 #if	CF_PROCESN
-local int	procesn(PROGINFO *,char *,int) ;
+local int	procesn(PI *,char *,int) noex ;
 #endif
 
-local int	progmk(PROGINFO *,char *,int,cchar *,int,cchar *) ;
-local int	progok(PROGINFO *,cchar *) ;
+local int	progmk(PI *,char *,int,cchar *,int,cchar *) noex ;
+local int	progok(PI *,cchar *) noex ;
 
 
 /* local variables */
 
 #ifdef	COMMENT
-static cchar	*roots[] = {
+constexpr cpcchar	roots[] = {
 	    "HOME",
 	    "LOCAL",
 	    "AST",
@@ -169,18 +154,18 @@ static cchar	*roots[] = {
 	    "TOOLS",
 	    "XDIR",
 	    NULL
-} ;
+} ; /* end array */
 #endif /* COMMENT */
 
-static const struct pivars	initvars = {
+constexpr pivars	initvars = {
 	    VARPROGRAMROOT1,
 	    VARPROGRAMROOT2,
 	    VARPROGRAMROOT3,
 	    PROGRAMROOT,
 	    VARPRNAME
-} ;
+} ; /* end array */
 
-static const struct mapex	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	    { SR_NOENT, EX_NOUSER },
 	    { SR_AGAIN, EX_TEMPFAIL },
 	    { SR_DEADLK, EX_TEMPFAIL },
@@ -189,61 +174,61 @@ static const struct mapex	mapexs[] = {
 	    { SR_ACCESS, EX_NOPERM },
 	    { SR_REMOTE, EX_PROTOCOL },
 	    { SR_NOSPC, EX_TEMPFAIL },
-	    { 0, 0 }} ;
+	    { 0, 0 }
+} ; /* end array */
 
-static cchar	*sched0[] = { /* map-directory file */
+constexpr cpcchar	sched0[] = { /* map-directory file */
 	    "%p/etc/%n/%n.%f",
 	    "%p/etc/%n/%f",
 	    "%p/etc/%n.%f",
 	    NULL
-} ;
+} ; /* end array */
 
-static cchar	*sched1[] = { /* "defs" file */
+constexpr cpcchar	sched1[] = { /* "defs" file */
 	    "%p/etc/%n/%n.%f",
 	    "%p/etc/%n/%f",
 	    "%p/etc/%n.%f",
 	    "%p/etc/%f",
 	    NULL
-} ;
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
-	PROGINFO	pi, *pip = &pi ;
+int main(int argc,con mainv argv,con mainv envv) {
+	PI		pi, *pip = &pi ;
 	bfile		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_EBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ex = EX_OSERR ;
-
 	cchar	*pr = NULL ;
 	cchar	*progname = NULL ;
 	cchar	*cp ;
 	char		tarname[MAXNAMELEN + 1] ;
 
-
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_EBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting x DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_EBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_EBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
 
 	if (argc == 0) goto badprogstart ;
 
-#if	CF_DEBUGS
+#if	CF_EBUG
 	debugprintf("main: proginfo_start()\n") ;
 #endif
 
@@ -254,7 +239,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    goto badprogstart ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_EBUG
 	debugprintf("main: getourenv()\n") ;
 #endif
 
@@ -263,13 +248,13 @@ int main(int argc,cchar **argv,cchar **envv)
 	    pip->debuglevel = rs ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_EBUG
 	debugprintf("main: front2\n") ;
 #endif
 
 	if ((cp = getourenv(envv,VAREFNAME)) == NULL) cp = BFILE_STDERR ;
 
-#if	CF_DEBUGS
+#if	CF_EBUG
 	debugprintf("main: efname=%s\n",cp) ;
 	debugprintf("main: debuglevel=%u\n",pip->debuglevel) ;
 #endif
@@ -434,7 +419,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_EBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -443,20 +428,17 @@ badprogstart:
 	}
 #endif
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_EBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
 	return ex ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
 
-
-local int procfindprog(PROGINFO *pip,char *pbuf)
-{
+local int procfindprog(PI *pip,char *pbuf) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -476,11 +458,9 @@ local int procfindprog(PROGINFO *pip,char *pbuf)
 	    } /* end if (procids) */
 	} /* end if (procdevinfo) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (procfindprog) */
+} /* end subroutine (procfindprog) */
 
-
-local int procdevinfo(PROGINFO *pip)
+local int procdevinfo(PI *pip)
 {
 	cint	tlen = MAXPATHLEN ;
 	int		rs ;
@@ -501,11 +481,9 @@ local int procdevinfo(PROGINFO *pip)
 	    debugprintf("main/procdevinfo: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end suborutine (procdevinfo) */
+} /* end suborutine (procdevinfo) */
 
-
-local int procfindfiles(PROGINFO *pip)
+local int procfindfiles(PI *pip)
 {
 	VECSTR		sv ;
 	int		rs ;
@@ -529,11 +507,9 @@ local int procfindfiles(PROGINFO *pip)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	return rs ;
-}
-/* end subroutine (procfindfiles) */
+} /* end subroutine (procfindfiles) */
 
-
-local int procfindcooks(PROGINFO *pip,vecstr *slp)
+local int procfindcooks(PI *pip,vecstr *slp)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -568,13 +544,11 @@ local int procfindcooks(PROGINFO *pip,vecstr *slp)
 	    } /* end for */
 	} /* end block */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procfindcooks) */
-
+} /* end subroutine (procfindcooks) */
 
 /* process Exec-Search-Name */
 #if	CF_PROCESN
-local int procesn(PROGINFO *pip,char *ebuf,int elen)
+local int procesn(PI *pip,char *ebuf,int elen)
 {
 	int		rs = SR_OK ;
 	cchar		*progename = pip->progename ;
@@ -593,12 +567,10 @@ local int procesn(PROGINFO *pip,char *ebuf,int elen)
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procesn) */
+} /* end subroutine (procesn) */
 #endif /* CF_PROCESN */
 
-
-local int procfindsched(PROGINFO *pip,cchar **vpp,vecstr *slp,cchar **sa,
+local int procfindsched(PI *pip,cchar **vpp,vecstr *slp,cchar **sa,
 		cchar *fn)
 {
 	cint	tlen = MAXPATHLEN ;
@@ -624,11 +596,9 @@ local int procfindsched(PROGINFO *pip,cchar **vpp,vecstr *slp,cchar **sa,
 	}
 #endif
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (procfindsched) */
+} /* end subroutine (procfindsched) */
 
-
-local int procids_begin(PROGINFO *pip)
+local int procids_begin(PI *pip)
 {
 	int		rs ;
 	IDS		*idp = &pip->id ;
@@ -636,11 +606,10 @@ local int procids_begin(PROGINFO *pip)
 	    pip->open.id = TRUE ;
 	}
 	return rs ;
-}
-/* end subroutine (procids_begin) */
+} /* end subroutine (procids_begin) */
 
 
-local int procids_end(PROGINFO *pip)
+local int procids_end(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -651,11 +620,9 @@ local int procids_end(PROGINFO *pip)
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (procids_end) */
+} /* end subroutine (procids_end) */
 
-
-local int procfind_withmap(PROGINFO *pip,char *pbuf)
+local int procfind_withmap(PI *pip,char *pbuf)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -693,11 +660,9 @@ local int procfind_withmap(PROGINFO *pip,char *pbuf)
 	}
 #endif
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (procfind_withmap) */
+} /* end subroutine (procfind_withmap) */
 
-
-local int procfind_withmapper(PROGINFO *pip,varsub *sdp,char *pbuf)
+local int procfind_withmapper(PI *pip,varsub *sdp,char *pbuf)
 {
 	KVSFILE		kf ;
 	KVSFILE_CUR	cur ;
@@ -785,12 +750,11 @@ local int procfind_withmapper(PROGINFO *pip,varsub *sdp,char *pbuf)
 	nprintf(NDF,"main/procfind_withmapper: rs=%d len=%u\n",rs,len) ;
 #endif
 	return (rs >= 0) ? len : rs ;
-}
-/* end sugroutine (procfind_withmapper) */
+} /* end sugroutine (procfind_withmapper) */
 
 
 /* if we do not have a program file yet, search the execution PATH */
-local int procfind_withpath(PROGINFO *pip,char *pbuf)
+local int procfind_withpath(PI *pip,char *pbuf)
 {
 	cint	plen = MAXPATHLEN ;
 	int		rs = SR_OK ;
@@ -849,11 +813,9 @@ local int procfind_withpath(PROGINFO *pip,char *pbuf)
 	}
 #endif
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (procfind_withpath) */
+} /* end subroutine (procfind_withpath) */
 
-
-local int procdefsadd(PROGINFO *pip,varsub *sdp)
+local int procdefsadd(PI *pip,varsub *sdp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -878,22 +840,18 @@ local int procdefsadd(PROGINFO *pip,varsub *sdp)
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procdefsadd) */
+} /* end subroutine (procdefsadd) */
 
-
-local int procinfo(PROGINFO *pip,cchar *pbuf)
+local int procinfo(PI *pip,cchar *pbuf)
 {
 	int		rs1 ;
 	if ((rs1 = proglog_printf(pip,"prog=%s",pbuf)) >= 0) {
 	    proglog_flush(pip) ;
 	}
 	return SR_OK ;
-}
-/* end subroutine (procinfo) */
+} /* end subroutine (procinfo) */
 
-
-local int progmk(PROGINFO *pip,char *rbuf,int rlen,cchar *pp,int pl,cchar *pn)
+local int progmk(PI *pip,char *rbuf,int rlen,cchar *pp,int pl,cchar *pn)
 {
 	SBUF		pbuf ;
 	int		rs ;
@@ -918,11 +876,9 @@ local int progmk(PROGINFO *pip,char *rbuf,int rlen,cchar *pp,int pl,cchar *pn)
 	} /* end if */
 
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (progmk) */
+} /* end subroutine (progmk) */
 
-
-local int progok(PROGINFO *pip,cchar *progfname)
+local int progok(PI *pip,cchar *progfname)
 {
 	ustat	sb ;
 	int		rs ;
@@ -952,7 +908,6 @@ local int progok(PROGINFO *pip,cchar *progfname)
 #endif
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (progok) */
+} /* end subroutine (progok) */
 
-
+[
