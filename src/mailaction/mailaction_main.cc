@@ -5,7 +5,6 @@
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGNOCONF	0		/* do not allow config file */
 #define	CF_RUNMODE	0		/* put RUNMODE in environment */
@@ -86,16 +85,8 @@
 #define	MAXARGINDEX	100
 #define	MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	(NUMNAMES * MAXPATHLEN)
-#endif
-
 #ifndef	BUFLEN
 #define	BUFLEN		((8 * 1024) + REALNAMELEN)
-#endif
-
-#ifndef	NULLDEV
-#define	NULLDEV		"/dev/null"
 #endif
 
 #ifndef	PORTBUFLEN
@@ -149,7 +140,7 @@ enum argopts {
 	argopt_sn,
 	argopt_caf,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	argopts[] = {
 	"ROOT",
@@ -162,7 +153,7 @@ constexpr cpcchar	argopts[] = {
 	"sn",
 	"caf",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
@@ -170,7 +161,7 @@ constexpr pivars	initvars = {
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRLOCAL
-} ;
+} ; /* end array */
 
 enum configopts {
 	configopt_marktime,
@@ -185,7 +176,7 @@ enum configopts {
 	configopt_speedname,
 	configopt_nopass,
 	configopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	configopts[] = {
 	"marktime",
@@ -200,7 +191,7 @@ constexpr cpcchar	configopts[] = {
 	"speedname",
 	"nopass",
 	nullptr
-} ;
+} ; /* end array */
 
 /* 'conf' for most regular programs */
 constexpr cpcchar	sched1[] = {
@@ -209,7 +200,7 @@ constexpr cpcchar	sched1[] = {
 	    "%p/%e/%n.%f",
 	    "%p/%n.%f",
 	    nullptr
-} ;
+} ; /* end array */
 
 /* non-'conf' ETC stuff for all regular programs */
 constexpr cpcchar	sched2[] = {
@@ -219,7 +210,7 @@ constexpr cpcchar	sched2[] = {
 	    "%p/%e/%f",
 	    "%p/%n.%f",
 	    nullptr
-} ;
+} ; /* end array */
 
 /* 'conf' and non-'conf' ETC stuff for local searching */
 constexpr cpcchar	sched3[] = {
@@ -230,7 +221,7 @@ constexpr cpcchar	sched3[] = {
 	    "%n.%f",
 	    "%f",
 	    nullptr
-} ;
+} ; /* end array */
 
 /* option terminators */
 constexpr char		oterms[] = {
@@ -242,7 +233,7 @@ constexpr char		oterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -297,12 +288,12 @@ int main(int argc,mainv argv,mainv envv) {
 	char	*portspec = nullptr ;
 	char	*sp, *cp ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 /* we want to open up some files so that the first few FD slots are FULL! */
 
@@ -1971,7 +1962,7 @@ ret1:
 
 ret0:
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -2400,11 +2391,9 @@ cchar	dname[] ;
 int		mode ;
 {
 	ustat	sb ;
-
 	int	rs ;
 
-
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("checkdir: entered\n") ;
 #endif
 
