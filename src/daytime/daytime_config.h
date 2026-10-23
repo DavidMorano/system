@@ -90,10 +90,6 @@
 #define	INETSVC_DAYTIME	"daytime"
 #endif
 
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
-#endif
-
 #define	LOGSIZE		(80*1024)
 
 #define	DEF_OFFSET	(5*60)		/* default offset 5 minutes */
