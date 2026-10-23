@@ -235,7 +235,7 @@ constexpr bool		f_usesbuf	= CF_USESBUF ;
 
 /* exported variables */
 
-constexpr strlistmks_obj	strlistmks_modinfo = {
+const strlistmks_obj	strlistmks_modinfo = {
 	"strlistmks",
 	szof(strlistmks),
 	0
