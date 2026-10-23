@@ -151,9 +151,9 @@ namespace {
 	omode		of{} ;
 	opener(ccfile *p,cchar *n) noex : op(p), fn(n) { } ;
 	int operator () (cchar *) noex ;
-	int getmode(cchar *) noex ;
-	int specials() noex ;
-	int openfile() noex ;
+	int getmode	(cchar *) noex ;
+	int specials	() noex ;
+	int openfile	() noex ;
     } ; /* end struct (opener) */
 } /* end namespace */
 
@@ -175,7 +175,7 @@ int opener::operator () (cchar *ofs) noex {
 	    if ((rs = specials()) >= 0) {
 		rs = openfile() ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end method (operner::operator) */
 
@@ -272,7 +272,7 @@ int ccfile::readln(char *ibuf,int ilen,int dch) noex {
 	int		len = 0 ; /* return-value */
 	if (dch == 0) dch = eol ;
 	if (ibuf) ylikely {
-	    ibuf[0] = '\0' ;
+	    ibuf[0] = eos ;
 	    rs = SR_OK ;
 	    if (! fl.fnulling) ylikely {
 		rs = istr_readln(isp,ibuf,ilen,dch) ;
@@ -293,12 +293,12 @@ int ccfile::readln(string &s,int dch) noex {
 	    if (char *lbuf ; (lbuf = new(nt) char[llen+1]) != np) ylikely {
 	        if ((rs = readln(lbuf,llen,char(dch))) >= 0) ylikely {
 		    len = rs ;
-		    lbuf[rs] = '\0' ;
+		    lbuf[rs] = eos ;
 		    try {
 		        s = lbuf ;
 		    } catch (...) {
 		        rs = SR_NOMEM ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (readln) */
 	        delete [] lbuf ;
 	    } /* end if (m-a-f) */
@@ -319,7 +319,7 @@ int ccfile::readlns(char *lbuf,int llen,int to,int *lcp) noex {
 	int		i = 0 ; /* return-value */
 	if (lbuf) {
 	    rs = SR_OK ;
-	    lbuf[0] = '\0' ;
+	    lbuf[0] = eos ;
 	    if (! fl.fnulling) ylikely {
 	        int	lines = 0 ;
 	        bool	fcont = false ;
@@ -361,10 +361,10 @@ int ccfile::seek(off_t o,int w) noex {
 		        seekg(o,sv) ;	
 		    } else {
 		        seekp(o,sv) ;
-		    }
+		    } /* end */
 		    if (fail()) {
 		        rs = SR_IO ;
-		    }
+		    } /* end if (error) */
 	        } catch (failure &e) {
 		    error_code	ec = e.code() ;
 		    cchar	*es = e.what() ;
@@ -374,7 +374,7 @@ int ccfile::seek(off_t o,int w) noex {
 		    ulogerror("ccfile",ev,es) ;
 	        } catch (...) {
 		    rs = SR_BADFMT ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (ok) */
 	} /* end if (not-fnulling) */
 	return rs ;
@@ -390,7 +390,7 @@ int ccfile::iclose() noex {
 	    fstream::close() ; /* superclass */
 	    if (fail()) {
 	        rs = SR_IO ;
-	    }
+	    } /* end */
 	    fl.fopened = false ;
 	} /* end if (not-fnulling) */
 	return rs ;
@@ -400,14 +400,14 @@ int ccfile::irewind() noex {
 	int		rs = SR_OK ;
 	if (! fl.fnulling) {
 	    rs = seek(0z) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (ccfile::irewind) */
 
 void ccfile::dtor() noex {
 	if (int rs ; (rs = iclose()) < 0) {
 	    ulogerror("ccfile",rs,"dtor-close") ;
-	}
+	} /* end */
 } /* end method (ccfile::dtor) */
 
 int ccfile_co::operator () (int) noex {
@@ -429,17 +429,17 @@ local omode mkmode(cchar *sp) noex {
 	omode		om{} ;
 	for (int ch ; (ch = mkchar(*sp++)) > 0 ; ) {
 	    switch (ch) {
-	    case 'r': om |= ios::in ; break ; 		/* input */
-	    case 'w': om |= ios::out ; break ;		/* output */
-	    case 'a': om |= ios::app ; break ;		/* append */
-	    case 't': om |= ios::trunc ; break ;	/* truncate */
-	    case 'e': om |= ios::noreplace ; break ;	/* exclusive-open */
-	    case 'b': om |= ios::binary ; break ;	/* binary-file */
-	    case 'A': om |= ios::ate ; break ;		/* seek-end at open */
+	    case 'r': om |= ios::in ;		break ; /* input */
+	    case 'w': om |= ios::out ;		break ;	/* output */
+	    case 'a': om |= ios::app ;		break ;	/* append */
+	    case 't': om |= ios::trunc ;	break ;	/* truncate */
+	    case 'e': om |= ios::noreplace ;	break ;	/* exclusive-open */
+	    case 'b': om |= ios::binary ;	break ;	/* binary-file */
+	    case 'A': om |= ios::ate ;		break ;	/* seek-end at open */
 	   } /* end switch */
 	   if (om == 0) {
 		om |= ios::in ;
-	   }
+	   } /* end */
 	} /* end for */
 	return om ;
 } /* end subroutine (mkmode) */
