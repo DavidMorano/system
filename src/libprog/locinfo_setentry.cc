@@ -1,4 +1,5 @@
 /* locinfo_setentry SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* LOCINFO set-entry */
@@ -72,11 +73,12 @@ struct locinfo {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
+int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
 	vecstr		*vsp = &lip->stores ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
