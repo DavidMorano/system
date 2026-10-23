@@ -42,11 +42,11 @@ struct ccfile_co {
         void operator () (ccfile *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         int operator () (int a = -1) noex ;
         operator int () noex {
 	    return operator () () ;
-        } ;
+        } ; /* end */
 } ; /* end struct (ccfile_co) */
 
 struct ccfile_fl {
