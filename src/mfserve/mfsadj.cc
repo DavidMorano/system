@@ -5,7 +5,6 @@
 /* MFS adjunct subroutines */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 
 /* revision history:
@@ -50,6 +49,7 @@
 #include	<msghdr.h>
 #include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"msgdata.h"
@@ -61,21 +61,16 @@
 #include	"mfsadj.h"
 #include	"mfsmsg.h"
 #include	"mfsns.h"
-#include	"defs.h"
-
+#include	"proginfo.hh"
 
 /* local defines */
 
-#ifndef	PROGINFO
-#define	PROGINFO	PROGINFO
+#ifndef	PI
+#define	PI		proginfo
 #endif
 
-#define	MFSADJ		struct mfsadj
-#define	MFSADJ_FL	struct mfsadj_fl
-
-#ifndef	POLL_INTMULT
-#define	POLL_INTMULT	1000
-#endif
+#define	MFSADJ		mfsadj
+#define	MFSADJ_FL	mfsadj_fl
 
 #ifndef	PBUFLEN
 #define	PBUFLEN		(4 * MAXPATHLEN)
@@ -89,40 +84,8 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 
 /* external subroutines */
-
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	listenusd(cchar *,mode_t,int) ;
-extern int	isBadSend(int) ;
-extern int	isBadMsg(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -142,24 +105,24 @@ struct mfsadj {
 
 /* forward references */
 
-local int	mfsadj_allocbegin(PROGINFO *) ;
-local int	mfsadj_allocend(PROGINFO *) ;
+local int	mfsadj_allocbegin(PI *) ;
+local int	mfsadj_allocend(PI *) ;
 
-local int	mfsadj_objbegin(PROGINFO *) ;
-local int	mfsadj_objend(PROGINFO *) ;
+local int	mfsadj_objbegin(PI *) ;
+local int	mfsadj_objend(PI *) ;
 
-local int	mfsadj_reqother(PROGINFO *,int) ;
-local int	mfsadj_reqmsg(PROGINFO *,int) ;
+local int	mfsadj_reqother(PI *,int) ;
+local int	mfsadj_reqmsg(PI *,int) ;
 
-local int	mfsadj_getstatus(PROGINFO *,MSGDATA *) ;
-local int	mfsadj_gethelp(PROGINFO *,MSGDATA *) ;
-local int	mfsadj_getlistener(PROGINFO *,MSGDATA *) ;
-local int	mfsadj_getval(PROGINFO *,MSGDATA *) ;
-local int	mfsadj_mark(PROGINFO *,MSGDATA *) ;
-local int	mfsadj_exit(PROGINFO *,MSGDATA *) ;
+local int	mfsadj_getstatus(PI *,MSGDATA *) ;
+local int	mfsadj_gethelp(PI *,MSGDATA *) ;
+local int	mfsadj_getlistener(PI *,MSGDATA *) ;
+local int	mfsadj_getval(PI *,MSGDATA *) ;
+local int	mfsadj_mark(PI *,MSGDATA *) ;
+local int	mfsadj_exit(PI *,MSGDATA *) ;
 
-local int	mfsadj_send(PROGINFO *,MSGDATA *,uint) ;
-local int	mfsadj_invalid(PROGINFO *,MSGDATA *,int,int) ;
+local int	mfsadj_send(PI *,MSGDATA *,uint) ;
+local int	mfsadj_invalid(PI *,MSGDATA *,int,int) ;
 
 
 /* local variables */
@@ -168,7 +131,7 @@ local int	mfsadj_invalid(PROGINFO *,MSGDATA *,int,int) ;
 /* exported subroutines */
 
 
-int mfsadj_begin(PROGINFO *pip)
+int mfsadj_begin(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -230,7 +193,7 @@ int mfsadj_begin(PROGINFO *pip)
 /* end subroutine (mfsadj_begin) */
 
 
-int mfsadj_end(PROGINFO *pip)
+int mfsadj_end(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -262,7 +225,7 @@ int mfsadj_end(PROGINFO *pip)
 /* end subroutine (mfsadj_end) */
 
 
-int mfsadj_poll(PROGINFO *pip,POLLER *pmp,int fd,int re)
+int mfsadj_poll(PI *pip,POLLER *pmp,int fd,int re)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -296,7 +259,7 @@ int mfsadj_poll(PROGINFO *pip,POLLER *pmp,int fd,int re)
 /* end subroutine (mfsadj_poll) */
 
 
-int mfsadj_register(PROGINFO *pip,POLLER *pmp)
+int mfsadj_register(PI *pip,POLLER *pmp)
 {
 	LOCINFO		*lip = pip->lip ;
 	POLLER_SPEC	ps ;
@@ -312,7 +275,7 @@ int mfsadj_register(PROGINFO *pip,POLLER *pmp)
 /* local subroutines */
 
 
-local int mfsadj_allocbegin(PROGINFO *pip)
+local int mfsadj_allocbegin(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	cint	asize = sizeof(MFSADJ) ;
@@ -329,7 +292,7 @@ local int mfsadj_allocbegin(PROGINFO *pip)
 /* end subroutine (mfsadj_allocbegin) */
 
 
-local int mfsadj_allocend(PROGINFO *pip)
+local int mfsadj_allocend(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -346,7 +309,7 @@ local int mfsadj_allocend(PROGINFO *pip)
 /* end subroutine (mfsadj_allocend) */
 
 
-local int mfsadj_objbegin(PROGINFO *pip)
+local int mfsadj_objbegin(PI *pip)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -361,7 +324,7 @@ local int mfsadj_objbegin(PROGINFO *pip)
 /* end subroutine (mfsadj_objbegin) */
 
 
-local int mfsadj_objend(PROGINFO *pip)
+local int mfsadj_objend(PI *pip)
 {
 	MFSADJ		*pap ;
 	LOCINFO		*lip = pip->lip ;
@@ -382,7 +345,7 @@ local int mfsadj_objend(PROGINFO *pip)
 /* end subroutine (mfsadj_objend) */
 
 
-local int mfsadj_reqother(PROGINFO *pip,int re)
+local int mfsadj_reqother(PI *pip,int re)
 {
 	int		rs = SR_OK ;
 	int		f_logged = FALSE ;
@@ -411,7 +374,7 @@ local int mfsadj_reqother(PROGINFO *pip,int re)
 
 
 /* ARGSUSED */
-local int mfsadj_reqmsg(PROGINFO *pip,int re)
+local int mfsadj_reqmsg(PI *pip,int re)
 {
 	LOCINFO		*lip = pip->lip ;
 	MFSADJ		*pap ;
@@ -469,7 +432,7 @@ local int mfsadj_reqmsg(PROGINFO *pip,int re)
 /* end subroutine (mfsadj_reqmsg) */
 
 
-local int mfsadj_getstatus(PROGINFO *pip,MSGDATA *mdp)
+local int mfsadj_getstatus(PI *pip,MSGDATA *mdp)
 {
 	struct mfsmsg_status	m0 ;
 	struct mfsmsg_getstatus	m1 ;
@@ -508,7 +471,7 @@ local int mfsadj_getstatus(PROGINFO *pip,MSGDATA *mdp)
 /* end subroutine (mfsadj_getstatus) */
 
 
-local int mfsadj_gethelp(PROGINFO *pip,MSGDATA *mdp)
+local int mfsadj_gethelp(PI *pip,MSGDATA *mdp)
 {
 	struct mfsmsg_gethelp	mreq ;
 	struct mfsmsg_help	mres ;
@@ -554,7 +517,7 @@ local int mfsadj_gethelp(PROGINFO *pip,MSGDATA *mdp)
 /* end subroutine (mfsadj_gethelp) */
 
 
-local int mfsadj_getlistener(PROGINFO *pip,MSGDATA *mdp)
+local int mfsadj_getlistener(PI *pip,MSGDATA *mdp)
 {
 	MFSMSG_GETLISTENER	mreq ;
 	MFSMSG_LISTENER		mres ;
@@ -605,7 +568,7 @@ local int mfsadj_getlistener(PROGINFO *pip,MSGDATA *mdp)
 /* end subroutine (mfsadj_getlistener) */
 
 
-local int mfsadj_getval(PROGINFO *pip,MSGDATA *mdp)
+local int mfsadj_getval(PI *pip,MSGDATA *mdp)
 {
 	struct mfsmsg_getval	mreq ;
 	struct mfsmsg_val	mres ;
@@ -677,7 +640,7 @@ local int mfsadj_getval(PROGINFO *pip,MSGDATA *mdp)
 /* end subroutine (mfsadj_getval) */
 
 
-local int mfsadj_mark(PROGINFO *pip,MSGDATA *mdp)
+local int mfsadj_mark(PI *pip,MSGDATA *mdp)
 {
 	struct mfsmsg_mark	mreq ;
 	struct mfsmsg_ack	mres ;
@@ -718,7 +681,7 @@ local int mfsadj_mark(PROGINFO *pip,MSGDATA *mdp)
 /* end subroutine (mfsadj_mark) */
 
 
-local int mfsadj_exit(PROGINFO *pip,MSGDATA *mdp)
+local int mfsadj_exit(PI *pip,MSGDATA *mdp)
 {
 	struct mfsmsg_exit	mreq ;
 	struct mfsmsg_ack	mres ;
@@ -742,7 +705,7 @@ local int mfsadj_exit(PROGINFO *pip,MSGDATA *mdp)
 /* end subroutine (mfsadj_exit) */
 
 
-local int mfsadj_invalid(PROGINFO *pip,MSGDATA *mdp,int mrs,int f)
+local int mfsadj_invalid(PI *pip,MSGDATA *mdp,int mrs,int f)
 {
 	struct mfsmsg_status	mres ;
 	int		rs ;
@@ -764,7 +727,7 @@ local int mfsadj_invalid(PROGINFO *pip,MSGDATA *mdp,int mrs,int f)
 /* end subroutine (mfsadj_invalid) */
 
 
-local int mfsadj_send(PROGINFO *pip,MSGDATA *mdp,uint tag)
+local int mfsadj_send(PI *pip,MSGDATA *mdp,uint tag)
 {
 	LOCINFO		*lip = pip->lip ;
 	MSGHDR		*mhp = &mdp->msg ;
