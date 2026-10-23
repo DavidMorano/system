@@ -5,7 +5,7 @@
 /* MFS Client code */
 /* object to interact with the MFS server */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -43,10 +43,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<csysbase.h>
 #include	<bufsizevar.hh>
 #include	<estrings.h>
 #include	<vechand.h>
@@ -57,6 +58,7 @@
 #include	<ctdec.h>
 #include	<listenspec.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"mfsc.h"
 #include	"mfsmsg.h"
@@ -74,7 +76,7 @@ import libutil ;			/* |memclear(3u)| */
 #define	MFSC_REQNAME	"req"
 #define	MFSC_DMODE	0777
 
-#define	VARPREXTRA	"EXTRA" ;
+#define	VARPREXTRA	"EXTRA"
 #define	VARMFSQUIET	"MFSERVE_QUIET"
 #define	VARMFSPR	"MFSERVE_PROGRAMROOT"
 
@@ -94,11 +96,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
-#endif
 
 
 /* external variables */
@@ -141,10 +138,13 @@ static cpcchar		prbins[] = {
 
 /* exported variables */
 
-mfsc_obj	mfsc_modinfo = {
+const mfsc_obj	mfsc_modinfo = {
 	"mfsc",
 	sizeof(mfsc)
-} ;
+} ; /* end initialization */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -158,7 +158,7 @@ int mfsc_open(MFSC *op,cchar *pr,int to) noex {
 
 	if (to < 1) to = 1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_open: ent pr=%s\n",pr) ;
 #endif
 
@@ -180,7 +180,7 @@ int mfsc_open(MFSC *op,cchar *pr,int to) noex {
 	    }
 	} /* end if (mfsc-set) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_open: ret rs=%d\n",rs) ;
 #endif
 
@@ -202,7 +202,7 @@ int mfsc_close(MFSC *op) noex {
 	rs1 = mfsc_setend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_close: ret rs=%d\n",rs) ;
 #endif
 
@@ -214,7 +214,7 @@ int mfsc_close(MFSC *op) noex {
 int mfsc_getstat(MFSC *op,MFSC_STATUS *statp) noex {
 	int		rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_status: ent\n") ;
 #endif
 
@@ -222,13 +222,13 @@ int mfsc_getstat(MFSC *op,MFSC_STATUS *statp) noex {
 
 	if (op->magic != MFSC_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_status: con\n") ;
 #endif
 
 	rs = mfsc_istatus(op,statp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_status: ret rs=%d\n",rs) ;
 #endif
 
@@ -240,7 +240,7 @@ int mfsc_help(MFSC *op,char *rbuf,int rlen,int idx) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_help: ent\n") ;
 #endif
 
@@ -286,7 +286,7 @@ int mfsc_help(MFSC *op,char *rbuf,int rlen,int idx) noex {
 	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_help: ret rs=%d rl=%u\n",rs,rl) ;
 #endif
 
@@ -298,7 +298,7 @@ int mfsc_getval(MFSC *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_getval: ent un=%s w=%u\n",un,w) ;
 #endif
 
@@ -348,7 +348,7 @@ int mfsc_getval(MFSC *op,char *rbuf,int rlen,cchar *un,int w) noex {
 	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_getval: ret rs=%d rl=%u\n",rs,rl) ;
 #endif
 
@@ -360,7 +360,7 @@ int mfsc_mark(MFSC *op) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_mark: ent\n") ;
 #endif
 
@@ -400,7 +400,7 @@ int mfsc_mark(MFSC *op) noex {
 	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_mark: ret rs=%d\n",rs) ;
 #endif
 
@@ -412,7 +412,7 @@ int mfsc_exit(MFSC *op,cchar *reason) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_exit: ent\n") ;
 #endif
 
@@ -456,7 +456,7 @@ int mfsc_exit(MFSC *op,cchar *reason) noex {
 	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_exit: ret rs=%d\n",rs) ;
 #endif
 
@@ -468,7 +468,7 @@ int mfsc_listener(MFSC *op,char *rbuf,int rlen,int idx) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_listener: ent\n") ;
 #endif
 
@@ -513,7 +513,7 @@ int mfsc_listener(MFSC *op,char *rbuf,int rlen,int idx) noex {
 	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_listener: ret rs=%d rl=%u\n",rs,rl) ;
 #endif
 
@@ -535,7 +535,7 @@ local int mfsc_setbegin(MFSC *op,cchar *pr) noex {
 	int		f = FALSE ;
 	cchar		*cp ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_setbegin: ent\n") ;
 #endif
 
@@ -651,7 +651,7 @@ local int mfsc_bind(MFSC *op,int f,cchar *srvdname) noex {
 	int		rs = SR_OK ;
 	int		f_err = FALSE ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_bind: ent f=%u\n",f) ;
 #endif
 
@@ -694,7 +694,7 @@ local int mfsc_bind(MFSC *op,int f,cchar *srvdname) noex {
 
 	} /* end if (bind-off) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_bind: ret rs=%d\n",rs) ;
 #endif
 
@@ -732,7 +732,7 @@ local int mfsc_connect(MFSC *op) noex {
 	int		rs1 ;
 	int		f = FALSE ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_connect: srvfname=%s\n",op->srvfname) ;
 #endif
 
@@ -754,7 +754,7 @@ local int mfsc_connect(MFSC *op) noex {
 	    } /* end if (sockaddress) */
 	} /* end if (non-null) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_connect: ret rs=%d f=%u\n",rs,f) ;
 #endif
 
@@ -766,7 +766,7 @@ local int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
 	int		rs = SR_OK ;
 	int		rc = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_istatus: ent\n") ;
 #endif
 
@@ -788,7 +788,7 @@ local int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
 	            cint	ro = FM_TIMED ;
 	            if ((rs = uc_recve(fd,mbuf,mlen,mf,to,ro)) >= 0) {
 	                if ((rs = mfsmsg_status(&mres,1,mbuf,rs)) >= 0) {
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                    debugprintf("mfsc_istatus: "
 	                        "mfsmsg_status() rs=%d rc=%u\n",rs,mres.rc) ;
 #endif
@@ -808,21 +808,21 @@ local int mfsc_istatus(MFSC *op,MFSC_STATUS *statp) noex {
 	                op->fl.srv = FALSE ;
 	                rs = SR_OK ;
 	            } /* end if (uc_recve) */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            debugprintf("mfsc_istatus: recv-out rs=%d\n",rs) ;
 #endif
 	        } else if (isBadSend(rs)) {
 	            op->fl.srv = FALSE ;
 	            rs = SR_OK ;
 	        } /* end if (u_send) */
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	        debugprintf("mfsc_istatus: send-out rs=%d\n",rs) ;
 #endif
 	    } /* end if (mfsmsg_getstatus) */
 	    if (rs < 0) op->fl.srv = FALSE ;
 	} /* end if (servicing) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("mfsc_istatus: ret rs=%d pid=%d\n",rs,rc) ;
 #endif
 
