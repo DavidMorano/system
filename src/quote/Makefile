@@ -369,8 +369,6 @@ vecstr_env.o:		vecstr_env.c
 
 vecstr_adduniq.o:	vecstr_adduniq.c
 
-keyopt.o:		keyopt.c keyopt.h
-
 realname.o:		realname.c realname.h
 
 ipasswd.o:		ipasswd.c ipasswd.h
