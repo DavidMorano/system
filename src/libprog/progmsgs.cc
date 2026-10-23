@@ -1,11 +1,10 @@
 /* progmsgs SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
-/* version %I% last-modified %G% */
 
 /* process the input messages and spool them up */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_DEBUGBODY	1		/* debug the MAILMSG body */
 #define	CF_SPAMSUBJECT	1		/* check SUBJECT for spam */
