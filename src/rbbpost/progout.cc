@@ -24,8 +24,8 @@
 	int progouthead(pip,ofp,name,vp,vl)
 	PROGINFO	*pip ;
 	bfile		*ofp ;
-	const char	name[] ;
-	const char	vp[] ;
+	cchar	name[] ;
+	cchar	vp[] ;
 	int		vl ;
 
 
@@ -35,7 +35,7 @@
 	int progoutheadema(pip,ofp,name,ap)
 	PROGINFO	*pip ;
 	bfile		*ofp ;
-	const char	name[] ;
+	cchar	name[] ;
 	EMA		*ap ;
 
 
@@ -112,15 +112,15 @@
 
 /* external subroutines */
 
-extern int	nextfield(const char *,int,const char **) ;
-extern int	buffer_stropaque(BUFFER *,const char *,int) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	buffer_stropaque(BUFFER *,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -139,17 +139,17 @@ struct outline {
 
 /* forward references */
 
-static int	outct(PROGINFO *,bfile *,MAILMSGATTENT *) ;
-static int	outentry(PROGINFO *,bfile *,OUTLINE *,BUFFER *,EMA_ENT *) ;
-static int	outvalue(PROGINFO *,bfile *,OUTLINE *,cchar *,int) ;
-static int	outpartbody(PROGINFO *,bfile *,bfile *,MAILMSGATTENT *) ;
-static int	outpartbodybits(PROGINFO *,bfile *,bfile *,MAILMSGATTENT *) ;
-static int	outbase64(PROGINFO *,bfile *,const char *,int) ;
+local int	outct(PROGINFO *,bfile *,MAILMSGATTENT *) ;
+local int	outentry(PROGINFO *,bfile *,OUTLINE *,BUFFER *,EMA_ENT *) ;
+local int	outvalue(PROGINFO *,bfile *,OUTLINE *,cchar *,int) ;
+local int	outpartbody(PROGINFO *,bfile *,bfile *,MAILMSGATTENT *) ;
+local int	outpartbodybits(PROGINFO *,bfile *,bfile *,MAILMSGATTENT *) ;
+local int	outbase64(PROGINFO *,bfile *,cchar *,int) ;
 
-static int	outline_start(OUTLINE *,int,int) ;
-static int	outline_finish(OUTLINE *) ;
+local int	outline_start(OUTLINE *,int,int) ;
+local int	outline_finish(OUTLINE *) ;
 
-static int	strestlen(const char *,int) ;
+local int	strestlen(cchar *,int) ;
 
 
 /* local variables */
@@ -162,7 +162,7 @@ static int	strestlen(const char *,int) ;
 int progouthead(PROGINFO *pip,bfile *ofp,cchar *name,cchar *vp,int vl)
 {
 	OUTLINE		ld ;
-	const int	llen = MAILMSGLINELEN ;
+	cint	llen = MAILMSGLINELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -225,8 +225,8 @@ int progoutheadema(PROGINFO *pip,bfile *ofp,cchar *name,EMA *ap)
 	    if ((rs = buffer_start(&b,80)) >= 0) {
 	        if ((rs = ema_count(ap)) > 0) {
 	            OUTLINE	ld ;
-	            const int	llen = MAILMSGLINELEN ;
-	            const int	n = rs ;
+	            cint	llen = MAILMSGLINELEN ;
+	            cint	n = rs ;
 	            if ((rs = outline_start(&ld,llen,llen)) >= 0) {
 	                int	c = 0 ;
 
@@ -238,7 +238,7 @@ int progoutheadema(PROGINFO *pip,bfile *ofp,cchar *name,EMA *ap)
 
 	                if (rs >= 0) {
 	                    EMA_ENT	*ep ;
-	                    const char	*fmt ;
+	                    cchar	*fmt ;
 	                    int		nlen ;
 	                    int		elen ;
 	                    int		i ;
@@ -321,7 +321,7 @@ MAILMSGATTENT	*ep ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	const char	*fn ;
+	cchar	*fn ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
@@ -342,8 +342,8 @@ MAILMSGATTENT	*ep ;
 #endif
 
 	if ((rs = bopen(ifp,fn,"r",0666)) >= 0) {
-	    const int	cte = ep->cte ;
-	    const int	f_pt = ep->f_plaintext ;
+	    cint	cte = ep->cte ;
+	    cint	f_pt = ep->f_plaintext ;
 	    int		f_fname ;
 	    int		f_enc = FALSE ;
 	    cchar	*dn = "/dev/fd/" ;
@@ -380,8 +380,8 @@ MAILMSGATTENT	*ep ;
 	    f_fname = f_fname && (strncmp(ep->attfname,dn,8) != 0) ;
 
 	    if (rs >= 0) {
-	        const int	f0 = (ep->cte >= CE_7BIT) ;
-	        const int	f1 = (ep->subtype != NULL) ;
+	        cint	f0 = (ep->cte >= CE_7BIT) ;
+	        cint	f1 = (ep->subtype != NULL) ;
 	        if (f_multipart || f_fname || (! f_pt) || f0 || f1) {
 	            f_enc = TRUE ;
 	            rs = outct(pip,ofp,ep) ;
@@ -470,7 +470,7 @@ MAILMSGATTENT	*ep ;
 /* local subroutines */
 
 
-static int outentry(pip,ofp,ldp,bufp,ep)
+local int outentry(pip,ofp,ldp,bufp,ep)
 PROGINFO	*pip ;
 bfile		*ofp ;
 OUTLINE		*ldp ;
@@ -481,7 +481,7 @@ EMA_ENT		*ep ;
 	int		wlen = 0 ;
 
 	if ((rs = buffer_reset(bufp)) >= 0) {
-	    const char	*bp ;
+	    cchar	*bp ;
 	    int		bl ;
 	    int		c = 0 ;
 
@@ -548,11 +548,11 @@ EMA_ENT		*ep ;
 
 
 /* output a single value for a header (folding lines as needed) */
-static int outvalue(pip,ofp,ldp,vp,vl)
+local int outvalue(pip,ofp,ldp,vp,vl)
 PROGINFO	*pip ;
 bfile		*ofp ;
 OUTLINE		*ldp ;
-const char	vp[] ;
+cchar	vp[] ;
 int		vl ;
 {
 	int		rs = SR_OK ;
@@ -566,8 +566,8 @@ int		vl ;
 	    int		nlen ;
 	    int		cl, cl2 ;
 	    int		f_linestart = FALSE ;
-	    const char	*fmt ;
-	    const char	*tp, *cp ;
+	    cchar	*fmt ;
+	    cchar	*tp, *cp ;
 
 	    if (vl < 0) vl = strlen(vp) ;
 
@@ -614,12 +614,12 @@ int		vl ;
 
 
 /* output the content type */
-static int outct(PROGINFO *pip,bfile *ofp,MAILMSGATTENT *ep)
+local int outct(PROGINFO *pip,bfile *ofp,MAILMSGATTENT *ep)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		cte = ep->cte ;
-	const int	f_pt = ep->f_plaintext ;
+	cint	f_pt = ep->f_plaintext ;
 	int		f_mime = pip->fl.mime ;
 
 	if (pip == NULL) return SR_FAULT ;
@@ -693,10 +693,10 @@ static int outct(PROGINFO *pip,bfile *ofp,MAILMSGATTENT *ep)
 /* end subroutine (outct) */
 
 
-static int outpartbody(PROGINFO *pip,bfile *ofp,bfile *ifp,MAILMSGATTENT *ep)
+local int outpartbody(PROGINFO *pip,bfile *ofp,bfile *ifp,MAILMSGATTENT *ep)
 {
-	const int	cte = ep->cte ;
-	const int	rlen = BUFLEN ;
+	cint	cte = ep->cte ;
+	cint	rlen = BUFLEN ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		wlen = 0 ;
@@ -728,7 +728,7 @@ static int outpartbody(PROGINFO *pip,bfile *ofp,bfile *ifp,MAILMSGATTENT *ep)
 	    } /* end while */
 
 	} else if (cte == CE_BASE64) {
-	    const int	ml = MIN(BASE64BUFLEN,BUFLEN) ;
+	    cint	ml = MIN(BASE64BUFLEN,BUFLEN) ;
 
 	    while ((rs = bread(ifp,rbuf,ml)) > 0) {
 	        len = rs ;
@@ -761,22 +761,22 @@ static int outpartbody(PROGINFO *pip,bfile *ofp,bfile *ifp,MAILMSGATTENT *ep)
 /* end subroutine (outpartbody) */
 
 
-static int outpartbodybits(PROGINFO *pip,bfile *ofp,bfile *ifp,
+local int outpartbodybits(PROGINFO *pip,bfile *ofp,bfile *ifp,
 	MAILMSGATTENT *ep)
 {
-	const int	ind = 2 ;
-	const int	bllen = BIGLINEBUFLEN ;
+	cint	ind = 2 ;
+	cint	bllen = BIGLINEBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	const int	f_pt = ep->f_plaintext ;
+	cint	f_pt = ep->f_plaintext ;
 	char		*blbuf = NULL ;
 	char		*p ;
 
 	if ((rs = uc_malloc((bllen+1),&p)) >= 0) {
 	    LINEFOLD	lf ;
-	    const int	cols = MAILTEXTCOLS ;
-	    const int	f_textcrnl = (pip->fl.crnl && f_pt) ;
+	    cint	cols = MAILTEXTCOLS ;
+	    cint	f_textcrnl = (pip->fl.crnl && f_pt) ;
 	    int		len ;
 	    int		ll ;
 	    int		f_bol = TRUE ;
@@ -809,8 +809,8 @@ static int outpartbodybits(PROGINFO *pip,bfile *ofp,bfile *ifp,
 	                }
 
 	                if (len > 0) {
-	                    const int	c = cols ;
-	                    const int	l = len ;
+	                    cint	c = cols ;
+	                    cint	l = len ;
 	                    char	*blb = blbuf ;
 	                    if ((rs = linefold_start(&lf,c,ind,blb,l)) >= 0) {
 	                        int	i = 0 ;
@@ -875,7 +875,7 @@ static int outpartbodybits(PROGINFO *pip,bfile *ofp,bfile *ifp,
 
 
 /* write out in BASE64! */
-static int outbase64(PROGINFO *pip,bfile *ofp,cchar *sbuf,int slen)
+local int outbase64(PROGINFO *pip,bfile *ofp,cchar *sbuf,int slen)
 {
 	int		rs = SR_OK ;
 	int		i = 0 ;
@@ -892,7 +892,7 @@ static int outbase64(PROGINFO *pip,bfile *ofp,cchar *sbuf,int slen)
 #endif
 
 	while ((rs >= 0) && (rlen > 0)) {
-	    const int	mlen = MIN(BASE64BUFLEN,rlen) ;
+	    cint	mlen = MIN(BASE64BUFLEN,rlen) ;
 	    len = base64_e((sbuf + i),mlen,outbuf) ;
 	    rs = bprintln(ofp,outbuf,len) ;
 	    wlen += rs ;
@@ -910,7 +910,7 @@ static int outbase64(PROGINFO *pip,bfile *ofp,cchar *sbuf,int slen)
 /* end subroutine (outbase64) */
 
 
-static int outline_start(OUTLINE *op,int maxlen,int rlen)
+local int outline_start(OUTLINE *op,int maxlen,int rlen)
 {
 
 	if (op == NULL) return SR_FAULT ;
@@ -924,7 +924,7 @@ static int outline_start(OUTLINE *op,int maxlen,int rlen)
 /* end subroutine (outline_start) */
 
 
-static int outline_finish(OUTLINE *op)
+local int outline_finish(OUTLINE *op)
 {
 
 	if (op == NULL) return SR_FAULT ;
@@ -935,11 +935,11 @@ static int outline_finish(OUTLINE *op)
 
 
 /* calculate an estimated length */
-static int strestlen(cchar *sp,int sl)
+local int strestlen(cchar *sp,int sl)
 {
 	int		len = 0 ;
 	int		cl ;
-	const char	*cp ;
+	cchar	*cp ;
 	while ((cl = nextfield(sp,sl,&cp)) > 0) {
 	    len += (cl+1) ;
 	    sl -= ((cp+cl)-sp) ;
