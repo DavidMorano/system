@@ -114,10 +114,6 @@
 #define	POLL_INTMULT	1000
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #ifndef	TO_LOGFLUSH
 #define	TO_LOGFLUSH	10
 #endif
