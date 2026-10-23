@@ -75,10 +75,6 @@
 #define	INETXADDRLEN	sizeof(struct in_addr)
 #endif
 
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
 #ifndef	SVCBUFLEN
 #define	SVCBUFLEN	LINEBUFLEN
 #endif
@@ -87,23 +83,14 @@
 #define	SVCSPECLEN	120
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 #ifndef	TO_SVC
 #define	TO_SVC		30
 #endif
 
-#define	ISEOL(c)	(((c) == '\n') || ((c) == '\r'))
-
 
 /* external subroutines */
-
-extern int	sisub(cchar *,int,cchar *) ;
-extern int	field_svcargs(FIELD *,VECSTR *) ;
 
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
@@ -111,9 +98,6 @@ extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -140,8 +124,10 @@ static const uchar	sterms[] = {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int proghandle(pip,sop,bop,cip)
 struct proginfo		*pip ;
