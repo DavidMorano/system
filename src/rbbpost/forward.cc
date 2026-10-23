@@ -88,8 +88,8 @@
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -98,7 +98,7 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int	bprintpath(bfile *,const char *,RETPATH *) ;
+local int	bprintpath(bfile *,cchar *,RETPATH *) ;
 
 
 /* exported subroutines */
@@ -127,7 +127,7 @@ char		host[] ;
 	int	f_bol, f_eol ;
 	int	f_looking, f_path ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	linebuf[LINEBUFLEN + 1] ;
 	char	cmdbuf[BUFLEN + 3] ;
@@ -446,9 +446,9 @@ badopen:
 /* local subroutines */
 
 
-static int bprintpath(pfp,nodename,plp)
+local int bprintpath(pfp,nodename,plp)
 bfile		*pfp ;
-const char	nodename[] ;
+cchar	nodename[] ;
 RETPATH		*plp ;
 {
 	int	rs = SR_OK ;
@@ -456,7 +456,7 @@ RETPATH		*plp ;
 	int	cl, ll ;
 	int	bl = 0 ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	ll = 0 ;
