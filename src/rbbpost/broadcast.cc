@@ -81,7 +81,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	isourself(struct proginfo *,BBHOSTS *,cchar *) ;
+local int	isourself(struct proginfo *,BBHOSTS *,cchar *) ;
 
 
 /* exported subroutines */
@@ -391,7 +391,7 @@ BBHOSTS		*bhp, *bnp ;
 
 
 /* is the supplied name a synonym for us? */
-static int isourself(pip,bnp,name)
+local int isourself(pip,bnp,name)
 struct proginfo	*pip ;
 BBHOSTS		*bnp ;
 cchar	name[] ;
