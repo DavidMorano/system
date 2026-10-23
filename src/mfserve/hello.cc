@@ -5,7 +5,7 @@
 /* this is a MFSERVE loadable service-module */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -47,25 +47,22 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<estrings.h>
 #include	<buffer.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"mfserve.h"
 #include	"hello.h"
 
 
 /* local defines */
-
-#ifndef	ORGCODELEN
-#define	ORGCODELEN	MAXNAMELEN
-#endif
 
 #define	HELLO_CSIZE	100 	/* default arg-chuck size */
 
@@ -74,15 +71,10 @@
 
 extern "C" {
     typedef int	(*thrsub_t)(void *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -102,11 +94,11 @@ local int hello_argsend(HELLO *) ;
 
 /* exported variables */
 
-MFSERVE_MOD	hello = {
+constexpr MFSERVE_MOD	hello = {
 	"hello",
 	szof(HELLO),
 	0
-} ;
+} ; /* end initialization */
 
 
 /* exported subroutines */
@@ -117,7 +109,7 @@ int hello_start(HELLO *op,cchar *pr,SREQ *jep,mainv argv,mainv envv) noex {
 
 	if (op == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_start: ent {%p}\n",op) ;
 	debugprintf("hello_start: pr=%s\n",pr) ;
 #endif
@@ -164,7 +156,7 @@ int hello_start(HELLO *op,cchar *pr,SREQ *jep,mainv argv,mainv envv) noex {
 	    } /* end if (hello_argsbegin) */
 	} /* end if (sreq_getstdout) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_start: ret rs=%d\n",rs) ;
 #endif
 
@@ -177,7 +169,7 @@ int hello_finish(HELLO *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_finish: ent {%p}\n",op) ;
 #endif
 
@@ -185,14 +177,14 @@ int hello_finish(HELLO *op) noex {
 
 	if (op->magic != HELLO_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_finish: f_working=%d\n",op->fl.working) ;
 #endif
 
 	rs1 = hello_argsend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_finish: ret rs=%d\n",rs) ;
 #endif
 
@@ -205,7 +197,7 @@ int hello_check(HELLO *op) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_check: ent {%p}\n",op) ;
 #endif
 
@@ -215,7 +207,7 @@ int hello_check(HELLO *op) noex {
 
 	f = op->f_exiting ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_check: ret rs=%d f=%u\n",rs,f) ;
 #endif
 
@@ -225,13 +217,13 @@ int hello_check(HELLO *op) noex {
 
 int hello_abort(HELLO *op) noex {
 	int	f ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_abort: ent {%p}\n",op) ;
 #endif
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != HELLO_MAGIC) return SR_NOTOPEN ;
 	f = op->f_exiting ;
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("hello_abort: cont f=%u\n",f) ;
 #endif
 	op->f_abort = true ;
