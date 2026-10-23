@@ -56,11 +56,11 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	vecpstr_loaddirs(VECPSTR *,const char *) ;
-extern int	isOneOf(const int *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	strwcmp(cchar *,cchar *,int) ;
+extern int	vecpstr_loaddirs(VECPSTR *,cchar *) ;
+extern int	isOneOf(cint *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
 
@@ -78,10 +78,10 @@ extern int	progpcsgid(PROGINFO *) ;
 
 /* forward references */
 
-static int	procdiffer(PROGINFO *,VECPSTR *,cchar *) ;
-static int	procdircache(PROGINFO *,bfile *,VECPSTR *,cchar *) ;
-static int	procdircacher(PROGINFO *,vecpstr *,cchar *) ;
-static int	procrem(PROGINFO *,cchar *,cchar *) ;
+local int	procdiffer(PROGINFO *,VECPSTR *,cchar *) ;
+local int	procdircache(PROGINFO *,bfile *,VECPSTR *,cchar *) ;
+local int	procdircacher(PROGINFO *,vecpstr *,cchar *) ;
+local int	procrem(PROGINFO *,cchar *,cchar *) ;
 
 
 /* local variables */
@@ -133,13 +133,13 @@ int progdname(PROGINFO *pip,bfile *ofp,cchar *np,int nl)
 	    } /* end if (vecpstr-dirs) */
 
 	    if ((rs >= 0) && (pip->debuglevel > 0)) {
-	        const char	*pn = pip->progname ;
-	        const char	*fmt = "%s: dir=%s updated=%u\n" ;
+	        cchar	*pn = pip->progname ;
+	        cchar	*fmt = "%s: dir=%s updated=%u\n" ;
 	        bprintf(pip->efp,fmt,pn,newsdname,f_updated) ;
 	    } /* end if */
 
 	    if ((rs >= 0) && (pip->open.logprog> 0)) {
-	        const char	*fmt = "dir=%s updated=%u" ;
+	        cchar	*fmt = "dir=%s updated=%u" ;
 	        proglog_printf(pip,fmt,newsdname,f_updated) ;
 	    } /* end if */
 
@@ -155,25 +155,25 @@ int progdname(PROGINFO *pip,bfile *ofp,cchar *np,int nl)
 /* local subroutines */
 
 
-static int procdiffer(PROGINFO *pip,VECPSTR *dlp,cchar *newsdname)
+local int procdiffer(PROGINFO *pip,VECPSTR *dlp,cchar *newsdname)
 {
-	const int	ml = strlen(DIRCACHE_MAGIC) ;
+	cint	ml = strlen(DIRCACHE_MAGIC) ;
 	int		rs ;
 	int		rs1 ;
 	int		f = TRUE ;
 
 	if ((rs = vecpstr_getsize(dlp)) >= 0) {
-	    const int	dsize = rs ;
-	    const char	*dc = DIRCACHEFNAME ;
+	    cint	dsize = rs ;
+	    cchar	*dc = DIRCACHEFNAME ;
 	    char	dcfname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath2(dcfname,newsdname,dc)) >= 0) {
 	        ustat	sb ;
 	        if ((rs = uc_stat(dcfname,&sb)) >= 0) {
 	            bfile	cfile, *cfp = &cfile ;
-	            const int	fsize = (sb.st_size & INT_MAX) ;
+	            cint	fsize = (sb.st_size & INT_MAX) ;
 	            if (dsize == (fsize-ml-1)) {
 	                if ((rs = bopen(cfp,dcfname,"r",0666)) >= 0) {
-	                    const int	dlen = MAXPATHLEN ;
+	                    cint	dlen = MAXPATHLEN ;
 	                    int		line = 0 ;
 	                    int		f_mis = FALSE ;
 	                    cchar	*dp ;
@@ -207,7 +207,7 @@ static int procdiffer(PROGINFO *pip,VECPSTR *dlp,cchar *newsdname)
 /* end subroutine (procdiffer) */
 
 
-static int procdircache(PROGINFO *pip,bfile *ofp,VECPSTR *dlp,cchar *newsdname)
+local int procdircache(PROGINFO *pip,bfile *ofp,VECPSTR *dlp,cchar *newsdname)
 {
 	int		rs ;
 	int		c = 0 ;
@@ -231,7 +231,7 @@ static int procdircache(PROGINFO *pip,bfile *ofp,VECPSTR *dlp,cchar *newsdname)
 /* end subroutine (procdircache) */
 
 
-static int procdircacher(PROGINFO *pip,vecpstr *dlp,cchar *fn)
+local int procdircacher(PROGINFO *pip,vecpstr *dlp,cchar *fn)
 {
 	bfile		dcfile, *dcfp = &dcfile ;
 	int		rs ;
@@ -260,7 +260,7 @@ static int procdircacher(PROGINFO *pip,vecpstr *dlp,cchar *fn)
 /* end subroutine (procdircacher) */
 
 
-static int procrem(PROGINFO *pip,cchar *tbuf,cchar *dcfname)
+local int procrem(PROGINFO *pip,cchar *tbuf,cchar *dcfname)
 {
 	int		rs ;
 	if ((rs = progpcsuid(pip)) >= 0) {
