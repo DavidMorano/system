@@ -52,14 +52,14 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -84,14 +84,14 @@ extern char	**environ ;
 
 int lpgetout(pip,printer,vbuf,vlen,key)
 struct proginfo	*pip ;
-const char	printer[] ;
+cchar	printer[] ;
 char		vbuf[] ;
 int		vlen ;
-const char	key[] ;
+cchar	key[] ;
 {
 	bfile	ofile, *ofp = &ofile  ;
 
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -101,9 +101,9 @@ const char	key[] ;
 	int	f_gotit ;
 	int	f_first ;
 
-	const char	*progfname = pip->prog_lpget ;
-	const char	*cp, *tp ;
-	const char	*av[6] ;
+	cchar	*progfname = pip->prog_lpget ;
+	cchar	*cp, *tp ;
+	cchar	*av[6] ;
 
 	char	progname[MAXNAMELEN + 1] ;
 	char	lbuf[LINEBUFLEN + 1] ;
