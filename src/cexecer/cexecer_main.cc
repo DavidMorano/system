@@ -1,11 +1,10 @@
-/* main SUPPORT (CEXECER) */
+/* cexecer_main SUPPORT (CEXECER) */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
 /* program to return a user's home login directory */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGN	0		/* special debugging */
@@ -41,20 +40,21 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
 #include	<bits.h>
-#include	<ascii.h>
 #include	<vecstr.h>
 #include	<stdorder.h>
 #include	<sockaddress.h>
 #include	<filer.h>
 #include	<dialopts.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<exitcodes.h>
-#include	<localmisc.h>
-#include	<debug.h>
+#include	<vardefs.h>		/* LIBU */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBU */
 
 #include	"dialcprogmsg.h"
 #include	"config.h"
@@ -69,22 +69,6 @@ import libutil ;			/* |memclear(3u)| */
 
 #ifndef	PORTBUFLEN
 #define	PORTBUFLEN	20
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
-#ifndef	VARPWD
-#define	VARPWD		"PWD"
-#endif
-
-#ifndef	VARNODE
-#define	VARNODE		"NODE"
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 #ifndef	BUFLEN
@@ -102,8 +86,8 @@ import libutil ;			/* |memclear(3u)| */
 #define	TARGETINFO	struct targetinfo
 #define	TARGETINFO_FL	struct targetinfo_flags
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#define	LI		locinfo
+#define	LI_FL		locinfo_flags
 
 #define	NDF		"/tmp/cexecer.deb"
 
@@ -112,14 +96,6 @@ import libutil ;			/* |memclear(3u)| */
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	nprintf(cchar *,cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -135,8 +111,8 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, finval ;
-	LOCINFO_FL	open ;
+	LI_FL	have, f, changed, finval ;
+	LI_FL	open ;
 	vecstr		stores ;
 	vecstr		args ;
 	vecstr		envs ;
@@ -172,11 +148,11 @@ local int	process_input(PROGINFO *,int,int,
 local int	process_record(PROGINFO *,filer *,int,int,char *,
 			int,TARGETINFO *) ;
 
-local int	locinfo_start(LOCINFO *,PROGINFO *) ;
-local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LI *,PROGINFO *) ;
+local int	locinfo_finish(LI *) ;
 
 #if	CF_LOCSETENT
-local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LI *,cchar **,cchar *,int) ;
 #endif
 
 
@@ -248,7 +224,7 @@ static cchar	*envsys[] = {
 int main(int argc,cchar **argv,cchar **envv)
 {
 	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+	LI		li, *lip = &li ;
 	TARGETINFO	ti, *tip = &ti ;
 	bits		pargs ;
 	bfile		errfile ;
@@ -1039,7 +1015,7 @@ local int usage(PROGINFO *pip)
 
 local int procenvsys(PROGINFO *pip)
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	struct utsname	un ;
 	int		rs ;
 	int		rs1 ;
@@ -1257,7 +1233,7 @@ char		rbuf[] ;
 int		rlen ;
 TARGETINFO	*tip ;
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	int		rs ;
 	int		len ;
 	int		envlen ;
@@ -1308,12 +1284,12 @@ TARGETINFO	*tip ;
 /* end subroutine (process_record) */
 
 
-local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LI *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		vo ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 	lip->pip = pip ;
 	lip->fl.poll = TRUE ;
 
@@ -1334,7 +1310,7 @@ local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-local int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LI *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1359,7 +1335,7 @@ local int locinfo_finish(LOCINFO *lip)
 
 
 #if	CF_LOCSETENT
-int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
+int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
