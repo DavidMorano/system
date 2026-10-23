@@ -175,7 +175,7 @@ so:			$(T).so
 $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
-$(T).o:			$(OBJ) Makefile localmisc.h
+$(T).o:			$(OBJ)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 $(T).so:		$(OBJ)
