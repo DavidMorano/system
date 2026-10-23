@@ -1,4 +1,4 @@
-/* localmisc_truth HEADER */
+/* localmisc_defs HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -17,28 +17,28 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	LOCALMISCTRUTH_INCLUDE
-#define	LOCALMISCTRUTH_INCLUDE
+#ifndef	LOCALMISCDEFS_INCLUDE
+#define	LOCALMISCDEFS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
-
-#define	NULLDEV		"/dev/null"
-#define	TTYDEV		"/dev/tty"
 
 #ifndef	PASSWDLEN
 #define	PASSWDLEN	64
 #endif
 
 #ifndef	ORGLEN
-#define	ORGLEN		80
+#define	ORGLEN		80		/* length organization-name */
+#endif
+#ifndef	ORGLOCLEN
+#define	ORLOCGLEN	80		/* length organization-location */
 #endif
 #ifndef	ORGCODELEN
-#define	ORGCODELEN	40
+#define	ORGCODELEN	40		/* length organization-ode */
 #endif
 
 
-#endif /* LOCALMISCTRUTH_INCLUDE */
+#endif /* LOCALMISCDEFS_INCLUDE */
 
 
