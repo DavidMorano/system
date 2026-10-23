@@ -190,7 +190,7 @@ local int reader(istream *isp,char *rbuf,int rlen,int delim) noex {
 	    } /* end for */
 	    if (ffail) {
 	        rs = SR_IO ;
-	    }
+	    } /* end if (error) */
 	} catch (...) {
 	    rs = SR_NOMEM ;
 	} /* end if (error) */
