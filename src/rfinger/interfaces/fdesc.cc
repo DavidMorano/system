@@ -127,7 +127,7 @@ int		to ;
 
 int fdesc_write(op,buf,buflen)
 FDESC		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int	rs ;
