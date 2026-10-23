@@ -5,7 +5,6 @@
 /* handle MSU configuration functions */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_CPUSPEED	1		/* calculate CPU speed */
 
@@ -58,17 +57,18 @@
 #include	<sockaddress.h>
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<kinfo.h>		/* Solaris® */
 
 #include	"config.h"
 #include	"progconfig.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
 
-#ifndef	PROGINFO
-#define	PROGINFO	struct proginfo
+#ifndef	PI
+#define	PI		proginfo
 #endif
 
 #ifndef	PBUFLEN
@@ -83,10 +83,6 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #ifndef	IPCBUFLEN
 #define	IPCBUFLEN	MSGBUFLEN
 #endif
@@ -96,10 +92,6 @@
 
 #define	DEBUGFNAME	"/tmp/nettime_config.deb"
 
-#ifndef	TTYFNAME
-#define	TTYFNAME	"/dev/tty"
-#endif
-
 #define	MSU_REQCNAME	"req"
 
 #undef	TMPDMODE
@@ -107,35 +99,6 @@
 
 
 /* external subroutines */
-
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecmfi(cchar *,int,int *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	optbool(cchar *,int) ;
-extern int	getutmpterm(char *,int,pid_t) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	securefile(cchar *,uid_t,gid_t) ;
-extern int	getserial(cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -147,7 +110,6 @@ extern char	*strwcpy(char *,cchar *,int) ;
 /* forward references */
 
 local int	config_addcooks(struct config *) ;
-
 local int	setfname(struct proginfo *,char *,cchar *,int,
 			int,cchar *,cchar *,cchar *) ;
 
