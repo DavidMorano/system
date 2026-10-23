@@ -26,8 +26,8 @@
 
 	int progkey(pip,printer,keyname)
 	PROGINFO	*pip ;
-	const char	printer[] ;
-	const char	keyname[] ;
+	cchar	printer[] ;
+	cchar	keyname[] ;
 
 	Arguments:
 
@@ -75,12 +75,12 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
 extern int lpgetout(PROGINFO *,cchar *,char *,int,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -101,14 +101,14 @@ extern int	strlinelen(const char *,int,int) ;
 
 int progkey(pip,printer,kp,kl)
 PROGINFO	*pip ;
-const char	printer[] ;
-const char	kp[] ;
+cchar	printer[] ;
+cchar	kp[] ;
 int		kl ;
 {
-	const int	vlen = VBUFLEN ;
+	cint	vlen = VBUFLEN ;
 	int		rs ;
 	int		vl = 0 ;
-	const char	*pp ;
+	cchar	*pp ;
 	char		keyname[KEYBUFLEN+1] ;
 	char		vbuf[VBUFLEN + 1] ;
 
