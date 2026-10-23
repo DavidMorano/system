@@ -5,7 +5,6 @@
 /* handle MSU configuration functions */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 
 /* revision history:
@@ -41,6 +40,7 @@
 #include	<strwcpy.h>
 #include	<strwcmp.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"msumain.h"
 #include	"msuconfig.h"
@@ -49,11 +49,6 @@
 
 
 /* local typedefs */
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef cchar	cchar ;
-#endif
 
 
 /* local defines */
@@ -68,10 +63,6 @@ typedef cchar	cchar ;
 
 #ifndef	EBUFLEN
 #define	EBUFLEN		(3 * MAXPATHLEN)
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 
@@ -132,7 +123,7 @@ enum params {
 /* exported subroutines */
 
 
-int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck)
+int config_start(CONFIG *cfp,PI *pip,cchar *cfname,int intcheck)
 {
 	EXPCOOK		*ckp ;
 	int		rs ;
@@ -198,11 +189,11 @@ int config_start(CONFIG *cfp,PROGINFO *pip,cchar *cfname,int intcheck)
 
 int config_finish(CONFIG *cfp)
 {
-	PROGINFO	*pip ;
+	PI	*pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("config_finish: ent\n") ;
 #endif
 
@@ -246,7 +237,7 @@ int config_finish(CONFIG *cfp)
 
 int config_check(CONFIG *cfp)
 {
-	PROGINFO	*pip ;
+	PI	*pip ;
 	int		rs = SR_OK ;
 	int		f_changed = FALSE ;
 
@@ -306,7 +297,7 @@ int config_read(CONFIG *cfp)
 
 local int config_reader(CONFIG *cfp)
 {
-	PROGINFO	*pip = cfp->pip ;
+	PI	*pip = cfp->pip ;
 	LOCINFO		*lip ;
 	paramfile	*pfp = &cfp->p ;
 	paramfile_cur	cur ;
@@ -497,7 +488,7 @@ local int config_reader(CONFIG *cfp)
 
 local int config_addcooks(CONFIG *cfp)
 {
-	PROGINFO	*pip = cfp->pip ;
+	PI	*pip = cfp->pip ;
 	EXPCOOK		*ckp = &cfp->cooks ;
 	int		rs = SR_OK ;
 	int		i ;
