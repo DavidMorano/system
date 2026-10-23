@@ -53,7 +53,7 @@
 #include	<ascii.h>
 #include	<char.h>
 #include	<hasx.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG */
@@ -183,19 +183,19 @@ struct artinfo {
 
 /* forward references */
 
-static int	procartfiles(PROGINFO *) ;
-static int	procmsg(PROGINFO *,PROCDATA *,cchar *,int) ;
-static int	procmsger(PROGINFO *,PROCDATA *,cchar *,int) ;
-static int	procmsgexpires(PROGINFO *,PROCDATA *,ARTINFO *) ;
-static int	procmsgmaint(PROGINFO *,PROCDATA *,ARTINFO *) ;
-static int	procmsgdel(PROGINFO *,PROCDATA *,ARTINFO *) ;
+local int	procartfiles(PROGINFO *) ;
+local int	procmsg(PROGINFO *,PROCDATA *,cchar *,int) ;
+local int	procmsger(PROGINFO *,PROCDATA *,cchar *,int) ;
+local int	procmsgexpires(PROGINFO *,PROCDATA *,ARTINFO *) ;
+local int	procmsgmaint(PROGINFO *,PROCDATA *,ARTINFO *) ;
+local int	procmsgdel(PROGINFO *,PROCDATA *,ARTINFO *) ;
 
-static int	procdata_start(PROCDATA *,char *,int) ;
-static int	procdata_finish(PROCDATA *) ;
+local int	procdata_start(PROCDATA *,char *,int) ;
+local int	procdata_finish(PROCDATA *) ;
 
-static int	artinfo_start(ARTINFO *,char *,cchar *,int) ;
-static int	artinfo_ngs(ARTINFO *,MAILMSG *,EMA **) ;
-static int	artinfo_finish(ARTINFO *) ;
+local int	artinfo_start(ARTINFO *,char *,cchar *,int) ;
+local int	artinfo_ngs(ARTINFO *,MAILMSG *,EMA **) ;
+local int	artinfo_finish(ARTINFO *) ;
 
 
 /* local variables */
@@ -257,7 +257,7 @@ int progartmaint(PROGINFO *pip,TDINFO *tip)
 /* local subroutines */
 
 
-static int procartfiles(PROGINFO *pip)
+local int procartfiles(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -306,7 +306,7 @@ static int procartfiles(PROGINFO *pip)
 
 
 /* process the current message */
-static int procmsg(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
+local int procmsg(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
 {
 	cint	tdlen = pdp->tdlen ;
 	int		rs ;
@@ -359,7 +359,7 @@ static int procmsg(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
 /* end subroutine (procmsg) */
 
 
-static int procmsger(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
+local int procmsger(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
 {
 	ARTINFO		ai, *aip = &ai ;
 	int		rs ;
@@ -397,7 +397,7 @@ static int procmsger(PROGINFO *pip,PROCDATA *pdp,cchar *ep,int el)
 /* end subroutine (procmsger) */
 
 
-static int procmsgexpires(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
+local int procmsgexpires(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 {
 	MAILMSG		*msgp = pdp->msgp ;
 	const time_t	dt = pip->daytime ;
@@ -434,7 +434,7 @@ static int procmsgexpires(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 /* end subroutine (procmsgexpires) */
 
 
-static int procmsgmaint(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
+local int procmsgmaint(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 {
 	EMA		*emap ;
 	EMA_ENT		*ep ;
@@ -518,7 +518,7 @@ static int procmsgmaint(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 /* end subroutine (procmsgmaint) */
 
 
-static int procmsgdel(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
+local int procmsgdel(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 {
 	EMA		*emap ;
 	EMA_ENT		*ep ;
@@ -594,7 +594,7 @@ static int procmsgdel(PROGINFO *pip,PROCDATA *pdp,ARTINFO *aip)
 /* end subroutine (procmsgdel) */
 
 
-static int procdata_start(PROCDATA *pdp,char *tdname,int tdlen)
+local int procdata_start(PROCDATA *pdp,char *tdname,int tdlen)
 {
 	memset(pdp,0,sizeof(PROCDATA)) ;
 	pdp->tdname = tdname ;
@@ -604,7 +604,7 @@ static int procdata_start(PROCDATA *pdp,char *tdname,int tdlen)
 /* end subroutine (procdata_start) */
 
 
-static int procdata_finish(PROCDATA *pdp)
+local int procdata_finish(PROCDATA *pdp)
 {
 	if (pdp == NULL) return SR_FAULT ;
 	return SR_OK ;
@@ -612,7 +612,7 @@ static int procdata_finish(PROCDATA *pdp)
 /* end subroutine (procdata_finish) */
 
 
-static int artinfo_start(ARTINFO *aip,char *tdname,cchar *anp,int anl)
+local int artinfo_start(ARTINFO *aip,char *tdname,cchar *anp,int anl)
 {
 	memset(aip,0,sizeof(ARTINFO)) ;
 	aip->tdname = tdname ;
@@ -623,7 +623,7 @@ static int artinfo_start(ARTINFO *aip,char *tdname,cchar *anp,int anl)
 /* end subroutine (artinfo_start) */
 
 
-static int artinfo_finish(ARTINFO *aip)
+local int artinfo_finish(ARTINFO *aip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -637,7 +637,7 @@ static int artinfo_finish(ARTINFO *aip)
 /* end subroutine (artinfo_finish) */
 
 
-static int artinfo_ngs(ARTINFO *aip,MAILMSG *msgp,EMA **rpp)
+local int artinfo_ngs(ARTINFO *aip,MAILMSG *msgp,EMA **rpp)
 {
 	int		rs = SR_OK ;
 
