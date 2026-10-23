@@ -69,10 +69,6 @@
 #define	TAG		23
 #define	DURATION	15
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	DENOM		(1000 * 1000)
 
 
