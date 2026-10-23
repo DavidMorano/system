@@ -46,10 +46,6 @@ import libutil ;
 
 /* local defines */
 
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
-#endif
-
 
 /* external subroutines */
 
@@ -157,7 +153,6 @@ int output(progifo *pip,cchar *ofname) noex {
 	} /* end if (writing the stuff) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (output) */
+} /* end subroutine (output) */
 
 
