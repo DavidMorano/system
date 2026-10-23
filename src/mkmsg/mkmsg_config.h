@@ -101,10 +101,6 @@
 
 #define	FROM_ESCAPE	'\b'
 
-#ifndef	ORGLEN
-#define	ORGLEN		80
-#endif
-
 #define	LOGSIZE		(80*1024)
 
 #define	OPT_LOGPROG	TRUE		/* logging */
