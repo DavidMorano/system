@@ -22,6 +22,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<limits.h>		/* POSIX® |UCHAR_MAX| */
 #include	<localmisc_isval.h>	/* LIBU */
 #include	<localmisc_isx.h>	/* LIBU */
 
