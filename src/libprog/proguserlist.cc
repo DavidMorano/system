@@ -1,4 +1,5 @@
 /* proguserlist SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* user-list handling (in the background) */
@@ -20,6 +21,10 @@
 
 /*******************************************************************************
 
+  	Name:
+	proguserlist
+
+	Description:
 	Here we do some user-list handling, in the background.
 
 *******************************************************************************/
