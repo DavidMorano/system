@@ -118,7 +118,7 @@ int progconfig(proginfo *pip) noex {
 
 	    varsub_start(&vsh_e,0) ;
 
-	    varsub_loadenv(&vsh_e,(const char **) envv) ;
+	    varsub_loadenv(&vsh_e,(cchar **) envv) ;
 
 /* program root from configuration file */
 
