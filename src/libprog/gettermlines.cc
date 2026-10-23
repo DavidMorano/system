@@ -1,4 +1,5 @@
 /* gettermlines SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* retrieve some information about any LOGIN terminal lines */
@@ -20,28 +21,30 @@
 
 /*******************************************************************************
 
+	Name:
+	gettermlines
+
+	Description:
 	We get some terminal lines here.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<csysbase.h>		/* LIBU */
+#include	<vardefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"proginfo.hh"
 
 
 /* local defines */
-
-#ifndef	VARLINES
-#define	VARLINES	"LINES"
-#endif
 
 #ifndef	VARTERMCAP
 #define	VARTERMCAP	"TERMCAP"
@@ -65,7 +68,7 @@
 
 /* exported subroutines */
 
-int gettermlines(PROGINFO *pip) noex {
+int gettermlines(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		n = pip->termlines ;
 	if (n <= 0) {
