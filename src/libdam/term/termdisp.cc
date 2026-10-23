@@ -58,6 +58,7 @@
 #include	<tabcols.h>		/* LIBUC */
 #include	<bufprintf.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |HEXBUFLEN| + |NTABCOLS| */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"termdisp.h"
 
@@ -92,17 +93,12 @@ import libutil ;			/* |memclear(3u)| + |lenstr(3u)| */
 #undef	CBUFLEN
 #define	CBUFLEN		((4*4)+3)
 
-#ifndef	HEXBUFLEN
-#define	HEXBUFLEN	100
-#endif
-
 
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -145,12 +141,13 @@ template<typename ... Args>
 local int termdisp_ctor(TD *op,Args ... args) noex {
     	TD		*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ; /* dangerous */
-	    if ((op->tsp = new(nothrow) termstr) != np) ylikely {
-	        if ((op->wlp = new(nothrow) vecitem) != np) ylikely {
+	    if ((op->tsp = new(nt) termstr) != np) ylikely {
+	        if ((op->wlp = new(nt) vecitem) != np) ylikely {
 		    rs = SR_OK ;
 	        } /* end if (new-vecitem) */
 		if (rs < 0) {
