@@ -130,6 +130,24 @@
 #define	once_call		call_once
 #endif
 
+#ifdef	__cplusplus
+#ifndef	statcexpr
+#define	statcexpr		static constexpr
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	statcinit
+#define	statcinit		static constinit
+#endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	statceval
+#define	statceval		static consteval
+#endif
+#endif /* __cplusplus */
+
 
 #endif /* CLANGUAGEKEYWORDS_INCLUDE */
 
