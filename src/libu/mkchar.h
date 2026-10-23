@@ -64,21 +64,21 @@
 
 extern int mkchar(int ch) noex {
 	return (ch & UCHAR_MAX) ;
-}
+} /* end */
 
 #else /* MODULE */
 #if	defined(__cplusplus)
 
 constexpr inline int mkchar(int ch) noex {
 	return (ch & UCHAR_MAX) ;
-}
+} /* end */
 
 #else /* __cplusplus */
 #define	MKCHAR_STATICINLINE
 
 local inline int mkchar(int ch) noex {
 	return (ch & UCHAR_MAX) ;
-}
+} /* end */
 
 #endif /* _cplusplus */
 #endif /* MODULE */
