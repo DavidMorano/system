@@ -1,11 +1,10 @@
-/* main SUPPORT */
+/* pcsuucpd_main SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGNOCONF	0		/* do not allow config file */
 #define	CF_RUNMODE	0		/* put RUNMODE in environment */
@@ -83,19 +82,11 @@
 
 /* local defines */
 
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100
-#endif
-
 #define	MAXARGINDEX	100
 #define	MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
 #ifndef	BUFLEN
 #define	BUFLEN		((8 * 1024) + REALNAMELEN)
-#endif
-
-#ifndef	NULLDEV
-#define	NULLDEV		"/dev/null"
 #endif
 
 #ifndef	PORTBUFLEN
@@ -307,12 +298,12 @@ int main(int argc,mainv argv,mainv envv) {
 	char	*portspec = NULL ;
 	char	*sp, *cp ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 /* we want to open up some files so that the first few FD slots are FULL! */
 
@@ -1979,7 +1970,7 @@ ret1:
 
 ret0:
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -2408,11 +2399,9 @@ cchar	dname[] ;
 int		mode ;
 {
 	ustat	sb ;
-
 	int	rs ;
 
-
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("checkdir: entered\n") ;
 #endif
 
