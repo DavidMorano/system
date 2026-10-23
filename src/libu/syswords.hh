@@ -80,7 +80,7 @@ struct syswords {
 	static cchar w_blanks[] ;
 	static cchar w_defprovider[] ;
 	static cchar w_localhost[] ;
-	static cchar w_mailhost[]	;
+	static cchar w_mailhost[] ;
 	static cchar w_loghost[] ;
 } ; /* end struct (syswords) */
 
