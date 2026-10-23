@@ -1,4 +1,5 @@
 /* progprinthelp SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* print out a help file if we have one */
