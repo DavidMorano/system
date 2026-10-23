@@ -76,10 +76,6 @@ import libutil ;			/* |lenstr(3u)| */
 #define	PCS		"/usr/add-on/pcs"
 #endif
 
-#ifndef	NULLDEV
-#define	NULLDEV		"/dev/null"
-#endif
-
 #ifndef	VARPRPCS
 #define	VARPRPCS	"PCS"
 #endif
