@@ -228,6 +228,10 @@
 #define	VARCOLUMNS	"COLUMNS"
 #endif
 
+#ifndef	VARTERMCAP
+#define	VARTERMCAP	"TERMCAP"
+#endif
+
 
 #endif /* VARDEFS_INCLUDE */
 
