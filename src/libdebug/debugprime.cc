@@ -31,8 +31,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstdarg>
 #include	<clanguage.h>
 #include	<usysbase.h>
@@ -43,7 +43,7 @@
 #include	<localmisc.h>		/* |COLUMNS| */
 
 #include	"debugutil.hh"
-#include	"libdebug.h"
+#include	"libdebug.h"		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -52,10 +52,6 @@ import libutil ;			/* |lenstr(3u)| */
 /* local defines */
 
 #define	PRINTBUFLEN	(COLUMNS + 2)
-
-#ifndef	HEXBUFLEN
-#define	HEXBUFLEN	100
-#endif
 
 
 /* imported namespaces */
