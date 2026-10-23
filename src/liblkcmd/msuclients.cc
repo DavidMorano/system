@@ -5,7 +5,7 @@
 /* object to interact with the MSU server */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+#define	CF_DEBUG	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -50,6 +50,7 @@
 #include	<ctdec.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"msuclients.h"
 #include	"msumsg.h"
@@ -82,14 +83,6 @@
 #define	CMSGBUFLEN	256
 #endif
 
-#ifndef	COLUMNS
-#define	COLUMNS		80
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #define	OPTBUFLEN	(DIGBUFLEN + 4)
 
 #define	NIOVECS		1
@@ -100,10 +93,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
 
 
 /* external variables */
@@ -200,7 +189,7 @@ int		to ;
 		msuclients_setend(op) ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_open: ret rs=%d\n",rs) ;
 #endif
 
@@ -225,7 +214,7 @@ MSUCLIENTS	*op ;
 	rs1 = msuclients_setend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_close: ret rs=%d\n",rs) ;
 #endif
 
@@ -260,7 +249,7 @@ int msuclients_get(MSUCLIENTS *op,time_t dt,MSUCLIENTS_DATA *dp)
 
 	if (op->magic != MSUCLIENTS_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_get: ent\n") ;
 #endif
 
@@ -270,7 +259,7 @@ int msuclients_get(MSUCLIENTS *op,time_t dt,MSUCLIENTS_DATA *dp)
 
 	memset(dp,0,sizeof(MSUCLIENTS_DATA)) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_get: ret rs=%d n=%u\n",rs,n) ;
 #endif
 
@@ -286,7 +275,7 @@ local int msuclients_setbegin(MSUCLIENTS *op,cchar *pr,cchar *reqfname)
 {
 	int		rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_setbegin: ent\n") ;
 #endif
 
@@ -358,7 +347,7 @@ local int msuclients_pr(MSUCLIENTS *op,cchar *pr)
 	    }
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_pr: rs=%d pr=%s\n",rs,op->pr) ;
 #endif
 
@@ -425,7 +414,7 @@ local int msuclients_tmpourdname(MSUCLIENTS *op)
 	cchar		*cp ;
 	char		tmpourdname[MAXPATHLEN + 1] ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_tmpourdname: tmpourdname=%s\n",
 		op->tmpourdname) ;
 #endif
@@ -477,7 +466,7 @@ local int msuclients_tmpourdname(MSUCLIENTS *op)
 
 ret0:
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_tmpourdname: ret rs=%d i=%u\n",rs,i) ;
 	debugprintf("msuclients_tmpourdname: tmpourdname=%s\n",
 		op->tmpourdname) ;
@@ -493,7 +482,7 @@ local int msuclients_bind(MSUCLIENTS *op,int f)
 	int		rs = SR_OK ;
 	int		f_err = FALSE ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_bind: f=%u\n",f) ;
 #endif
 
@@ -508,7 +497,7 @@ local int msuclients_bind(MSUCLIENTS *op,int f)
 	        rs = opentmpusd(template,oflags,operms,fname) ;
 	        op->fd = rs ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_bind: template=%s\n",template) ;
 	debugprintf("msuclients_bind: opentmpusd() rs=%d\n",rs) ;
 #endif
@@ -542,7 +531,7 @@ local int msuclients_bind(MSUCLIENTS *op,int f)
 
 	} /* end if (bind-off) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_bind: ret rs=%d\n",rs) ;
 #endif
 
@@ -556,7 +545,7 @@ local int msuclients_connect(MSUCLIENTS *op)
 	ustat	sb ;
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_connect: reqfname=%s\n",op->reqfname) ;
 #endif
 
@@ -583,7 +572,7 @@ local int msuclients_connect(MSUCLIENTS *op)
 	    op->srvlen = rs ;
 	    op->fl.srv = (rs >= 0) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	   { 
 		int	mc = COLUMNS ;
 		cchar	*s = (cchar *) &op->srv ;
@@ -604,7 +593,7 @@ local int msuclients_connect(MSUCLIENTS *op)
 
 ret0:
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_connect: ret rs=%d\n",rs) ;
 #endif
 
@@ -645,7 +634,7 @@ local int msuclients_istatus(MSUCLIENTS *op)
 	int		to = op->to ;
 	int		pid = 0 ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_istatus: ent srvlen=%u\n",op->srvlen) ;
 #endif
 
@@ -679,7 +668,7 @@ local int msuclients_istatus(MSUCLIENTS *op)
 
 	} /* end if (msumsg_getstatus) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("msuclients_istatus: ret rs=%d pid=%d\n",rs,pid) ;
 #endif
 
