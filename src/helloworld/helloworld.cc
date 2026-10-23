@@ -70,22 +70,6 @@
 
 /* local defines */
 
-#ifndef	LOGNAMELEN
-#ifdef	LOGNAME_MAX
-#define	LOGNAMELEN	LOGNAME_MAX
-#else
-#define	LOGNAMELEN	32
-#endif
-#endif
-
-#ifndef	USERNAMELEN
-#ifdef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
 #ifndef	BUFLEN
 #define	BUFLEN		MAXPATHLEN
 #endif
