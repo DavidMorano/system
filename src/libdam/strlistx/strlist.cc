@@ -169,7 +169,7 @@ local bool	ismatkey(cchar *,cchar *,int) noex ;
 
 /* exported variables */
 
-constexpr SL_OBJ	strlist_modinfo = {
+const SL_OBJ	strlist_modinfo = {
 	"strlist",
 	szof(strlist),
 	szof(strlist_cur)
