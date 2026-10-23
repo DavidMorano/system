@@ -64,6 +64,7 @@
 #include	<cthex.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"preload.h"
 
@@ -86,14 +87,6 @@
 #define	VARHOSTID	"HOSTID"
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int129_t in decimal */
-#endif
-
-#ifndef	HEXBUFLEN
-#define	HEXBUFLEN	32		/* can hold 'int128_t' in hexadecimal */
-#endif
-
 #ifndef	UIDSYS
 #define	UIDSYS		100
 #endif
@@ -108,7 +101,7 @@
 
 extern "C" {
     typedef	int (*sysinfo_func)(int,char *,long) noex ;
-}
+} /* end extern (C) */
 
 
 /* external subroutines */
