@@ -5,7 +5,6 @@
 /* try to load s shared-lib into the MFSERVE daemon */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable at invocation */
 
 /* revision history:
@@ -44,8 +43,9 @@
 #include	<strn.h>
 #include	<char.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"defs.h"
+#include	"proginfo.hh"
 #include	"mfsmain.h"
 #include	"mfsconfig.h"
 #include	"mfslocinfo.h"
@@ -72,19 +72,10 @@
 #define	EBUFLEN		(3 * MAXPATHLEN)
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #define	NDF		"/tmp/mfs.deb"
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS || CF_DEBUG
-extern "C" int	debugprintf(cchar *,...) noex ;
-extern "C" int	strllen(cchar *,int,int) noex ;
-#endif
 
 
 /* external variables */
