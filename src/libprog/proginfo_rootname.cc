@@ -1,4 +1,5 @@
 /* proginfo_rootname SUPPORT */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* program information (extracting the distribution root-name) */
