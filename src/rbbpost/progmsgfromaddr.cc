@@ -80,7 +80,7 @@ extern int	progmsgfromname(struct proginfo *) ;
 
 /* forward references */
 
-static int	procfrom(struct proginfo *) ;
+local int	procfrom(struct proginfo *) ;
 
 
 /* local variables */
@@ -95,7 +95,7 @@ struct proginfo	*pip ;
 	int	rs = SR_OK ;
 
 	if (pip->msgfromaddr == NULL) {
-	    const char	*cp = NULL ;
+	    cchar	*cp = NULL ;
 
 	    if (pip->msgfromaddr == NULL) {
 	        if ((cp = getenv(VARPROGMAILFROM)) != NULL) {
@@ -136,7 +136,7 @@ struct proginfo	*pip ;
 /* local subroutines */
 
 
-static int procfrom(pip)
+local int procfrom(pip)
 struct proginfo	*pip ;
 {
 	BUFFER	b ;
@@ -146,7 +146,7 @@ struct proginfo	*pip ;
 
 
 	if ((rs = buffer_start(&b,MABUFLEN)) >= 0) {
-	    const char	*bp ;
+	    cchar	*bp ;
 
 	    buffer_strw(&b,pip->username,-1) ;
 	    buffer_chr(&b,'@') ;
