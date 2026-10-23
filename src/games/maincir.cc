@@ -1,4 +1,4 @@
-/* main SUPPORT (CIR) */
+/* maincir_main SUPPORT (CIR) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -39,35 +39,32 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-#include	<new>
-#include	<initializer_list>
-#include	<utility>
-#include	<functional>
-#include	<algorithm>
-#include	<array>
-#include	<set>
-#include	<vector>
-#include	<list>
-#include	<stack>
-#include	<deque>
-#include	<string>
-#include	<fstream>
-#include	<iostream>
-#include	<ostream>
-#include	<iomanip>
-#include	<usystem.h>
+#include	<new>			/* C++STD */
+#include	<initializer_list>	/* C++STD */
+#include	<utility>		/* C++STD */
+#include	<functional>		/* C++STD */
+#include	<algorithm>		/* C++STD */
+#include	<array>			/* C++STD */
+#include	<set>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<list>			/* C++STD */
+#include	<stack>			/* C++STD */
+#include	<deque>			/* C++STD */
+#include	<string>		/* C++STD */
+#include	<fstream>		/* C++STD */
+#include	<iostream>		/* C++STD */
+#include	<ostream>		/* C++STD */
+#include	<iomanip>		/* C++STD */
+#include	<clanguage.h>
+#include	<csysbase.h>
 #include	<ctdec.h>
 #include	<localmisc.h>
 
 
 /* local defines */
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	45
-#endif
 
 
 /* name spaces */
