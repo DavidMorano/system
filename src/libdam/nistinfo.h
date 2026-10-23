@@ -1,4 +1,5 @@
 /* nistinfo HEADER */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* NIST information */
