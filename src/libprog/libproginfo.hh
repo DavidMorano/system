@@ -1,0 +1,218 @@
+/* proginfo HEADER (Program-Information) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* program information */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	PROGINFO_INCLUDE
+#define	PROGINFO_INCLUDE
+#ifdef	__cplusplus
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<ids.h>			/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+
+
+#define	PI		proginfo
+#define	PI_FL		proginfo_fl
+#define	PI_VALS		proginfo_vals
+
+
+enum proginfomems {
+	proginfomem_ncpu,
+	proginfomem_overlast
+} ; /* end enum (proginfomems) */
+
+struct proginfo ;
+
+struct proginfo_fl {
+	uint		progdash:1 ;	/* leading dash on program-name */
+	uint		akopts:1 ;
+	uint		aparams:1 ;
+	uint		quiet:1 ;
+	uint		ignore:1 ;
+	uint		errfile:1 ;
+	uint		outfile:1 ;
+	uint		pcsconf:1 ;
+	uint		cfname:1 ;
+	uint		lfname:1 ;
+	uint		pidfname:1 ;
+	uint		logprog:1 ;
+	uint		config:1 ;
+	uint		watch:1 ;
+	uint		background:1 ;
+	uint		daemon:1 ;
+	uint		logsize:1 ;
+	uint		nodeonly:1 ;
+	uint		tmpdate:1 ;
+	uint		disable:1 ;
+	uint		all:1 ;
+	uint		def:1 ;
+	uint		lister:1 ;
+	uint		bufwhole:1 ;
+	uint		bufline:1 ;
+	uint		bufnone:1 ;
+	uint		intrun:1 ;
+	uint		intidle:1 ;
+	uint		intpoll:1 ;
+	uint		intmark:1 ;
+	uint		intlock:1 ;
+	uint		intdis:1 ;
+	uint		reuseaddr:1 ;
+	uint		to:1 ;
+} ; /* end struct (proginfo_fl) */
+
+struct proginfo_hwser {
+	proginfo	*op = nullptr ;
+	uint		val ;
+	void operator () (proginfo *) noex ;
+	operator uint() noex ;
+} ; /* end struct (proginfo_hwser) */
+
+struct proginfo_co {
+	proginfo	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (proginfo *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ; /* end */
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ; /* end */
+} ; /* end struct (proginfo_co) */
+
+struct proginfo_vals {
+	cchar		*argz ;		/* raw ARGZ */
+	cchar		*execname ;	/* execution filename */
+	cchar		*progname ;	/* program name */
+	cchar		*progdname ;	/* dirname of arg[0] */
+	cchar		*progename ;	/* execution file-name */
+	cchar		*searchname ;
+	cchar		*pr ;		/* program root */
+	cchar		*rootname ;	/* distribution name */
+	cchar		*version ;
+	cchar		*banner ;
+	cchar		*umachine ;	/* UNAME machine name */
+	cchar		*usysname ;	/* UNAME OS system-name */
+	cchar		*urelease ;	/* UNAME OS release */
+	cchar		*uversion ;	/* UNAME OS version */
+	cchar		*architecture ;	/* UAUX machine architecture */
+	cchar		*platform ;	/* UAUX machine platform */
+	cchar		*provider ;	/* UAUX machine provider */
+	cchar		*nisdomain ;	/* UAUX machine nisdomain */
+	cchar		*hz ;		/* OS HZ */
+	cchar		*nodename ;	/* USERINFO */
+	cchar		*domainname ;	/* USERINFO */
+	cchar		*username ;	/* USERINFO */
+	cchar		*homedname ;	/* USERINFO */
+	cchar		*shell ;	/* USERINFO */
+	cchar		*org ;		/* USERINFO */
+	cchar		*gecosname ;	/* USERINFO */
+	cchar		*realname ;	/* USERINFO */
+	cchar		*name ;		/* USERINFO */
+	cchar		*fullname ;	/* USERINFO full-name */
+	cchar		*mailname ;	/* USERINFO mail-abbreviated-name */
+	cchar		*tz ;		/* USERINFO */
+	cchar		*maildname ;	/* USERINFO */
+	cchar		*logid ;	/* USERINFO ID for logging purposes */
+	cchar		*orgcode ;
+	cchar		*groupname ;
+	cchar		*hostname ;
+	cchar		*tmpdname ;
+	cchar		*random ;	/* SHELL */
+	cchar		*seconds ;	/* SHELL */
+	cchar		*newsdname ;
+	cchar		*hfname ;
+	cchar		*cfname ;
+	cchar		*lfname ;
+	cchar		*pidfname ;
+	cchar		*zname ;	/* time-zone abbreviation */
+	cchar		*pwd ;		/* present-wirkubg-directory */
+	void		*efp ;
+	void		*buffer ;	/* general buffer */
+	void		*contextp ;	/* SHELL context */
+	void		*lip ;		/* local information */
+	void		*uip ;		/* USERINFO object */
+	void		*userlist ;	/* user-list state */
+	void		*config ;	/* configuration */
+	void		*watch ;	/* watch */
+	void		*pcsconf ;	/* save space when not needed */
+	int		progmode ;	/* program mode */
+	int		debuglevel ;
+	int		verboselevel ;
+	int		quietlevel ;
+	int		to ;		/* general time-out */
+	int		to_open ;	/* open time-out */
+	int		to_read ;	/* read time-out */
+	int		n ;
+	int		logsize ;	/* max log-file size */
+	int		intrun ;	/* interval run */
+	int		intidle ;	/* interval idle */
+	int		intpoll ;	/* interval poll */
+	int		intmark ;	/* interval mark */
+	int		intlock ;	/* interval lock */
+	int		intdis ;	/* interval disable */
+	int		pserial ;	/* "pserial" serial number */
+	int		serial ;	/* serial number */
+	int		ncpus ;		/* internal storage */
+	proginfo_vals() noex ;
+} ; /* end struct (proginfo_vals) */
+
+struct proginfo : proginfo_vals {
+	friend		proginfo_co ;
+	proginfo_hwser	hwserial ;
+	proginfo_co	ncpu ;
+	proginfo_co	finish ;
+	proginfo_co	rootdname ;
+	vecstr		*sdp ;		/* store-data-pointer */
+	ids		*idp ;
+	logfile		*lfp ;
+	mainv		argv ;
+	mainv		envv ;
+	ulong		randvar ;
+	TIMEB		now ;
+	time_t		daytime ;
+	pid_t		pid ;
+	uid_t		uid, euid ;
+	gid_t		gid, egid ;
+	PI_FL		pfhave{} ;
+	PI_FL		pf{} ;
+	PI_FL		pfchanged{} ;
+	PI_FL		pfopen{} ;
+	proginfo	() noex ; /* <- ctor */
+	int		argc ;
+	void args	(int ac,mainv av,mainv ev) noex ;
+	int start	(mainv,mainv,cchar *) noex ;
+	int setprogroot	(cchar *,int) noex ;
+	int rootexecname(cchar *) noex ;
+	int setent	(cchar **,cchar *,int) noex ;
+	int setversion	(cchar *) noex ;
+	int setbanner	(cchar *) noex ;
+	int setsearchname(cchar *,cchar *) noex ;
+	int setprogname	(cchar *) noex ;
+	int setexecname	(cchar *) noex ;
+	int getpwd	(char *,int) noex ;
+	int getename	(char *,int) noex ;
+	int expand	(char *,int,cchar *,int) noex ;
+   private:
+	int incpu	() noex ;
+	int irootdname	() noex ;
+} ; /* end struct (proginfo) */
+
+extern int	proginfo_realbegin	(proginfo *) noex ;
+extern int	proginfo_realend	(proginfo *) noex ;
+
+
+#endif /* __cplusplus */
+#endif /* PROGINFO_INCLUDE */
+
+
