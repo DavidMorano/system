@@ -81,7 +81,9 @@
 #include	<logfile.h>		/* LIBUC */
 #include	<iserror.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
@@ -99,18 +101,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 #ifndef	EBUFLEN
 #define	EBUFLEN		(3 * MAXPATHLEN)
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	45		/* can hold long128_t in decimal */
-#endif
-
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
 #endif
 
 #ifndef	VTMPDNAME
@@ -766,7 +756,7 @@ local int subinfo_logenv(MAINTQOTD *sip) noex {
 
 	if (sip->open.logsub) {
 	    LOGFILE	*lhp = sip->logsub ;
-	    timestr_logz(sip->dt,tbuf) ;
+	    strtime_logz(sip->dt,tbuf) ;
 	    logfile_printf(lhp,"%s %s %s!%s",tbuf,sip->dn,sip->nn,sip->un) ;
 #ifdef	COMMENT
 	    logfile_printf(lhp,"pr=%s",sip->pr) ;
