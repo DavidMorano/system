@@ -5,7 +5,6 @@
 /* process any PCS configuration information */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
 #define	CF_PCSCONF	0		/* compile in PCSCONF */
 
@@ -21,6 +20,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine processes any PCS configuration information
 	that may be available for the current program (every program
 	may have some different possible PCS information available
@@ -42,16 +42,13 @@
 #include	<vecstr.h>
 #include	<pcsconf.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"fingers_config.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100
-#endif
 
 #ifndef	BUFLEN
 #define	BUFLEN		((8 * 1024) + REALNAMELEN)
@@ -59,10 +56,6 @@
 
 #ifndef	ARCHBUFLEN
 #define	ARCHBUFLEN	80
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 
