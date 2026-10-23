@@ -67,8 +67,8 @@
 
 /* external subroutines */
 
-extern int	pcsfullname(const char *,char *,int,const char *) ;
-extern int	pcsname(const char *,char *,int,const char *) ;
+extern int	pcsfullname(cchar *,char *,int,cchar *) ;
+extern int	pcsname(cchar *,char *,int,cchar *) ;
 
 
 /* local structures */
@@ -92,7 +92,7 @@ struct proginfo	*pip ;
 
 	if (pip->msgfromname == NULL) {
 	    char	namebuf[REALNAMELEN + 1] ;
-	    const char	*nbp ;
+	    cchar	*nbp ;
 
 /* for a real-name: first try the PCS facility (we are a PCS program!) */
 
