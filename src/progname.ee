@@ -1,5 +1,6 @@
 #!/usr/bin/ksh
 # XXX (some general program)
+# PROGNAME
 
 
 ADDON_ECE=${HOME}/add-on
@@ -59,19 +60,14 @@ fi
 #print -u2 NODE=${NODE}
 
 if [[ -z "${DOMAIN}" ]] ; then
-
-  case $NODE in
-
+  case ${NODE} in
   hammett* )
     DOMAIN=ece.neu.edu
     ;;
-
   * )
     DOMAIN=$( getinetdomain )
     ;;
-
   esac
-
 fi
 
 export DOMAIN
