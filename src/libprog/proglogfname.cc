@@ -1,12 +1,11 @@
-/* proglogfname */
+/* proglogfname SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* program log-fname-name calculation */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
