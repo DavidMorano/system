@@ -71,39 +71,39 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	progfile(PROGINFO *,int,const char *) ;
+extern int	progfile(PROGINFO *,int,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
 
 /* external variables */
 
-extern const char	makedate[] ;
+extern cchar	makedate[] ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -151,8 +151,8 @@ static const struct mapex	mapexs[] = {
 
 int main(argc,argv,envv)
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 {
 	PROGINFO	pi, *pip = &pi ;
 
@@ -179,14 +179,14 @@ const char	*envv[] ;
 	int	f_z = FALSE ;
 	int	f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -367,7 +367,7 @@ const char	*envv[] ;
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -585,7 +585,7 @@ const char	*envv[] ;
 	    if ((afname == NULL) || (afname[0] == '-')) afname = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afname,"r",0666)) >= 0) {
-	    	const int	llen = LINEBUFLEN ;
+	    	cint	llen = LINEBUFLEN ;
 	        int	len ;
 	        char	lbuf[LINEBUFLEN + 1] ;
 
@@ -702,11 +702,11 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
+	cchar	*pn = pip->progname ;
 	cchar		*fmt ;
 
 	rs = bprintf(pip->efp,
