@@ -5,11 +5,10 @@
 /* KSH built-in version of 's(1d)' */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_DEBUGN	0		/* special debugging */
-#define	CF_DEBUGSD	0		/* debug status-display */
+#define	CF_DEBUGD	0		/* debug status-display */
 #define	CF_DEBUGHEXBUF	0		/* debug w/ HEX-string output */
 #define	CF_LINES25	0		/* 25 lines? */
 #define	CF_DATEBLINK	0
@@ -96,7 +95,7 @@
 #include	"shio.h"
 #include	"kshlib.h"
 #include	"b_s.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
@@ -119,9 +118,6 @@
 
 #undef	MNBUFLEN
 #define	MNBUFLEN	60
-
-#undef	HEXBUFLEN
-#define	HEXBUFLEN	100
 
 #define	DEFTERMSPEC	"default"
 
@@ -166,30 +162,6 @@
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	optbool(cchar *,int) ;
-extern int	optvalue(cchar *,int) ;
-extern int	tcgetlines(int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	termconseq(char *,int,int,int,int,int,int) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	pcsmailcheck(cchar *,char *,int,cchar *) ;
-extern int	nusers(cchar *) ;
-extern int	sbuf_loadstrs(SBUF *,cchar **) ;
-extern int	isdigitlatin(int) ;
-extern int	isFailOpen(int) ;
-extern int	isNotPresent(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
@@ -528,7 +500,7 @@ local int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -552,14 +524,14 @@ local int mainsub(int argc,cchar **argv,cchar **envv,void *contextp)
 	cchar		*utfname = NULL ;
 	cchar		*cp ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_s: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -1177,7 +1149,7 @@ badprogstart:
 	nprintf(NDF,"b_s: ret rs=%d\n",rs) ;
 #endif
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mi[12] ;
 	    uint	mo ;
@@ -1214,7 +1186,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -2186,9 +2158,9 @@ local int termdatesd(PROGINFO *pip,SBUF *bufp,cchar *timebuf)
 
 	if (rs >= 0) {
 
-#if	CF_DEBUGSD
+#if	CF_DEBUGD
 	    len = sncpy1(lbuf,llen,"hello world1!") ;
-#endif /* CF_DEBUGSD */
+#endif /* CF_DEBUGD */
 
 	    rs = bufsd(pip,lip->termflags,bufp,(cols-ncols),lbuf,len) ;
 	}
