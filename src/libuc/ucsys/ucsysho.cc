@@ -105,8 +105,8 @@ typedef cvoid	cv ;
 
 /* GNU version (like on Linux) */
 unixret_t gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood 0 ;
+	errno_t		ec = EOK ;
 	if (hop && hobuf) {
 	    HOSTENT *rp{} ;
 	    int		herr{} ;
@@ -114,20 +114,20 @@ unixret_t gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 	    if ((ec = gethostent_r(hop,hobuf,holen,&rp,&herr)) == 0) {
 	        if (rp == nullptr) {
 		    ec = getresolvec(herr) ;
-	            rc = -1 ;
+	            ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (gethoent_rp) */
 
 #else /* defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0) */
@@ -135,21 +135,21 @@ unixret_t gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 /* POSIX draft-6 inspired version (like on SunOS) */
 unixret_t gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (hop && hobuf) {
 	    CHOSTENT *rp ;
 	    errno = 0 ;
 	    if ((rp = gethostent_r(hop,hobuf,holen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	        void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (gethoent_rp) */
 
 #endif	/* defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0) */
@@ -180,8 +180,8 @@ unixret_t gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 
 /* GNU version (like on Linux) */
 unixret_t gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (hop && hobuf) {
 	    HOSTENT *rp{} ;
 	    int		herr{} ;
@@ -189,20 +189,20 @@ unixret_t gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 	    if ((ec = gethostbyname_r(n,hop,hobuf,holen,&rp,&herr)) == 0) {
 	        if (rp == nullptr) {
 		    ec = getresolvec(herr) ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-		rc = -1 ;
+		ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-		rc = -1 ;
+		ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (gethonam_rp) */
 
 #else /* defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0) */
@@ -210,21 +210,21 @@ unixret_t gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 /* POSIX draft-6 inspired version (like on SunOS) */
 unixret_t gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (hop && hobuf) {
 	    CHOSTENT *rp ;
 	    errno = 0 ;
 	    if ((rp = gethostbyname_r(n,hop,hobuf,holen)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (gethonam_rp) */
 
 #endif	/* defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0) */
@@ -255,8 +255,8 @@ unixret_t gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 
 /* GNU version (like on Linux) */
 unixret_t gethonum_rp(HO *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
-    	unixret_t	rc = 0 ;
-    	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+    	errno_t		ec = EOK ;
 	if (hop && hobuf) {
 	    HOSTENT *rp{} ;
 	    int		herr{} ;
@@ -265,20 +265,20 @@ unixret_t gethonum_rp(HO *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
 	    if ((ec = getbyaddr(ap,al,af,hop,hobuf,holen,&rp,&herr)) == 0) {
 	        if (rp == nullptr) {
 		    ec = getresolvec(herr) ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-		rc = -1 ;
+		ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-		rc = -1 ;
+		ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (gethonum_rp) */
 
 #else /* defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0) */
@@ -286,21 +286,21 @@ unixret_t gethonum_rp(HO *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
 /* POSIX draft-6 inspired version (like on SunOS) */
 unixret_t gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
     	cnullptr	np{} ;
-	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (hop && hobuf) {
 	    CHOSTENT *rp ;
 	    errno = 0 ;
 	    if ((rp = gethostbyaddr_r(ap,al,af,hop,hobuf,holen)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (gethoadd_rp) */
 
 #endif	/* defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0) */
@@ -331,7 +331,7 @@ HOSTENT *gethoent() noex {
 
 HOSTENT *gethonam(cchar *n) noex {
 	HOSTENT		*rp = nullptr ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (n) {
 	    if (n[0]) {
 		errno = 0 ;
@@ -348,7 +348,7 @@ HOSTENT *gethonam(cchar *n) noex {
 
 HOSTENT *gethoadd(int af,cvoid *abuf,int alen) noex {
 	HOSTENT		*rp = nullptr ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (abuf) {
 	    if ((alen > 0) && (af >= 0)) {
 		errno = 0 ;
