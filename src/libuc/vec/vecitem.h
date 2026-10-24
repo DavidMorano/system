@@ -124,14 +124,14 @@ struct vecitem_iter {
 	vecitem_iter() = default ;
 	vecitem_iter(void **ov,int oi,int oii) noex : va(ov), i(oi) {
 	    ii = oii ;
-	} ;
+	} ; /* end */
 	vecitem_iter(const vecitem_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
 		i = oit.i ;
 		ii = oit.ii ;
 	    }
-	} ;
+	} ; /* end */
 	vecitem_iter &operator = (const vecitem_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
@@ -146,7 +146,7 @@ struct vecitem_iter {
 	    void	*rp = nullptr ;
 	    if (i < ii) rp = va[i] ;
 	    return rp ;
-	} ;
+	} ; /* end */
 	vecitem_iter operator + (int) const noex ;
 	vecitem_iter operator += (int) noex ;
 	vecitem_iter operator ++ () noex ; /* pre */
@@ -160,11 +160,11 @@ struct vecitem_co {
 	void operator () (vecitem *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecitem_co) */
 struct vecitem : vecitem_head {
 	vecitem_co	del ;
@@ -192,15 +192,15 @@ struct vecitem : vecitem_head {
 	vecitem_iter begin() noex {
 	    vecitem_iter		it(va,0,i) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	vecitem_iter end() noex {
 	    vecitem_iter		it(va,i,i) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	void dtor() noex ;
 	destruct vecitem() {
 	    if (va) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecitem) */
 #else	/* __cplusplus */
 typedef VECITEM		vecitem ;
