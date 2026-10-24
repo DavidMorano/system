@@ -21,7 +21,7 @@
 
 
 
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 
 
