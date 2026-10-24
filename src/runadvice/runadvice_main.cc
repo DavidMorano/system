@@ -73,6 +73,7 @@
 #include	<cfx.h>
 #include	<varsub.h>		/* LIBUC */
 #include	<paramopt.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<mapex.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -109,7 +110,6 @@ extern int	runinit(), runcount(), runadd(), runwait(), rundel() ;
 extern int	machineinit(), machineadd(), machineupdate() ;
 extern int	machinebest(), machinemin() ;
 
-extern char	*timestr_log(time_t,char *) ;
 
 extern void	vsaprint() ;
 extern void	fixdisplay() ;
@@ -1035,7 +1035,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 	daytime = time(nullptr) ;
 
 	logfile_printf(&g.lh,"%s S=%03d exiting\n",
-	    timestr_log(daytime,buf),nslave) ;
+	    strtime_log(daytime,buf),nslave) ;
 
 #if	CF_DEBUG
 	debugprintf("main: slave=%d is exiting rs=%d\n",nslave,rs) ;
@@ -1732,7 +1732,7 @@ loop:
 
 
 	logfile_printf(&g.lh,"%s M     exiting\n",
-	    timestr_log(daytime,buf)) ;
+	    strtime_log(daytime,buf)) ;
 
 #if	CF_DEBUG
 	    if (g.debuglevel > 1) debugprintf(
@@ -1749,7 +1749,7 @@ completed:
 signaled:
 	if (g.f_signal) {
 	    logfile_printf(&g.lh,"%s M     exiting due to a signal\n",
-	        timestr_log(daytime,buf)) ;
+	        strtime_log(daytime,buf)) ;
 	    bprintf(g.efp,"%s: caught a signal\n",
 	        g.progname) ;
 	}
