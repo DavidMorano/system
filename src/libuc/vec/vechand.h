@@ -82,7 +82,7 @@ struct vechand_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-} ;
+} ; /* end struct (vechand_flags) */
 
 struct vechand_head {
 	void		**va ;
@@ -112,7 +112,7 @@ enum vechandmems {
 	vechandmem_audit,
 	vechandmem_finish,
 	vechandmem_overlast
-} ;
+} ; /* end enum (vechandmems) */
 struct vechand ;
 struct vechand_co {
 	vechand		*op = nullptr ;
@@ -120,11 +120,11 @@ struct vechand_co {
 	void operator () (vechand *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vechand_co) */
 struct vechand : vechand_head {
 	vechand_co	count ;
@@ -160,7 +160,7 @@ struct vechand : vechand_head {
 	operator int () noex ;
 	destruct vechand() {
 	    if (va) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vechand) */
 #else	/* __cplusplus */
 typedef VECHAND		vechand ;
