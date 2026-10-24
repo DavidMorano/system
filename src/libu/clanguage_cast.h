@@ -20,6 +20,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cnumeric>		/* C++ only */
 
 
 #ifdef	__cplusplus
@@ -37,7 +38,11 @@
 
 #ifdef	__cplusplus
 #ifndef	saturate
+#ifdef	__cpp_lib_saturation_arithmetic
+#define	saturate		std::saturating_cast
+#else
 #define	saturate		std::saturate_cast
+#endif /* __cpp_lib_saturation_arithmetic */
 #endif /* saturate */
 #endif /* __cplusplus */
 
@@ -45,9 +50,15 @@
 /* NOTE: C++26 says the proper cast is |std:saturating_cast(3c++)| */
 #ifdef	__cplusplus
 #ifndef	cast_saturate
+#ifdef	__cpp_lib_saturation_arithmetic
+#define	cast_saturate		saturating_cast
+#define	cast_saturate		saturating_cast
+#define	cast_sat		saturating_cast
+#else
 #define	cast_saturate		saturate_cast
 #define	cast_saturate		saturate_cast
 #define	cast_sat		saturate_cast
+#endif /* __cpp_lib_saturation_arithmetic */
 #endif /* cast_saturate */
 #endif /* __cplusplus */
 
