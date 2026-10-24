@@ -54,32 +54,32 @@
 import libutil ;
 
 unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
+	cnullptr	np{} ;
 	cint		rlen = int(rsz & INT_MAX) ;
-	unixret_t	rc = 0 ;
+	unixret_t	ru = unixretgood ;
 	int		rl = 0 ; /* return-value */
-	if (rbuf) {
-	    cnullptr	np{} ;
-	    if (fname[0] && (rlen >= 0)) {
-		 if (char *rp ; (rp = realpath(fname,np)) != np) {
+	if (rbuf) ylikely {
+	    if (fname[0] && (rlen >= 0)) ylikely {
+		 if (char *rp = realpath(fname,np)) ylikely {
 		    if ((rl = cstrlen(rp)) <= rlen) {
 			strcpy(rbuf,rp) ;
 		    } else {
-			rc = -1 ;
+			ru = unixretbad ;
 			errno = EOVERFLOW ;
-		    }
+		    } /* end */
 		    free(rp) ;
 		} else {
-		    rc = -1 ; /* ERRNO is already set by |realpath| */
+		    ru = unixretbad ; /* ERRNO is already set by |realpath| */
 		} /* end if (realpath) */
 	    } else {
-		rc = -1 ;
+		ru = unixretbad ;
 		errno = EINVAL ;
 	    } /* end if (valid) */
 	} else {
-	    rc = -1 ;
+	    ru = unixretbad ;
 	    errno = EFAULT ;
 	} /* end if (non-null) */
-	return (rc >= 0) ? rl : rc ;
+	return (ru >= 0) ? rl : ru ;
 } /* end subroutine (resolvepath) */
 
 #endif /* (!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0) */
