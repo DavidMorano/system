@@ -73,7 +73,7 @@
 
 #define	u_rewind(fd)	u_seek((fd),0L,SEEK_SET)
 
-#define	O_FLAGS		(O_WRONLY | O_CREAT | O_TRUNC)
+#define	OX_FL		(O_WRONLY | O_CREAT | O_TRUNC)
 #define	CLOSEDFDS	3
 #define	NFORKS		3
 #define	W_OPTIONS	0
@@ -83,10 +83,10 @@
 
 /* external subroutines */
 
-extern int	sfbasename(const char *,int,const char **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
 
 extern char	*strbasename(char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 #if	CF_DEBUG
 extern char	*d_procmode() ;
@@ -101,7 +101,7 @@ extern char	*d_procmode() ;
 
 /* forward references */
 
-static int	writeout(struct proginfo *,int,const char *) ;
+local int	writeout(struct proginfo *,int,cchar *) ;
 
 
 /* local variables */
@@ -130,8 +130,8 @@ int		ifd, ofd, efd ;
 	int	len ;
 	int	tlen = 0 ;
 
-	const char	*program, *arg0 ;
-	const char	*cp ;
+	cchar	*program, *arg0 ;
+	cchar	*cp ;
 
 	char	buf[BUFLEN + 1] ;
 	char	timebuf[TIMEBUFLEN + 1] ;
@@ -554,10 +554,10 @@ bad1:
 
 
 /* write out the output files from the executed program */
-static int writeout(gp,fd,s)
+local int writeout(gp,fd,s)
 struct proginfo	*gp ;
 int		fd ;
-const char	s[] ;
+cchar	s[] ;
 {
 	ustat	sb ;
 
