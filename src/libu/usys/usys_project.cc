@@ -60,7 +60,7 @@ projid_t getprojid() noex {
 
 projid_t getprojidbyname(cchar *name) noex {
     	projid_t	id = 0 ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (name) {
 	    if (! name[0]) {
 		ec = EINVAL ;
@@ -91,34 +91,42 @@ void endprojent(void) noex {
     	errno = ENOSYS ;
 } /* end */
 
-CPROJECT *getprojent(PROJECT *,void *,size_t) noex {
+CPROJECT *getprojent(PROJECT *pjp,void *pjbuf,size_t) noex {
     	PROJECT	 *rp = nullptr ;
-	errno_t	ec = 0 ;
-	ec = ENOSYS ;
+	errno_t	ec = EFAULT ;
+	if (pjp && pjbuf) {
+	    ec = ENOSYS ;
+	}
 	if (ec) errno = ec ;
 	return rp ;
 } /* end */
 
-CPROJECT *getprojbyname(cchar *,PROJECT *,void *,size_t) noex {
+CPROJECT *getprojbyname(cchar *pjp,PROJECT *pjbuf,void *,size_t) noex {
     	PROJECT *rp = nullptr ;
-	errno_t	ec = 0 ;
-	ec = ENOSYS ;
+	errno_t	ec = EFAULT ;
+	if (pjp && pjbuf) {
+	    ec = ENOSYS ;
+	}
 	if (ec) errno = ec ;
 	return rp ;
 } /* end */
 
-CPROJECT *getprojbyid(projid_t,PROJECT *,void *,size_t) noex {
+CPROJECT *getprojbyid(projid_t,PROJECT *pjp,void *pjbuf,size_t) noex {
     	PROJECT *rp = nullptr ;
-	errno_t	ec = 0 ;
-	ec = ENOSYS ;
+	errno_t	ec = EFAULT ;
+	if (pjp && pjbuf) {
+	    ec = ENOSYS ;
+	}
 	if (ec) errno = ec ;
 	return rp ;
 } /* end */
 
-CPROJECT *getdefaultproj(cchar *,PROJECT *,void *,size_t) noex {
+CPROJECT *getdefaultproj(cchar *,PROJECT *pjp,void *pjbuf,size_t) noex {
     	PROJECT *rp = nullptr ;
-	errno_t	ec = 0 ;
-	ec = ENOSYS ;
+	errno_t	ec = EFAULT ;
+	if (pjp && pjbuf) {
+	    ec = ENOSYS ;
+	}
 	if (ec) errno = ec ;
 	return rp ;
 } /* end subroutine (getdefaultproj) */
