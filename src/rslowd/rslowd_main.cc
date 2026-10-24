@@ -73,6 +73,7 @@
 #include	<getusername.h>
 #include	<mallocstuff.h>
 #include	<prognamevar.hh>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -838,7 +839,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    daytime = time(0L) ;
 
 	    bprintf(lfp,"%s: %s %s started\n",
-	        pip->progname,timestr_lodaytime,timebuf),
+	        pip->progname,strtime_lodaytime,timebuf),
 	        BANNER) ;
 
 	    bflush(pip->lfp) ;
@@ -953,7 +954,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    logfile_printf(&pip->lh,"\n") ;
 
 	    logfile_printf(&pip->lh,"%s %s started\n",
-	        timestr_log(daytime,timebuf),
+	        strtime_log(daytime,timebuf),
 	        BANNER) ;
 
 	    logfile_printf(&pip->lh,"%-14s %s/%s\n",
@@ -1228,7 +1229,7 @@ int main(int argc,mainv argv,mainv envv) {
 	            pip->interrupt) ;
 
 	    logfile_printf(&pip->lh,"%s finished initializing\n",
-	        timestr_log(daytime,timebuf)) ;
+	        strtime_log(daytime,timebuf)) ;
 
 	} /* end if (making log entries) */
 
