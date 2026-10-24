@@ -104,28 +104,28 @@ import libutil ;			/* |memclear(3u)| */
 
 /* GNU version (like on Linux) */
 unixret_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (prp && prbuf) {
 	    PROTOENT *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getprotoent_r(prp,prbuf,prlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-		rc = -1 ;
+		ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-		rc = -1 ;
+		ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getprent_rp) */
 
 #else /* defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0) */
@@ -133,21 +133,21 @@ unixret_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 /* POSIX draft-6 inspired version (like on Solaris®) */
 unixret_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (prp && prbuf) {
 	    CPROTOENT *rp ;
 	    errno = 0 ;
 	    if ((rp = getprotoent_r(prp,prbuf,prlen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	        void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getprent_rp) */
 
 #endif	/* defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0) */
@@ -178,28 +178,28 @@ unixret_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 
 /* GNU version (like on Linux) */
 unixret_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (prp && prbuf && n) {
 	    PROTOENT *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getprotobyname_r(n,prp,prbuf,prlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-	            rc = -1 ;
+	            ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-		rc = -1 ;
+		ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getprnam_np) */
 
 #else /* defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0) */
@@ -207,21 +207,21 @@ unixret_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 /* POSIX draft-6 inspired version */
 unixret_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (prp && prbuf && n) {
 	    CPROTOENT *rp ;
 	    errno = 0 ;
 	    if ((rp = getprotobyname_r(n,prp,prbuf,prlen)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 	        void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getprnam_np) */
 
 #endif	/* defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0) */
@@ -259,20 +259,20 @@ unixret_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 	    if ((ec = getprotobynumber_r(num,prp,prbuf,prlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-		rc = -1 ;
+		ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-		rc = -1 ;
+		ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getprnum_rp) */
 
 #else /* defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0) */
@@ -280,21 +280,21 @@ unixret_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 /* POSIX draft-6 inspired version */
 unixret_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (prp && prbuf) {
 	    CPROTOENT *rp ;
 	    errno = 0 ;
 	    if ((rp = getprotobynumber_r(num,prp,prbuf,prlen)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 	        void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getprnum_rp) */
 
 #endif	/* defined(SYSHAS_GETPRGNUR) && (SYSHAS_GETPRGNUR > 0) */
@@ -325,7 +325,7 @@ PROTOENT *getprent() noex {
 
 PROTOENT *getprnam(cchar *n) noex {
 	PROTOENT	*rp = nullptr ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (n) {
 	    if (n[0]) {
 		errno = 0 ;
@@ -342,7 +342,7 @@ PROTOENT *getprnam(cchar *n) noex {
 
 PROTOENT *getprnum(int num) noex {
 	PROTOENT	*rp = nullptr ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (num >= 0) {
 	    errno = 0 ;
 	    rp = getprotobynumber(num) ;
