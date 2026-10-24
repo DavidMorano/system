@@ -75,19 +75,19 @@ typedef size_t		sz ;
 typedef void		vo ;
 
 local errno_t bufck(void *bp,size_t *lp) noex {
-    	errno_t		ec = 0 ;
+    	errno_t		ec = EOK ;
 	if (bp) {
 	    if (lp) {
-		ec = 0 ;
+		ec = EOK ;
 	    } else {
 		ec = EFAULT ;
 	    }
-	}
+	} /* end if (non-null) */
 	return ec ;
 } /* end subroutine (bufck) */
 
 local errno_t argck(void *obp,size_t *olp,void *nbp,size_t nbl) noex {
-    	errno_t		ec = 0 ; /* return-value */
+    	errno_t		ec ; /* return-value */
 	if ((ec = bufck(obp,olp)) == 0) {
 	    if (nbp) {
 		if (nbl <= 0) ec = EOVERFLOW ;
@@ -97,7 +97,7 @@ local errno_t argck(void *obp,size_t *olp,void *nbp,size_t nbl) noex {
 } /* end subroutine (argck) */
 
 unixret_t sysctl(int *nap,ui nal,void *obp,sz *olp,void *nbp,sz nbl) noex {
-    	int		rc = -1 ;
+    	unitret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (nap) {
 	    ec = EINVAL ;
@@ -108,11 +108,11 @@ unixret_t sysctl(int *nap,ui nal,void *obp,sz *olp,void *nbp,sz nbl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (sysctl) */
 
 unixret_t sysctlbyname(int *nap,ui nal,vo *obp,sz *olp,vo *nbp,sz nbl) noex {
-    	int		rc = -1 ;
+    	unitret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (nap) {
 	    ec = EINVAL ;
@@ -123,7 +123,7 @@ unixret_t sysctlbyname(int *nap,ui nal,vo *obp,sz *olp,vo *nbp,sz nbl) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (sysctlbyname) */
 
 
