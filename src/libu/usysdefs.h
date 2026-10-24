@@ -55,6 +55,7 @@
 #include	<usysdefs_of.h>
 #include	<usysdefs_pc.h>
 #include	<usysdefs_poll.h>
+#include	<usysdefs_rets.h>
 #include	<usysdefs_rtld.h>
 #include	<usysdefs_sig.h>
 #include	<usysdefs_sigmask.h>
