@@ -1055,6 +1055,10 @@ int vecstr::findkey(cchar *kp,int kl,cchar **rpp) noex {
 	return searchl(kp,kl,vstrkeycmp,rpp) ;
 } /* end method (vecstr::findkey) */
 
+int vecstr::findaddr(cchar *addr) noex {
+	return vecstr_findaddr(this,addr) ;
+} /* end method (vecstr::findaddr) */
+
 int vecstr::getvec(mainv *rppp) noex {
 	return vecstr_getvec(this,rppp) ;
 } /* end method */
@@ -1067,14 +1071,14 @@ int vecstr::del(int ai) noex {
 void vecstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecstr",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (vecstr::dtor) */
 
 vecstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
 	if (vext >= 0) {
 	    rs = vcnt ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecstr::operator) */
 
