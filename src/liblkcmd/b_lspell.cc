@@ -1476,7 +1476,7 @@ int		wl ;
 	int		wlen = 0 ;
 
 	if ((rs = locinfo_storeword(lip,wp,wl)) == 0) {
-	    rs = shio_printline(ofp,wp,wl) ;
+	    rs = shio_println(ofp,wp,wl) ;
 	    wlen += rs ;
 	} /* end if (is unique) */
 
