@@ -67,10 +67,6 @@
 
 /* local defines */
 
-#ifndef	MAXNAMELEN
-#define	MAXNAMELEN	PROJNAMELEN
-#endif
-
 #define	LOCINFO		struct locinfo
 #define	LOCINFO_FL	struct locinfo_flags
 
