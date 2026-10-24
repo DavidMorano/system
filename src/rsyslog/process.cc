@@ -40,7 +40,7 @@
 #include	<vecobj.h>
 #include	<paramopt.h>
 #include	<opentmp.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -60,7 +60,7 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -90,7 +90,7 @@ int process(pip,app,ofp,fname)
 struct proginfo	*pip ;
 PARAMOPT	*app ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	ustat	sb ;
 
