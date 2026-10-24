@@ -85,8 +85,8 @@
 /* external subroutines */
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -98,10 +98,10 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int	specs(struct proginfo *,vecobj *,vecstr *,int,int) ;
-static int	recips(struct proginfo *,int,SOCKADDRESS *,int,vecobj *) ;
-static int	rmtabnodes(struct proginfo *,vecstr *) ;
-static int	mkcsmsg(char *,int,const char *,int,uint) ;
+local int	specs(struct proginfo *,vecobj *,vecstr *,int,int) ;
+local int	recips(struct proginfo *,int,SOCKADDRESS *,int,vecobj *) ;
+local int	rmtabnodes(struct proginfo *,vecstr *) ;
+local int	mkcsmsg(char *,int,cchar *,int,uint) ;
 
 
 /* local variables */
@@ -145,7 +145,7 @@ vecobj		*rsp ;
 /* get the COMSAT hosts */
 
 	    if ((rs = vecstr_start(&h,n,0)) >= 0) {
-	        const char	*cfname = pip->comsatfname ;
+	        cchar	*cfname = pip->comsatfname ;
 
 	        if ((cfname[0] != '-') && (cfname[0] != '\0')) {
 
@@ -157,7 +157,7 @@ vecobj		*rsp ;
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4)) {
 	                    int	i ;
-	                    const char	*np ;
+	                    cchar	*np ;
 	                    debugprintf("progcomsat: rmtabnodes() rs=%d\n",
 	                        rs1) ;
 	                    for (i = 0 ; vecstr_get(&h,i,&np) >= 0 ; i += 1)
@@ -201,7 +201,7 @@ vecobj		*rsp ;
 /* private subroutines */
 
 
-static int specs(pip,rsp,nlp,fd,defport)
+local int specs(pip,rsp,nlp,fd,defport)
 struct proginfo	*pip ;
 vecobj		*rsp ;
 vecstr		*nlp ;
@@ -214,7 +214,7 @@ int		defport ;
 	int		i ;
 	int		port ;
 	int		n = 0 ;
-	const char	*nsp, *np ;
+	cchar	*nsp, *np ;
 	char		nodename[NODENAMELEN + 1] ;
 	char		*hebuf ;
 
@@ -272,7 +272,7 @@ int		defport ;
 
 	        if ((rs >= 0) && (hep->h_addrtype == af)) {
 	            SOCKADDRESS	sa ;
-	            const char	*a = (const char *) hep->h_addr ;
+	            cchar	*a = (cchar *) hep->h_addr ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
@@ -313,7 +313,7 @@ int		defport ;
 /* end subroutine (specs) */
 
 
-static int recips(pip,fd,sap,sal,rsp)
+local int recips(pip,fd,sap,sal,rsp)
 struct proginfo	*pip ;
 int		fd ;
 SOCKADDRESS	*sap ;
@@ -327,7 +327,7 @@ vecobj		*rsp ;
 	int		j, ul ;
 	int		cl ;
 	int		n = 0 ;
-	const char	*up ;
+	cchar	*up ;
 	char		cbuf[MBUFLEN + 1] ;
 
 #if	CF_DEBUG
@@ -404,7 +404,7 @@ vecobj		*rsp ;
 }
 /* end subroutine (recips) */
 
-static int rmtabnodes(pip,nlp)
+local int rmtabnodes(pip,nlp)
 struct proginfo	*pip ;
 vecstr		*nlp ;
 {
@@ -449,10 +449,10 @@ vecstr		*nlp ;
 
 
 /* make (marshall) the COMSAT message itself */
-static int mkcsmsg(mbuf,mlen,up,ul,val)
+local int mkcsmsg(mbuf,mlen,up,ul,val)
 char		mbuf[] ;
 int		mlen ;
-const char	*up ;
+cchar	*up ;
 int		ul ;
 uint		val ;
 {
