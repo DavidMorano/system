@@ -1,5 +1,8 @@
-/* config HEADER */
+/* imail_config HEADER */
 /* charset=ISO8859-1 */
+/* version %I% last-modified %G% */
+
+/* IMAIL program */
 /* version %I% last-modified %G% */
 
 
@@ -117,10 +120,6 @@
 #define	SUBJ_MAILNOTE	"MAILNOTE"	/* used in MAILNOTE mode */
 
 #define	MAILHOST	"mailhost"
-
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
-#endif
 
 #define	LOGSIZE		(160*1024)
 
