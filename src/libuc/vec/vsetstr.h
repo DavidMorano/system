@@ -33,7 +33,6 @@ struct vsetstr_cursor {
 	int		i ;
 } ; /* end struct (vsetstr_cursor) */
 
-
 typedef	VSETSTR		vsetstr ;
 typedef	VSETSTR_CUR	vsetstr_cur ;
 
