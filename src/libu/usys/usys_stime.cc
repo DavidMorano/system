@@ -50,15 +50,15 @@
 
 
 unixret_t stime(const time_t *tp) noex {
-	unixret_t	rc = -1 ;
+	unixret_t	ru = unixretbad ;
 	if (tp) ylikely {
 	    TIMEVAL	tv{} ;
 	    tv.tv_sec = *tp ;
-	    rc = settimeofday(&tv,nullptr) ;
+	    ru = settimeofday(&tv,nullptr) ;
 	} else {
 	    errno = EFAULT ;
 	} /* end if (non-null) */
-	return rc ;
+	return ru ;
 } /* end subroutine (stime) */
 
 
