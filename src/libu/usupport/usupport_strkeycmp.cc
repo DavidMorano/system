@@ -138,7 +138,7 @@ local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
 		    }
 		}
 	    }
-	}
+	} /* end */
 	return rc ;
 } /* end subroutine (strxcmp) */
 
@@ -154,67 +154,67 @@ local int strxcmp(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
 namespace libu {
     int strkeybasecmp(cchar *e1p,cchar *e2p) noex {
 	return strkeyxcmp(tobc,e1p,e2p) ;
-    }
+    } /* end */
     int strkeycasecmp(cchar *e1p,cchar *e2p) noex {
 	return strkeyxcmp(touc,e1p,e2p) ;
-    }
+    } /* end */
     int strkeyfoldcmp(cchar *e1p,cchar *e2p) noex {
 	return strkeyxcmp(tofc,e1p,e2p) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strkeybasecmpo(cchar *s1,cchar *s2) noex {
 	return (+ strkeybasecmp(s1,s2)) ;
-    }
+    } /* end */
     int strkeybasecmpr(cchar *s1,cchar *s2) noex {
 	return (- strkeybasecmp(s1,s2)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strkeycasecmpo(cchar *s1,cchar *s2) noex {
     	return (+ strkeycasecmp(s1,s2)) ;
-    }
+    } /* end */
     int strkeycasecmpr(cchar *s1,cchar *s2) noex {
     	return (- strkeycasecmp(s1,s2)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strkeyfoldcmpo(cchar *s1,cchar *s2) noex {
     	return (+ strkeyfoldcmp(s1,s2)) ;
-    }
+    } /* end */
     int strkeyfoldcmpr(cchar *s1,cchar *s2) noex {
     	return (- strkeyfoldcmp(s1,s2)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strkeyxbasecmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeybasecmp,s1,s2,cmporder_obverse) ;
-    }
+    } /* end */
     int strkeyxbasecmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeybasecmp,s1,s2,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strkeyxcasecmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeycasecmp,s1,s2,cmporder_obverse) ;
-    }
+    } /* end */
     int strkeyxcasecmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeycasecmp,s1,s2,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strkeyxfoldcmpo(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeyfoldcmp,s1,s2,cmporder_obverse) ;
-    }
+    } /* end */
     int strkeyxfoldcmpr(cchar *s1,cchar *s2) noex {
     	return strxcmp(strkeyfoldcmp,s1,s2,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 
