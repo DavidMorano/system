@@ -140,6 +140,7 @@ logfile_prime.o:	logfile_prime.cc	$(DEPS)		$(INCS)
 logfile_printfold.o:	logfile_printfold.cc	$(DEPS)		$(INCS)
 logfile_userinfo.o:	logfile_userinfo.cc	$(DEPS)		$(INCS)
 logfile_copylock.o:	logfile_copylock.cc	$(DEPS)		$(INCS)
+logfile_meths.o:	logfile_meths.cc	#(DEPS)		$(INCS)
 logfile_mag.o:		logfile_mag.ccm				$(INCS)
 
 
