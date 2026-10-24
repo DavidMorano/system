@@ -59,6 +59,7 @@
 #include	<vecelem.h>
 #include	<vecstr.h>
 #include	<srvfile.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"jobdb.h"
@@ -80,7 +81,6 @@ extern int	jobdb_add(), jobdb_search(), jobdb_findpid() ;
 extern int	handlejob_start() ;
 extern int	checklockfile() ;
 
-extern char	*timestr_log(), *timevalstr_ulog(struct timeval *,char *) ;
 
 extern void	handlejob_end() ;
 
@@ -100,9 +100,9 @@ void		makelogid() ;
 
 static struct dirent	*lreaddir_r() ;
 
-static int		dirtest() ;
+local int		dirtest() ;
 
-static void		int_term() ;
+local void		int_term() ;
 
 
 /* external variables */
@@ -289,12 +289,12 @@ top:
 	            if (g.f.srvtab)
 	                logfile_printf(&g.lh,
 	                    "%s the service file changed\n",
-	                    timestr_log(ssb.st_mtime,timebuf)) ;
+	                    strtime_log(ssb.st_mtime,timebuf)) ;
 
 	            else
 	                logfile_printf(&g.lh,
 	                    "%s the service file has returned\n",
-	                    timestr_log(ssb.st_mtime,timebuf)) ;
+	                    strtime_log(ssb.st_mtime,timebuf)) ;
 
 	            (void) time(&daytime) ;
 
@@ -324,14 +324,14 @@ top:
 
 	                logfile_printf(&g.lh,
 	                    "%s the new service file is %s\n",
-	                    timestr_log(daytime,timebuf),
+	                    strtime_log(daytime,timebuf),
 	                    (g.f.srvtab) ? "OK" : "BAD") ;
 
 	            } else {
 
 	                logfile_printf(&g.lh,
 	                    "%s the new service file is not accessible\n",
-	                    timestr_log(ssb.st_mtime,timebuf)) ;
+	                    strtime_log(ssb.st_mtime,timebuf)) ;
 
 	                close(sfd) ;
 
@@ -348,7 +348,7 @@ top:
 	            g.f.srvtab = FALSE ;
 	            logfile_printf(&g.lh,
 	                "%s service file went away\n",
-	                timestr_log(ssb.st_mtime,timebuf)) ;
+	                strtime_log(ssb.st_mtime,timebuf)) ;
 
 	            close(sfd) ;
 
@@ -396,7 +396,7 @@ top:
 	        f_directory = TRUE ;
 	        logfile_printf(&g.lh,
 	            "%s directory came back\n",
-	            timestr_log(daytime,timebuf)) ;
+	            strtime_log(daytime,timebuf)) ;
 
 	        sleeptime = g.polltime ;
 
@@ -416,7 +416,7 @@ top:
 	        f_directory = FALSE ;
 	        logfile_printf(&g.lh,
 	            "%s directory went away\n",
-	            timestr_log(daytime,timebuf)) ;
+	            strtime_log(daytime,timebuf)) ;
 
 	    }
 
@@ -452,8 +452,8 @@ top:
 	                timevalstr_ulog(&tod,timebuf)) ;
 
 	            debugprintf("watch: dirstat=%s dirtime=%s\n",
-	                timestr_log(dsb.st_mtime,timebuf),
-	                timestr_log(t_dir,timebuf2)) ;
+	                strtime_log(dsb.st_mtime,timebuf),
+	                strtime_log(t_dir,timebuf2)) ;
 
 	        } else if (wsp->c[JOBSTATE_WATCH] > 0)
 	            debugprintf("watch: DIR c.watch=%d\n",
@@ -546,7 +546,7 @@ top:
 	                (void) time(&daytime) ;
 
 	                logfile_printf(&g.lh, "%s job entering\n",
-	                    timestr_log(daytime,timebuf)) ;
+	                    strtime_log(daytime,timebuf)) ;
 
 #if	CF_DEBUG
 	                if (g.debuglevel > 0)
@@ -605,7 +605,7 @@ top:
 	                        logfile_setid(&g.lh,jep->logid) ;
 
 	                        logfile_printf(&g.lh,"%s processing job\n",
-	                            timestr_log(daytime,timebuf)) ;
+	                            strtime_log(daytime,timebuf)) ;
 
 #if	CF_DEBUG
 	                        if (g.debuglevel > 0)
@@ -641,7 +641,7 @@ top:
 	                        logfile_setid(&g.lh,jep->logid) ;
 
 	                        logfile_printf(&g.lh, "%s processing job\n",
-	                            timestr_log(daytime,timebuf)) ;
+	                            strtime_log(daytime,timebuf)) ;
 
 #if	CF_DEBUG
 	                        if (g.debuglevel > 0)
@@ -710,7 +710,7 @@ top:
 	                logfile_setid(&g.lh,jep->logid) ;
 
 	                logfile_printf(&g.lh, "%s job completed, es=%d\n",
-	                    timestr_log(daytime,timebuf),
+	                    strtime_log(daytime,timebuf),
 	                    child_stat & 255) ;
 
 	                handlejob_end(jep,child_stat) ;
@@ -771,7 +771,7 @@ top:
 	            logfile_setid(&g.lh,jep->logid) ;
 
 	            logfile_printf(&g.lh, "%s processing old job\n",
-	                timestr_log(daytime,timebuf)) ;
+	                strtime_log(daytime,timebuf)) ;
 
 #if	CF_DEBUG
 	            if (g.debuglevel > 0)
@@ -810,7 +810,7 @@ top:
 
 	        logfile_printf(&g.lh,
 	            "%s other program has my lock file, other PID=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            rs) ;
 
 	        goto badlockfile ;
@@ -830,7 +830,7 @@ top:
 
 	        logfile_printf(&g.lh,
 	            "%s other program has my PID file, other PID=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            rs) ;
 
 	        goto badpidfile ;
@@ -936,7 +936,7 @@ top:
 	time(&daytime) ;
 
 	logfile_printf(&g.lh,"%s program exiting\n",
-	    timestr_log(daytime,timebuf)) ;
+	    strtime_log(daytime,timebuf)) ;
 
 
 	if (g.f.interrupt) close(ifd) ;
@@ -995,7 +995,7 @@ char			logid[15] ;
 
 #ifdef	COMMENT
 
-static void internal(filename)
+local void internal(filename)
 char	filename[] ;
 {
 	int	i, srs = FALSE ;
@@ -1029,7 +1029,7 @@ char	filename[] ;
 #endif /* COMMENT */
 
 
-static int dirtest(dfd,n,sbp)
+local int dirtest(dfd,n,sbp)
 int		dfd ;
 char		n[] ;
 ustat	*sbp ;
@@ -1053,7 +1053,7 @@ ustat	*sbp ;
 /* end subroutine (dirtest) */
 
 
-static void int_term(sn)
+local void int_term(sn)
 int	sn ;
 {
 
