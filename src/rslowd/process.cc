@@ -38,6 +38,7 @@
 #include	<msg.h>
 #include	<msgheaders.h>
 #include	<ema.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -60,8 +61,7 @@ extern int	unlinkd() ;
 extern int	path_init(), path_parse() ;
 
 extern char	*malloc_str() ;
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_edate(), *timestr_hdate() ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 extern void	list_articles() ;
 
@@ -77,9 +77,9 @@ extern struct userinfo	u ;
 
 /* forward references */
 
-static int	ph_write() ;
-static int	ext_id() ;
-static int	didheader() ;
+local int	ph_write() ;
+local int	ext_id() ;
+local int	didheader() ;
 
 
 /* exported subroutines */
@@ -656,7 +656,7 @@ struct vecelem	*aqp ;
 	                subtime = g.daytime ;
 
 	            bprintf(afp,"%s:       %s\n",HN_DATE,
-	                timestr_hdate(subtime,buf)) ;
+	                strtime_hdate(subtime,buf)) ;
 
 	        }
 
@@ -970,7 +970,7 @@ struct vecelem	*aqp ;
 /* end subroutine (process) */
 
 
-static int ph_write(afp,mhp,name,nlen,mode)
+local int ph_write(afp,mhp,name,nlen,mode)
 bfile			*afp ;
 struct msg_header	*mhp ;
 char			name[] ;
@@ -1080,7 +1080,7 @@ int			nlen, mode ;
 
 
 /* extract an ID type header value */
-static int ext_id(articleid,s)
+local int ext_id(articleid,s)
 char	s[], articleid[] ;
 {
 	struct ema		aid ;
@@ -1117,7 +1117,7 @@ char	s[], articleid[] ;
 
 
 /* did we already "do" this header ? */
-static int didheader(hp,mhp)
+local int didheader(hp,mhp)
 vecstr		*hp ;
 struct msg_header	*mhp ;
 {
