@@ -46,13 +46,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cerrno>
-#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysrets.h>
-#include	<usysflag.h>
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cnumeric>		/* CSTD */
+#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
 
 #include	"usys_ugetdents.h"
 
@@ -61,7 +64,7 @@
 namespace usys {
     sysret_t ugetdents(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
@@ -69,9 +72,11 @@ namespace usys {
 		if (fd >= 0) {
 		    csize	vsz = size_t(rlen) ;
 		    rs = SR_OK ;
-		    if (int rc ; (rc = getdents(fd,rbuf,vsz)) < 0) {
+		    if (unixret_t ru ; (ru = getdents(fd,rbuf,vsz)) >= 0) {
+			len = saturate<int>(ru) ;
+		    } else {
 			rs = (neg errno) ;
-		    }
+		    } /* end if */
 	        } /* end if (not-bad FD) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -84,7 +89,7 @@ namespace usys {
 namespace usys {
     sysret_t ugetdents(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
@@ -103,7 +108,7 @@ namespace usys {
 namespace usys {
     sysret_t ugetdents(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
@@ -111,9 +116,11 @@ namespace usys {
 		if (fd >= 0) {
 		    csize	vsz = size_t(rlen) ;
 		    rs = SR_OK ;
-		    if (int rc ; (rc = getdents(fd,rbuf,vsz)) < 0) {
+		    if (unixret_t ru ; (ru = getdents(fd,rbuf,vsz)) >= 0) {
+			len = saturate<int>(ru) ;
+		    } else {
 			rs = (neg errno) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (not-bad FD) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -126,7 +133,7 @@ namespace usys {
 namespace usys {
     sysret_t ugetdents(int fd,void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (rbuf) {
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
