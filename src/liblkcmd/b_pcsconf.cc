@@ -110,10 +110,6 @@
 #define	BUFLEN		(MAXPATHLEN + 12)
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #ifndef	PROGINFO
 #define	PROGINFO	PROGINFO
 #endif
