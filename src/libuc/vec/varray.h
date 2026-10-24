@@ -57,11 +57,11 @@ struct varray_co {
 	void operator () (varray *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (varray_co) */
 struct varray : varray_head {
 	varray_co	count ;
