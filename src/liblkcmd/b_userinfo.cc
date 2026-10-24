@@ -5,7 +5,6 @@
 /* SHELL built-in: return various user information */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_DEFGROUP	0		/* for compatibility w/ 'id(1)' */
@@ -107,18 +106,6 @@
 import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
-
-#ifndef	ORGCODELEN
-#define	ORGCODELEN	USERNAMELEN
-#endif
-
-#ifndef	ORGLOCLEN
-#define	ORGLOCLEN	USERNAMELEN
-#endif
-
-#ifndef	CBUFLEN
-#define	CBUFLEN		MAX(MAXPATHLEN,100)
-#endif
 
 #ifndef	DEVDNAME
 #define	DEVDNAME	"/dev"
@@ -227,7 +214,7 @@ struct datauser {
 	char		unbuf[USERNAMELEN+1] ;
 	char		domainname[MAXHOSTNAMELEN + 1] ;
 	char		logname[LOGNAMELEN + 1] ;
-	char		tz[TZLEN + 1] ;
+	char		tz[TZNAMELEN + 1] ;
 	char		dn[MAXHOSTNAMELEN + 1] ;
 	char		lasthost[LASTLOGFILE_LHOST + 1] ;
 	char		lastline[LASTLOGFILE_LLINE + 1] ;
@@ -697,7 +684,7 @@ local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	SHIO		errfile ;
 	uid_t		uid = getuid() ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -728,14 +715,14 @@ local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	cchar		*cp ;
 	char		unbuf[USERNAMELEN + 1] ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_userinfo: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -1294,7 +1281,7 @@ local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	if ((rs < 0) && (ex == EX_OK)) {
 	    switch (rs) {
 	    case SR_NOANODE:
-	        ex = EX_OLDER ;
+	        ex = EX_OSERR ;
 	        break ;
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
@@ -1349,7 +1336,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -1358,7 +1345,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -2683,7 +2670,7 @@ local int progdata_start(PROGDATA *pdp,PI *pip,cchar *un,int f_self,
 	pdp->hostname[0] = '\0' ;
 	pdp->fl.self = f_self ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("userinfo/progdata_start: ent un=%s\n",un) ;
 	debugprintf("userinfo/progdata_start: f_self=%u\n",pdp->fl.self) ;
 #endif
@@ -2694,14 +2681,14 @@ local int progdata_start(PROGDATA *pdp,PI *pip,cchar *un,int f_self,
 	        datasys_finish(&pdp->ds) ;
 	} /* end if (datasys-start) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("userinfo/progdata_start: datauser_start() rs=%d\n",rs) ;
 	debugprintf("userinfo/progdata_start: f_self=%u\n",pdp->fl.self) ;
 #endif
 
 	if (rs == SR_NOTFOUND) rs = SR_SEARCH ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("userinfo/progdata_start: ret rs=%d f_self=%u\n",
 	    rs,pdp->fl.self) ;
 #endif
@@ -3095,7 +3082,7 @@ local int datauser_start(DATAUSER *dup,PI *pip,cchar *un,cchar *pwfname)
 	cint	pjlen ;
 	int		rs ;
 	
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("userinfo/datauser_start: ent un=%s\n",un) ;
 #endif
 
@@ -3149,7 +3136,7 @@ local int datauser_start(DATAUSER *dup,PI *pip,cchar *un,cchar *pwfname)
 	    } /* end if (bufsizeget) */
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("userinfo/datauser_start: ret rs=%d\n",rs) ;
 #endif
 
@@ -3226,7 +3213,7 @@ local int datauser_ua(DATAUSER *dup) noex {
 			vl = rs ;
 	                switch (i) {
 	                case uakey_tz:
-	                    rs = snwcpy(dup->tz,TZLEN,vbuf,vl) ;
+	                    rs = snwcpy(dup->tz,TZNAMELEN,vbuf,vl) ;
 	                    dup->have.tz = (rs > 0) ;
 	                    break ;
 	                case uakey_dn:
@@ -3257,7 +3244,7 @@ local int datauser_domain(DATAUSER *dup)
 
 	if (dup == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("datauser_domain: un=%s\n",dup->un) ;
 #endif
 
@@ -3290,7 +3277,7 @@ local int datauser_domain(DATAUSER *dup)
 	    rs = strlen(dup->domainname) ;
 	} /* end if (needed) */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("datauser_domain: ret rs=%d\n",rs) ;
 #endif
 
@@ -3730,7 +3717,7 @@ local int datauser_tz(DATAUSER *dup)
 
 	if (dup == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("datauser_tz: ent\n") ;
 #endif
 
@@ -3739,7 +3726,7 @@ local int datauser_tz(DATAUSER *dup)
 	    if (! dup->init.ua) rs = datauser_ua(dup) ;
 	    if (rs >= 0) {
 		if (! dup->have.tz) {
-	            if ((rs = inittimezone(dup->tz,TZLEN,DEFINITFNAME)) >= 0) {
+	            if ((rs = inittimezone(dup->tz,TZNAMELEN,DEFINITFNAME)) >= 0) {
 	               dup->have.tz = true ;
 	           }
 		} else {
