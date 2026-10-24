@@ -85,7 +85,7 @@ extern char	*strbasename() ;
 
 /* local static data */
 
-static int	f_alarm ;
+local int	f_alarm ;
 
 
 
@@ -161,7 +161,7 @@ int		i ;
 	- the number of runs still outstanding
 */
 
-static void int_alarm() ;
+local void int_alarm() ;
 
 int runwait(rhp,timeout)
 machinehead	*rhp ;
@@ -297,7 +297,7 @@ int		timeout ;
 
 
 
-static void int_alarm(sig)
+local void int_alarm(sig)
 int	sig ;
 {
 
