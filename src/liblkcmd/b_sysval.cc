@@ -227,7 +227,7 @@ struct locinfo {
 	int		ttl ;
 	int		timeform ;
 	char		username[USERNAMELEN+1] ;
-	char		tz[TZLEN+1] ;
+	char		tz[TZNAMELEN+1] ;
 	char		stype[USERNAMELEN+1] ;
 	char		snum[USERNAMELEN+1] ;
 } ;
@@ -2772,7 +2772,7 @@ local int locinfo_tz(LOCINFO *lip)
 
 	if ((lip->tz[0] == '\0') || ((pip->daytime - lip->ti_tz) >= to)) {
 	    lip->ti_tz = pip->daytime ;
-	    rs = inittimezone(lip->tz,TZLEN,nullptr) ;
+	    rs = inittimezone(lip->tz,TZNAMELEN,nullptr) ;
 	} else {
 	    rs = strlen(lip->tz) ;
 	}
