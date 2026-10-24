@@ -51,25 +51,25 @@ using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
 unixret_t getrandom(void *rbuf,size_t rsz,uint) noex {
-	unixret_t	rc = 0 ;
+	unixret_t	ru = unixretgood ;
 	unixret_t	rl = 0 ; /* return-value */
 	if (rbuf) {
 	    if (rsz > 0) {
 		csize		inc = MAXRANDSIZE ;
 		const caddr_t	ca = caddr_t(rbuf) ;
-		while ((rc >= 0) && (rsz > 0)) {
+		while ((ru >= 0) && (rsz > 0)) {
 		    csize msz = min(rsz,inc) ;
-		    if ((rc = getentropy((ca+rl),msz)) >= 0) {
+		    if ((ru = getentropy((ca+rl),msz)) >= 0) {
 			rl += intconv(msz) ;
 			rsz -= msz ;
 		    } /* end if */
 	 	} /* end while */
 	    } /* end if (non-negative) */
 	} else {
-	    rc = -1 ;
+	    ru = unixretbad ;
 	    errno = EFAULT ;
 	} /* end if (non-null) */
-	return (rc >= 0) ? rl : rc ;
+	return (ru >= 0) ? rl : ru ;
 } /* end subroutine (getrandom) */
 
 
