@@ -132,14 +132,14 @@ struct vecstr_iter {
 	vecstr_iter() = default ;
 	vecstr_iter(cchar **ov,int oi,int oii) noex : va(ov), i(oi) {
 	    ii = oii ;
-	} ;
+	} ; /* end */
 	vecstr_iter(const vecstr_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
 		i = oit.i ;
 		ii = oit.ii ;
 	    }
-	} ;
+	} ; /* end */
 	vecstr_iter &operator = (const vecstr_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
@@ -147,14 +147,14 @@ struct vecstr_iter {
 		ii = oit.ii ;
 	    }
 	    return *this ;
-	} ;
+	} ; /* end */
 	bool operator != (const vecstr_iter &) noex ;
 	bool operator == (const vecstr_iter &) noex ;
 	cchar *operator * () noex {
 	    cchar	*rp = nullptr ;
 	    if (i < ii) rp = va[i] ;
 	    return rp ;
-	} ;
+	} ; /* end */
 	vecstr_iter operator + (int) const noex ;
 	vecstr_iter &operator += (int) noex ;
 	vecstr_iter operator ++ () noex ; /* pre */
@@ -167,21 +167,21 @@ struct vecstr_st {
 	vecstr		*op = nullptr ;
 	void operator () (vecstr *p) noex {
 	    op = p ;
-	} ;
+	} ; /* end */
 	int operator () (int = 0,int = 0) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecstr_st) */
 struct vecstr_so {
 	vecstr		*op = nullptr ;
 	void init(vecstr *p) noex {
 	    op = p ;
-	} ;
+	} ; /* end */
 	int operator () (vecstr_f = nullptr) noex ;
 	operator int () noex {
 	    return operator () (nullptr) ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecstr_so) */
 struct vecstr_co {
 	vecstr		*op = nullptr ;
@@ -189,11 +189,11 @@ struct vecstr_co {
 	void operator () (vecstr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecstr_co) */
 struct vecstr : vecstr_head {
 	vecstr_st	start ;
@@ -242,21 +242,22 @@ struct vecstr : vecstr_head {
 	int searchl	(cchar *,int,vecstr_vcmp,cc ** = nullptr) noex ;
 	int finder	(cchar *,vecstr_f,cchar ** = nullptr) noex ;
 	int findkey	(cchar *,int,cchar ** = nullptr) noex ;
+	int findaddr	(cchar *) noex ;
 	int del		(int = -1) noex ;
 	int addpathclean	(cchar *,int) noex ;
 	operator int () noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,vidx) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	vecstr_iter end() noex {
 	    vecstr_iter		it(va,vidx,vidx) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	void dtor() noex ;
 	destruct vecstr() {
 	    if (va) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecstr) */
 #else	/* __cplusplus */
 typedef VECSTR		vecstr ;
@@ -316,7 +317,7 @@ extern int vecstr_svcargs	(vecstr *,int *,cchar *) noex ;
 
 local inline int vecstr_loaddirs(vecstr *op,cchar *newsdname) noex {
 	return vecstr_addsubdirs(op,newsdname) ;
-}
+} /* end */
 
 EXTERNC_end
 
