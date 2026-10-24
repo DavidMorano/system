@@ -86,6 +86,7 @@
 #include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -101,24 +102,12 @@
 #define	GETPW_NAME	getpw_name
 #endif /* CF_UGETPW */
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
+#ifndef	PI
+#define	PI		proginfo
 #endif
 
-#ifndef	USERNAMELEN
-#define	USERNAMELEN	32
-#endif
-
-#ifndef	GNAMELEN
-#define	GNAMELEN	100		/* GECOS name length */
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* real name length */
-#endif
-
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#define	LI		locinfo
+#define	LI_FL		locinfo_flags
 
 #define	MAXOUT(f)	if ((f) > 99.9) (f) = 99.9
 
@@ -126,13 +115,7 @@
 /* external subroutines */
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-#endif
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
 
 
 /* external variables */
@@ -150,7 +133,7 @@ struct locinfo_flags {
 
 struct locinfo {
 	cchar	*wtmpfname ;
-	LOCINFO_FL	have, f, changed, finval ;
+	LI_FL	have, f, changed, finval ;
 	int		records ;
 	char		username[USERNAMELEN + 1] ;
 } ;
@@ -170,15 +153,15 @@ struct dead {
 
 local int	mainsub(int,cchar **,cchar **,void *) ;
 
-local int	usage(PROGINFO *) ;
+local int	usage(PI *) ;
 
-local int	procopts(PROGINFO *,keyopt *) ;
-local int	procargs(PROGINFO *,ARGINFO *,bits *,vecstr *,cchar *) ;
-local int	procloadnames(PROGINFO *,VECSTR *,cchar *,int) ;
-local int	procloadname(PROGINFO *,vecstr *,cchar *,int) ;
-local int	procout(PROGINFO *,cchar *,vecstr *) ;
-local int	process(PROGINFO *,SHIO *,vecstr *) ;
-local int	procthemout(PROGINFO *,void *,vecobj *) ;
+local int	procopts(PI *,keyopt *) ;
+local int	procargs(PI *,ARGINFO *,bits *,vecstr *,cchar *) ;
+local int	procloadnames(PI *,VECSTR *,cchar *,int) ;
+local int	procloadname(PI *,vecstr *,cchar *,int) ;
+local int	procout(PI *,cchar *,vecstr *) ;
+local int	process(PI *,SHIO *,vecstr *) ;
+local int	procthemout(PI *,void *,vecobj *) ;
 local int	getrealname(char *,int,cchar *) ;
 
 local int	cmpname(struct user **,struct user **) ;
@@ -292,25 +275,18 @@ int b_loghist(int argc,cchar *argv[],void *contextp)
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
 
 	return ex ;
-}
-/* end subroutine (b_loghist) */
+} /* end subroutine (b_loghist) */
 
-
-int p_loghist(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_loghist(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_loghist) */
+} /* end subroutine (p_loghist) */
 
 
 /* local subroutines */
 
-
-/* ARGSUSED */
-local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
-	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
+	PI	pi, *pip = &pi ;
+	LI		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	bits		pargs ;
 	keyopt		akopts ;
@@ -363,7 +339,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* initialize */
 
 	pip->lip = &li ;
-	memset(&li,0,sizeof(LOCINFO)) ;
+	memset(&li,0,sizeof(LI)) ;
 
 	pip->verboselevel = 1 ;
 
@@ -893,12 +869,9 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
-
-local int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar	*pn = pip->progname ;
@@ -917,14 +890,11 @@ local int usage(PROGINFO *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
-
+} /* end subroutine (usage) */
 
 /* process the program ako-options */
-local int procopts(PROGINFO *pip,keyopt *kop)
-{
-	LOCINFO		*lip = pip->lip ;
+local int procopts(PI *pip,keyopt *kop) noex {
+	LI		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar	*cp ;
@@ -983,11 +953,9 @@ local int procopts(PROGINFO *pip,keyopt *kop)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procopts) */
+} /* end subroutine (procopts) */
 
-
-local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1065,11 +1033,9 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,vecstr *nlp,cchar *afn)
 	}
 
 	return (rs >= 0) ? pan : rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
-
-local int procloadnames(PROGINFO *pip,VECSTR *nlp,cchar *sp,int sl)
+local int procloadnames(PI *pip,vecstr *nlp,cchar *sp,int sl) noex {
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1094,13 +1060,10 @@ local int procloadnames(PROGINFO *pip,VECSTR *nlp,cchar *sp,int sl)
 	} /* end if (field) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procloadnames) */
+} /* end subroutine (procloadnames) */
 
-
-local int procloadname(PROGINFO *pip,vecstr *nlp,cchar *cp,int cl)
-{
-	LOCINFO		*lip = pip->lip ;
+local int procloadname(PI *pip,vecstr *nlp,cchar *cp,int cl) noex {
+	LI		*lip = pip->lip ;
 	cint	nch = MKCHAR(cp[0]) ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -1123,12 +1086,9 @@ local int procloadname(PROGINFO *pip,vecstr *nlp,cchar *cp,int cl)
 	}
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procloadname) */
+} /* end subroutine (procloadname) */
 
-
-local int procout(PROGINFO *pip,cchar *ofn,vecstr *nlp)
-{
+local int procout(PI *pip,cchar *ofn,vecstr *nlp) noex {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -1152,15 +1112,14 @@ local int procout(PROGINFO *pip,cchar *ofn,vecstr *nlp)
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end if (procout) */
+} /* end if (procout) */
 
 
 /* process the names that we have */
-local int process(PROGINFO *pip,SHIO *ofp,vecstr *aup)
+local int process(PI *pip,SHIO *ofp,vecstr *aup)
 {
 	struct user	u, *rp ;
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	TMPX		wt ;
 	TMPX_CUR	cur, fcur ;
 	TMPX_ENT	e, fe, *up = &e ;
@@ -1370,14 +1329,11 @@ ret0:
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
-
-local int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
-{
-	struct passwd	pw ;
-	LOCINFO		*lip = pip->lip ;
+local int procthemout(PI *pip,void *ofp,vecobj *ulp) noex {
+	PASSWD		pw ;
+	LI		*lip = pip->lip ;
 	cint	pwlen = bufsizeget(bufsize_pw) ;
 	int		rs ;
 	int		rs1 ;
@@ -1448,17 +1404,14 @@ local int procthemout(PROGINFO *pip,void *ofp,vecobj *ulp)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procthemout) */
+} /* end subroutine (procthemout) */
 
-
-local int getrealname(char *nbuf,int nlen,cchar *gecosname)
-{
-	cint	glen = GNAMELEN ;
+local int getrealname(char *nbuf,int nlen,cchar *gecosname) noex {
+	cint	glen = REALNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	char		gbuf[GNAMELEN + 1] ;
+	char		gbuf[REALNAMELEN + 1] ;
 
 	if (gecosname == NULL) return SR_FAULT ;
 	if (nbuf == NULL) return SR_FAULT ;
@@ -1488,13 +1441,10 @@ local int getrealname(char *nbuf,int nlen,cchar *gecosname)
 	} /* end if */
 
 	return (rs >= 0) ? rl : 0 ;
-}
-/* end subroutine (getrealname) */
-
+} /* end subroutine (getrealname) */
 
 /* compare user names */
-local int cmpname(struct user **e1pp,struct user **e2pp)
-{
+local int cmpname(struct user **e1pp,struct user **e2pp) noex {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
 	    if (*e1pp != NULL) {
@@ -1506,13 +1456,10 @@ local int cmpname(struct user **e1pp,struct user **e2pp)
 	        rc = 1 ;
 	}
 	return rc ;
-}
-/* end subroutine (cmpname) */
-
+} /* end subroutine (cmpname) */
 
 /* compare record dates */
-local int cmpdate(struct user **e1pp,struct user **e2pp)
-{
+local int cmpdate(struct user **e1pp,struct user **e2pp) noex {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
 	    if (*e1pp != NULL) {
@@ -1524,13 +1471,10 @@ local int cmpdate(struct user **e1pp,struct user **e2pp)
 	        rc = 1 ;
 	}
 	return rc ;
-}
-/* end subroutine (cmpdate) */
-
+} /* end subroutine (cmpdate) */
 
 /* compare dead record entry indices */
-local int cmpei(struct dead **e1pp,struct dead **e2pp)
-{
+local int cmpei(struct dead **e1pp,struct dead **e2pp) noex {
 	int		rc = 0 ;
 	if ((*e1pp != NULL) || (*e2pp != NULL)) {
 	    if (*e1pp != NULL) {
@@ -1542,26 +1486,20 @@ local int cmpei(struct dead **e1pp,struct dead **e2pp)
 	        rc = 1 ;
 	}
 	return rc ;
-}
-/* end subroutine (cmpei) */
-
+} /* end subroutine (cmpei) */
 
 /* compare two records */
-local int utmatch(TMPX_ENT *u1p,TMPX_ENT *u2p)
-{
+local int utmatch(TMPX_ENT *u1p,TMPX_ENT *u2p) noex {
 	int		f = TRUE ;
 	f = f && (u1p->ut_pid == u2p->ut_pid) ;
 	f = f && (strncmp(u1p->ut_user,u2p->ut_user,TMPX_LUSER) == 0) ;
 	f = f && (strncmp(u1p->ut_id,u2p->ut_id,TMPX_LID) == 0) ;
 	f = f && (strncmp(u1p->ut_line,u2p->ut_line,TMPX_LLINE) == 0) ;
 	return f ;
-}
 /* end subroutine (utmatch) */
 
-
 #if	CF_DEBUGS || CF_DEBUG
-local int debugprintrecord(cchar *s,TMPX_ENT *up)
-{
+local int debugprintrecord(cchar *s,TMPX_ENT *up) noex {
 	int		rs ;
 	rs = debugprintf("%s t=%u id=%-4t u=%-12t l=%-12t p=6u e=%2d\n",
 	    s,
@@ -1572,7 +1510,7 @@ local int debugprintrecord(cchar *s,TMPX_ENT *up)
 	    up->ut_pid,
 	    up->ut_exit.e_exit) ;
 	return rs ;
-}
+} /* end subroutine */
 #endif /* CF_DEBUG */
 
 
