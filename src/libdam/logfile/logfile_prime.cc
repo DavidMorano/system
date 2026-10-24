@@ -71,7 +71,7 @@
 #include	<strn.h>		/* LIBUC */
 #include	<strw.h>		/* LIBUC |strwset(3uc)| */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<ncol.h>		/* |ncolchar(3uc)| */
+#include	<ncol.h>		/* LIBUC |ncolchar(3uc)| */
 #include	<mkx.h>			/* LIBUC */
 #include	<mklogid.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC */
@@ -130,7 +130,7 @@ using std::max ;			/* subroutine-template */
 
 extern "C" {
     extern int	bufvprintf(char *,int,cchar *,va_list) noex ;
-}
+} /* end extern */
 
 extern "C" {
     extern int uc_getpid() noex ;
@@ -138,7 +138,7 @@ extern "C" {
 
 namespace logfile_util {
     int logfile_copylock(logfile *,int) noex ;
-}
+} /* end namespace (logfile_util) */
 
 using logfile_util::logfile_copylock ;	/* subroutine */
 
@@ -367,7 +367,7 @@ int logfile_checksize(logfile *op,int logsz) noex {
 	if ((rs = logfile_magic(op)) >= 0) {
 	    if (logsz <= 0) {
 		logsz = LOGFILE_LOGSIZE ;
-	    }
+	    } /* end */
 	    if ((rs = logfile_fileopen(op)) >= 0) {
 	        cint	loglimit = (logsz * (op->percent + 100)) / 100 ;
 	        if (ustat sb ; (rs = u_fstat(op->lfd,&sb)) >= 0) {
