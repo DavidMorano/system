@@ -62,8 +62,8 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	matstr() ;
 extern int	configread(), configfree() ;
 extern int	paramloads(), paramloadu(), paramload() ;
@@ -271,7 +271,7 @@ pid_t		pid ;
 	if ((rs = bopencmd(fpa,cmd)) < 0) goto badspawn ;
 
 	if (g.f.machines) {
-	    const int	LINEBUFLEN ;
+	    cint	LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN+1] ;
 
 /* funnel the output from ADVICE back to the main parent */
