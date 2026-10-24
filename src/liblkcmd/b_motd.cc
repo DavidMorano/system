@@ -166,22 +166,6 @@
 #define	GETPW_UID	getpw_uid
 #endif /* CF_UGETPW */
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	USERNAMELEN
-#define	USERNAMELEN	32
-#endif
-
-#ifndef	GNAMELEN
-#define	GNAMELEN	80		/* GECOS name length */
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* real name length */
-#endif
-
 #ifndef	ENVBUFLEN
 #define	ENVBUFLEN	2048
 #endif
