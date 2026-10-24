@@ -108,14 +108,6 @@ import libutil ;			/* |lenstr(3u)| */
 #define	DEVDNAME	"/dev"
 #endif
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	USERNAMELEN
-#define	USERNAMELEN	32
-#endif
-
 #define	COLS_USERNAME	8
 #define	COLS_REALNAME	39
 
