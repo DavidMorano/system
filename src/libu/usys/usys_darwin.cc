@@ -40,20 +40,20 @@
 /* USYS_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
-#include	<sys/types.h>
-#include	<unistd.h>		/* |getdomainname(3darwin)| */
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® |getdomainname(3darwin)| */
 #include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<usyscallbase.hh>	/* |usyscallbase(3u)| */
-#include	<intsat.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<usyscallbase.hh>	/* LIBU |usyscallbase(3u)| */
+#include	<intsat.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_darwin.h"
 
@@ -73,14 +73,14 @@ namespace {
 	    obuf = b ;
 	    olen = l ;
 	    return handler() ;
-	} ;
+	} ; /* end */
         int callstd() noex override {
             int         rs = SR_BUGCHECK ;
             if (m) {
                 rs = (this->*m)() ;
             }
             return rs ;
-        } ;
+        } ; /* end */
 	int isysctl() noex ;
     } ; /* end struct (syscaller) */
 } /* end namespace */
@@ -138,23 +138,23 @@ typedef	CTIMESPEC 	ctsp ;
 EXTERNC_begin
 
 unixret_t sigwaitinfo(const sigset_t *setp,siginfo_t *sip) noex {
-    	int	rc = -1 ;	
+    	unixret_t	ru = unixretbad ;
 	if (setp && sip) {
 	    errno = ENOSYS ;
 	} else {
 	    errno = EFAULT ;
 	}
-	return rc ;
+	return ru ;
 } /* end subroutine (sigwaitinfo) */
 
 unixret_t sigtimedwait(const sigset_t *setp,siginfo_t *sip,ctsp *tsp) noex {
-    	int	rc = -1 ;	
+    	unixret_t	ru = unixretbad ;	
 	if (setp && sip && tsp) {
 	    errno = ENOSYS ;
 	} else {
 	    errno = EFAULT ;
 	}
-	return rc ;
+	return ru ;
 } /* end subroutine (sigtimedwait) */
 
 unixret_t sigwaitinfoto(const sigset_t *setp,siginfo_t *sip,ctsp *tsp) noex {
@@ -189,7 +189,7 @@ errno_t pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
 
 EXTERNC_begin
 
-unixret_t darwinsem_init(sem_t *semp,int,unsigned int) noex {
+sysret_t darwinsem_init(sem_t *semp,int,unsigned int) noex {
     	int		rs = SR_FAULT ;
 	if (semp) {
 	    rs = SR_NOSYS ;
@@ -197,7 +197,7 @@ unixret_t darwinsem_init(sem_t *semp,int,unsigned int) noex {
 	return rs ;
 } /* end */
 
-unixret_t darwinsem_destroy(sem_t *semp) noex {
+sysret_t darwinsem_destroy(sem_t *semp) noex {
     	int		rs = SR_FAULT ;
 	if (semp) {
 	    rs = SR_NOSYS ;
@@ -236,7 +236,7 @@ int syscaller::isysctl() noex {
             obuf[len] = '\0' ;
         } else {
             rs = (neg errno) ;
-	}
+	} /* end */
 	return (rs >= 0) ? len : rs ;
 } /* end method (syscaller:isysctl) */
 
