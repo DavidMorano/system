@@ -89,7 +89,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* GNU version (like in Linux) */
 unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
-    	unixret_t	rc = 0 ;
+    	unixret_t	ru = unixretgood ;
         errno_t		ec  = 0 ;
 	if (grp && grbuf) {
             GROUP *rp{} ;
@@ -97,20 +97,20 @@ unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
             if ((ec = getgrent_r(grp,grbuf,grlen,&rp)) == 0) {
                 if (rp == nullptr) {
                     ec = ENOENT ;
-                    rc = -1 ;
+                    ru = unixretbad ;
                 }
             } else if (ec > 0) {
-                rc = -1 ;
+                ru = unixretbad ;
 	    } else {
                 ec = EBUGCHECK ;
-		rc = -1 ;
+		ru = unixretbad ;
             }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	} /* end if (non-null) */
 	if (ec) errno = ec ;
-        return rc ;
+        return ru ;
 } /* end subroutine (getgrent_rp) */
 
 #else /* defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0) */
@@ -118,21 +118,21 @@ unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
 /* POSIX draft-version (like in SunOS) */
 unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (grp && grbuf) {
 	    CGROUP *rp ;
 	    errno = 0 ;
 	    if ((rp = getgrent_r(grp,grbuf,grlen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getgrent_rp) */
 
 #endif /* defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0) */
@@ -162,28 +162,28 @@ unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
 #if     defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0)
 
 unixret_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (grp && grbuf && n) {
 	    GROUP *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getgrnam_r(n,grp,grbuf,grlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-		rc = -1 ;
+		ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getgrnam_rp) */
 
 #else /* defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0) */
@@ -191,21 +191,21 @@ unixret_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 /* Solaris version */
 unixret_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (grp && grbuf && n) {
 	    CGROUP *rp{} ;
 	    errno = 0 ;
 	    if ((rp = getgrnam_r(n,grp,grbuf,grlen,&rp)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getgrnam_rp) */
 
 #endif /* defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0) */
@@ -235,28 +235,28 @@ unixret_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 #if     defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0)
 
 unixret_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (grp && grbuf) {
 	    GROUP *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getgrgid_r(gid,grp,grbuf,grlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getgrgid_rp) */
 
 #else /* defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0) */
@@ -264,21 +264,21 @@ unixret_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
 /* Solaris version */
 unixret_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (grp && grbuf) {
 	    CGROUP *rp{} ;
 	    errno = 0 ;
 	    if ((rp = getgrgid_r(gid,grp,grbuf,grlen,&rp)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getgrgid_rp) */
 
 #endif /* defined(SYSHAS_GETGRGNUR) && (SYSHAS_GETGRGNUR > 0) */
