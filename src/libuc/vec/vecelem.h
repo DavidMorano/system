@@ -110,7 +110,7 @@ enum vecelemmems {
 	vecelemmem_audit,
 	vecelemmem_finish,
 	vecelemmem_overlast
-} ;
+} ; /* end enum (vecelemmems) */
 struct vecelem ;
 struct vecelem_co {
 	vecelem		*op = nullptr ;
@@ -118,11 +118,11 @@ struct vecelem_co {
 	void operator () (vecelem *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecelem_co) */
 struct vecelem : vecelem_head {
 	vecelem_co	count ;
@@ -156,7 +156,7 @@ struct vecelem : vecelem_head {
 	operator int () noex ;
 	destruct vecelem() {
 	    if (magval && va) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecelem) */
 #else	/* __cplusplus */
 typedef VECELEM		vecelem ;
