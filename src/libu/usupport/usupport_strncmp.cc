@@ -107,7 +107,7 @@ local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
 		    }
 		}
 	    }
-	}
+	} /* end */
 	return rc ;
 } /* end subroutine (strxcmp) */
 
@@ -150,10 +150,10 @@ namespace libu {
 namespace libu {
     int strnbasecmpo(cchar *e1p,cchar *e2p,int n) noex {
     	return (+ strnbasecmp(e1p,e2p,n)) ;
-    }
+    } /* end */
     int strnbasecmpr(cchar *e1p,cchar *e2p,int n) noex {
     	return (- strnbasecmp(e1p,e2p,n)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
@@ -168,37 +168,37 @@ namespace libu {
 namespace libu {
     int strnfoldcmpo(cchar *e1p,cchar *e2p,int n) noex {
     	return (+ strnfoldcmp(e1p,e2p,n)) ;
-    }
+    } /* end */
     int strnfoldcmpr(cchar *e1p,cchar *e2p,int n) noex {
     	return (- strnfoldcmp(e1p,e2p,n)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strnxbasecmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnbasecmp,s1,s2,n,cmporder_obverse) ;
-    }
+    } /* end */
     int strnxbasecmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnbasecmp,s1,s2,n,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strnxcasecmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strncasecmp,s1,s2,n,cmporder_obverse) ;
-    }
+    } /* end */
     int strnxcasecmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strncasecmp,s1,s2,n,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
     int strnxfoldcmpo(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnfoldcmp,s1,s2,n,cmporder_obverse) ;
-    }
+    } /* end */
     int strnxfoldcmpr(cchar *s1,cchar *s2,int n) noex {
     	return strnxcmp(strnfoldcmp,s1,s2,n,cmporder_reverse) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 
