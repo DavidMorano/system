@@ -685,10 +685,10 @@ int shio_print(SHIO *op,cchar *lbuf,int llen) noex {
 }
 /* end subroutine (shio_print) */
 
-int shio_printline(SHIO *op,cchar *lbuf,int llen) noex {
+int shio_println(SHIO *op,cchar *lbuf,int llen) noex {
 	return shio_println(op,lbuf,llen) ;
 }
-/* end subroutine (shio_printline) */
+/* end subroutine (shio_println) */
 
 int shio_printf(SHIO *op,cchar *fmt,...) noex {
 	int		rs ;
