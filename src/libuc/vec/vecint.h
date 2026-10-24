@@ -125,14 +125,14 @@ struct vecint_iter {
 	vecint_iter() = default ;
 	vecint_iter(VECINT_TYPE *ov,int oi,int oii) noex : va(ov), i(oi) {
 	    ii = oii ;
-	} ;
+	} ; /* end */
 	vecint_iter(const vecint_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
 		i = oit.i ;
 		ii = oit.ii ;
 	    }
-	} ;
+	} ; /* end */
 	vecint_iter &operator = (const vecint_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
@@ -140,14 +140,14 @@ struct vecint_iter {
 		ii = oit.ii ;
 	    }
 	    return *this ;
-	} ;
+	} ; /* end */
 	bool operator != (const vecint_iter &) noex ;
 	bool operator == (const vecint_iter &) noex ;
 	VECINT_TYPE *operator * () noex {
 	    VECINT_TYPE	*rp = nullptr ;
 	    if (i < ii) rp = (va + i) ;
 	    return rp ;
-	} ;
+	} ; /* end */
 	vecint_iter operator + (int) const noex ;
 	vecint_iter operator += (int) noex ;
 	vecint_iter operator ++ () noex ; /* pre */
@@ -161,11 +161,11 @@ struct vecint_st {
 	void operator () (vecint *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = 0,int = 0) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecint_st) */
 struct vecint_co {
 	vecint		*op = nullptr ;
@@ -173,11 +173,11 @@ struct vecint_co {
 	void operator () (vecint *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecint_co) */
 struct vecint : vecint_head {
     	vecint_st	start ;
@@ -220,15 +220,15 @@ struct vecint : vecint_head {
 	vecint_iter begin() noex {
 	    vecint_iter		it(va,0,i) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	vecint_iter end() noex {
 	    vecint_iter		it(va,i,i) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	void dtor() noex ;
 	destruct vecint() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecint) */
 #else	/* __cplusplus */
 typedef VECINT		vecint ;
