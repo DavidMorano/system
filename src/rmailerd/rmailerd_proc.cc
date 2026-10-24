@@ -61,6 +61,7 @@
 #include	<pcsconf.h>		/* LIBUC */
 #include	<mailaddr.h>		/* LIBUC */
 #include	<recipient.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>		/* LIBB */
@@ -71,11 +72,7 @@
 
 /* local defines */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 
 /* external subroutines */
@@ -96,10 +93,10 @@ extern int	mailenter(struct proginfo *,struct prog_params *,
 
 /* forward references */
 
-static int	get_efrom() ;
-static int	isindomain(), isinlocalmaildomain() ;
+local int	get_efrom() ;
+local int	isindomain(), isinlocalmaildomain() ;
 
-static void	longline() ;
+local void	longline() ;
 
 
 /* local variables */
@@ -151,7 +148,7 @@ int		ofd, efd ;
 	int	f_errlen = FALSE ;
 	int	f_errsum = FALSE ;
 
-	const char	*hp, *cp ;
+	cchar	*hp, *cp ;
 
 	char	buf[BUFLEN + 1] ;
 	char	hostpart[HOSTPARTLEN + 1], localpart[LOCALPARTLEN + 1] ;
@@ -401,7 +398,7 @@ int		ofd, efd ;
 	        goto bad3 ;
 	    }
 
-	    rs = u_open(ifnamebuf,O_FLAGS,0666) ;
+	    rs = u_open(ifnamebuf,OX_FL,0666) ;
 	    ifd = rs ;
 	    {
 	         u_unlink(ifnamebuf) ;
@@ -726,26 +723,26 @@ done:
 	        if (f_cksum2) {
 	            logfile_printf(&pip->lh,
 	                "%s message %3d cksum=\\x%08x len=%d\n",
-	                timestr_logz(daytime,timebuf),pn,
+	                strtime_logz(daytime,timebuf),pn,
 	                cksum2,mlen) ;
 
 	        } else
 	            logfile_printf(&pip->lh,
 	                "%s message %3d len=%d\n",
-	                timestr_logz(daytime,timebuf),pn,
+	                strtime_logz(daytime,timebuf),pn,
 	                mlen) ;
 
 	    } else
 	        logfile_printf(&pip->lh,
 	            "%s message %3d cksum=\\x%08x len=%d\n",
-	            timestr_logz(daytime,timebuf),pn,
+	            strtime_logz(daytime,timebuf),pn,
 	            cksum2,mlen) ;
 
 	} else {
 
 	    logfile_printf(&pip->lh,
 	        "%s message %3d ERROR\n",
-	        timestr_logz(daytime,timebuf),pn) ;
+	        strtime_logz(daytime,timebuf),pn) ;
 
 	    if (f_errlen) {
 
@@ -814,7 +811,7 @@ ret0:
 
 
 /* waste the rest of a long line */
-static void longline(pip,ifp,buf,len)
+local void longline(pip,ifp,buf,len)
 struct proginfo	*pip ;
 bfile		*ifp ;
 char		buf[] ;
@@ -839,7 +836,7 @@ int		len ;
 
 
 /* get the envelope "from" address */
-static int get_efrom(pip,fp,envelope_host,envelope_from)
+local int get_efrom(pip,fp,envelope_host,envelope_from)
 struct proginfo	*pip ;
 bfile		*fp ;
 char		envelope_host[] ;
@@ -849,7 +846,7 @@ char		envelope_from[] ;
 	int	len ;
 	int	cl ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	linebuf[LINELEN + 1] ;
 	char	localpart[LOCALPARTLEN + 1] ;
@@ -898,9 +895,9 @@ char		envelope_from[] ;
 
 
 /* is the given domain really in the current mail domain ? */
-static int isinlocalmaildomain(pip,name)
+local int isinlocalmaildomain(pip,name)
 struct proginfo	*pip ;
-const char	name[] ;
+cchar	name[] ;
 {
 	char	*dotp ;
 
@@ -934,9 +931,9 @@ const char	name[] ;
 
 
 /* is the named host in the domain given ? */
-static int isindomain(pip,domainname,name)
+local int isindomain(pip,domainname,name)
 struct proginfo	*pip ;
-const char	domainname[], name[] ;
+cchar	domainname[], name[] ;
 {
 	int	f_unqualled = TRUE ;
 	int	i ;
