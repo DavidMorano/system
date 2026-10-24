@@ -5,7 +5,6 @@
 /* KSH built-in version of 's(1d)' */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGHEXBUF	0
@@ -79,12 +78,12 @@
 #include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
-#include	<debug.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
 #include	"tabsvt_config.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
 
 /* local defines */
@@ -101,9 +100,6 @@
 
 #undef	MNBUFLEN
 #define	MNBUFLEN	60
-
-#undef	HEXBUFLEN
-#define	HEXBUFLEN	100
 
 #define	DEFTERMSPEC	"default"
 
@@ -141,7 +137,7 @@
 /* external subroutines */
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
 
 
 /* external variables */
@@ -179,16 +175,16 @@ struct termtype {
 
 local int	mainsub(int,cchar **,cchar **,void *) ;
 
-local int	usage(PROGINFO *) ;
+local int	usage(PI *) ;
 
-local int	procopts(PROGINFO *,keyopt *) ;
-local int	process(PROGINFO *,SHIO *,int,cchar *) ;
-local int	gettermflags(PROGINFO *,cchar *,int *) ;
-local int	terminit(PROGINFO *,cchar *,int,int,char *,int) ;
-local int	termclear(PROGINFO *,cchar *,int,int,char *,int) ;
-local int	termdate(PROGINFO *,cchar *,int,int,char *,int,time_t) ;
-local int	bufsd(PROGINFO *,int,SBUF *,int,cchar *,int) ;
-local int	bufdiv(PROGINFO *,int,SBUF *,int,int,cchar *,int) ;
+local int	procopts(PI *,keyopt *) ;
+local int	process(PI *,SHIO *,int,cchar *) ;
+local int	gettermflags(PI *,cchar *,int *) ;
+local int	terminit(PI *,cchar *,int,int,char *,int) ;
+local int	termclear(PI *,cchar *,int,int,char *,int) ;
+local int	termdate(PI *,cchar *,int,int,char *,int,time_t) ;
+local int	bufsd(PI *,int,SBUF *,int,cchar *,int) ;
+local int	bufdiv(PI *,int,SBUF *,int,int,cchar *,int) ;
 local int	loadstrs(SBUF *,cchar **) ;
 
 
@@ -394,14 +390,14 @@ int p_tabsvt(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* ARGSUSED */
 local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
-	PROGINFO	pi, *pip = &pi ;
+	PI	pi, *pip = &pi ;
 	LOCINFO	li, *lip = &li ;
 	bits		pargs ;
 	keyopt		akopts ;
 	SHIO		errfile ;
 	SHIO		outfile, *ofp = &outfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -435,14 +431,14 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	char		pcsroot[MAXPATHLEN + 1] ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_tabsvt: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -1012,7 +1008,7 @@ badpargs:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -1021,7 +1017,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	CF_DEBUG
 	debugclose() ;
 #endif
 
@@ -1039,7 +1035,7 @@ badarg:
 /* end subroutine (mainsub) */
 
 
-local int usage(PROGINFO *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1060,7 +1056,7 @@ local int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-local int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PI *pip,keyopt *kop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -1213,7 +1209,7 @@ local int procopts(PROGINFO *pip,keyopt *kop)
 
 
 local int process(pip,ofp,fd,termspec)
-PROGINFO	*pip ;
+PI	*pip ;
 SHIO		*ofp ;
 int		fd ;
 cchar	termspec[] ;
@@ -1347,7 +1343,7 @@ ret0:
 
 
 local int gettermflags(pip,termspec,rp)
-PROGINFO	*pip ;
+PI	*pip ;
 cchar	termspec[] ;
 int		*rp ;
 {
@@ -1382,7 +1378,7 @@ int		*rp ;
 
 /* create the data to set (reset-fix) the terminal state */
 local int terminit(pip,termspec,termflags,lines,buf,buflen)
-PROGINFO	*pip ;
+PI	*pip ;
 cchar	termspec[] ;
 int		termflags ;
 int		lines ;
@@ -1555,7 +1551,7 @@ ret0:
 
 /* clear the terminal */
 local int termclear(pip,termspec,termflags,lines,buf,buflen)
-PROGINFO	*pip ;
+PI	*pip ;
 cchar	termspec[] ;
 int		termflags ;
 int		lines ;
@@ -1606,7 +1602,7 @@ ret0:
 #ifdef	COMMENT
 
 local int termlines(pip,termflags,lines,buf,buflen,daytime)
-PROGINFO	*pip ;
+PI	*pip ;
 int		termflags ;
 int		lines ;
 char		buf[] ;
@@ -1686,7 +1682,7 @@ ret0:
 
 
 local int termdate(pip,termspec,termflags,lines,buf,buflen,daytime)
-PROGINFO	*pip ;
+PI	*pip ;
 cchar	termspec[] ;
 int		termflags ;
 int		lines ;
@@ -1937,7 +1933,7 @@ ret0:
 
 
 local int bufsd(pip,termflags,bufp,x,buf,buflen)
-PROGINFO	*pip ;
+PI	*pip ;
 int		termflags ;
 SBUF		*bufp ;
 int		x ;
@@ -2026,7 +2022,7 @@ ret0:
 
 
 local int bufdiv(pip,termflags,bufp,y,x,buf,buflen)
-PROGINFO	*pip ;
+PI	*pip ;
 int		termflags ;
 SBUF		*bufp ;
 int		y, x ;
