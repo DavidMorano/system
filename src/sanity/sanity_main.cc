@@ -5,6 +5,7 @@
 /* generic front-end for SHELL built-ins */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_UTIL		0		/* run the utility worker */
 
 /* revision history:
@@ -34,21 +35,19 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<ucontext.h>
-#include	<dlfcn.h>
-#include	<csignal>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<new>			/* |nothrow(3c++)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<intceil.h>
-#include	<sighand.h>
-#include	<mapex.h>
-#include	<strx.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<new>			/* C++STD placement-new */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
+#include	<sighand.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
+#include	<mapex.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"kshlib.h"
 #include	"maininfo.h"
@@ -65,6 +64,10 @@
 #define	SIGCODE		struct sigcode
 
 #define	NDF		"main.deb"
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -84,7 +87,7 @@
 struct sigcode {
 	int	code ;
 	cchar	*name ;
-} ;
+} ; /* end struct (sigcode) */
 
 
 /* forward references */
@@ -97,7 +100,7 @@ local cchar	*strsigcode(const SIGCODE *,int) noex ;
 
 /* local variables */
 
-static const MAPEX	mapexs[] = {
+constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -110,18 +113,18 @@ static const MAPEX	mapexs[] = {
 	{ SR_EXIT, EX_TERM },
 	{ SR_DOM, EX_NOPROG },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
-static cint	sigcatches[] = {
+constexpr cint		sigcatches[] = {
 	SIGILL, 
 	SIGSEGV,
 	SIGBUS,
 	SIGQUIT,
 	SIGABRT,
 	0
-} ;
+} ; /* end array */
 
-static const SIGCODE	sigcode_ill[] = {
+constexpr SIGCODE	sigcode_ill[] = {
 	{ ILL_ILLOPC, "ILLOPC" },
 	{ ILL_ILLOPN, "ILLOPN" },
 	{ ILL_ILLADR, "ILLADR" },
@@ -131,20 +134,22 @@ static const SIGCODE	sigcode_ill[] = {
 	{ ILL_COPROC, "COPROC" },
 	{ ILL_BADSTK, "BADSTK" },
 	{ 0, nullptr }
-} ;
+} ; /* end array */
 
-static const SIGCODE	sigcode_segv[] = {
+constexpr SIGCODE	sigcode_segv[] = {
 	{ SEGV_MAPERR, "MAPERR" },
 	{ SEGV_ACCERR, "ACCERR" },
 	{ 0, nullptr }
-} ;
+} ; /* end array */
 
-static const SIGCODE	sigcode_bus[] = {
+constexpr SIGCODE	sigcode_bus[] = {
 	{ BUS_ADRALN, "ADRALN" },
 	{ BUS_ADRERR, "ADRERR" },
 	{ BUS_OBJERR, "OBJERR" },
 	{ 0, nullptr }
-} ;
+} ; /* end array */
+
+vbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -152,7 +157,7 @@ static const SIGCODE	sigcode_bus[] = {
 
 /* exported subroutines */
 
-int main(int argc,mainv argv,mainv envv) {
+int main(int argc,con mainv argv,con mainv envv) {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -185,13 +190,13 @@ int main(int argc,mainv argv,mainv envv) {
 	        if (rs >= 0) rs = rs1 ;
 	    } else {
 	        ex = EX_OSERR ;
-	    }
+	    } /* end */
 	} else {
 	    ex = EX_OSERR ;
-	}
+	} /* end */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    ex = mapex(mapexs,rs) ;
-	}
+	} /* end if (error) */
 	return ex ;
 } /* end subroutine (main) */
 
@@ -216,10 +221,10 @@ local void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	        wl = bufprintf(wbuf,wlen,fmt,ra,dl.dli_fname,dl.dli_sname) ;
 	        write(2,wbuf,wl) ;
 	    }
-	}
+	} /* end if */
 	if (sip != nullptr) {
 	    main_sigdump(sip) ;
-	}
+	} /* end if */
 	u_exit(EX_TERM) ;
 } /* end subroutine (main_sighand) */
 
@@ -269,7 +274,7 @@ local cchar *strsigcode(const SIGCODE *scp,int code) noex {
 	for (i = 0 ; scp[i].code != 0 ; i += 1) {
 	    f = (scp[i].code == code) ;
 	    if (f) break ;
-	}
+	} /* end for */
 	if (f) sn = scp[i].name ;
 	return sn ;
 } /* end subroutine (strsigcode) */
