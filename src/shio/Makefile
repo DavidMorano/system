@@ -42,7 +42,7 @@ LIBS +=
 
 OBJ0= shio_main.o shio_print.o
 OBJ1= shio_printdline.o shio_readlns.o
-OBJ2= shio_writeblanks.o
+OBJ2= shio_wrblanks.o
 OBJ3= 
 
 OBJA= obj0.o obj1.o obj2.o 
@@ -52,9 +52,7 @@ OBJ= obja.o
 
 
 INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
-
+LIBDIRS += -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -140,6 +138,6 @@ shio_main.o:		shio_main.cc				$(INCS)
 shio_print.o:		shio_print.cc				$(INCS)
 shio_printdline.o:	shio_printdline.cc			$(INCS)
 shio_readlns.o:		shio_readlns.cc				$(INCS)
-shio_writeblanks.o:	shio_writeblanks.cc			$(INCS)
+shio_wrblanks.o:	shio_wrblanks.cc			$(INCS)
 
 
