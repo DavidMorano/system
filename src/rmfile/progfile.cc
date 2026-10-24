@@ -70,8 +70,8 @@
 
 /* external subroutines */
 
-extern int	removes(const char *) ;
-extern int	unlinkd(const char *,int) ;
+extern int	removes(cchar *) ;
+extern int	unlinkd(cchar *,int) ;
 
 
 /* external variables */
@@ -92,7 +92,7 @@ extern int	unlinkd(const char *,int) ;
 int progfile(pip,delay,fname)
 struct proginfo	*pip ;
 int		delay ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	ustat	sb ;
 
