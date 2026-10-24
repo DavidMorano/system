@@ -70,10 +70,10 @@
 namespace solaris {
     CSPWD *getspent_r(SPWD *sps,char *rbuf,int rlen) noex {
     	SPWD		*rp = nullptr ;
-	int		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (sps && rbuf) {
 	    if (rlen > 0) {
-		    ec = ENOSYS ;
+		ec = ENOSYS ;
 	    } else {
 		ec = EOVERFLOW ;
 	    }
@@ -85,7 +85,7 @@ namespace solaris {
     } /* end subroutine (getspent_r) */
     CSPWD *getspnam_r(cchar *nam,SPWD *sps,char *rbuf,int rlen) noex {
     	SPWD		*rp = nullptr ;
-	int		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (nam && sps && rbuf) {
 	    if (rlen > 0) {
 		if (nam[0]) {
