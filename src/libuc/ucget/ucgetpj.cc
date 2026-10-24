@@ -230,14 +230,14 @@ int ucgetpj::getpj_ent(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	        rs = pjp->size() ;
 	    } else {
 		rs = (neg errno) ;
-	    }
+	    } /* end */
 	} else {
 	    CSYSDBPJ	*ep = getprojent(pjp,pjbuf,pjsize) ;
 	    if (cucentpj *rp = cast_static<cucentpj *>(ep) ; rp != np) {
 	        rs = pjp->load(pjbuf,pjlen,rp) ;
 	    } else {
 	        rs = (neg errno) ;
-	    }
+	    } /* end */
 	} /* end if_constexpr (selection) */
 	return rs ;
 } /* end subroutine (ucgetpj::getpj_ent) */
@@ -251,18 +251,18 @@ int ucgetpj::getpj_nam(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	        rs = pjp->size() ;
 	    } else {
 	        rs = (neg errno) ;
-	    }
+	    } /* end */
 	} else {
 	    CSYSDBPJ	*ep = getprojbyname(name,pjp,pjbuf,pjsize) ;
 	    if (cucentpj *rp = cast_static<cucentpj *>(ep) ; rp != np) {
 	        rs = pjp->load(pjbuf,pjlen,rp) ;
 	    } else {
 	        rs = (neg errno) ;
-	    }
+	    } /* end */
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (ucgetpj::getpj_nam) */
 
@@ -275,18 +275,18 @@ int ucgetpj::getpj_pid(ucentpj *pjp,char *pjbuf,projid_t pjlen) noex {
 	        rs = pjp->size() ;
 	    } else {
 		rs = (neg errno) ;
-	    }
+	    } /* end */
 	} else {
 	    CSYSDBPJ	*ep = getprojbyid(pjid,pjp,pjbuf,pjsize) ;
 	    if (cucentpj *rp = cast_static<cucentpj *>(ep) ; rp != np) {
 	        rs = pjp->load(pjbuf,pjlen,rp) ;
 	    } else {
 	        rs = (neg errno) ;
-	    }
+	    } /* end */
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	    if (rs == SR_BADF) rs = SR_NOENT ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (ucgetpj::getpj_pid) */
 
@@ -299,18 +299,18 @@ int ucgetpj::getpj_def(ucentpj *pjp,char *pjbuf,int pjlen) noex {
 	        rs = pjp->size() ;
 	    } else {
 	        rs = (neg errno) ;
-	    }
+	    } /* end */
 	} else {
 	    CSYSDBPJ	*ep = getdefaultproj(name,pjp,pjbuf,pjsize) ;
 	    if (cucentpj *rp = cast_static<cucentpj *>(ep) ; rp != np) {
 	        rs = pjp->load(pjbuf,pjlen,rp) ;
 	    } else {
 	        rs = (neg errno) ;
-	    }
+	    } /* end */
 	} /* end if_constexpr (selection) */
 	if_constexpr (f_sunos) {
 	   if (rs == SR_BADF) rs = SR_NOENT ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (ucgetpj::getpj_def) */
 
