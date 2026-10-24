@@ -80,9 +80,9 @@ local int pipes_nonblock(int *pipes,int of) noex {
 } /* end subroutine (pipes_nonblock) */
     
 unixret_t pipe2(int *pipes,int of) noex {
-	unixret_t	rc = 0 ;
+	unixret_t	ru = unixretgood ;
 	if (pipes) ylikely {
-	    if ((rc = pipe(pipes)) >= 0) ylikely {
+	    if ((ru = pipe(pipes)) >= 0) ylikely {
 		int	rs ;
 		if ((rs = pipes_closeon(pipes,of)) >= 0) ylikely {
 		    rs = pipes_nonblock(pipes,of) ;
@@ -91,14 +91,14 @@ unixret_t pipe2(int *pipes,int of) noex {
                     close(pipes[0]) ;
                     close(pipes[1]) ;
 		    errno = (neg rs) ;
-		    rc = -1 ;
+		    ru = unixretbad ;
                 } /* end if (error) */
 	    } /* end if (pipe) */
 	} else {
-	    rc = -1 ;
+	    ru = unixretbad ;
 	    errno = EFAULT ;
 	} /* end if (non-null) */
-	return rc ;
+	return ru ;
 } /* end subroutine (pipe2) */
 
 
