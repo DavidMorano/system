@@ -90,9 +90,9 @@ struct chpairs {
 
 /* local references */
 
-static int	adesc_init(struct adesc *) noex ;
-static int	adesc_line(struct adesc *,char *,int) noex ;
-static int	adesc_free(struct adesc *) noex ;
+local int	adesc_init(struct adesc *) noex ;
+local int	adesc_line(struct adesc *,char *,int) noex ;
+local int	adesc_free(struct adesc *) noex ;
 
 
 /* forward references */
@@ -289,7 +289,7 @@ int main(argc,mainv argv,mainv envv) {
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -543,7 +543,7 @@ badret:
 
 
 /* process a line of input */
-static int adesc_line(adp,linebuf,linelen)
+local int adesc_line(adp,linebuf,linelen)
 struct adesc	*adp ;
 char	linebuf[] ;
 int	linelen ;
@@ -634,7 +634,7 @@ int	linelen ;
 /* end subroutine (adesc_line) */
 
 
-static int adesc_init(adp)
+local int adesc_init(adp)
 struct adesc	*adp ;
 {
 	int	i ;
@@ -648,7 +648,7 @@ struct adesc	*adp ;
 }
 
 
-static int adesc_free(adp)
+local int adesc_free(adp)
 struct adesc	*adp ;
 {
 
