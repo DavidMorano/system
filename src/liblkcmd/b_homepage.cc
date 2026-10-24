@@ -3250,11 +3250,11 @@ local int procdocbodyhdr(PI *pip,HTM *hdp) noex {
 	        cchar		*fn = lip->wfname ;
 	        char		hbuf[HBUFLEN+1] ;
 	        if ((rs = procdocbodyhdrfile(pip,hbuf,hlen,fn)) >= 0) {
-	            rs = htm_printline(hdp,hbuf,rs) ;
+	            rs = htm_println(hdp,hbuf,rs) ;
 	        } else if (isNotPresent(rs)) {
 	            cchar	*hp = pip->org ;
 	            if (hp == nullptr) hp = "home page" ;
-	            rs = htm_printline(hdp,hp,-1) ;
+	            rs = htm_println(hdp,hp,-1) ;
 	        }
 	        rs1 = htm_tagend(hdp,"h1") ;
 	        if (rs >= 0) rs = rs1 ;
@@ -3380,7 +3380,7 @@ local int procdocbodyfooterleft(PI *pip,HTM *hdp) noex {
 	            strdcpy2(hbuf,hlen,"mailto:",title) ;
 	            if ((rs = htm_abegin(hdp,class,n,href,title)) >= 0) {
 	                {
-	                    rs = htm_printline(hdp,"webmaster",-1) ;
+	                    rs = htm_println(hdp,"webmaster",-1) ;
 	                }
 	                rs1 = htm_aend(hdp) ;
 	                if (rs >= 0) rs = rs1 ;
@@ -3395,7 +3395,7 @@ local int procdocbodyfooterleft(PI *pip,HTM *hdp) noex {
 	            LI	*lip = pip->lip ;
 	            {
 	                cchar	*c = lip->copyright ;
-	                rs = htm_printline(hdp,c,-1) ;
+	                rs = htm_println(hdp,c,-1) ;
 	            }
 	            rs1 = htm_tagend(hdp,"p") ;
 	            if (rs >= 0) rs = rs1 ;
@@ -3529,7 +3529,7 @@ local int procdocbodymain_svcerhdr(PI *pip,HTM *hdp,
 	    vl = rs ;
 	    if ((rs = htm_tagbegin(hdp,"h3",nullptr,nullptr,nullptr)) >= 0) {
 	        {
-	            rs = htm_printline(hdp,vp,vl) ;
+	            rs = htm_println(hdp,vp,vl) ;
 	        }
 	        rs1 = htm_tagend(hdp,"h3") ;
 	        if (rs >= 0) rs = rs1 ;
