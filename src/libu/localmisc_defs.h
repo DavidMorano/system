@@ -28,16 +28,6 @@
 #define	PASSWDLEN	64
 #endif
 
-#ifndef	ORGLEN
-#define	ORGLEN		80		/* length organization-name */
-#endif
-#ifndef	ORGLOCLEN
-#define	ORLOCGLEN	80		/* length organization-location */
-#endif
-#ifndef	ORGCODELEN
-#define	ORGCODELEN	40		/* length organization-ode */
-#endif
-
 
 #endif /* LOCALMISCDEFS_INCLUDE */
 
