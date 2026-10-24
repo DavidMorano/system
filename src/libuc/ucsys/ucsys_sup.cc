@@ -74,7 +74,7 @@
 
 namespace ucsys {
     errno_t getresolvec(int herr) noex {
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	switch (herr) {
 	case NETDB_SUCCESS:
 	    break ;
