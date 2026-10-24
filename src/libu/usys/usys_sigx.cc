@@ -43,16 +43,16 @@
 #if	(!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0)
 
 unixret_t sigqueue(pid_t pid,int sn,const SIGVAL) noex {
-	unixret_t	rc = 0 ;
+	unixret_t	ru = unixretgood ;
 	errno_t		ec = EOK ;
 	if ((pid > 0) && (sn >= 0)) {
-	    rc = kill(pid,sn) ;
+	    ru = kill(pid,sn) ;
 	} else {
+	    ru = unixretbad ;
 	    ec = EINVAL ;
-	    rc = -1 ;
 	} /* end if */
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine */
 
 #endif /* (!defined(SYSHAS_SIGQUEUE)) || (SYSHAS_SIGQUEUE == 0) */
@@ -67,41 +67,41 @@ constexpr id_t		idend = id_t(-1) ;
 #endif
 
 unixret_t sigsend(idtype_t type,id_t id,int sn) noex {
-	unixret_t	rc = 0 ;
+	unixret_t	ru = unixretgood ;
 	errno_t		ec = EOK ;
 	if ((id != idend) && (sn >= 0)) {
 	    switch (type) {
 	    case P_ALL:
 	        id = id_t(-1) ;
-	        rc = kill(id,sn) ;
+	        ru = kill(id,sn) ;
 	        break ;
 	    case P_PID:
 	        if (id != idend) {
 		    if (id > 0) {
-	               rc = kill(id,sn) ;
+	               ru = kill(id,sn) ;
 		    } else {
-	               rc = killpg(0,sn) ;
-		    }
+	               ru = killpg(0,sn) ;
+		    } /* end */
 	        } else {
+	            ru = unixretbad ;
 	            ec = EINVAL ;
-	            rc = -1 ;
-	        }
+	        } /* end */
 	        break ;
 	    case P_PGID:
 	        id = id_t(- id) ;
-	        rc = kill(id,sn) ;
+	        ru = kill(id,sn) ;
 	        break ;
 	    default:
+		ru = unixretbad ;
 	        ec = ENOTSUP ;
-	        rc = -1 ;
 	        break ;
 	    } /* end switch */
 	} else {
+	    ru = unixretbad ;
 	    ec = EINVAL ;
-	    rc = -1 ;
 	} /* end if */
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine */
 
 #endif /* (!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0) */
@@ -111,22 +111,22 @@ unixret_t sigsend(idtype_t type,id_t id,int sn) noex {
 #if	(!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0)
 
 unixret_t sigsendset(procset_t *sp,int sn) noex {
-	unixret_t	rc = 0 ;
+	unixret_t	ru = unixretgood ;
 	errno_t		ec = EOK ;
 	if (sp) {
 	    if (sn >= 0) {
+		ru = unixretbad ;
 	        ec = ENOTSUP ;
-	        rc = -1 ;
 	    } else {
+		ru = unixretbad ;
 	        ec = EINVAL ;
-	        rc = -1 ;
-	    }
+	    } /* end */
 	} else {
+	    ru = unixretbad ;
 	    ec = EFAULT ;
-	    rc = -1 ;
 	} /* end if */
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine */
 
 #endif /* (!defined(SYSHAS_SIGSENDSET)) || (SYSHAS_SIGSENDSET == 0) */
