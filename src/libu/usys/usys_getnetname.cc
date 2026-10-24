@@ -103,11 +103,11 @@ local int mknetname(char *rbuf,int rlen) noex {
 		    rl = sl ;
 		} else {
 		    rs = SR_OVERFLOW ;
-		}
+		} /* end if (error) */
 	    } /* end if (ok) */
 	} catch (...) {
 	    rs = SR_NOMEM ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine (mknetname) */
 
