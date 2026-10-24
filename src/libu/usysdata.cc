@@ -221,7 +221,7 @@ constexpr cbool		f_linux		= F_LINUX ;
 
 int u_uname(utsname *up) noex {
 	int		rs = SR_FAULT ;
-	int		rc = 0 ;
+	int		rc = 0 ; /* return-value */
 	if (up) ylikely {
 	    if ((rs = usys_uname(up)) >= 0) ylikely {
 		rc = rs ;
