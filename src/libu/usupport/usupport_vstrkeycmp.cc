@@ -124,13 +124,13 @@ local int vstrkeyxcmp(strxcmp_f vx,cchar **s1pp,cchar **s2pp) noex {
 namespace libu {
     int vstrkeybasecmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyxcmp(strkeybasecmp,s1pp,s2pp) ;
-    }
+    } /* end */
     int vstrkeycasecmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyxcmp(strkeycasecmp,s1pp,s2pp) ;
-    }
+    } /* end */
     int vstrkeyfoldcmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeyxcmp(strkeyfoldcmp,s1pp,s2pp) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 
