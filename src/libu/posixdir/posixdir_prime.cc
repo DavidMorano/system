@@ -279,9 +279,9 @@ int posixdir::dirclose() noex {
 	if (dirp) {
 	    errno = 0 ;
 	    rs = SR_OK ;
-	    if (int rc = closedir(dirp) ; rc < 0) {
+	    if (unixret_t rc = closedir(dirp) ; rc < 0) {
 	        rs = (neg errno) ;
-	    }
+	    } /* end if (error) */
 	    dirp = nullptr ;
 	} /* end if (open) */
 	return rs ;
