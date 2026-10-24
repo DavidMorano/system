@@ -104,28 +104,28 @@ import libutil ;			/* |memclear(3u)| */
 
 /* GNU version (like on Linux) */
 unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (svp && svbuf) {
 	    SERVENT *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getservent_r(svp,svbuf,svlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getsvent_np) */
 
 #else /* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
@@ -133,21 +133,21 @@ unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 /* POSIX draft-6 inspired version (like on Solaris®) */
 unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (svp && svbuf) {
 	    CSERVENT *rp ;
 	    errno = 0 ;
 	    if ((rp = getservent_r(svp,svbuf,svlen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec  EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getsvent_np) */
 
 #endif	/* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
@@ -178,28 +178,28 @@ unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 
 /* GNU version (like on Linux) */
 unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (svp && svbuf) {
 	    SERVENT *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getservbyname_r(n,p,svp,svbuf,svlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-	            rc = -1 ;
+	            ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getsvnam_np) */
 
 #else /* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
@@ -207,18 +207,18 @@ unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
 /* POSIX draft-6 inspired version */
 unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (svp && svbuf) {
 	    CSERVENT *rp ;
 	    errno = 0 ;
 	    if ((rp = getservbyname_r(n,p,svp,svbuf,svlen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
 	return ec ;
@@ -252,28 +252,28 @@ unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
 
 /* GNU version (like on Linux) */
 unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	rc = uixretgood ;
+	errno_t		ec = EOK ;
 	if (svp && svbuf) {
 	    CSERVENT *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getservbyport_r(num,p,svp,svbuf,svlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-	            rc = -1 ;
+	            ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getsvpor_np) */
 
 #else /* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
@@ -281,21 +281,21 @@ unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
 /* POSIX draft-6 inspired version */
 unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (svp && svbuf) {
 	    CSERVENT *rp ;
 	    errno = 0 ;
 	    if ((rp = getservbyport_r(num,p,svp,svbuf,svlen)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 	        void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getsvpor_np) */
 
 #endif	/* defined(SYSHAS_GETSVGNUR) && (SYSHAS_GETSVGNUR > 0) */
@@ -326,7 +326,7 @@ SERVENT *getsvent() noex {
 
 SERVENT *getsvnam(cchar *n,cchar *p) noex {
 	SERVENT		*rp = nullptr ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (n && p) {
 	    if (n[0] && p[0]) {
 		errno = 0 ;
@@ -343,7 +343,7 @@ SERVENT *getsvnam(cchar *n,cchar *p) noex {
 
 SERVENT *getsvpor(int num,cchar *p) noex {
 	SERVENT		*rp = nullptr ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (p) {
 	    if (num >= 0) {
 	        errno = 0 ;
