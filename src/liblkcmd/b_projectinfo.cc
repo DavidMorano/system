@@ -814,7 +814,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if ((rs < 0) && (ex == EX_OK)) {
 	    switch (rs) {
 	    case SR_NOANODE:
-	        ex = EX_OLDER ;
+	        ex = EX_OSERR ;
 	        break ;
 	    case SR_INVALID:
 	        ex = EX_USAGE ;
