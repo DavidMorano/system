@@ -72,18 +72,6 @@
 
 /* local defines */
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(2048,LINE_MAX)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif /* LINEBUFLEN */
-
 #ifndef	ABUFLEN
 #ifdef	ALIASNAMELEN
 #define	ABUFLEN		ALIASNAMELEN
