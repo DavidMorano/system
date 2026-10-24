@@ -89,23 +89,23 @@
 #if	(!defined(SYSHAS_STREAMS)) || (SYSHAS_STREAMS == 0)
 
 unixret_t isastream(int fd) noex {
-	unixret_t	rc = -1 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretbad ;
+	errno_t		ec = EOK ;
 	if (fd >= 0) {
 	    ec = ENOSYS ;
 	} else {
 	    ec = EBADF ;
 	} /* end */
 	if (ec) {
+	    ru = unixretbad ;
 	    errno = ec ;
-	    rc = -1 ;
 	} /* end if (error) */
-	return rc ;
+	return ru ;
 } /* end */
 
 unixret_t fattach(int fd,cchar *fname) noex {
-	unixret_t	rc = -1 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretbad ;
+	errno_t		ec = EOK ;
 	if (fd >= 0) {
 	    if (fname) {
 		if (fname[0]) {
@@ -120,15 +120,15 @@ unixret_t fattach(int fd,cchar *fname) noex {
 	    ec = EBADF ;
 	}
 	if (ec) {
+	    ru = unixretbad ;
 	    errno = ec ;
-	    rc = -1 ;
 	} /* end if (error) */
-	return rc ;
+	return ru ;
 } /* end */
 
 unixret_t fdetach(cchar *fname) noex {
-	unixret_t	rc = -1 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretbad ;
+	errno_t		ec = EOK ;
 	if (fname) {
 	    if (fname[0]) {
 		ec = ENOSYS ;
@@ -139,15 +139,15 @@ unixret_t fdetach(cchar *fname) noex {
 	    ec = EFAULT ;
 	}
 	if (ec) {
+	    ru = unixretbad ;
 	    errno = ec ;
-	    rc = -1 ;
 	} /* end if (error) */
-	return rc ;
+	return ru ;
 } /* end */
 
 unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
-	unixret_t	rc = -1 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretbad ;
+	errno_t		ec = EOK ;
 	if (fd >= 0) {
 	    if (cmp && dmp && fp) {
 		ec = ENOSYS ;
@@ -158,15 +158,15 @@ unixret_t getmsg(int fd,SB *cmp,SB *dmp,int *fp) noex {
 	    ec = EBADF ;
 	}
 	if (ec) {
+	    ru = unixretbad ;
 	    errno = ec ;
-	    rc = -1 ;
 	} /* end if (error) */
-	return rc ;
+	return ru ;
 } /* end */
 
 unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
-	unixret_t	rc = -1 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretbad ;
+	errno_t		ec = EOK ;
 	if (fd >= 0) {
 	    if (cmp && dmp && bp && fp) {
 		ec = ENOSYS ;
@@ -177,15 +177,15 @@ unixret_t getpmsg(int fd,SB *cmp,SB *dmp,int *bp,int *fp) noex {
 	    ec = EBADF ;
 	}
 	if (ec) {
+	    ru = unixretbad ;
 	    errno = ec ;
-	    rc = -1 ;
 	} /* end if (error) */
-	return rc ;
+	return ru ;
 } /* end */
 
 unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
-	unixret_t	rc = -1 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretbad ;
+	errno_t		ec = EOK ;
 	(void) fl ;
 	if (fd >= 0) {
 	    if (cmp && dmp) {
@@ -197,15 +197,15 @@ unixret_t putmsg(int fd,SB *cmp,SB *dmp,int fl) noex {
 	    ec = EBADF ;
 	}
 	if (ec) {
+	    ru = unixretbad ;
 	    errno = ec ;
-	    rc = -1 ;
 	} /* end if (error) */
-	return rc ;
+	return ru ;
 } /* end */
 
 unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
-	unixret_t	rc = -1 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretbad ;
+	errno_t		ec = EOK ;
 	(void) fl ;
 	(void) bd ;
 	if (fd >= 0) {
@@ -218,10 +218,10 @@ unixret_t putpmsg(int fd,SB *cmp,SB *dmp,int bd,int fl) noex {
 	    ec = EBADF ;
 	}
 	if (ec) {
+	    ru = unixretbad ;
 	    errno = ec ;
-	    rc = -1 ;
 	} /* end if (error) */
-	return rc ;
+	return ru ;
 } /* end */
 
 #endif /* (!defined(SYSHAS_STREAMS)) || (SYSHAS_STREAMS == 0) */
