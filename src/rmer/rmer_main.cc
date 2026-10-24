@@ -75,27 +75,27 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfdecti(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfdecti(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -111,28 +111,28 @@ struct entry {
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
-static int	process(PROGINFO *,int) ;
-static int	procafiles(PROGINFO *,vecobj *) ;
-static int	procin(PROGINFO *,vecobj *,int) ;
-static int	procin_file(PROGINFO *,vecobj *,struct rmermsg_fname *) ;
-static int	procoff(PROGINFO *,vecobj *) ;
-static int	procthem(PROGINFO *,vecobj *) ;
-static int	filecheck(PROGINFO *,const char *,time_t) ;
-static int	findmin(PROGINFO *,vecobj *) ;
-static int	vecobj_finishfiles(vecobj *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
+local int	process(PROGINFO *,int) ;
+local int	procafiles(PROGINFO *,vecobj *) ;
+local int	procin(PROGINFO *,vecobj *,int) ;
+local int	procin_file(PROGINFO *,vecobj *,struct rmermsg_fname *) ;
+local int	procoff(PROGINFO *,vecobj *) ;
+local int	procthem(PROGINFO *,vecobj *) ;
+local int	filecheck(PROGINFO *,cchar *,time_t) ;
+local int	findmin(PROGINFO *,vecobj *) ;
+local int	vecobj_finishfiles(vecobj *) ;
 
 #if	CF_SORTENTRIES
-static int	cmpentry(struct entry **,struct entry **) ;
+local int	cmpentry(struct entry **,struct entry **) ;
 #endif
 
-static int	entry_start(struct entry *,const char *,time_t) ;
-static int	entry_finish(struct entry *) ;
+local int	entry_start(struct entry *,cchar *,time_t) ;
+local int	entry_finish(struct entry *) ;
 
 #ifdef	COMMENT
-static int	filedel(PROGINFO *,const char *) ;
+local int	filedel(PROGINFO *,cchar *) ;
 #endif
 
 
@@ -215,15 +215,15 @@ int main(int argc,cchar **argv,cchar **envv) {
 	int	f_version = FALSE ;
 	int	f_inclose = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -274,7 +274,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -480,7 +480,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -780,7 +780,7 @@ badarg:
 
 /* local subroutines */
 
-static int usage(PROGINFO *pip) noex {
+local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -798,7 +798,7 @@ static int usage(PROGINFO *pip) noex {
 }
 /* end subroutine (usage) */
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pan = 0 ;
@@ -866,7 +866,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 }
 /* end subroutine (procargs) */
 
-static int process(PROGINFO *pip,int fd) noex {
+local int process(PROGINFO *pip,int fd) noex {
     	cint		vn = 10 ;
 	int		rs ;
 	int		sz = sizeof(struct entry) ;
@@ -918,7 +918,7 @@ static int process(PROGINFO *pip,int fd) noex {
 }
 /* end subroutine (process) */
 
-static int procafiles(proginfo *pip,vecobj *flp) noex {
+local int procafiles(proginfo *pip,vecobj *flp) noex {
 	struct entry	e ;
 	time_t		ti_e ;
 	int		rs = SR_OK ;
@@ -943,7 +943,7 @@ static int procafiles(proginfo *pip,vecobj *flp) noex {
 }
 /* end subroutine (procafiles) */
 
-static int procin(proginfo *pip,vecobj *flp,int fd) noex {
+local int procin(proginfo *pip,vecobj *flp,int fd) noex {
 	struct rmermsg_fname	m0 ;
 	struct rmermsg_unknown	mu ;
 	int		rs = SR_OK ;
@@ -994,7 +994,7 @@ static int procin(proginfo *pip,vecobj *flp,int fd) noex {
 }
 /* end subroutine (procin) */
 
-static int procin_file(proginfo *pip,vecobj *flp,rmermsg_fname *mp) noex {
+local int procin_file(proginfo *pip,vecobj *flp,rmermsg_fname *mp) noex {
 	struct entry	e ;
 	time_t		ti_e ;
 	int		rs = SR_OK ;
@@ -1029,7 +1029,7 @@ ret0:
 /* end subroutine (procin_file) */
 
 
-static int procoff(PROGINFO *pip,vecobj *flp)
+local int procoff(PROGINFO *pip,vecobj *flp)
 {
 	int		rs ;
 
@@ -1067,7 +1067,7 @@ static int procoff(PROGINFO *pip,vecobj *flp)
 /* end subroutine (procoff) */
 
 
-static int procthem(PROGINFO *pip,vecobj *flp)
+local int procthem(PROGINFO *pip,vecobj *flp)
 {
 	struct entry	*ep ;
 	int		rs = SR_OK ;
@@ -1109,7 +1109,7 @@ static int procthem(PROGINFO *pip,vecobj *flp)
 /* end subroutine (procthem) */
 
 
-static int filecheck(PROGINFO *pip,cchar *fname,time_t ti_e)
+local int filecheck(PROGINFO *pip,cchar *fname,time_t ti_e)
 {
 	ustat	sb ;
 	int		rs = SR_OK ;
@@ -1136,9 +1136,9 @@ static int filecheck(PROGINFO *pip,cchar *fname,time_t ti_e)
 
 #ifdef	COMMENT
 
-static int filedel(pip,fname)
+local int filedel(pip,fname)
 PROGINFO	*pip ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1157,7 +1157,7 @@ const char	fname[] ;
 #endif /* COMMENT */
 
 
-static int findmin(pip,flp)
+local int findmin(pip,flp)
 PROGINFO	*pip ;
 vecobj		*flp ;
 {
@@ -1182,7 +1182,7 @@ vecobj		*flp ;
 /* end subroutine (findmin) */
 
 
-static int vecobj_finishfiles(vecobj *flp)
+local int vecobj_finishfiles(vecobj *flp)
 {
 	struct entry	*ep ;
 	int		rs = SR_OK ;
@@ -1201,10 +1201,10 @@ static int vecobj_finishfiles(vecobj *flp)
 /* end subroutine (vecobj_finishfiles) */
 
 
-static int entry_start(struct entry *ep,cchar *fname,time_t ti_e)
+local int entry_start(struct entry *ep,cchar *fname,time_t ti_e)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (ep == NULL) return SR_FAULT ;
 	if (fname == NULL) return SR_FAULT ;
@@ -1222,7 +1222,7 @@ static int entry_start(struct entry *ep,cchar *fname,time_t ti_e)
 /* end subroutine (entry_start) */
 
 
-static int entry_finish(struct entry *ep)
+local int entry_finish(struct entry *ep)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1242,7 +1242,7 @@ static int entry_finish(struct entry *ep)
 
 #if	CF_SORTENTRIES
 
-static int cmpentry(f1pp,f2pp)
+local int cmpentry(f1pp,f2pp)
 struct entry	**f1pp, **f2pp ;
 {
 
