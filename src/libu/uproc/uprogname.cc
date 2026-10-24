@@ -83,6 +83,7 @@ int u_progname(char *rbuf,int rlen) noex {
 		        rs = sncpy(rbuf,rlen,pn) ;
 		    } /* end if */
 		} else {
+		    rs = SR_OK ;
 		    rbuf[0] = eos ;
 		} /* end if */
 	    } /* end if (valid) */
