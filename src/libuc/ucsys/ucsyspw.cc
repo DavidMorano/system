@@ -91,28 +91,28 @@ import libutil ;			/* |memclear(3u)| */
 
 /* GNU version (like in Linux) */
 unixret_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pwp && pwbuf) {
 	    PASSWD *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getpwent_r(pwp,pwbuf,pwlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 	            ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-		rc = -1 ;
+		ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpwent_rp) */
 
 #else /* defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0) */
@@ -120,20 +120,20 @@ unixret_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 /* POSIX draft-version (like in SunOS) */
 unixret_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	int		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pwp && pwbuf) {
 	    errno = 0 ;
 	    if (CPASSWD *rp ; (rp = getpwent_r(pwp,pwbuf,pwlen)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	} /* end if (non-null) */
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpwent_rp) */
 
 #endif /* defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0) */
@@ -164,28 +164,28 @@ unixret_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 
 /* GNU version (like in Linux) */
 unixret_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pwp && pwbuf && n) {
 	    PASSWD *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getpwnam_r(n,pwp,pwbuf,pwlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-		rc = -1 ;
+		ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpwnam_rp) */
 
 #else /* defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0) */
@@ -193,21 +193,21 @@ unixret_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
 /* POSIX version (like in SunOS) */
 unixret_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pwp && pwbuf && n) {
 	    CPASSWD *rp{} ;
 	    errno = 0 ;
 	    if ((rp = getpwnam_r(n,pwp,pwbuf,pwlen,&rp)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpwnam_rp) */
 
 #endif /* defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0) */
@@ -238,28 +238,28 @@ errno_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int,cchar *n) noex {
 
 /* GNU version (like in Linux) */
 unixret_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pwp && pwbuf) {
 	    PASSWD *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getpwuid_r(uid,pwp,pwbuf,pwlen,&rp)) == 0) {
 	        if (rp == nullptr) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 	        }
 	    } else if (ec > 0) {
-		rc = -1 ;
+		ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpwuid_rp) */
 
 #else /* defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0) */
@@ -267,21 +267,21 @@ unixret_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 /* POSIX version (like in SunOS) */
 unixret_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pwp && pwbuf) {
 	    CPASSWD *rp{} ;
 	    errno = 0 ;
 	    if ((rp = getpwuid_r(uid,pwp,pwbuf,pwlen,&rp)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpwuid_rp) */
 
 #endif /* defined(SYSHAS_GETPWGNUR) && (SYSHAS_GETPWGNUR > 0) */
