@@ -56,17 +56,20 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<getfiledirs.h>
-#include	<pcsconf.h>
-#include	<bfile.h>
-#include	<char.h>
-#include	<localmisc.h>
+#include	<char.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<pcsconf.h>		/* LIBPCS */
 
 #include	"config.h"
 #include	"defs.h"
@@ -75,30 +78,24 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-extern char	*timestr_edate(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -164,7 +161,7 @@ int handle(proginfo *pip,int s,vecstr *elp) noex {
 	daytime = time(NULL) ;
 
 	logfile_printf(&pip->lh,"%s request pid=%d\n",
-	    timestr_logz(daytime,timebuf),pip->pid) ;
+	    strtime_logz(daytime,timebuf),pip->pid) ;
 
 	if ((pip->workdname != NULL) && (pip->workdname[0] != '\0'))
 		u_chdir(pip->workdname) ;
@@ -172,7 +169,7 @@ int handle(proginfo *pip,int s,vecstr *elp) noex {
 /* can we get a peername from this socket, if it IS a socket ? */
 
 #ifdef	COMMENT
-	if (isasocket(s)) {
+	if (isfdsocket(s)) {
 
 	    char	inethost[MAXHOSTNAMELEN + 1] ;
 
@@ -245,12 +242,12 @@ int handle(proginfo *pip,int s,vecstr *elp) noex {
 
 /* open them both */
 
-	rs = u_open(ofnamebuf,O_FLAGS,0666) ;
+	rs = u_open(ofnamebuf,OX_FL,0666) ;
 	ofd = rs ;
 	if (rs < 0)
 	    goto bad3 ;
 
-	rs = u_open(efnamebuf,O_FLAGS,0666) ;
+	rs = u_open(efnamebuf,OX_FL,0666) ;
 	efd = rs ;
 	if (rs < 0)
 	    goto bad4 ;
