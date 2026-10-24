@@ -33,22 +33,24 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<ftw.h>
 #include	<dirent.h>
-#include	<usystem.h>
+#include	<ftw.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>
 #include	<getfiledirs.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<fieldterms.h>
 #include	<logfile.h>
 #include	<vecstr.h>
-#include	<baops.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"jobdb.h"
 #include	"config.h"
@@ -59,16 +61,16 @@
 
 /* defines */
 
-#define	O_FLAGS		(O_WRONLY | O_CREAT | O_TRUNC)
+#define	OX_FL		(O_WRONLY | O_CREAT | O_TRUNC)
 #define	CLOSEDFDS	4
 
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 extern char	*strbasename() ;
 
@@ -80,7 +82,7 @@ extern struct global	g ;
 
 /* forwards */
 
-static int	processargs(), expand() ;
+local int	processargs(), expand() ;
 
 
 /* external variables */
@@ -146,7 +148,7 @@ struct srventry	*sep ;
 /* perform some simple checks for starters */
 
 	if ((sep->args == NULL) && (sep->program == NULL))
-	    return SR_BAD ;
+	    return SR_BADE ;
 
 
 /* input file */
@@ -309,7 +311,7 @@ struct srventry	*sep ;
 	    subs.service = jep->service ;
 
 	    subs.date = subs_jobdate ;
-	    timestr_log(jep->date,subs_jobdate) ;
+	    strtime_log(jep->date,subs_jobdate) ;
 
 #if	CF_DEBUG
 	    if (g.debuglevel > 0)
@@ -387,7 +389,7 @@ struct srventry	*sep ;
 
 	if ((program == NULL) && (arg0 == NULL)) {
 
-	    rs = SR_BAD ;
+	    rs = SR_BADE ;
 	    goto badret7 ;
 	}
 
@@ -489,9 +491,9 @@ struct srventry	*sep ;
 
 	    close(ifd) ;
 
-	    fd1 = open(ofname,O_FLAGS,0600) ;
+	    fd1 = open(ofname,OX_FL,0600) ;
 
-	    fd2 = open(efname,O_FLAGS,0600) ;
+	    fd2 = open(efname,OX_FL,0600) ;
 
 	    handlejob_setstat(jep,2,SR_OK) ;
 
@@ -745,7 +747,7 @@ struct jobentry	*jep ;
 
 
 /* process an argument list */
-static int processargs(alp,command,app)
+local int processargs(alp,command,app)
 vecstr		*alp ;
 char			command[] ;
 struct argparams	*app ;
@@ -826,7 +828,7 @@ struct argparams	*app ;
 #
 */
 
-static int expand(buf,len,app,rbuf,rlen)
+local int expand(buf,len,app,rbuf,rlen)
 char			rbuf[], buf[] ;
 int			rlen, len ;
 struct argparams	*app ;
