@@ -49,7 +49,7 @@ template<typename T> constexpr inline bool bit(T v,int n) noex {
 sint	strtosi(cchar *s,char **epp,int b) noex {
 	cint		nb = nbits<long> ;
     	sint		res = 0 ; /* return-value */
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	bool		fneg ;
     	if (s) ylikely {
 	    clong	v = strtol(s,epp,b) ;
@@ -87,7 +87,7 @@ sint	strtosi(cchar *s,char **epp,int b) noex {
 
 uint	strtoui(cchar *s,char **epp,int b) noex {
     	uint		res = 0 ; /* return-value */
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (s) ylikely {
 	    con ulong resl = strtoul(s,epp,b) ;
 	    if (errno == 0) ylikely {
@@ -110,7 +110,7 @@ uint	strtoui(cchar *s,char **epp,int b) noex {
 
 slong	strtosl(cchar *s,char **epp,int b) noex {
     	slong		res = 0 ; /* return-value */
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (s) ylikely {
 	    res = strtol(s,epp,b) ;
 	} else {
