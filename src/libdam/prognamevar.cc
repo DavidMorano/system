@@ -181,7 +181,7 @@ bool prognamevar::procenv(con mainv envv) noex {
     	bool		f = false ;
 	sp = buf ;
 	if (envv) {
-	    if (cchar *valp = getourenv(envv,"_") ; valp) {
+	    if (cchar *valp = getourenv(envv,"_")) {
 		int rs{} ;
 		if (shellunder_dat d ; (rs = shellunder_load(&d,valp)) >= 0) {
 		    f = proc(d.execname) ;
