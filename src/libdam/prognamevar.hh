@@ -40,17 +40,17 @@ struct prognamevar {
 	char		*as = nullptr ;	/* allocated memory */
 	int		sl = 0 ;
 	char		buf[PROGNAMEVAR_SHORTLEN + 1] ;
-	prognamevar(int argc,con mainv argv,con mainv envv = nullptr) noex ;
-	prognamevar(cchar *ap,int al = -1) noex ;
-	prognamevar(strview &sv) noex ;
-	prognamevar() noex : prognamevar(nullptr,0) { } ;
-	prognamevar(con prognamevar &) = delete ;
+	prognamevar	(int,con mainv,con mainv = nullptr) noex ;
+	prognamevar	(cchar *ap,int al = -1) noex ;
+	prognamevar	(strview &sv) noex ;
+	prognamevar	() noex : prognamevar(nullptr,0) { } ;
+	prognamevar	(con prognamevar &) = delete ;
 	prognamevar &operator = (con prognamevar &) = delete ;
 	prognamevar &operator = (con strview &sv) noex ;
 	ccharp operator () (cchar *ap,int al = -1) noex ;
 	ccharp operator () (con strview &sv) noex ;
 	operator ccharp () noex ;
-	void dtor() noex ;
+	void dtor	() noex ;
 	destruct prognamevar() {
 	    if (as) dtor() ;
 	} ; /* end dtor */
