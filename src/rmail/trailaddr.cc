@@ -44,13 +44,13 @@
 /* exported subroutines */
 
 
-const char *trailaddr(addr,addrlen)
-const char	addr[] ;
+cchar *trailaddr(addr,addrlen)
+cchar	addr[] ;
 int		addrlen ;
 {
 	int	al ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 
 	if (addr == NULL)
