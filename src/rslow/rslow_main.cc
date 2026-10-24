@@ -105,9 +105,9 @@ void		bdump() ;
 
 /* forward references */
 
-static int	make_intfile() ;
-static int	delete_jobfile() ;
-static int	checkuucppublic() ;
+local int	make_intfile() ;
+local int	delete_jobfile() ;
+local int	checkuucppublic() ;
 
 
 /* local variables */
@@ -2162,7 +2162,7 @@ badrexec:
 
 
 /* make a temporary file with a single character in it for RSLOW interrupt */
-static int make_intfile(tmpfname)
+local int make_intfile(tmpfname)
 char	tmpfname[] ;
 {
 	bfile	tmpfile, *tfp = &tmpfile ;
@@ -2192,7 +2192,7 @@ badret:
 /* end subroutine (make_intfile) */
 
 
-static int delete_jobfile(jobfname)
+local int delete_jobfile(jobfname)
 char	jobfname[] ;
 {
 	int	rs, i, err ;
@@ -2207,7 +2207,7 @@ char	jobfname[] ;
 
 
 /* check if the UUCPPUBLIC spool area has the proper directories */
-static int checkuucppublic(gp)
+local int checkuucppublic(gp)
 struct global	*gp ;
 {
 	bfile		file0, file1, file2, *fpa[3] ;
