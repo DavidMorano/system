@@ -40,15 +40,18 @@
 #include	<ctype.h>
 #include	<netdb.h>
 #include	<ctime>
-
-#include	<usystem.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<baops.h>
-#include	<bfile.h>
 #include	<vecstr.h>
 #include	<field.h>
 #include	<dater.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -81,11 +84,11 @@ struct obdate {
 
 /* forward references */
 
-static int	out_open(PROGINFO *) ;
-static int	out_close(PROGINFO *) ;
-static int	getobdate(PROGINFO *,cchar *,int,struct obdate *) ;
+local int	out_open(PROGINFO *) ;
+local int	out_close(PROGINFO *) ;
+local int	getobdate(PROGINFO *,cchar *,int,struct obdate *) ;
 
-static int	ismonthok(int,int) ;
+local int	ismonthok(int,int) ;
 
 
 /* local variables */
@@ -126,14 +129,14 @@ int main(int argc,cchar **argv,cchar **envv) {
 	int	f_version = FALSE ;
 	int	f_usage = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = nullptr ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	timebuf[TIMEBUFLEN + 1] ;
-	const char	*pr = nullptr ;
-	const char	*obfname = nullptr ;
-	const char	*sp ;
-	const char	*cp ;
+	cchar	*pr = nullptr ;
+	cchar	*obfname = nullptr ;
+	cchar	*sp ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -542,9 +545,9 @@ int main(int argc,cchar **argv,cchar **envv) {
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	debugprintf("main: LOCAL modtime=%s\n",
-		timestr_log(modtime,timebuf)) ;
+		strtime_log(modtime,timebuf)) ;
 	debugprintf("main: GMT modtime=%s\n",
-		timestr_gmlog(modtime,timebuf)) ;
+		strtime_gmlog(modtime,timebuf)) ;
 	}
 #endif
 
@@ -658,7 +661,7 @@ badnofile:
 
 
 
-static int out_open(pip)
+local int out_open(pip)
 PROGINFO	*pip ;
 {
 	int	rs = SR_OK ;
@@ -680,7 +683,7 @@ PROGINFO	*pip ;
 /* end subroutine (out_open) */
 
 
-static int out_close(pip)
+local int out_close(pip)
 PROGINFO	*pip ;
 {
 	int	rs = SR_OK ;
@@ -700,7 +703,7 @@ PROGINFO	*pip ;
 
 
 /* get the hour and minutes from the METAR time field */
-static int getobdate(PROGINFO *pip,cchar *sp,int sl,struct obdate *hmp)
+local int getobdate(PROGINFO *pip,cchar *sp,int sl,struct obdate *hmp)
 {
 	TM	ts ;
 	int		rs ;
@@ -763,7 +766,7 @@ static int getobdate(PROGINFO *pip,cchar *sp,int sl,struct obdate *hmp)
 /* end subroutine (getobdate) */
 
 
-static int ismonthok(int today,int otherday)
+local int ismonthok(int today,int otherday)
 {
 
 	if (today == otherday)
