@@ -93,6 +93,7 @@
 #include	<mallocstuff.h>
 #include	<strx.h>		/* |strnncmp(3uc)| */
 #include	<prognamevar.hh>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -137,7 +138,7 @@ local int	proc_rxenv(proginfo *,jobinfo *,char *,int) noex ;
 local int	send_procenv(proginfo *,jobinfo *) noex ;
 local int	proc_env(proginfo *,jobinfo *,cchar *,int,cchar *) noex ;
 
-static void	bdump() ;
+local void	bdump() ;
 
 
 /* local variables */
@@ -686,7 +687,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    daytime = time(nullptr) ;
 
 	    logfile_printf(&lh,"%s %-14s %s/%s\n",
-	        timestr_log(daytime,buf),pip->progname,VERSION,
+	        strtime_log(daytime,buf),pip->progname,VERSION,
 	        (f_sysvct) ? "SYSV" : "BSD") ;
 
 	    logfile_printf(&lh,"os=%s %s!%s(%s) uid=%d\n",
@@ -799,7 +800,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	bprintf(jfp," # <-- force CSH to use Bourne shell\n") ;
 
-	bprintf(jfp,"# RSHE %s\n",timestr_log(daytime,buf)) ;
+	bprintf(jfp,"# RSHE %s\n",strtime_log(daytime,buf)) ;
 
 
 /* put some stuff together for later */
@@ -1586,7 +1587,7 @@ local int quotevalue(proginfo *pip,cchar *vs,bufstr *bsp) noex {
 
 #define	DUMPLEN	50
 
-static void bdump(bfile *f1p,bfile *f2p) noex {
+local void bdump(bfile *f1p,bfile *f2p) noex {
 	int		f_done1, f_done2 ;
 	char		buf[DUMPLEN + 1] ;
 
