@@ -71,14 +71,6 @@
 #define	MAILNEW		"new"
 #endif
 
-#ifndef	GNAMELEN
-#define	GNAMELEN	80		/* GECOS name length */
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* real name length */
-#endif
-
 #if	CF_PWCACHE
 #define	GETPW_NAME	ucpwcache_name
 #define	GETPW_UID	ucpwcache_uid
