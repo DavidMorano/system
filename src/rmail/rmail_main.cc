@@ -49,14 +49,16 @@
 #include	<netinet/in.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<unistd.h>
-#include	<ctime>
-#include	<csignal>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
 #include	<getpwx.h>
 #include	<getportnum.h>
 #include	<getx.h>
@@ -67,8 +69,6 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
-#include	<nulstr.h>
-#include	<bfile.h>
 #include	<userinfo.h>
 #include	<userattr.h>
 #include	<logfile.h>
@@ -95,8 +95,11 @@
 #include	<matxstr.h>
 #include	<isnot.h>
 #include	<headkeymat.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -108,7 +111,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#ifndef	PI
 #define	PI		proginfo
+#endif
 
 #define	BUFLEN		MAX((2 * MAXHOSTNAMELEN),MSGBUFLEN)
 
@@ -149,7 +154,7 @@ local int	procmsgid_update(PI *,MSGINFO *,cchar *) noex ;
 
 extern int	progexpand(PI *,char *,int,cchar *,int) noex ;
 extern int	progmsgs(PI *,bfile *,bfile *,vecobj *,vecobj *) noex ;
-extern int	progcomsat(PI *,VECOBJ *) noex ;
+extern int	progcomsat(PI *,vecobj *) noex ;
 extern int	progdeliver(PI *,int,RECIP *) noex ;
 extern int	progboxer(PI *,int,RECIP *) noex ;
 extern int	parsenodespec(PI *,int,char *,int,char *,cchar *) noex ;
@@ -175,8 +180,8 @@ local int	logrecip(PI *,cchar *,PASSWD *) noex ;
 
 local int	mkrecipname(char *,int,cchar *) noex ;
 
-local int	loadrecips(PI *,VECOBJ *,cchar *,int) noex ;
-local int	loadrecip(PI *,VECOBJ *,cchar *,int) noex ;
+local int	loadrecips(PI *,vecobj *,cchar *,int) noex ;
+local int	loadrecip(PI *,vecobj *,cchar *,int) noex ;
 
 #if	CF_SETPCS
 local int	procopts_setpcs(PI *,keyopt *,vecstr *) noex ;
@@ -191,7 +196,7 @@ local int	process(PI *,ARGINFO *,bits *,paramopt *,
 			cchar *,cchar *,cchar *) noex ;
 local int	processing(PI *,ARGINFO *,bits *,
 			cchar *,cchar *,cchar *) noex ;
-local int	processings(PI *,VECOBJ *,VECOBJ *,cchar *) noex ;
+local int	processings(PI *,vecobj *,vecobj *,cchar *) noex ;
 local int	procfindfiles(PI *) noex ;
 local int	procfindsched(PI *,vecstr *) noex ;
 local int	procfindcomsat(PI *,vecstr *) noex ;
@@ -200,7 +205,7 @@ local int	procfindmbtab(PI *,vecstr *) noex ;
 local int	procdefs(PI *) noex ;
 local int	procuserboxes(PI *pip) noex ;
 local int	procloginfo(PI *) noex ;
-local int	procargs(PI *,ARGINFO *,bits *,VECOBJ *,cchar *) noex ;
+local int	procargs(PI *,ARGINFO *,bits *,vecobj *,cchar *) noex ;
 local int	procin(PI *,vecobj *,bfile *,vecobj *,cchar *) noex ;
 local int	procmaildirdead(PI *,cchar *,int) noex ;
 local int	procmaildircopy(PI *,cchar *,int) noex ;
@@ -460,7 +465,7 @@ constexpr char		terms[] = {
 
 /* exported subroutines */
 
-int main(int argc,mainv argv,mainv envv) {
+int main(int argc,con mainv argv,con mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;
@@ -520,7 +525,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    goto baddatestart ;
 	}
 
-	timestr_logz(pip->daytime,pip->stamp) ;
+	strtime_logz(pip->daytime,pip->stamp) ;
 
 	pip->verboselevel = 1 ;
 
@@ -2195,7 +2200,7 @@ local int procloginfo(PI *pip)
 /* end subroutine (procloginfo) */
 
 
-local int procargs(PI *pip,ARGINFO *aip,bits *app,VECOBJ *rlp,cchar *afn)
+local int procargs(PI *pip,ARGINFO *aip,bits *app,vecobj *rlp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2290,24 +2295,19 @@ local int logrecip(PI *pip,cchar recip[],PASSWD *pwp)
 /* end subroutine (logrecip) */
 #endif /* CF_LOGRECIP */
 
-
 /* extract the real name from a GECOS name */
-local int mkrecipname(char rbuf[],int rlen,cchar gecos[])
-{
-	cint	glen = GNAMELEN ;
+local int mkrecipname(char *rbuf,int rlen,cchar *gecos) noex {
+	cint	glen = REALNAMELEN ;
 	int		rs ;
-	char		gbuf[GNAMELEN + 1] ;
+	char		gbuf[REALNAMELEN + 1] ;
 	rbuf[0] = '\0' ;
 	if ((rs = mkgecosname(gbuf,glen,gecos)) > 0) {
 	    rs = mkrealname(rbuf,rlen,gbuf,rs) ;
 	}
 	return rs ;
-}
-/* end subroutine (mkrecipname) */
+} /* end subroutine (mkrecipname) */
 
-
-local int loadrecips(PI *pip,VECOBJ *rlp,cchar sp[],int sl)
-{
+local int loadrecips(PI *pip,vecobj *rlp,cchar *sp,int sl) noex {
 	FIELD		fsb ;
 	int		rs ;
 	int		c = 0 ;
@@ -2325,12 +2325,9 @@ local int loadrecips(PI *pip,VECOBJ *rlp,cchar sp[],int sl)
 	    field_finish(&fsb) ;
 	} /* end if (field) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (loadrecips) */
+} /* end subroutine (loadrecips) */
 
-
-local int loadrecip(PI *pip,VECOBJ *nlp,cchar np[],int nl)
-{
+local int loadrecip(PI *pip,vecobj *nlp,cchar np[],int nl) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -2438,8 +2435,8 @@ cchar		*ifn ;
 	                if ((rs = procin(pip,&info,tfp,&recips,ifn)) >= 0) {
 	                    if ((rs = procmsgid_begin(pip)) >= 0) {
 	                        {
-	                            VECOBJ	*mip = &info ;
-	                            VECOBJ	*rip = &recips ;
+	                            vecobj	*mip = &info ;
+	                            vecobj	*rip = &recips ;
 	                            rs = processings(pip,mip,rip,tbuf) ;
 	                        }
 	                        rs1 = procmsgid_end(pip) ;
@@ -2468,7 +2465,7 @@ cchar		*ifn ;
 /* end subroutine (processing) */
 
 
-local int processings(PI *pip,VECOBJ *mip,VECOBJ *rip,cchar *tfn)
+local int processings(PI *pip,vecobj *mip,vecobj *rip,cchar *tfn)
 {
 	int		rs ;
 	if ((rs = procspamsetup(pip,mip)) >= 0) {
@@ -3857,7 +3854,7 @@ local int mkreportout(PI *pip,cchar *fbuf,cchar *id,int ac,
 	int		rs1 ;
 	cchar		*fmt ;
 	char		tbuf[TIMEBUFLEN+1] ;
-	timestr_logz(dt,tbuf) ;
+	strtime_logz(dt,tbuf) ;
 	if ((rs = bopen(rfp,fbuf,"wct",om)) >= 0) {
 	    if ((rs = bminmod(rfp,om)) >= 0) {
 	    cint	al = DISARGLEN ;
