@@ -46,14 +46,15 @@
 
 
 unixret_t getauid(au_id_t *rp) noex {
-    	int		rc = 0 ; /* return-value */
+    	unixret_t	ru = unixretbad 0 ; /* return-value */
 	int		ec = EFAULT ;
 	if (rp) {
 	    const uid_t	uid = getuid() ;
+	    ru = unixretgood ;
 	    *rp = cast_static<au_id_t>(uid) ;
 	} /* end if (non-null) */
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getauid) */
 
 
