@@ -62,7 +62,7 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	matstr() ;
 extern int	configread(), configfree() ;
 extern int	paramloads(), paramloadu(), paramload() ;
@@ -76,9 +76,9 @@ extern void	vsaprint() ;
 
 /* forward subroutines */
 
-static int	machineupdateone() ;
+local int	machineupdateone() ;
 
-static int	lastline() ;
+local int	lastline() ;
 
 
 /* external subroutines */
@@ -88,7 +88,7 @@ extern struct global	g ;
 
 /* local static data */
 
-static int	f_fieldterms = FALSE ;
+local int	f_fieldterms = FALSE ;
 
 static uchar	terms[32] ;
 
@@ -430,7 +430,7 @@ int		ttl ;
 
 
 /* update the status of one machine */
-static int machineupdateone(mp)
+local int machineupdateone(mp)
 struct machine	*mp ;
 {
 	ustatstime	*rstatp ;
@@ -658,7 +658,7 @@ struct machine	*mp ;
 
 
 /* get the last line off of this file pointer before it goes EOF */
-static int lastline(fp,buf,buflen)
+local int lastline(fp,buf,buflen)
 bfile		*fp ;
 char		buf[] ;
 int		buflen ;
