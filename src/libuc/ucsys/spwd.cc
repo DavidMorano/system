@@ -35,12 +35,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 #include	"spwd.h"
 
@@ -90,7 +90,7 @@ import libutil ;			/* |memclear(3u)| */
 
 namespace gnu {
     errno_t getspent_r(SPWD *spp,char *spbuf,size_t splen) noex {
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (spp && spbuf) {
 	    memclear(spp) ;
 	    if (splen > 0) {
@@ -123,7 +123,7 @@ namespace gnu {
 
 namespace gnu {
     errno_t getspnam_r(cc *n,SPWD *spp,char *spbuf,int splen,CSPWD **rpp) noex {
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (spp && spbuf && n) {
 	    memclear(spp) ;
 	    if ((splen > 0) && n[0]) {
@@ -164,7 +164,7 @@ namespace gnu {
 
 namespace gnu {
     errno_t getspent_r(SPWD *spp,char *spbuf,size_t splen,CSPWD **rpp) noex {
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (spp && spbuf) {
 	    memclear(spp) ;
 	    if (splen > 0) {
@@ -185,7 +185,7 @@ namespace gnu {
 
 namespace gnu {
     errno_t getspnam_r(cc *n,SPWD *spp,char *spbuf,int splen,CSPWD **rpp) noex {
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (spp && spbuf && n) {
 	    memclear(spp) ;
 	    if ((splen > 0) && n[0]) {
