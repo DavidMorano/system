@@ -216,14 +216,14 @@ using libu::getsign ;			/* subroutine */
 
 /* local structures */
 
-constexpr int	maxbase = 36 ;		/* must be classic value */
-constexpr int   chtablen = (UCHAR_MAX + 1) ;
+constexpr int	maxbase		= 36 ;	/* must be classic value */
+constexpr int   chtablen	= (UCHAR_MAX + 1) ;
 
 namespace {
     struct llhelper {
-	ulonglong	ullmax = 0 ;
-	longlong	llmin = 0 ;
-	longlong	llmax = 0 ;
+	ulonglong	ullmax	= 0 ;
+	longlong	llmin	= 0 ;
+	longlong	llmax	= 0 ;
 	ulonglong	cutoff	[maxbase+1] = {} ;
 	longlong	pcutoff	[maxbase+1] = {} ;
 	longlong	ncutoff	[maxbase+1] = {} ;
@@ -287,11 +287,11 @@ namespace {
 } /* end namespace */
 
 constexpr basepairs	pairs[] = {
-	{ 'B', 2 },
-	{ 'O', 8 },
-	{ 'D', 10 },
-	{ 'X', 16 },
-	{ 0, 0 }
+	{ 'B',	2	},
+	{ 'O',	8	},
+	{ 'D',	10	},
+	{ 'X',	16	},
+	{ 0,	0	}
 } ; /* end array */
 
 namespace {
@@ -347,7 +347,7 @@ namespace {
 	void ender() noex {
             if (endpp) {
                 *endpp = charp(verr ? sp : startp) ;
-            }
+            } /* end */
 	} ; /* end method */
 	virtual void cookprep()	noex = 0 ;
 	virtual void cvt(int)	noex = 0 ;
@@ -392,7 +392,7 @@ template<>
 inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 	cint		nb = nbits<long> ;
 	int		res = 0 ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	bool		fneg ;
 	if (sp) ylikely {
 	    clong	v = strtol(sp,epp,b) ;
@@ -406,24 +406,24 @@ inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 		    if (uv || (! bit(v,((nb / 2) - 1)))) {
 			res = INT_MIN ;
 			ec = ERANGE ;
-		    }
+		    } /* end if (error) */
 		} else {	/* test poitive value */
 	            uv >>= (nb / 2) ;
 		    if (uv || bit(v,((nb / 2) - 1))) {
 			res = INT_MAX ;
 			ec = ERANGE ;
-		    }
+		    } /* end if (error) */
 		} /* end if */
 	    } else {
                 if (fneg) {
                     res = UINT_MIN ;
                 } else {
                     res = UINT_MAX ;
-                }
+                } /* end */
 	    } /* end if (no error so far) */
 	} else {
 	    ec = EFAULT ;
-	}
+	} /* end if (error) */
 	if (ec) errno = ec ;
 	*rp = res ;
 } /* end subroutine-template (strtox) */
@@ -431,7 +431,7 @@ inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 template<>
 inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 	uint		res = 0 ;
-	errno_t		ec = 0 ;
+	errno_t		ec = EOK ;
 	if (sp) ylikely {
 	    ulong	uv = strtoul(sp,epp,b) ;
 	    if (errno == 0) {
@@ -441,13 +441,13 @@ inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 	        if (uv) {
 		    res = UINT_MAX ;
 		    ec = ERANGE ;
-	        }
+	        } /* end if (error) */
 	    } else {
 	        res = UINT_MAX ;
 	    } /* end if (no-error) */
 	} else {
 	    ec = EFAULT ;
-	} /* end if */
+	} /* end if (error) */
 	if (ec) errno = ec ;
 	*rp = res ;
 } /* end subroutine-template (strtox) */
@@ -508,7 +508,7 @@ sint		strtoxsi(cchar *sp,char **epp,int b)	noex {
 	    strtox(sp,epp,b,&res) ;
 	} else {
 	    errno = EFAULT ;
-	}
+	} /* end if (error) */
 	return res ;
 } /* end subroutine (strtoxsi) */
 
@@ -519,7 +519,7 @@ slong		strtoxsl(cchar *sp,char **epp,int b)	noex {
 	    res = strtol(sp,epp,b) ;
 	} else {
 	    errno = EFAULT ;
-	}
+	} /* end if (error) */
 	return res ;
 } /* end subroutine (strtoxsl) */
 
@@ -536,7 +536,7 @@ uint		strtoxui(cchar *sp,char **epp,int b)	noex {
 	    strtox(sp,epp,b,&ures) ;
 	} else {
 	    errno = EFAULT ;
-	}
+	} /* end if (error) */
 	return ures ;
 } /* end subroutine (strtoxui) */
 
@@ -547,7 +547,7 @@ ulong		strtoxul(cchar *sp,char **epp,int b)	noex {
 	    ures = strtoul(sp,epp,b) ;
 	} else {
 	    errno = EFAULT ;
-	}
+	} /* end if (error) */
 	return ures ;
 } /* end subroutine (strtoxul) */
 
@@ -574,7 +574,7 @@ void strer::suber() noex {
 	    reterr() ;
 	} else {
 	    errno = EFAULT ;
-	}
+	} /* end if (error) */
 } /* end method (strer::suber) */
 
 void strer::baser() noex {
@@ -656,7 +656,7 @@ void strer_sll::reterr() noex {
     	if (verr < 0) {
 	    res = (fneg) ? llhelp.llmin : llhelp.llmax ;
 	    errno = ERANGE ;
-	}
+	} /* end if (error) */
 } /* end method (strer_sll::reterr) */
 
 strer_ull::operator ulonglong () noex {
@@ -689,7 +689,7 @@ void strer_ull::reterr() noex {
     	if (verr < 0) {
 	    ures = llhelp.ullmax ;
 	    errno = ERANGE ;
-	}
+	} /* end if (error) */
 } /* end method (strer_ull::reterr) */
 
 
