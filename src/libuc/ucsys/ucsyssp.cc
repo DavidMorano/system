@@ -44,13 +44,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsyssp.h"
 
@@ -95,28 +95,28 @@ import libutil ;			/* |memclear(3u)| */
 
 /* GUN version */
 unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
-	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (spp && spbuf) {
 	    SPWD *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getspent_r(spp,spbuf,splen,&rp)) == 0) {
 		if (! rp) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 		}
 	    } else if (ec > 0) {
-	        rc = -1 ;
+	        rc = uniretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	} /* end if (non-null) */
-	if (ec) errno = ex ;
-	return rc ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (getspent_rp) */
 
 #else /* defined(SYSHAS_GETSPGNUR) && (SYSHAS_GETSPGNUR > 0) */
@@ -124,20 +124,20 @@ unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 /* Solaris version */
 unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
     	cnullptr	np{} ;
-	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (spp && spbuf) {
 	    errno = 0 ;
 	    if (CSPWD *rp{} ; (rp = getspent_r(spp,spbuf,splen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getspent_rp) */
 
 #endif /* defined(SYSHAS_GETSPGNUR) && (SYSHAS_GETSPGNUR > 0) */
@@ -165,28 +165,28 @@ unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 
 /* GUN version */
 unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen) noex {
-	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (spp && spbuf) {
 	    SPWD *rp{} ;
 	    errno = 0 ;
 	    if ((ec = getspent_r(spp,spbuf,splen,&rp)) == 0) {
 		if (! rp) {
 		    ec = ENOENT ;
-		    rc = -1 ;
+		    ru = unixretbad ;
 		}
 	    } else if (ec > 0) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
-	        rc = -1 ;
+	        ru = unixretbad ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	} /* end if (non-null) */
-	if (ec) errno = ex ;
-	return rc ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (getspnam_rp) */
 
 #else /* defined(SYSHAS_GETSPGNUR) && (SYSHAS_GETSPGNUR > 0) */
@@ -194,21 +194,21 @@ unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen) noex {
 /* Solaris version */
 unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
     	cnullptr	np{} ;
-	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (spp && spbuf && n) {
 	    CSPWD *rp{} ;
 	    errno = 0 ;
 	    if ((rp = getspnam_r(n,spp,spbuf,splen)) == np) {
-		rc = -1 ;
+		ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	} /* end if (non-null) */
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getspnam_rp) */
 
 #endif /* defined(SYSHAS_GETSPGNUR) && (SYSHAS_GETSPGNUR > 0) */
