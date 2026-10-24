@@ -82,38 +82,6 @@
 #define	GETPW_NAME	getpw_name
 #endif /* CF_UGETPW */
 
-#ifndef	LOGNAMELEN
-#ifdef	LOGNAME_MAX
-#define	LOGNAMELEN	LOGNAME_MAX
-#else
-#define	LOGNAMELEN	32
-#endif
-#endif
-
-#ifndef	USERNAMELEN
-#ifdef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100
-#endif
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARLOGNAME
-#define	VARLOGNAME	"LOGNAME"
-#endif
-
-#ifndef	VARUSER
-#define	VARUSER		"USER"
-#endif
-
 #define	LOCINFO		struct locinfo
 #define	LOCINFO_FL	struct locinfo_flags
 #define	LOCINFO_GMCUR	struct locinfo_gmcur
