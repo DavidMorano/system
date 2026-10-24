@@ -114,7 +114,7 @@ class bstree_node {
 	T			val ;
 	void SetVal(const T v) noex {
 	    val = v ;
-	} ;
+	} ; /* end */
 public:
 	bstree_node(T av) noex : val(av) { } ;
 	bstree_node(const bstree_node<T> &other) = delete ;
@@ -137,77 +137,77 @@ public:
 	    if (this != &it) {
 	        n = it.n ;
 	    }
-	} ;
+	} ; /* end */
 	bstree_iter(bstree_iter<T,Comp> &&it) noex {
 	    if (this != &it) {
 	        n = it.n ;
 		it.n = nullptr ;
 	    }
-	} ;
+	} ; /* end */
 	bstree_iter<T,Comp> &operator = (const bstree_iter<T,Comp> &it) noex {
 	    if (this != &it) {
 	        n = it.n ;
 	    }
 	    return (*this) ;
-	} ;
+	} ; /* end */
 	bstree_iter<T,Comp> &operator = (bstree_iter<T,Comp> &&it) noex {
 	    if (this != &it) {
 	        n = it.n ;
 		it.n = nullptr ;
 	    }
 	    return (*this) ;
-	} ;
+	} ; /* end */
 	bstree_iter<T,Comp> &operator = (const bstree_iter<T,Comp> *ip) noex {
 	    if (this != ip) {
 	        n = ip->n ;
 	    }
 	    return (*this) ;
-	} ;
+	} ; /* end */
 	bstree_iter<T,Comp> &operator = (const node *nn) noex {
 	    n = nn ; /* possible nullptr */
 	    return (*this) ;
-	} ;
-	~bstree_iter() {
+	} ; /* end */
+	destruct bstree_iter() {
 	    n = nullptr ;
-	} ;
+	} ; /* end destruct */
 	void setnode(node *nn) noex {
 	    n = nn ; /* possible nullptr */
-	} ;
+	} ; /* end */
 	T &operator * () const noex {
 	    T &rv = defval ;
 	    if (n != nullptr) {
 		rv = n->val ;
 	    }
 	    return rv ;
-	} ;
+	} ; /* end */
 	bstree_iter<T,Comp> &operator ++ () noex { /* pre-increment */
 	    return findnext(1) ;
-	} ;
+	} ; /* end */
 	bstree_iter<T,Comp> operator ++ (int) noex { /* post-increment */
 	    bstree_iter<T,Comp>	tmp(*this) ;
 	    findnext(1) ;
 	    return tmp ; /* returns previous value */
-	} ;
+	} ; /* end */
 	bstree_iter<T,Comp> &operator += (int inc) noex {
 	    return findnext(inc) ;
-	} ;
+	} ; /* end */
 	bstree_iter<T,Comp> &operator + (int inc) noex {
 	    return findnext(inc) ;
-	} ;
+	} ; /* end */
 	operator int() const noex {
 	    return (n != nullptr) ;
-	} ;
+	} ; /* end */
 	operator bool() const noex {
 	    return (n != nullptr) ;
-	} ;
+	} ; /* end */
 	friend bool operator == (const bstree_iter<T,Comp> &i1,
 		const bstree_iter<T,Comp> &i2) noex {
 	    return (i1.n == i2.n) ;
-	} ;
+	} ; /* end */
 	friend bool operator != (const bstree_iter<T,Comp> &i1,
 		const bstree_iter<T,Comp> &i2) noex {
 	    return (i1.n != i2.n) ;
-	} ;
+	} ; /* end */
 	friend bstree<T,Comp> ;
 } ; /* end class (bstree_iter) */
 
@@ -222,15 +222,15 @@ bstree_iter<T,Comp> &bstree_iter<T,Comp>::findnext(int inc) noex {
       		    n = n->right ;
       		    while (n->left != nullptr) {
         	        n = n->left ;
-        	    }
+        	    } /* end while */
      	        } else {
 		    bstree_node<T,Comp> *p = n->parent ;
 		    while ((p != nullptr) && (n == p->right)) {
            	        n = p ;
            	        p = p->parent;
-         	    }
+         	    } /* end while */
 		    n = p ;
-		}
+		} /* end */
 	    } /* end if (inc) */
         } /* end if (not-nullptr) */
  	return (*this) ;
@@ -242,7 +242,7 @@ struct bstree_depth {
 	void clear() noex {
 	    dmin = INT_MAX ;
 	    dmax = 0 ;
-	} ;
+	} ; /* end */
 } ; /* end method (bstree_depth) */
 
 export {
@@ -265,28 +265,28 @@ export {
 	            if (n->right != nullptr) {
 		        it = FindNodeByVal(n->right,v) ;
 	            }
-	        }
+	        } /* end */
 	    } /* end if non-null root) */
 	    return it ;
-        } ;
+        } ; /* end */
 	void ReplaceUsInParent(node *nop,node *oop) noex {
 	    node 	*p = nop->parent ;
 	    if (p->left == nop) {
 		p->left = oop ;
 	    } else {
 		p->right = oop ;
-	    }
+	    } /* end */
 	    if (oop != nullptr) oop->parent = p ;
-	} ;
+	} ; /* end */
 	node *GetChild(node *nop) const noex {
 	    return (nop->left != nullptr) ? nop->left : nop->right ;
-	} ;
+	} ; /* end */
 	node *FindMinNode(node *nop) const noex {
 	    while (nop->left != nullptr) {
 		nop = nop->left ;
-	    }
+	    } /* end while */
 	    return nop ;
-	} ;
+	} ; /* end */
 	int delnodes(node *n) noex {
 	    int		i = 0 ;
 	    if (n != nullptr) {
@@ -294,9 +294,9 @@ export {
 	        cnt += delnodes(n->left) ;
 	        cnt += delnodes(n->right) ;
 		delete n ;
-	    }
+	    } /* end */
 	    return i ;
-	} ;
+	} ; /* end */
 	int insert(node *n,node *nn) noex {
 	    int		d = 0 ;
 	    if (keycmp(nn->val,n->val)) {
@@ -305,37 +305,37 @@ export {
 		} else {
 		    nn->parent = n ;
 		    n->left = nn ;
-		}
+		} /* end */
 	    } else {
 		if (n->right != nullptr) {
 	            d = insert(n->right,nn) ;
 		} else {
 		    nn->parent = n ;
 		    n->right = nn ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	    return d ;
-	} ;
+	} ; /* end */
 	int walk(std::vector<T> &vl,node *n) const noex {
 	    int		i = 0 ;
 	    if (n != nullptr) {
 		if (n->left) {
 		    i += walk(vl,n->left) ;
-		}
+		} /* end */
 	        vl.push_back(n->val) ;
 	        i += 1 ;
 	        if (n->right) {
 		    i += walk(vl,n->right) ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	    return i ;
-	} ;
+	} ; /* end */
 	bool keyequal(const T &v1,const T &v2) const noex { /* equal */
 	    bool 	f = true ;
 	    f = f && (! keycmp(v1,v2)) ;
 	    f = f && (! keycmp(v2,v1)) ;
 	    return f ;
-	} ;
+	} ; /* end */
 public:
 	typedef		bstree_iter<T,Comp> iterator ;
 	typedef		T value_type ;
@@ -348,8 +348,8 @@ public:
 		    add(an->val) ;
 	            an = an->next ;
 	        } /* end while */
-	    }
-	} ;
+	    } /* end */
+	} ; /* end */
 	bstree(bstree<T,Comp> &&al) noex {
 	    if (this != &al) {
 	        if (root != nullptr) clear() ;
@@ -357,8 +357,8 @@ public:
 	        cnt = al.cnt ;
 	        al.root = nullptr ;
 	        al.cnt = 0 ;
-	    }
-	} ;
+	    } /* end */
+	} ; /* end */
 	bstree &operator = (const bstree<T,Comp> &al) noex {
 	    if (this != &al) {
 	        bstree_node<T,Comp>	*an = al.root ;
@@ -367,9 +367,9 @@ public:
 		    add(an->val) ;
 	            an = an->next ;
 	        } /* end while */
-	    }
+	    } /* end */
 	    return (*this) ;
-	} ;
+	} ; /* end */
 	bstree &operator = (bstree<T,Comp> &&al) noex {
 	    if (this != &al) {
 	        if (root != nullptr) clear() ;
@@ -377,73 +377,73 @@ public:
 	        cnt = al.cnt ;
 	        al.root = nullptr ;
 	        al.cnt = 0 ;
-	    }
+	    } /* end */
 	    return (*this) ;
-	} ;
+	} ; /* end */
 	bstree(const std::initializer_list<T> &il) noex {
 	    if (root != nullptr) clear() ;
 	    for (const T &v : il) {
 		add(v) ;
-	    }
-	} ;
+	    } /* end for */
+	} ; /* end */
 	bstree &operator = (const std::initializer_list<T> &il) noex {
 	    if (root != nullptr) clear() ;
 	    for (const T &v : il) {
 		add(v) ;
 	    } /* end for */
 	    return (*this) ;
-	} ;
+	} ; /* end */
 	bstree &operator += (const std::initializer_list<T> &il) noex {
 	    for (const T &v : il) {
 		add(v) ;
 	    } /* end for */
 	    return (*this) ;
-	} ;
+	} ; /* end */
 	bstree &operator += (const T &v) noex {
 	    add(v) ;
 	    return (*this) ;
-	} ;
+	} ; /* end */
 	destruct bstree() {
 	    if (root != nullptr) {
 	        delnodes(root) ;
 	        root = nullptr ;
-	    }
+	    } /* end */
 	    cnt = 0 ;
-	} ;
+	} ; /* end */
 	int clear() noex {
 	    int		rc = cnt ;
 	    if (root != nullptr) {
 	        delnodes(root) ;
 	        root = nullptr ;
-	    }
+	    } /* end */
 	    cnt = 0 ;
 	    return rc ;
-	} ;
+	} ; /* end */
 	int add(const T &v) noex {
 	    bstree_node<T,Comp>	*nn = new(std::nothrow) bstree_node<T,Comp>(v) ;
-	    int			rc = -1 ;
+	    int		rc = -1 ;
 	    if (nn != nullptr) {
 		if (root != nullptr) {
 	            insert(root,nn) ;
 		} else {
 		    root = nn ;
-		}
+		} /* end */
 	        rc = ++cnt ;
-	    }
+	    } /* end */
 	    return rc ;
-	} ;
+	} ; /* end */
 	int add(const std::initializer_list<T> &il) noex {
 	    for (const T &v : il) {
 		add(v) ;
 	    } /* end for */
 	    return cnt ;
-	} ;
+	} ; /* end */
 	int add(const bstree<T,Comp> &other) noex {
 	    for (const T &v : other) {
 		add(v) ;
 	    } /* end for */
 	    return cnt ;
-	} ;
+	} ; /* end */
 	int del(iterator &it) noex {
 	    int		rc = -1 ;
 	    if (it) {
@@ -477,30 +477,30 @@ public:
 			it.setnode(nullptr) ;
 		    }
 		    delete n ;
-		}
+		} /* end */
 		rc = --cnt ;
 	    } /* end if (iterator not at end) */
 	    return rc ;
-	} ;
+	} ; /* end */
 	int delval(const T &v) noex {
 	    int		rc = -1 ;
 	    if (root != nullptr) {
 		iterator	it ;
 	        if (it = FindNodeByVal(root,v)) {
 		    rc = del(it) ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	    return rc ;
-	} ;
+	} ; /* end */
 	int topval(const T **rpp) const noex {
 	    if (root != nullptr) {
 	        bstree_node<T,Comp>	*n = root ;
 		*rpp = &n->val ;
 	    } else {
 	        *rpp = nullptr ;
-	    }
+	    } /* end */
 	    return cnt ;
-	} ;
+	} ; /* end */
 	int minval(const T **rpp) const noex {
 	    if (root != nullptr) {
 	        bstree_node<T,Comp>	*n = root ;
@@ -518,30 +518,30 @@ public:
 	        bstree_node<T,Comp>	*n = root ;
 		while (n->right != nullptr) {
 		    n = n->right ;
-		}
+		} /* end while */
 		*rpp = &n->val ;
 	    } else {
 	        *rpp = nullptr ;
-	    }
+	    } /* end */
 	    return cnt ;
-	} ;
+	} ; /* end */
 	int count() const noex {
 	    return cnt ;
-	} ;
+	} ; /* end */
 	int empty() const noex {
 	    return (cnt == 0) ;
-	} ;
+	} ; /* end */
 	operator int() const noex {
 	    return cnt ;
-	} ;
+	} ; /* end */
 	operator bool() const noex {
 	    return (cnt != 0) ;
-	} ;
+	} ; /* end */
 	int storevec(std::vector<T> &vl) const noex {
 	    int		c = 0 ;
 	    if (root != nullptr) {
 	        c = walk(vl,root) ;
-	    }
+	    } /* end */
 	    return c ;
 	} ; /* end method (storevec) */
 	iterator begin() const noex {
@@ -550,22 +550,22 @@ public:
 	        bstree_node<T,Comp>	*n = root ;
 		while (n->left != nullptr) {
 		    n = n->left ;
-		}
+		} /* end while */
 		it = iterator(n) ;
-	    }
+	    } /* end */
 	    return it ;
-	} ;
+	} ; /* end */
 	iterator end() const noex {
 	    iterator it ;
 	    return it ;
-	} ;
+	} ; /* end */
 	iterator find(const T& v) const noex {
 	    iterator it ;
 	    if (root != nullptr) {
 		it = FindNodeByVal(root,v) ;
-	    }
+	    } /* end */
 	    return it ;
-	} ;
+	} ; /* end */
 	int depth(bstree_depth *resp) const noex {
 	    int		d = 0 ;
 	    if (resp != nullptr) resp->clear() ;
@@ -583,8 +583,8 @@ public:
 		if (resp != nullptr) {
 		     resp->dmin = std::min(resp->dmin,i) ;
 		     resp->dmax = std::max(resp->dmax,i) ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	    return d ;
         } ; /* end method (depthrecurse) */
     } ; /* end class (bstree) */
