@@ -5,7 +5,6 @@
 /* SHELL built-in for user login-administration */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_PERCACHE	1		/* use persistent cache */
@@ -64,6 +63,7 @@
 #include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -76,25 +76,14 @@
 #define	CVTBUFLEN	100
 #define	UTMPIDLEN	5
 
-#ifndef	TTYDEV
-#define	TTYDEV		"/dev/tty"
-#endif
-
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#define	LI		locinfo
+#define	LI_FL		locinfo_flags
 
 
 /* external subroutines */
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
 
 
 /* external variables */
@@ -115,9 +104,9 @@ struct locinfo_flags {
 } ;
 
 struct locinfo {
-	LOCINFO_FL	have, f, changed, finval ;
-	LOCINFO_FL	init ;
-	PROGINFO	*pip ;
+	LI_FL	have, f, changed, finval ;
+	LI_FL	init ;
+	PI	*pip ;
 	cchar		*utfname ;
 	cchar		*hostname ;
 	cchar		*termline ;
@@ -133,23 +122,23 @@ struct locinfo {
 
 local int	mainsub(int,cchar **,cchar **,void *) ;
 
-local int	usage(PROGINFO *) ;
+local int	usage(PI *) ;
 
-local int	locinfo_start(LOCINFO *,PROGINFO *) ;
-local int	locinfo_utfname(LOCINFO *,cchar *) ;
-local int	locinfo_to(LOCINFO *,int) ;
-local int	locinfo_username(LOCINFO *) ;
-local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LI *,PI *) ;
+local int	locinfo_utfname(LI *,cchar *) ;
+local int	locinfo_to(LI *,int) ;
+local int	locinfo_username(LI *) ;
+local int	locinfo_finish(LI *) ;
 
 #if	CF_LOCUTMPENT
-local int	locinfo_utmpent(LOCINFO *) ;
+local int	locinfo_utmpent(LI *) ;
 #endif
 
-local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-local int	procspecs(PROGINFO *,void *,cchar *,int) ;
-local int	procspec(PROGINFO *,void *, cchar *,int) ;
-local int	procout(PROGINFO *,SHIO *,cchar *,int) ;
-local int	proclogin(PROGINFO *) ;
+local int	procargs(PI *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procspecs(PI *,void *,cchar *,int) ;
+local int	procspec(PI *,void *, cchar *,int) ;
+local int	procout(PI *,SHIO *,cchar *,int) ;
+local int	proclogin(PI *) ;
 
 
 /* local variables */
@@ -274,15 +263,11 @@ int b_logadm(int argc,cchar *argv[],void *contextp)
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
 
 	return ex ;
-}
-/* end subroutine (b_logadm) */
+} /* end subroutine (b_logadm) */
 
-
-int p_logadm(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_logadm(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_logadm) */
+} /* end subroutine (p_logadm) */
 
 
 /* local subroutines */
@@ -291,14 +276,14 @@ int p_logadm(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* ARGSUSED */
 local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
-	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+	PI	pi, *pip = &pi ;
+	LI		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	bits		pargs ;
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -324,14 +309,14 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	cchar		*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_logadm: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -997,7 +982,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -1006,7 +991,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	CF_DEBUG
 	debugclose() ;
 #endif
 
@@ -1020,11 +1005,10 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
 
-local int usage(PROGINFO *pip)
+local int usage(PI *pip)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -1076,38 +1060,35 @@ local int usage(PROGINFO *pip)
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 
-local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LI *lip,PI *pip)
 {
 
 	if (lip == NULL)
 	    return SR_FAULT ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 	lip->pip = pip ;
 	lip->to = -1 ;
 	lip->sid = getsid(0) ;
 
 	return SR_OK ;
-}
-/* end subroutine (locinfo_start) */
+} /* end subroutine (locinfo_start) */
 
 
-local int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LI *lip)
 {
 
 	if (lip == NULL)
 	    return SR_FAULT ;
 
 	return SR_OK ;
-}
-/* end subroutine (locinfo_finish) */
+} /* end subroutine (locinfo_finish) */
 
 
-local int locinfo_utfname(LOCINFO *lip,cchar *utfname)
+local int locinfo_utfname(LI *lip,cchar *utfname)
 {
 
 	if (lip == NULL)
@@ -1115,23 +1096,21 @@ local int locinfo_utfname(LOCINFO *lip,cchar *utfname)
 
 	lip->utfname = utfname ;
 	return SR_OK ;
-}
-/* end subroutine (locinfo_utfname) */
+} /* end subroutine (locinfo_utfname) */
 
 
-local int locinfo_to(LOCINFO *lip,int to)
+local int locinfo_to(LI *lip,int to)
 {
 
 	if (to < 0) to = TO_CACHE ;
 
 	lip->to = to ;
 	return SR_OK ;
-}
-/* end subroutine (locinfo_to) */
+} /* end subroutine (locinfo_to) */
 
 
 #if	CF_LOCUTMPENT
-local int locinfo_utmpent(LOCINFO *lip)
+local int locinfo_utmpent(LI *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1144,12 +1123,11 @@ local int locinfo_utmpent(LOCINFO *lip)
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_utmpent) */
+} /* end subroutine (locinfo_utmpent) */
 #endif /* CF_LOCUTMPENT */
 
 
-local int locinfo_username(LOCINFO *lip)
+local int locinfo_username(LI *lip)
 {
 	int		rs = SR_OK ;
 
@@ -1163,13 +1141,12 @@ local int locinfo_username(LOCINFO *lip)
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_username) */
+} /* end subroutine (locinfo_username) */
 
 
-local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -1258,11 +1235,10 @@ local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
 
-local int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
+local int procspecs(PI *pip,void *ofp,cchar *lbuf,int len)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -1281,14 +1257,13 @@ local int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 	    field_finish(&fsb) ;
 	} /* end if (field) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procspecs) */
+} /* end subroutine (procspecs) */
 
 
 /* process a specification name */
-local int procspec(PROGINFO *pip,void *ofp,cchar qp[],int ql)
+local int procspec(PI *pip,void *ofp,cchar qp[],int ql)
 {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	GETUTMPENT	*utp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1369,11 +1344,10 @@ local int procspec(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procspec) */
+} /* end subroutine (procspec) */
 
 
-local int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
+local int procout(PI *pip,SHIO *ofp,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1388,13 +1362,10 @@ local int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 	} /* end if */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procout) */
+} /* end subroutine (procout) */
 
-
-local int proclogin(PROGINFO *pip)
-{
-	LOCINFO		*lip = pip->lip ;
+local int proclogin(PI *pip) noex {
+	LI		*lip = pip->lip ;
 	cint	dlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1504,7 +1475,6 @@ local int proclogin(PROGINFO *pip)
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (proclogin) */
+} /* end subroutine (proclogin) */
 
 
