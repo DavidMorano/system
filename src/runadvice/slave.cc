@@ -63,7 +63,7 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	matstr() ;
 extern int	configread(), configfree() ;
 extern int	paramloads(), paramloadu(), paramload() ;
@@ -73,7 +73,7 @@ extern int	runinit(), runadd(), rundel() ;
 
 /* forward references */
 
-static int	getfilename() ;
+local int	getfilename() ;
 
 
 /* extern variables */
@@ -100,7 +100,7 @@ pid_t		pid ;
 	int		len, i, rs ;
 	int		nparams = 0 ;
 	int		f_bol, f_eol ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
 #if	CF_DEBUG
@@ -315,7 +315,7 @@ badalloc:
 /* end subroutine (slave) */
 
 
-static int getfilename(ifp,fnp)
+local int getfilename(ifp,fnp)
 bfile		*ifp ;
 char		**fnp ;
 {
