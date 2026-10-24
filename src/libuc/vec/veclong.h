@@ -117,7 +117,7 @@ enum veclongmems {
 	veclongmem_audit,
 	veclongmem_finish,
 	veclongmem_overlast
-} ;
+} ; /* end enum (veclongmems) */
 struct veclong_iter {
 	VECLONG_TYPE	*va = nullptr ;
 	int		i = -1 ;
@@ -125,14 +125,14 @@ struct veclong_iter {
 	veclong_iter() = default ;
 	veclong_iter(VECLONG_TYPE *ov,int oi,int oii) noex : va(ov), i(oi) {
 	    ii = oii ;
-	} ;
+	} ; /* end */
 	veclong_iter(const veclong_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
 		i = oit.i ;
 		ii = oit.ii ;
 	    }
-	} ;
+	} ; /* end */
 	veclong_iter &operator = (const veclong_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
@@ -140,14 +140,14 @@ struct veclong_iter {
 		ii = oit.ii ;
 	    }
 	    return *this ;
-	} ;
+	} ; /* end */
 	bool operator != (const veclong_iter &) noex ;
 	bool operator == (const veclong_iter &) noex ;
 	VECLONG_TYPE *operator * () noex {
 	    VECLONG_TYPE	*rp = nullptr ;
 	    if (i < ii) rp = (va + i) ;
 	    return rp ;
-	} ;
+	} ; /* end */
 	veclong_iter operator + (int) const noex ;
 	veclong_iter operator += (int) noex ;
 	veclong_iter operator ++ () noex ; /* pre */
@@ -161,11 +161,11 @@ struct veclong_st {
 	void operator () (veclong *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = 0,int = 0) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (veclong_st) */
 struct veclong_co {
 	veclong		*op = nullptr ;
@@ -173,11 +173,11 @@ struct veclong_co {
 	void operator () (veclong *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (veclong_co) */
 struct veclong : veclong_head {
     	veclong_st	start ;
@@ -220,15 +220,15 @@ struct veclong : veclong_head {
 	veclong_iter begin() noex {
 	    veclong_iter		it(va,0,i) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	veclong_iter end() noex {
 	    veclong_iter		it(va,i,i) ;
 	    return it ;
-	} ;
+	} ; /* end */
 	void dtor() noex ;
 	destruct veclong() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (veclong) */
 #else	/* __cplusplus */
 typedef VECLONG		veclong ;
