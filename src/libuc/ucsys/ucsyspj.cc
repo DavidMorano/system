@@ -93,21 +93,21 @@ import libutil ;			/* |memclear(3u)| */
 
 unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pjp && pjbuf) {
 	    CPROJECT *rp ;
 	    errno = 0 ;
 	    if ((rp = getprojent(pjp,pjbuf,pjlen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 		void(rp) ;
 	    }
         } else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
         }
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpjent_rp) */
 
 #else /* defined(SYSHAS_GETPJENTR) && (SYSHAS_GETPJENTR > 0) */
@@ -131,21 +131,21 @@ unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
 
 unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pjp && pjbuf && n) {
 	    CPROJECT *rp ;
 	    errno = 0 ;
 	    if ((rp = getprojbyname(n,pjp,pjbuf,pjlen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ex ;
-	return rc ;
+	return ru ;
 } /* end subroutine */
 
 #else /* defined(SYSHAS_GETPJNAMR) && (SYSHAS_GETPJNAMR > 0) */
@@ -169,21 +169,21 @@ unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
 
 unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t pid) noex {
     	cnullptr	np{} ;
-    	unixret_t	rc = 0 ;
-	errno_t		ec = 0 ;
+    	unixret_t	ru = unixretgood ;
+	errno_t		ec = EOK ;
 	if (pjp && pjbuf) {
 	    CPROJECT *rp ;
 	    errno = 0 ;
 	    if ((rp = getprojbyid(pid,pjp,pjbuf,pjlen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpjpid_np) */
 
 #else /* defined(SYSHAS_GETPJPIDR) && (SYSHAS_GETPJPIDR > 0) */
@@ -212,15 +212,15 @@ unixret_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
 	    CPROJECT *rp ;
 	    errno = 0 ;
 	    if ((rp = getdefaultproj(n,pjp,pjbuf,pjlen)) == np) {
-	        rc = -1 ;
+	        ru = unixretbad ;
 		void(rp) ;
 	    }
 	} else {
 	    ec = EFAULT ;
-	    rc = -1 ;
+	    ru = unixretbad ;
 	}
 	if (ec) errno = ec ;
-	return rc ;
+	return ru ;
 } /* end subroutine (getpjdef_rp) */
 
 #else /* defined(SYSHAS_GETPJDEFR) && (SYSHAS_GETPJDEFR > 0) */
