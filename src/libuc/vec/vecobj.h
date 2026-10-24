@@ -116,7 +116,7 @@ enum vecobjmems {
 	vecobjmem_audit,
 	vecobjmem_finish,
 	vecobjmem_overlast
-} ;
+} ; /* end enum (vecobjmems) */
 struct vecobj ;
 struct vecobj_co {
 	vecobj		*op = nullptr ;
@@ -124,11 +124,11 @@ struct vecobj_co {
 	void operator () (vecobj *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecobj_co) */
 struct vecobj : vecobj_head {
 	vecobj_co	count ;
@@ -161,7 +161,7 @@ struct vecobj : vecobj_head {
 	operator int () noex ;
 	destruct vecobj() {
 	    if (va) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (vecobj) */
 #else	/* __cplusplus */
 typedef VECOBJ		vecobj ;
