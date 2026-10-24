@@ -45,6 +45,7 @@
 #include	<srvfile.h>
 #include	<strx.h>
 #include	<char.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"jobdb.h"
@@ -65,7 +66,6 @@ extern int	jobdb_search(), jobdb_findpid() ;
 extern int	handlejob_start(), handlejob_end() ;
 
 extern char	*strshrink() ;
-extern char	*timestr_log(time_t,char *) ;
 
 
 /* externals variables */
@@ -75,8 +75,8 @@ extern struct global	g ;
 
 /* forwards */
 
-static int	ext_id() ;
-static int	handle_enter() ;
+local int	ext_id() ;
+local int	handle_enter() ;
 
 
 /* external variables */
@@ -216,7 +216,7 @@ badopen:
 /* end subroutine (handle_new) */
 
 
-static int handle_enter(wsp,jep,sbp,slp,ifp,offset,linebuf,linelen)
+local int handle_enter(wsp,jep,sbp,slp,ifp,offset,linebuf,linelen)
 struct watchstate	*wsp ;
 struct jobentry	*jep ;
 ustat	*sbp ;
@@ -715,7 +715,7 @@ struct jobentry	**jepp ;
 	(void) time(&daytime) ;
 
 	logfile_printf(&g.lh, "%s job entering\n",
-	    timestr_log(daytime,timebuf)) ;
+	    strtime_log(daytime,timebuf)) ;
 
 #if	CF_DEBUG
 	if (g.debuglevel > 1)
