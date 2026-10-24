@@ -87,27 +87,25 @@
 
 /* external subroutines */
 
-extern uint	hash_elf(const void *,int) ;
+extern uint	hash_elf(cvoid *,int) ;
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snscs(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	getserial(const char *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	snscs(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	getserial(cchar *) ;
 extern int	getheour(cchar *,cchar *,struct hostent *,char *,int) ;
-extern int	issamehostname(const char *,const char *,const char *) ;
+extern int	issamehostname(cchar *,cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 
-extern int	parsenodespec(PROGINFO *,char *,const char *,int) ;
+extern int	parsenodespec(PROGINFO *,char *,cchar *,int) ;
 
-extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
+extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern char	*strbasename(char *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -137,13 +135,13 @@ typedef unsigned int	in_addr_t ;
 
 /* forward references */
 
-static int	prognotifyrecip(PROGINFO *,vecobj *,
+local int	prognotifyrecip(PROGINFO *,vecobj *,
 			REPORTINFO *,paramfile *,RECIP *) ;
-static int	prognotifyrecipnode(PROGINFO *,vecobj *,
-			REPORTINFO *,RECIP *,const char *,int) ;
-static int	report(PROGINFO *,REPORTINFO *) ;
+local int	prognotifyrecipnode(PROGINFO *,vecobj *,
+			REPORTINFO *,RECIP *,cchar *,int) ;
+local int	report(PROGINFO *,REPORTINFO *) ;
 
-static int	searchfunc() ;
+local int	searchfunc() ;
 
 
 /* local variables */
@@ -256,7 +254,7 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
 /* local subroutines */
 
 
-static int prognotifyrecip(pip,mip,rip,mbp,rp)
+local int prognotifyrecip(pip,mip,rip,mbp,rp)
 PROGINFO	*pip ;
 vecobj		*mip ;
 REPORTINFO	*rip ;
@@ -268,7 +266,7 @@ RECIP		*rp ;
 	int		rs1 ;
 	int		ul ;
 	int		c = 0 ;
-	const char	*up ;
+	cchar	*up ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -324,12 +322,12 @@ RECIP		*rp ;
 /* end subroutine (prognotifyrecip) */
 
 
-static int prognotifyrecipnode(pip,mip,rip,rp,nn,port)
+local int prognotifyrecipnode(pip,mip,rip,rp,nn,port)
 PROGINFO	*pip ;
 vecobj		*mip ;
 REPORTINFO	*rip ;
 RECIP		*rp ;
-const char	*nn ;
+cchar	*nn ;
 int		port ;
 {
 	struct hostent	he, *hep = &he ;
@@ -342,7 +340,7 @@ int		port ;
 	int		k ;
 	int		ml ;
 	int		c = 0 ;
-	const char	*np = nn ;
+	cchar	*np = nn ;
 	char		*hebuf ;
 
 #if	CF_ISSAMEHOST
@@ -361,7 +359,7 @@ int		port ;
 	if ((rs = uc_malloc((helen+1),&hebuf)) >= 0) {
 	    if ((rs = getheour(np,NULL,hep,hebuf,helen)) >= 0) {
 		if (hep->h_addrtype == AF_INET) {
-	    	    cchar	*a = (const char *) hep->h_addr ;
+	    	    cchar	*a = (cchar *) hep->h_addr ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4)) {
@@ -441,7 +439,7 @@ int		port ;
 /* end subroutine (prognotifyrecipnode) */
 
 
-static int report(PROGINFO *pip,struct reportinfo *rip)
+local int report(PROGINFO *pip,struct reportinfo *rip)
 {
 	SOCKADDR	*sap = (SOCKADDR *) &rip->sa ;
 	mcmsg_ack	m2{} ;
@@ -490,7 +488,7 @@ static int report(PROGINFO *pip,struct reportinfo *rip)
 
 
 /* compare MSGINFO records */
-static int searchfunc(e1pp,e2pp)
+local int searchfunc(e1pp,e2pp)
 struct msginfo	**e1pp, **e2pp ;
 {
 	int		rc = 0 ;
