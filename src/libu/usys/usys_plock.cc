@@ -117,8 +117,8 @@ cbool		f_memplock		= F_MEMPLOCK ;
 /* exported subroutines */
 
 local unixret_t unix_plock(int op) noex {
-        int rc = 0 ; /* return-value */
-        int flags = 0 ;
+        unixret_t	ru = unixretgood ; /* return-value */
+        int		flags = 0 ;
         switch (op) {
     	case MLOCKP_ALL:
     	case MLOCKP_TXT:
@@ -130,22 +130,20 @@ local unixret_t unix_plock(int op) noex {
     		locking that |plock()| provides.
 	    ****/
             flags = (MCL_CURRENT | MCL_FUTURE) ;
-            if (mlockall(flags) == -1) {
-                rc = -1 ; /* ERRNO is set by |mlockall()| */
-            }
+	    /* ERRNO is set by |mlockall()| */
+	    ru = mlockall(flags) ;
             break ;
         case MLOCKP_NON:
             /* Unlock all currently locked pages. */
-            if (munlockall() == -1) {
-                rc = -1 ; /* ERRNO is set by |munlockall()| */
-            }
+	    /* ERRNO is set by |munlockall()| */
+	    ru = munlockall() ;
             break;
         default:
             errno = EINVAL ; // Invalid argument
-            rc = -1 ;
+            ru = unixretbad ;
     	    break ;
         } /* end switch */
-        return rc ;
+        return ru ;
 } /* end subroutine (unix_plock) */
 
 local sysret_t sys_plock(int opt) noex {
@@ -154,10 +152,10 @@ local sysret_t sys_plock(int opt) noex {
 	    rs = plock(opt) ;
 	} else {
 	    rs = unix_plock(opt) ;
-	}
+	} /* end */
 	if (rs < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sys_plock) */
 
