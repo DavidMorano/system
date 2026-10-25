@@ -51,14 +51,14 @@
 #include	<sntmtime.h>		/* LIBUC */
 #include	<ncol.h>		/* LIBUC |ncolchar(3uc)| */
 #include	<tabexpand.h>		/* LIBUC */
+#include	<dispmgr.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |NTABCOLS| */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"vmail_config.h"
 #include	"defs.h"
-#include	"ds.h"
 #include	"display.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -70,7 +70,7 @@ import libutil ;			/* |lenstr(3u)| */
 #define	DISPLAY_NDASHES		16
 #define	DISPLAY_NBLANKS		20
 #define	DISPLAY_STZSTR		(COL_DATESTR+4+5)
-#define	DISPLAY_STZLEN		(DISPLAY_LTZNAME + 2)
+#define	DISPLAY_STZNAMELEN		(DISPLAY_LTZNAME + 2)
 #define	DISPLAY_MBSTRLEAD	"mb: "
 #define	DISPLAY_VALS		struct display_vals
 
@@ -695,7 +695,7 @@ int display_setdate(DISPLAY *op,int f_end) noex {
 	        rs = display_setstzone(op) ;
 	        if (rs >= 0) {
 	            dp = (op->scantitle + DISPLAY_STZSTR + m) ;
-	            dl = DISPLAY_STZLEN ;
+	            dl = DISPLAY_STZNAMELEN ;
 	            x = DISPLAY_STZSTR ;
 	            y = op->rl_scantitle ;
 	            rs = ds_pwrite(&op->ds,w,y,x,dp,dl) ;
@@ -2557,7 +2557,7 @@ local int display_setstzone(DISPLAY *op) noex {
 	int		rs = SR_OK ;
 	int		fl ;
 	int		len = 0 ;
-	char		stbuf[DISPLAY_STZLEN + 1] ;
+	char		stbuf[DISPLAY_STZNAMELEN + 1] ;
 	char		*fp ;
 
 	if (pip == nullptr) return SR_FAULT ;
@@ -2578,7 +2578,7 @@ local int display_setstzone(DISPLAY *op) noex {
 /* do it */
 
 	fp = op->scantitle + DISPLAY_STZSTR ;
-	fl = DISPLAY_STZLEN ;
+	fl = DISPLAY_STZNAMELEN ;
 
 /* formulate string (that will be NUL-terminated) */
 
