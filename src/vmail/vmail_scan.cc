@@ -41,21 +41,25 @@
 #include	<sys/stat.h>
 #include	<sys/timeb.h>
 #include	<unistd.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdio>
-#include	<cstring>
 #include	<curses.h>
-#include	<bfile.h>
-#include	<mailmsg.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<dater.h>
-#include	<localmisc.h>
+#include	<dispmgr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
+#include	<mailmsg.h>		/* LIBMAILMSG */
 
 #include	"vmail_config.h"
 #include	"defs.h"
 #include	"mb.h"
-#include	"ds.h"
 
 
 /* local defines */
@@ -65,24 +69,17 @@
 
 /* external subroutines */
 
-extern int	getgecos() ;
-extern int	fixfrom(struct proginfo *,char *,char *,int) ;
-extern int	mkdisplayable(char *,int,const char *,int) ;
-
-extern char	strwcpy(char *,const char *,int) ;
-extern char	*strshrink(char *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_scandate(time_t,char *) ;
+extern int	mkdisplayable(char *,int,cchar *,int) ;
 
 
 /* forward references */
 
 int		fetchfrom(struct proginfo *,int,char *,int) ;
 
-static int	scantitle(struct proginfo *,DS *) ;
-static int	scanlong(struct proginfo *,DS *,struct mailbox *,int,int) ;
-static int	scanshort(struct proginfo *,DS *,struct mailbox *,int,int) ;
-static int	compressname(), compressdate() ;
+local int	scantitle(struct proginfo *,DS *) ;
+local int	scanlong(struct proginfo *,DS *,struct mailbox *,int,int) ;
+local int	scanshort(struct proginfo *,DS *,struct mailbox *,int,int) ;
+local int	compressname(), compressdate() ;
 
 
 /* external variables */
@@ -95,9 +92,9 @@ extern struct mailbox	mb ;
 
 /* local variables */
 
-static const char	blanks[] = "          " ;
+constexpr char		blanks[] = "          " ;
 
-static const char	*days[] = {
+constexpr cpcchar	days[] = {
 	    "sun",
 	    "mon",
 	    "tue",
@@ -105,12 +102,14 @@ static const char	*days[] = {
 	    "thu",
 	    "fri",
 	    "sat",
-	    NULL
+	    nullptr
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int scanner(pip,dsp,mbp,mn,line)
 struct proginfo	*pip ;
@@ -170,7 +169,7 @@ int	line ;
 /* local subroutines */
 
 
-static int scanlong(pip,dsp,mbp,mn,wline)
+local int scanlong(pip,dsp,mbp,mn,wline)
 struct proginfo	*pip ;
 DS		*dsp ;
 struct mailbox	*mbp ;
@@ -190,7 +189,7 @@ int	wline ;
 	char	string[LINEBUFLEN + 1] ; /* getfield returns values here */ 
 	char	work[LINEBUFLEN + 1] ;
 	char	timebuf[TIMEBUFLEN + 1], timebuf2[TIMEBUFLEN + 1] ;
-	char	*env_from = NULL ;
+	char	*env_from = nullptr ;
 	char	*sp ;
 	char	*cp, *cp2, *cp3 ;
 
@@ -227,7 +226,7 @@ int	wline ;
 #endif /* CF_DEBUG */
 
 	envtime = 0 ;
-	rs = msg_init(&m,mbp->mfp,-1L,NULL,0) ;
+	rs = msg_init(&m,mbp->mfp,-1L,nullptr,0) ;
 
 	if (rs >= 0) {
 	    MSG_ENV	*ep ;
@@ -238,9 +237,9 @@ int	wline ;
 	        debugprintf("scanlong: 'init'ed a message object\n") ;
 #endif
 
-	    env_from = NULL ;
+	    env_from = nullptr ;
 	    for (i = 0 ; msg_getenv(&m,i,&ep) >= 0 ; i += 1) {
-	        if (ep == NULL) continue ;
+	        if (ep == nullptr) continue ;
 
 #if	CF_DEBUG
 	        if (pip->debuglevel > 1)
@@ -249,16 +248,16 @@ int	wline ;
 
 /* from */
 
-	        if ((ep->from != NULL) && (env_from == NULL))
+	        if ((ep->from != nullptr) && (env_from == nullptr))
 	            env_from = ep->from ;
 
 /* from */
 
-	        if (ep->date != NULL) {
+	        if (ep->date != nullptr) {
 
 #if	CF_DEBUG
 	            if (pip->debuglevel >= 4) {
-	                debugprintf("scanlong: non-NULL envelope date\n") ;
+	                debugprintf("scanlong: non-nullptr envelope date\n") ;
 	                debugprintf("scanlong: >%s<\n",ep->date) ;
 	            }
 #endif
@@ -277,7 +276,7 @@ int	wline ;
 #if	CF_DEBUG
 	                if (pip->debuglevel >= 4)
 	                    debugprintf("scanlong: tmptime=>%s<\n",
-	                        timestr_log(tmptime,timebuf)) ;
+	                        strtime_log(tmptime,timebuf)) ;
 #endif
 
 	                if (envtime != 0) {
@@ -299,7 +298,7 @@ int	wline ;
 
 	        if (envtime != ((time_t) -1))
 	            debugprintf("scanlong: envelope date %s\n",
-	                timestr_scandate(envtime,timebuf)) ;
+	                strtime_scandate(envtime,timebuf)) ;
 
 	        else
 	            debugprintf("scanlong: no envelope date\n") ;
@@ -330,7 +329,7 @@ int	wline ;
 #endif
 
 	string[0] = '\0' ;
-	if (sp != NULL) {
+	if (sp != nullptr) {
 
 	    rs1 = fixfrom(pip,sp,work,LINEBUFLEN) ;
 
@@ -425,16 +424,16 @@ int	wline ;
 		dater_getzoneoff(&d,&zoff) ;
 
 	        debugprintf("scanlong: date=%s zone=%s off=%d\n",
-			timestr_log(msgtime,timebuf),
+			strtime_log(msgtime,timebuf),
 			zname,zoff) ;
 
 	}
 #endif /* CF_DEBUG */
 
-	        (void) timestr_scandate(msgtime,string) ;
+	        (void) strtime_scandate(msgtime,string) ;
 
 	    } else
-	        (void) timestr_scandate(envtime,string) ;
+	        (void) strtime_scandate(envtime,string) ;
 
 	    slp += sprintf(slp," %-15s",string) ;
 
@@ -504,10 +503,10 @@ int	wline ;
 
 	    dater_gettime(&d,&msgtime) ;
 
-	    (void) timestr_scandate(msgtime,work) ;
+	    (void) strtime_scandate(msgtime,work) ;
 
 	} else
-	    (void) timestr_scandate(envtime,work) ;
+	    (void) strtime_scandate(envtime,work) ;
 
 	slp += sprintf(slp," %-15s",work) ;
 
@@ -545,7 +544,7 @@ int	wline ;
 
 
 /* short version of scan line */
-static int scanshort(pip,dsp,mbp,mn,wline)
+local int scanshort(pip,dsp,mbp,mn,wline)
 struct proginfo	*pip ;
 DS		*dsp ;
 struct mailbox	*mbp ;
@@ -603,7 +602,7 @@ int		wline ;
 
 
 /* compress name into last name only & pad to right len */
-static int compressname(str,len)
+local int compressname(str,len)
 char	str[] ;
 int	len ;
 {
@@ -616,7 +615,7 @@ int	len ;
 
 	sp = strrchr(str,'.') ;
 
-	if (sp == NULL)
+	if (sp == nullptr)
 	    name = str ;
 
 	else 
@@ -629,7 +628,7 @@ int	len ;
 	tname = tempstr ;
 	sp = strtok(tempstr," ") ;
 
-	while (sp != NULL) {
+	while (sp != nullptr) {
 
 	    tname = sp ;
 	    sp = strtok(0," ") ;
@@ -650,7 +649,7 @@ int	len ;
 
 
 /* compress date into only mm/dd if is in that form & pad to right len */
-static int compressdate(str,len)
+local int compressdate(str,len)
 char	str[] ;
 int	len ;
 {
@@ -684,7 +683,7 @@ int	len ;
 
 
 /* print a line identifying the fields in the scanline */
-static int scantitle(pip,dsp)
+local int scantitle(pip,dsp)
 struct proginfo	*pip ;
 DS		*dsp ;
 {
