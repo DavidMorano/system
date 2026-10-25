@@ -38,7 +38,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<hdrdecode.h>
 #include	<localmisc.h>
 #include	<debug.h>
