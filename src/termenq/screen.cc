@@ -1,10 +1,11 @@
-/* screen */
+/* screen SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* discriminate among SCREENx models */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -17,22 +18,22 @@
 
 /*******************************************************************************
 
+  	Description:
 	Discrminate among VT52X models.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -40,33 +41,14 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
 
-extern char	*strwcpy(char *,char *,int) ;
-extern char	*strnwcpy(char *,int,cchar *,int) ;
+/* external variables */
 
 
 /* forward references */
 
 
 /* local variables */
-
-static cchar	*names[] = {
-	"vt100",
-	"vt101",
-	"vt102",
-	"vt220",
-	"vt220int",
-	"vt320",
-	"vt320int",
-	"vt420",
-	"vt420int",
-	"vt520",
-	"vt520pc",
-	"vt525",
-	"vt525pc",
-	NULL
-} ;
 
 enum names {
 	name_vt100,
@@ -83,7 +65,25 @@ enum names {
 	name_vt525,
 	name_vt525pc,
 	name_overlast
-} ;
+} ; /* end enum */
+
+static cchar	*names[] = {
+	"vt100",
+	"vt101",
+	"vt102",
+	"vt220",
+	"vt220int",
+	"vt320",
+	"vt320int",
+	"vt420",
+	"vt420int",
+	"vt520",
+	"vt520pc",
+	"vt525",
+	"vt525pc",
+	nullptr
+} ; /* end array */
+
 
 
 /* exported subroutines */
@@ -94,8 +94,8 @@ int vt100(char *rbuf,int rlen,ushort *pp, int pl)
 	int		rs = SR_OK ;
 	int		si = name_vt100 ;
 	int		i ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
 	for (i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
 	    if (pp[i] == 2) {
@@ -125,8 +125,8 @@ int vt220(char *rbuf,int rlen,uint *pp, int pl)
 	int		rs = SR_OK ;
 	int		si = name_vt220 ;
 	int		i ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
 	for (i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
 	    if (pp[i] == 9) {
@@ -145,8 +145,8 @@ int vt320(char *rbuf,int rlen,uint *pp, int pl)
 	int		rs = SR_OK ;
 	int		si = name_vt320 ;
 	int		i ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
 	for (i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
 	    if (pp[i] == 9) {
@@ -174,10 +174,10 @@ int vt520(char *rbuf,int rlen,uint *pp, int pl)
 	int		rs = SR_OK ;
 	int		si = name_vt520 ;
 	int		i ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
-	for (i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
+	for (int i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
 	    if (pp[i] == 8) {
 		si = name_vt520 ;
 		break ;
