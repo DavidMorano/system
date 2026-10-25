@@ -27,7 +27,7 @@
 *********************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -64,7 +64,7 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
 
 
 /* forward references */
@@ -81,7 +81,7 @@ extern int	sfshrink(const char *,int,const char **) ;
 
 int progfile(pip,infname,fn,f_eject)
 struct proginfo	*pip ;
-const char	infname[] ;
+cchar	infname[] ;
 int		fn ;
 int		f_eject ;
 {
@@ -93,7 +93,7 @@ int		f_eject ;
 	int	sl ;
 	int	f_exit ;
 
-	const char	*lbp ;
+	cchar	*lbp ;
 
 	char	linebuf[LINEBUFLEN + 1] ;
 
