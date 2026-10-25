@@ -1,10 +1,11 @@
-/* vtxx0 */
+/* vt100 SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* discriminate among VT52x models */
+/* discriminate among VTxx0 models */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -17,22 +18,23 @@
 
 /*******************************************************************************
 
+  	Description:
 	Discrminate among VTxx0 models.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<strn.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -40,33 +42,11 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-
-extern char	*strwcpy(char *,char *,int) ;
-extern char	*strnwcpy(char *,int,cchar *,int) ;
-
 
 /* forward references */
 
 
 /* local variables */
-
-static cchar	*names[] = {
-	"vt100",
-	"vt101",
-	"vt102",
-	"vt220",
-	"vt220int",
-	"vt320",
-	"vt320int",
-	"vt420",
-	"vt420int",
-	"vt520",
-	"vt520pc",
-	"vt525",
-	"vt525pc",
-	NULL
-} ;
 
 enum names {
 	name_vt100,
@@ -83,21 +63,38 @@ enum names {
 	name_vt525,
 	name_vt525pc,
 	name_overlast
-} ;
+} ; /* end enum (names) */
+
+constexpr cpcchar	names[] = {
+	"vt100",
+	"vt101",
+	"vt102",
+	"vt220",
+	"vt220int",
+	"vt320",
+	"vt320int",
+	"vt420",
+	"vt420int",
+	"vt520",
+	"vt520pc",
+	"vt525",
+	"vt525pc",
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int vt100(char *rbuf,int rlen,ushort *pp, int pl)
-{
+int vt100(char *rbuf,int rlen,ushort *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
-	int		i ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
-	for (i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
+	for (int i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
 	    if (pp[i] == 2) {
 		break ;
 	    } else if (pp[i] == 0) {
@@ -107,28 +104,22 @@ int vt100(char *rbuf,int rlen,ushort *pp, int pl)
 	} /* end for */
 	rs = sncpy1(rbuf,rlen,names[si]) ;
 	return rs ;
-}
-/* end subroutine (vt100) */
+} /* end subroutine (vt100) */
 
-
-/* ARGSUSED */
-int vt102(char *rbuf,int rlen,ushort *pp, int pl)
-{
+int vt102(char *rbuf,int rlen,ushort *pp,int pl) noex {
 	int		si = name_vt102 ;
+	(void) pp ;
+	(void) pl ;
 	return sncpy1(rbuf,rlen,names[si]) ;
-}
-/* end subroutine (vt102) */
+} /* end subroutine (vt102) */
 
-
-int vt220(char *rbuf,int rlen,uint *pp, int pl)
-{
+int vt220(char *rbuf,int rlen,uint *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		si = name_vt220 ;
-	int		i ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
-	for (i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
+	for (int i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
 	    if (pp[i] == 9) {
 		si = name_vt220int ;
 		break ;
@@ -136,19 +127,15 @@ int vt220(char *rbuf,int rlen,uint *pp, int pl)
 	} /* end for */
 	rs = sncpy1(rbuf,rlen,names[si]) ;
 	return rs ;
-}
-/* end subroutine (vt220) */
+} /* end subroutine (vt220) */
 
-
-int vt320(char *rbuf,int rlen,uint *pp, int pl)
-{
+int vt320(char *rbuf,int rlen,uint *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		si = name_vt320 ;
-	int		i ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
-	for (i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
+	for (int i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
 	    if (pp[i] == 9) {
 		si = name_vt320int ;
 		break ;
@@ -156,29 +143,24 @@ int vt320(char *rbuf,int rlen,uint *pp, int pl)
 	} /* end for */
 	rs = sncpy1(rbuf,rlen,names[si]) ;
 	return rs ;
-}
-/* end subroutine (vt320) */
-
+} /* end subroutine (vt320) */
 
 /* ARGSUSED */
 /* I am not aware of a way to discriminate out a vt420int from a vt420 */
-int vt420(char *rbuf,int rlen,ushort *pp, int pl)
-{
+int vt420(char *rbuf,int rlen,ushort *pp,int pl) noex {
 	int		si = name_vt420 ;
+	(void) pp ;
+	(void) pl ;
 	return sncpy1(rbuf,rlen,names[si]) ;
-}
-/* end subroutine (vt102) */
+} /* end subroutine (vt102) */
 
-
-int vt520(char *rbuf,int rlen,uint *pp, int pl)
-{
+int vt520(char *rbuf,int rlen,uint *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		si = name_vt520 ;
-	int		i ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
-	for (i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
+	for (int i = 0 ; (i < pl) && (pp[i] != USHORT_MAX) ; i += 1) {
 	    if (pp[i] == 8) {
 		si = name_vt520 ;
 		break ;
@@ -189,7 +171,6 @@ int vt520(char *rbuf,int rlen,uint *pp, int pl)
 	} /* end for */
 	rs = sncpy1(rbuf,rlen,names[si]) ;
 	return rs ;
-}
-/* end subroutine (vt520) */
+} /* end subroutine (vt520) */
 
 
