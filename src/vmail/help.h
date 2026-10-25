@@ -1,5 +1,9 @@
 /* help HEADER */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
+
+/* help defines */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
