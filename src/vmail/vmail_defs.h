@@ -29,14 +29,6 @@
 #include	<ids.h>			/* LIBUC */
 
 
-#ifndef	MAXPATHLEN
-#define	MAXPATHLEN	2048
-#endif
-
-#ifndef	MAXNAMELEN
-#define	MAXNAMELEN	256
-#endif
-
 #ifndef	MSGBUFLEN
 #define	MSGBUFLEN	2048
 #endif
@@ -45,99 +37,13 @@
 #define	SVCNAMELEN	32
 #endif
 
-#ifndef	LOGNAMELEN
-#ifndef	LOGNAME_MAX
-#define	LOGNAMELEN	LOGNAME_MAX
-#else
-#define	LOGNAMELEN	32
-#endif
-#endif
-
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
-#ifndef	USERNAMELEN
-#ifndef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
-#ifndef	GROUPNAMELEN
-#ifndef	LOGNAME_MAX
-#define	GROUPNAMELEN	LOGNAME_MAX
-#else
-#define	GROUPNAMELEN	32
-#endif
-#endif
-
-/* Solaris project name */
-#ifndef	PROJNAMELEN
-#ifndef	LOGNAME_MAX
-#define	PROJNAMELEN	LOGNAME_MAX
-#else
-#define	PROJNAMELEN	32
-#endif
-#endif
-
 #ifndef	MAXNETNAMELEN
 #define	MAXNETNAMELEN	255	/* maximum length of network user's name */
-#endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
 #endif
 
 /* mail address */
 #ifndef	MAILADDRLEN
 #define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
-
-/* timezone (zoneinfo) name */
-#ifndef	TZLEN
-#define	TZLEN		60
-#endif
-
-#ifndef	LOGIDLEN
-#define	LOGIDLEN	15
-#endif
-
-#ifndef	GNAMELEN
-#define	GNAMELEN	80		/* GECOS name length */
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* real name length */
-#endif
-
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
-#endif
-
-#ifndef	ORGCODELEN
-#define	ORGCODELEN	80
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#ifndef	NULLDEV
-#define	NULLDEV		"/dev/null"
-#endif
-
-#ifndef	TTYDEV
-#define	TTYDEV		"/dev/tty"
-#endif
-
-#ifndef	COLUMNS
-#define	COLUMNS		80		/* output columns (should be 80) */
 #endif
 
 #ifndef	KBUFLEN
@@ -152,12 +58,10 @@
 #define	EBUFLEN		(6 * MAXPATHLEN)
 #endif
 
-#ifndef	EX_OLDER
-#define	EX_OLDER	1
+#ifndef	PI
+#define	PI	proginfo
+#define	PI_FL	proginfo_flags
 #endif
-
-#define	PROGINFO	struct proginfo
-#define	PROGINFO_FL	struct proginfo_flags
 
 #define	PIVARS		struct pivars
 
@@ -259,8 +163,8 @@ struct proginfo {
 	void		*config ;	/* configuration */
 	void		*watch ;	/* watch */
 	void		*pcsconf ;	/* save space when not needed */
-	PROGINFO_FL	have, f, changed, finval ;
-	PROGINFO_FL	open ;
+	PI_FL	have, f, changed, finval ;
+	PI_FL	open ;
 	struct timeb	now ;
 	IDS		id ;
 	LOGFILE		lh ;
@@ -293,41 +197,37 @@ struct pivars {
 	cchar		*vpr3 ;
 	cchar		*pr ;
 	cchar		*vprname ;
-} ;
+} ; /* end struct */
 
 struct arginfo {
 	cchar		**argv ;
 	int		argc ;
 	int		ai, ai_max, ai_pos ;
 	int		ai_continue ;
-} ;
+} ; /* end struct */
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int proginfo_start(PI *,cchar **,cchar *,cchar *) ;
+extern int proginfo_setentry(PI *,cchar **,cchar *,int) ;
+extern int proginfo_setversion(PI *,cchar *) ;
+extern int proginfo_setbanner(PI *,cchar *) ;
+extern int proginfo_setsearchname(PI *,cchar *,cchar *) ;
+extern int proginfo_setprogname(PI *,cchar *) ;
+extern int proginfo_setexecname(PI *,cchar *) ;
+extern int proginfo_setprogroot(PI *,cchar *,int) ;
+extern int proginfo_pwd(PI *) ;
+extern int proginfo_rootname(PI *) ;
+extern int proginfo_progdname(PI *) ;
+extern int proginfo_progename(PI *) ;
+extern int proginfo_nodename(PI *) ;
+extern int proginfo_getpwd(PI *,char *,int) ;
+extern int proginfo_getename(PI *,char *,int) ;
+extern int proginfo_getenv(PI *,cchar *,int,cchar **) ;
+extern int proginfo_finish(PI *) ;
 
-extern int proginfo_start(PROGINFO *,cchar **,cchar *,cchar *) ;
-extern int proginfo_setentry(PROGINFO *,cchar **,cchar *,int) ;
-extern int proginfo_setversion(PROGINFO *,cchar *) ;
-extern int proginfo_setbanner(PROGINFO *,cchar *) ;
-extern int proginfo_setsearchname(PROGINFO *,cchar *,cchar *) ;
-extern int proginfo_setprogname(PROGINFO *,cchar *) ;
-extern int proginfo_setexecname(PROGINFO *,cchar *) ;
-extern int proginfo_setprogroot(PROGINFO *,cchar *,int) ;
-extern int proginfo_pwd(PROGINFO *) ;
-extern int proginfo_rootname(PROGINFO *) ;
-extern int proginfo_progdname(PROGINFO *) ;
-extern int proginfo_progename(PROGINFO *) ;
-extern int proginfo_nodename(PROGINFO *) ;
-extern int proginfo_getpwd(PROGINFO *,char *,int) ;
-extern int proginfo_getename(PROGINFO *,char *,int) ;
-extern int proginfo_getenv(PROGINFO *,cchar *,int,cchar **) ;
-extern int proginfo_finish(PROGINFO *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* DEFS_INCLUDE */
 
