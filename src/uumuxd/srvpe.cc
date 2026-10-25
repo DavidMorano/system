@@ -36,7 +36,7 @@
 #define	SRVPE_MASTER	1
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -91,7 +91,7 @@ extern struct proginfo	g ;
 
 /* forward references */
 
-static int	expand(char *,int,SRVPE *,SRVPE_ARGS *,char *,int) ;
+local int	expand(char *,int,SRVPE *,SRVPE_ARGS *,char *,int) ;
 
 
 /* external variables */
@@ -247,7 +247,7 @@ SRVENTRY	*psp ;
 #
 */
 
-static int expand(buf,len,pbp,pdp,rbuf,rlen)
+local int expand(buf,len,pbp,pdp,rbuf,rlen)
 char			rbuf[], buf[] ;
 int			rlen, len ;
 SRVPE			*pbp ;
