@@ -20,25 +20,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/timeb.h>		/* for 'struct timeb' */
 #include	<limits.h>
-
 #include	<vecstr.h>
 #include	<logfile.h>
 #include	<ids.h>
-#include	<localmisc.h>
 
-
-#ifndef	MAXPATHLEN
-#define	MAXPATHLEN	2048
-#endif
-
-#ifndef	MAXNAMELEN
-#define	MAXNAMELEN	256
-#endif
 
 #ifndef	MSGBUFLEN
 #define	MSGBUFLEN	2048
@@ -48,94 +37,8 @@
 #define	SVCNAMELEN	32
 #endif
 
-#ifndef	LOGNAMELEN
-#ifndef	LOGNAME_MAX
-#define	LOGNAMELEN	LOGNAME_MAX
-#else
-#define	LOGNAMELEN	32
-#endif
-#endif
-
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
-#ifndef	USERNAMELEN
-#ifndef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
-#ifndef	GROUPNAMELEN
-#ifndef	LOGNAME_MAX
-#define	GROUPNAMELEN	LOGNAME_MAX
-#else
-#define	GROUPNAMELEN	32
-#endif
-#endif
-
-/* Solaris project name */
-#ifndef	PROJNAMELEN
-#ifndef	LOGNAME_MAX
-#define	PROJNAMELEN	LOGNAME_MAX
-#else
-#define	PROJNAMELEN	32
-#endif
-#endif
-
 #ifndef	MAXNETNAMELEN
 #define	MAXNETNAMELEN	255	/* maximum length of network user's name */
-#endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-/* timezone (zoneinfo) name */
-#ifndef	TZLEN
-#define	TZLEN		60
-#endif
-
-#ifndef	LOGIDLEN
-#define	LOGIDLEN	15
-#endif
-
-#ifndef	GNAMELEN
-#define	GNAMELEN	80		/* GECOS name length */
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* real name length */
-#endif
-
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
-#endif
-
-#ifndef	ORGCODELEN
-#define	ORGCODELEN	80
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#ifndef	NULLDEV
-#define	NULLDEV		"/dev/null"
-#endif
-
-#ifndef	TTYDEV
-#define	TTYDEV		"/dev/tty"
-#endif
-
-#ifndef	COLUMNS
-#define	COLUMNS		80		/* output columns (should be 80) */
 #endif
 
 #ifndef	KBUFLEN
@@ -148,10 +51,6 @@
 
 #ifndef	EBUFLEN
 #define	EBUFLEN		(6 * MAXPATHLEN)
-#endif
-
-#ifndef	EX_OLDER
-#define	EX_OLDER	1
 #endif
 
 #define	PROGINFO	struct proginfo
