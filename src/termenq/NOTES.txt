@@ -1,11 +1,12 @@
-TERM-ENQ
+TERMENQ
 
-When a terminal line goes active (carrier-detect turns on), an enquiry is
-supposed to be made to the terminal from the first (or early) login-like program
-that executes. This program is often the program invoked from the terminal
-monitor (TTYMON as controlled by SAC). The result of the terminal enquiry is
-supposed to be a terminal code. The terminal code is looked up in a database
-consisting of the tupples:
+When a terminal line goes active (carrier-detect turns on), an
+enquiry is supposed to be made to the terminal from the first (or
+early) login-like program that executes. This program is often the
+program invoked from the terminal monitor (TTYMON as controlled by
+SAC). The result of the terminal enquiry is supposed to be a terminal
+code. The terminal code is looked up in a database consisting of
+the tupples:
 
 	code,location,multiplexor,port
 
@@ -22,18 +23,19 @@ termtype	if found from "code"
 location	is an ASCII human readable representation of the terminal
 		location
 
-The "line" of the terminal is determined in the usual way (by searching
-'/dev/' for matching criteria as given by the terminal file descriptor
-(presummably in hand).
+The "line" of the terminal is determined in the usual way (by
+searching '/dev/' for matching criteria as given by the terminal
+file descriptor (presummably in hand).
 
-Once the location of the terminal is found from the above database, it should be
-made available to subsequent programs by placing it in the execution
-environment. The multiplexor and port can optionally also be placed into the
-environment. The location value should be concise enough so that it can be
-conveneiently used as a key in other operations.
+Once the location of the terminal is found from the above database,
+it should be made available to subsequent programs by placing it
+in the execution environment. The multiplexor and port can optionally
+also be placed into the environment. The location value should be
+concise enough so that it can be conveneiently used as a key in
+other operations.
 
-After login is essentially completed by the login-system, an entry should be
-made in the PCS user-location database consisting of:
+After login is essentially completed by the login-system, an entry
+should be made in the PCS user-location database consisting of:
 
 username
 node
