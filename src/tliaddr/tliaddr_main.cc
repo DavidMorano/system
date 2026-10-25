@@ -1,10 +1,10 @@
-/* main */
+/* tliaddr_main */
+/* charset=ISO8859-1 */
 /* lang=C++20 */
 
 /* program to print out a hexadecimal TPI address */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 
@@ -46,22 +46,17 @@
 #include	<usystem.h>
 #include	<keyopt.h>
 #include	<bits.h>
-#include	<bfile.h>
 #include	<sockaddress.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
 
 
 /* local defines */
-
-#ifndef	HOSTBUFLEN
-#define	HOSTBUFLEN		(8 * MAXHOSTNAMELEN)
-#endif
-
-#define	HEXBUFLEN		(4 * MAXHOSTNAMELEN)
 
 #define	INTERFACENAMELEN	32
 #define	FAMILYNAMELEN		32
@@ -73,13 +68,6 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	prograw(PROGINFO *,cchar *,cchar *,cchar *) ;
 extern int	progsock(PROGINFO *,cchar *,cchar *,cchar *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -119,7 +107,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const struct pivars	initvars = {
+constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
