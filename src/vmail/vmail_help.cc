@@ -23,16 +23,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<bfile.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<dispmgr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"defs.h"
 #include	"help.h"
-#include	"ds.h"
 
 
 /* local defines */
@@ -48,7 +49,7 @@
 
 /* local variables */
 
-static int	page ;
+local int	page ;
 
 
 /* exported variables */
