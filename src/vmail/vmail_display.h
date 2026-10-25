@@ -22,12 +22,11 @@
 #include	<stdarg.h>
 #include	<varray.h>
 #include	<tmtime.hh>
+#include	<dispmgr.h>		/* LIBUC */
 #include	<hdrdecode.h>
-#include	<localmisc.h>
 
 #include	"config.h"
 #include	"defs.h"
-#include	"ds.h"
 
 
 /* starting columns where for various things */
