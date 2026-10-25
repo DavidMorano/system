@@ -38,14 +38,17 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<curses.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstdio>
-
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<dispmgr.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"vmail_config.h"
 #include	"defs.h"
-#include	"ds.h"
 
 
 /* external subroutines */
