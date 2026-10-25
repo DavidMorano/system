@@ -87,7 +87,7 @@ extern int	getpwd(char *,int) ;
 
 /* forward references */
 
-static int	mkcmdfname(char *,cchar *,cchar *) ;
+local int	mkcmdfname(char *,cchar *,cchar *) ;
 
 
 /* exported subroutines */
@@ -95,7 +95,7 @@ static int	mkcmdfname(char *,cchar *,cchar *) ;
 
 int spawncmdproc(SPAWNPROC *psp,cchar *shell,cchar *cmd)
 {
-	const int	am = (R_OK|X_OK) ;
+	cint	am = (R_OK|X_OK) ;
 	int		rs ;
 	int		pid = 0 ;
 	cchar	*shprog = NULL ;
@@ -183,7 +183,7 @@ int spawncmdproc(SPAWNPROC *psp,cchar *shell,cchar *cmd)
 /* local subroutines */
 
 
-static int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
+local int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
 {
 	int		rs ;
 	int		rs1 ;
@@ -194,7 +194,7 @@ static int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
 
 	if ((rs = mkpath2(inname,tmpdname,"pscXXXXXXXXXXX")) >= 0) {
 	    const mode_t	omode = 0770 ;
-	    const int		oflags = (O_WRONLY | O_CREAT | O_TRUNC) ;
+	    cint		oflags = (O_WRONLY | O_CREAT | O_TRUNC) ;
 
 #if	CF_DEBUGS
 	debugprintf("spawncmdproc/mkcmdfname: inname=%s\n",inname) ;
