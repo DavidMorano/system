@@ -69,6 +69,7 @@
 #include	<strx.h>
 #include	<toxc.h>
 #include	<isnot.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 #include	<libdebug.h>		/* LIBDEBUG */
@@ -1795,7 +1796,7 @@ local int proclog_session(PROGINFO *pip)
 	    if (pip->ti_start != 0) {
 	        time_t	sessionint = (pip->daytime - pip->ti_start) ;
 	        char	tbuf[TIMEBUFLEN+1] ;
-	        timestr_elapsed(sessionint,tbuf) ;
+	        strtime_elapsed(sessionint,tbuf) ;
 	        proglog_printf(pip,"session duration %s",tbuf) ;
 	    }
 	    proglog_printf(pip,"exiting (%d)",rs) ;
