@@ -93,7 +93,7 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_RDWR | O_CREAT | O_APPEND)
+#define	OX_FL		(O_RDWR | O_CREAT | O_APPEND)
 
 #ifndef	MUINFO
 #define	MUINFO		struct muinfo
@@ -145,16 +145,16 @@ struct muinfo {
 
 /* forward references */
 
-static int	procmailgeter(PROGINFO *,paramopt *) ;
-static int	procmailgeteruc(PROGINFO *,paramopt *,vechand *) ;
-static int	procmailgeterux(PROGINFO *,vechand *,cchar *,cchar *) ;
-static int	procmuc(PROGINFO *,paramopt *,cchar *) ;
-static int	procmailgeteru(PROGINFO *,vechand *) ;
-static int	procmailgeterum(PROGINFO *,vechand *,int,cchar *) ;
-static int	procmkenvusers(PROGINFO *,vechand *,ENVHELP *,struct muinfo *) ;
-static int	procmailgeterumer(PROGINFO *,int,cchar **,struct muinfo *) ;
+local int	procmailgeter(PROGINFO *,paramopt *) ;
+local int	procmailgeteruc(PROGINFO *,paramopt *,vechand *) ;
+local int	procmailgeterux(PROGINFO *,vechand *,cchar *,cchar *) ;
+local int	procmuc(PROGINFO *,paramopt *,cchar *) ;
+local int	procmailgeteru(PROGINFO *,vechand *) ;
+local int	procmailgeterum(PROGINFO *,vechand *,int,cchar *) ;
+local int	procmkenvusers(PROGINFO *,vechand *,ENVHELP *,struct muinfo *) ;
+local int	procmailgeterumer(PROGINFO *,int,cchar **,struct muinfo *) ;
 
-static int	mbopen(cchar *,mode_t,gid_t) ;
+local int	mbopen(cchar *,mode_t,gid_t) ;
 
 
 /* local variables */
@@ -256,7 +256,7 @@ int progmailget(PROGINFO *pip,paramopt *app)
 /* local subroutines */
 
 
-static int procmailgeter(PROGINFO *pip,paramopt *app)
+local int procmailgeter(PROGINFO *pip,paramopt *app)
 {
 	vecstr		*mlp = &pip->mailusers ;
 	int		rs ;
@@ -270,7 +270,7 @@ static int procmailgeter(PROGINFO *pip,paramopt *app)
 
 	if ((rs = vecstr_count(mlp)) > 0) {
 	    VECHAND		musers ;
-	    const int	vo = VECHAND_OSWAP ;
+	    cint	vo = VECHAND_OSWAP ;
 	    if ((rs = vechand_start(&musers,1,vo)) >= 0) {
 	        int		i ;
 	        int		c = 0 ;
@@ -318,7 +318,7 @@ static int procmailgeter(PROGINFO *pip,paramopt *app)
 /* end subroutine (procmailgeter) */
 
 
-static int procmailgeteruc(PROGINFO *pip,paramopt *app,vechand *mlp)
+local int procmailgeteruc(PROGINFO *pip,paramopt *app,vechand *mlp)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -370,7 +370,7 @@ static int procmailgeteruc(PROGINFO *pip,paramopt *app,vechand *mlp)
 /* end subroutine (procmailgeteruc) */
 
 
-static int procmuc(PROGINFO *pip,paramopt *app,cchar *mup)
+local int procmuc(PROGINFO *pip,paramopt *app,cchar *mup)
 {
 	paramopt_cur	cur ;
 	int		rs ;
@@ -408,7 +408,7 @@ static int procmuc(PROGINFO *pip,paramopt *app,cchar *mup)
 
 	            rs1 = uc_stat(msfname,&sb) ;
 	            if ((rs1 >= 0) && (! S_ISDIR(sb.st_mode))) {
-	                const int	am = (R_OK|W_OK) ;
+	                cint	am = (R_OK|W_OK) ;
 #if	CF_ACCESS
 	                if (sb.st_size > 0) {
 	                    rs1 = u_access(msfname,am) ;
@@ -440,7 +440,7 @@ static int procmuc(PROGINFO *pip,paramopt *app,cchar *mup)
 /* end subroutine (procmuc) */
 
 
-static int procmailgeteru(PROGINFO *pip,vechand *mlp)
+local int procmailgeteru(PROGINFO *pip,vechand *mlp)
 {
 	int		rs ;
 	int		len = 0 ;
@@ -489,7 +489,7 @@ static int procmailgeteru(PROGINFO *pip,vechand *mlp)
 /* end subroutine (progmailgeteru) */
 
 
-static int procmailgeterux(PROGINFO *pip,vechand *mlp,cchar *ifn,cchar *pfn)
+local int procmailgeterux(PROGINFO *pip,vechand *mlp,cchar *ifn,cchar *pfn)
 {
 	const mode_t	om = 0666 ;
 	int		rs ;
@@ -497,10 +497,10 @@ static int procmailgeterux(PROGINFO *pip,vechand *mlp,cchar *ifn,cchar *pfn)
 	int		len = 0 ;
 	if ((rs = mbopen(ifn,om,pip->gid_mail)) >= 0) {
 	    USTAT	sb ;
-	    const int	mfd = rs ;
+	    cint	mfd = rs ;
 	    if ((rs = u_fstat(mfd,&sb)) >= 0) {
 	        if (S_ISREG(sb.st_mode)) {
-		    const int	to = TO_LOCK ;
+		    cint	to = TO_LOCK ;
 	            if ((rs = lockend(mfd,TRUE,0,to)) >= 0) {
 		        off_t	offstart, offend ;
 			int		cmd ;
@@ -531,7 +531,7 @@ static int procmailgeterux(PROGINFO *pip,vechand *mlp,cchar *ifn,cchar *pfn)
 /* end subroutine (procmailgeterux) */
 
 
-static int procmailgeterum(pip,mlp,mfd,progfname)
+local int procmailgeterum(pip,mlp,mfd,progfname)
 PROGINFO	*pip ;
 vechand		*mlp ;
 int		mfd ;
@@ -635,13 +635,13 @@ cchar	*progfname ;
 /* end subroutine (procmailgeterum) */
 
 
-static int procmkenvusers(pip,mlp,ehp,mip)
+local int procmkenvusers(pip,mlp,ehp,mip)
 PROGINFO	*pip ;
 vechand		*mlp ;
 ENVHELP		*ehp ;
 struct muinfo	*mip ;
 {
-	const int	ulen = UBUFLEN ;
+	cint	ulen = UBUFLEN ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	char		*ubuf ;
@@ -654,7 +654,7 @@ struct muinfo	*mip ;
 	if (pip == NULL) return SR_FAULT ;
 
 	if ((rs = vechand_count(mlp)) > 0) {
-	    const int	size = (ulen+1) ;
+	    cint	size = (ulen+1) ;
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
 	        debugprintf("progmailget/procmkenvusers: c=%u\n",rs) ;
@@ -712,7 +712,7 @@ struct muinfo	*mip ;
 /* end subroutine (procmkenvusers) */
 
 
-static int procmailgeterumer(pip,mfd,ev,mip)
+local int procmailgeterumer(pip,mfd,ev,mip)
 PROGINFO	*pip ;
 int		mfd ;
 cchar	**ev ;
@@ -812,15 +812,15 @@ struct muinfo	*mip ;
 /* end subroutine (procmailgeterumer) */
 
 
-static int mbopen(cchar *fname,mode_t om,gid_t gid)
+local int mbopen(cchar *fname,mode_t om,gid_t gid)
 {
 	int		rs ;
-	int		oflags = O_FLAGS ;
+	int		oflags = OX_FL ;
 	int		mfd = -1 ;
 	rs = uc_open(fname,oflags,om) ;
 	mfd = rs ;
 	if (isNotPresent(rs)) {
-	    oflags = (O_FLAGS | O_CREAT) ;
+	    oflags = (OX_FL | O_CREAT) ;
 	    rs = uc_open(fname,oflags,om) ;
 	    mfd = rs ;
 	    if ((rs >= 0) && (gid > 0)) {
