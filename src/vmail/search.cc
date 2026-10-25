@@ -1,9 +1,11 @@
-/* search */
+/* search SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* search for something */
+/* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
@@ -16,21 +18,25 @@
 
 /*******************************************************************************
 
- This function executes 'function(mn)' on each mn in the current
-  mailbox that matches.  A message matches if the logical expression
-  set up by "leparse" evaluates to true.  Each term in the expression
-  consists of HEADER:value  where value matches if it is equal to any
-  word within the corresponding  .
+  	Description:
+	This function executes 'function(mn)' on each mn in the
+	current mailbox that matches.  A message matches if the
+	logical expression set up by "leparse" evaluates to true.
+	Each term in the expression consists of HEADER:value  where
+	value matches if it is equal to any word within the
+	corresponding  .
 
-  Thus  "SUBJECT:rdmail" as an expression matches 
-   "SUBJECT: program rdmail now available" .
+	Thus "SUBJECT:rdmail" as an expression matches:
+		"SUBJECT: program rdmail now available" .
 
-  The expression is contained in the global variables:
-   isop, etoken, hvalpt     which are set up by  leparse.
+	The expression is contained in the global variables:
+		isop, etoken, hvalpt     
+	which are set up by |leparse()|.
 
-  Looping is done on external messages since that is what func() expects.
-   However, evaluation and matching must be done on internal.
-  Returns 0 if can do matching, 1 if expression improperly formed.
+	Looping is done on external messages since that is what
+	|func()| expects.  However, evaluation and matching must
+	be done on internal.  Returns 0 if can do matching, 1 if
+	expression improperly formed.
 
 *******************************************************************************/
 
@@ -39,15 +45,16 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<cstring>
-#include	<curses.h>
-#include	<cstdio>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<cstdio>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<bfile.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"vmail_defs.h"
@@ -56,21 +63,24 @@
 
 /* local defines */
 
+#ifndef	PI
+#define	PI	proginfo
+#endif
+
 
 /* forward references */
 
-static int	wmatch() ;
-
-static void	tokeval(struct proginfo *,int,char *) ;
-
+local int	wmatch() noex ;
+local void	tokeval(PI *,int,char *) noex ;
 
 
+/* exported variables */
 
 
-
+/* exported subroutines */
 
 int search(pip,dsp,mbp,func)
-struct proginfo	*pip ;
+PI	*pip ;
 DS		*dsp ;
 struct mailbox	*mbp ;
 int		(*func)() ;
@@ -109,116 +119,81 @@ int		(*func)() ;
 	} /* end for */
 
 	return 0 ;
-}
-/* end subroutine (search) */
+} /* end subroutine (search) */
 
 
-
-/* LOCAL SUBROUTINES */
-
-
+/* local subroutines */
 
 /***************************************************************************
 
- generates boolean expression of logical expression for this mn.
-  ie evaluates matching of the specified field values into 0s and 1s.
-  logical expression is in global variables.  
-  boolexp returned as character string in boolexp.
-  mn is internal mn.
-
+  	Description:
+	generates boolean expression of logical expression for this
+	mn.  ie evaluates matching of the specified field values
+	into 0s and 1s.  logical expression is in global variables.
+	boolexp returned as character string in boolexp.  mn is
+	internal mn.
 
 ****************************************************************************/
 
-static void tokeval(pip,mn,boolexp)
-struct proginfo	*pip ;
-int		mn ;
-char		boolexp[] ;
-{
-	int	b, letok ;
-
+local void tokeval(PI *pip,int mn,char *boolexp) noex {
+	int	b = 0 ;
+	int	letok ;
 	char	mhval[LINEBUFLEN] ;
 
-
-	b=0 ;
-
-/* just copy through operators */
-
+	/* just copy through operators */
 	for (letok=0; letok < numletok; letok += 1) {
-
 	    if (isop[letok] == 1) {
-
 	        boolexp[b++] = operator[etoken[letok]] ;
 	        continue ;		/*next token*/
 	    }
-
-/* have HEADER:value token so get value */
-
-	    if (fetchfield(mn,header[etoken[letok]], mhval,LINEBUFLEN) != 0)
-
-/* try special check for non-sendmail From */
-
-	        if (etoken[letok] == 0)
+	    /* have HEADER:value token so get value */
+	    if (fetchfield(mn,header[etoken[letok]],mhval,LINEBUFLEN) != 0) {
+		/* try special check for non-sendmail From */
+	        if (etoken[letok] == 0) {
 	            fetchfrom(pip,mn,mhval,LINEBUFLEN) ;
-
-	        else {
-
-/* message missing so eval to 0 */
-
+		} else {
+		    /* message missing so eval to '0' */
 	            boolexp[b++] = '0' ;
 	            continue ;	/*next token*/
 	        }
-
-/* does message value match logexpr  value? */
-
-	    if (wmatch (hvalpt[letok],mhval))
+	    } /* end if */
+	    /* does message value match logexpr  value? */
+	    if (wmatch (hvalpt[letok],mhval)) {
 	        boolexp[b++] = '1' ;
-
-	    else
+	    } else {
 		boolexp[b++] = '0' ;
-
+	    }
 	} /* next token */
-
-	boolexp[b] = '\0' ;
-
-}
-/* end subroutine (tokeval) */
-
+	boolexp[b] = eos ;
+} /* end subroutine (tokeval) */
 
 /* returns true iff word occurs within string */
-static int wmatch(word,string)
-char	word[], string[] ;
-{
+local int wmatch(char *word,char *strval) noex {
 	char text[LINEBUFLEN], *tp ;
 
-
-	strcpy(text,string) ;
-
-/* note -' not delimeters */
-
+	strcpy(text,strval) ;
+	/* note -' not delimeters */
 	tp = strtok (text," .,:;\"()/?!~*_&[]@");  
-
-	while (tp != NULL)
-
-	    if (strcasecmp(word,tp))
+	while (tp != nullptr) {
+	    if (strcasecmp(word,tp)) {
 	        return(1) ;
+	    } else {
+		tp = strtok(0," .,:;\"()/?!~*_&[]@") ;
+	    }
+	} /* end while */
+	/* special cases exclude delimeters:    .!@ (FROM),  /: (DATE) */
 
-	    else	
-		tp = strtok (0," .,:;\"()/?!~*_&[]@") ;
-
-/* special cases exclude delimeters:    .!@ (FROM),  /: (DATE) */
-
-	strcpy (text,string) ;
+	strcpy (text,strval) ;
 	tp = strtok (text," ,;\"()?~*_&[]");  /*note  -'  not delimeters*/
-	while (tp != NULL)
-	    if (strcasecmp(word,tp))
+	while (tp != nullptr) {
+	    if (strcasecmp(word,tp)) {
 	        return(1) ;
-	    else	tp = strtok (0," ,;\"()?~*_&[]") ;
-
-/* no match */
-
+	    } else {
+		tp = strtok (0," ,;\"()?~*_&[]") ;
+	    }
+	}
+	/* no match */
 	return 0 ;
-}
-/* end subroutine (wmatch) */
-
+} /* end subroutine (wmatch) */
 
 
