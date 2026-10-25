@@ -68,8 +68,8 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 
 
 /* external variables */
