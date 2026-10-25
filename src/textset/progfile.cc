@@ -1,10 +1,8 @@
-/* progfile */
+/* progfile SUPPORT */
 
 /* process an input file to the output */
 
-
 #define	CF_DEBUG	1		/* run-time debug print-outs */
-
 
 /* revistion history:
 
@@ -17,26 +15,27 @@
 
 /*******************************************************************************
 
-        This subroutine processes a file by writing its contents out to an
-        output file with the correct pagination.
-
+  	Descrption:
+	This subroutine processes a file by writing its contents
+	out to an output file with the correct pagination.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<ctime>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<sbuf.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -54,17 +53,10 @@
 extern int	expandline(char *,int,cchar *,int,int *) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*timestr_edate(time_t,char *) ;
-
 
 /* forward references */
 
-static int	mkheader(PROGINFO *,char *,int,cchar *,int,time_t,int) ;
+local int	mkheader(PROGINFO *,char *,int,cchar *,int,time_t,int) ;
 
 
 /* local structures */
@@ -104,7 +96,7 @@ int progfile(PROGINFO *pip,cchar *ifn)
 
 	if ((rs = bopen(ifp,ifn,"r",0666)) >= 0) {
 	    time_t	ft ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		f_esc ;
 	    cchar	*bls = pip->blanklines ;
 	    char	lbuf[LINEBUFLEN + 1], *lbp ;
@@ -182,8 +174,8 @@ int progfile(PROGINFO *pip,cchar *ifn)
 	        while ((rs >= 0) && (*lbp == '\014')) {
 
 	            if (pip->debuglevel > 0) {
-			const int	nf = pip->files ;
-			const int	np = pip->pages ;
+			cint	nf = pip->files ;
+			cint	np = pip->pages ;
 	                fmt = "%s: requested page break\n" ;
 	                bprintf(pip->efp,fmt,pn) ;
 	                fmt = "%s: fn=%u page=%u line=%u\n" ;
@@ -228,7 +220,7 @@ int progfile(PROGINFO *pip,cchar *ifn)
 /* are we at a page header? */
 
 	        if ((rs >= 0) && (line == 0) && pip->fl.headers) {
-	    	    const int	hlen = LINEBUFLEN ;
+	    	    cint	hlen = LINEBUFLEN ;
 	    	    char	hbuf[LINEBUFLEN + 1] ;
 		    if ((rs = mkheader(pip,hbuf,hlen,ifn,f_si,ft,page)) >= 0) {
 	            	rs = bprintf(pip->ofp,"%r\n\n",hbuf,rs) ;
@@ -238,10 +230,10 @@ int progfile(PROGINFO *pip,cchar *ifn)
 /* process this new line - expand it */
 
 		if (rs >= 0) {
-		    const int	elen = LINEBUFLEN ;
+		    cint	elen = LINEBUFLEN ;
 		    char	ebuf[LINEBUFLEN+1] ;
 		    if ((rs = expandline(ebuf,elen,lbp,len,&f_esc)) >= 0) {
-			const int	el = rs ;
+			cint	el = rs ;
 
 /* check for user specified leading offset */
 
@@ -296,7 +288,7 @@ int progfile(PROGINFO *pip,cchar *ifn)
 /* local subroutines */
 
 
-static int mkheader(PROGINFO *pip,char *hbuf,int hlen,cchar *ifn,int f_si,
+local int mkheader(PROGINFO *pip,char *hbuf,int hlen,cchar *ifn,int f_si,
 		time_t pt,int pn)
 {
 	SBUF		b ;
@@ -306,7 +298,7 @@ static int mkheader(PROGINFO *pip,char *hbuf,int hlen,cchar *ifn,int f_si,
 	    if ((rs = sbuf_start(&b,hbuf,hlen)) >= 0) {
 	        cchar	*fmt = pip->headerstring ;
 	        char	tbuf[TIMEBUFLEN+1] ;
-	        timestr_edate(pt,tbuf) ;
+	        strtime_edate(pt,tbuf) ;
 	        if ((rs = sbuf_printf(&b,fmt,tbuf,(pn+1))) >= 0) {
 		    if (f_si) {
 		        ifn = "** standard input **" ;
