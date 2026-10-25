@@ -73,15 +73,15 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -100,28 +100,28 @@ struct subopts {
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	procopts(PROGINFO *,keyopt *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,
+local int	procopts(PROGINFO *,keyopt *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,
 			VARSUB *,cchar *,cchar *,cchar *) ;
 
-static int	procfiles(PROGINFO *,VARSUB *,bfile *,const char *,int) ;
-static int	procfile(PROGINFO *,VARSUB *,bfile *,const char *,int) ;
-static int	getkeychars(PROGINFO *,SUBOPTS *,const char *) ;
-static int	loadsubstrs(PROGINFO *,VARSUB *,VECSTR *) ;
-static int	vecstr_addpair(VECSTR *,const char *,int) ;
+local int	procfiles(PROGINFO *,VARSUB *,bfile *,cchar *,int) ;
+local int	procfile(PROGINFO *,VARSUB *,bfile *,cchar *,int) ;
+local int	getkeychars(PROGINFO *,SUBOPTS *,cchar *) ;
+local int	loadsubstrs(PROGINFO *,VARSUB *,VECSTR *) ;
+local int	vecstr_addpair(VECSTR *,cchar *,int) ;
 
 #ifdef	COMMENT
-static int	getconfig() ;
-static int	ourfreeze(PROGINFO *,bfile *,char *,char *) ;
-static int	fullpath(const char *,char *,int) ;
+local int	getconfig() ;
+local int	ourfreeze(PROGINFO *,bfile *,char *,char *) ;
+local int	fullpath(cchar *,char *,int) ;
 
-static void	mkfzname(const char *,int,const char *) ;
+local void	mkfzname(cchar *,int,cchar *) ;
 #endif /* COMMENT */
 
 #if	CF_DEBUG 
-static int	debugsubs(PROGINFO *,VARSUB *) ;
+local int	debugsubs(PROGINFO *,VARSUB *) ;
 #endif
 
 
@@ -241,18 +241,18 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_env = FALSE ;
 	int		f_remove = TRUE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*pmspec = NULL ;
-	const char	*keychars = NULL ;
-	const char	*ffname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*pmspec = NULL ;
+	cchar	*keychars = NULL ;
+	cchar	*ffname = NULL ;
+	cchar	*cp ;
 	char		fzfname[MAXPATHLEN + 1] ;
 	char		fbuf[FBUFLEN + 1] ;
 	char		keychar[4] ;
@@ -319,7 +319,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -515,7 +515,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -1017,12 +1017,12 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-db <map>] [<file(s)>] [-of <ofile>]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -1042,11 +1042,11 @@ static int usage(PROGINFO *pip)
 
 
 /* process the program ako-options */
-static int procopts(PROGINFO *pip,keyopt *kop)
+local int procopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getenv(VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1105,14 +1105,14 @@ static int procopts(PROGINFO *pip,keyopt *kop)
 /* end subroutine (procopts) */
 
 
-static int procargs(pip,aip,bop,vsp,ofn,afn,ifn)
+local int procargs(pip,aip,bop,vsp,ofn,afn,ifn)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bits		*bop ;
 VARSUB		*vsp ;
-const char	*ofn ;
-const char	*afn ;
-const char	*ifn ;
+cchar	*ofn ;
+cchar	*afn ;
+cchar	*ifn ;
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -1156,7 +1156,7 @@ const char	*ifn ;
 	        if (afn[0] == '-') afn = BFILE_STDIN ;
 
 	        if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
@@ -1226,11 +1226,11 @@ const char	*ifn ;
 /* end subroutine (procargs) */
 
 
-static int procfiles(pip,vsp,ofp,lbuf,llen)
+local int procfiles(pip,vsp,ofp,lbuf,llen)
 PROGINFO	*pip ;
 VARSUB		*vsp ;
 bfile		*ofp ;
-const char	*lbuf ;
+cchar	*lbuf ;
 int		llen ;
 {
 	FIELD		fsb ;
@@ -1238,7 +1238,7 @@ int		llen ;
 	int		wlen = 0 ;
 	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
 	    int		fl ;
-	    const char	*fp ;
+	    cchar	*fp ;
 	    while ((fl = field_get(&fsb,aterms,&fp)) >= 0) {
 	        if (fl > 0) {
 	            rs = procfile(pip,vsp,ofp,fp,fl) ;
@@ -1254,18 +1254,18 @@ int		llen ;
 /* end subroutine (procfiles) */
 
 
-static int procfile(pip,vsp,ofp,fp,fl)
+local int procfile(pip,vsp,ofp,fp,fl)
 PROGINFO	*pip ;
 VARSUB		*vsp ;
 bfile		*ofp ;
-const char	*fp ;
+cchar	*fp ;
 int		fl ;
 {
 	NULSTR		n ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	const char	*fname ;
+	cchar	*fname ;
 
 	if (pip == NULL) return SR_FAULT ;
 	if (fname == NULL) return SR_FAULT ;
@@ -1305,10 +1305,10 @@ int		fl ;
 
 
 /* what are the key characters */
-static int getkeychars(PROGINFO *pip,SUBOPTS *sop,cchar *keychars)
+local int getkeychars(PROGINFO *pip,SUBOPTS *sop,cchar *keychars)
 {
 	int		n = 0 ;
-	const char	*cp = keychars ;
+	cchar	*cp = keychars ;
 
 	if (pip == NULL) return SR_FAULT ;
 
@@ -1345,7 +1345,7 @@ static int getkeychars(PROGINFO *pip,SUBOPTS *sop,cchar *keychars)
 
 
 /* load up invocation-argument substitutions */
-static int loadsubstrs(pip,subp,substrp)
+local int loadsubstrs(pip,subp,substrp)
 PROGINFO	*pip ;
 VARSUB		*subp ;
 VECSTR		*substrp ;
@@ -1354,8 +1354,8 @@ VECSTR		*substrp ;
 	int		i ;
 	int		kl, vl ;
 	int		c = 0 ;
-	const char	*tp, *sp ;
-	const char	*kp, *vp ;
+	cchar	*tp, *sp ;
+	cchar	*kp, *vp ;
 
 	if (pip == NULL) return SR_FAULT ;
 
@@ -1396,15 +1396,15 @@ VECSTR		*substrp ;
 /* end subroutine (loadsubstrs) */
 
 
-static int vecstr_addpair(op,sp,sl)
+local int vecstr_addpair(op,sp,sl)
 VECSTR		*op ;
-const char	sp[] ;
+cchar	sp[] ;
 int		sl ;
 {
 	int		rs ;
 	int		kl, vl ;
-	const char	*kp, *vp ;
-	const char	*tp ;
+	cchar	*kp, *vp ;
+	cchar	*tp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
@@ -1455,7 +1455,7 @@ int		sl ;
 
 ****/
 
-static int getconfig(pip,ffname,fe,fbuf,nfep,fbuflenp,fzfname)
+local int getconfig(pip,ffname,fe,fbuf,nfep,fbuflenp,fzfname)
 PROGINFO	*pip ;
 char		ffname[] ;
 struct fzentry	fe[] ;
@@ -1906,12 +1906,12 @@ toomuch:
 
 
 /* get the full path to a file (for freeze same purposes) */
-static int fullpath(filename,pathbuf,pathlen)
-const char	filename[] ;
+local int fullpath(filename,pathbuf,pathlen)
+cchar	filename[] ;
 char		pathbuf[] ;
 int		pathlen ;
 {
-	const int	flen = strlen(filename) ;
+	cint	flen = strlen(filename) ;
 	int		plen ;
 
 	if (filename[0] == '/') {
@@ -1942,15 +1942,15 @@ int		pathlen ;
 
 
 /* make a freeze file */
-static void mkfzname(ffname,seed,fzfname)
-const char	*ffname ;
+local void mkfzname(ffname,seed,fzfname)
+cchar	*ffname ;
 int		seed ;
-const char	fzfname[] ;
+cchar	fzfname[] ;
 {
 	uint		num1 = 0 ;
 	uint		num2 = 0 ;
 	int		len, bnlen, i ;
-	const char	*bn ;
+	cchar	*bn ;
 
 	if ((bnlen = sfbasename(ffname,-1,&bn)) <= 0) {
 	    bn = "junk" ;
@@ -1992,10 +1992,10 @@ const char	fzfname[] ;
 
 
 /* is the specified freeze file "our" freeze file? */
-static int ourfreeze(pip,zfp,fzfname,pathbuf)
+local int ourfreeze(pip,zfp,fzfname,pathbuf)
 PROGINFO	*pip ;
 bfile		*zfp ;
-const char	fzfname[], pathbuf[] ;
+cchar	fzfname[], pathbuf[] ;
 {
 	long		fzmagic ;
 	int		rs ;
@@ -2118,13 +2118,13 @@ bad:
 
 
 #if	CF_DEBUG 
-static int debugsubs(PROGINFO *pip,VARSUB *vsp)
+local int debugsubs(PROGINFO *pip,VARSUB *vsp)
 {
 	int	rs = SR_OK ;
 	if (DEBUGLEVEL(2) && (rs >= 0)) {
 	    VARSUB_CUR	scur ;
 	    int		vl ;
-	    const char	*kp, *vp ;
+	    cchar	*kp, *vp ;
 	    debugprintf("main: list-start\n") ;
 	    varsub_curbegin(&subs,&scur) ;
 	    while ((vl = varsub_curenum(&subs,&scur,&kp,&vp)) >= 0) {
