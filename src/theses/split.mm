@@ -1,3 +1,5 @@
+.\"_ Nonrty Theses
+.\"_ TROFF (Memorandum Macros)
 .fp 5 ZI
 .ft ZI
 .nr N 4
