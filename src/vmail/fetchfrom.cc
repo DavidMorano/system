@@ -22,26 +22,26 @@
 
 /*******************************************************************************
 
+  	Description:
 	This subroutine will look for "From " or ">From " (for remote
 	mail).
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<mailmsg.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<mailmsg.h>		/* LIBUC */
+#include	<dispmgr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"vmail_defs.h"
@@ -61,11 +61,6 @@
 
 
 /* external subroutines */
-
-extern int	getgecos() ;
-extern int	white(const char *) ;
-
-extern char	*strshrink(char *) ;
 
 
 /* external variables */
@@ -92,7 +87,6 @@ int fetchfrom(proginfo *pip,int mn,char *str,int len) noex {
 	char	temp[LINEBUFLEN + 1], last[LINEBUFLEN + 1] ;
 	char	sender[LINEBUFLEN + 1] ;
 	char	*word, *c ;
-
 
 	if (str == NULL)
 		return SR_FAULT ;
