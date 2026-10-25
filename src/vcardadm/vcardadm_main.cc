@@ -1,14 +1,13 @@
-/* main */
+/* vcardadm_main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* test template */
+/* C-Card Administration */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_GETEXECNAME	1		/* try to use 'getexecname(3c)' ? */
 #define	CF_MID		1		/* do new MID print-out */
-
 
 /* revision history:
 
@@ -23,40 +22,35 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ vcardadm
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
 #include	<netdb.h>
-#include	<ctime>
-#include	<climits>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<baops.h>
-#include	<vecobj.h>
-#include	<mallocstuff.h>
+#include	<baops.h>		/* LIBU */
+#include	<vecobj.h>		/* LIBUC */
+#include	<msgid.h>		/* LIBUC */
+#include	<mallocstuff.h>		/* LIBUC */
 #include	<strtime.h>		/* LIBUC */
-#include	<exitcodes.h>
-#include	<localmisc.h>
-#include	<bfile.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	"config.h"
+#include	"vcardadm_config.h"
 #include	"defs.h"
-#include	"msgid.h"
 
 
 /* local defines */
@@ -68,7 +62,7 @@
 #define	DEBUGLEVEL(n)	(pip->debuglevel >= (n))
 #endif
 
-#define	O_FLAGS		O_RDONLY
+#define	OX_FL		O_RDONLY
 
 
 /* external subroutines */
@@ -91,18 +85,6 @@ local int	cmpr_utime(), cmpr_ctime(), cmpr_mtime() ;
 
 /* local variables */
 
-static cchar *argopts[] = {
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"of",
-	"a",
-	"af",
-	"db",
-	"td",
-	NULL
-} ;
-
 enum argopts {
 	argopt_version,
 	argopt_verbose,
@@ -113,18 +95,19 @@ enum argopts {
 	argopt_db,
 	argopt_td,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static cchar *sortkeys[] = {
-	"utime",
-	"mtime",
-	"ctime",
-	"update",
-	"msg",
-	"create",
-	"none",
-	NULL
-} ;
+constexpr cpcchar	argopts[] = {
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"of",
+	"a",
+	"af",
+	"db",
+	"td",
+	nullptr
+} ; /* end array */
 
 enum sortkeys {
 	sortkey_utime,
@@ -135,28 +118,32 @@ enum sortkeys {
 	sortkey_ctime2,
 	sortkey_none,
 	sortkey_overlast
-} ;
+} ; /* end enum */
+
+constexpr cpcchar	sortkeys[] = {
+	"utime",
+	"mtime",
+	"ctime",
+	"update",
+	"msg",
+	"create",
+	"none",
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,con mainv argv,con mainv envv) {
 	ustat	sb ;
-
-	struct proginfo	pi, *pip = &pi ;
-
+	PI	pi, *pip = &pi ;
 	bfile	errfile ;
 	bfile	outfile, *ofp = &outfile ;
-
 	time_t	daytime ;
-
 	pid_t	pid ;
-
 	int	argr, argl, aol, akl, avl, kwi ;
 	int	ai, ai_max, ai_pos ;
 	int	argvalue = -1 ;
@@ -171,26 +158,26 @@ char	*envv[] ;
 	int	fd_debug = -1 ;
 	int	ex = EX_INFO ;
 	int	f_optminus, f_optplus, f_optequal ;
-	int	f_extra = FALSE ;
-	int	f_version = FALSE ;
-	int	f_usage = FALSE ;
-	int	f_help = FALSE ;
-	int	f_all = FALSE ;
-	int	f_header = FALSE ;
-	int	f_mid = FALSE ;
-	int	f_sort = TRUE ;
-	int	f_reverse = FALSE ;
+	int	f_extra = false ;
+	int	f_version = false ;
+	int	f_usage = false ;
+	int	f_help = false ;
+	int	f_all = false ;
+	int	f_header = false ;
+	int	f_mid = false ;
+	int	f_sort = true ;
+	int	f_reverse = false ;
 	int	f ;
 
 	cchar	*argp, *aop, *akp, *avp ;
-	cchar	*pr = NULL ;
-	cchar	*dbfname = NULL ;
-	cchar	*afname = NULL ;
-	cchar	*ofname = NULL ;
-	cchar	*recipient = NULL ;
-	cchar	*svcname = NULL ;
-	cchar	*sortkeyspec = NULL ;
-	cchar	*tdspec = NULL ;
+	cchar	*pr = nullptr ;
+	cchar	*dbfname = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*recipient = nullptr ;
+	cchar	*svcname = nullptr ;
+	cchar	*sortkeyspec = nullptr ;
+	cchar	*tdspec = nullptr ;
 	cchar	*cp, *cp2 ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	buf[BUFLEN + 1], *bp ;
@@ -200,21 +187,21 @@ char	*envv[] ;
 	char	msgidfnamebuf[MAXPATHLEN + 1] ;
 	char	timebuf[TIMEBUFLEN + 1] ;
 
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+#if	CF_DEBUG || CF_DEBUG
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
 	proginfo_start(pip,envv,argv[0],VERSION) ;
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 	if (bopen(&errfile,BFILE_STDERR,"dwca",0666) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->fl.errfile = TRUE ;
+	    pip->fl.errfile = true ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	}
 
@@ -256,13 +243,13 @@ char	*envv[] ;
 	                aop = argp + 1 ;
 	                aol = argl - 1 ;
 	                akp = aop ;
-	                f_optequal = FALSE ;
-	                if ((avp = strchr(aop,'=')) != NULL) {
+	                f_optequal = false ;
+	                if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                    akl = avp - aop ;
 	                    avp += 1 ;
 	                    avl = aop + aol - avp ;
-	                    f_optequal = TRUE ;
+	                    f_optequal = true ;
 
 	                } else {
 
@@ -279,7 +266,7 @@ char	*envv[] ;
 
 /* version */
 	                    case argopt_version:
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        if (f_optequal)
 	                            rs = SR_INVALID ;
 
@@ -290,7 +277,7 @@ char	*envv[] ;
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 
 	                                rs = cfdeci(avp,avl,
@@ -302,18 +289,18 @@ char	*envv[] ;
 	                        break ;
 
 	                    case argopt_help:
-	                        f_help = TRUE ;
+	                        f_help = true ;
 	                        break ;
 
 	                    case argopt_a:
-	                        f_all = TRUE ;
+	                        f_all = true ;
 	                        break ;
 
 /* database name (path) */
 	                    case argopt_db:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                dbfname = avp ;
 
@@ -339,7 +326,7 @@ char	*envv[] ;
 	                    case argopt_af:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                afname = avp ;
 
@@ -365,7 +352,7 @@ char	*envv[] ;
 	                    case argopt_of:
 	                        if (f_optequal) {
 
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl)
 	                                ofname = avp ;
 
@@ -422,7 +409,7 @@ char	*envv[] ;
 	                            pip->debuglevel = 1 ;
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl > 0) {
 
 	                                    rs = cfdeci(avp,avl,
@@ -435,32 +422,32 @@ char	*envv[] ;
 
 /* version */
 	                        case 'V':
-	                            f_version = TRUE ;
+	                            f_version = true ;
 	                            break ;
 
 	                        case 'a':
-	                            f_all = TRUE ;
+	                            f_all = true ;
 	                            break ;
 
 	                        case 'f':
-	                            f_mid = FALSE ;
+	                            f_mid = false ;
 	                            break ;
 
 	                        case 'h':
-	                            f_header = TRUE ;
+	                            f_header = true ;
 	                            break ;
 
 	                        case 'm':
-	                            f_mid = TRUE ;
+	                            f_mid = true ;
 	                            break ;
 
 /* quiet mode */
 	                        case 'q':
-	                            pip->fl.quiet = TRUE ;
+	                            pip->fl.quiet = true ;
 	                            break ;
 
 	                        case 'r':
-	                            f_reverse = TRUE ;
+	                            f_reverse = true ;
 	                            break ;
 
 	                        case 's':
@@ -483,7 +470,7 @@ char	*envv[] ;
 	                            pip->verboselevel = 2 ;
 	                            if (f_optequal) {
 
-	                                f_optequal = FALSE ;
+	                                f_optequal = false ;
 	                                if (avl > 0) {
 
 	                                    rs = cfdeci(avp,avl,
@@ -495,7 +482,7 @@ char	*envv[] ;
 	                            break ;
 
 	                        case '?':
-	                            f_usage = TRUE ;
+	                            f_usage = true ;
 	                            break ;
 
 	                        default:
@@ -554,32 +541,32 @@ char	*envv[] ;
 
 /* get the program root */
 
-	if (pr == NULL) {
+	if (pr == nullptr) {
 
 	    pr = getenv(VARPROGRAMROOT1) ;
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = getenv(VARPROGRAMROOT2) ;
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = getenv(VARPROGRAMROOT3) ;
 
 /* try to see if a path was given at invocation */
 
-	    if ((pr == NULL) && (pip->progdname != NULL))
+	    if ((pr == nullptr) && (pip->progdname != nullptr))
 	        proginfo_rootprogdname(pip) ;
 
 /* do the special thing */
 
 #if	CF_GETEXECNAME && defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-	    if ((pr == NULL) && (pip->pr == NULL)) {
+	    if ((pr == nullptr) && (pip->pr == nullptr)) {
 
 	        cchar	*pp ;
 
 
 	        pp = getexecname() ;
 
-	        if (pp != NULL)
+	        if (pp != nullptr)
 	            proginfo_execname(pip,pp) ;
 
 	    }
@@ -587,9 +574,9 @@ char	*envv[] ;
 
 	} /* end if (getting a program root) */
 
-	if (pip->pr == NULL) {
+	if (pip->pr == nullptr) {
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = PROGRAMROOT ;
 
 	    pip->pr = mallocstr(pr) ;
@@ -608,10 +595,10 @@ char	*envv[] ;
 
 /* other initialization */
 
-	if (pip->tmpdname == NULL)
+	if (pip->tmpdname == nullptr)
 	    pip->tmpdname = getenv("TMPDIR") ;
 
-	if (pip->tmpdname == NULL)
+	if (pip->tmpdname == nullptr)
 	    pip->tmpdname = TMPDNAME ;
 
 
@@ -635,7 +622,7 @@ char	*envv[] ;
 /* sort key */
 
 	ski = sortkey_utime ;
-	if (sortkeyspec != NULL) {
+	if (sortkeyspec != nullptr) {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
@@ -689,7 +676,7 @@ char	*envv[] ;
 /* time display (TD) */
 
 	tdi = sortkey_mtime ;
-	if (tdspec != NULL) {
+	if (tdspec != nullptr) {
 
 	    i = matostr(sortkeys,1,tdspec,-1) ;
 
@@ -717,7 +704,7 @@ char	*envv[] ;
 
 /* open the output file */
 
-	if (ofname != NULL)
+	if (ofname != nullptr)
 	    rs = bopen(ofp,ofname,"wct",0666) ;
 
 	else
@@ -772,7 +759,7 @@ char	*envv[] ;
 
 /* apply some defaults */
 
-	if ((dbfname == NULL) || (dbfname[0] == '\0')) {
+	if ((dbfname == nullptr) || (dbfname[0] == '\0')) {
 
 	    dbfname = msgidfnamebuf ;
 	    mkpath2(msgidfnamebuf,pip->pr,VCARDADMDBNAME) ;
@@ -822,8 +809,8 @@ char	*envv[] ;
 
 /* open the database */
 
-	    oflags = O_FLAGS ;
-	    f = FALSE ;
+	    oflags = OX_FL ;
+	    f = false ;
 	    f = f || ((oflags & O_RDWR) == O_RDWR) ;
 	    rs = msgid_open(&db,dbfname,oflags,0666,4) ;
 
@@ -858,7 +845,7 @@ char	*envv[] ;
 
 /* list all entries */
 
-	    f_done = FALSE ;
+	    f_done = false ;
 	    for (tc = 0 ; (! f_done) && (tc < 20) ; tc += 1) {
 
 #ifdef	COMMENT
@@ -906,14 +893,14 @@ char	*envv[] ;
 
 	        f_done = (rs >= 0) ;
 #else
-	        f_done = TRUE ;
+	        f_done = true ;
 #endif
 
 	        if (! f_done) {
 
 	            for (i = 0 ; vecobj_get(&entries,i,&ep) >= 0 ; i += 1) {
 
-	                if (ep == NULL)
+	                if (ep == nullptr)
 	                    continue ;
 
 	                vecobj_del(&entries,i--) ;
@@ -947,7 +934,7 @@ char	*envv[] ;
 	    for (i = 0 ; (i < nentries) && (vecobj_get(&entries,i,&ep) >= 0) ; 
 	        i += 1) {
 
-	        if (ep == NULL) continue ;
+	        if (ep == nullptr) continue ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
@@ -1044,7 +1031,7 @@ usage:
 
 /* print out some help */
 help:
-	printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	goto retearly ;
 
@@ -1086,14 +1073,10 @@ badret:
 	bclose(pip->efp) ;
 
 	goto retearly ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
-
-/* LOCAL SUBROUTINES */
-
-
+/* local subroutines */
 
 local int usage(pip)
 struct proginfo	*pip ;
@@ -1110,8 +1093,7 @@ struct proginfo	*pip ;
 	    pip->progname) ;
 
 	return rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 
 local int cmp_utime(e1pp,e2pp)
@@ -1120,20 +1102,19 @@ void	**e1pp, **e2pp ;
 	MSGID_ENT	*e1p, *e2p ;
 
 
-	if ((*e1pp == NULL) && (*e2pp == NULL))
+	if ((*e1pp == nullptr) && (*e2pp == nullptr))
 	    return 0 ;
 
-	if (*e1pp == NULL)
+	if (*e1pp == nullptr)
 	    return 1 ;
 
-	if (*e2pp == NULL)
+	if (*e2pp == nullptr)
 	    return -1 ;
 
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e2p->utime - e1p->utime) ;
-}
-/* end subroutine (cmp_utime) */
+} /* end subroutine (cmp_utime) */
 
 
 local int cmpr_utime(e1pp,e2pp)
@@ -1142,20 +1123,19 @@ void	**e1pp, **e2pp ;
 	MSGID_ENT	*e1p, *e2p ;
 
 
-	if ((*e1pp == NULL) && (*e2pp == NULL))
+	if ((*e1pp == nullptr) && (*e2pp == nullptr))
 	    return 0 ;
 
-	if (*e2pp == NULL)
+	if (*e2pp == nullptr)
 	    return 1 ;
 
-	if (*e1pp == NULL)
+	if (*e1pp == nullptr)
 	    return -1 ;
 
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e1p->utime - e2p->utime) ;
-}
-/* end subroutine (cmpr_utime) */
+} /* end subroutine (cmpr_utime) */
 
 
 local int cmp_ctime(e1pp,e2pp)
@@ -1164,20 +1144,19 @@ void	**e1pp, **e2pp ;
 	MSGID_ENT	*e1p, *e2p ;
 
 
-	if ((*e1pp == NULL) && (*e2pp == NULL))
+	if ((*e1pp == nullptr) && (*e2pp == nullptr))
 	    return 0 ;
 
-	if (*e1pp == NULL)
+	if (*e1pp == nullptr)
 	    return 1 ;
 
-	if (*e2pp == NULL)
+	if (*e2pp == nullptr)
 	    return -1 ;
 
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e2p->ctime - e1p->ctime) ;
-}
-/* end subroutine (cmp_ctime) */
+} /* end subroutine (cmp_ctime) */
 
 
 local int cmpr_ctime(e1pp,e2pp)
@@ -1186,20 +1165,19 @@ void	**e1pp, **e2pp ;
 	MSGID_ENT	*e1p, *e2p ;
 
 
-	if ((*e1pp == NULL) && (*e2pp == NULL))
+	if ((*e1pp == nullptr) && (*e2pp == nullptr))
 	    return 0 ;
 
-	if (*e2pp == NULL)
+	if (*e2pp == nullptr)
 	    return 1 ;
 
-	if (*e1pp == NULL)
+	if (*e1pp == nullptr)
 	    return -1 ;
 
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e1p->ctime - e2p->ctime) ;
-}
-/* end subroutine (cmpr_ctime) */
+} /* end subroutine (cmpr_ctime) */
 
 
 local int cmp_mtime(e1pp,e2pp)
@@ -1208,42 +1186,35 @@ void	**e1pp, **e2pp ;
 	MSGID_ENT	*e1p, *e2p ;
 
 
-	if ((*e1pp == NULL) && (*e2pp == NULL))
+	if ((*e1pp == nullptr) && (*e2pp == nullptr))
 	    return 0 ;
 
-	if (*e1pp == NULL)
+	if (*e1pp == nullptr)
 	    return 1 ;
 
-	if (*e2pp == NULL)
+	if (*e2pp == nullptr)
 	    return -1 ;
 
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e2p->mtime - e1p->mtime) ;
-}
-/* end subroutine (cmp_mtime) */
+} /* end subroutine (cmp_mtime) */
 
 
-local int cmpr_mtime(e1pp,e2pp)
-void	**e1pp, **e2pp ;
-{
+local int cmpr_mtime(cvoid **e1pp,cvoid **e2pp) noex {
 	MSGID_ENT	*e1p, *e2p ;
-
-
-	if ((*e1pp == NULL) && (*e2pp == NULL))
+	if ((*e1pp == nullptr) && (*e2pp == nullptr))
 	    return 0 ;
 
-	if (*e2pp == NULL)
+	if (*e2pp == nullptr)
 	    return 1 ;
 
-	if (*e1pp == NULL)
+	if (*e1pp == nullptr)
 	    return -1 ;
 
 	e1p = *e1pp ;
 	e2p = *e2pp ;
 	return (e1p->mtime - e2p->mtime) ;
-}
-/* end subroutine (cmp_mtime) */
-
+} /* end subroutine (cmp_mtime) */
 
 
