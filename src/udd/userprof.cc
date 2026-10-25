@@ -1,36 +1,44 @@
-/* userprof */
+/* userprof SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* version %I% last-modified %G% */
+/* version %I% last-modified %G% */
 
+#define		CF_DEBUG	1
 
-#define		F_DEBUG	1
+/* revision history:
 
-
-/* revision history :
-
-	95/06/01, David A­D­ Morano
-
+	= 1995-06-01, David A­D­ Morano
+	Originally written.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
 
-#include	<envstandards.h>
+  	Description:
+	?
 
+*******************************************************************************/
+
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
-#include	<ctime>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<csignal>
+#include	<ctime>
 #include	<curses.h>
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-
-#include	<usystem.h>
+#include	<clanguage.h>
+#include	<usysbase.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<char.h>
@@ -43,40 +51,39 @@
 /* local defines */
 
 
-/* external routines */
+/* external subroutines */
 
-extern int	mkdir() ;
-
-extern char	*strdirname(), *strbasename() ;
-extern char	*strshrink() ;
 
 /* external variables */
 
-extern struct userprof	u ;
+extern userprof		u ;
 
 
-/* local static variables */
-
-struct utsname		uts ;
+/* local structures */
 
 
-int userprof(up)
-struct userprof	*up ;
-{
+/* forward references */
+
+
+/* local variables */
+
+static URSNAME		uts ;
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int userprof(userprog *up) noex {
+	TM		*timep ;
+	PASSWD		*pp ;
+	GROUP		*gp ;
 	ustat		stats ;
-
-	struct tm		*timep ;
-
-	struct passwd		*pp ;
-
-	struct group		*gp ;
-
 	int		pan, i, l ;
 	int		rs ;
-
 	char	buf[BUFLEN + 1] ;
 	char	*cp ;
-
 
 /* get our process PID */
 
@@ -133,7 +140,7 @@ struct userprof	*up ;
 
 	if (pp != NULL) {
 
-#if	F_DEBUG_MAIN
+#if	CF_DEBUG_MAIN
 	        eprintf("got a passwd entry\n") ;
 #endif
 
@@ -144,7 +151,7 @@ struct userprof	*up ;
 
 	} else {
 
-#if	F_DEBUG_MAIN
+#if	CF_DEBUG_MAIN
 	        eprintf("did NOT get a passwd entry\n") ;
 #endif
 
@@ -163,7 +170,7 @@ struct userprof	*up ;
 	up->gecosname = NULL ;
 	if (cp != NULL) {
 
-#if	F_DEBUG_MAIN
+#if	CF_DEBUG_MAIN
 	        eprintf("cp so far %s\n",cp) ;
 #endif
 
@@ -172,11 +179,9 @@ struct userprof	*up ;
 
 	}
 
-#if	F_DEBUG_MAIN
+#if	CF_DEBUG_MAIN
 	    eprintf("userprof: about gecos %08X\n",up->gecosname) ;
-
 	    eprintf("userprof: gecos %s\n",up->gecosname) ;
-
 	    eprintf("userprof: homedir=\"%s\"\n",up->homedir) ;
 #endif
 
@@ -190,7 +195,7 @@ struct userprof	*up ;
 
 	}
 
-#if	F_DEBUG_MAIN
+#if	CF_DEBUG_MAIN
 	    eprintf("userprof: put name on heap\n") ;
 #endif
 
@@ -199,10 +204,8 @@ struct userprof	*up ;
 
 	up->logid = mallocstr(buf) ;
 
-
 	return OK ;
 }
 /* end subroutine (userprof) */
-
 
 
