@@ -1,12 +1,11 @@
-/* progvmerr */
+/* progvmerr SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* Program-Error */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
-
 
 /* revision history:
 
@@ -20,45 +19,47 @@
 
 /*******************************************************************************
 
-	Here we do some multi-threaded error printing.
+  	Name:
+	programerr
+
+	Description:
+	I do some multi-threaded error printing.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<fmtstr.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
+#include	<proginfo.hh>		/* LIBPROG */
 
-#include	"defs.h"
+#include	"progvmerr.h"
+#include	"vmail_config.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
 
+/* imported namespaces */
+
+using libuc::mem ;			/* variable */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -69,66 +70,58 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-int	progvmerr_vprintf(PROGINFO *,cchar *,va_list) ;
-int	progvmerr_print(PROGINFO *,cchar *,int) ;
-
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progvmerr_printf(PROGINFO *pip,cchar *fmt,...)
-{
-	int		rs ;
-
-	if (fmt == NULL) return SR_FAULT ;
-
-	{
-	    va_list	ap ;
+int progvmerr_printf(PI *pip,cchar *fmt,...) noex {
+	va_list		ap ;
+	int		rs = SR_FAULT ;
+	if (pip && fmt) ylikely {
 	    va_begin(ap,fmt) ;
 	    rs = progvmerr_vprintf(pip,fmt,ap) ;
 	    va_end(ap) ;
-	}
-
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (progvmerr_printf) */
-
+} /* end subroutine (progvmerr_printf) */
 
 /* vprintf-like thing */
-int progvmerr_vprintf(PROGINFO *pip,cchar *fmt,va_list ap)
-{
-	int		rs ;
-	int		wlen = 0 ;
-
-	if (fmt == NULL) return SR_FAULT ;
-
-	if (pip->efp != NULL) {
-	    cint	flen = LINEBUFLEN ;
-	    char	fbuf[LINEBUFLEN+1] ;
-	    if ((rs = fmtstr(fbuf,flen,0x01,fmt,ap)) >= 0) {
-	        rs = progvmerr_print(pip,fbuf,rs) ;
-	        wlen = rs ;
-	    }
-	}
-
+int progvmerr_vprintf(PI *pip,cchar *fmt,va_list ap) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		wlen = 0 ; /* return-value */
+	if (pip && fmt) ylikely {
+	    rs = SR_OK ;
+	    if (pip->efp) {
+	        if (char *fbuf ; (rs = mem.ml(&fbuf)) >= 0) ylikely {
+		    cint flen = rs ;
+	            if ((rs = fmtstr(fbuf,flen,0x01,fmt,ap)) >= 0) {
+	                rs = progvmerr_print(pip,fbuf,rs) ;
+	                wlen = rs ;
+	            } /* end if (fmtstr) */
+		    rs1 = mem.free(fbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (progvmerr_vprintf) */
+} /* end subroutine (progvmerr_vprintf) */
 
-
-int progvmerr_print(PROGINFO *pip,cchar *sp,int sl)
-{
-	int		rs ;
-	if (pip == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-	if (pip->efp != NULL) {
-	    rs = bprintln(pip->efp,sp,sl) ;
-	}
+int progvmerr_print(PI *pip,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (pip && sp) ylikely {
+	    rs = SR_OK ;
+	    if (pip->efp) {
+		bfile *efp = resumelife<bfile>(pip->efp) ;
+	        rs = bprintln(efp,sp,sl) ;
+	    } /* end if */
+	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (progvmerr_print) */
+} /* end subroutine (progvmerr_print) */
 
 
