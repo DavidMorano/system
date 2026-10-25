@@ -32,24 +32,25 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdio>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<usysutility.hh>	/* |libu::snprintf(3u)| */
-#include	<uclibmem.h>
-#include	<uctimeconvx.h>		/* |uc_timelocal(3uc)| */
-#include	<ucstrftime.h>		/* |uc_strftime(3uc)| */
-#include	<strmgr.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<usysutility.hh>	/* LIBU |libu::snprintf(3u)| */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<uctime.h>		/* LIBUC |uc_timelocal(3uc)| */
+#include	<ucstrftime.h>		/* LIBUC |uc_strftime(3uc)| */
+#include	<strmgr.h>		/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |TIMEBUFLEN| + |COLUMNS| */
+#include	<deb.hh>		/* LIBU |DPRINTF(3u)| */
 #include	<libf.h>		/* |fwrite(3f)| */
-#include	<ascii.h>
-#include	<matstr.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| + |COLUMNS| */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/uconstants.ccm"
@@ -58,12 +59,12 @@
 import libutil ;			/* |getlenstr(3u)| */
 import uconstants ;			/* |sysword(3u)| + |varname(3u)| */
 import ulibvals ;			/* |ulibval(3u)| */
-import deb ;
+import deb ;				/* LIBU |DEBPRINTF(3u)| */
 
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
@@ -86,11 +87,11 @@ using libu::snprintf ;			/* subroutine */
 
 /* forward references */
 
-local int	mktermstr(strmgr *) noex ;
-local int	mktimestr(char *,int) noex ;
-local int	mkcurstr(strmgr *,int,int) noex ;
-local int	mkcurpos(strmgr *,int) noex ;
-local int	gettermtype(cchar *,int = -1) noex ;
+local int	mktermstr	(strmgr *) noex ;
+local int	mktimestr	(char *,int) noex ;
+local int	mkcurstr	(strmgr *,int,int) noex ;
+local int	mkcurpos	(strmgr *,int) noex ;
+local int	gettermtype	(cchar *,int = -1) noex ;
 
 
 /* local variables */
@@ -136,19 +137,16 @@ enum termtypes {
 struct srcode {
     	cchar	*cursav ;
     	cchar	*curres ;
-} ; 
+} ;  /* end struct */
 
 constexpr srcode	termcodes[] = {
     	[termtype_vt]		= { "\e7", "\e8" },
     	[termtype_ansi]		= { "\e[s", "\e[u" },
 	[termtype_overlast]	= { "\0", "\0" }
-} ;
+} ; /* end array */
 
-local cint	pagesz = ulibval.pagesz ;
-
-cint		termcols = COLUMNS ;
-
-cbool		f_debug = CF_DEBUG ;
+cint		termcols	= COLUMNS ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -159,20 +157,19 @@ cbool		f_debug = CF_DEBUG ;
 int main(int,mainv,mainv) {
     	constexpr int	dfd = (f_debug) ? FD_STDERR : -1 ;
     	cnothrow	nt{} ;
-	cnullptr	np{} ;
 	FILE		*fp = stdout ;
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_SUCCESS ;
-	debfd(dfd) ;
-	debprintf(__func__,"ent\n") ;
-	if ((rs = pagesz) >= 0) {
+	DEBFD(dfd) ;
+	DEBPRINTF("ent\n") ;
+	if ((rs = ulibval.pagesz) >= 0) ylikely {
 	    cint tlen = rs ;
-	    if (char *tbuf ; (tbuf = new(nt) char[tlen + 1]) != np) {
-		if (strmgr sm ; (rs = sm.start(tbuf,tlen)) >= 0) {
-		    if ((rs = mktermstr(&sm)) >= 0) {
-			if (cc *cp ; (rs = sm.get(&cp)) >= 0) {
-			    rs = fwrite(fp,cp,rs) ;
+	    if (char *tbuf = new(nt) char[tlen + 1]) ylikely {
+		if (strmgr sm ; (rs = sm.start(tbuf,tlen)) >= 0) ylikely {
+		    if ((rs = mktermstr(&sm)) >= 0) ylikely {
+			if (cc *cp ; (rs = sm.get(&cp)) >= 0) ylikely {
+			    rs = fwriter(fp,cp,rs) ;
 			} /* end if (sm.get) */
 		    } /* end if (mktermstr) */
 		    rs1 = sm.finish ;
@@ -180,11 +177,11 @@ int main(int,mainv,mainv) {
 		} /* end if (strmgr) */
 		delete [] tbuf ;
 	    } /* end if (m-a-f) */
-	} /* end if (pagesz) */
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret rs=%d\n",rs) ;
-	}
-	if ((ex == EX_SUCCESS) && (rs < 0)) ex = EX_DATAERR ;
+	} /* end if (ulibval.pagesz) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	if ((ex == EX_SUCCESS) && (rs < 0)) {
+	    ex = EX_DATAERR ;
+	} /* end if (error) */
 	return ex ;
 } /* end subroutine (main) */
 
@@ -197,15 +194,14 @@ local int mktermstr(strmgr *smp) noex {
 	int		rs = SR_NOTFOUND ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (valp) {
+	if (valp) ylikely {
 	    if (char sbuf[slen + 1] ; (rs = mktimestr(sbuf,slen)) >= 0) {
-	        static cint rst = gettermtype(valp) ;
 		cint	sl = rs ;
-	        if ((rs = rst) >= 0) {
+	        if (static cint rst = gettermtype(valp) ; (rs = rst) >= 0) {
 		    cint tt = rs ;
-		    if ((rs = mkcurstr(smp,tt,0)) >= 0) {
+		    if ((rs = mkcurstr(smp,tt,0)) >= 0) ylikely {
 			len += rs ;
-			if ((rs = mkcurpos(smp,sl)) >= 0) {
+			if ((rs = mkcurpos(smp,sl)) >= 0) ylikely {
 			    len += rs ;
 	                    rs = smp->str(sbuf,sl) ;
 			    len += rs ;
@@ -217,9 +213,7 @@ local int mktermstr(strmgr *smp) noex {
 	        } /* end if (valid) */
 	    } /* end if (mktimestr) */
 	} /* end if (getenv) */
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret rs=%d\n",rs) ;
-	}
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mktermstr) */
 
@@ -232,9 +226,7 @@ local int mktimestr(char *tbuf,int tlen) noex {
 	    rs = uc_strftime(tbuf,tlen,fmt,&ts) ;
 	    tl = rs ;
 	} /* end if (uc_timelocal) */
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret rs=%d\n",rs) ;
-	}
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? tl : rs ;
 } /* end subroutine (mktimestr) */
 
@@ -242,7 +234,7 @@ local int mkcurstr(strmgr *smp,int tt,int w) noex {
 	int		rs = SR_INVALID ;
 	if ((tt >= 0) && (tt < termtype_overlast)) {
 	    const srcode	*srp = (termcodes + tt) ;
-	    if ((w >= 0) && (w < 2)) {
+	    if ((w >= 0) && (w < 2)) ylikely {
 		cchar	*curstr = nullptr ;
 		rs = SR_BUGCHECK ;
 		switch (w) {
@@ -255,12 +247,10 @@ local int mkcurstr(strmgr *smp,int tt,int w) noex {
 		} /* end switch */
 		if (curstr) {
 		    rs = smp->str(curstr) ;
-		}
+		} /* end if (valid) */
 	    } /* end if (valid) */
 	} /* end if (valid) */
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret rs=%d\n",rs) ;
-	}
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (mkcurstr) */
 
@@ -273,9 +263,7 @@ local int mkcurpos(strmgr *smp,int sl) noex {
 	if ((rs = snprintf(cbuf,clen,fmt,1,hpos)) >= 0) {
 	    rs = smp->str(cbuf,rs) ;
 	} /* end if (snwprintf) */
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret rs=%d\n",rs) ;
-	}
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (mkcurpos) */
 
@@ -309,9 +297,7 @@ local int gettermtype(cchar *sp,int µsl) noex {
 	        } /* end switch */
 	    } /* end if (matostr) */
 	} /* end if (getlenstr) */
-	if_constexpr (f_debug) {
-	    debprintf(__func__,"ret rs=%d tt=%d\n",rs,tt) ;
-	}
+	DEBPRINTF("ret rs=%d tt=%d\n",rs,tt) ;
 	return (rs >= 0) ? tt : rs ;
 } /* end subroutine (gettermtype) */
 
