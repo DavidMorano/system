@@ -28,7 +28,7 @@
 **************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
@@ -60,8 +60,8 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 extern char	*strbasename(char *) ;
 
@@ -76,7 +76,7 @@ int process(pip,opts,ofp,fname)
 struct proginfo	*pip ;
 struct options	opts ;
 FILE		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	FILE	*ifp ;
 	FILE	*wfp ;
