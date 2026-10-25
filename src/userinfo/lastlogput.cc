@@ -15,8 +15,8 @@
 
 
 int lastlogput(username,hostname)
-const char	username[] ;
-const char	hostname[] ;
+cchar	username[] ;
+cchar	hostname[] ;
 {
 
 
