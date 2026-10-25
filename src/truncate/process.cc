@@ -28,7 +28,7 @@
 ******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -52,12 +52,12 @@
 
 /* external subroutines */
 
-extern int	cfdecmfui(const char *,int,int *) ;
-extern int	cfdecmfull(const char *,int,ULONG *) ;
+extern int	cfdecmfui(cchar *,int,int *) ;
+extern int	cfdecmfull(cchar *,int,ULONG *) ;
 extern int	permf(int,uid_t,gid_t,gid_t *,int) ;
 extern int	uc_ftruncate(int,off_t) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* forward references */
@@ -77,7 +77,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 int process(pip,namespec,trunclen)
 struct proginfo	*pip ;
-const char	namespec[] ;
+cchar	namespec[] ;
 ULONG		trunclen ;
 {
 	ustat	sb ;
@@ -88,8 +88,8 @@ ULONG		trunclen ;
 	int	fd ;
 	int	f_flen ;
 
-	const char	*fname ;
-	const char	*cp ;
+	cchar	*fname ;
+	cchar	*cp ;
 
 	char	tmpfname[MAXPATHLEN + 1] ;
 
