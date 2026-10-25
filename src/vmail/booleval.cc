@@ -30,20 +30,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<ascii.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<dispmgr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"defs.h"
-#include	"ds.h"
 
 
 /* local defines */
@@ -75,15 +76,15 @@
 
 /* forward references */
 
-static int	transinput(int) noex ;
-static int	transstack(int) noex ;
-static void	eval() noex ;
+local int	transinput(int) noex ;
+local int	transstack(int) noex ;
+local void	eval() noex ;
 
 
 /* local variables */
 
 /* action table - stacktop vs input */
-static int  actable [4][5]  = {
+local int  actable [4][5]  = {
 	{BE_ERR,   BE_PUSH,  BE_ERR,   BE_BALANCE,  BE_EVALSTAR},
 	{BE_EVAL,  BE_ERR,   BE_PUSH,    BE_ERR,      BE_ERR   },
 	{BE_PUSH,  BE_ERR,   BE_PUSH,    BE_ERR,      BE_ERR   },
@@ -92,7 +93,7 @@ static int  actable [4][5]  = {
 
 /* the stack itself and its pointer */
 static char  stack[LINEBUFLEN] ;
-static int   sp ;
+local int   sp ;
 
 
 /* exported variables */
@@ -152,7 +153,7 @@ int booleval(cchar *bexp) noex {
    becomes the stacktop.
  */
 
-static void eval(cchar *x) noex {
+local void eval(cchar *x) noex {
 	char		op = pop() ;
 	switch (op) {
 	case '&':
@@ -170,7 +171,7 @@ static void eval(cchar *x) noex {
 /* end subroutine (eval) */
 
 /* translate stack entries into internal numbers (cf actable) */
-static int transstack(int ch) noex {
+local int transstack(int ch) noex {
 	int		rc = 4 ;
 	switch (ch) {
 	case '0':
@@ -193,7 +194,7 @@ static int transstack(int ch) noex {
 /* end subroutine (transstack) */
 
 /* translate input tokens into internal numbers (cf actable) */
-static int transinput(int ch) noex {
+local int transinput(int ch) noex {
 	int		rc = 4 ;
 	switch (ch) {
 	case '0':
