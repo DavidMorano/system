@@ -76,10 +76,6 @@
 #define	PWBUFLEN	2048
 #endif
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
 #ifndef	COMBUFLEN
 #define	COMBUFLEN	80
 #endif
