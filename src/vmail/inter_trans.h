@@ -1,6 +1,9 @@
-/* inter_trans */
+/* inter_trans SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* translation adjunct for the INTER object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,8 +17,11 @@
 
 /*******************************************************************************
 
-	Manage character translation services for the INTER object.
+  	Name
+	inter_trans
 
+	Description:
+	Manage character translation services for the INTER object.
 
 *******************************************************************************/
 
@@ -24,26 +30,21 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+#include	"vmail_cofig.h"
 
 
-#if	(! defined(INTERTRANS_MASTER)) || (INTERTRANS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int inter_transbegin(INTER *) ;
-extern int inter_transend(INTER *) ;
-extern int inter_transhd(INTER *) ;
-extern int inter_transproc(INTER *,char *,int,cchar *,int,int) ;
+extern int inter_transbegin(INTER *) noex ;
+extern int inter_transend(INTER *) noex ;
+extern int inter_transhd(INTER *) noex ;
+extern int inter_transproc(INTER *,char *,int,cchar *,int,int) noex ;
  
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* INTERTRANS_MASTER */
 
 #endif /* INTERTRANS_INCLUDE */
 
