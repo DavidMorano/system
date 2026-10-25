@@ -28,7 +28,7 @@
 
 /* this is the shared-object description */
 struct ttimk_obj {
-	const char	*name ;
+	cchar	*name ;
 	uint		objsize ;
 } ;
 
@@ -63,8 +63,8 @@ struct ttimk_flags {
 
 struct ttimk_head {
 	uint		magic ;
-	const char 	*dbname ;
-	const char	*idname ;
+	cchar 	*dbname ;
+	cchar	*idname ;
 	char		*nfname ;
 	struct ttimk_flags	f ;
 	VECOBJ		verses ;
@@ -86,7 +86,7 @@ struct ttimk_head {
 extern "C" {
 #endif
 
-extern int	ttimk_open(TTIMK *,const char *,int,int) ;
+extern int	ttimk_open(TTIMK *,cchar *,int,int) ;
 extern int	ttimk_add(TTIMK *,TTIMK_VERSE *) ;
 extern int	ttimk_info(TTIMK *,TTIMK_INFO *) ;
 extern int	ttimk_close(TTIMK *) ;
