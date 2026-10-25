@@ -1,10 +1,11 @@
-/* vtxx0 */
+/* termtype_ct SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
-/* discriminate among VT52x models */
+/* discriminate among VT1xx models */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
+#define	CF_DEBUG	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -20,22 +21,25 @@
 
 /*******************************************************************************
 
-	Discrminate among VTxx0 models.
+  	Name:
 
+	Description:
+	Discrminate among VTxx0 models.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sncpyx.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"termtype.h"
 
@@ -47,17 +51,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprint(cchar *,int) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,char *,int) ;
-extern char	*strnwcpy(char *,int,cchar *,int) ;
-
 
 /* local structures */
 
@@ -67,7 +60,7 @@ extern char	*strnwcpy(char *,int,cchar *,int) ;
 
 /* local variables */
 
-static const struct termtype	types[] = {
+constexpr termtype	types[] = {
 	{ "vt100",	{ 1, 2, U, U },		{ -83, U, U, U } },
 	{ "vt101",	{ 1, 0, U, U },		{ U, U, U, U } },
 	{ "vt102",	{ 6, U, U, U },		{ U, U, U, U } },
@@ -81,26 +74,26 @@ static const struct termtype	types[] = {
 	{ "vt525",	{ 65, 22, U, U },	{ 65, 0, U, U } },
 	{ "vt525pc",	{ 65, 22, U, U },	{ 65, 1, U, U } },
 	{ "screen",	{ 1, 2, U, U },		{ 83, 9999, 0, U } },
-	{ NULL,		{ 0, 0, 0, 0 },		{ 0, 0, 0, 0 } }
-} ;
+	{ nullptr,		{ 0, 0, 0, 0 },		{ 0, 0, 0, 0 } }
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int termtype_vt(char *rbuf,int rlen, const short *pvp,const short *svp)
-{
+int termtype_vt(char *rbuf,int rlen,cshort *pvp,cshort *svp) noex {
 	int		rs = SR_OK ;
 	int		si ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (pvp == NULL) return SR_FAULT ;
-	if (svp == NULL) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (pvp == nullptr) return SR_FAULT ;
+	if (svp == nullptr) return SR_FAULT ;
 	rbuf[0] = 0 ;
 	if ((si = termtype(types,pvp,svp)) >= 0) {
 	    rs = sncpy1(rbuf,rlen,types[si].name) ;
 	}
 	return rs ;
-}
-/* end subroutine (termtype_vt) */
+} /* end subroutine (termtype_vt) */
 
 
