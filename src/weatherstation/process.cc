@@ -57,8 +57,8 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 extern char	*strbasename(char *) ;
 
