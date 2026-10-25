@@ -31,13 +31,13 @@ TOUCH		?= touch
 LINT		?= lint
 
 
-DEFS+=
+DEFS +=
 
-INCS+=
+INCS +=
 
-MODS+=
-MODS+=
-MODS+= 
+MODS +=
+MODS +=
+MODS += 
 
 LIBS += -lf -luo -lu
 
@@ -55,9 +55,7 @@ OBJ_MAIN= obja.o
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
