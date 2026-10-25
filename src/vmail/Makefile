@@ -2,488 +2,284 @@
 
 T= vmail
 
-ALL= $(T)
-
-#PCS= /usr/add-on/pcs
-SRCROOT= $(REPOROOT)
+ALL= $(T).x
 
 
-BINDIR= $(SRCROOT)/bin
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-MANDIR= $(SRCROOT)/man/man1
-HELPDIR= $(SRCROOT)/share/help
-PLIBDIR= $(SRCROOT)/lib/vmail
+BINDIR		?= $(REPOROOT)/bin
+INCDIR		?= $(REPOROOT)/include
+LIBDIR		?= $(REPOROOT)/lib
+MANDIR		?= $(REPOROOT)/man
+INFODIR		?= $(REPOROOT)/info
+HELPDIR		?= $(REPOROOT)/share/help
+CRTDIR		?= $(CGS_CRTDIR)
+VALDIR		?= $(CGS_VALDIR)
+RUNDIR		?= $(CGS_RUNDIR)
 
-LDCRTDIR= $(CGS_CRTDIR)
-VALDIR= $(CGS_VALDIR)
-
-
-CC= $(CGS_CC)
-GPP= $(CGS_GPP)
-
-GPPFLAGS= $(CGS_CXXFLAGS)
-CCOPTS_GCCALL= -pthread -fexceptions
-CCOPTS_CCALL= -MT
-
-CCOPTS_GCCOPTSGPP= $(CGS_CXXFLAGS)
-
-CCOPTS= $(CCOPTS_GCCALL) -g
-#CCOPTS= $(CCOPTS_GCCALL) -g -O
-#CCOPTS= $(CCOPTS_GCCALL) -g -pg
-#CCOPTS= $(CCOPTS_GCCALL) -g -Wstrict-aliasing
-#CCOPTS= $(CCOPTS_GCCALL) -g -Wall
-
-#CCOPTS= $(CCOPTS_CCALL) -g -xs
-
-# PROF profiling w/ GCC
-#CCOPTS= $(CCOPTS_GCCALL) -O -mcpu=ultrasparc -p -g
-# GPROF profiling w/ GCC
-#CCOPTS= $(CCOPTS_GCCALL) -O3 -mcpu=ultrasparc -pg -g
-
-# HyperSPARC
-#CCOPTS= -xO5 -xtarget=ss20/hs22 -dalign -xdepend
-
-# UltraSPARC
-#CCOPTS= -xO5 -xtarget=ultra -xsafe=mem -dalign -xdepend
+CPP		?= cpp
+CC		?= gcc
+CXX		?= gxx
+LD		?= gld
+RANLIB		?= granlib
+AR		?= gar
+NM		?= gnm
+COV		?= gcov
+LORDER		?= lorder
+TSORT		?= tsort
+LINT		?= lint
+RM		?= rm -f
+TOUCH		?= touch
+LINT		?= lint
 
 
-CMDHELP= $(T).cmdhelp
+DEFS +=
 
-DEF0=
-DEF1=
-DEF2=
-DEF3=
-DEF4=
-DEF5=
-DEF6=
-DEF7= $(LF_DEFS)
+INCS +=
 
-DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
+MODS +=
+
+LIBS += -ldam -lpcs -luo -lu -lf
 
 
-INCDIRS= -I$(INCDIR) -I$(LOCAL)/include
+DEPS_MAIN += 
+DEPS_MAIN +=
+DEPS_MAIN += 
 
-CPPFLAGS= $(DEFS) $(INCDIRS)
+OBJ0= vmail_main.o
+OBJ1= strkeycmp.o matkeystr.o
+OBJ2=
+OBJ3= 
+OBJ4=
+OBJ5=
+OBJ6=
+OBJ7=
 
-CFLAGS= $(CCOPTS)
-CXXFLAGS= $(GPPFLAGS) $(CFLAGS)
+OBJA= obj0.o obj1.o
+OBJB= obj4.o 
+#OBJB= obj4.o obj5.o obj6.o obj7.o
 
-#LD= $(CC)
-#LD= cc
-LD= ld
-
-
-LDRPATH= $(LOCAL)/lib:$(GNU)/lib:$(EXTRA)/lib:/usr/lib/lwp
-
-# regular
-LDFLAGS= $(LF_LDFLAGS) -R$(LIBDIR):$(LDRPATH)
-# for profiling w/ PROF
-LDFLAGS_P= $(LF_LDFLAGS) -L/usr/lib/libp -R$(LIBDIR):$(LDRPATH)
-# for profiling w/ GPROF
-LDFLAGS_G= $(LF_LDFLAGS) -L/usr/lib/libp -R$(LIBDIR):$(LDRPATH)
+OBJ= obja.o
 
 
-LIBDIRS= -L$(LIBDIR) -L$(LOCAL)/lib -L$(CGS_LIBDIR) 
+INCDIRS=
+LIBDIRS= -L lib
 
-LIB0=
-LIB1= -lpcs -ldam -lb
-LIB2=
-LIB3= -luc -lu
-LIB4= -liconv $(CGS_LIBS)
-LIB5= 
-# this has the addition of |libthread| to force linking of kernel-only threads
-LIB6= -lsecdb -lproject -lpthread -lthread -lrt -lxnet -lsocket -lnsl
-LIB7= -ldl -lc
-
-LIBS= $(LIB0) $(LIB1) $(LIB2) $(LIB3) $(LIB4) $(LIB5) $(LIB6) $(LIB7)
-
+RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
 
-
-TLIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
-
-TLIB0=
-TLIB1= -lpcs -ldam -lb
-TLIB2= -ldebug
-TLIB3= -luc -lu
-TLIB4= -liconv $(CGS_LIBS)
-TLIB5=
-TLIB6= -lsecdb -lproject -lpthread -lthread -lrt -lxnet -lsocket -lnsl
-TLIB7= -ldl
-
-TLIBS= $(TLIB0) $(TLIB1) $(TLIB2) $(TLIB3) $(TLIB4) $(TLIB5) $(TLIB6) $(TLIB7)
-
-TLIBINFO= $(TLIBDIRS) $(TLIBS)
+# flag setting
+CPPFLAGS	?= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS		?= $(MAKECFLAGS)
+CXXFLAGS	?= $(MAKECXXFLAGS) -g
+ARFLAGS		?= $(MAKEARFLAGS)
+LDFLAGS		?= $(MAKELDFLAGS)
 
 
-VALUES= $(CGS_VALDIR)/$(CGS_VALUES)
-
-CRT1= $(LDCRTDIR)/crt1.o
-CRTI= $(LDCRTDIR)/crti.o
-CRTBEGIN= $(LDCRTDIR)/crtbegin.o
-MCRT1= $(LDCRTDIR)/mcrt1.o
-GCRT1= $(LDCRTDIR)/gcrt1.o
-CRTEND= $(LDCRTDIR)/crtend.o
-CRTN= $(LDCRTDIR)/crtn.o
-
-CRTFRONT= $(CRT1) $(CRTI) $(VALUES) $(CRTBEGIN)
-CRTBACK= $(CRTEND) $(CRTN)
-
-# for regular (no profiling)
-CRT0= $(CRT1) $(CRTI) $(VALUES) $(CRTBEGIN)
-# for 'prof(1)'
-MCRT0= $(CRTI) $(MCRT1) $(VALUES) $(CRTBEGIN)
-# for 'gprof(1)'
-GCRT0= $(GCRT1) $(CRTI) $(GMON) $(VALUES) $(CRTBEGIN)
-
-CRTC= makedate.o
-
-LINT= lint
-LINTFLAGS= -uxn -Dlint
-
-NM= nm
-NMFLAGS= -xs -v
-
-CPP= cpp
-
-
-INCS= config.h defs.h profile.h 
-
-
-OBJ00= main.o whatinfo.o proginfo.o proginfo_setpiv.o proginfo_rootname.o
-OBJ01= progopts.o progconfig.o progterm.o progmailget.o proguserlist.o
-OBJ02= proglog.o progvmerr.o
-OBJ03= inter.o inter_trans.o
-OBJ04=
-OBJ05= mailmsgviewer.o
-OBJ06= timestr_scandate.o digit3.o
-OBJ07= printhelp.o kshlib.o sesmsg.o msgdata.o
-OBJ08=
-OBJ09=
-OBJ10=
-OBJ11= dater.o dater_getdate.o 
-OBJ12= comparse.o tmz.o zos.o
-OBJ13= mailmsgmatenv.o mailmsgmathdr.o mailmsgfrom.o
-OBJ14= mailbox.o mailbox_getfrom.o tmpmailboxes.o
-OBJ15= mailmsg.o mailmsg_loadmb.o mailmsg_enver.o
-
-OBJ16= mailmsghdrval.o mailmsghdrfold.o mbcache.o
-OBJ17=
-OBJ18= kbdinfo.o cmdmap.o subprocs.o
-OBJ19=
-OBJ20= sigign.o
-OBJ21= varray.o
-OBJ22=
-OBJ23=
-
-OBJ24=
-OBJ25=
-OBJ26=
-OBJ27=
-OBJ28=
-OBJ29=
-OBJ30= headkeymat.o mkdisplayable.o sfsubstance.o
-OBJ31= mkbestaddr.o mkbestfrom.o mktmpuserdir.o
-
-OBJ32=
-OBJ33= termconseq.o
-OBJ34= mailboxappend.o hdrextnum.o
-OBJ35=
-OBJ36=
-OBJ37= nlinecols.o
-OBJ38=
-OBJ39=
-
-OBJ40= initnow.o
-OBJ41=
-OBJ42= iscmdstart.o
-OBJ43=
-OBJ44= straltwchar.o
-OBJ45=
-OBJ46=
-OBJ47=
-
-OBJ48=
-OBJ49=
-OBJ50=
-OBJ51=
-OBJ52=
-OBJ53=
-OBJ54=
-OBJ55=
-
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
-OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
-OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
-OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
-OBJF= $(OBJ40) $(OBJ41) $(OBJ42) $(OBJ43) $(OBJ44) $(OBJ45) $(OBJ46) $(OBJ47)
-OBJG= $(OBJ48) $(OBJ49) $(OBJ50) $(OBJ51) $(OBJ52) $(OBJ53) $(OBJ54) $(OBJ55)
-OBJH= $(OBJ56) $(OBJ57) $(OBJ58) $(OBJ59) $(OBJ60) $(OBJ61) $(OBJ62) $(OBJ63)
-
-OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG) $(OBJH) 
-
-# for regular (no profiling)
-OBJS= $(CRTFRONT) $(OBJ) $(CRTC) $(CRTBACK)
-# for 'prof(1)'
-MOBJS= $(MCRT0) $(OBJ) $(CRTC) $(CRTBACK)
-# for 'gprof(1)'
-GOBJS= $(GCRT0) $(OBJ) $(CRTC) $(CRTBACK)
-
-
-SRC= $(OBJ:.c=.o)
-
-
-.SUFFIXES:		.ls .i .cx .cs
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).x
 
 all:			$(ALL)
 
-.cc.o:
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $<
-
-.c.o:
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
-
-.c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
-
-.c.ls:
-	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.i:
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
+.cc.ii:
+	$(CPP) $(CPPFLAGS) $< > $(*).ii
 
-$(T):			$(T).ee
-	cp -p $(T).ee $(T)
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
-$(T).x:			$(OBJ) Makefile
-	makedate -m $(T) > makedate.c
-	$(CC) -c makedate.c
-	$(LD) -o $@ $(LDFLAGS) $(OBJS) $(LIBINFO) > $(T).lm
+.c.s:
+	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
 
-$(T).prof:		$(OBJ) Makefile
-	makedate -m $(T) > makedate.c
-	$(CC) -c makedate.c
-	$(LD) -o $@ $(LDFLAGS_P) $(MOBJS) $(LIBINFO) > $(T).lm
+.cc.s:
+	$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) $<
 
-$(T).gprof:		$(OBJ) Makefile
-	makedate -m $(T) > makedate.c
-	$(CC) -c makedate.c
-	$(LD) -o $@ $(LDFLAGS_G) $(GOBJS) $(LIBINFO) > $(T).lm
+.c.o:
+	$(COMPILE.c) $<
 
-$(T).$(OFF) $(OFF):	$(T).x
-	cp -p $(T).x $(T).$(OFF)
+.cc.o:
+	$(COMPILE.cc) $<
 
-$(T).nm nm:		$(T).x
+.ccm.o:
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
+
+
+$(T).x:			obj.o
+	$(CXX) -o $@ $(LDFLAGS) $(RUNINFO) $^ $(LIBINFO)
+
+$(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).x > $(T).nm
 
-safe:
-	makesafe -v=3 -I $(INCDIR) $(OBJ)
-
-strip:			$(T).x
-	strip $(T).x
-	rm -f $(T).$(OFF) $(T)
-
-install:		install-raw install-help install-cmdhelp
-
-install-ee:		$(ALL) $(T).$(OFF)
-	rm -f n$(T) n$(T).x n$(T).$(OFF)
-	makenewer -r $(ALL) $(BINDIR)
-
-install-raw:		$(T).x
-	rm -f $(BINDIR)/$(T).$(OFF)
-	makenewer -r -o rmsuf $(T).x $(BINDIR)
-	-chgrp mail $(BINDIR)/$(T)
-#	-chmod g+s $(BINDIR)/$(T)
-
-install-help:		$(T).help
-	-mkdir -p $(HELPDIR) 2> /dev/null
-	makenewer -o rmsuf $(T).help $(HELPDIR)
-
-install-cmdhelp:	$(T).cmdhelp
-	rm -f cmdhelp
-	ln -f $(T).cmdhelp cmdhelp
-	makenewer cmdhelp $(PLIBDIR)
-
-install-man:
-	rm -f $(CATMAN)/cat1/$(T).1
-	makenewer -m man=1 $(T).man $(MANDIR)
-
 again:
-	-rm -f $(ALL) $(T).x $(T).$(OFF) $(T).prof $(T).gprof
+	rm -f $(T).x
 
-clean:			again
-	rm -f *.ls *.ln *.i *.o *.so *.x *.lm core gmon.out
+clean:
+	makeclean $(ALL)
 
 control:
 	(uname -n ; date) > Control
 
 
-libcurses.a:		libcurses.obj
-	cp -p libcurses.obj $@
+obj0.o:			$(OBJ0)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-vsnprintf.o:		vsnprintf.obj
-	cp -p vsnprintf.obj $@
+obj1.o:			$(OBJ1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj2.o:			$(OBJ2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-main.o:			main.c $(INCS)
+obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-whatinfo.o:		whatinfo.c config.h
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-proginfo.o:		proginfo.c defs.h
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-proginfo_setpiv.o:	proginfo_setpiv.c defs.h
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-proginfo_rootname.o:	proginfo_rootname.c defs.h
+obj7.o:			$(OBJ7)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-progopts.o:		progopts.c $(INCS)
 
-progconfig.o:		progconfig.c $(INCS)
+obja.o:			$(OBJA)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-proglog.o:		proglog.c $(INCS)
+objb.o:			$(OBJB)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-progterm.o:		progterm.c $(INCS) inter.h
 
-progmailget.o:		progmailget.c $(INCS)
+obj.o:			$(OBJ)
+	$(LD) -r $(LDFLAGS) -o $@ $^
 
-proguserlist.o:		proguserlist.c $(INCS)
 
-initnow.o:		initnow.c $(INCS)
+vmail_main.o:		vmail_main.cc $(DEPS_MAIN)	$(INCS)
 
-inter.o:		inter.c inter.h $(INCS) ds.h display.h
-inter.o:		mailbox.h mailmsgviewer.h mbcache.h
-inter.o:		kbdinfo.h cmdmap.h subprocs.h
+# USTREAM
+ustream.o:		ustream.dir
+ustream.dir:
+	makesubdir $@
 
-inter_trans.o:		inter_trans.c inter.h ${INCS}
+# STRN
+strn.o:			strn.dir
+strn.dir:
+	makesubdir $@
 
-display.o:		display.cc display.h $(INCS) ds.h
+# SFX
+sfx.o:			sfx.dir
+sfx.dir:
+	makesubdir $@
 
-mailmsgviewer.o:	mailmsgviewer.c mailmsgviewer.h
+# SIX
+six.o:			six.dir
+six.dir:
+	makesubdir $@
 
-mbdels.o:		mbdels.c mb.h $(INCS)
+# RMX
+rmx.o:			rmx.dir
+rmx.dir:
+	makesubdir $@
 
-help.o:			help.c $(INCS)
+# HASX
+hasx.o:			hasx.dir
+hasx.dir:
+	makesubdir $@
 
-periph.o:		periph.c $(INCS)
+# ISX
+isx.o:			isx.dir
+isx.dir:
+	makesubdir $@
 
+# BUFOS
+bufos.o:		bufos.dir
+bufos.dir:
+	makesubdir $@
 
-kshlib.o:		kshlib.c kshlib.h sesmsg.h msgdata.h
+# STRCPTX
+strcpyx.o:		strcpyx.dir
+strcpyx.dir:
+	makesubdir $@
 
-progsig.o:		progsig.c progsig.h sesmsg.h msgdata.h
+# STRWCPY
+strwcpy.o:		strwcpy.dir
+strwcpy.dir:
+	makesubdir $@
 
+# STRW
+strw.o:			strw.dir
+strw.dir:
+	makesubdir $@
 
-progspawncmd.o:		progspawncmd.c spawnproc.h
+# STRX
+strx.o:			strx.dir
+strx.dir:
+	makesubdir $@
 
-mkbestaddr.o:		mkbestaddr.c ema.h
+# NLEADX
+nleadx.o:		nleadx.dir
+nleadx.dir:
+	makesubdir $@
 
+# MATXSTR
+matxstr.o:		matxstr.dir
+matxstr.dir:
+	makesubdir $@
 
-# testing
+# STRNXCMP
+strnxcmp.o:		strnxcmp.dir
+strnxcmp.dir:
+	makesubdir $@
 
-T01= testchartrans
+# STRXCMP
+strxcmp.o:		strxcmp.dir
+strxcmp.dir:
+	makesubdir $@
 
-T01OBJa= $(T01).o chartrans.o uiconv.o termtrans.o
-T01OBJb= 
-T01OBJc=
-T01OBJd= debugprintf.o debug.o
+# VARITHMETIC
+varithmetic.o:		varithmetic.dir
+varithmetic.dir:
+	makesubdir $@
 
-T01OBJ= $(T01OBJa) $(T01OBJb) $(T01OBJc) $(T01OBJd)
+# DIGTAB
+digtab.o:		digtab.dir
+digtab.dir:
+	makesubdir $@
 
-$(T01).x:		Makefile $(T01OBJ)
-	$(GPP) -o $@ $(T01OBJ) $(TLIBDIRS) $(TLIBS)
 
+char.o:			char.cc		char.h
+inetconv.o:		inetconv.cc	inetconv.h
+base64.o:		base64.cc	base64.h
+base128.o:		base128.cc	base128.h
+dictdiff.o:		dictdiff.cc	dictdiff.h
 
-T02= testsntmtime
+ccfile.o:		ccfile.cc	ccfile.hh
+readln.o:		readln.cc	readln.hh
 
-T02OBJ= $(T02).o sntmtime.o
+ureade.o:		ureade.cc	ureade.h
+ucinetconv.o:		ucinetconv.cc	ucinetconv.h
 
-$(T02).x:		Makefile $(T02OBJ)
-	$(GPP) -o $@ $(T02OBJ) $(TLIBDIRS) $(TLIBS)
+timeval.o:		timeval.cc	timeval.hh
 
+# TESTINT
+testint.o:		testint.ccm	intext.o varithmetic.o loadvals.o
 
-T03= testintmax
+# INTX
+intext.o:		intext.ccm	loadvals.o
+	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
-T03OBJ= $(T03).o
+arithsteps.o:		arithsteps.ccm
 
-$(T03).x:		Makefile $(T03OBJ)
-	$(GPP) -o $@ $(T03OBJ) $(TLIBDIRS) $(TLIBS)
+loadvals.o:		loadvals.ccm
 
+xxtostr.o:		xxtostr.cc	xxtostr.h
 
-T04= testqpdecode
-
-T04OBJ= $(T04).o qpdecoder.o obuf.o
-
-$(T04).x:		Makefile $(T04OBJ)
-	$(GPP) -o $@ $(T04OBJ) $(TLIBDIRS) $(TLIBS)
-
-
-T05= testhdrdecode
-
-T05OBJa= $(T05).o hdrdecode.o
-T05OBJb= qpdecoder.o b64decoder.o uiconv.o chartrans.o
-T05OBJc= utf8decoder.o
-T05OBJd= obuf.o
-T05OBJe= snwcpywidehdr.o
-T05OBJf= straltwchar.o
-T05OBJg=
-T05OBJh=
-
-T05OBJ0= $(T05OBJa) $(T05OBJb) $(T05OBJc) $(T05OBJd)
-T05OBJ1= $(T05OBJe) $(T05OBJf) $(T05OBJg) $(T05OBJh)
-
-T05OBJ= $(T05OBJ0) $(T05OBJ1)
-
-$(T05).x:		Makefile $(T05OBJ)
-	$(GPP) -o $@ $(T05OBJ) $(TLIBINFO)
-
-
-T06= testbins
-
-T06OBJa= $(T06).o
-T06OBJb=
-T06OBJc=
-T06OBJd=
-T06OBJe=
-T06OBJf=
-T06OBJg=
-T06OBJh=
-
-T06OBJ0= $(T06OBJa) $(T06OBJb) $(T06OBJc) $(T06OBJd)
-T06OBJ1= $(T06OBJe) $(T06OBJf) $(T06OBJg) $(T06OBJh)
-
-T06OBJ= $(T06OBJ0) $(T06OBJ1)
-
-$(T06).o:		$(T06).cc
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $(T06).cc
-
-$(T06).x:		Makefile $(T06OBJ)
-	$(GPP) -o $@ $(T06OBJ) $(TLIBINFO)
-
-
-T07= testobuf
-
-T07OBJa= $(T07).o 
-T07OBJb= obuf.o
-T07OBJc=
-T07OBJd=
-T07OBJe=
-T07OBJf=
-T07OBJg=
-T07OBJh=
-
-T07OBJ0= $(T07OBJa) $(T07OBJb) $(T07OBJc) $(T07OBJd)
-T07OBJ1= $(T07OBJe) $(T07OBJf) $(T07OBJg) $(T07OBJh)
-
-T07OBJ= $(T07OBJ0) $(T07OBJ1)
-
-$(T07).o:		$(T07).cc
-	$(GPP) -c $(GPPFLAGS) $(CFLAGS) $(CPPFLAGS) $(T07).cc
-
-$(T07).x:		Makefile $(T07OBJ)
-	$(GPP) -o $@ $(T07OBJ) $(TLIBINFO)
+strkeycmp.o:		strkeycmp.cc	strkeycmp.h
+matkeystr.o:		matkeystr.cc	matkeystr.h
 
 
