@@ -64,8 +64,8 @@
 /* external subroutines */
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -80,7 +80,7 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* local variables */
 
-static const char *akopts[] = {
+static cchar *akopts[] = {
 	"cf",
 	"pcspoll",
 	"clen",
@@ -136,7 +136,7 @@ int progopts(PROGINFO *pip,keyopt *kop)
 {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -168,7 +168,7 @@ int progopts(PROGINFO *pip,keyopt *kop)
 
 	                case akopt_cf:
 	                    if ((vl > 0) && (! pip->finval.cfname)) {
-	                        const char	**vpp = &pip->cfname ;
+	                        cchar	**vpp = &pip->cfname ;
 	                        pip->finval.cfname = TRUE ;
 	                        pip->have.cfname = TRUE ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -311,21 +311,21 @@ int progopts(PROGINFO *pip,keyopt *kop)
 
 	                case akopt_maildir:
 	                    if ((vl > 0) && (pip->maildname == NULL)) {
-				const char	**vpp = &pip->maildname ;
+				cchar	**vpp = &pip->maildname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 			    }
 	                    break ;
 
 	                case akopt_folderdir:
 	                    if ((vl > 0) && (pip->folderdname == NULL)) {
-	                        const char	**vpp = &pip->folderdname ;
+	                        cchar	**vpp = &pip->folderdname ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
 			    }
 	                    break ;
 
 	                case akopt_scanline:
 	                    if ((vl > 0) && (! pip->finval.svspec)) {
-	                        const char	**vpp = &pip->svspec ;
+	                        cchar	**vpp = &pip->svspec ;
 	                        pip->finval.svspec = TRUE ;
 	                        pip->have.svspec = TRUE ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -334,7 +334,7 @@ int progopts(PROGINFO *pip,keyopt *kop)
 
 	                case akopt_scanjump:
 	                    if ((vl > 0) && (! pip->finval.sjspec)) {
-	                        const char	**vpp = &pip->sjspec ;
+	                        cchar	**vpp = &pip->sjspec ;
 	                        pip->finval.sjspec = TRUE ;
 	                        pip->have.sjspec = TRUE ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
@@ -343,7 +343,7 @@ int progopts(PROGINFO *pip,keyopt *kop)
 
 	                case akopt_shell:
 	                    if ((vl > 0) && (! pip->finval.shell)) {
-	                        const char	**vpp = &pip->prog_shell ;
+	                        cchar	**vpp = &pip->prog_shell ;
 	                        pip->finval.shell = TRUE ;
 	                        pip->have.shell = TRUE ;
 	                        rs = proginfo_setentry(pip,vpp,vp,vl) ;
