@@ -2,7 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* profile options */
+/* version %I% last-modified %G% */
+
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 
 /* revision history:
@@ -16,28 +18,28 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<curses.h>
-#include	<pwd.h>
-#include	<grp.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<cstdio>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<logfile.h>
-#include	<bfile.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<curses.h>		/* POSIX® */
+#include	<pwd.h>			/* POSIX® */
+#include	<grp.h>			/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<logfile.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
+#include	"vmail_prof.h"
 #include	"defs.h"
-#include	"profile.h"
 
 
 /* external subroutines */
@@ -56,7 +58,7 @@ extern struct proginfo	g ;
  */
 
 int profile(opt)
-const char	opt[];
+cchar	opt[];
 {
 	int	i ;
 
@@ -145,8 +147,6 @@ int profinit() noex {
 	} /* end if */
 
 	return OK ;
-}
-/* end subroutine (profinit) */
-
+} /* end subroutine (profinit) */
 
 
