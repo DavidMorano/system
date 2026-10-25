@@ -396,7 +396,7 @@ int main(int argc,con mainv argv,con mainv envv) {
 	                } else {
 
 	                    while (aol--) {
-			        const int	kc = MKCHAR(*akp) ;
+			        cint	kc = MKCHAR(*akp) ;
 
 	                        switch (kc) {
 
