@@ -62,7 +62,7 @@ int progout_open(PROGINFO *pip)
 /* end subroutine (progout_open) */
 
 
-int progout_printf(PROGINFO *pip,const char *fmt,...)
+int progout_printf(PROGINFO *pip,cchar *fmt,...)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -72,7 +72,7 @@ int progout_printf(PROGINFO *pip,const char *fmt,...)
 
 	if (pip->open.outfile) {
 	    va_list	ap ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
