@@ -5,7 +5,6 @@
 /* fetch a header field value */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 
 /* revision history:
@@ -34,17 +33,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<hmatch.h>		/* |hmatch(3pcs)| */
-#include	<char.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<hmatch.h>		/* LIBUC |hmatch(3pcs)| */
+#include	<char.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"vmail_defs.h"
@@ -182,7 +183,7 @@ int	buflen ;
 	    } /* end while (inner) */
 
 #ifdef	COMMENT
-	    if (flen >= buflen) return BAD ;
+	    if (flen >= buflen) return SR_BADE ;
 #endif
 
 #if	CF_DEBUG
@@ -195,7 +196,6 @@ int	buflen ;
 	} /* end outer while */
 
 	return 2 ; /* not found */
-}
-/* end subroutine (fetchfield) */
+} /* end subroutine (fetchfield) */
 
 
