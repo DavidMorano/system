@@ -1,4 +1,9 @@
-/* config */
+/* termenq_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* terminal enquire */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,9 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	TERMENQCONFIG_INCLUDE
+#define	TERMENQCONFIG_INCLUDE
 
 
 #define	VERSION		"0"
@@ -80,5 +88,8 @@
 #define	TO_READ		2
 
 #define	OPT_LOGPROG	TRUE
+
+
+#endif /* TERMENQCONFIG_INCLUDE */
 
 
