@@ -84,26 +84,26 @@ struct locinfo {
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
-static int	procout(PROGINFO *,cchar *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,cchar *) ;
+local int	procout(PROGINFO *,cchar *) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_dirbegin(LOCINFO *) ;
-static int	locinfo_dirend(LOCINFO *) ;
-static int	locinfo_diradd(LOCINFO *,cchar *,int) ;
+local int	locinfo_start(LOCINFO *,PROGINFO *) ;
+local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_dirbegin(LOCINFO *) ;
+local int	locinfo_dirend(LOCINFO *) ;
+local int	locinfo_diradd(LOCINFO *,cchar *,int) ;
 
 #if	CF_LOCSETENT
-static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
+local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -153,7 +153,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progmodes[] = {
+static cchar	*progmodes[] = {
 	"uniqdirs",
 	NULL
 } ;
@@ -190,15 +190,15 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_version = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*pmspec = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*pmspec = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -251,7 +251,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int ach = MKCHAR(argp[1]) ;
+		cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -462,7 +462,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-			    const int	kc = MKCHAR(*akp) ;
+			    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -724,12 +724,12 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<directory(s)> ...] [-af <afile>]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -744,7 +744,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -769,7 +769,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -804,7 +804,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 	    if (strcmp(afn,"-") == 0) afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = breadln(afp,lbuf,llen)) > 0) {
@@ -834,7 +834,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 
 	    afn = BFILE_STDIN ;
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = breadln(afp,lbuf,llen)) > 0) {
@@ -865,7 +865,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *afn)
 
 
 /* output the results */
-static int procout(PROGINFO *pip,cchar *ofn)
+local int procout(PROGINFO *pip,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	DIRDB 		*dirp ;
@@ -908,7 +908,7 @@ static int procout(PROGINFO *pip,cchar *ofn)
 /* end subroutine (procout) */
 
 
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
+local int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 
@@ -920,7 +920,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 /* end subroutine (locinfo_start) */
 
 
-static int locinfo_finish(LOCINFO *lip)
+local int locinfo_finish(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -974,7 +974,7 @@ int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 #endif /* CF_LOCSETENT */
 
 
-static int locinfo_dirbegin(LOCINFO *lip)
+local int locinfo_dirbegin(LOCINFO *lip)
 {
 	int		rs ;
 	if (lip->ne == 0) lip->ne = NDEFENTS ;
@@ -986,7 +986,7 @@ static int locinfo_dirbegin(LOCINFO *lip)
 /* end subroutine (locinfo_dirbegin) */
 
 
-static int locinfo_dirend(LOCINFO *lip)
+local int locinfo_dirend(LOCINFO *lip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1000,7 +1000,7 @@ static int locinfo_dirend(LOCINFO *lip)
 /* end subroutine (locinfo_dirend) */
 
 
-static int locinfo_diradd(LOCINFO *lip,cchar *sp,int sl)
+local int locinfo_diradd(LOCINFO *lip,cchar *sp,int sl)
 {
 	PROGINFO	*pip = lip->pip ;
 	DIRDB		*dirp = &lip->dirs ;
