@@ -1,14 +1,17 @@
-/* forward */
+/* forward SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
+/* forward a mail message */
+/* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -16,53 +19,73 @@
 
 /*******************************************************************************
 
-        We invoke SMAIL, appending specified message onto the entered text and
-        then forwards the entire composite message.
+  	Name:
+	forward
 
+	Description:
+	We invoke SMAIL, appending specified message onto the entered
+	text and then forwards the entire composite message.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<csignal>
-#include	<cstring>
-#include	<ctime>
-#include	<pwd.h>
-#include	<grp.h>
-#include	<curses.h>
-#include	<cstdio>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<sys/stat.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<pwd.h>			/* POSIX® */
+#include	<grp.h>			/* POSIX® */
+#include	<curses.h>		/* POSIX® */
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"vmail_defs.h"
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
 /* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int forward(pip,mn, f_edit)
-struct proginfo	*pip ;
-int	mn, f_edit ;
-{
+int forward(PI *pip,int mn,int f_edit) noex {
 	FILE	*fout ;
-
 	int	len ;
-
 	char	temp[LINEBUFLEN + 1], last[LINEBUFLEN + 1] ;
 	char	filename[LINEBUFLEN + 1], command[LINEBUFLEN + 1] ;
 	char	string[LINEBUFLEN + 1], from[LINEBUFLEN + 1] ;
-
 
 	mn = messord[mn] ;     /* convert to internal number */
 
@@ -81,8 +104,9 @@ int	mn, f_edit ;
 
 	mktemp(filename) ;
 
-	if ((fout = fopen(filename,"w")) == NULL)
-		return BAD ;
+	if ((fout = fopen(filename,"w")) == NULL) {
+		return SR_BADE ;
+	}
 
 /*jm*/	chmod(filename, 0660) ;		/* do not let the rest of */
 /* the world read the forwarded mail!!   */
@@ -176,9 +200,7 @@ int	mn, f_edit ;
 
 	u_unlink(filename) ;		/* still just in case!!! */
 
-	return OK ;
-}
-/* end subroutine (forward) */
-
+	return SR_OK ;
+} /* end subroutine (forward) */
 
 
