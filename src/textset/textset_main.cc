@@ -65,16 +65,16 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	progfile(PROGINFO *,cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -86,20 +86,20 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int	usage(PROGINFO *) ;
+local int	usage(PROGINFO *) ;
 
-static int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
-static int	procleader(PROGINFO *,bfile *) ;
-static int	proctrailer(PROGINFO *,bfile *) ;
-static int	procargs(PROGINFO *,ARGINFO *,bits *,bfile *,cchar *) ;
+local int	process(PROGINFO *,ARGINFO *,bits *,cchar *,cchar *) ;
+local int	procleader(PROGINFO *,bfile *) ;
+local int	proctrailer(PROGINFO *,bfile *) ;
+local int	procargs(PROGINFO *,ARGINFO *,bits *,bfile *,cchar *) ;
 
-static int	procdata_begin(PROGINFO *pip,int blines) ;
-static int	procdata_end(PROGINFO *pip) ;
+local int	procdata_begin(PROGINFO *pip,int blines) ;
+local int	procdata_end(PROGINFO *pip) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"DEBUG",
 	"VERSION",
@@ -149,7 +149,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*stdfonts[] = {
+static cchar	*stdfonts[] = {
 	"R",
 	"I",
 	"B",
@@ -186,15 +186,15 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*pointstring  = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*pointstring  = NULL ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -242,7 +242,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -425,7 +425,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -773,12 +773,12 @@ badarg:
 /* local subroutines */
 
 
-static int usage(PROGINFO *pip)
+local int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-l <lines>] [-<lines>] [<infile> [...]]\n" ;
 	if (rs >= 0) rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -837,7 +837,7 @@ static int usage(PROGINFO *pip)
 /* end subroutine (usage) */
 
 
-static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
+local int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs = SR_OK ;
@@ -872,7 +872,7 @@ static int process(PROGINFO *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn)
 /* end subroutine (process) */
 
 
-static int procleader(PROGINFO *pip,bfile *ofp)
+local int procleader(PROGINFO *pip,bfile *ofp)
 {
 	int		rs = SR_OK ;
 
@@ -897,7 +897,7 @@ static int procleader(PROGINFO *pip,bfile *ofp)
 /* end subroutine (procleader) */
 
 
-static int proctrailer(PROGINFO *pip,bfile *ofp)
+local int proctrailer(PROGINFO *pip,bfile *ofp)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -910,7 +910,7 @@ static int proctrailer(PROGINFO *pip,bfile *ofp)
 /* end subroutine (proctrailer) */
 
 
-static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,bfile *ofp,cchar *afn)
+local int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,bfile *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -944,7 +944,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,bfile *ofp,cchar *afn)
 	    if ((afn == NULL) || (afn[0] == '-')) afn = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -993,13 +993,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,bits *bop,bfile *ofp,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procdata_begin(PROGINFO *pip,int blines)
+local int procdata_begin(PROGINFO *pip,int blines)
 {
 	int		rs ;
 	char		*bp ;
 	if (blines > MAXBLANKLINES) blines = MAXBLANKLINES ;
 	if ((rs = uc_malloc((blines+1),&bp)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		i ;
 	    char	*lp ;
 	    pip->blanklines = bp ;
@@ -1024,7 +1024,7 @@ static int procdata_begin(PROGINFO *pip,int blines)
 /* end subroutine (procdata_begin) */
 
 
-static int procdata_end(PROGINFO *pip)
+local int procdata_end(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
