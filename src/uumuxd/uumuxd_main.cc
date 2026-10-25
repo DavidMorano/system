@@ -44,19 +44,18 @@
 #include	<netdb.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<ctime>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<ctime>			/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<getax.h>
 #include	<getusername.h>
 #include	<getportnum.h>
 #include	<mallocstuff.h>
-#include	<baops.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<userinfo.h>
 #include	<logfile.h>
@@ -66,8 +65,10 @@
 #include	<srvtab.h>
 #include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<strtime.h>		/* LIBUC */
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<isfd.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"builtin.h"
 #include	"config.h"
@@ -2063,7 +2064,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        debugprintf("main: are we a socket on STDIN ?\n") ;
 #endif
 
-	    if (! isasocket(s))
+	    if (! isfdsocket(s))
 	        goto badnotsocket ;
 #endif /* COMMENT */
 
