@@ -58,10 +58,10 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	siskipwhite(const char *,int) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	siskipwhite(cchar *,int) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
 
 /* external variables */
@@ -72,7 +72,7 @@ extern int	mktmpfile(char *,mode_t,const char *) ;
 
 /* forward references */
 
-static int	procline(PROGINFO *,bfile *,const char *,int) ;
+local int	procline(PROGINFO *,bfile *,cchar *,int) ;
 
 
 /* local variables */
@@ -84,11 +84,11 @@ static int	procline(PROGINFO *,bfile *,const char *,int) ;
 int progfile(pip,ofp,fname)
 PROGINFO	*pip ;
 bfile		*ofp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile		infile, *ifp = &infile ;
 	bfile		workfile, *wfp = &workfile ;
-	const int	llen = LINEBUFLEN ;
+	cint	llen = LINEBUFLEN ;
 
 	int	rs = SR_OK ;
 	int	i, len ;
@@ -101,7 +101,7 @@ const char	fname[] ;
 	int	f_newline = FALSE ;
 	int	f_regular ;
 
-	const char	*oflags ;
+	cchar	*oflags ;
 
 	char	lbuf[LINEBUFLEN + 1] ;
 	char	template[MAXPATHLEN + 1] ;
@@ -268,10 +268,10 @@ ret0:
 /* local subroutines */
 
 
-static int procline(pip,wfp,lbuf,llen)
+local int procline(pip,wfp,lbuf,llen)
 PROGINFO	*pip ;
 bfile		*wfp ;
-const char	lbuf[] ;
+cchar	lbuf[] ;
 int		llen ;
 {
 	int		rs = SR_OK ;
@@ -279,8 +279,8 @@ int		llen ;
 	int		si ;
 	int		c = 0 ;
 	int		wlen = 0 ;
-	const char	*tp, *sp ;
-	const char	*cp ;
+	cchar	*tp, *sp ;
+	cchar	*cp ;
 
 
 	if ((llen > 0) && (lbuf[llen - 1] == '\n')) {
