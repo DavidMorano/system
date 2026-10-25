@@ -1,71 +1,67 @@
-/* watch */
+/* watch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* watch (listen on) the specified socket */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1
 #define	F_STALE		0
-
 
 /* revision history:
 
 	= 91/09/10, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
-
 
 */
 
-
 /*****************************************************************************
 
+  	Description:
 	This subroutine is responsible for listening on the given
 	socket and spawning off a program to handle any incoming
-	connection.
-
-	This subroutine is called with the folowing arguments :
-
+	connection.  This subroutine is called with the folowing
+	arguments:
 	gp	global data pointer
 	s	socket to listen on
 	elp	vector list of exported variables
 
 	Returns:
-
-	OK	doesn't really matter in the current implementation
-
+	OK	does not really matter in the current implementation
 
 *****************************************************************************/
 
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<sys/ctime>
+#include	<sys/time.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<cstdlib>
+#include	<dirent.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<ctime>
-#include	<ftw.h>
-#include	<dirent.h>
-#include	<climits>
-#include	<cstring>
 #include	<poll.h>
-
-#include	<bfile.h>
+#include	<ftw.h>
+#include	<ctime>
+#include	<csignal>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
+#include	<cstring>
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<baops.h>
 #include	<field.h>
 #include	<logfile.h>
 #include	<vecstr.h>
-#include	<baops.h>
-#include	<usystem.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"srvtab.h"
 
-#include	"localmisc.h"
 #include	"jobdb.h"
 #include	"builtin.h"
 #include	"srvpe.h"
@@ -88,8 +84,6 @@ extern int	checklockfile() ;
 extern int	handle(struct global *,
 			SRVPE *,int,int,VECSTR *,SRVTAB *,BUILTIN *) ;
 
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_elapsed(time_t,char *) ;
 
 #if	CF_DEBUG
 extern char	*d_reventstr() ;
@@ -103,9 +97,9 @@ extern struct global	g ;
 
 /* forward references */
 
-static int	writeout() ;
+local int	writeout() ;
 
-static void	int_all(int) ;
+local void	int_all(int) ;
 
 
 /* external variables */
@@ -387,13 +381,13 @@ top:
 	            (void) time(&daytime) ;
 
 	            logfile_printf(&g.lh, "%s server exit, es=%d\n",
-	                timestr_log(daytime,timebuf),
+	                strtime_log(daytime,timebuf),
 	                child_stat & 255) ;
 
 	            writeout(gp,efd,"* standard error *") ;
 
 		    logfile_printf(&gp->lh,"elapsed time %s\n",
-			timestr_elapsed((daytime - jep->atime),timebuf)) ;
+			strtime_elapsed((daytime - jep->atime),timebuf)) ;
 
 	        } else {
 
@@ -427,7 +421,7 @@ top:
 
 	        logfile_printf(&gp->lh,
 	            "%s another program has my lock file, other PID=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            rs) ;
 
 	        goto badlockfile ;
@@ -447,7 +441,7 @@ top:
 
 	        logfile_printf(&gp->lh,
 	            "%s another program has my PID file, other PID=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            rs) ;
 
 	        goto badpidfile ;
@@ -462,7 +456,7 @@ top:
 
 	if ((rs = srvtab_check(sfp,daytime,NULL)) > 0)
 		logfile_printf(&gp->lh,"%s server table file changed\n",
-			timestr_log(daytime,timebuf)) ;
+			strtime_log(daytime,timebuf)) ;
 
 
 #if	CF_DEBUG
@@ -487,7 +481,7 @@ top:
 	(void) time(&daytime) ;
 
 	logfile_printf(&gp->lh,"%s daemon exiting\n",
-	    timestr_log(daytime,timebuf)) ;
+	    strtime_log(daytime,timebuf)) ;
 
 	return OK ;
 
@@ -636,13 +630,13 @@ BUILTIN		*bip ;
 	        (void) time(&daytime) ;
 
 	        logfile_printf(&g.lh, "%s server exit, es=%d\n",
-	            timestr_log(daytime,timebuf),
+	            strtime_log(daytime,timebuf),
 	            child_stat & 255) ;
 
 	        writeout(gp,efd,"* standard error *") ;
 
 		logfile_printf(&gp->lh,"elapsed time %s\n",
-			timestr_elapsed(daytime - jep->atime,timebuf)) ;
+			strtime_elapsed(daytime - jep->atime,timebuf)) ;
 
 	    } else
 	        logfile_printf(&gp->lh,"server did not 'exec'\n") ;
@@ -665,74 +659,44 @@ BUILTIN		*bip ;
 	}
 
 #ifdef	COMMENT
-	jobdb_delp(&jdb,jep) ;
+	jobdb_delent(&jdb,jep) ;
 #endif /* COMMENT */
 
 	jobdb_free(&jdb) ;
-
 	return rs ;
-}
-/* end subroutine (watchone) */
+} /* end subroutine (watchone) */
 
 
+/* local subroutines */
 
-/* LOCAL SUBROUTINES */
-
-
-
-static void int_all(sn)
-int	sn ;
-{
-
-
-	g.f_exit = TRUE ;
-}
-/* end subroutine (int_all) */
-
+local void int_all(int sn) noex {
+	g.f_exit = true ;
+} /* end subroutine (int_all) */
 
 /* write out the output files from the executed program */
-static int writeout(gp,fd,s)
+local int writeout(gp,fd,s)
 struct global	*gp ;
 int	fd ;
 char	s[] ;
 {
 	bfile		file, *fp = &file ;
-
-	ustat	sb ;
-
-	int		tlen, len ;
-
+	int		tlen = 0 ;
+	int		len ;
 	char		linebuf[LINELEN + 1] ;
-
-
-	tlen = 0 ;
-	if ((u_fstat(fd,&sb) >= 0) && (sb.st_size > 0)) {
-
+	if (ustat sb ; (u_fstat(fd,&sb) >= 0) && (sb.st_size > 0)) {
 	    u_rewind(fd) ;
-
 	    logfile_printf(&gp->lh,s) ;
-
 	    if (bopen(fp,(char *) fd,"dr",0666) >= 0) {
-
 	        while ((len = breadln(fp,linebuf,LINELEN)) > 0) {
-
 	            tlen += len ;
 	            if (linebuf[len - 1] == '\n')
 	                linebuf[--len] = '\0' ;
-
 	            logfile_printf(&gp->lh,"| %W\n",linebuf,MAX(len,62)) ;
-
 	        } /* end while (reading lines) */
-
 	        bclose(fp) ;
-
 	    } /* end if (opening file) */
-
 	} /* end if (non-zero file size) */
-
 	return tlen ;
-}
-/* end subroutine (writeout) */
-
+} /* end subroutine (writeout) */
 
 
