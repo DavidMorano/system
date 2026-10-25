@@ -35,17 +35,18 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-#include	<usystem.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<getportnum.h>
-#include	<char.h>
-#include	<bfile.h>
 #include	<hostinfo.h>
 #include	<sockaddress.h>
-#include	<localmisc.h>
+#include	<char.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -83,22 +84,11 @@
 
 #define	HEXBUFLEN_ADDR		(2*SOCKADDRESSLEN)
 #define	HEXBUFLEN_PATH		(2*(MAXPATHLEN+MAXNAMELEN))
-#define	HEXBUFLEN		MIN(HEXBUFLEN_ADDR,HEXBUFLEN_PATH)
 
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	getaf(cchar *,int) ;
-extern int	getaflen(int) ;
-extern int	cfnumi(cchar *,int,int *) ;
-extern int	progout_printf(PROGINFO *,cchar *,...) ;
-extern int	tolower(int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*timestr_log(time_t,char *) ;
+extern int	progout_printf(PI *,cchar *,...) ;
 
 
 /* external variables */
@@ -106,11 +96,11 @@ extern char	*timestr_log(time_t,char *) ;
 
 /* forward references */
 
-int		progout_open(PROGINFO *) ;
-int		progout_close(PROGINFO *) ;
+int		progout_open(PI *) ;
+int		progout_close(PI *) ;
 
-static int	procsocker(PROGINFO *,int,cchar *,int) ;
-static int	gethostinfo(PROGINFO *,char *,int,cchar *,int *) ;
+local int	procsocker(PI *,int,cchar *,int) ;
+local int	gethostinfo(PI *,char *,int,cchar *,int *) ;
 
 
 /* local structures */
@@ -119,10 +109,12 @@ static int	gethostinfo(PROGINFO *,char *,int,cchar *,int *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int progsock(PROGINFO *pip,cchar *famname,cchar *naddr1,cchar *naddr2) noex {
+int progsock(PI *pip,cchar *famname,cchar *naddr1,cchar *naddr2) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -222,7 +214,7 @@ int progsock(PROGINFO *pip,cchar *famname,cchar *naddr1,cchar *naddr2) noex {
 /* local subroutine */
 
 
-static int procsocker(PROGINFO *pip,int af,cchar *naddr,int port)
+local int procsocker(PI *pip,int af,cchar *naddr,int port)
 {
 	SOCKADDRESS	sa ;
 	int		rs ;
@@ -230,7 +222,7 @@ static int procsocker(PROGINFO *pip,int af,cchar *naddr,int port)
 	int		wlen = 0 ;
 
 	if ((rs = sockaddress_start(&sa,af,naddr,port,0)) >= 0) {
-	    const int	hlen = HEXBUFLEN ;
+	    cint	hlen = HEXBUFLEN ;
 	    char	hbuf[HEXBUFLEN + 1] ;
 
 	    if ((rs = sockaddress_gethex(&sa,hbuf,hlen)) >= 0) {
@@ -263,9 +255,8 @@ static int procsocker(PROGINFO *pip,int af,cchar *naddr,int port)
 }
 /* end subroutine (procsocker) */
 
-
-static int gethostinfo(pip,naddr,af,namespec,pp)
-PROGINFO	*pip ;
+local int gethostinfo(pip,naddr,af,namespec,pp)
+PI	*pip ;
 char		naddr[] ;
 int		af ;
 cchar	namespec[] ;
