@@ -1,23 +1,26 @@
-/* setupmailbox */
+/* setupmailbox SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* setup something -- the mailbox? */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_GETMAIL	0		/* get new mail */
 #define	CF_SPAWNPROC	0		/* spawn sub-process */
 
-
 /* revision history:
 
 	= 94-01-23, David A­D­ Morano
-        This module was copied and modified from the VMAIL original. A variety
-        of enhancements were made to prevent it from crashing due to short
-        buffers. No checks were being made about whether a copy into a buffer
-        was overflowing! Yes, this was one of the causes of the spread of the
-        1988 Internet worm. Of course, nobody likes a program that crashes
-        either (including myself). It was the crashing of this (and other)
-        programs that lead me to fix this crap up in the first place!
+	This module was copied and modified from the VMAIL original.
+	A variety of enhancements were made to prevent it from
+	crashing due to short buffers. No checks were being made
+	about whether a copy into a buffer was overflowing! Yes,
+	this was one of the causes of the spread of the 1988 Internet
+	worm. Of course, nobody likes a program that crashes either
+	(including myself). It was the crashing of this (and other)
+	programs that lead me to fix this crap up in the first
+	place!
 
 	= 96-06-18, David A­D­ Morano
 	I did:
@@ -33,10 +36,11 @@
 		- added full binary compatibility for new mail
 
 	= 2007-11-13, David A­D­ Morano
-        Oh man! How long have I been toiling with this thing? I added the
-        ability to grab mail from multiple users. I also rewrote from the
-        original (before I started cleaning up this crap in 1994) much of the
-        way that this process takes place.
+	Oh man!  How long have I been toiling with this thing?  I
+	added the ability to grab mail from multiple users.  I also
+	rewrote from the original (before I started cleaning up
+	this crap in 1994) much of the way that this process takes
+	place.
 
 */
 
@@ -52,11 +56,7 @@
 	messdel (delete markers).
 
 	Synopsis:
-
-	int setupmailbox(pip,dsp,mbname)
-	struct proginfo	*pip ;
-	DS		*dsp ;
-	const char	mbname[] ;
+	int setupmailbox(PI *pip,DS *dsp,cchar *mbname) noex
 
 	Arguments:
 	pip		program information pointer
@@ -81,28 +81,27 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ids.h>
+#include	<mkx.h>
 #include	<permx.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
-#include	<localmisc.h>
+#include	<dispmgr.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 
 #include	"vmail_config.h"
 #include	"defs.h"
 #include	"mb.h"
-#include	"ds.h"
 
 
 /* local defines */
 
-#define	O_FLAGS		(O_RDWR | O_APPEND)
+#define	OX_FL		(O_RDWR | O_APPEND)
 
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkmailbox(struct proginfo *,const char *) ;
+extern int	mkmailbox(PI *,cchar *) noex ;
 
 
 /* external variables */
@@ -122,17 +121,18 @@ local int	lockfileend(int) ;
 /* local variables */
 
 local int	tempmessord[MAXMESS + 1] ;
-
 local int	ptord ;		/* to make it compile */
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
 int setupmailbox(pip,dsp,mbname)
 struct proginfo	*pip ;
 DS		*dsp ;
-const char	mbname[] ;
+cchar	mbname[] ;
 {
 	FILE	*fk ;
 
@@ -346,23 +346,16 @@ int	array[] ;
 int	num ;
 int	len ;	/* length of given array */
 {
-	int	i ;
-
-
-	for (i = 0 ; i < len ; i += 1) {
-
-	    if (array[i] == num)
-	        return BAD ;
-
-	}
-
-	return OK ;
-}
-/* end subroutine (numinarray) */
+	for (int i = 0 ; i < len ; i += 1) {
+	    if (array[i] == num) {
+	        return SR_BADE ;
+	    }
+	} /* end for */
+	return SR_OK ;
+} /* end subroutine (numinarray) */
 
 
 /* local subroutines */
-
 
 /* get new mail from the spool area and append to the "incoming" mailbox */
 local int getnewmail(pip)
@@ -370,16 +363,12 @@ struct proginfo	*pip ;
 {
 	ustat	sf ;
 	ustat	sb ;
-
-	struct flock	fl ;
-
+	FLOCK		fl ;
 	time_t		daytime ;
-
 	off_t		offset ;
-
 	pid_t	pid ;
-
-	int	rs = SR_OK, rs1 ;
+	int	rs = SR_OK ;
+	int	rs1 ;
 	int	len ;
 	int	i, k, l ;
 	int	mfd ;
@@ -419,11 +408,11 @@ struct proginfo	*pip ;
 
 /* open the mailbox file */
 
-	rs = uc_open(infname,O_FLAGS,0666) ;
+	rs = uc_open(infname,OX_FL,0666) ;
 	mfd = rs ;
 	if (rs < 0) {
 
-	    rs = uc_open(infname,(O_FLAGS | O_CREAT),0666) ;
+	    rs = uc_open(infname,(OX_FL | O_CREAT),0666) ;
 	    mfd = rs ;
 	    if ((rs >= 0) && (pip->gid_mail > 0))
 	        u_fchown(mfd,-1,pip->gid_mail) ;
