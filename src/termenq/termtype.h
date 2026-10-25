@@ -1,4 +1,9 @@
-/* termtype */
+/* termtype HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* terminal types (of a sort) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,14 +18,13 @@
 
 /* Copyright © 2000,2017 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	TERMTYPE_INCLUDE
-#define	TERMTYPE_INCLUDE	1
+#define	TERMTYPE_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<localmisc.h>	/* for special types */
+#include	<localmisc.h>		/* for special types */
 
 
 #define	TERMTYPE	struct termtype
@@ -30,22 +34,12 @@ struct termtype {
 	cchar		*name ;
 	short		pv[4] ;
 	short		sv[4] ;
-} ;
+} ; /* end struct */
 
-
-#if	(! defined(TERMTYPE_MASTER)) || (TERMTYPE_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
+EXTERNC_begin
 extern int termtype(const TERMTYPE *,const short *,const short *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TERMTYPE_MASTER */
 
 #endif /* TERMTYPE_INCLUDE */
 
