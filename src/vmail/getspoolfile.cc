@@ -87,10 +87,10 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,char **) ;
-extern int	pcsgetprog(const char *,char *,const char *) ;
+extern int	sfshrink(cchar *,int,char **) ;
+extern int	pcsgetprog(cchar *,char *,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
