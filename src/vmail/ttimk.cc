@@ -25,7 +25,7 @@
 
 	int ttimk_open(op,dbname,...)
 	TTIMK		*op ;
-	const char	dbname[] ;
+	cchar	dbname[] ;
 
 	Arguments:
 
@@ -104,33 +104,33 @@
 
 extern uint	uceil(uint,int) ;
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,const char *,const char *,const char *,
-			const char *) ;
-extern int	sncpy5(char *,int,const char *,const char *,const char *,
-			const char *,const char *) ;
-extern int	sncpy6(char *,int,const char *,const char *,const char *,
-			const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf3(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,uint *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,
+			cchar *) ;
+extern int	sncpy5(char *,int,cchar *,cchar *,cchar *,
+			cchar *,cchar *) ;
+extern int	sncpy6(char *,int,cchar *,cchar *,cchar *,
+			cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf3(char *,cchar *,cchar *,cchar *,
+			cchar *) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfhexi(cchar *,int,uint *) ;
 extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	filer_writefill(FILER *,const void *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	filer_writefill(FILER *,cvoid *,int) ;
 extern int	iceil(int,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 
@@ -162,26 +162,26 @@ struct blentry {
 
 /* forward references */
 
-static int	ttimk_filesbegin(TTIMK *) ;
-static int	ttimk_filesend(TTIMK *,int) ;
-static int	ttimk_listbegin(TTIMK *,int) ;
-static int	ttimk_listend(TTIMK *) ;
-static int	ttimk_nfcreate(TTIMK *,const char *) ;
-static int	ttimk_nfcreatecheck(TTIMK *,const char *,const char *) ;
-static int	ttimk_nfdestroy(TTIMK *) ;
-static int	ttimk_fexists(TTIMK *) ;
-static int	ttimk_nfstore(TTIMK *,const char *) ;
-static int	ttimk_mkbvi(TTIMK *) ;
-static int	ttimk_renamefiles(TTIMK *) ;
+local int	ttimk_filesbegin(TTIMK *) ;
+local int	ttimk_filesend(TTIMK *,int) ;
+local int	ttimk_listbegin(TTIMK *,int) ;
+local int	ttimk_listend(TTIMK *) ;
+local int	ttimk_nfcreate(TTIMK *,cchar *) ;
+local int	ttimk_nfcreatecheck(TTIMK *,cchar *,cchar *) ;
+local int	ttimk_nfdestroy(TTIMK *) ;
+local int	ttimk_fexists(TTIMK *) ;
+local int	ttimk_nfstore(TTIMK *,cchar *) ;
+local int	ttimk_mkbvi(TTIMK *) ;
+local int	ttimk_renamefiles(TTIMK *) ;
 
-static int	mkcitation(uint *,TTIMK_VERSE *) ;
+local int	mkcitation(uint *,TTIMK_VERSE *) ;
 
-static int	vvecmp(void *,void *) ;
+local int	vvecmp(void *,void *) ;
 
 
 /* local variables */
 
-static const char	zerobuf[4] = {
+static cchar	zerobuf[4] = {
 	0, 0, 0, 0 
 } ;
 
@@ -191,7 +191,7 @@ static const char	zerobuf[4] = {
 
 int ttimk_open(op,dbname,oflags,operms)
 TTIMK		*op ;
-const char	dbname[] ;
+cchar	dbname[] ;
 int		oflags ;
 int		operms ;
 {
@@ -430,12 +430,12 @@ TTIMK_INFO	*bip ;
 /* private subroutines */
 
 
-static int ttimk_filesbegin(op)
+local int ttimk_filesbegin(op)
 TTIMK		*op ;
 {
 	int		rs = SR_INVALID ;
 	int		dnl ;
-	const char	*dnp ;
+	cchar	*dnp ;
 	char		tmpdname[MAXPATHLEN + 1] ;
 
 /* check that the parent directory is writable to us */
@@ -500,7 +500,7 @@ bad0:
 /* end subroutine (ttimk_filesbegin) */
 
 
-static int ttimk_filesend(op,f)
+local int ttimk_filesend(op,f)
 TTIMK		*op ;
 {
 	int		rs = SR_OK ;
@@ -527,7 +527,7 @@ TTIMK		*op ;
 /* end subroutine (ttimk_filesend) */
 
 
-static int ttimk_listbegin(op,n)
+local int ttimk_listbegin(op,n)
 TTIMK		*op ;
 int		n ;
 {
@@ -562,7 +562,7 @@ bad0:
 /* end subroutine (ttimk_listbegin) */
 
 
-static int ttimk_listend(op)
+local int ttimk_listend(op)
 TTIMK		*op ;
 {
 	int		rs = SR_OK ;
@@ -579,7 +579,7 @@ TTIMK		*op ;
 /* end subroutine (ttimk_listend) */
 
 
-static int ttimk_mkbvi(op)
+local int ttimk_mkbvi(op)
 TTIMK		*op ;
 {
 	struct bventry	*bvep ;
@@ -589,7 +589,7 @@ TTIMK		*op ;
 	time_t		daytime = time(NULL) ;
 	uint		fileoff = 0 ;
 	uint		a[4] ;
-	const int	pagesize = getpagesize() ;
+	cint	pagesize = getpagesize() ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		size ;
@@ -725,7 +725,7 @@ ret0:
 /* end subroutine (ttimk_mkbvi) */
 
 
-static int ttimk_renamefiles(op)
+local int ttimk_renamefiles(op)
 TTIMK		*op ;
 {
 	int		rs ;
@@ -756,16 +756,16 @@ ret0:
 
 
 /* "exclusive create" of file */
-static int ttimk_nfcreate(op,fsuf)
+local int ttimk_nfcreate(op,fsuf)
 TTIMK		*op ;
-const char	fsuf[] ;
+cchar	fsuf[] ;
 {
 	ustat	sb ;
 	int		rs ;
 	int		rs1 ;
 	int		nfl ;
 	int		oflags = (O_CREAT | O_EXCL | O_WRONLY) ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		nfname[MAXPATHLEN + 1] ;
 
 	rs = mkfnamesuf3(nfname,op->dbname,fsuf,ENDIANSTR,"n") ;
@@ -820,10 +820,10 @@ bad0:
 /* end subroutine (ttimk_nfcreate) */
 
 
-static int ttimk_nfcreatecheck(op,fpre,fsuf)
+local int ttimk_nfcreatecheck(op,fpre,fsuf)
 TTIMK		*op ;
-const char	fpre[] ;
-const char	fsuf[] ;
+cchar	fpre[] ;
+cchar	fsuf[] ;
 {
 	int		rs = SR_OK ;
 	int		oflags ;
@@ -874,7 +874,7 @@ const char	fsuf[] ;
 /* end subroutine (ttimk_nfcreatecheck) */
 
 
-static int ttimk_nfdestroy(op)
+local int ttimk_nfdestroy(op)
 TTIMK		*op ;
 {
 	int		rs = SR_OK ;
@@ -900,12 +900,12 @@ TTIMK		*op ;
 /* end subroutine (ttimk_nfdestroy) */
 
 
-static int ttimk_nfstore(op,outfname)
+local int ttimk_nfstore(op,outfname)
 TTIMK		*op ;
-const char	outfname[] ;
+cchar	outfname[] ;
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op->nfname != NULL) {
 	    uc_free(op->nfname) ;
@@ -920,7 +920,7 @@ const char	outfname[] ;
 /* end subroutine (ttimk_nfstore) */
 
 
-static int ttimk_fexists(op)
+local int ttimk_fexists(op)
 TTIMK		*op ;
 {
 	ustat	sb ;
@@ -946,7 +946,7 @@ ret0:
 /* end subroutine (ttimk_fexists) */
 
 
-static int mkcitation(cip,bvp)
+local int mkcitation(cip,bvp)
 uint		*cip ;
 TTIMK_VERSE	*bvp ;
 {
@@ -973,7 +973,7 @@ TTIMK_VERSE	*bvp ;
 /* end subroutine (mkcitation) */
 
 
-static int vvecmp(v1p,v2p)
+local int vvecmp(v1p,v2p)
 void	*v1p, *v2p ;
 {
 	struct bventry	**e1pp = (struct bventry **) v1p ;
