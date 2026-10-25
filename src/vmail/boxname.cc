@@ -86,7 +86,7 @@ struct proginfo	*pip ;
 int full_boxname(pip,fullname, boxname)
 struct proginfo	*pip ;
 char		fullname[] ;
-const char	boxname[] ;
+cchar	boxname[] ;
 {
 	ustat	ss ;
 
@@ -122,7 +122,7 @@ ret0:
 /* returns mailbox name (boxname) from complete UNIX pathname (fullname) */
 int mail_boxname(boxname, fullname)
 char		boxname[] ;
-const char	fullname[] ;
+cchar	fullname[] ;
 {
 	int	rs = SR_NOENT ;
 	int	cl ;
