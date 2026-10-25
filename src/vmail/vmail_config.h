@@ -2,6 +2,9 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
+/* VMAIL program */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -24,8 +27,8 @@
 
 *******************************************************************************/
 
-#ifndef	VMAILCONF_INCLUDE
-#define	VMAILCONF_INCLUDE
+#ifndef	VMAILCONFIG_INCLUDE
+#define	VMAILCONFIG_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -35,7 +38,6 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
-#include	<localmisc.h>		/* LIBU */
 
 
 #define	VERSION		"4b"
@@ -145,16 +147,10 @@
 #define	LOGSIZE		(80*1024)
 #endif
 
-#ifndef	COLUMNS
-#define	COLUMNS		80		/* output columns (should be 80) */
-#endif
-
 /* mail spool area stuff */
-
 #define	MAILLOCKAGE	(5 * 60)
 
 /* mail host stuff */
-
 #define	MAILHOST	"mailhost"
 #define	ORGDOMAIN	"lucent.com"
 
@@ -179,10 +175,6 @@
 #define	MAXMESS		9999
 
 #define	VMDMODE		0700		/* msg-dir creation mode */
-
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
-#endif
 
 #define	CMDBUFLEN	(2 * MAXPATHLEN)
 
@@ -246,6 +238,6 @@
 #define	MB_TRASH	"trash"
 
 
-#endif /* VMAILCONF_INCLUDE */
+#endif /* VMAILCONFIG_INCLUDE */
 
 
