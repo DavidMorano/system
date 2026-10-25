@@ -76,7 +76,7 @@
 #include	<toxc.h>		/* LIBUC */
 #include	<ansigr.h>		/* LIBUC */
 #include	<opentmp.h>		/* LIBUC */
-#include	<ischarx.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<iserror.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |COLUMNS| */
