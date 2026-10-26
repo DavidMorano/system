@@ -91,6 +91,7 @@ EXTERNC_end
 EXTERNC_begin
 
 unixret_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (ma) {
 	    ec = EINVAL ;
@@ -98,8 +99,8 @@ unixret_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 		ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (memcntl) */
 
 EXTERNC_end
@@ -115,6 +116,7 @@ EXTERNC_end
 EXTERNC_begin
 
 unixret_t minherit(void *ma,size_t ms,int cmd) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (ma) {
 	    ec = EINVAL ;
@@ -122,8 +124,8 @@ unixret_t minherit(void *ma,size_t ms,int cmd) noex {
 		ec = ENOSYS ;
 	    }
 	}
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (memcntl) */
 
 EXTERNC_end
@@ -139,12 +141,13 @@ EXTERNC_end
 EXTERNC_begin
 
 unixret_t plock(int cmd) noex {
+    	unixret_t	ru = unixretbad ;
     	errno_t		ec = EINVAL ;
 	if (cmd >= 0) {
 	    ec = ENOSYS ;
 	}
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (plock) */
 
 EXTERNC_end
