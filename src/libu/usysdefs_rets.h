@@ -37,6 +37,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>
+#include	<stdlib.h>
+#include	<errno.h>
 
 
 #ifndef	unixretgood
