@@ -156,6 +156,7 @@ unixret_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 
 /* NULL version (like on Apple Darwin) */
 unixret_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (prp && prbuf) {
 	    ec = EINVAL ;
@@ -165,7 +166,7 @@ unixret_t getprent_rp(PROTOENT *prp,char *prbuf,int prlen) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getprent_rp) */
 
 #endif /* defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0) */
@@ -230,6 +231,7 @@ unixret_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 
 /* NULL version (like on Apple Darwin) */
 unixret_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (prp && prbuf && n) {
 	    ec = EINVAL ;
@@ -239,7 +241,7 @@ unixret_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getprnam_np) */
 
 #endif /* defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0) */
@@ -252,7 +254,8 @@ unixret_t getprnam_rp(PROTOENT *prp,char *prbuf,int prlen,cchar *n) noex {
 
 /* GNU version (like on Linux) */
 unixret_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
-	int		ec = EFAULT ;
+    	unixret_t	ru = unixretbad ;
+	errno_t		ec = EFAULT ;
 	if (prp && prbuf) {
 	    PROTOENT *rp{} ;
 	    errno = 0 ;
@@ -303,6 +306,7 @@ unixret_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 
 /* NULL version (like on Apple Darwin) */
 unixret_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (prp && prbuf) {
 	    ec = EINVAL ;
@@ -312,7 +316,7 @@ unixret_t getprnum_rp(PROTOENT *prp,char *prbuf,int prlen,int num) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getprnum_rp) */
 
 #endif /* defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0) */
