@@ -152,6 +152,7 @@ unixret_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
 #else /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 
 unixret_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (nwp && nwbuf) {
 	    ec = EINVAL ;
@@ -161,7 +162,7 @@ unixret_t getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getnwent_rp) */
 
 #endif /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
@@ -225,6 +226,7 @@ unixret_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
 #else /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 
 unixret_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (nwp && nwbuf && n) {
 	    ec = EINVAL ;
@@ -234,7 +236,7 @@ unixret_t getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getnwnam_rp) */
 
 #endif /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
@@ -298,6 +300,7 @@ unixret_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t n) noex {
 
 /* NULL version */
 unixret_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (nwp && nwbuf) {
 	    ec = EINVAL ;
@@ -307,7 +310,7 @@ unixret_t getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getnwnum_t) */
 
 #endif /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
