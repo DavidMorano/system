@@ -213,33 +213,33 @@ int ucfork::stdfork() noex {
 int ucfork::lockbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	int		rc = 0 ;
+	int		rv = 0 ; /* return-value */
 	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
 	        rs = lock.rdlock(to) ;
-		rc = rs ;
+		rv = rs ;
 	    } /* end if (ucfork_init) */
 	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
-	return (rs >= 0) ? rc : rs ;
+	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (ucfork::lockbegin) */
 
 int ucfork::lockend() noex {
 	int		rs ;
 	int		rs1 ;
-	int		rc = 0 ;
+	int		rv = 0 ; /* return-value */
 	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if (finit) {
 	        rs = lock.unlock ;
-		rc = rs ;
+		rv = rs ;
 	    } else {
 	        rs = SR_NOANODE ;
 	    }
 	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
-	return (rs >= 0) ? rc : rs ;
+	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (ucfork::lockend) */
 
 local void ucfork_exit() noex {
