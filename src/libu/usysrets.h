@@ -21,7 +21,7 @@
 /*******************************************************************************
 
   	Header:
-	usysret
+	usysrets
 
 	Description:
 	This file provides the preprocessor defines for system-return
