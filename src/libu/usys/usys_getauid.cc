@@ -28,14 +28,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cerrno>
-#include	<cstddef>
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysflag.h>
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysflag.h>		/* LIBU */
 #include	<localmisc.h>		/* |DECBUFLEN| */
 
 #include	"usys_getauid.h"
@@ -46,8 +46,8 @@
 
 
 unixret_t getauid(au_id_t *rp) noex {
-    	unixret_t	ru = unixretbad 0 ; /* return-value */
-	int		ec = EFAULT ;
+    	unixret_t	ru = unixretbad ; /* return-value */
+	errno_t		ec = EFAULT ;
 	if (rp) {
 	    const uid_t	uid = getuid() ;
 	    ru = unixretgood ;
