@@ -69,15 +69,17 @@ mqd_t mq_open(cchar *n,int,mode_t,const MQATTR *) noex {
 } /* end */
 
 unixret_t mq_close(mqd_t qd) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = ENOSYS ;
 	}
 	if (ec) errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end */
 
 unixret_t mq_send(mqd_t qd,cchar *sp,int,int) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
@@ -86,10 +88,11 @@ unixret_t mq_send(mqd_t qd,cchar *sp,int,int) noex {
 	    }
 	}
 	if (ec) errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end */
 
 unixret_t mq_receive(mqd_t qd,char *rp,int,uint *) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
@@ -98,10 +101,11 @@ unixret_t mq_receive(mqd_t qd,char *rp,int,uint *) noex {
 	    }
 	}
 	if (ec) errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end */
 
 unixret_t mq_setattr(mqd_t qd,const MQATTR *ap,MQATTR *) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
@@ -110,10 +114,11 @@ unixret_t mq_setattr(mqd_t qd,const MQATTR *ap,MQATTR *) noex {
 	    }
 	}
 	if (ec) errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end */
 
 unixret_t mq_getattr(mqd_t qd,MQATTR *ap) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
@@ -122,10 +127,11 @@ unixret_t mq_getattr(mqd_t qd,MQATTR *ap) noex {
 	    }
 	}
 	if (ec) errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end */
 
 unixret_t mq_notify(mqd_t qd,struct sigevent *sep) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EBADFD ;
 	if (qd != mqdbad) {
 	    ec = EFAULT ;
@@ -134,10 +140,11 @@ unixret_t mq_notify(mqd_t qd,struct sigevent *sep) noex {
 	    }
 	}
 	if (ec) errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end */
 
 unixret_t mq_unlink(cchar *n) noex {/* end */
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (n) {
 	    ec = EINVAL ;
@@ -146,7 +153,7 @@ unixret_t mq_unlink(cchar *n) noex {/* end */
 	    }
 	}
 	if (ec) errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end */
 
 /*----------------------------------------------------------------------------*/
