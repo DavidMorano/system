@@ -28,10 +28,8 @@
 
 
 EXTERNC_begin
-
 extern slonglong	atosll(cchar *) noex ;
 extern ulonglong	atoull(cchar *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
