@@ -106,7 +106,7 @@ unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 		    ru = unixretbad ;
 		}
 	    } else if (ec > 0) {
-	        rc = uniretbad ;
+	        ru = unixretbad ;
 	    } else {
 	        ec = EBUGCHECK ;
 	        ru = unixretbad ;
@@ -145,6 +145,7 @@ unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 #else /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
 
 unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
+    	unixret_t	ru = unixretbad ;
     	errno_t		ec = EFAULT ;
 	if (spp && spbuf) {
 	    ec = EINVAL ;
@@ -154,7 +155,7 @@ unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getspent_rp) */
 
 #endif /* defined(SYSHAS_GETSPENTR) && (SYSHAS_GETSPENTR > 0) */
@@ -217,7 +218,8 @@ unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 
 /* BULL version */
 unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
-	int		ec = EFAULT ;
+    	unixret_t	ru = unixretbad ;
+	errno_t		ec = EFAULT ;
 	if (spp && spbuf && n) {
 	    ec = EINVAL ;
 	    memclear(spp) ;
@@ -226,7 +228,7 @@ unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	    }
 	}
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getspnam_rp) */
 
 #endif /* defined(SYSHAS_GETSPNAMR) && (SYSHAS_GETSPNAMR > 0) */
@@ -235,6 +237,7 @@ unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 
 /* NULL version */
 unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (spp && spbuf) {
 	    ec = EINVAL ;
@@ -244,11 +247,12 @@ unixret_t getspent_rp(SPWD *spp,char *spbuf,int splen) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getspent_rp) */
 
 /* NULL version */
 unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (spp && spbuf && n) {
 	    ec = EINVAL ;
@@ -258,7 +262,7 @@ unixret_t getspnam_rp(SPWD *spp,char *spbuf,int splen,cchar *n) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getspnam_rp) */
 
 #endif /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
