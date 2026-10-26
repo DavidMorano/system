@@ -232,6 +232,16 @@
 #define	VARTERMCAP	"TERMCAP"
 #endif
 
+/* this is a library thing */
+#ifndef	VAREXECFNAME
+#define	VAREXECFNAME	"_EF"
+#endif
+
+/* this is a SHELL environment variable thing */
+#ifndef	VARUNDER
+#define	VARUNDER	"_"
+#endif
+
 
 #endif /* VARDEFS_INCLUDE */
 
