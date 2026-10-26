@@ -44,8 +44,9 @@
 #include	"usys_waitid.h"
 
 unixret_t waitid(idtype_t,id_t,siginfo_t *,int) noex {
+    	unixret_t	ru = unixretbad ;
 	errno = ENOSYS ;
-	return -1 ;
+	return ru ;
 } /* end */
 
 #endif /* (!defined(SYSHAS_WAITID)) || (SYSHAS_WAITID == 0) */
