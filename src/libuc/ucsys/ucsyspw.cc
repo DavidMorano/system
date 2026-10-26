@@ -142,6 +142,7 @@ unixret_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 
 /* NULL version (like in Apple-Darwin) */
 unixret_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (pwp && pwbuf) {
 	    ec = EINVAL ;
@@ -150,8 +151,8 @@ unixret_t getpwent_rp(PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	        ec = ENOSYS ;
 	    }
 	} /* end if (non-null) */
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (getpwent_rp) */
 
 #endif /* defined(SYSHAS_GETPWENTR) && (SYSHAS_GETPWENTR > 0) */
@@ -216,7 +217,8 @@ unixret_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int pwlen,cchar *n) noex {
 
 /* NULL version (like in Apple-Darwin) */
 errno_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int,cchar *n) noex {
-	int		ec = EFAULT ;
+    	unixret_t	ru = unixretbad ;
+	errno_t		ec = EFAULT ;
 	if (pwp && pwbuf && n) {
 	    ec = EINVAL ;
 	    memclear(pwp) ;
@@ -224,8 +226,8 @@ errno_t getpwnam_rp(PASSWD *pwp,char *pwbuf,int,cchar *n) noex {
 	        ec = ENOSYS ;
 	    }
 	} /* end if (non-null) */
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (getpwnam_rp) */
 
 #endif /* defined(SYSHAS_GETPWNAMR) && (SYSHAS_GETPWNAMR > 0) */
@@ -290,6 +292,7 @@ unixret_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 
 /* NULL version (like in Apple-Darwin) */
 unixret_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (pwp && pwbuf) {
 	    ec = EINVAL ;
@@ -298,8 +301,8 @@ unixret_t getpwuid_rp(PASSWD *pwp,char *pwbuf,int pwlen,uid_t) noex {
 	        ec = ENOSYS ;
 	    }
 	} /* end if (non-null) */
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (getpwuid_rp) */
 
 #endif /* defined(SYSHAS_GETPWUIDR) && (SYSHAS_GETPWUIDR > 0) */
