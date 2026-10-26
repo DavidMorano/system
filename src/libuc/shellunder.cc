@@ -25,7 +25,7 @@
 	from a given string (containing the shell-under information).
 
 	Synopsis:
-	int shellunder_load(shellunder_dat *op,char *under) noex
+	int shellunder_load(shellunder *op,char *under) noex
 
 	Arguments:
 	op		pointer to object
@@ -97,9 +97,9 @@ using libu::cfdec ;			/* subroutine */
 
 /* exported subroutines */
 
-int shellunder_load(shellunder_dat *op,cchar *under) noex {
+int shellunder_load(shellunder *op,cchar *under) noex {
 	int		rs = SR_FAULT ;
-	int		pl = 0 ;
+	int		pl = 0 ; /* return-value (path-length) */
 	if (op && under) ylikely {
 	    rs = SR_OK ;
 	    op->pid = -1 ;
