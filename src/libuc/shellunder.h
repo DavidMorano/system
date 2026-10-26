@@ -18,7 +18,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-#define	SHELLUNDER_DAT	struct shellunder_data
+#define	SHELLUNDER	struct shellunder_data
 
 
 struct shellunder_data {
@@ -26,16 +26,13 @@ struct shellunder_data {
 	pid_t		pid ;		/* parent (shell) PID */
 } ; /* end struct (shellunder_data) */
 
-typedef	SHELLUNDER_DAT	shellunder_dat ;
+typedef	SHELLUNDER	shellunder ;
 
 EXTERNC_begin
-
-extern int	shellunder_load(shellunder_dat *,cchar *) noex ;
-
-local inline int shellunder_wr(shellunder_dat *sup,cchar *sp) noex {
+extern int shellunder_load(shellunder *,cchar *) noex ;
+local inline int shellunder_wr(shellunder *sup,cchar *sp) noex {
 	return shellunder_load(sup,sp) ;
 } /* end */
-
 EXTERNC_end
 
 
