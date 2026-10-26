@@ -41,14 +41,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<localmisc.h>
+#include	<unistd.h>		/* POSIX® */
+#include	<cerrno>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"ucsysgr.h"
 
@@ -90,7 +89,7 @@ import libutil ;			/* |memclear(3u)| */
 /* GNU version (like in Linux) */
 unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
     	unixret_t	ru = unixretgood ;
-        errno_t		ec  = 0 ;
+        errno_t		ec = EOK ;
 	if (grp && grbuf) {
             GROUP *rp{} ;
             errno = 0 ;
@@ -141,6 +140,7 @@ unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
 
 /* NULL version */
 unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (grp && grbuf) {
 	    ec = EINVAL ;
@@ -149,8 +149,8 @@ unixret_t getgrent_rp(GROUP *grp,char *grbuf,int grlen) noex {
 	        ec = ENOSYS ;
 	    }
 	} /* end if (non-null) */
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (getgrent_rp) */
 
 #endif /* defined(SYSHAS_GETGRENTR) && (SYSHAS_GETGRENTR > 0) */
@@ -214,6 +214,7 @@ unixret_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 
 /* NULL version */
 unixret_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (grp && grbuf && n) {
 	    ec = EINVAL ;
@@ -222,8 +223,8 @@ unixret_t getgrnam_rp(GROUP *grp,char *grbuf,int grlen,cchar *n) noex {
 	        ec = ENOSYS ;
 	    }
 	} /* end if (non-null) */
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (getgrnam_rp) */
 
 #endif /* defined(SYSHAS_GETGRNAMR) && (SYSHAS_GETGRNAMR > 0) */
@@ -287,7 +288,8 @@ unixret_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t gid) noex {
 
 /* NULL version */
 unixret_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t) noex {
-	int		ec = EFAULT ;
+    	unixret_t	ru = unixretbad ;
+	errno_t		ec = EFAULT ;
 	if (grp && grbuf) {
 	    ec = EINVAL ;
 	    memclear(grp) ;
@@ -295,8 +297,8 @@ unixret_t getgrgid_rp(GROUP *grp,char *grbuf,int grlen,gid_t) noex {
 	        ec = ENOSYS ;
 	    }
 	} /* end if (non-null) */
-	errno = ec ;
-	return -1 ;
+	if (ec) errno = ec ;
+	return ru ;
 } /* end subroutine (getgrgid_rp) */
 
 #endif /* defined(SYSHAS_GETGRGIDR) && (SYSHAS_GETGRGIDR > 0) */
