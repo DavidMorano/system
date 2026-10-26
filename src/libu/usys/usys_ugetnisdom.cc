@@ -80,11 +80,11 @@ namespace libu {
     sysret_t ugetnisdom(char *rbuf,int rlen) noex {
         cint		maxlen = (2*1024) ; /* pseudo-random value */
 	int		rs = SR_FAULT ;
-	if (rbuf) {
+	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen >= 0) {
+	    if (rlen >= 0) ylikely {
 	        if (rlen > maxlen) rlen = maxlen ;
-	        if ((rs = getdom(rbuf,rlen)) >= 0) {
+	        if ((rs = getdom(rbuf,rlen)) >= 0) ylikely {
 	            rbuf[rlen] = '\0' ; /* for safety */
 	        } else {
 	            rs = (neg errno) ;
