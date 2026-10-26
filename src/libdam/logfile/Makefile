@@ -45,10 +45,15 @@ DEPS= logfile_mag.o
 OBJ0= logfile_prime.o 
 OBJ1= logfile_printfold.o 
 OBJ2= logfile_userinfo.o
-OBJ3= logfile_copylock.o $(DEPS)
+OBJ3= logfile_copylock.o 
 
-OBJA= obj0.o obj1.o
-OBJB= obj2.o obj3.o
+OBJ4= logfile_meths.o 
+OBJ5= $(DEPS)
+OBJ6=
+OBJ7=
+
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o obj5.o
 
 OBJ= obja.o objb.o
 
@@ -126,6 +131,19 @@ obj2.o:			$(OBJ2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj3.o:			$(OBJ3)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj4.o:			$(OBJ4)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj5.o:			$(OBJ5)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj6.o:			$(OBJ6)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj7.o:			$(OBJ7)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
