@@ -30,15 +30,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* POSIX® */
-#include	<sys/utsname.h>		/* POSIX® */
-#include	<sys/param.h>		/* POSIX® */
-#include	<sys/stat.h>		/* |S_IS{x}| + S_IF{x}| */
-#include	<limits.h>		/* |{xxx}_MIN| + |{xxx}_MAX| */
-#include	<signal.h>		/* |SIG{x}| */
-#include	<unistd.h>		/* |_SC_{x}| + |_PC_{x}| */
-#include	<fcntl.h>		/* |O_{x}| */
-#include	<netdb.h>		/* |NI_MAX{x}| */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<errno.h>		/* CSTD */
 
 
 #ifndef	EOK
