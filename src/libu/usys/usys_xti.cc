@@ -48,52 +48,61 @@
 int t_errno = 0 ;
 
 voidp	xti_alloc	(int,int,int) noex {
-    return nullptr ;
+	return nullptr ;
 } /* end */
 
-int	xti_open	(cchar *,int,struct t_info *) noex {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_open	(cchar *,int,struct t_info *) noex {
+    	unixret_t	ru = unixretbad ;
+        t_errno = TBADF ;
+	return ru ;
 } /* end */
 
-int	xti_bind	(int,struct t_bind *,struct t_bind *) noex {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_bind	(int,struct t_bind *,struct t_bind *) noex {
+    	unixret_t	ru = unixretbad ;
+	t_errno = TBADF ;
+	return ru ;
 } /* end */
 
-int	xti_listen	(int,struct t_call *) noex {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_listen	(int,struct t_call *) noex {
+    	unixret_t	ru = unixretbad ;
+	t_errno = TBADF ;
+	return ru ;
 } /* end */
 
-int	xti_connect	(int,struct t_call *,struct t_call *) noex {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_connect	(int,struct t_call *,struct t_call *) noex {
+    	unixret_t	ru = unixretbad ;
+	t_errno = TBADF ;
+	return ru ;
 } /* end */
 
-int	xti_accept	(int,int,const struct t_call *) noex {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_accept	(int,int,const struct t_call *) noex {
+    	unixret_t	ru = unixretbad ;
+	t_errno = TBADF ;
+	return ru ;
 } /* end */
 
-int	xti_look	(int) noex {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_look	(int) noex {
+    	unixret_t	ru = unixretbad ;
+	t_errno = TBADF ;
+	return ru ;
 } /* end */
 
-int	xti_sync	(int) noex {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_sync	(int) noex {
+    	unixret_t	ru = unixretbad ;
+	t_errno = TBADF ;
+	return ru ;
 } /* end */
 
-int	xti_close	(int) noex  {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_close	(int) noex  {
+    	unixret_t	ru = unixretbad ;
+	t_errno = TBADF ;
+	return ru ;
 } /* end */
 
-int	xti_free	(void *,int) noex  {
-    t_errno = TBADF ;
-    return -1 ;
+unixret_t xti_free	(void *,int) noex  {
+    	unixret_t	ru = unixretbad ;
+	t_errno = TBADF ;
+	return ru ;
 } /* end */
 
 
