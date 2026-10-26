@@ -158,6 +158,7 @@ unixret_t gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 
 /* NULL version */
 unixret_t gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (hop && hobuf) {
 	    ec = EINVAL ;
@@ -167,7 +168,7 @@ unixret_t gethoent_rp(HOSTENT *hop,char *hobuf,int holen) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (gethoent_rp) */
 
 #endif /* defined(SYSHAS_GETHOXXXR) && (SYSHAS_GETHOXXXR > 0) */
@@ -233,6 +234,7 @@ unixret_t gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 
 /* NULL version */
 unixret_t gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (hop && hobuf && n) {
 	    ec = EINVAL ;
@@ -242,7 +244,7 @@ unixret_t gethonam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (gethonam_rp) */
 
 #endif /* defined(SYSHAS_GETHOXXXR) && (SYSHAS_GETHOXXXR > 0) */
@@ -309,6 +311,7 @@ unixret_t gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
 
 /* NULL version */
 unixret_t gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (hop && hobuf && ap) {
 	    ec = EINVAL ;
@@ -318,7 +321,7 @@ unixret_t gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (gethoadd_rp) */
 
 #endif /* defined(SYSHAS_GETHOXXXR) && (SYSHAS_GETHOXXXR > 0) */
