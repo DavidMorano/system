@@ -1,4 +1,4 @@
-/* localmisc_isval HEADER */
+/* localmisc_rets HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -17,12 +17,18 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	LOCALMISCTRUTH_INCLUDE
-#define	LOCALMISCTRUTH_INCLUDE
+#ifndef	LOCALMISCRETS_INCLUDE
+#define	LOCALMISCRETS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
+
+/****
+Note: These (|OK| and |BAD| below) are the same as the UNIX® basic
+return values; namely, '0' and '-1'.  But thes have been used for
+user-oriented code rather than system-oriented code.
+****/
 
 #ifndef	OK
 #define	OK		0
@@ -33,6 +39,6 @@
 #endif
 
 
-#endif /* LOCALMISCTRUTH_INCLUDE */
+#endif /* LOCALMISCRETS_INCLUDE */
 
 
