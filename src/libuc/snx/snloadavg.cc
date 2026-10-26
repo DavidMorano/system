@@ -128,7 +128,7 @@ int snloadavg(char *rbuf,int rlen,uint la,int w,int p,int fill) noex {
 	            prec = (w - 1 - p) ;
 	        } else {
 	            prec = w ;
-	        }
+	        } /* end */
 	        if (prec < 0) prec = 0 ;
 	    } /* end if */
 	    /* put the resulting string together */
@@ -139,7 +139,7 @@ int snloadavg(char *rbuf,int rlen,uint la,int w,int p,int fill) noex {
 	        if ((prec >= 0) && (prec < dl)) {
 	            dp += (dl - prec) ;
 	            dl = prec ;
-	        }
+	        } /* end */
 	        rs = buf.strw(dp,dl) ;
 	    } /* end if (ctdec) */
 	    if ((rs >= 0) && (p >= 0)) ylikely {
