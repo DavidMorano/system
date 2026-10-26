@@ -113,6 +113,7 @@ unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
 #else /* defined(SYSHAS_GETPJENTR) && (SYSHAS_GETPJENTR > 0) */
 
 unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+    	unixret_t	ru = unixretbad ;
         errno_t		ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
@@ -122,7 +123,7 @@ unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
             }
 	} /* end if (non-null) */
         errno = ec ;
-        return -1 ;
+	return ru ;
 } /* end subroutine (getpjent_rp) */
 
 #endif /* defined(SYSHAS_GETPJENTR) && (SYSHAS_GETPJENTR > 0) */
@@ -189,6 +190,7 @@ unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t pid) noex {
 #else /* defined(SYSHAS_GETPJPIDR) && (SYSHAS_GETPJPIDR > 0) */
 
 unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
+    	unixret_t	ru = unixretbad ;
         errno_t     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
@@ -198,7 +200,7 @@ unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
             }
 	} /* end if (non-null) */
         errno = ec ;
-        return -1 ;
+	return ru ;
 } /* end subroutine (getpjpid_np) */
 
 #endif /* defined(SYSHAS_GETPJPIDR) && (SYSHAS_GETPJPIDR > 0) */
@@ -274,6 +276,7 @@ PROJECT	*getpjdef(cchar *) noex {
 } /* end */
 
 unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
+    	unixret_t	ru = unixretbad ;
         errno_t     	ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
@@ -283,10 +286,11 @@ unixret_t getpjent_rp(PROJECT *pjp,char *pjbuf,int pjlen) noex {
             }
 	} /* end if (non-null) */
         errno = ec ;
-        return -1 ;
+	return ru ;
 } /* end subroutine (getpjent_np) */
 
 unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+    	unixret_t	ru = unixretbad ;
         errno_t     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
@@ -296,10 +300,11 @@ unixret_t getpjnam_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
             }
 	} /* end if (non-null) */
         errno = ec ;
-        return -1 ;
+	return ru ;
 } /* end subroutine (getpjnam_np) */
 
 unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
+    	unixret_t	ru = unixretbad ;
         errno_t		ec = EFAULT ;
         if (pjp && pjbuf) {
             ec = EINVAL ;
@@ -309,10 +314,11 @@ unixret_t getpjpid_rp(PROJECT *pjp,char *pjbuf,int pjlen,projid_t) noex {
             }
 	} /* end if (non-null) */
         errno = ec ;
-        return -1 ;
+	return ru ;
 } /* end subroutine (getpjpid_rp) */
 
 unixret_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
+    	unixret_t	ru = unixretbad ;
         errno_t     	ec = EFAULT ;
         if (pjp && pjbuf && n) {
             ec = EINVAL ;
@@ -322,7 +328,7 @@ unixret_t getpjdef_rp(PROJECT *pjp,char *pjbuf,int pjlen,cchar *n) noex {
             }
 	} /* end if (non-null) */
         errno = ec ;
-        return -1 ;
+	return ru ;
 } /* end subroutine (getpjdef_np) */
 
 #endif /*  defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
