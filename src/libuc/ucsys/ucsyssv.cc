@@ -156,6 +156,7 @@ else /* defined(SYSHAS_GETSVXXXR) && (SYSHAS_GETSVXXXR > 0) */
 
 /* NULL version (like on Apple Darwin) */
 unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (svp && svbuf) {
 	    ec = EINVAL ;
@@ -165,7 +166,7 @@ unixret_t getsvent_rp(SERVENT *svp,char *svbuf,int svlen) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getsvent_np) */
 
 #endif /* defined(SYSHAS_GETSVXXXR) && (SYSHAS_GETSVXXXR > 0) */
@@ -230,6 +231,7 @@ unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
 
 /* NULL version (like on Apple Darwin) */
 unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (svp && svbuf && n && p) {
 	    ec = EINVAL ;
@@ -239,7 +241,7 @@ unixret_t getsvnam_rp(SERVENT *svp,char *svbuf,int svlen,cc *n,cc *p) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getsvnam_np) */
 
 #endif /* defined(SYSHAS_GETPRXXXR) && (SYSHAS_GETPRXXXR > 0) */
@@ -304,6 +306,7 @@ unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
 
 /* NULL version (like on Apple Darwin) */
 unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
+    	unixret_t	ru = unixretbad ;
 	errno_t		ec = EFAULT ;
 	if (svp && svbuf && p) {
 	    ec = EINVAL ;
@@ -313,7 +316,7 @@ unixret_t getsvpor_rp(SERVENT *svp,char *svbuf,int svlen,int num,cc *p) noex {
 	    }
 	} /* end if (non-null) */
 	errno = ec ;
-	return -1 ;
+	return ru ;
 } /* end subroutine (getsvpor_np) */
 
 #endif /* defined(SYSHAS_GETSVXXXR) && (SYSHAS_GETSVXXXR > 0) */
