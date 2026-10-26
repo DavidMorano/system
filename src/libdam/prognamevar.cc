@@ -183,7 +183,7 @@ bool prognamevar::procenv(con mainv envv) noex {
 	if (envv) {
 	    if (cchar *valp = getourenv(envv,"_")) {
 		int rs{} ;
-		if (shellunder_dat d ; (rs = shellunder_load(&d,valp)) >= 0) {
+		if (shellunder d ; (rs = shellunder_load(&d,valp)) >= 0) {
 		    f = proc(d.execname) ;
 		} else if (rs < 0) {
 		    ulogerror("prognamevar",rs,"shellunder") ;
