@@ -79,9 +79,9 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 
 extern char	*strwcpy(char *,char *,int) ;
 
@@ -91,7 +91,7 @@ extern char	*strwcpy(char *,char *,int) ;
 
 /* forward references */
 
-static int	frcopen(FILE **,char *,char *) ;
+local int	frcopen(FILE **,char *,char *) ;
 
 
 /* local structures */
@@ -230,7 +230,7 @@ ret0:
 
 
 /* file open w/ return code */
-static int frcopen(fpp,fname,mode)
+local int frcopen(fpp,fname,mode)
 FILE	**fpp ;
 char	fname[] ;
 char	mode[] ;
