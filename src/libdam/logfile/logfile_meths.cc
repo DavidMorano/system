@@ -107,7 +107,6 @@ int logfile::printf(cchar *fmt,...) noex {
 int logfile::vprintf(cchar *fmt,va_list ap) noex {
 	return logfile_vprintf(this,fmt,ap) ;
 } /* end method (logfile::vprintf) */
- 
 
 int logfile::setid(cchar *id) noex {
 	return logfile_setid(this,id) ;
@@ -132,6 +131,12 @@ int logfile::write(cchar *sp,int sl) noex {
 int logfile::print(cchar *sp,int sl) noex {
 	return logfile_write(this,sp,sl) ;
 } /* end method (logfile::print) */
+
+void logfile::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("logfile",rs,"fini-close") ;
+	} /* end */
+} /* end method (logfile::dtor) */
 
 int logfile_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
