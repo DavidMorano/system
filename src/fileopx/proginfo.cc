@@ -492,16 +492,16 @@ int proginfo_progename(proginfo *pip) noex {
 	    }
 #endif /* SOLARIS */
 
-	    if ((rs >= 0) && (efn == nullptr) && (efn[0] != '\0')) {
+	    if ((rs >= 0) && (efn == nullptr) || (*efn == eos)) {
 	        efn = getourenv(pip->envv,VAREXECFNAME) ;
 	    }
 
-	    if ((rs >= 0) && (efn == nullptr) && (efn[0] != '\0')) {
+	    if ((rs >= 0) && (efn == nullptr) || (*efn == eos)) {
 		if (cchar *cp = getourenv(pip->envv,VARUNDER) ; cp) {
-	    	    if (shellunder_dat su ; shellunder_load(&su,cp) >= 0) {
+	    	    if (shellunder su ; shellunder_load(&su,cp) >= 0) {
 	                efn = su.execname ;
-		    }
-	        }
+		    } /* end if (shellunder) */
+	        } /* end if (getourenv) */
 	    }
 
 	    if ((rs >= 0) && (efn != nullptr)) {
