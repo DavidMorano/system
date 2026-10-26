@@ -588,7 +588,7 @@ void strer::baser() noex {
 	} /* end if */
 	if (base == 0) {
 	    base = ((ch == '0') ? base8 : base10) ;
-	}
+	} /* end */
 } /* end method (strer::baser) */
 
 local inline int getval(int b,cchar *sp) noex {
@@ -629,7 +629,7 @@ void strer_sll::cvt(int val) noex {
 	    cvtneg(val) ;
 	} else {
 	    cvtpos(val) ;
-	}
+	} /* end */
 } /* end method */
 
 void strer_sll::cvtneg(int val) noex {
@@ -682,7 +682,7 @@ void strer_ull::cvt(int val) noex {
 void strer_ull::negator() noex {
 	if (fneg && verr > 0) {
 	    ures = (neg ures) ;
-	}
+	} /* end */
 } /* end method (strer_ull::negator) */
 
 void strer_ull::reterr() noex {
