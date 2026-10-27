@@ -62,20 +62,21 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<calstrs.h>
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<spawnproc.h>
-#include	<linefold.h>
-#include	<filer.h>
-#include	<strx.h>
+#include	<calstrs.h>		/* LIBUC */
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<spawnproc.h>		/* LIBUC */
+#include	<linefold.h>		/* LIBUC */
+#include	<filer.h>		/* LIBUC */
+#include	<cfdec.h>		/* LIBUC */
+#include	<strx.h>		/* LIBUC */
 #include	<exitcodes.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
 #include	"b_cal.h"
-#include	"defs.h"
 
 
 /* local defines */
@@ -87,13 +88,6 @@
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUG || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -116,11 +110,11 @@ struct calarger {
 	int		type ;
 	int		cols ;
 	int		n ;
-} ;
+} ; /* end struct */
 
 struct monyear {
 	short		y, m ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -145,21 +139,6 @@ local int	getval(cchar *,int) noex ;
 
 /* local variables */
 
-static cchar	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"option",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"cp",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_version,
@@ -173,17 +152,32 @@ enum argopts {
 	argopt_of,
 	argopt_cp,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"option",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"cp",
+	nullptr
+} ; /* end array */
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
-static const MAPEX	mapexs[] = {
+constexpr MAPEX	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -195,7 +189,7 @@ static const MAPEX	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 static cchar	blanks[] = "        " ;
 
@@ -210,7 +204,7 @@ int b_cal(int argc,mainv argv,void *contextp) noex {
 	int		rs1 ;
 	int		ex = EX_OK ;
 
-	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
+	if ((rs = lib_kshbegin(contextp,nullptr)) >= 0) {
 	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
@@ -220,13 +214,11 @@ int b_cal(int argc,mainv argv,void *contextp) noex {
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
 
 	return ex ;
-}
-/* end subroutine (b_cal) */
+} /* end subroutine (b_cal) */
 
 int p_cal(int argc,mainv argv,mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_cal) */
+} /* end subroutine (p_cal) */
 
 
 /* local subroutines */
@@ -257,22 +249,22 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	int		f ;
 
 	cchar		*argp, *aop, *akp, *avp ;
-	cchar		*argval = NULL ;
-	cchar		*pr = NULL ;
-	cchar		*sn = NULL ;
-	cchar		*afname = NULL ;
-	cchar		*efname = NULL ;
-	cchar		*ofname = NULL ;
-	cchar		*specyear = NULL ;
-	cchar		*specmonth = NULL ;
-	cchar		*progcal = NULL ;
-	cchar		*pos1 = NULL ;
-	cchar		*pos2 = NULL ;
+	cchar		*argval = nullptr ;
+	cchar		*pr = nullptr ;
+	cchar		*sn = nullptr ;
+	cchar		*afname = nullptr ;
+	cchar		*efname = nullptr ;
+	cchar		*ofname = nullptr ;
+	cchar		*specyear = nullptr ;
+	cchar		*specmonth = nullptr ;
+	cchar		*progcal = nullptr ;
+	cchar		*pos1 = nullptr ;
+	cchar		*pos2 = nullptr ;
 	cchar		*cp ;
 
 
 #if	CF_DEBUG || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_cal: starting DFD=%d\n",rs) ;
 	}
@@ -289,7 +281,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    goto badprogstart ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 	pip->verboselevel = 1 ;
@@ -305,7 +297,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -333,14 +325,14 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -607,8 +599,8 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getourenv(envv,VAREFNAME) ;
-	if (efname == NULL) efname = STDFNERR ;
+	if (efname == nullptr) efname = getourenv(envv,VAREFNAME) ;
+	if (efname == nullptr) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -676,7 +668,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 #if	CF_SFIO
 	    printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	} /* end if */
 
@@ -688,18 +680,18 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* check a few more things */
 
-	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
+	if (afname == nullptr) afname = getourenv(envv,VARAFNAME) ;
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getourenv(envv,VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getourenv(envv,VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
 /* get the calendar program ('CAL(1)') file-path */
 
 	{
 
-	    if ((progcal == NULL) || (progcal[0] == '\0'))
+	    if ((progcal == nullptr) || (progcal[0] == '\0'))
 	        progcal = getourenv(envv,VARPROGCAL) ;
-	    if ((progcal == NULL) || (progcal[0] == '\0'))
+	    if ((progcal == nullptr) || (progcal[0] == '\0'))
 	        progcal = PROG_CAL ;
 
 	    if (pip->debuglevel > 0)
@@ -710,7 +702,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* output columns (line-width) */
 
 	{
-	    if ((cp = getourenv(envv,VARCOLUMNS)) != NULL) {
+	    if ((cp = getourenv(envv,VARCOLUMNS)) != nullptr) {
 	        rs = cfdeci(cp,-1,&cols) ;
 	    }
 	    if (cols < 0) cols = COLUMNS ;
@@ -722,7 +714,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    for (ai = 1 ; ai < argc ; ai += 1) {
 
 	        f = (ai <= ai_max) && (bits_test(&pargs,ai) > 0) ;
-	        f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	        f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = argv[ai] ;
 	            switch (pan) {
@@ -742,7 +734,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    } /* end for (looping through positional arguments) */
 	} /* end if (ok) */
 
-	if ((rs >= 0) && (argval != NULL)) {
+	if ((rs >= 0) && (argval != nullptr)) {
 	    rs = cfdeci(argval,-1,&argvalue) ;
 	}
 	if ((rs >= 0) && (argvalue < 1)) {
@@ -784,7 +776,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* we are out of here */
 retearly:
-	if ((pip->debuglevel > 0) && (pip->efp != NULL)) {
+	if ((pip->debuglevel > 0) && (pip->efp != nullptr)) {
 	    shio_printf(pip->efp,"%s: exiting ex=%u (%d)\n", 
 	        pip->progname,ex,rs) ;
 	}
@@ -794,10 +786,10 @@ retearly:
 	    debugprintf("b_cal: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = FALSE ;
 	    shio_close(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
@@ -826,8 +818,7 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
 local int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
@@ -844,8 +835,7 @@ local int usage(PROGINFO *pip) noex {
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 local int procarger(PROGINFO *pip,CA *cap) noex {
 	struct monyear	my, *myp = &my ;
@@ -862,12 +852,12 @@ local int procarger(PROGINFO *pip,CA *cap) noex {
 
 /* grind */
 
-	if ((rs >= 0) && (cap->pos1 != NULL)) {
+	if ((rs >= 0) && (cap->pos1 != nullptr)) {
 
 	    cap->type = 1 ;
 	    if ((rs = getstuff(pip,myp,cap->pos1)) >= 0) {
 
-	        if (cap->pos2 != NULL) {
+	        if (cap->pos2 != nullptr) {
 
 	            cap->month = (myp->m >= 0) ? myp->m : myp->y ;
 	            cap->type = 2 ;
@@ -899,7 +889,7 @@ local int procarger(PROGINFO *pip,CA *cap) noex {
 
 	} /* end if (positions) */
 
-	if ((rs >= 0) && (cap->pos1 == NULL) && (cap->pos2 == NULL)) {
+	if ((rs >= 0) && (cap->pos1 == nullptr) && (cap->pos2 == nullptr)) {
 	    int	n ;
 
 	    rs = getdefyear(cap) ;
@@ -940,8 +930,7 @@ local int procarger(PROGINFO *pip,CA *cap) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (procarger) */
+} /* end subroutine (procarger) */
 
 local int process(PROGINFO *pip,CA *cap,cchar *ofn,int ncals) noex {
 	SHIO		ofile, *ofp = &ofile ;
@@ -958,12 +947,12 @@ local int process(PROGINFO *pip,CA *cap,cchar *ofn,int ncals) noex {
 	}
 #endif
 
-	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	if ((ofn == nullptr) || (ofn[0] == '\0') || (ofn[0] == '-'))
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 
-	    if ((rs = opentmp(NULL,O_RDWR,0664)) >= 0) {
+	    if ((rs = opentmp(nullptr,O_RDWR,0664)) >= 0) {
 	        int	ofd = rs ;
 	        int	i ;
 
@@ -1019,8 +1008,7 @@ local int process(PROGINFO *pip,CA *cap,cchar *ofn,int ncals) noex {
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
 local int procexec(PROGINFO *pip,CA *cap,int ofd) noex {
 	SPAWNPROC	ps ;
@@ -1068,7 +1056,7 @@ local int procexec(PROGINFO *pip,CA *cap,int ofd) noex {
 	        rs = SR_NOANODE ;
 	        break ;
 	    } /* end switch */
-	    calargs[cai] = NULL ;
+	    calargs[cai] = nullptr ;
 
 	    if (rs >= 0) {
 
@@ -1077,12 +1065,12 @@ local int procexec(PROGINFO *pip,CA *cap,int ofd) noex {
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4)) {
 	            int	i ;
-	            for (i = 0 ; calargs[i] != NULL ; i += 1)
+	            for (i = 0 ; calargs[i] != nullptr ; i += 1)
 	                debugprintf("b_cal: carg[%u]=%s\n",i,calargs[i]) ;
 	        }
 #endif /* CF_DEBUG */
 
-	        if ((rs = opentmp(NULL,O_RDWR,0664)) >= 0) {
+	        if ((rs = opentmp(nullptr,O_RDWR,0664)) >= 0) {
 	            int		efd = rs ;
 	            cchar	*es = "standard error" ;
 
@@ -1123,8 +1111,7 @@ local int procexec(PROGINFO *pip,CA *cap,int ofd) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (procexec) */
+} /* end subroutine (procexec) */
 
 local int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
 	int		rs = SR_OK ;
@@ -1133,7 +1120,7 @@ local int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
 	int		f_title = FALSE ;
 	cchar		*pn = pip->progname ;
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    if (filer b ; (rs = filer_start(&b,ofd,0z,0,0)) >= 0) {
 	        cint	llen = LINEBUFLEN ;
 	        char	lbuf[LINEBUFLEN + 1] ;
@@ -1142,7 +1129,7 @@ local int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
 	            int		len = rs ;
 	            if (lbuf[len - 1] == '\n') lbuf[--len] = '\0' ;
 	            if ((! f_title) && (len > 0)) {
-	                if ((s != NULL) && (s[0] != '\0')) {
+	                if ((s != nullptr) && (s[0] != '\0')) {
 	                    f_title = TRUE ;
 	                    rs1 = shio_printf(pip->efp,"%s: %s>\n",pn,s) ;
 	                    wlen += rs1 ;
@@ -1163,8 +1150,7 @@ local int procerrout(PROGINFO *pip,int cols,cchar *s,int ofd) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procerrout) */
+} /* end subroutine (procerrout) */
 
 local int procline(PROGINFO *pip,int cols,cchar *lp,int ll) noex {
 	SHIO		*fp = pip->efp ;
@@ -1198,8 +1184,7 @@ local int procline(PROGINFO *pip,int cols,cchar *lp,int ll) noex {
 	} /* end if (text-len) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procline) */
+} /* end subroutine (procline) */
 
 /* get the month and-or year out of a string argument */
 local int getstuff(PROGINFO *pip,struct monyear *myp,cchar *s) noex {
@@ -1212,10 +1197,10 @@ local int getstuff(PROGINFO *pip,struct monyear *myp,cchar *s) noex {
 	    debugprintf("b_cal/getstuff: s=>%s<\n",s) ;
 #endif
 
-	if (pip == NULL) return SR_FAULT ; /* lint */
+	if (pip == nullptr) return SR_FAULT ; /* lint */
 	myp->m = -1 ;
 	myp->y = -1 ;
-	if ((tp = strbrk(s,"/-")) != NULL) {
+	if ((tp = strbrk(s,"/-")) != nullptr) {
 
 	    if (tp[0] == '-') {
 
@@ -1272,12 +1257,11 @@ local int getstuff(PROGINFO *pip,struct monyear *myp,cchar *s) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (getstuff) */
+} /* end subroutine (getstuff) */
 
 local int getdefyear(CA *cap) noex {
 	TM		ts ;
-	const time_t	daytime = time(NULL) ;
+	const time_t	daytime = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		v ;
 	int		n = 0 ;
@@ -1289,13 +1273,13 @@ local int getdefyear(CA *cap) noex {
 	        cap->defmonth = (ts.tm_mon + 1) ;
 	    }
 
-	    if ((rs >= 0) && (cap->specyear != NULL)) {
+	    if ((rs >= 0) && (cap->specyear != nullptr)) {
 	        rs = cfdeci(cap->specyear,-1,&v) ;
 	        cap->defyear = v ;
 	        n |= 0x01 ;
 	    }
 
-	    if ((rs >= 0) && (cap->specmonth != NULL)) {
+	    if ((rs >= 0) && (cap->specmonth != nullptr)) {
 	        v = whichmonth(cap->specmonth,-1) ;
 	        if (v < 0) {
 	            rs = cfdeci(cap->specmonth,-1,&v) ;
@@ -1311,8 +1295,7 @@ local int getdefyear(CA *cap) noex {
 	}
 
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (getdefyear) */
+} /* end subroutine (getdefyear) */
 
 local int whichmonth(cchar *sp,int sl) noex {
 	int		i = -1 ;
@@ -1322,8 +1305,7 @@ local int whichmonth(cchar *sp,int sl) noex {
 	    i = matocasestr(calstrs_months,2,cp,cl) ;
 	}
 	return ((i >= 0) ? (i + 1) : -1) ;
-}
-/* end subroutine (whichmonth) */
+} /* end subroutine (whichmonth) */
 
 local int getval(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
@@ -1333,7 +1315,6 @@ local int getval(cchar *sp,int sl) noex {
 	    rs = cfdeci(cp,cl,&v) ;
 	}
 	return (rs >= 0) ? v : rs ;
-}
-/* end subroutine (getval) */
+} /* end subroutine (getval) */
 
 
