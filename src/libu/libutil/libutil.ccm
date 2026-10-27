@@ -20,7 +20,6 @@ module ;
 
 export module libutil ;
 
-export import :cvtconst ;
 export import :getlen ;
 export import :lenstr ;
 export import :lenstrarr ;
