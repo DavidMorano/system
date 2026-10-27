@@ -115,7 +115,7 @@
 #define	CH_APC		0x9F		/* application program command */
 
 #define	CH_NBSP		0xA0		/* non-breaking space */
-
+#define	CH_SHY		0xAD		/* Syllable-Hyphen or Soft-Hyphen */
 
 /* aliases: some extras because they appear now and then */
 
