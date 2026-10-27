@@ -62,6 +62,7 @@ inline int sncpyfc(char *dp,int dl,Args ... args) noex {
 } /* end subroutine-template (sncpy) */
 #endif /* __cplusplus */
 
+
 #endif /* SNCPYXC_INCLUDE */
 
 
