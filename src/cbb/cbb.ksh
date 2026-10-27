@@ -1,4 +1,4 @@
-#!/usr/extra/bin/ksh
+#!/usr/local/bin/ksh
 # CBB
 
 RF_DEBUG=false
