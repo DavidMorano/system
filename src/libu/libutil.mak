@@ -43,7 +43,7 @@ LIBS +=
 DEPS +=
 
 OBJPART00= libutil-strlen.o libutil-strxspn.o
-OBJPART01= libutil-cvtconst.o libutil-getlen.o 
+OBJPART01= libutil-getlen.o 
 OBJPART02= libutil-lenstr.o libutil-lenstrarr.o
 OBJPART03= libutil-loadstrs.o libutil-memclear.o
 OBJPART04= libutil-memcopy.o libutil-memcpy.o
@@ -137,8 +137,7 @@ again:
 
 clean:
 	makeclean $(ALL)
-	rmsubpat $(T)
-	rmobj
+	rmsubpat
 
 control:
 	(uname -n ; date) > Control
@@ -270,7 +269,6 @@ libutil9.o:		libutil9.cc libutil.o		$(DEPS) $(INCS)
 libutil10.o:		libutil10.cc libutil.o		$(DEPS) $(INCS)
 libutil11.o:		libutil11.cc libutil.o		$(DEPS) $(INCS)
 
-libutil-cvtconst.o:	libutil-cvtconst.ccm		$(DEPS)	$(INCS)
 libutil-getbyte.o:	libutil-getbyte.ccm		$(DEPS)	$(INCS)
 libutil-getlen.o:	libutil-getlen.ccm		$(DEPS)	$(INCS)
 libutil-lenstr.o:	libutil-lenstr.ccm		$(DEPS)	$(INCS)
