@@ -27,13 +27,13 @@ struct example {
 {{
     typedef int (*caller_f)(int) ;
     int rs ;
-    int cal1(int v) ;
+    int cal1(int v) <= noex ;
     struct clang {
 	caller_f	m ;
     } ;
 
     clang	cc ;
-    cc.m = call ;
+    cc.m = call ;		/* implicit call */
     rs = cc.m(42) ;
 
     clang	*clp = &cc ;
