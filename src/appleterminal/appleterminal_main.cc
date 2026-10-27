@@ -285,7 +285,7 @@ local char hexchar(int ch) noex {
 	return char(chx) ;
 } /* end subroutine (hexchar) */
 
-static bool isnotbadchar(int ch) noex {
+local bool isnotbadchar(int ch) noex {
 	return (strchr(badchars,ch) == nullptr) ;
 } /* end subroutine (isnotbadchar) */
 
