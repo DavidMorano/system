@@ -35,9 +35,9 @@ DEFS +=
 
 INCS +=
 
-MODS += libutil.ccm umisc.ccm
+MODS +=
 
-LIBS += -lu
+LIBS += -lu -lf
 
 
 DEPS_MAIN += 
