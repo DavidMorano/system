@@ -82,7 +82,7 @@
 
 /* external subroutines */
 
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 
 extern char	*strwcpy(char *,char *,int) ;
 
@@ -92,7 +92,7 @@ extern char	*strwcpy(char *,char *,int) ;
 
 /* forward references */
 
-static int	frcopen(FILE **,char *,char *) ;
+local int	frcopen(FILE **,char *,char *) ;
 
 
 /* local global variabes */
@@ -238,7 +238,7 @@ done:
 
 
 /* file open w/ return code */
-static int frcopen(fpp,fname,mode)
+local int frcopen(fpp,fname,mode)
 FILE	**fpp ;
 char	fname[] ;
 char	mode[] ;
