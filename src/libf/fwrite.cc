@@ -76,7 +76,7 @@ int fwriter(FILE *fp,cvoid *lbuf,int µllen) noex {
 	    rs = SR_OK ;
 	    if (cint llen = getlenstr(sbuf,µllen) ; llen > 0) ylikely {
 		csize nsize = size_t(llen) ;
-		csize lsize = 1 ;
+		csize lsize = 1uz ;
 	        if (size_t res = fwrite(lbuf,lsize,nsize,fp) ; res > 0) {
 	            wlen += intsat(res) ;
 		} else {
