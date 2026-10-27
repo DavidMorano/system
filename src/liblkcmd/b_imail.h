@@ -1,6 +1,6 @@
 /* imail_config HEADER */
 /* charset=ISO8859-1 */
-/* version %I% last-modified %G% */
+/* lang=C++20 (conformance reviewed) */
 
 /* IMAIL program */
 /* version %I% last-modified %G% */
