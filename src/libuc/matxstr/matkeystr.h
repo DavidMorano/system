@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern int	matkeystr(con mainv,cchar *,int) noex ;
-
 EXTERNC_end
 
 
