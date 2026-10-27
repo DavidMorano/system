@@ -5,6 +5,7 @@
 /* C-language defines */
 /* version %I% last-modified %G% */
 
+#define	CF_SATURATING		0	/* what name to use for saturating? */
 
 /* revision history:
 
@@ -15,12 +16,31 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	Description:
+	Make better sense out of these C++ casts.
+
+	Notes:
+	1. The required header file for the saturating cast
+	(|std::satrurating_cast|) is 'cnumeric'.
+	2. Which name to use for saturating cast?  For now, the
+	maintainer decides using the pre-processor define
+	|CF_SATURATING|.
+
+*******************************************************************************/
+
 #ifndef	CLANGUAGECAST_INCLUDE
 #define	CLANGUAGECAST_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cnumeric>		/* C++ only */
+
+
+#ifndef	CF_SATURATING
+#define	CF_SATURATING		0	/* what name to use for saturating? */
+#endif
 
 
 #ifdef	__cplusplus
@@ -38,7 +58,7 @@
 
 #ifdef	__cplusplus
 #ifndef	saturate
-#ifdef	__cpp_lib_saturation_arithmetic
+#if	defined(__cpp_lib_saturation_arithmetic) && CF_SATURATING
 #define	saturate		std::saturating_cast
 #else
 #define	saturate		std::saturate_cast
@@ -50,7 +70,7 @@
 /* NOTE: C++26 says the proper cast is |std:saturating_cast(3c++)| */
 #ifdef	__cplusplus
 #ifndef	cast_saturate
-#ifdef	__cpp_lib_saturation_arithmetic
+#if	defined(__cpp_lib_saturation_arithmetic) && CF_SATURATING
 #define	cast_saturate		saturating_cast
 #define	cast_saturate		saturating_cast
 #define	cast_sat		saturating_cast
