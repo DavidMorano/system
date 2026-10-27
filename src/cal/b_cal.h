@@ -1,4 +1,9 @@
-/* config */
+/* cal_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* CAL program */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,9 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	CALCONFIG_INCLUDE
+#define	CALCONFIG_INCLUDE
 
 
 #define	VERSION		"0"
@@ -76,5 +84,8 @@
 #define	PO_OPTION	"option"
 
 #define	LOGSIZE		(80*1024)
+
+
+#endif /* CALCONFIG_INCLUDE */
 
 
