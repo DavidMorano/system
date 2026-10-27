@@ -57,9 +57,7 @@ enum localfses {
 } ; /* end enum (localfses) */
 
 EXTERNC_begin
-
 extern int	matlocalfs(cchar *sp,int sl) noex ;
-
 EXTERNC_end
 
 
