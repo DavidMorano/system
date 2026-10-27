@@ -107,6 +107,8 @@ bitand_eq	&=
 bitor_eq	|=
 bitxor_eq	^=
 
+bitnot		~		(also exists as 'compl')
+
 logand		&&		(also exists as 'and')
 logor		||		(also exists as 'or')
 logxor		^^
@@ -115,9 +117,10 @@ logand_eq	&&=
 logor_eq	||=
 logxor_eq	^^=
 
-bitnot		~		(also exists as 'compl')
 lognot		!		(also exists as 'not')
 
+pos		+
+neg		-
 
 = new keywords
 
