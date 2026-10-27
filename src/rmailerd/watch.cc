@@ -1,18 +1,16 @@
-/* watch */
+/* watch SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* watch (listen on) the specified socket */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
 	= 1991-09-10, David A­D­ Morano
-
 	This subroutine was adopted from the DWD program.
-
 
 */
 
@@ -30,15 +28,11 @@
 	elp	vector list of exported variables
 
 	Returns:
-
-	OK	doesn't really matter in the current implementation
-
+	OK	does not really matter in the current implementation
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -47,19 +41,21 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<unistd.h>
-#include	<climits>
 #include	<fcntl.h>
 #include	<poll.h>
+#include	<ctime>
 #include	<csignal>
-#include	<time.h>
+#include	<climits>
+#include	<cstddef>		/* |unllptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
+#include	<opendefstds.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<logfile.h>
 #include	<vecstr.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -83,15 +79,14 @@
 
 extern int	handle(struct proginfo *,int,VECSTR *) ;
 extern int	checklockfile(struct proginfo *,bfile *,
-			const char *,const char *,time_t,pid_t) ;
+			cchar *,cchar *,time_t,pid_t) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*timestr_logz(time_t,char *) ;
 
 #if	CF_DEBUG
 extern char	*d_reventstr() ;
@@ -103,7 +98,7 @@ extern char	*d_reventstr() ;
 
 /* forward references */
 
-static void	int_all(int) ;
+local void	int_all(int) ;
 
 
 /* external variables */
@@ -164,10 +159,7 @@ VECSTR		*elp ;
 
 /* we want to receive the new socket (from 'accept') above these guys */
 
-	for (i = 0 ; i < 3 ; i += 1) {
-		if (u_fstat(i,&sb) < 0) 
-			u_open(NULLFNAME,O_RDONLY,0666) ;
-	}
+	rs = opendefstds(3) ;
 
 	uc_sigsetempty(&signalmask) ;
 
@@ -329,7 +321,7 @@ top:
 
 	        logfile_printf(&pip->lh,
 	            "%s another program has my lock file, other PID=%d\n",
-	            timestr_logz(pip->daytime,timebuf),
+	            strtime_logz(pip->daytime,timebuf),
 	            rs) ;
 
 	        goto badlockfile ;
@@ -349,7 +341,7 @@ top:
 
 	        logfile_printf(&pip->lh,
 	            "%s another program has my PID file, other PID=%d\n",
-	            timestr_logz(pip->daytime,timebuf),
+	            strtime_logz(pip->daytime,timebuf),
 	            rs) ;
 
 	        goto badpidfile ;
@@ -372,7 +364,7 @@ top:
 	pip->daytime = time(NULL) ;
 
 	logfile_printf(&pip->lh,"%s daemon exiting (%d)\n",
-	    timestr_logz(pip->daytime,timebuf),rs) ;
+	    strtime_logz(pip->daytime,timebuf),rs) ;
 
 ret0:
 	return rs ;
@@ -391,7 +383,7 @@ badhup:
 /* end subroutine (watch) */
 
 
-static void int_all(sn)
+local void int_all(sn)
 int	sn ;
 {
 
