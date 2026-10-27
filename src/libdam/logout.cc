@@ -89,7 +89,7 @@ cbool		f_debug		= CF_DEBUG ;
 /* exported subroutines */
 
 int logout(pid_t sid) noex {
-	utmpx		*up = nullptr ;
+	utmpx		*up = nullptr ; /* used-afterwards */
 	int		rs = SR_OK ;
 	int		si = 0 ; /* return-value */
 	DEBUGPRINTF("ent sid=%d\n",sid) ;
@@ -110,7 +110,7 @@ int logout(pid_t sid) noex {
 	    if (up == nullptr) rs = SR_PERM ;
 	} else {
 	    rs = SR_NOENT ;
-	}
+	} /* end if (error) */
 	endutxent() ;
 	DEBUGPRINTF("ret rs=%d si=%d\n",rs,si) ;
 	return (rs >= 0) ? si : rs ;
