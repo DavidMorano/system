@@ -37,23 +37,25 @@ struct sreqdb_head {
 	INTIQ		exits ;		/* thread-exits by job-ID (jsn) */
 	volatile int	f_threxiting ;	/* a child thread is exiting */
 	uint		magic ;
-} ;
+} ; /* end struct */
+
+typedef SREQDB		sreqdb ;
 
 EXTERNC_begin
 
-extern int sreqdb_start(SREQDB *,cchar *,int) noex ;
-extern int sreqdb_newjob(SREQDB *,int,cchar *,int,int) noex ;
-extern int sreqdb_typeset(SREQDB *,int,int,int) noex ;
-extern int sreqdb_get(SREQDB *,int,SREQ **) noex ;
-extern int sreqdb_findpid(SREQDB *,pid_t,SREQ **) noex ;
-extern int sreqdb_thrsdone(SREQDB *,SREQ **) noex ;
-extern int sreqdb_del(SREQDB *,int) noex ;
-extern int sreqdb_delobj(SREQDB *,SREQ *) noex ;
-extern int sreqdb_findfd(SREQDB *,int) noex ;
-extern int sreqdb_exiting(SREQDB *,int) noex ;
-extern int sreqdb_count(SREQDB *) noex ;
-extern int sreqdb_builtrelease(SREQDB *) noex ;
-extern int sreqdb_finish(SREQDB *) noex ;
+extern int sreqdb_start(sreqdb *,cchar *,int) noex ;
+extern int sreqdb_newjob(sreqdb *,int,cchar *,int,int) noex ;
+extern int sreqdb_typeset(sreqdb *,int,int,int) noex ;
+extern int sreqdb_get(sreqdb *,int,SREQ **) noex ;
+extern int sreqdb_findpid(sreqdb *,pid_t,SREQ **) noex ;
+extern int sreqdb_thrsdone(sreqdb *,SREQ **) noex ;
+extern int sreqdb_del(sreqdb *,int) noex ;
+extern int sreqdb_delobj(sreqdb *,SREQ *) noex ;
+extern int sreqdb_findfd(sreqdb *,int) noex ;
+extern int sreqdb_exiting(sreqdb *,int) noex ;
+extern int sreqdb_count(sreqdb *) noex ;
+extern int sreqdb_builtrelease(sreqdb *) noex ;
+extern int sreqdb_finish(sreqdb *) noex ;
 
 EXTERNC_end
 
