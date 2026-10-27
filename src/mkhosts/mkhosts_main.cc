@@ -5,7 +5,6 @@
 /* convert a DNS database (in ASCII) into a 'hosts' table format */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
 
 /* revision history:
@@ -33,22 +32,22 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<bfile.h>
-#include	<baops.h>
-#include	<mallocstuff.h>
-#include	<prognamevar.hh>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
+#include	<prognamevar.hh>	/* LIBDAM */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"mkhosts_config.h"
 
+import proginfo ;
 
 /* local defines */
 
@@ -56,25 +55,30 @@
 #define	NARGGROUPS	(MAXARGINDEX/8 + 1)
 #define	DEFMAXLINES	66
 #define	MAXLINES	180
-#define	LINELEN		200
 #define	BUFLEN		(MAXPATHLEN + (2 * LINELEN))
 #define	DEFPOINT	10
+
+#ifndef	LINELEN
+#define	LINELEN		200
+#endif
 
 
 /* external subroutines */
 
-extern int	procfile() ;
+extern "C" {
+    extern int	mkhsots_file() noex ;
+} /* end extern */
 
 
-/* forward references */
-
-local void	helpfile(cchar *,bfile *) ;
+/* external variables */
 
 
 /* local structures */
 
 
 /* forward references */
+
+local void	helpfile(cchar *,bfile *) noex ;
 
 
 /* local variables */
@@ -86,7 +90,7 @@ enum argopts {
 	argopt_verbose,
 	argopt_help,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	argopts[] = {
 	"ROOT",
@@ -95,24 +99,23 @@ constexpr cpcchar	argopts[] = {
 	"VERBOSE",
 	"HELP",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
-
-struct global		g ;
 
 
 /* exported subroutines */
 
 int main(int argc,mainv argv,mainv envv) {
     	prognamevar	progname(argc,argv,envv) ;
-	global		*gp = &g ;
+	proginfo	pi ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		errfile, *efp = &errfile ;
 	int	argr, argl, aol, avl ;
 	int	maxai, pan, npa, kwi, i ;
 	int	f_optminus, f_optplus, f_optequal ;
+	int	rs = SR_OK ;
 	int	rs, bl ;
 	int	ex = EX_INFO ;
 	int	argnum ;
@@ -121,7 +124,6 @@ int main(int argc,mainv argv,mainv envv) {
 	int	f_version = false ;
 	int	f_usage = false ;
 	int	f_help = false ;
-
 	cchar	*argp, *aop, *avp ;
 	char	argpresent[NARGGROUPS] ;
 	char	buf[BUFLEN + 1] ;
@@ -218,7 +220,7 @@ int main(int argc,mainv argv,mainv envv) {
 	                        g.debuglevel = 1 ;
 	                        if (f_optequal) {
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	                            debugprintf(
 	                                "main: debug flag, avp=\"%W\"\n",
 	                                avp,avl) ;
