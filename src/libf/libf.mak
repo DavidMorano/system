@@ -44,7 +44,7 @@ LIBS +=
 DEPS= 		$(MODS)
 DEPS_MISC=	modutil.o
 
-OBJ0= freadln.o
+OBJ0= fread.o freadln.o
 OBJ1= fwrite.o fprint.o fputch.o
 OBJ2= fopenroot.o
 OBJ3= $(MODS)
@@ -160,6 +160,7 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+fread.o:		fread.cc			$(DEPS) $(INCS)
 freadln.o:		freadln.cc	freadln.h	$(DEPS) $(INCS)
 fwrite.o:		fwrite.cc			$(DEPS) $(INCS)
 fprint.o:		fprint.cc			$(DEPS) $(INCS)
