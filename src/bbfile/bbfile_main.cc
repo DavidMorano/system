@@ -13,6 +13,9 @@
 
 */
 
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
 /*******************************************************************************
 
 	Name:
@@ -23,15 +26,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstdio>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<isch.h>
-#include	<localmisc.h>
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<isch.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"bbfile_config.h"
 
 
 /* local defines */
@@ -68,44 +73,30 @@
 int main(int argc,mainv argv,mainv) {
     	int		ex = EXIT_SUCCESS ;
 	int		rs = SR_OK ;
-	int j, k ;
-
+	int k ;
 	k = 0 ;
 	for (int i = 1 ; i < argc ; i += 1) {
-	    j = 0 ;
+	    int j = 0 ;
+	    bool fdone = false ;
 	    while (argv[i][j] != '\0') {
-
 	        if (isalnumlatin(argv[i][j]) ||
 	            argv[i][j] == '+' ||
 	            argv[i][j] == '_' ||
 	            argv[i][j] == '-' ||
 	            argv[i][j] == '.' ) {
-
 	            putc(argv[i][j],stdout) ;
-
-	            if (++k == BB_MAXNAMELEN) 
-			goto done ;
-
-	        }
-
+	            if ((fdone = (++k == BB_MAXNAMELEN))) break ;
+	        } /* end if */
 	        j += 1 ;
-
+		if (fdone) break ;
 	    } /* end while */
-
-	    if (++k == BB_MAXNAMELEN) 
-		break ;
-
-	    if ((i + 1) == argc) 
-		break ;
-
+	    if (fdone) break ;
+	    if (++k == BB_MAXNAMELEN) break ;
+	    if ((i + 1) == argc) break ;
 	    putc('_',stdout) ;
-
 	} /* end for */
-
 	putc('\n',stdout) ;
-
 	return ex ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
