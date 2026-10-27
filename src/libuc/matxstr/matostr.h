@@ -27,21 +27,18 @@
 
 
 EXTERNC_begin
-
 extern int matobasestr(con mainv,int,cchar *,int) noex ;
 extern int matocasestr(con mainv,int,cchar *,int) noex ;
 extern int matofoldstr(con mainv,int,cchar *,int) noex ;
-
+local inline int matostr(con mainv bs,int n,cchar *sp,int sl) noex {
+	return matobasestr(bs,n,sp,sl) ;
+} /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int matostr(con mainv bs,int n,cchar *sp,int sl = -1) noex {
-	return matobasestr(bs,n,sp,sl) ;
-}
-#else
-local inline int matostr(con mainv bs,int n,cchar *sp,int sl) noex {
-	return matobasestr(bs,n,sp,sl) ;
-}
+inline int matostr(con mainv bs,int n,cchar *sp) noex {
+	return matobasestr(bs,n,sp,-1) ;
+} /* end */
 #endif /* __cplusplus */
 
 
