@@ -44,11 +44,11 @@ enum sreqstates {
 	sreqstate_thread,		/* spawned thread */
 	sreqstate_done,			/* job finished */
 	sreqstate_overlast
-} ;
+} ; /* end struct */
 
 struct sreq_sncursor {
 	osetstr_cur	cur ;
-} ;
+} ; /* end struct */
 
 struct sreq_flags {
 	uint		longopt:1 ;		/* the "long" switch */
@@ -59,7 +59,7 @@ struct sreq_flags {
 	uint		builtout:1 ;
 	uint		builtdone:1 ;
 	uint		namesvcs:1 ;		/* service names (for 'help') */
-} ;
+} ; /* end struct */
 
 struct sreq_head {
 	sockaddress	sa ;			/* peername socket address */
