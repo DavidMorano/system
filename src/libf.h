@@ -30,9 +30,10 @@
 
 EXTERNC_begin
 
-extern int	fprint(FILE *,cchar *,int) noex ;
-extern int	fputch(FILE *,int) noex ;
-extern int	fwriter(FILE *,cvoid *,int) noex ;
+extern int	fprint	(FILE *,cchar *,int) noex ;
+extern int	fputch	(FILE *,int) noex ;
+extern int	fwriter	(FILE *,cvoid *,int) noex ;
+extern int	freader	(FILE *,void *,int) noex ;
 
 extern FILE *fopenroot(cchar *,cchar *,
 			char * = nullptr,cchar * = nullptr) noex ;
@@ -46,7 +47,8 @@ EXTERNC_end
 /* the following subroutine are C++ overloaded */
 #ifndef	__cplusplus
 
-extern int	fwrite(FILE *,cvoid *,int) noex ;
+extern int	fwrite	(FILE *,cvoid *,int) noex ;
+extern int	fread	(FILE *,void *,int) noex ;
 
 #endif /* __cplusplus */
 
