@@ -15,6 +15,16 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
+#ifndef	PROGCHECKCONFIG_INCLUDE
+#define	PROGCHECKCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>		/* POSIX® */
+#include	<stdlib.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
 
 #define	VERSION		"0"
 #define	WHATINFO	"@(#)progcheck "
@@ -43,34 +53,18 @@
 #define	VARDEBUGFD1	"PROGCHECK_DEBUGFD"
 #define	VARDEBUGFD2	"DEBUGFD"
 
-#define	VARNODE		"NODE"
-#define	VARSYSNAME	"SYSNAME"
-#define	VARRELEASE	"RELEASE"
-#define	VARMACHINE	"MACHINE"
-#define	VARARCHITECTURE	"ARCHITECTURE"
-#define	VARCLUSTER	"CLUSTER"
-#define	VARSYSTEM	"SYSTEM"
-#define	VARNISDOMAIN	"NISDOMAIN"
-#define	VARTERM		"TERM"
-#define	VARPRINTER	"PRINTER"
-#define	VARLPDEST	"LPDEST"
-#define	VARPAGER	"PAGER"
-#define	VARMAIL		"MAIL"
-#define	VARORGANIZATION	"ORGANIZATION"
-#define	VARLINES	"LINES"
-#define	VARCOLUMNS	"COLUMNS"
-#define	VARNAME		"NAME"
-#define	VARFULLNAME	"FULLNAME"
-#define	VARHZ		"HZ"
-#define	VARTZ		"TZ"
-
+#ifndef	VARHOMEDNAME
 #define	VARHOMEDNAME	"HOME"
+#endif
+#ifndef	VARTMPDNAME
 #define	VARTMPDNAME	"TMPDIR"
+#endif
+#ifndef	VARMAILDNAME
 #define	VARMAILDNAME	"MAILDIR"
+#endif
+#ifndef	VARMAILDNAMES
 #define	VARMAILDNAMES	"MAILDIRS"
-
-#define	VARPRLOCAL	"LOCAL"
-#define	VARPRPCS	"PCS"
+#endif
 
 #define	TMPDNAME	"/tmp"
 #define	WORKDNAME	"/tmp"
@@ -91,5 +85,8 @@
 #define	LOGSIZE		(80*1024)
 
 #define	TO_FILEMOD	(1 * 60 * 60)		/* IPASSWD timeout */
+
+
+#endif /* PROGCHECKCONFIG_INCLUDE */
 
 
