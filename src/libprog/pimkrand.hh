@@ -20,11 +20,7 @@
 #include	"proginfo.hh"
 
 
-EXTERNC_begin
-
 extern int	pimkrand(proginfo *) noex ;
-
-EXTERNC_end
 
 
 #endif /* __cplusplus */
