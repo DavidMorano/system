@@ -1107,7 +1107,7 @@ int main(int argc,mainv argv,mainv envv)
 
 	        pip->open.logfile = TRUE ;
 	        if (pip->loglen > 0)
-	            logfile_checksize(&pip->lh,pip->loglen) ;
+	            logfile_cksize(&pip->lh,pip->loglen) ;
 
 	        logfile_printf(&pip->lh,"%s %s",
 	            strtime_logz(pip->daytime,timebuf),
