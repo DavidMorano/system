@@ -1,4 +1,4 @@
-/* filex_main HEADER */
+/* fileopx_main HEADER */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -14,6 +14,13 @@
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>		/* POSIX® */
+#include	<stdlib.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	VERSION		"0a"
