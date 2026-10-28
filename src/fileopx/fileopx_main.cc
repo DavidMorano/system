@@ -5,7 +5,6 @@
 /* front-end subroutine for the FILEOPX program */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_FOLLOWFILES	0		/* follow symbolic links of files */
@@ -613,7 +612,7 @@ int main(int argc,mainv argv,mainv envv) {
 	keyopt		akopts ;
 	bfile		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -648,14 +647,14 @@ int main(int argc,mainv argv,mainv envv) {
 	rs = sighand_start(&sm,sigblocks,sigignores,sigints,main_sighand) ;
 	if (rs < 0) goto badsighand ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs2 = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs2) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -1841,7 +1840,7 @@ badpargs:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mi[12] ;
 	    uint	mo ;
@@ -1878,16 +1877,15 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
+#if	CF_DEBUG
+	DEBUGCLOSE() ;
 #endif
 
 	sighand_finish(&sm) ;
 
 badsighand:
 	return ex ;
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
@@ -1906,8 +1904,7 @@ local void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	    if_exit = true ;
 	    break ;
 	} /* end switch */
-}
-/* end subroutine (main_sighand) */
+} /* end subroutine (main_sighand) */
 
 local int usage(PI *pip) noex {
 	bfile		*efp = (bfile *) pip->efp ;
@@ -1937,8 +1934,7 @@ local int usage(PI *pip) noex {
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 local int procsig(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -1949,8 +1945,7 @@ local int procsig(PI *pip) noex {
 	    rs = SR_INTR ;
 	}
 	return rs ;
-}
-/* end subroutine (procsig) */
+} /* end subroutine (procsig) */
 
 local int loadfnos(PI *pip) noex {
 	if (pip->fl.f_nodev) {
@@ -1963,8 +1958,7 @@ local int loadfnos(PI *pip) noex {
 	if (pip->fl.f_nosock) bwset(pip->fnos,ft_s) ;
 	if (pip->fl.f_nodoor) bwset(pip->fnos,ft_d) ;
 	return SR_OK ;
-}
-/* end if (loadfnos) */
+} /* end if (loadfnos) */
 
 local int procopts(PI *pip,keyopt *kop) noex {
 	int		rs = SR_OK ;
@@ -2302,8 +2296,7 @@ local int procopts(PI *pip,keyopt *kop) noex {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procopts) */
+} /* end subroutine (procopts) */
 
 local int procfts(PI *pip) noex {
 	paramopt	*pop = &pip->aparams ;
@@ -2373,8 +2366,7 @@ local int procfts(PI *pip) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procfts) */
+} /* end subroutine (procfts) */
 
 local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn) noex {
 	bfile		ofile, *ofp = &ofile ;
@@ -2449,8 +2441,7 @@ local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
 local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	bfile		*efp = (bfile *) pip->efp ;
@@ -2559,8 +2550,7 @@ local int procargs(PI *pip,ARGINFO *aip,bits *bop,cchar *afn) noex {
 	} /* end if (program mode=filesize) */
 
 	return rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
 local int procnames(PI *pip,cchar *lbuf,int llen) noex {
 	field		fsb ;
@@ -2591,8 +2581,7 @@ local int procnames(PI *pip,cchar *lbuf,int llen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procnames) */
+} /* end subroutine (procnames) */
 
 int procname(PI *pip,cchar *name) noex {
 	ustat		sb, ssb, *sbp = &sb ;
@@ -2698,8 +2687,7 @@ int procname(PI *pip,cchar *name) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (procname) */
+} /* end subroutine (procname) */
 
 local int procdir(PI *pip,cchar *np,ustat *sbp) noex {
 	int		rs = SR_OK ;
@@ -2752,8 +2740,7 @@ local int procdir(PI *pip,cchar *np,ustat *sbp) noex {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procdir) */
+} /* end subroutine (procdir) */
 
 local int procdirs(PI *pip,cchar *namp,int naml,ustat *sbp) noex {
 	bfile		*efp = (bfile *) pip->efp ;
@@ -2843,8 +2830,7 @@ local int procdirs(PI *pip,cchar *namp,int naml,ustat *sbp) noex {
 	    debugprintf("main/procdirs: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procdirs) */
+} /* end subroutine (procdirs) */
 
 local int procother(PI *pip,cchar *name,ustat *sbp) noex {
 	FILEINFO	ck{}, *ckp = &ck ;
@@ -3197,8 +3183,7 @@ local int procother(PI *pip,cchar *name,ustat *sbp) noex {
 #endif
 
 	return (rs >= 0) ? f_process : rs ;
-}
-/* end subroutine (procother) */
+} /* end subroutine (procother) */
 
 local int procothers(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	TARDIR		*tdp ;
@@ -3235,8 +3220,7 @@ local int procothers(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	} /* end for */
 	if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
 	return rs ;
-}
-/* end subroutine (procothers) */
+} /* end subroutine (procothers) */
 
 #if	CF_NEWPRUNE
 local int procprune(PI *pip,cchar *name) noex {
@@ -3261,8 +3245,7 @@ local int procprune(PI *pip,cchar *name) noex {
 #endif
 
 	return (rs >= 0) ? f_go : rs ;
-}
-/* end subroutine (procprune) */
+} /* end subroutine (procprune) */
 #else /* CF_NEWPRUNE */
 local int procprune(PI *pip,cchar *name) noex {
 	int		rs = SR_OK ;
@@ -3307,8 +3290,7 @@ local int procprune(PI *pip,cchar *name) noex {
 #endif
 
 	return (rs >= 0) ? f_go : rs ;
-}
-/* end subroutine (procprune) */
+} /* end subroutine (procprune) */
 #endif /* CF_NEWPRUNE */
 
 local int procprintfts(PI *pip,cchar *po) noex {
@@ -3336,8 +3318,7 @@ local int procprintfts(PI *pip,cchar *po) noex {
 	} /* end if */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procprintfts) */
+} /* end subroutine (procprintfts) */
 
 local int procprintsufs(PI *pip,cchar *po) noex {
 	paramopt	*pop = &pip->aparams ;
@@ -3364,8 +3345,7 @@ local int procprintsufs(PI *pip,cchar *po) noex {
 	} /* end if */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procprintsufs) */
+} /* end subroutine (procprintsufs) */
 
 local int procrm(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	int		rs = SR_OK ;
@@ -3395,8 +3375,7 @@ local int procrm(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (procrm) */
+} /* end subroutine (procrm) */
 
 local int proclines(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	int		rs = SR_OK ;
@@ -3430,8 +3409,7 @@ local int proclines(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	    debugprintf("fileop/proclines: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (proclines) */
+} /* end subroutine (proclines) */
 
 local int proctars_begin(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -3465,8 +3443,7 @@ local int proctars_begin(PI *pip) noex {
 	    debugprintf("main/proctars_begin: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (proctars_begin) */
+} /* end subroutine (proctars_begin) */
 
 local int proctars_end(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -3492,8 +3469,7 @@ local int proctars_end(PI *pip) noex {
 	    debugprintf("main/proctars_end: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (proctars_end) */
+} /* end subroutine (proctars_end) */
 
 local int proctars_check(PI *pip) noex {
 	paramopt	*pop = &pip->aparams ;
@@ -3562,8 +3538,7 @@ local int proctars_check(PI *pip) noex {
 	    debugprintf("main/proctars_check: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (proctars_check) */
+} /* end subroutine (proctars_check) */
 
 local int proctars_checkerr(PI *pip,cchar *td,int rs) noex {
 	bfile		*efp = (bfile *) pip->efp ;
@@ -3590,8 +3565,7 @@ local int proctars_checkerr(PI *pip,cchar *td,int rs) noex {
 	        bprintf(efp,"%s: tar=%s\n",pn,td) ;
 	    }
 	return rs ;
-}
-/* end subroutine (proctars_checkerr) */
+} /* end subroutine (proctars_checkerr) */
 
 local int proctars_same(PI *pip,ustat *sbp) noex {
 	int		rs = SR_OK ;
@@ -3605,8 +3579,7 @@ local int proctars_same(PI *pip,ustat *sbp) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (proctars_same) */
+} /* end subroutine (proctars_same) */
 
 local int proctars_load(PI *pip,cchar *name,ustat *sbp) noex {
 	TARDIR		*tdp ;
@@ -3637,8 +3610,7 @@ local int proctars_load(PI *pip,cchar *name,ustat *sbp) noex {
 	    } /* end if (m-a) */
 	} /* end if (proctars_notalready) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (proctars_load) */
+} /* end subroutine (proctars_load) */
 
 local int proctars_notalready(PI *pip,ustat *sbp) noex {
 	int		rs = SR_OK ;
@@ -3656,8 +3628,7 @@ local int proctars_notalready(PI *pip,ustat *sbp) noex {
 	    } /* end for */
 	}
 	return (rs >= 0) ? (!f) : rs ;
-}
-/* end subroutine (proctars_notalready) */
+} /* end subroutine (proctars_notalready) */
 
 local int proctars_fins(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -3683,8 +3654,7 @@ local int proctars_fins(PI *pip) noex {
 	    debugprintf("main/proctars_fins: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (proctars_load) */
+} /* end subroutine (proctars_load) */
 
 local int procsuf_have(PI *pip,cchar *sp,int sl) noex {
 	paramopt	*pop = &pip->aparams ;
@@ -3712,8 +3682,7 @@ local int procsuf_have(PI *pip,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paramopt-cur) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (procsuf_have) */
+} /* end subroutine (procsuf_have) */
 
 local int procsuf_begin(PI *pip) noex {
 	paramopt	*pop = &pip->aparams ;
@@ -3812,8 +3781,7 @@ local int procsuf_begin(PI *pip) noex {
 	    debugprintf("main/procsuf_begin: ret rs=%d c=%u\n",rs,c) ;
 #endif
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procsuf_begin) */
+} /* end subroutine (procsuf_begin) */
 
 local int procsuf_end(PI *pip) noex {
 	vecpstr		*slp ;
@@ -3842,8 +3810,7 @@ local int procsuf_end(PI *pip) noex {
 	    }
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (procsuf_end) */
+} /* end subroutine (procsuf_end) */
 
 local int procsuf_load(PI *pip,int si,cchar *ap,int al) noex {
 	paramopt	*pop = &pip->aparams ;
@@ -3895,8 +3862,7 @@ local int procsuf_load(PI *pip,int si,cchar *ap,int al) noex {
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procsuf_load) */
+} /* end subroutine (procsuf_load) */
 
 local int procrm_begin(PI *pip) noex {
 	int		rs ;
@@ -3904,8 +3870,7 @@ local int procrm_begin(PI *pip) noex {
 	    pip->fl.rmdirs = true ;
 	}
 	return rs ;
-}
-/* end subroutine (procrm_begin) */
+} /* end subroutine (procrm_begin) */
 
 local int procrm_add(PI *pip,cchar *dp,int dl) noex {
 	int		rs ;
@@ -3915,8 +3880,7 @@ local int procrm_add(PI *pip,cchar *dp,int dl) noex {
 	}
 	rs = vecpstr_add(&pip->rmdirs,dp,dl) ;
 	return rs ;
-}
-/* end subroutine (procrm_add) */
+} /* end subroutine (procrm_add) */
 
 local int procrm_end(PI *pip) noex {
 	vecpstr_vcmpq	vcf = vecpstr_vcmp(vstrcmpr) ;
@@ -3936,8 +3900,7 @@ local int procrm_end(PI *pip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (rmdirs) */
 	return rs ;
-}
-/* end subroutine (procrm_end) */
+} /* end subroutine (procrm_end) */
 
 local int proclines_begin(PI *pip) noex {
 	int		rs = SR_FAULT ;
@@ -3945,8 +3908,7 @@ local int proclines_begin(PI *pip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (proclines_begin) */
+} /* end subroutine (proclines_begin) */
 
 local int proclines_end(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -3956,8 +3918,7 @@ local int proclines_end(PI *pip) noex {
 	    rs = bprintf(ofp,"%10u\n",pip->c_lines) ;
 	}
 	return rs ;
-}
-/* end subroutine (proclines_end) */
+} /* end subroutine (proclines_end) */
 
 local int procdir_begin(PI *pip) noex {
 	hdb		*dbp = &pip->dirs ;
@@ -3975,8 +3936,7 @@ local int procdir_begin(PI *pip) noex {
 	        hdb_finish(dbp) ;
 	} /* end if (hdb_start) */
 	return rs ;
-}
-/* end subroutine (procdir_begin) */
+} /* end subroutine (procdir_begin) */
 
 local int procdir_end(PI *pip) noex {
 	hdb		*dbp = &pip->dirs ;
@@ -4011,8 +3971,7 @@ local int procdir_end(PI *pip) noex {
 	    }
 	} /* end if (was activated) */
 	return rs ;
-}
-/* end subroutine (procdir_end) */
+} /* end subroutine (procdir_end) */
 
 local int procdir_have(PI *pip,dev_t dev,ino_t ino,cchar *sp,int nl) noex {
 	hdb		*dbp = &pip->dirs ;
@@ -4034,8 +3993,7 @@ local int procdir_have(PI *pip,dev_t dev,ino_t ino,cchar *sp,int nl) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procdir_have) */
+} /* end subroutine (procdir_have) */
 
 local int procdir_addid(PI *pip,dev_t dev,ino_t ino) noex {
 	DIRID		*dip ;
@@ -4060,8 +4018,7 @@ local int procdir_addid(PI *pip,dev_t dev,ino_t ino) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (procdir_addid) */
+} /* end subroutine (procdir_addid) */
 
 local int procdir_haveprefix(PI *pip,cchar *fp,int fl) noex {
 	hdbstr		*plp = &pip->dirnames ;
@@ -4076,8 +4033,7 @@ local int procdir_haveprefix(PI *pip,cchar *fp,int fl) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procdir_haveprefix) */
+} /* end subroutine (procdir_haveprefix) */
 
 local int procdir_addprefix(PI *pip,cchar *sp,int nl) noex {
 	hdbstr		*plp = &pip->dirnames ;
@@ -4090,8 +4046,7 @@ local int procdir_addprefix(PI *pip,cchar *sp,int nl) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procdir_addprefix) */
+} /* end subroutine (procdir_addprefix) */
 
 local int procuniq_begin(PI *pip) noex {
 	hdb		*dbp = &pip->files ;
@@ -4106,8 +4061,7 @@ local int procuniq_begin(PI *pip) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (procuniq_begin) */
+} /* end subroutine (procuniq_begin) */
 
 local int procuniq_end(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -4144,8 +4098,7 @@ local int procuniq_end(PI *pip) noex {
 	} /* end if (unique and was activated) */
 
 	return rs ;
-}
-/* end subroutine (procuniq_end) */
+} /* end subroutine (procuniq_end) */
 
 local int procuniq_have(PI *pip,dev_t dev,ino_t ino) noex {
 	hdb		*dbp = &pip->files ;
@@ -4168,8 +4121,7 @@ local int procuniq_have(PI *pip,dev_t dev,ino_t ino) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (procuniq_have) */
+} /* end subroutine (procuniq_have) */
 
 local int procuniq_addid(PI *pip,dev_t dev,ino_t ino) noex {
 	cint		sz = szof(FILEID) ;
@@ -4191,8 +4143,7 @@ local int procuniq_addid(PI *pip,dev_t dev,ino_t ino) noex {
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (procuniq_addid) */
+} /* end subroutine (procuniq_addid) */
 
 local int procprune_begin(PI *pip,cchar *pfname) noex {
 	int		rs ;
@@ -4235,8 +4186,7 @@ local int procprune_begin(PI *pip,cchar *pfname) noex {
 	    } /* end if (prune) */
 	} /* end if (prune-file) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procprune_begin) */
+} /* end subroutine (procprune_begin) */
 
 local int procprune_end(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -4247,8 +4197,7 @@ local int procprune_end(PI *pip) noex {
 	    pip->prune = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (procuniq_end) */
+} /* end subroutine (procuniq_end) */
 
 local int procprune_loadfile(PI *pip,cchar *pfname) noex {
 	int		rs = SR_OK ;
@@ -4286,8 +4235,7 @@ local int procprune_loadfile(PI *pip,cchar *pfname) noex {
 	    if (c > 0) pip->fl.prune = true ;
 	} /* end if (have file) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procprune_loadfile) */
+} /* end subroutine (procprune_loadfile) */
 
 local int procprune_size(PI *pip,int *sizep) noex {
 	paramopt	*pop = &pip->aparams ;
@@ -4316,8 +4264,7 @@ local int procprune_size(PI *pip,int *sizep) noex {
 	} /* end if (paramopt-cur) */
 	if (sizep != nullptr) *sizep = sz ;
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procuniq_size) */
+} /* end subroutine (procuniq_size) */
 
 local int proclink_begin(PI *pip) noex {
 	hdb		*dbp = &pip->links ;
@@ -4331,8 +4278,7 @@ local int proclink_begin(PI *pip) noex {
 	    pip->open.links = (rs >= 0) ;
 	}
 	return rs ;
-}
-/* end subroutine (proclink_begin) */
+} /* end subroutine (proclink_begin) */
 
 local int proclink_end(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -4349,8 +4295,7 @@ local int proclink_end(PI *pip) noex {
 	    }
 	} /* end if (was activated) */
 	return rs ;
-}
-/* end subroutine (proclink_end) */
+} /* end subroutine (proclink_end) */
 
 local int proclink_fins(PI *pip) noex {
 	hdb		*dbp = &pip->links ;
@@ -4383,8 +4328,7 @@ local int proclink_fins(PI *pip) noex {
 	} /* end if (hdb-cur) */
 	if (rs >= 0) rs = rs1 ;
 	return rs ;
-}
-/* end subroutine (proclink_fins) */
+} /* end subroutine (proclink_fins) */
 
 local int proclink_add(PI *pip,dev_t dev,ino_t ino,mode_t m,cchar *fp) noex {
 	int		rs ;
@@ -4411,8 +4355,7 @@ local int proclink_add(PI *pip,dev_t dev,ino_t ino,mode_t m,cchar *fp) noex {
 	    } /* end if (memory-allocation) */
 	} /* end if (needed to add) */
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (proclink_add) */
+} /* end subroutine (proclink_add) */
 
 local int proclink_have(PI *pip,dev_t dev,ino_t ino,LI **rpp) noex {
 	LINKINFO	li ;
@@ -4434,8 +4377,7 @@ local int proclink_have(PI *pip,dev_t dev,ino_t ino,LI **rpp) noex {
 	    rs = 0 ;
 	}
 	return rs ;
-}
-/* end subroutine (proclink_have) */
+} /* end subroutine (proclink_have) */
 
 local int procsize(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	size_t		bytes ;
@@ -4453,8 +4395,7 @@ local int procsize(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	}
 	rs = int(sz & INT_MAX) ;
 	return rs ;
-}
-/* end subroutine (procsize) */
+} /* end subroutine (procsize) */
 
 local int proclink(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	int		rs = SR_OK ;
@@ -4529,8 +4470,7 @@ local int proclink(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	    rs = SR_XDEV ;
 	}
 	return (rs >= 0) ? f_linked : rs ;
-}
-/* end subroutine (proclink) */
+} /* end subroutine (proclink) */
 
 local int procsync(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 	LINKINFO	*lip ;
@@ -4563,8 +4503,7 @@ local int procsync(PI *pip,cchar *name,ustat *sbp,FILEINFO *ckp) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (procsync) */
+} /* end subroutine (procsync) */
 
 local int procsynclink(PI *pip,cchar *name,ustat *sbp,LI *lip) noex {
 	bfile		*efp = (bfile *) pip->efp ;
@@ -4653,8 +4592,7 @@ local int procsynclink(PI *pip,cchar *name,ustat *sbp,LI *lip) noex {
 #endif
 
 	return (rs >= 0) ? f_linked : rs ;
-}
-/* end subroutine (procsynclink) */
+} /* end subroutine (procsynclink) */
 
 local int procsyncer(PI *pip,cchar *name,ustat *sbp) noex {
 	int		rs = SR_OK ;
@@ -4703,8 +4641,7 @@ local int procsyncer(PI *pip,cchar *name,ustat *sbp) noex {
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procsyncer) */
+} /* end subroutine (procsyncer) */
 
 local int procsyncer_reg(PI *pip,cchar *name,ustat *sbp) noex {
 	off_t		dfsize = 0 ;
@@ -4991,8 +4928,7 @@ ret0:
 #endif
 
 	return (rs >= 0) ? f_updated : rs ;
-}
-/* end subroutine (procsyncer_reg) */
+} /* end subroutine (procsyncer_reg) */
 
 local int procsyncer_dir(PI *pip,cchar *name,ustat *sbp) noex {
 	cmode		nm = (sbp->st_mode & (~ S_IFMT)) | DMODE ;
@@ -5121,8 +5057,7 @@ ret0:
 #endif
 
 	return (rs >= 0) ? f_updated : rs ;
-}
-/* end subroutine (procsyncer_dir) */
+} /* end subroutine (procsyncer_dir) */
 
 local int procsyncer_lnk(PI *pip,cchar *name,ustat *sbp) noex {
 	int		rs = SR_OK ;
@@ -5229,8 +5164,7 @@ local int procsyncer_lnk(PI *pip,cchar *name,ustat *sbp) noex {
 ret0:
 
 	return (rs >= 0) ? f_updated : rs ;
-}
-/* end subroutine (procsyncer_lnk) */
+} /* end subroutine (procsyncer_lnk) */
 
 local int procsyncer_fifo(PI *pip,cchar *name,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
@@ -5238,8 +5172,7 @@ local int procsyncer_fifo(PI *pip,cchar *name,ustat *sbp) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (procsyncer_fifo) */
+} /* end subroutine (procsyncer_fifo) */
 
 local int procsyncer_sock(PI *pip,cchar *name,ustat *sbp) noex {
 	int		rs = SR_FAULT ;
@@ -5247,8 +5180,7 @@ local int procsyncer_sock(PI *pip,cchar *name,ustat *sbp) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (procsyncer_sock) */
+} /* end subroutine (procsyncer_sock) */
 
 local int tardir_start(TARDIR *tdp,cchar *n,ustat *sbp) noex {
 	int		rs ;
@@ -5258,8 +5190,7 @@ local int tardir_start(TARDIR *tdp,cchar *n,ustat *sbp) noex {
 	    tdp->ino = sbp->st_ino ;
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (tardir_start) */
+} /* end subroutine (tardir_start) */
 
 local int tardir_finish(TARDIR *tdp) noex {
 	int		rs = SR_OK ;
@@ -5270,16 +5201,14 @@ local int tardir_finish(TARDIR *tdp) noex {
 	    tdp->dname = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (tardir_finish) */
+} /* end subroutine (tardir_finish) */
 
 local int tardir_match(TARDIR *tdp,ustat *sbp) noex {
 	int		f = true ;
 	f = f && (tdp->dev == sbp->st_dev) ;
 	f = f && (tdp->ino == sbp->st_ino) ;
 	return f ;
-}
-/* end subroutine (tardir_match) */
+} /* end subroutine (tardir_match) */
 
 local int dirid_start(DIRID *dip,dev_t dev,ino_t ino) noex {
 	int		rs = SR_FAULT ;
@@ -5289,8 +5218,7 @@ local int dirid_start(DIRID *dip,dev_t dev,ino_t ino) noex {
 	    dip->ino = ino ;
 	}
 	return rs ;
-}
-/* end subroutine (dirid_start) */
+} /* end subroutine (dirid_start) */
 
 local int dirid_finish(DIRID *dip) noex {
 	int		rs = SR_FAULT ;
@@ -5298,8 +5226,7 @@ local int dirid_finish(DIRID *dip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (dirid_finish) */
+} /* end subroutine (dirid_finish) */
 
 local int fileid_start(FILEID *dip,dev_t dev,ino_t ino) noex {
 	int		rs = SR_FAULT ;
@@ -5309,8 +5236,7 @@ local int fileid_start(FILEID *dip,dev_t dev,ino_t ino) noex {
 	    dip->ino = ino ;
 	}
 	return rs ;
-}
-/* end subroutine (fileid_start) */
+} /* end subroutine (fileid_start) */
 
 local int fileid_finish(FILEID *dip) noex {
 	int		rs = SR_FAULT ;
@@ -5318,8 +5244,7 @@ local int fileid_finish(FILEID *dip) noex {
 	    rs = SR_OK ;
 	}
 	return rs ;
-}
-/* end subroutine (fileid_finish) */
+} /* end subroutine (fileid_finish) */
 
 local int fileinfo_loadfts(FILEINFO *ckp,ustat *sbp) noex {
 	cint		ftype = (sbp->st_mode & S_IFMT) ;
@@ -5356,8 +5281,7 @@ local int fileinfo_loadfts(FILEINFO *ckp,ustat *sbp) noex {
 	} /* end switch */
 	ckp->fts = fts ;
 	return (rs >= 0) ? fts : rs ;
-}
-/* end subroutine (fileinfo_loadfts) */
+} /* end subroutine (fileinfo_loadfts) */
 
 local int linkinfo_start(LI *lip,dev_t dev,ino_t ino,mode_t m,cc *fp) noex {
 	int		rs ;
@@ -5369,8 +5293,7 @@ local int linkinfo_start(LI *lip,dev_t dev,ino_t ino,mode_t m,cc *fp) noex {
 	    lip->fname = cp ;
 	} /* end if (memory-allocation) */
 	return rs ;
-}
-/* end subroutine (linkinfo_start) */
+} /* end subroutine (linkinfo_start) */
 
 local int linkinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
@@ -5381,8 +5304,7 @@ local int linkinfo_finish(LI *lip) noex {
 	    lip->fname = nullptr ;
 	}
 	return rs ;
-}
-/* end subroutine (linkinfo_finish) */
+} /* end subroutine (linkinfo_finish) */
 
 /* make *parent* directories as needed */
 local int mkpdirs(cchar *tarfname,mode_t dm) noex {
@@ -5402,8 +5324,7 @@ local int mkpdirs(cchar *tarfname,mode_t dm) noex {
 	    rs = SR_NOENT ;
 	}
 	return rs ;
-}
-/* end subroutine (mkpdirs) */
+} /* end subroutine (mkpdirs) */
 
 local uint linkhash(cvoid *vp,int vl) noex {
 	LINKINFO	*lip = (LI *) vp ;
@@ -5426,8 +5347,7 @@ local uint linkhash(cvoid *vp,int vl) noex {
 	    }
 	}
 	return h ;
-}
-/* end subroutine (linkhash) */
+} /* end subroutine (linkhash) */
 
 local uint diridhash(cvoid *vp,int vl) noex {
 	const uint	uvl = (uint) vl ;
@@ -5448,8 +5368,7 @@ local uint diridhash(cvoid *vp,int vl) noex {
 	    }
 	}
 	return h ;
-}
-/* end subroutine (diridhash) */
+} /* end subroutine (diridhash) */
 
 local uint fileidhash(cvoid *vp,int vl) noex {
 	const uint	uvl = (uint) vl ;
@@ -5470,8 +5389,7 @@ local uint fileidhash(cvoid *vp,int vl) noex {
 	    }
 	}
 	return h ;
-}
-/* end subroutine (fileidhash) */
+} /* end subroutine (fileidhash) */
 
 local int linkcmp(LI *e1p,LINKINFO *e2p,int len) noex {
 	int		rc ; /* return-value */
@@ -5484,8 +5402,7 @@ local int linkcmp(LI *e1p,LINKINFO *e2p,int len) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (linkcmp) */
+} /* end subroutine (linkcmp) */
 
 local int diridcmp(struct dirid *e1p,struct dirid *e2p,int len) noex {
 	int		rc ;
@@ -5499,8 +5416,7 @@ local int diridcmp(struct dirid *e1p,struct dirid *e2p,int len) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (diridcmp) */
+} /* end subroutine (diridcmp) */
 
 local int fileidcmp(FILEID *e1p,FILEID *e2p,int len) noex {
 	int		rc ;
@@ -5513,14 +5429,11 @@ local int fileidcmp(FILEID *e1p,FILEID *e2p,int len) noex {
 	    }
 	}
 	return rc ;
-}
-/* end subroutine (fileidcmp) */
+} /* end subroutine (fileidcmp) */
 
 local book isNotStat(int rs) noex {
 	return isOneOf(rsnostat,rs) ;
-}
-/* end subroutine (isNotStat) */
-
+} /* end subroutine (isNotStat) */
 
 #if	CF_DEBUG
 #ifdef	COMMENT
@@ -5534,7 +5447,7 @@ enum ftypes {
 	ftype_lnk,
 	ftype_other,
 	ftype_overlast
-} ;
+} ; /* end enum */
 constexpr cpcchar	ftypes[] = {
 	"REG",	
 	"DIR",
@@ -5545,7 +5458,7 @@ constexpr cpcchar	ftypes[] = {
 	"LNK",
 	"OTHER",
 	nullptr
-} ;
+} ; /* end array */
 #endif /* COMMENT */
 static cchar *strfiletype(ustat *sbp) {
 	cchar	*cp ;
