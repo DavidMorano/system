@@ -1511,7 +1511,7 @@ local int locinfo_logbegin(LOCINFO *lip,USERINFO *uip,cchar *lfname)
 	    pip->open.logprog = TRUE ;
 	    if (pip->daytime == 0) pip->daytime = time(NULL) ;
 	    if (pip->logsize > 0) {
-	        rs = logfile_checksize(&pip->lh,pip->logsize) ;
+	        rs = logfile_cksize(&pip->lh,pip->logsize) ;
 	    }
 	    if (rs >= 0) {
 	        time_t		dt = pip->daytime ;
