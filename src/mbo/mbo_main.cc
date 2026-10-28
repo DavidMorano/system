@@ -954,7 +954,7 @@ char	*envv[] ;
 
 	    pip->fl.log = TRUE ;
 	    if (pip->loglen > 0)
-	        logfile_checksize(&pip->lh,pip->loglen) ;
+	        logfile_cksize(&pip->lh,pip->loglen) ;
 
 	    logfile_printf(&pip->lh,"%s %-14s %s/%s",
 	        strtime_logz(pip->now.time,timebuf),
