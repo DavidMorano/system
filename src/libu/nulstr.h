@@ -54,14 +54,14 @@ struct nulstr_co {
 struct nulstr : nulstr_head {
 	nulstr_co	finish ;
 	nulstr() noex {
-	    finish(this,nulstrmem_finish) ;
-	    as = nullptr ;
+	    finish	(this,nulstrmem_finish) ;
+	    as		= nullptr ;
 	} ; /* end ctor */
 	nulstr(const nulstr &) = delete ;
 	nulstr &operator = (const nulstr &) = delete ;
-	int start(cchar *,int,cchar **) noex ;
-	void dtor() noex ;
-	operator int () noex ;
+	int start	(cchar *,int,cchar **) noex ;
+	void dtor	() noex ;
+	operator int 	() noex ;
 	destruct nulstr() {
 	    if (as) dtor() ;
 	} ; /* end */
