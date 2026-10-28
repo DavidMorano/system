@@ -24,9 +24,7 @@
 #include	<stddef.h>		/* POSIX® */
 #include	<stdlib.h>		/* POSIX® */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	VERSION		"0a"
