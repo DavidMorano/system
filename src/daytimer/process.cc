@@ -481,7 +481,7 @@ MAILFILES	*mfp ;
 	        logfile_check(&pip->lh,daytime) ;
 
 	    if ((tic % 100) == 0)
-	        logfile_checksize(&pip->lh,pip->loglen) ;
+	        logfile_cksize(&pip->lh,pip->loglen) ;
 
 	    }
 
