@@ -904,7 +904,7 @@ local int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        pip->open.logprog = TRUE ;
 
 	        if (pip->loglen > 0)
-	            logfile_checksize(&pip->lh,pip->loglen) ;
+	            logfile_cksize(&pip->lh,pip->loglen) ;
 
 	        logfile_userinfo(&pip->lh,&u,
 	            pip->daytime,pip->progname,pip->version) ;
