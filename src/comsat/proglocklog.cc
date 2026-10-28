@@ -145,7 +145,7 @@ int progloglock_maint(PROGINFO *pip) noex {
 
 	        if ((dt - ldp->ti_logsize) >= ldp->intlogsize) {
 	            ldp->ti_logsize = pip->daytime ;
-	            logfile_checksize(&pip->lh,pip->logsize) ;
+	            logfile_cksize(&pip->lh,pip->logsize) ;
 		} else if ((dt - ldp->ti_logcheck) >= ldp->intlogcheck) {
 	            ldp->ti_logcheck = pip->daytime ;
 	            logfile_check(&pip->lh,pip->daytime) ;
