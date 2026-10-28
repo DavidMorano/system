@@ -1,0 +1,112 @@
+/* proglog_log MODULE (primary) */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* handle program logging */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 2008-09-01, David A­D­ Morano
+	This subroutine was borrowed and modified from previous
+	generic front-end 'main' subroutines!
+
+*/
+
+/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Module:
+	proginfo_log
+
+	Description:
+	Manage the general process logging.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>		/* POSIX */
+#include	<sys/param.h>		/* POSIX */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD |va_{x}(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
+#include	<ucmem.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<logfile.h>		/* LIBDAM */
+#include	<userinfo.h>		/* LIBDAM */
+#include	<bfile.h>		/* LIBB */
+
+#include	"proginfo.hh"
+
+export module proginfo.log ;
+
+import proginfo.base ;
+
+/* local defines */
+
+#ifndef	UI
+#define	UI	userinfo
+#endif
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+export {
+    int proglog_begin		(PI *,UI *) noex ;
+    int proglog_end		(PI *) noex ;
+    int proglog_intro		(PI *,UI *uip) noex ;
+    int proglog_cksize		(PI *) noex ;
+    int proglog_check		(PI *) noex ;
+    int proglog_getid		(PI *,char *rbuf,int rlen) noex ;
+    int proglog_setid		(PI *,cchar *sp,int sl) noex ;
+    int proglog_print		(PI *,cchar *sp,int sl) noex ;
+    int proglog_vprintf		(PI *,cchar *fmt,va_list ap) noex ;
+    int proglog_printf		(PI *,cchar *fmt,...) noex ;
+    int proglog_printfold	(PI *,cchar *pre,cchar *sp,int sl) noex ;
+    int proglog_ssprint		(PI *,cchar *id,cchar *sp,int sl) noex ;
+    int proglog_ssvprintf	(PI *,cchar *id,cchar *fmt,va_list ap) noex ;
+    int proglog_ssprintf	(PI *,cchar *id,cchar *fmt,...) noex ;
+    int proglog_flush		(PI *) noex ;
+} /* end export */
+
+
+/* local subroutines */
+
+
