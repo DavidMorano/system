@@ -1547,7 +1547,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    if (loglen < 0) 
 		loglen = LOGSIZE ;
 
-	    logfile_checksize(&pip->lh,loglen) ;
+	    logfile_cksize(&pip->lh,loglen) ;
 
 	    logfile_userinfo(&pip->lh,&u,
 		pip->daytime,pip->progname,pip->version) ;
