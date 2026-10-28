@@ -1343,7 +1343,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        pip->daytime = time(NULL) ;
 
 	    if (pip->logsize > 0)
-	        logfile_checksize(&pip->lh,pip->logsize) ;
+	        logfile_cksize(&pip->lh,pip->logsize) ;
 
 	    logfile_userinfo(&pip->lh,&u,
 	        pip->daytime,pip->searchname,pip->version) ;
