@@ -31,7 +31,7 @@
 		logfile_vprintf
 		logfile_setid
 		logfile_check
-		logfile_checksize
+		logfile_cksize
 		logfile_close
 
 	Although masking interrupts during the locking of the logfile
