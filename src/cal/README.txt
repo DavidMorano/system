@@ -1,8 +1,8 @@
 CAL
 
-This command is essentially identical to the standard UNIX CAL(1) program
-except that some additional parameters can be specified to select the desired
-month.
+This command is essentially identical to the standard UNIX CAL(1)
+program except that some additional parameters can be specified to
+select the desired month.
 
 Synopsis:
 $ cal { <am> [<y>] | [[<m>] <y>] | [<y>] | [<y>/<m>] | [<y>-<m>] } 
