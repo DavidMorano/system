@@ -23,7 +23,7 @@
 
 	Description:
 	These subroutines set the UNAME and IDS related fields in
-	the PROGINFO object.
+	the PI object.
 
 	Synopsis:
 	int proginfo_nameid(proginfo *pip) noex
@@ -38,20 +38,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<ucinfo.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucinfo.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"proginfo.hh"
 
+import proginfo ;
 
 /* local defines */
 
@@ -82,7 +83,7 @@ constexpr bool		f_uname = CF_UNAME ;
 
 /* exported subroutines */
 
-int proginfo_nameidbegin(PROGINFO *pip) noex {
+int proginfo_nameidbegin(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
 	    if_constexpr (f_uname) {
@@ -104,7 +105,7 @@ int proginfo_nameidbegin(PROGINFO *pip) noex {
 }
 /* end subroutine (proginfo_nameidbegin) */
 
-int proginfo_nameidend(PROGINFO *pip) noex {
+int proginfo_nameidend(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (pip) {
