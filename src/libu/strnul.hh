@@ -33,20 +33,35 @@
 #define	STRNUL_SHORTLEN		127	/* "short-string optimization" */
 
 
+class strnul ;
+struct strnul_len {
+    	strnul		*op ;
+	void operator	() (strnul *p) noex {
+	    op = p ;
+	} ; /* end method */
+	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ; /* end method */
+} ; /* end struct (strnul_len) */
 class strnul {
 	typedef std::string_view	strview ;
+	friend		strnul_len ;
 	cchar		*rp = nullptr ;
 	char		*as = nullptr ;	/* allocated memory */
 	char		buf[STRNUL_SHORTLEN + 1] ;
 	void clear	() noex ;
-	void alloc	(cchar *,int) noex ;
+	int alloc	(cchar *,int) noex ;
 	ccharp proc	(cchar *,int = -1) noex ;
-	void dtor() noex ;
+	void dtor	() noex ;
+	void init	() noex ;
+	int		rl ;		/* return-length */
     public:
+	strnul_len	len ;
 	bool		fok = true ;
-	strnul(cchar *,int = -1) noex ;
-	strnul(const strview &sv) noex ;
-	strnul() noex : strnul(nullptr,0) { } ;
+	strnul(cchar *,int = -1) noex ;		/* <- CTOR */
+	strnul(const strview &sv) noex ;	/* <- CTOR */
+	strnul() noex : strnul(nullptr,0) { } ;	/* <- CTOR */
 	strnul(const strnul &) = delete ;
 	strnul &operator = (const strnul &) = delete ;
 	strnul &operator = (cchar *) noex ;
