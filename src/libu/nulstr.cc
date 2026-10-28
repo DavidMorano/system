@@ -77,7 +77,7 @@ using libu::umem ;			/* variable */
 
 int nulstr_start(nulstr *ssp,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		cl = 0 ;
+	int		cl = 0 ; /* return-value */
 	if (ssp && sp && rpp) ylikely {
 	    rs = SR_OK ;
 	    ssp->as = nullptr ;
@@ -89,17 +89,17 @@ int nulstr_start(nulstr *ssp,cchar *sp,int sl,cchar **rpp) noex {
 	                    cl = rs ;
 	                    *rpp = cp ;
 	                    ssp->as = cp ;
-	                }
+	                } /* end if (memory-acquire) */
 	            } else {
 	                *rpp = ssp->buf ;
 	                cl = intconv(strwcpy(ssp->buf,sp,sl) - ssp->buf) ;
 	            } /* end if */
 	        } else {
 	            cl = sl ;
-	        }
+	        } /* end */
 	    } else {
 	        cl = lenstr(sp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? cl : rs ;
 } /* end subroutine (nulstr_start) */
@@ -110,12 +110,12 @@ int nulstr_finish(nulstr *ssp) noex {
 	if (ssp) ylikely {
 	    rs = SR_OK ;
 	    if (ssp->as) ylikely {
-		char *bp = cast_const<charp>(ssp->as) ;
+		charp bp = cast_const<charp>(ssp->as) ;
 	        rs1 = umem.free(bp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        ssp->as = nullptr ;
-	    }
-	    ssp->buf[0] = '\0' ;
+	    } /* end if (memory-release) */
+	    ssp->buf[0] = eos ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (nulstr_finish) */
@@ -133,7 +133,7 @@ nulstr::operator int () noex {
 	    rs = lenstr(as) ;
 	} else {
 	    rs = lenstr(buf) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (nulstr::operator) */
 
@@ -152,7 +152,7 @@ nulstr_co::operator int () noex {
 void nulstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("dtor",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (nulstr::dtor) */
 
 
