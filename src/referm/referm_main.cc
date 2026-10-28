@@ -1110,7 +1110,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    if (loglen < 0) loglen = LOGSIZE ;
 
-	    logfile_checksize(&g.lh,loglen) ;
+	    logfile_cksize(&g.lh,loglen) ;
 
 #if	CF_DEBUG
 	    if (g.debuglevel > 1)
