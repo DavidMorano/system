@@ -17,21 +17,28 @@
 
 /*******************************************************************************
 
-	Here we simply extract the root-name of the software
-	distribution from our program-root directory.
+  	Description:
+	Here I simply extract the root-name of the software
+	distribution from our program-root directory.  This is
+	really just grabbing the "base-name" of a directory path.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
-#include	<usystem.h>
-#include	<sfx.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sfx.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"proginfo.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import proginfo ;
 
 /* local defines */
 
@@ -62,26 +69,25 @@
 
 /* exported subroutines */
 
-int proginfo_rootname(PROGINFO *pip) noex {
+int proginfo_rootname(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	if (pip) {
+	if (pip) ylikely {
 	    rs = SR_BADFMT ;
 	    if (pip->pr) {
 	        if (pip->rootname == nullptr) {
 	            cchar	*cp ;
 	            if (int cl ; (cl = sfbasename(pip->pr,-1,&cp)) > 0) {
-		        cchar	**vpp = &pip->rootname ;
-		        rs = proginfo_setentry(pip,vpp,cp,cl) ;
+		        ccharpp	vpp = &pip->rootname ;
+		        rs = pip->setent(vpp,cp,cl) ;
 		        len = rs ;
-	            }
+	            } /* end */
 	        } else {
-	            len = strlen(pip->rootname) ;
-	        }
+	            len = lenstr(pip->rootname) ;
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (proginfo_rootname) */
+} /* end subroutine (proginfo_rootname) */
 
 
