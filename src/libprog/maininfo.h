@@ -20,16 +20,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<pthread.h>
-#include	<signal.h>
-#include	<stddef.h>
-#include	<stdlib.h>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecstr.h>
-#include	<sighand.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<pthread.h>		/* POSIX® */
+#include	<signal.h>		/* CSTD */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecstr.h>		/* LIBUC */
+#include	<sighand.h>		/* LIBUC */
 
 
 #define	MAININFO	struct maininfo
@@ -42,7 +42,7 @@ struct maininfo_flags {
 } ; /* end struct */
 
 struct maininfo {
-	SIGHAND		sh ;
+	sighand		sh ;
 	vecstr		stores ;
 	stack_t		astack ;
 	cchar		*progdname ;
@@ -65,14 +65,14 @@ EXTERNC_begin
 
 typedef void		(*maininfohand_t)(int,siginfo_t *,void *) noex ;
 
-extern int maininfo_start(MAININFO *,int,cchar **) noex ;
-extern int maininfo_finish(MAININFO *) noex ;
-extern int maininfo_setentry(MAININFO *,cchar **,cchar *,int) noex ;
-extern int maininfo_sigbegin(MAININFO *,maininfohand_t,cint *) noex ;
-extern int maininfo_sigend(MAININFO *) noex ;
-extern int maininfo_utilbegin(MAININFO *,int) noex ;
-extern int maininfo_utilend(MAININFO *) noex ;
-extern int maininfo_srchname(MAININFO *,cchar **) noex ;
+extern int maininfo_start	(maininfo *,int,cchar **) noex ;
+extern int maininfo_finish	(maininfo *) noex ;
+extern int maininfo_setentry	(maininfo *,cchar **,cchar *,int) noex ;
+extern int maininfo_sigbegin	(maininfo *,maininfohand_t,cint *) noex ;
+extern int maininfo_sigend	(maininfo *) noex ;
+extern int maininfo_utilbegin	(maininfo *,int) noex ;
+extern int maininfo_utilend	(maininfo *) noex ;
+extern int maininfo_srchname	(maininfo *,cchar **) noex ;
 
 EXTERNC_end
 
