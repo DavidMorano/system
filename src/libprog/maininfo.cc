@@ -66,7 +66,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 extern "C" {
     typedef int (*thrsub)(void *) noex ;
-}
+} /* end extern */
 
 
 /* external subroutines */
@@ -132,12 +132,11 @@ int maininfo_start(MI *mip,int argc,mainv argv) noex {
 	        }
 	        if (rs < 0) {
 	            vecstr_finish(&mip->stores) ;
-		}
+		} /* end if (error) */
 	    } /* end if (vecstr_start) */
 	} /* end if (u_sigmask) */
 	return rs ;
-}
-/* end subroutine (maininfo_start) */
+} /* end subroutine (maininfo_start) */
 
 int maininfo_finish(MI *mip) noex {
 	int		rs = SR_FAULT ;
@@ -154,8 +153,7 @@ int maininfo_finish(MI *mip) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (maininfo_finish) */
+} /* end subroutine (maininfo_finish) */
 
 int maininfo_setentry(MI *mip,cchar **epp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
@@ -179,8 +177,7 @@ int maininfo_setentry(MI *mip,cchar **epp,cchar *vp,int vl) noex {
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (maininfo_setentry) */
+} /* end subroutine (maininfo_setentry) */
 
 #if	CF_SIGALTSTACK
 int maininfo_sigbegin(MI *mip,maininfohand_t sh,cint *sigcatches) noex {
@@ -205,19 +202,18 @@ int maininfo_sigbegin(MI *mip,maininfohand_t sh,cint *sigcatches) noex {
 	        if (rs < 0) {
 	            mip->astack.ss_flags = SS_DISABLE ;
 	            u_sigaltstack(&mip->astack,nullptr) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (u_sigaltstack) */
 	    if (rs < 0) {
 	        u_munmap(mip->mdata,mip->msize) ;
 	        mip->mdata = nullptr ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mmap) */
 #if	CF_DEBUGN
 	nprintf(NDF,"maininfo_sigbegin: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (maininfo_sigbegin) */
+} /* end subroutine (maininfo_sigbegin) */
 #else /* CF_SIGALTSTACK */
 int maininfo_sigbegin(MI *mip,maininfohand_t sh,cint *sigcatches) noex {
     	cnullptr	np{} ;
@@ -229,8 +225,7 @@ int maininfo_sigbegin(MI *mip,maininfohand_t sh,cint *sigcatches) noex {
 	nprintf(NDF,"maininfo_sigbegin: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (maininfo_sigbegin) */
+} /* end subroutine (maininfo_sigbegin) */
 #endif /* CF_SIGALTSTACK */
 
 int maininfo_sigend(MI *mip) noex {
@@ -259,8 +254,7 @@ int maininfo_sigend(MI *mip) noex {
 #endif /* CF_SIGALTSTACK */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (maininfo_sigend) */
+} /* end subroutine (maininfo_sigend) */
 
 int maininfo_utilbegin(MI *op,int f_run) noex {
 	int		rs = SR_FAULT ;
@@ -276,8 +270,7 @@ int maininfo_utilbegin(MI *op,int f_run) noex {
 	    } /* end if (run) */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (maininfo_utilbegin) */
+} /* end subroutine (maininfo_utilbegin) */
 
 int maininfo_utilend(MI *op) noex {
 	int		rs = SR_OK ;
@@ -289,8 +282,7 @@ int maininfo_utilend(MI *op) noex {
 	    }
 	}
 	return rs ;
-}
-/* end subroutine (maininfo_utilend) */
+} /* end subroutine (maininfo_utilend) */
 
 int maininfo_srchname(MI *mip,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -309,8 +301,7 @@ int maininfo_srchname(MI *mip,cchar **rpp) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (maininfo_srchname) */
+} /* end subroutine (maininfo_srchname) */
 
 
 /* private subroutines */
