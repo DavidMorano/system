@@ -176,7 +176,7 @@ int logprogname(PI *pip) noex {
 	    char	timebuf[TIMEBUFLEN + 1] ;
 
 	    if (pip->logsize > 0) {
-	        logfile_checksize(&pip->lh,pip->logsize) ;
+	        logfile_cksize(&pip->lh,pip->logsize) ;
 	    }
 
 	    fmt = "%s %-14s %s" ;
