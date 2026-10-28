@@ -49,10 +49,10 @@ typedef UCINFO_AUXS	ucinfo_auxs ;
 
 EXTERNC_begin
 
-extern int ucinfo_init() noex ;
-extern int ucinfo_name(ucinfo_names *) noex ;
-extern int ucinfo_aux(ucinfo_auxs *) noex ;
-extern int ucinfo_fini() noex ;
+extern int ucinfo_init	() noex ;
+extern int ucinfo_name	(ucinfo_names *) noex ;
+extern int ucinfo_aux	(ucinfo_auxs *) noex ;
+extern int ucinfo_fini	() noex ;
 
 EXTERNC_end
 
