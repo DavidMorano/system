@@ -1053,7 +1053,7 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    pip->open.logfile = TRUE ;
 	    if (pip->loglen > 0)
-	        logfile_checksize(&pip->lh,pip->loglen) ;
+	        logfile_cksize(&pip->lh,pip->loglen) ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(4))
