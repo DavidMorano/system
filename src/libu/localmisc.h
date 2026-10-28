@@ -41,6 +41,7 @@
 #include	<localmisc_minmax.h>
 #include	<localmisc_nums.h>
 #include	<localmisc_org.h>
+#include	<localmisc_progroot.h>
 #include	<localmisc_rets.h>
 #include	<localmisc_truth.h>
 #include	<localmisc_typealiases.h>
