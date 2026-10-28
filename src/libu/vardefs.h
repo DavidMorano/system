@@ -39,195 +39,150 @@
 #ifndef	VARSYSNAME
 #define	VARSYSNAME	"SYSNAME"
 #endif
-
 #ifndef	VARSYSTYPE
 #define	VARSYSTYPE	"SYSTYPE"
 #endif
-
 #ifndef	VARRELEASE
 #define	VARRELEASE	"RELEASE"
 #endif
-
 #ifndef	VARVERSION
 #define	VARVERSION	"VERSION"
 #endif
-
 #ifndef	VARMACHINE
 #define	VARMACHINE	"MACHINE"
 #endif
-
 #ifndef	VARARCHITECTURE
 #define	VARARCHITECTURE	"ARCHITECTURE"
 #endif
-
 #ifndef	VARTMODIR
 #define	VARTMPDIR	"TMPDIR"
 #endif
-
 #ifndef	VARTMPDNAME
 #define	VARTMPDNAME	"TMPDIR"
 #endif
-
 #ifndef	VARINCDIR
 #define	VARINCDIR	"INCBDIR"
 #endif
-
 #ifndef	VARLIBDIR
 #define	VARLIBDIR	"LIBDIR"
 #endif
-
 #ifndef	VARHZ
 #define	VARHZ		"HZ"
 #endif
-
 #ifndef	VARTZ
 #define	VARTZ		"TZ"
 #endif
-
 #ifndef	VARNCPU
 #define	VARNCPU		"NCPU"
 #endif
-
 #ifndef	VARNODE
 #define	VARNODE		"NODE"
 #endif
-
 #ifndef	VARDOMAIN
 #define	VARDOMAIN	"DOMAIN"
 #endif
-
 #ifndef	VARHOMEDNAME
 #define	VARHOMEDNAME	"HOME"
 #endif
-
 #ifndef	VARUSERNAME
 #define	VARUSERNAME	"USERNAME"
 #endif
-
 #ifndef	VARGORUPNAME
 #define	VARGROUPNAME	"GROUPNAME"
 #endif
-
 #ifndef	VARPROJNAME
 #define	VARPROJNAME	"PROJNAME"
 #endif
-
 #ifndef	VARLOGNAME
 #define	VARLOGNAME	"LOGNAME"
 #endif
-
 #ifndef	VARUSER
 #define	VARUSER		"USER"
 #endif
-
 #ifndef	VARPWD
 #define	VARPWD		"PWD"
 #endif
-
 #ifndef	VARMAIL
 #define	VARMAIL		"MAIL"
 #endif
-
 #ifndef	VARLIBPATH
 #define	VARLIBPATH	"LD_LIBRARY_PATH"
 #endif
-
 #ifndef	VARPATH
 #define	VARPATH		"PATH"
 #endif
-
 #ifndef	VARLIBPATH
 #define	VARLIBPATH	"LIBPATH"
 #endif
-
 #ifndef	VARFPATH
 #define	VARFPATH	"FPATH"
 #endif
-
 #ifndef	VARMANPATH
 #define	VARMANPATH	"MANPATH"
 #endif
-
 #ifndef	VARINFOPATH
 #define	VARINFOPATH	"INFOPATH"
 #endif
-
 #ifndef	VARVPATH
 #define	VARVPATH	"VPATH"
 #endif
-
+#ifndef	VARPRAPACHE
+#define	VARPRAPACHE	"APACHE"
+#endif
 #ifndef	VARPREXTRA
 #define	VARPREXTRA	"EXTRA"
 #endif
-
 #ifndef	VARPRUSRLOCAL
 #define	VARPRUSRLOCAL	"USRLOCAL"
 #endif
-
 #ifndef	VARPRLOCAL
 #define	VARPRLOCAL	"LOCAL"
 #endif
-
 #ifndef	VARPRGNU
 #define	VARPRGNU	"GNU"
 #endif
-
 #ifndef	VARPRNCMP
 #define	VARPRNCMP	"NCMP"
 #endif
-
 #ifndef	VARPRPCS
 #define	VARPRPCS	"PCS"
 #endif
-
 #ifndef	VARPRAST
 #define	VARPRAST	"AST"
 #endif
-
 #ifndef	VARPRTOOLS
 #define	VARPRTOOLS	"TOOLS"
 #endif
-
 #ifndef	VARPRXDIR
 #define	VARPRXDIR	"XDIR"
 #endif
-
 #ifndef	VARPRDWB
 #define	VARPRDWB	"DWB"
 #endif
-
 #ifndef	VARMAILDIR
 #define	VARMAILDIR	"MAILDIR"
 #endif
-
 #ifndef	VARMAILDIRS
 #define	VARMAILDIRS	"MAILDIRS"
 #endif
-
 #ifndef	VARMAILHOST
 #define	VARMAILHOST	"MAILHOST"
 #endif
-
 #ifndef	VARDISPLAY
 #define	VARDISPLAY	"DISPLAY"
 #endif
-
 #ifndef	VARNAME
 #define	VARNAME		"NAME"
 #endif
-
 #ifndef	VARFULLNAME
 #define	VARFULLNAME	"FULLNAME"
 #endif
-
 #ifndef	VARLINES
 #define	VARLINES	"LINES"
 #endif
-
 #ifndef	VARCOLUMNS
 #define	VARCOLUMNS	"COLUMNS"
 #endif
-
 #ifndef	VARTERMCAP
 #define	VARTERMCAP	"TERMCAP"
 #endif
@@ -240,6 +195,76 @@
 /* this is a SHELL environment variable thing */
 #ifndef	VARUNDER
 #define	VARUNDER	"_"
+#endif
+
+#ifndef	VARAFNAME
+#define	VARAFNAME	"AFNAME"
+#endif
+#ifndef	VAREFNAME
+#define	VAREFNAME	"EFNAME"
+#endif
+#ifndef	VARBANNER
+#define	VARBANNER	"BANNER"
+#endif
+#ifndef	VARCLUSTER
+#define	VARCLUSTER	"CLUSTER"
+#endif
+#ifndef	VARDEBUGFNAME
+#define	VARDEBUGFNAME	"DEBUGFNAME"
+#endif
+#ifndef	VARERRORFNAME
+#define	VARERRORFNAME	"ERRORFNAME"
+#endif
+#ifndef	VARFILEROOT
+#define	VARFILEROOT	"FILEROOT"
+#endif
+#ifndef	VARLOGTAB
+#define	VARLOGTAB	"LOGTAB"
+#endif
+#ifndef	VARLPDEST
+#define	VARLPDEST	"LPDEST"
+#endif
+#ifndef	VARMAILDNAME
+#define	VARMAILDNAME	"MAILDNAME"
+#endif
+#ifndef	VARMAILDNAMES
+#define	VARMAILDNAMES	"MAILDNAMES"
+#endif
+#ifndef	VARNISDOMAIN
+#define	VARNISDOMAIN	"NISDOMAIN"
+#endif
+#ifndef	VAROPTS
+#define	VAROPTS		"OPTS"
+#endif
+#ifndef	VARORGANIZATION
+#define	VARORGANIZATION	"ORGANIZATION"
+#endif
+#ifndef	VARPAGER
+#define	VARPAGER	"PAGER"
+#endif
+#ifndef	VARPRINTER
+#define	VARPRINTER	"PRINTER"
+#endif
+#ifndef	VARPRNAME
+#define	VARPRNAME	"PRNAME"
+#endif
+#ifndef	VARPROGRAMROOT1
+#define	VARPROGRAMROOT1	"PROGRAMROOT1"
+#endif
+#ifndef	VARPROGRAMROOT2
+#define	VARPROGRAMROOT2	"PROGRAMROOT2"
+#endif
+#ifndef	VARPROGRAMROOT3
+#define	VARPROGRAMROOT3	"PROGRAMROOT3"
+#endif
+#ifndef	VARSEARCHNAME
+#define	VARSEARCHNAME	"SEARCHNAME"
+#endif
+#ifndef	VARSYSTEM
+#define	VARSYSTEM	"SYSTEM"
+#endif
+#ifndef	VARTERM
+#define	VARTERM		"TERM"
 #endif
 
 
