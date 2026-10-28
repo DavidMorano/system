@@ -86,7 +86,8 @@ cbool		f_debug = CF_DEBUG ;
 
 strnul::strnul(cchar *sp,int sl) noex {
     	DPRINTF("ent as=%p\n",as) ;
-    	buf[0] = '\0' ;
+    	buf[0] = eos ;
+	init() ;
 	proc(sp,sl) ;
     	DPRINTF("ret\n") ;
 } /* end ctor */
@@ -95,7 +96,8 @@ strnul::strnul(const strview &sv) noex {
 	ccharp	sp = sv.data() ;
 	cint	sl = (int) sv.length() ;
     	DPRINTF("ent as=%p\n",as) ;
-    	buf[0] = '\0' ;
+    	buf[0] = eos ;
+	init() ;
 	proc(sp,sl) ;
     	DPRINTF("ret\n") ;
 } /* end ctor */
@@ -103,60 +105,64 @@ strnul::strnul(const strview &sv) noex {
 void strnul::clear() noex {
     	DPRINTF("ent as=%p\n",as) ;
 	rp = nullptr ;
-    	buf[0] = '\0' ;
+    	buf[0] = eos ;
 	if (as) {
     	    DPRINTF("delete\n") ;
 	    delete [] as ;
 	    as = nullptr ;
-	}
+	} /* end */
     	DPRINTF("ret as=%p\n",as) ;
     	DPRINTF("ret\n") ;
 } /* end method (strnul::proc) */
 
-void strnul::alloc(cchar *sp,int sl) noex {
+int strnul::alloc(cchar *sp,int sl) noex {
+    	int		al = -1 ;
     	DPRINTF("ent as=%p\n",as) ;
 	if ((as = new(nothrow) char[sl + 1]) != nullptr) {
-	    strwcpy(as,sp,sl) ;
+	    al = intconv(strwcpy(as,sp,sl) - as) ;
 	    rp = as ;
 	} else {
 	    ulogerror("strnul",SR_NOMEM,"mem-alloc failure") ;
 	    rp = "«mem-alloc-failure»" ;
 	    fok = false ;
-	}
+	} /* end */
     	DPRINTF("ret as=%p\n",as) ;
-    	DPRINTF("ret\n") ;
+    	DPRINTF("ret al=%d\n",al) ;
+	return al ;
 } /* end method (strnul::alloc) */
 
 ccharp strnul::proc(cchar *sp,int sl) noex {
     	DPRINTF("ent sl=%d\n",sl) ;
     	DPRINTF("as=%p\n",as) ;
-    	if (sp) {
-    	if (sl < 0) sl = lenstr(sp) ;
-	string	str(sp,sl) ;
-    	DPRINTF("ent s=>%s<\n",str.c_str()) ;
-	}
-	if (sp) {
+	if_constexpr (f_debug) {
+    	    if (sp) {
+    	        if (sl < 0) sl = lenstr(sp) ;
+	        string str(sp,sl) ;
+    	        DPRINTF("ent s=>%s<\n",str.c_str()) ;
+	    } /* end if (non-null) */
+	} /* end if_constexpr (f_debug) */
+	if (sp) ylikely {
     	    DPRINTF("non-null\n") ;
 	    rp = sp ;
-	    if (sl >= 0) {
+	    if (sl >= 0) ylikely {
     	        DPRINTF("non-negative\n") ;
-		if (sp[sl] != '\0') {
+		if (sp[sl] != '\0') ylikely {
     	            DPRINTF("not nul-terminated on length\n") ;
-		    if (lenstr(sp,sl) >= sl) {
+		    if (lenstr(sp,sl) >= sl) ylikely {
     	                DPRINTF("lenstr=%d _ge_ sl=%d\n",lenstr(sp,sl),sl) ;
 	                if (sl > blen) {
     	                    DPRINTF("alloc\n") ;
-		            alloc(sp,sl) ;
+		            rl = alloc(sp,sl) ;
 	                } else {
     	                    DPRINTF("store-in-buf\n") ;
-		            strwcpy(buf,sp,sl) ;
+		            rl = intconv(strwcpy(buf,sp,sl) - buf) ;
 		            rp = buf ;
-	                }
+	                } /* end */
 		    } /* end if (storeage required) */
 		} /* end if (not nul-terminated as given) */
 	    } /* end if (possibly required) */
 	} /* end if (need calculation) */
-    	DPRINTF("ret as=%p\n",as) ;
+    	DPRINTF("ret rl=%d\n",rl) ;
     	DPRINTF("ret rp=>%s<\n",((rp) ? rp : "null")) ;
 	return rp ;
 } /* end method (strnul::proc) */
@@ -202,5 +208,10 @@ ccharp strnul::operator () (const strview &sv) noex {
     	DPRINTF("ret\n") ;
 	return rp ;
 } /* end method (strnul::operator) */
+
+void strnul::init() noex {
+    	len	(this) ;
+	rl	= -1 ;
+} /* end method (strnul::init) */
 
 
