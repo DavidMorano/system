@@ -33,18 +33,15 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += usystem.h localmisc.h
-INCS += uclibsubs.h
+INCS += fileopx_config.h
 
 MODS +=
 
-LIBS=
+LIBS += -ldam -luo -lu -lf
 
 
 INCDIRS=
-
-LIBDIRS= -L$(LIBDIR)
-
+LIBDIRS= -L lib
 
 RUNINFO= -rpath $(RUNDIR)
 LIBINFO= $(LIBDIRS) $(LIBS)
@@ -57,14 +54,14 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-OBJ00= fileopx_main.o whatinfo.o proginfo.o proginfo_setpiv.o 
+OBJ00= fileopx_main.o
 OBJ01= 
 OBJ02=
 OBJ03=
 OBJ04=
 OBJ05=
 OBJ06= 
-OBJ07= printhelp.o
+OBJ07=
 OBJ08=
 OBJ09=
 OBJ10=
@@ -74,15 +71,16 @@ OBJ13=
 OBJ14=
 OBJ15=
 
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
+#OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07)
+OBJA= $(OBJ00) 
 OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
 
-OBJ= $(OBJA) $(OBJB)
+OBJ= $(OBJA)
 
 SRC= $(OBJ:.c=.o)
 
 
-.SUFFIXES:		.hh .ii .ccm
+.SUFFIXES:		.hh .ii .iim .ccm
 
 
 default:		$(T).x
@@ -95,6 +93,9 @@ all:			$(ALL)
 
 .cc.ii:
 	$(CPP) $(CPPFLAGS) $< > $(*).ii
+
+.ccm.iim:
+	$(CPP) $(CPPFLAGS) $< > $(*).iim
 
 .c.s:
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $<
@@ -175,11 +176,5 @@ control:
 
 
 fileopx_main.o:		fileopx_main.cc $(INCS)
-
-whatinfo.o:		whatinfo.c config.h
-
-proginfo.o:		proginfo.c defs.h
-
-proginfo_setpiv.o:	proginfo_setpiv.c defs.h
 
 
