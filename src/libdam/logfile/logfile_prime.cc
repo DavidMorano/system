@@ -33,7 +33,7 @@
 		logfile_vprintf
 		logfile_setid
 		logfile_check
-		logfile_checksize
+		logfile_cksize
 		logfile_close
 
 	Although masking interrupts during the locking of the logfile
@@ -361,7 +361,7 @@ int logfile_control(logfile *op,int cmd,void *ap) noex {
 } /* end subroutine (logfile_control) */
 
 /* maintenance a log file with respect to its length */
-int logfile_checksize(logfile *op,int logsz) noex {
+int logfile_cksize(logfile *op,int logsz) noex {
 	int		rs ;
 	int		f_oversize = false ;
 	if ((rs = logfile_magic(op)) >= 0) {
@@ -379,7 +379,7 @@ int logfile_checksize(logfile *op,int logsz) noex {
 	    } /* end if (file-open) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_oversize : rs ;
-} /* end subroutine (logfile_checksize) */
+} /* end subroutine (logfile_cksize) */
 
 int logfile_check(logfile *op,time_t dt) noex {
 	int		rs = SR_OK ;
