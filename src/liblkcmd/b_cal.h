@@ -19,6 +19,13 @@
 #define	CALCONFIG_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>		/* POSIX® */
+#include	<stdlib.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+
 #define	VERSION		"0"
 #define	WHATINFO	"@(#)CAL "
 #define	BANNER		"Calendar Month"
@@ -44,32 +51,18 @@
 #define	VARDEBUGFD1	"CAL_DEBUGFD"
 #define	VARDEBUGFD2	"DEBUGFD"
 
-#define	VARNODE		"NODE"
-#define	VARSYSNAME	"SYSNAME"
-#define	VARRELEASE	"RELEASE"
-#define	VARMACHINE	"MACHINE"
-#define	VARARCHITECTURE	"ARCHITECTURE"
-#define	VARCLUSTER	"CLUSTER"
-#define	VARSYSTEM	"SYSTEM"
-#define	VARNISDOMAIN	"NISDOMAIN"
-#define	VARTERM		"TERM"
-#define	VARPRINTER	"PRINTER"
-#define	VARLPDEST	"LPDEST"
-#define	VARPAGER	"PAGER"
-#define	VARMAIL		"MAIL"
-#define	VARORGANIZATION	"ORGANIZATION"
-#define	VARLINES	"LINES"
-#define	VARCOLUMNS	"COLUMNS"
-#define	VARNAME		"NAME"
-#define	VARFULLNAME	"FULLNAME"
-
+#ifndef	VARHOMEDNAME
 #define	VARHOMEDNAME	"HOME"
+#endif
+#ifndef	VARTMPDNAME
 #define	VARTMPDNAME	"TMPDIR"
+#endif
+#ifndef	VARMAILDNAME
 #define	VARMAILDNAME	"MAILDIR"
+#endif
+#ifndef	VARMAILDNAMES
 #define	VARMAILDNAMES	"MAILDIRS"
-
-#define	VARPRLOCAL	"LOCAL"
-#define	VARPRPCS	"PCS"
+#endif
 
 #define	TMPDNAME	"/tmp"
 #define	LOGCNAME	"log"
