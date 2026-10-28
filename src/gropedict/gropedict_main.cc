@@ -726,7 +726,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if (rs1 >= 0) {
 	        pip->open.log = TRUE ;
 	        if (loglen < 0) loglen = LOGSIZE ;
-	        logfile_checksize(&pip->lh,loglen) ;
+	        logfile_cksize(&pip->lh,loglen) ;
 	        logfile_userinfo(&pip->lh,&u,pip->daytime,
 		    pip->searchname,pip->version) ;
 	        logfile_printf(&pip->lh,"dictionary dir=%s\n",
