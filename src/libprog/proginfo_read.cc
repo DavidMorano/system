@@ -63,6 +63,7 @@
 
 #include	<proginfo.hh>
 
+import proginfo ;
 
 /* local defines */
 
