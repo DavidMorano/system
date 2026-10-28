@@ -23,7 +23,8 @@
 
 	Description:
 	This subroutine creates a unique (?) string no more than
-	MSGBOUND characters.
+	MSGBOUND characters.  This string (called a "message-boundary"
+	here) is used to separate sections within email messages.
 
 	Synopsis:
 	int pimkmsgbound(proginfo *pip,char *rbuf,int rlen) noex
@@ -40,20 +41,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstring>
-#include	<usystem.h>
-#include	<sbuf.h>
-#include	<ctdec.h>
-#include	<cthex.h>
-#include	<dater.h>
-#include	<localmisc.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<ctdec.h>		/* LIBUC */
+#include	<cthex.h>		/* LIBUC */
+#include	<dater.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"proginfo.hh"
 
+import proginfo ;
 
 /* local defines */
 
@@ -65,10 +69,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	pimkrand(proginfo *) noex ;
-}
 
 
 /* local structures */
@@ -125,7 +125,6 @@ int pimkmsgbound(proginfo *pip,char *mbuf,int mlen) noex {
 	    } /* end if (pimkrand) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (pimkmsgbound) */
+} /* end subroutine (pimkmsgbound) */
 
 
