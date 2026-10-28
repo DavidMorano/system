@@ -117,7 +117,7 @@ extern int logfile_write	(logfile *,cchar *,int) noex ;
 extern int logfile_print	(logfile *,cchar *,int) noex ;
 extern int logfile_printf	(logfile *,cchar *,...) noex ;
 extern int logfile_vprintf	(logfile *,cchar *,va_list) noex ;
-extern int logfile_checksize	(logfile *,int) noex ;
+extern int logfile_cksize	(logfile *,int) noex ;
 extern int logfile_check	(logfile *,time_t) noex ;
 extern int logfile_flush	(logfile *) noex ;
 extern int logfile_chmod	(logfile *,mode_t) noex ;
