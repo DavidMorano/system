@@ -808,7 +808,7 @@ local int termnote_lfopener(TN *op,time_t dt,cc *lfname,cc *sn) noex {
             fopened = true ;
             op->open.lf = true ;
             if (rs >= 0) {
-                rs = logfile_checksize(lfp,TERMNOTE_LOGSIZE) ;
+                rs = logfile_cksize(lfp,TERMNOTE_LOGSIZE) ;
             }
             if (rs >= 0) {
                 rs = termnote_username(op) ;
