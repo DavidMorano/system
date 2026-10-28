@@ -31,7 +31,7 @@
 		logfile_vprintf
 		logfile_setid
 		logfile_check
-		logfile_checksize
+		logfile_cksize
 		logfile_close
 
 	Although masking interrupts during the locking of the logfile
@@ -146,7 +146,7 @@ int logfile_co::operator () (int a) noex {
 	        rs = logfile_flush(op) ;
 	        break ;
 	    case logfilemem_cksize:
-	        rs = logfile_checksize(op,a) ;
+	        rs = logfile_cksize(op,a) ;
 	        break ;
 	    case logfilemem_close:
 	        rs = logfile_close(op) ;
