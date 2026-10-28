@@ -5,7 +5,6 @@
 /* check C-language programs for some simple problems */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_LOCSETENT	0		/* allow |locinfo_setentry()| */
@@ -67,38 +66,37 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
-#include	<uclibmem.h>
-#include	<getoutenv.h>
-#include	<bits.h>
-#include	<keyopt.h>
-#include	<vecstr.h>
-#include	<ascii.h>
-#include	<langstate.h>
-#include	<optval.h>
-#include	<sncpyx.h>
-#include	<rmx.h>
-#include	<sfx.h>
-#include	<matstr.h>
-#include	<linehist.h>
-#include	<mkchar.h>
-#include	<char.h>
-#include	<isch.h>
-#include	<isbad.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
+#include	<ascii.h>		/* LIBU */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<bits.h>		/* LIBUC */
+#include	<keyopt.h>		/* LIBUC */
+#include	<vecstr.h>		/* LIBUC */
+#include	<langstate.h>		/* LIBUC */
+#include	<optval.h>		/* LIBUC */
+#include	<sncpyx.h>		/* LIBUC */
+#include	<rmx.h>			/* LIBUC */
+#include	<sfx.h>			/* LIBUC */
+#include	<matstr.h>		/* LIBUC */
+#include	<linehist.h>		/* LIBUC */
+#include	<char.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
+#include	<isbad.h>		/* LIBUC */
+#include	<mkchar.h>		/* LIBU */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"shio.h"
 #include	"kshlib.h"
 #include	"b_progcheck.h"
 #include	"progdata_helpdata.h"
-#include	"defs.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -106,8 +104,11 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
+#ifndef	PI
 #define	PI		proginfo
+#endif
 
+#define	LI		locinfo
 #define	LI_FL		locinfo_fl
 
 #define	KO		keyopt
@@ -132,14 +133,6 @@ import libutil ;			/* |memclear(3u)| */
 extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
 extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
 
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) noex ;
-extern int	debugprintf(cchar *,...) noex ;
-extern int	debugprinthex(cchar *,int,cchar *,int) noex ;
-extern int	debugclose() noex ;
-extern int	strlinelen(cchar *,int,int) noex ;
-#endif
-
 
 /* external variables */
 
@@ -152,7 +145,7 @@ struct locinfo_flags {
 	uint		stores:1 ;
 	uint		counts:1 ;
 	uint		dirty:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
 	LI_FL		have, f, changed, finval ;
@@ -160,22 +153,22 @@ struct locinfo {
 	vecstr		stores ;
 	PI		*pip ;
 	int		to ;
-} ;
+} ; /* end struct */
 
 struct hist_head {
 	linehist	types[3] ;
-} ;
+} ; /* end struct */
 
 struct fun_tab {
 	char		*funcname ;
 	char		c_open ;
 	char		c_close ;
-} ;
+} ; /* end struct */
 
 struct fun_count {
 	int		c_open ;
 	int		c_close ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
@@ -226,7 +219,7 @@ enum argopts {
 	argopt_tr,
 	argopt_c,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	argopts[] = {
 	"ROOT",
@@ -242,7 +235,7 @@ constexpr cpcchar	argopts[] = {
 	"tr",
 	"c",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
@@ -250,7 +243,7 @@ constexpr PIVARS	initvars = {
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
 constexpr MAPEX		mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -264,7 +257,7 @@ constexpr MAPEX		mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end array */
 
 enum akonames {
 	akoname_bufwhole,
@@ -277,7 +270,7 @@ enum akonames {
 	akoname_counts,
 	akoname_empty,
 	akoname_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	akonames[] = {
 	"bufwhole",
@@ -290,27 +283,27 @@ constexpr cpcchar	akonames[] = {
 	"counts",
 	"",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr fun_tab	cca[] = {
 	{ "paren", CH_LPAREN, CH_RPAREN },
 	{ "brace", CH_LBRACE, CH_RBRACE },
 	{ "brack", CH_LBRACK, CH_RBRACK }
-} ;
+} ; /* end array */
 
 constexpr cpcchar	balstrs[] = {
 	"()",
 	"{}",
 	"[]",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	chartypes[] = {
 	"unspec",
 	"open",
 	"close",
 	nullptr
-} ;
+} ; /* end array */
 
 constexpr cpcchar	langstatetypes[] = {
 	"clear",
@@ -318,7 +311,7 @@ constexpr cpcchar	langstatetypes[] = {
 	"quote",
 	"literal",
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -341,13 +334,11 @@ int b_progcheck(int argc,mainv argv,void *contextp) noex {
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
 
 	return ex ;
-}
-/* end subroutine (b_progcheck) */
+} /* end subroutine (b_progcheck) */
 
 int p_progcheck(int argc,mainv argv,mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_progcheck) */
+} /* end subroutine (p_progcheck) */
 
 
 /* local subroutines */
@@ -361,7 +352,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	LO		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -389,14 +380,14 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	(void) envv ;
 	(void) contextp ;
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_progcheck: starting DFD=%u\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -423,7 +414,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* start parsing the arguments */
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_progcheck: args\n") ;
 #endif
 
@@ -444,7 +435,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    argp = argv[ai] ;
 	    argl = lenstr(argp) ;
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	    debugprintf("b_progcheck: a=>%r<\n",argp,argl) ;
 #endif
 
@@ -480,7 +471,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                akl = aol ;
 	            }
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	            debugprintf("b_progcheck: ak=>%r<\n",akp,akl) ;
 #endif
 
@@ -789,7 +780,7 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-#if	CF_DEBUGS
+#if	CF_DEBUG
 	debugprintf("b_progcheck: args-out rs=%d\n",rs) ;
 #endif
 
@@ -981,7 +972,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
@@ -990,7 +981,7 @@ badprogstart:
 	}
 #endif
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	CF_DEBUG
 	debugclose() ;
 #endif
 
@@ -1005,8 +996,7 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
 local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
@@ -1018,8 +1008,7 @@ local int usage(PI *pip) noex {
 	    wlen += rs ;
 	} /* end for */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 /* process the program ako-options */
 local int procopts(PI *pip,KO *kop) noex {
@@ -1116,8 +1105,7 @@ local int procopts(PI *pip,KO *kop) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procopts) */
+} /* end subroutine (procopts) */
 
 local int procargs(PI *pip,AI *aip,bits *bop,cchar *ofn,cchar *afn) noex {
 	SHIO		ofile, *ofp = &ofile ;
@@ -1199,8 +1187,7 @@ local int procargs(PI *pip,AI *aip,bits *bop,cchar *ofn,cchar *afn) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (procargs) */
+} /* end subroutine (procargs) */
 
 local int procfile(PI *pip,void *ofp,cchar *fn) noex {
 	int		rs ;
@@ -1258,8 +1245,7 @@ local int procfile(PI *pip,void *ofp,cchar *fn) noex {
 	    debugprintf("progcheck/procfile: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
-/* end subroutine (procfile) */
+} /* end subroutine (procfile) */
 
 local int procln(PI *pip,LS *lsp,FC *cntp,int ln,cc *lp,int ll) noex {
 	int		rs = SR_FAULT ;
@@ -1284,8 +1270,7 @@ local int procln(PI *pip,LS *lsp,FC *cntp,int ln,cc *lp,int ll) noex {
 	    } /* end for */
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (procln) */
+} /* end subroutine (procln) */
 
 local int procout(PI *pip,void *ofp,cchar *fn,FC *counts) noex {
 	LI		*lip = pip->lip ;
@@ -1319,8 +1304,7 @@ local int procout(PI *pip,void *ofp,cchar *fn,FC *counts) noex {
 	    } /* end for */
 	} /* end if (counts) */
 	return rs ;
-}
-/* end subroutine (procout) */
+} /* end subroutine (procout) */
 
 local int procouthist(PI *pip,void *ofp,HIST *hlp) noex {
 	cint		ncca = nelem(cca) ;
@@ -1355,8 +1339,7 @@ local int procouthist(PI *pip,void *ofp,HIST *hlp) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (procouthist) */
+} /* end subroutine (procouthist) */
 
 local int procoutlang(PI *pip,void *ofp,LS *lsp) noex {
 	int		rs ;
@@ -1376,8 +1359,7 @@ local int procoutlang(PI *pip,void *ofp,LS *lsp) noex {
 	    rs = shio_printf(ofp,fmt,cp,stat.line) ;
 	} /* end if (langstate_getstat) */
 	return rs ;
-}
-/* end subroutine (procoutlang) */
+} /* end subroutine (procoutlang) */
 
 local int locinfo_start(LI *lip,PI *pip) noex {
 	int		rs = SR_OK ;
@@ -1389,8 +1371,7 @@ local int locinfo_start(LI *lip,PI *pip) noex {
 	lip->to = -1 ;
 
 	return rs ;
-}
-/* end subroutine (locinfo_start) */
+} /* end subroutine (locinfo_start) */
 
 local int locinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
@@ -1405,8 +1386,7 @@ local int locinfo_finish(LI *lip) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_finish) */
+} /* end subroutine (locinfo_finish) */
 
 #if	CF_LOCSETENT
 local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
@@ -1435,8 +1415,7 @@ local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_setentry) */
+} /* end subroutine (locinfo_setentry) */
 #endif /* CF_LOCSETENT */
 
 local int hist_start(HIST *hlp) noex {
@@ -1455,8 +1434,7 @@ local int hist_start(HIST *hlp) noex {
 	    } /* end for */
 	} /* end if (error) */
 	return rs ;
-}
-/* end subroutine (hist_start) */
+} /* end subroutine (hist_start) */
 
 local int hist_finish(HIST *hlp) noex {
 	cint		n = PROGCHECK_NCH ;
@@ -1468,8 +1446,7 @@ local int hist_finish(HIST *hlp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (hist_finish) */
+} /* end subroutine (hist_finish) */
 
 local int hist_proc(HIST *hlp,int ln,cchar *sp,int sl) noex {
 	cint		n = PROGCHECK_NCH ;
@@ -1479,8 +1456,7 @@ local int hist_proc(HIST *hlp,int ln,cchar *sp,int sl) noex {
 	    rs = linehist_proc(lhp,ln,sp,sl) ;
 	} /* end for */
 	return rs ;
-}
-/* end subroutine (hist_proc) */
+} /* end subroutine (hist_proc) */
 
 local int hist_count(HIST *hlp,int w) noex {
 	int		rs = SR_INVALID ;
@@ -1489,8 +1465,7 @@ local int hist_count(HIST *hlp,int w) noex {
 	    rs = linehist_count(lhp) ;
 	}
 	return rs ;
-}
-/* end if (hist_count) */
+} /* end if (hist_count) */
 
 local int hist_get(HIST *hlp,int w,int i,int *lnp) noex {
 	int		rs = SR_INVALID ;
@@ -1499,8 +1474,7 @@ local int hist_get(HIST *hlp,int w,int i,int *lnp) noex {
 	    rs = linehist_get(lhp,i,lnp) ;
 	}
 	return rs ;
-}
-/* end if (hist_get) */
+} /* end if (hist_get) */
 
 local int funcount_clear(FC *counts) noex {
 	cint	ncca = nelem(cca) ;
@@ -1509,8 +1483,7 @@ local int funcount_clear(FC *counts) noex {
 	    counts[i].c_close = 0 ;
 	} /* end for */
 	return SR_OK ;
-}
-/* end subroutine (funcount_clear) */
+} /* end subroutine (funcount_clear) */
 
 static cchar *chartype(int w) noex {
 	cchar		*cs = "unknown" ;
@@ -1518,7 +1491,6 @@ static cchar *chartype(int w) noex {
 	    cs = chartypes[w] ;
 	} /* end if */
 	return cs ;
-}
-/* end subroutine (chartype) */
+} /* end subroutine (chartype) */
 
 
