@@ -44,7 +44,7 @@
 	number of characters corresponding to the number of digits
 	in the maximum-values) for various different types (sizes)
 	and number bases.  Hence a two dimensional array is setup
-	that can be indexed by ineger (size) type and a base.  The
+	that can be indexed by integer (size) type and a base.  The
 	type is given as the log-base-two of the number of bytes
 	in the C++ integer type.  So (for example) the type |char|
 	bas type-num equal to '0' (log-base-two of 1 is 0).  The
@@ -98,9 +98,10 @@ module ;
 export module digbufsizes ;
 
 export {
-    constexpr int digbufsizes_maxbase = MAXBASE ; /* current max-base */
     constexpr int digbufsizes_maxtype = MAXTYPE ; /* types in bytes */
-    constexpr int digbufsizes_nbases = (digbufsizes_maxbase+1) ;
+    constexpr int digbufsizes_maxbase = MAXBASE ; /* current max-base */
+    constexpr int digbufsizes_ntypes = (digbufsizes_maxtype + 1) ;
+    constexpr int digbufsizes_nbases = (digbufsizes_maxbase + 1) ;
 } /* end export */
 
 consteval short ndigits(int t,int b) noex {
@@ -115,8 +116,8 @@ consteval short ndigits(int t,int b) noex {
 
 export {
     struct digbufsizes {
-	cint		nbases = digbufsizes_nbases ;
-	cint		ntypes = (digbufsizes_maxtype+1) ;
+	cint		ntypes = (digbufsizes_maxtype + 1) ;
+        cint		nbases = (digbufsizes_maxbase + 1) ;
 	ushort		bufsize[digbufsizes_maxtype+1][digbufsizes_nbases] ;
 	consteval digbufsizes() noex {
 	    for (int b = 0 ; b < nbases ; b += 1) {
@@ -125,6 +126,15 @@ export {
 	        } /* end for */
 	    } /* end for */
 	} ; /* end constructor (digbufsizes) */
+	int operator [] (int t,int b) const {
+	    int sz = 0 ;
+	    if ((t >= 0) && (t <= MAXTYPE)) {
+	        if ((b >= 2) && (t <= MAXBASE)) {
+	    	    sz = bufsize[t][b] ;
+		} /* end */
+	    } /* end */
+	    return sz ;
+	} ; /* end method */
     } ; /* end subroutine (digbufsizes) */
 } /* end export */
 
