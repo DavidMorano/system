@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	getserial(cchar *) noex ;
-
 EXTERNC_end
 
 
