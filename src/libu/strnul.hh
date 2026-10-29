@@ -39,8 +39,8 @@ struct strnul_len {
 	void operator	() (strnul *p) noex {
 	    op = p ;
 	} ; /* end method */
-	operator int () noex ;
-	int operator () () noex {
+	operator int () const noex ;
+	int operator () () const noex {
 	    return operator int () ;
 	} ; /* end method */
 } ; /* end struct (strnul_len) */
@@ -58,7 +58,7 @@ class strnul {
 	int		rl ;		/* return-length */
     public:
 	strnul_len	len ;
-	bool		fok = true ;
+	bool		fok = false ;
 	strnul(cchar *,int = -1) noex ;		/* <- CTOR */
 	strnul(const strview &sv) noex ;	/* <- CTOR */
 	strnul() noex : strnul(nullptr,0) { } ;	/* <- CTOR */
