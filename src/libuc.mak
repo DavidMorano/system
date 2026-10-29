@@ -450,9 +450,6 @@ memtrack.o:		memtrack.dir
 memtrack.dir:
 	makesubdir $@
 
-ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h
-ucmemalloc.o:		addrset.o
-
 # misc-character
 toxc.o:			toxc.cc toxc.h
 char.o:			char.cc char.h
@@ -940,9 +937,9 @@ permx.o:		permx.dir
 permx.dir:
 	makesubdir $@
 
-# UCMEM
-ucmem.o:		ucmem.dir
-ucmem.dir:
+# UCMEMORY
+ucmemory.o:		ucmemory.dir
+ucmemory.dir:
 	makesubdir $@
 
 # UCINET
@@ -962,6 +959,9 @@ tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
 ucpts.o:		ucpts.cc	ucpts.h			$(INCS)
 ucpwcache.o:		ucpwcache.cc	ucpwcache.h		$(INCS)
 tcx.o:			tcx.cc		tcx.h			$(INCS)
+
+ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h ucmallreg.h
+ucmemalloc.o:		addrset.o
 
 # other objects
 expcook.o:		expcook.cc	expcook.h		$(INCS)
