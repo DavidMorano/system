@@ -64,8 +64,8 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-extern int	dialudp(const char *,const char *,int,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	dialudp(cchar *,cchar *,int,int) ;
 
 
 /* forward references */
