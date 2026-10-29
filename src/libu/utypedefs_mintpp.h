@@ -28,8 +28,9 @@
 #include	<stdintx.h>		/* extended integer types */
 #include	<syspredefined.h>	/* system pre-defined types */
 
-#include	<utypedefs_msintpp.h>
-#include	<utypedefs_muintpp.h>
+#include	<utypedefs_mrintpp.h>	/* raw */
+#include	<utypedefs_msintpp.h>	/* signed */
+#include	<utypedefs_muintpp.h>	/* unsigned */
 
 
 #endif /* UTYPEDEFSMINTPP_INCLUDE */
