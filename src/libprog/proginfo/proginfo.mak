@@ -40,8 +40,10 @@ MODS += proginfo_base.o proginfo_rand.o
 LIBS= -luo -lu
 
 
+# overall
 PR_PROG= proginfo0.o
 
+# base
 # module primary
 PR_BASE= proginfo_base0.o
 
@@ -58,6 +60,7 @@ PI_BASE= pi_base0.o pi_base1.o pi_base2.o pi_base3.o
 
 MOD_BASE= proginfo_base.o
 
+# rand
 PR_RAND= proginfo_rand0.o
 
 PA_RAND=
@@ -66,12 +69,23 @@ PI_RAND=
 
 MOD_RAND= proginfo_rand.o
 
+# log
+PR_LOG= proginfo_log0.o
+
+PI_LOG0= proginfo_log1.o
+PI_LOG1=
+PI_LOG2=
+PI_LOG3=
+
+PI_LOG= pi_log0.o
+
+
 OBJ0= proginfo_base.o
 OBJ1= proginfo_rand.o
-OBJ2=
+OBJ2= proginfo_log.o
 OBJ3=
 
-OBJ= obj0.o obj1.o
+OBJ= obj0.o obj1.o obj2.o
 
 
 INCDIRS=
@@ -177,6 +191,22 @@ pi_rand.o:		$(PI_RAND)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 
+pi_log0.o:		$(PI_LOG0)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+pi_log1.o:		$(PI_LOG1)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+pi_log2.o:		$(PI_LOG2)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+pi_log3.o:		$(PI_LOG3)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+pi_log.o:		$(PI_LOG)
+	$(LD) -r -o $@ $(LDFLAGS) $^
+
+
 # module
 proginfo.o:		$(PR_PROG) $(MOD_BASE) $(MOD_RAND)
 	$(LD) -r -o $@ $(LDFLAGS) $^
@@ -214,9 +244,13 @@ proginfo_log0.o:	proginfo_log.ccm $(PR_BASE)			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 proginfo_log1.o:	proginfo_log1.cc $(PR_BASE) $(PR_LOG)		$(INCS)
+
 proginfo_log2.o:	proginfo_log2.cc $(PR_BASE) $(PR_LOG)		$(INCS)
+
 proginfo_log3.o:	proginfo_log3.cc $(PR_BASE) $(PR_LOG)		$(INCS)
+
 proginfo_log4.o:	proginfo_log4.cc $(PR_BASE) $(PR_LOG)		$(INCS)
+
 proginfo_log5.o:	proginfo_log5.cc $(PR_BASE) $(PR_LOG)		$(INCS)
 
 
