@@ -61,10 +61,6 @@
 #define	MAXARGINDEX	100
 #define	MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
 #ifdef	ALIASNAMELEN
 #define	ABUFLEN		ALIASNAMELEN
 #else
