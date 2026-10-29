@@ -67,28 +67,6 @@
 #define	TIMEBUFLEN	80		/* can hold? all known date strings */
 #endif
 
-/* common digit base (2, 8, 10, 16) buffer lengths (convenience defines) */
-
-#ifndef	BINBUFLEN
-#define	BINBUFLEN	256		/* can hold |int256_t| in binary */
-#endif
-
-#ifndef	OCTBUFLEN
-#define	OCTBUFLEN	86		/* can hold |int256_t| in octal */
-#endif
-
-#ifndef	DECBUFLEN
-#define	DECBUFLEN	78		/* can hold |int256_t| in decimal */
-#endif
-
-#ifndef	HEXBUFLEN
-#define	HEXBUFLEN	64		/* can hold |int256_t| in hexadecimal */
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	MAX(MAX(MAX(BINBUFLEN,OCTBUFLEN),DECBUFLEN),HEXBUFLEN)
-#endif
-
 #ifndef	REALNAMELEN
 #define	REALNAMELEN	100		/* "real" name length */
 #endif
