@@ -23,30 +23,30 @@
 
 
 struct srventry_a {
-	const char	*version ;	/* %V */
-	const char	*searchname ;	/* %S */
-	const char	*programroot ;	/* %R */
-	const char	*nodename ;	/* %N */
-	const char	*domainname ;	/* %D */
-	const char	*hostname ;	/* %H */
-	const char	*username ;	/* %U */
-	const char	*service ;
-	const char	*subservice ;
-	const char	*svcargs ;	/* service arguments! */
-	const char	*peername ;
-	const char	*ident ;	/* IDENT name if available */
-	const char	*nethost ;	/* reverse lookup (what is this ??) */
-	const char	*netuser ;	/* network username if available */
-	const char	*netpass ;	/* network password (encrypted ?) */
+	cchar	*version ;	/* %V */
+	cchar	*searchname ;	/* %S */
+	cchar	*programroot ;	/* %R */
+	cchar	*nodename ;	/* %N */
+	cchar	*domainname ;	/* %D */
+	cchar	*hostname ;	/* %H */
+	cchar	*username ;	/* %U */
+	cchar	*service ;
+	cchar	*subservice ;
+	cchar	*svcargs ;	/* service arguments! */
+	cchar	*peername ;
+	cchar	*ident ;	/* IDENT name if available */
+	cchar	*nethost ;	/* reverse lookup (what is this ??) */
+	cchar	*netuser ;	/* network username if available */
+	cchar	*netpass ;	/* network password (encrypted ?) */
 } ;
 
 struct srventry_head {
-	const char	*program ;	/* server program path */
-	const char	*srvargs ;	/* server program arguments */
-	const char	*username ;
-	const char	*groupname ;
-	const char	*options ;
-	const char	*access ;
+	cchar	*program ;	/* server program path */
+	cchar	*srvargs ;	/* server program arguments */
+	cchar	*username ;
+	cchar	*groupname ;
+	cchar	*options ;
+	cchar	*access ;
 } ;
 
 
