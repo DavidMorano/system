@@ -28,14 +28,14 @@
 ******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<csignal>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 
@@ -71,13 +71,13 @@ struct expander {
 
 /* forward references */
 
-static int	process_exp(struct proginfo *,struct expander *,const char *) ;
-static int	shaver(struct proginfo *,const char *,int,const char **) ;
+local int	process_exp(struct proginfo *,struct expander *,cchar *) ;
+local int	shaver(struct proginfo *,cchar *,int,cchar **) ;
 
-static int	expander_start(struct expander *,int) ;
-static int	expander_expand(struct expander *,const char *,int,
-			const char **) ;
-static int	expander_finish(struct expander *) ;
+local int	expander_start(struct expander *,int) ;
+local int	expander_expand(struct expander *,cchar *,int,
+			cchar **) ;
+local int	expander_finish(struct expander *) ;
 
 
 /* local variables */
@@ -88,11 +88,11 @@ static int	expander_finish(struct expander *) ;
 
 int process(pip,fname)
 struct proginfo	*pip ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	struct expander	e ;
 
-	const int	elen = (LINEBUFLEN + NCOLSPERTAB + 1) ;
+	cint	elen = (LINEBUFLEN + NCOLSPERTAB + 1) ;
 
 	int	rs ;
 	int	wlen = 0 ;
@@ -114,10 +114,10 @@ const char	fname[] ;
 /* local subroutines */
 
 
-static int process_exp(pip,exp,fname)
+local int process_exp(pip,exp,fname)
 struct proginfo	*pip ;
 struct expander	*exp ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile	ifile, *ifp = &ifile ;
 
@@ -126,7 +126,7 @@ const char	fname[] ;
 	int	wlen = 0 ;
 	int	f_bol, f_eol ;
 
-	const char	*lp ;
+	cchar	*lp ;
 
 	char	linebuf[LINEBUFLEN + 1] ;
 
@@ -212,17 +212,17 @@ const char	fname[] ;
 /* end subroutine (process_exp) */
 
 
-static int shaver(pip,lbuf,llen,rpp)
+local int shaver(pip,lbuf,llen,rpp)
 struct proginfo	*pip ;
-const char	lbuf[] ;
+cchar	lbuf[] ;
 int		llen ;
-const char	**rpp ;
+cchar	**rpp ;
 {
 	int	rs = SR_OK ;
 	int	i ;
 	int	len = 0 ;
 
-	const char	*lp = lbuf ;
+	cchar	*lp = lbuf ;
 
 
 	for (i = 0 ; (i < pip->shave) && (i < llen) ; i += 1) {
@@ -251,7 +251,7 @@ const char	**rpp ;
 /* end subroutine (shaver) */
 
 
-static int expander_start(op,elen)
+local int expander_start(op,elen)
 struct expander	*op ;
 int		elen ;
 {
@@ -275,11 +275,11 @@ int		elen ;
 /* end subroutine (expander_start) */
 
 
-static int expander_expand(op,linebuf,linelen,rpp)
+local int expander_expand(op,linebuf,linelen,rpp)
 struct expander	*op ;
-const char	linebuf[] ;
+cchar	linebuf[] ;
 int		linelen ;
-const char	**rpp ;
+cchar	**rpp ;
 {
 	int	rs = SR_OK ;
 	int	n, i, j ;
@@ -317,7 +317,7 @@ const char	**rpp ;
 /* end subroutine (expander_expand) */
 
 
-static int expander_finish(op)
+local int expander_finish(op)
 struct expander	*op ;
 {
 
