@@ -1,4 +1,0 @@
-UCMEM
-
-Core memory operations.
-
