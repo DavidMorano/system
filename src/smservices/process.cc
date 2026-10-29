@@ -62,12 +62,12 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	cfhexui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,int *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	cfhexui(cchar *,int,uint *) ;
+extern int	cfhexi(cchar *,int,int *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -87,9 +87,9 @@ struct counts {
 
 /* forward references */
 
-static int	readem(struct proginfo *,LMAPPROG *,MIPSDIS *,
+local int	readem(struct proginfo *,LMAPPROG *,MIPSDIS *,
 			RECORDER *,struct counts *,uint,uint) ;
-static int	writecache(struct proginfo *,RECORDER *,char *) ;
+local int	writecache(struct proginfo *,RECORDER *,char *) ;
 
 
 /* local (module-scope static) data */
@@ -189,7 +189,7 @@ char		sshfname[] ;
 	    uint	secstart, seclen ;
 
 
-	    if ((shp->sh_type & SHT_PROGBITS) &&
+	    if ((shp->sh_type & SHT_PROGbits) &&
 	        (shp->sh_flags & SHF_ALLOC) && 
 	        (shp->sh_flags & SHF_EXECINSTR)) {
 
@@ -376,7 +376,7 @@ badcache:
 
 
 
-static int readem(pip,pmp,dp,rp,cp,start,len)
+local int readem(pip,pmp,dp,rp,cp,start,len)
 struct proginfo	*pip ;
 LMAPPROG	*pmp ;
 MIPSDIS		*dp ;
@@ -551,7 +551,7 @@ uint		start, len ;
 
 
 /* write out the cache file */
-static int writecache(pip,rp,fname)
+local int writecache(pip,rp,fname)
 struct proginfo	*pip ;
 RECORDER	*rp ;
 char		fname[] ;
