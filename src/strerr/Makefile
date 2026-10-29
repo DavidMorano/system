@@ -51,7 +51,7 @@ DEPS_MAIN +=
 OBJ0= strerr_main.o cmdutils.o
 OBJ1= argmgr.o filerec.o
 OBJ2= tardir.o modproc.o
-OBJ3= ischarx.o
+OBJ3= isch.o
 
 OBJ4= strx.o six.o rmx.o strn.o strx.o
 OBJ5= prognamevar.o shellunder.o
@@ -327,11 +327,11 @@ nleadx.dir:
 
 # SINGLES
 shortq.o:		shortq.cc	shortq.h		$(INCS)
-ischarx.o:		ischarx.cc	ischarx.h		$(INCS)
 strabbrerr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
 
 prognamevar.o:		prognamevar.cc	prognamevar.hh
 shellunder.o:		shellunder.cc	shellunder.h
 char.o:			char.cc		char.h
+isch.o:			isch.cc		isch.h
 
 
