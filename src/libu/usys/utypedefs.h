@@ -178,128 +178,15 @@ typedef int (*sortvcmp_f)(const void *,const void *) noex ;
 EXTERNC_end
 #endif /* TYPEDEF_SORTVCMP */
 
-#ifndef	TYPEDEF_LONGDOUBLE
-#define	TYPEDEF_LONGDOUBLE
-typedef long double		longdouble ;
-#endif /* TYPEDEF_LONGDOUBLE */
-
-/* contstant versions */
-
-#ifndef	TYPEDEF_CBOOL
-#define	TYPEDEF_CBOOL
-typedef const bool		cbool ;
-#endif
-
-#ifndef	TYPEDEF_CFLOAT
-#define	TYPEDEF_CFLOAT
-typedef const float		cfloat ;
-#endif /* TYPEDEF_CFLOAT */
-
-#ifndef	TYPEDEF_CDOUBLE
-#define	TYPEDEF_CDOUBLE
-typedef const double		cdouble ;
-#endif /* TYPEDEF_CDOUBLE */
-
-#ifndef	TYPEDEF_CLONGDOUBLE
-#define	TYPEDEF_CLONGDOUBLE
-typedef const long double	clongdouble ;
-#endif /* TYPEDEF_CLONGDOUBLE */
-
-#ifndef	TYPEDEF_CVOID
-#define	TYPEDEF_CVOID
-typedef const void		cvoid ;
-#endif /* TYPEDEF_CVOID */
-
-#ifndef	TYPEDEF_CSIZE
-#define	TYPEDEF_CSIZE
-typedef const size_t		csize ;
-#endif /* TYPEDEF_CSIZE */
-
-#ifndef	TYPEDEF_COFF
-#define	TYPEDEF_COFF
-typedef const off_t		coff ;
-#endif /* TYPEDEF_COFF */
-
-#ifndef	TYPEDEF_CINTPTR
-#define	TYPEDEF_CINTPTR
-typedef const intptr_t		cintptr ;
-#endif /* TYPEDEF_CINTPTR */
-
-#ifndef	TYPEDEF_CUINTPTR
-#define	TYPEDEF_CUINTPTR
-typedef const uintptr_t		cuintptr ;
-#endif /* TYPEDEF_CUINTPTR */
-
-#ifndef	TYPEDEF_CNFDS
-#define	TYPEDEF_CBFDS
-typedef const nfds_t		cnfds ;
-#endif
-
-#ifndef	TYPEDEF_CSOCKLEN
-#define	TYPEDEF_CSOCKLEN
-typedef const socklen_t		csocklen ;
-#endif /* TYPEDEF_CSOCKLEN */
-
-#ifndef	TYPEDEF_CMODE
-#define	TYPEDEF_CMODE
-typedef const mode_t		cmode ;
-#endif /* TYPEDEF_CMODE */
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char		cc ;
-#endif
-
 #ifndef	TYPEDEF_VOIDP
 #define	TYPEDEF_VOIDP
 typedef void *			voidp ;
 #endif
 
-#ifndef	TYPEDEF_VOIDPP
-#define	TYPEDEF_VOIDPP
-typedef void **			voidpp ;
-#endif
-
-#ifndef	TYPEDEF_CCP
-#define	TYPEDEF_CCP
-typedef const char *		ccp ;
-#endif
-
-#ifndef	TYPEDEF_CVOIDP
-#define	TYPEDEF_CVOIDP
-typedef const void *		cvoidp ;
-#endif
-
-#ifndef	TYPEDEF_CPCVOID
-#define	TYPEDEF_CPCVOID
-typedef const void *const	cpcvoid ;
-#endif
-
-#ifndef	TYPEDEF_CVOIDPP
-#define	TYPEDEF_CVOIDPP
-typedef const void **		cvoidpp ;
-#endif
-
-#ifndef	TYPEDEF_CNULLPTR
-#define	TYPEDEF_CNULLPTR
-typedef const nullptr_t		cnullptr ;
-#endif
-
-#ifndef	TYPEDEF_CNULLOPT
-#define	TYPEDEF_CNULLOPT
-#ifdef	__cplusplus
-#include	<optional>
-typedef const std::nullopt_t	cnullopt ;
-#endif /* __cplusplus */
-#endif
-
-#ifndef	TYPEDEF_CNOTHROW
-#define	TYPEDEF_CNOTHROW
-#ifdef	__cplusplus
-#include			<new>		/* |nothrow(3c++)| */
-typedef const nothrow_t		cnothrow ;
-#endif /* __cplusplus */
-#endif
+#ifndef	TYPEDEF_LONGDOUBLE
+#define	TYPEDEF_LONGDOUBLE
+typedef long double		longdouble ;
+#endif /* TYPEDEF_LONGDOUBLE */
 
 #ifndef	TYPEDEF_WCHARP
 #define	TYPEDEF_WCHARP
@@ -366,33 +253,140 @@ typedef unsigned int *		uintp ;
 typedef unsigned long *		ulongp ;
 #endif
 
-#ifndef	TYPEDEF_CHARPP
-#define	TYPEDEF_CHARPP
-typedef char **			charpp ;
+/* pointer-to-pointer */
+
+#ifndef	TYPEDEF_VOIDPP
+#define	TYPEDEF_VOIDPP
+typedef void **			voidpp ;
 #endif
 
-/* usigned (pointer-to-pointer-to) */
-#ifndef	TYPEDEF_UCHARPP
-#define	TYPEDEF_UCHARPP
-typedef unsigned char **	ucharpp ;
+#ifndef	TYPEDEF_CPP
+#define	TYPEDEF_CPP
+typedef char **			cpp ;
 #endif
 
-#ifndef	TYPEDEF_USHORTPP
-#define	TYPEDEF_USHORTPP
-typedef unsigned short **	ushortpp ;
+/* constant */
+
+#ifndef	TYPEDEF_CBOOL
+#define	TYPEDEF_CBOOL
+typedef const bool		cbool ;
 #endif
 
-#ifndef	TYPEDEF_UINTPP
-#define	TYPEDEF_UINTPP
-typedef unsigned int **		uintpp ;
+#ifndef	TYPEDEF_CFLOAT
+#define	TYPEDEF_CFLOAT
+typedef const float		cfloat ;
+#endif /* TYPEDEF_CFLOAT */
+
+#ifndef	TYPEDEF_CDOUBLE
+#define	TYPEDEF_CDOUBLE
+typedef const double		cdouble ;
+#endif /* TYPEDEF_CDOUBLE */
+
+#ifndef	TYPEDEF_CLONGDOUBLE
+#define	TYPEDEF_CLONGDOUBLE
+typedef const long double	clongdouble ;
+#endif /* TYPEDEF_CLONGDOUBLE */
+
+#ifndef	TYPEDEF_CVOID
+#define	TYPEDEF_CVOID
+typedef const void		cvoid ;
+#endif /* TYPEDEF_CVOID */
+
+#ifndef	TYPEDEF_CSIZE
+#define	TYPEDEF_CSIZE
+typedef const size_t		csize ;
+#endif /* TYPEDEF_CSIZE */
+
+#ifndef	TYPEDEF_COFF
+#define	TYPEDEF_COFF
+typedef const off_t		coff ;
+#endif /* TYPEDEF_COFF */
+
+#ifndef	TYPEDEF_CINTPTR
+#define	TYPEDEF_CINTPTR
+typedef const intptr_t		cintptr ;
+#endif /* TYPEDEF_CINTPTR */
+
+#ifndef	TYPEDEF_CUINTPTR
+#define	TYPEDEF_CUINTPTR
+typedef const uintptr_t		cuintptr ;
+#endif /* TYPEDEF_CUINTPTR */
+
+#ifndef	TYPEDEF_CNFDS
+#define	TYPEDEF_CBFDS
+typedef const nfds_t		cnfds ;
 #endif
 
-#ifndef	TYPEDEF_ULONGPP
-#define	TYPEDEF_ULONGPP
-typedef unsigned long **	ulongpp ;
+#ifndef	TYPEDEF_CSOCKLEN
+#define	TYPEDEF_CSOCKLEN
+typedef const socklen_t		csocklen ;
+#endif /* TYPEDEF_CSOCKLEN */
+
+#ifndef	TYPEDEF_CMODE
+#define	TYPEDEF_CMODE
+typedef const mode_t		cmode ;
+#endif /* TYPEDEF_CMODE */
+
+#ifndef	TYPEDEF_CC
+#define	TYPEDEF_CC
+typedef const char		cc ;
 #endif
 
-/* constant (pointer-to) */
+/* constant */
+#ifndef	TYPEDEF_CCP
+#define	TYPEDEF_CCP
+typedef const char *		ccp ;
+#endif
+
+/* constant */
+#ifndef	TYPEDEF_CCPP
+#define	TYPEDEF_CCPP
+typedef const char **		ccpp ;
+#endif
+
+/* constant */
+#ifndef	TYPEDEF_CVOIDP
+#define	TYPEDEF_CVOIDP
+typedef const void *		cvoidp ;
+#endif
+
+/* constant */
+#ifndef	TYPEDEF_CPCVOID
+#define	TYPEDEF_CPCVOID
+typedef const void *const	cpcvoid ;
+#endif
+
+/* constant */
+#ifndef	TYPEDEF_CVOIDPP
+#define	TYPEDEF_CVOIDPP
+typedef const void **		cvoidpp ;
+#endif
+
+#ifndef	TYPEDEF_CNULLPTR
+#define	TYPEDEF_CNULLPTR
+typedef const nullptr_t		cnullptr ;
+#endif
+
+/* constant */
+#ifndef	TYPEDEF_CNULLOPT
+#define	TYPEDEF_CNULLOPT
+#ifdef	__cplusplus
+#include	<optional>
+typedef const std::nullopt_t	cnullopt ;
+#endif /* __cplusplus */
+#endif
+
+/* constant */
+#ifndef	TYPEDEF_CNOTHROW
+#define	TYPEDEF_CNOTHROW
+#ifdef	__cplusplus
+#include			<new>		/* |nothrow(3c++)| */
+typedef const nothrow_t		cnothrow ;
+#endif /* __cplusplus */
+#endif
+
+/* constant raw pointer-to */
+
 #ifndef	TYPEDEF_CCHARP
 #define	TYPEDEF_CCHARP
 typedef const char *		ccharp ;
@@ -414,6 +408,7 @@ typedef const long *		clongp ;
 #endif
 
 /* constant (pointer-to-unsigned) */
+
 #ifndef	TYPEDEF_CUCHARP
 #define	TYPEDEF_CUCHARP
 typedef const unsigned char *	cucharp ;
@@ -435,25 +430,8 @@ typedef const unsigned long *	culongp ;
 #endif
 
 /* special types for characters */
-#ifndef	TYPEDEF_CCHARPP
-#define	TYPEDEF_CCHARPP
-typedef const char **		ccharpp ;
-#endif
 
-#ifndef	TYPEDEF_CSHORTPP
-#define	TYPEDEF_CSHORTPP
-typedef const short **		cshortpp ;
-#endif
-
-#ifndef	TYPEDEF_CINTPP
-#define	TYPEDEF_CINTPP
-typedef const int **		cintpp ;
-#endif
-
-#ifndef	TYPEDEF_CLONGPP
-#define	TYPEDEF_CLONGPP
-typedef const long **		clongpp ;
-#endif
+/* special constant raw */
 
 #ifndef	TYPEDEF_CPCCHAR
 #define	TYPEDEF_CPCCHAR
@@ -464,6 +442,8 @@ typedef const char *const	cpcchar ;
 #define	TYPEDEF_CPCCHARP	/* same as |mainv| */
 typedef const char *const *	cpccharp ;
 #endif
+
+/* special constant unsigned */
 
 #ifndef	TYPEDEF_CUCHARPP
 #define	TYPEDEF_CUCHARPP
