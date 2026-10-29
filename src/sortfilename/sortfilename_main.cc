@@ -69,10 +69,6 @@
 #define	MAXARGINDEX	100
 #define	MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
 #ifndef	LINELEN
 #define	LINELEN		2048
 #endif
@@ -91,9 +87,9 @@ extern int	printhelp(bfile *,cchar *,cchar *,cchar *) ;
 
 /* forward references */
 
-static int	usage(struct proginfo *) ;
-static int	sfdigits(cchar *,int,char **) ;
-static int	sortfunc(cchar **,cchar **) ;
+local int	usage(struct proginfo *) ;
+local int	sfdigits(cchar *,int,char **) ;
+local int	sortfunc(cchar **,cchar **) ;
 
 
 /* local variables */
@@ -739,7 +735,7 @@ badarg:
 
 
 
-static int usage(pip)
+local int usage(pip)
 struct proginfo	*pip ;
 {
 	int	rs ;
@@ -761,7 +757,7 @@ struct proginfo	*pip ;
 /* end subroutine (usage) */
 
 
-static int sortfunc(e1p,e2p)
+local int sortfunc(e1p,e2p)
 cchar	**e1p, **e2p ;
 {
 	int	c ;
@@ -828,7 +824,7 @@ cchar	**e1p, **e2p ;
 /* end subroutine (sortfunc) */
 
 
-static int sfdigits(s,slen,rpp)
+local int sfdigits(s,slen,rpp)
 cchar	s[] ;
 int		slen ;
 char		**rpp ;
