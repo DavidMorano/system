@@ -34,6 +34,7 @@
 #include	<localmisc_funmacs.h>
 #include	<localmisc_integer.h>
 #include	<localmisc_len.h>
+#include	<localmisc_lendig.h>
 #include	<localmisc_lims.h>
 #include	<localmisc_logical.h>
 #include	<localmisc_max.h>
