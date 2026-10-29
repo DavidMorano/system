@@ -24,7 +24,7 @@
 	This subroutine processes a single file.
 
 	Synopsis:
-	int piaudit(PROGINFO *pip,ARGINFO *aip,cchar *t,cc *dbn,char ofn) noex
+	int piaudit(PI *pip,ARGINFO *aip,cchar *t,cc *dbn,char ofn) noex
 
 	Arguments:
 	pip		program information pointer
@@ -40,18 +40,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"config.h"
-#include	"defs.h"
 
 
 /* local defines */
@@ -71,7 +66,7 @@
 
 /* local variables */
 
-static constexpr cchar	aterms[] = {
+constexpr char		aterms[] = {
 	0x00, 0x3E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -80,7 +75,7 @@ static constexpr cchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -88,14 +83,13 @@ static constexpr cchar	aterms[] = {
 
 /* exported subroutines */
 
-int piaudit(PROGINFO *pip,ARGINFO *aip,cchar *terms,cc *dbn,char *ofname) noex {
+int piaudit(PI *pip,ARGINFO *aip,cchar *terms,cc *dbn,char *ofname) noex {
 	int		rs ;
 	(void) aip ;
 	(void) terms ;
 	(void) ofname ;
 	rs = auditdb(pip,dbn) ;
 	return rs ;
-}
-/* end subroutine (piaudit) */
+} /* end subroutine (piaudit) */
 
 
