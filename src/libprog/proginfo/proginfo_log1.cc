@@ -38,15 +38,14 @@ module ;
 #include	<usysbase.h>		/* LIBU */
 #include	<nulstr.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
-#include	<fmtstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
+#include	<fmtstr.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<logfile.h>		/* LIBDAM */
 #include	<userinfo.h>		/* LIBDAM */
-#include	<bfile.h>		/* LIBB */
 
 #include	"proginfo.hh"
 
@@ -198,10 +197,10 @@ statcexpr bool		f_comment = false ;
 	if (pip && sp) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
+	        logfile	*lfp = pip->lfp ;
 	        cchar	*logid ;
 	        if (nulstr ls ; (rs = ls.start(sp,sl,&logid)) >= 0) {
 		    {
-	                logfile	*lfp = pip->lfp ;
 	                rs = lfp->setid(logid) ;
 		        c = rs ;
 		    }
@@ -239,7 +238,7 @@ statcexpr bool		f_comment = false ;
 	            if ((rs = fmtstr(fbuf,flen,0x01,fmt,ap)) >= 0) {
 	                rs = proglog_print(pip,fbuf,rs) ;
 	                wlen = rs ;
-		    }
+		    } /* end */
 		    rs1 = mem.free(fbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
