@@ -28,29 +28,9 @@
 #include	<stdintx.h>		/* extended integer types */
 #include	<syspredefined.h>	/* system pre-defined types */
 
+#include	<utypedefs_crintpp.h>
 #include	<utypedefs_csintpp.h>
 #include	<utypedefs_cuintpp.h>
-
-
-#ifndef	TYPEDEF_CCHARPP
-#define	TYPEDEF_CCHARPP
-typedef const char **		ccharpp ;
-#endif /* TYPEDEF_CCHARPP */
-
-#ifndef	TYPEDEF_CSHORTPP
-#define	TYPEDEF_CSHORTPP
-typedef const short **		cshortpp ;
-#endif /* TYPEDEF_CSHORPP */
-
-#ifndef	TYPEDEF_CINTPP
-#define	TYPEDEF_CINTPP
-typedef const int **		cintpp ;
-#endif /* TYPEDEF_CINTPP */
-
-#ifndef	TYPEDEF_CLONGPP
-#define	TYPEDEF_CLONGPP
-typedef const long **		clongpp ;
-#endif /* TYPEDEF_CLONGPP */
 
 
 #endif /* UTYPEDEFSCINTPP_INCLUDE */
