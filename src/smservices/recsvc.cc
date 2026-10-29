@@ -50,8 +50,8 @@
 
 /* forward references */
 
-static int	recsvc_extend(RECSVC *) ;
-static int	recsvc_already(RECSVC *,uint,int,int) ;
+local int	recsvc_extend(RECSVC *) ;
+local int	recsvc_already(RECSVC *,uint,int,int) ;
 
 
 /* local variables */
@@ -431,7 +431,7 @@ RECSVC	*asp ;
 
 
 /* extend the object recsvc */
-static int recsvc_extend(asp)
+local int recsvc_extend(asp)
 RECSVC	*asp ;
 {
 	int	rs ;
