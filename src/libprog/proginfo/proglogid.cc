@@ -25,10 +25,10 @@
 	to a log-file.
 
 	Synopsis:
-	int proglogid(PROGINFO *pip) noex
+	int proglogid(PI *pip) noex
 
 	Arguments:
-	pip		pointer to PROGINFO object
+	pip		pointer to PI object
 
 	Returns:
 	>=0		OK
@@ -48,22 +48,26 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
-#include	<cstddef>		/* |unllptr_t| */
-#include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
-#include	<usystem.h>
-#include	<ucgetpid.h>
-#include	<getserial.h>
-#include	<mkpathx.h>
-#include	<mklogid.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucgetpid.h>		/* LIBUC */
+#include	<getserial.h>		/* LIBUC */
+#include	<mkpathx.h>		/* LIBUC */
+#include	<mklogid.h>		/* LIBUC */
 #include	<localmisc.h>		/* |LOGIDLEN| */
 
 #include	"proginfo.hh"
 
 
 /* local defines */
+
+#ifndef	CF_SERIAL
+#define	CF_SERIAL	0		/* serial or PID */
+#endif
 
 
 /* imported namespaces */
@@ -92,10 +96,10 @@
 
 /* exported subroutines */
 
-int proglogid(PROGINFO *pip) noex {
+int proglogid(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		v = -1 ;
-	int		ll = 0 ;
+	int		ll = 0 ; /* return-value */
 
 	if (pip->pid < 0) pip->pid = uc_getpid() ;
 
@@ -113,7 +117,7 @@ int proglogid(PROGINFO *pip) noex {
 
 	    if ((rs >= 0) && (v < 0)) {
 	        tdn = pip->tmpdname ;
-	        if ((tdn != NULL) && (tdn[0] != '0')) {
+	        if ((tdn != nullptr) && (tdn[0] != '0')) {
 	            if ((rs = mkpath2(tbuf,pip->tmpdname,sfname)) >= 0) {
 	                if (tbuf[0] != '\0') {
 	                    v = getserial(tbuf) ;
@@ -135,13 +139,11 @@ int proglogid(PROGINFO *pip) noex {
 	    if ((rs = mklogid(lbuf,llen,nn,-1,v)) > 0) {
 		cchar	**vpp = &pip->logid ;
 		ll = rs ;
-	        rs = proginfo_setentry(pip,vpp,lbuf,ll) ;
+	        rs = pip->setent(vpp,lbuf,ll) ;
 	    }
-
 	} /* end block (logid) */
 
 	return (rs >= 0) ? ll : rs ;
-}
-/* end subroutine (proglogid) */
+} /* end subroutine (proglogid) */
 
 
