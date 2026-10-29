@@ -25,8 +25,13 @@
 	proginfo
 
 	Description:
-	This module provides a very basic sets of simple subroutines
+	This module provides a very basic set of simple subroutines
 	for basic program management.
+
+	Notes:
+	1. The length (in bytes) of the program-name when printing
+	error messages is limited to a maximum of |LOGIDLEN| bytes.
+	Someone thought that this was a good idea.
 
 *******************************************************************************/
 
@@ -72,6 +77,7 @@ module ;
 module proginfo.base ;
 
 import libutil ;			/* |memclear(3u)| */
+import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
@@ -82,7 +88,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using strview = stringview ;		/* type */
 using libu::snvprintf ;			/* subroutine */
 using libuc::mem ;			/* variable */
 using std::cerr ;			/* variable */
@@ -130,12 +135,13 @@ int proginfo::eprintf(cchar *fmt,...) noex {
 	            if (char *pbuf ; (rs = mem.ml(&pbuf)) >= 0) ylikely {
 		        cint plen = rs ;
 	    	        if ((rs = snvprintf(pbuf,plen,fmt,ap)) > 0) ylikely {
-		    	    strview vs(pn,47) ;
-			    {
-		        	cint pnsz = conv<int>(vs.size()) ;
-		                cerr << vs << ": " << pbuf ;
-		                len = (pnsz + 2 + rs) ;
-			    }
+			    cint fl = rs ;
+		    	    if (strnul vs(pn,LOGIDLEN) ; vs.fok) {
+		        	cint pnl = vs.len ;
+				ccp  pnp = vs ;
+		                cerr << pnp << ": " << pbuf ;
+		                len = (pnl + 2 + fl) ;
+			    } /* end if (strnul) */
 		        } /* end if (snvprintf) */
 	                rs1 = mem.free(pbuf) ;
 		        if (rs >= 0) rs = rs1 ;
@@ -148,35 +154,40 @@ int proginfo::eprintf(cchar *fmt,...) noex {
 } /* end method (proginfo::eprintf) */
 
 int proginfo_eprint::operator () (cchar *sp,int sl) noex {
-    	int		rs = SR_FAULT ;
+    	int		rs = SR_BUGCHECK ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
-	if (sp) ylikely {
-	    rs = SR_INVALID ;
-	    if (cchar *pn = op->progname.valp) ylikely {
-	        cchar *bp ;
-	        if (nulstr ss ; (rs = ss.start(sp,sl,&bp)) >= 0) ylikely {
-		    strview vs(pn,47) ;
-		    cint bl = rs ;
-		    {
-		        cint pnsz = conv<int>(vs.size()) ;
-		        cerr << vs << ": " << bp << eol ; 
-		        len = (pnsz + 2 + bl + 1) ;
-		    }
-		    rs1 = ss.finish ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (nulstr) */
-	    } /* end if (progname) */
-	} /* end if (non-null) */
+	if (op) ylikely {
+    	    rs = SR_FAULT ;
+	    if (sp) ylikely {
+	        rs = SR_INVALID ;
+	        if (cchar *pn = op->progname.valp) ylikely {
+	            cchar *bp ;
+	            if (nulstr ss ; (rs = ss.start(sp,sl,&bp)) >= 0) ylikely {
+		        cint bl = rs ;
+		        if (strnul vs(pn,LOGIDLEN) ; vs.fok) {
+		            cint pnl = vs.len ;
+			    ccp  pnp = vs ;
+		            cerr << pnp << ": " << bp << eol ; 
+		            len = (pnl + 2 + bl + 1) ;
+		        } /* end if (strnul) */
+		        rs1 = ss.finish ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (nulstr) */
+	        } /* end if (progname) */
+	    } /* end if (non-null) */
+	} /* end if (bug-check) */
 	return (rs >= 0) ? len : rs ;
 } /* end method (proginfo_eprint::operator) */
 
 int proginfo_eprint::operator () () noex {
-    	return operator () (nullptr,0) ;
+    	ccharp sp = sysword.w_blanks ;
+    	return operator () (sp,0) ;
 } /* end method (proginfo_eprint::operator) */
 
 proginfo_eprint::operator int () noex {
-    	return operator () (nullptr,0) ;
+    	ccharp sp = sysword.w_blanks ;
+    	return operator () (sp,0) ;
 } /* end method (proginfo_eprint::operator) */
 
 
