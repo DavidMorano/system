@@ -78,6 +78,7 @@
 #include	<msfile.h>
 #include	<msflag.h>
 #include	<utmpacc.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -102,10 +103,6 @@
 #define	TO_SPEED	30
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
@@ -113,16 +110,15 @@ extern int	isNotPresent(int) ;
 extern int	isBadMsg(int) ;
 
 #if	CF_CPUSPEED
-extern int	cpuspeed(const char *,const char *,int) ;
+extern int	cpuspeed(cchar *,cchar *,int) ;
 #endif
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -140,34 +136,34 @@ enum cotypes {
 /* forward references */
 
 #ifdef	COMMENT
-static int standing_boottime(STANDING *,int,char *,char *) ;
+local int standing_boottime(STANDING *,int,char *,char *) ;
 #endif
 
-static int standing_undefined(STANDING *,time_t,char *,char *) ;
-static int standing_getsysmisc(STANDING *,time_t,char *,char *) ;
-static int standing_getloadave(STANDING *,time_t,char *,char *) ;
-static int standing_reploadave(STANDING *,time_t,char *,char *) ;
-static int standing_getlistener(STANDING *,time_t,char *,char *) ;
+local int standing_undefined(STANDING *,time_t,char *,char *) ;
+local int standing_getsysmisc(STANDING *,time_t,char *,char *) ;
+local int standing_getloadave(STANDING *,time_t,char *,char *) ;
+local int standing_reploadave(STANDING *,time_t,char *,char *) ;
+local int standing_getlistener(STANDING *,time_t,char *,char *) ;
 
-static int standing_checkopen(STANDING *,time_t,int) ;
-static int standing_checkclose(STANDING *,time_t) ;
-static int standing_cosend(STANDING *,time_t,struct standing_callout *,int) ;
-static int standing_afsendto(STANDING *,time_t,int,const char *,int,
+local int standing_checkopen(STANDING *,time_t,int) ;
+local int standing_checkclose(STANDING *,time_t) ;
+local int standing_cosend(STANDING *,time_t,struct standing_callout *,int) ;
+local int standing_afsendto(STANDING *,time_t,int,cchar *,int,
 		SOCKADDRESS *,int) ;
 
-static int standing_maintsysmisc(STANDING *,time_t) ;
-static int standing_maintloadave(STANDING *,time_t) ;
+local int standing_maintsysmisc(STANDING *,time_t) ;
+local int standing_maintloadave(STANDING *,time_t) ;
 
-static int standing_handlems(STANDING *,time_t) ;
-static int standing_checkspeed(STANDING *,time_t) ;
+local int standing_handlems(STANDING *,time_t) ;
+local int standing_checkspeed(STANDING *,time_t) ;
 
-static int	callout_start(struct standing_callout *) ;
-static int	callout_finish(struct standing_callout *) ;
+local int	callout_start(struct standing_callout *) ;
+local int	callout_finish(struct standing_callout *) ;
 
-static int	afs_checkclose(struct standing_afsocket *,time_t) ;
+local int	afs_checkclose(struct standing_afsocket *,time_t) ;
 
 #ifdef	COMMENT
-static int	afs_close(struct standing_afsocket *) ;
+local int	afs_close(struct standing_afsocket *) ;
 #endif
 
 
@@ -441,7 +437,7 @@ time_t		daytime ;
 	        if (DEBUGLEVEL(4)) {
 	            debugprintf("standing_check: need cosend callout=%d\n", i) ;
 	            debugprintf("standing_check: curent time=%s\n",
-	                timestr_log(daytime,timebuf)) ;
+	                strtime_log(daytime,timebuf)) ;
 	        }
 #endif /* CF_DEBUG */
 
@@ -509,7 +505,7 @@ STANDING_SYSMISC	*dp ;
 {
 	PROGINFO	*pip ;
 	time_t		dt ;
-	const int	to = TO_SYSMISC ;
+	cint	to = TO_SYSMISC ;
 	int		rs = SR_OK ;
 
 	if (sop == NULL) return SR_FAULT ;
@@ -544,7 +540,7 @@ ret0:
 /* private subroutines */
 
 
-static int standing_undefined(sop,daytime,ipcbuf,buf)
+local int standing_undefined(sop,daytime,ipcbuf,buf)
 STANDING	*sop ;
 time_t		daytime ;
 char		ipcbuf[] ;
@@ -578,7 +574,7 @@ char		buf[] ;
 
 #ifdef	COMMENT
 
-static int standing_boottime(sop,ipcbuf,buf)
+local int standing_boottime(sop,ipcbuf,buf)
 STANDING	*sop ;
 char		ipcbuf[] ;
 char		buf[] ;
@@ -616,7 +612,7 @@ char		buf[] ;
 #endif /* COMMENT */
 
 
-static int standing_getsysmisc(sop,daytime,ipcbuf,buf)
+local int standing_getsysmisc(sop,daytime,ipcbuf,buf)
 STANDING	*sop ;
 time_t		daytime ;
 char		ipcbuf[] ;
@@ -646,7 +642,7 @@ char		buf[] ;
 /* end subroutine (standing_getsysmisc) */
 
 
-static int standing_getloadave(sop,daytime,ipcbuf,buf)
+local int standing_getloadave(sop,daytime,ipcbuf,buf)
 STANDING	*sop ;
 time_t		daytime ;
 char		ipcbuf[] ;
@@ -683,7 +679,7 @@ char		buf[] ;
 
 
 /* handle a request to repeat 'loadave' reports */
-static int standing_reploadave(sop,daytime,ipcbuf,buf)
+local int standing_reploadave(sop,daytime,ipcbuf,buf)
 STANDING	*sop ;
 time_t		daytime ;
 char		ipcbuf[] ;
@@ -816,7 +812,7 @@ badavail0:
 /* end subroutine (standing_reploadave) */
 
 
-static int standing_getlistener(sop,daytime,ipcbuf,resbuf)
+local int standing_getlistener(sop,daytime,ipcbuf,resbuf)
 STANDING	*sop ;
 time_t		daytime ;
 char		ipcbuf[] ;
@@ -867,7 +863,7 @@ char		resbuf[] ;
 
 
 /* check that the socket for the specified address family is open */
-static int standing_checkopen(sop,daytime,af)
+local int standing_checkopen(sop,daytime,af)
 STANDING	*sop ;
 time_t		daytime ;
 int		af ;
@@ -917,7 +913,7 @@ int		af ;
 
 
 /* check on if we can close some open sockets */
-static int standing_checkclose(sop,daytime)
+local int standing_checkclose(sop,daytime)
 STANDING	*sop ;
 time_t		daytime ;
 {
@@ -934,7 +930,7 @@ time_t		daytime ;
 
 
 /* send out a message to a client */
-static int standing_cosend(sop,daytime,cop,rc)
+local int standing_cosend(sop,daytime,cop,rc)
 STANDING	*sop ;
 time_t		daytime ;
 struct standing_callout	*cop ;
@@ -984,11 +980,11 @@ int		rc ;
 /* end subroutine (standing_cosend) */
 
 
-static int standing_afsendto(sop,dt,af,buf,buflen,sap,salen)
+local int standing_afsendto(sop,dt,af,buf,buflen,sap,salen)
 STANDING	*sop ;
 time_t		dt ;
 int		af ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 SOCKADDRESS	*sap ;
 int		salen ;
@@ -1026,9 +1022,9 @@ int		salen ;
 
 
 /* maintenance the SYSMISC stuff */
-static int standing_maintsysmisc(STANDING *sop,time_t dt)
+local int standing_maintsysmisc(STANDING *sop,time_t dt)
 {
-	const int	to = TO_SYSMISC ;
+	cint	to = TO_SYSMISC ;
 	int		rs ;
 
 #if	CF_DEBUG || CF_DEBUGS
@@ -1065,9 +1061,9 @@ static int standing_maintsysmisc(STANDING *sop,time_t dt)
 
 
 /* maintenance the LOADAVE stuff */
-static int standing_maintloadave(STANDING *sop,time_t dt)
+local int standing_maintloadave(STANDING *sop,time_t dt)
 {
-	const int	to = TO_LOADAVE ;
+	cint	to = TO_LOADAVE ;
 	int		rs = SR_OK ;
 
 	if ((sop->c.ti_loadave == 0) || ((dt - sop->c.ti_loadave) > to)) {
@@ -1087,7 +1083,7 @@ static int standing_maintloadave(STANDING *sop,time_t dt)
 
 
 /* handle the MS stuff */
-static int standing_handlems(sop,daytime)
+local int standing_handlems(sop,daytime)
 STANDING	*sop ;
 time_t		daytime ;
 {
@@ -1196,7 +1192,7 @@ ret0:
 /* end subroutine (standing_handlems) */
 
 
-static int standing_checkspeed(sop,daytime)
+local int standing_checkspeed(sop,daytime)
 STANDING	*sop ;
 time_t		daytime ;
 {
@@ -1243,7 +1239,7 @@ ret0:
 /* CALLOUT stuff */
 
 
-static int callout_start(cop)
+local int callout_start(cop)
 struct standing_callout	*cop ;
 {
 
@@ -1254,15 +1250,15 @@ struct standing_callout	*cop ;
 /* end subroutine (callout_start) */
 
 
-static int callout_finish(cop)
+local int callout_finish(cop)
 struct standing_callout	*cop ;
 {
-	const int	salen = sizeof(struct sockaddr) ;
+	cint	salen = sizeof(struct sockaddr) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
 	int		f = FALSE ;
-	const char	*ccp = (const char *) &cop->sa ;
+	cchar	*ccp = (cchar *) &cop->sa ;
 
 	f = FALSE ;
 	for (i = 0 ; i < salen ; i += 1) {
@@ -1280,11 +1276,11 @@ struct standing_callout	*cop ;
 
 
 /* AFS object methods */
-static int afs_checkclose(afsp,daytime)
+local int afs_checkclose(afsp,daytime)
 struct standing_afsocket	*afsp ;
 time_t				daytime ;
 {
-	const int	to = TO_AFSCLOSE ;
+	cint	to = TO_AFSCLOSE ;
 	int		rs = SR_OK ;
 
 	if ((afsp->fd >= 0) && ((daytime - afsp->lastaccess) >= to)) {
@@ -1300,7 +1296,7 @@ time_t				daytime ;
 #ifdef	COMMENT
 
 /* unconditionally close this AF-socket */
-static int afs_close(afsp)
+local int afs_close(afsp)
 struct standing_afsocket	*afsp ;
 {
 	int		rs = SR_OK ;
