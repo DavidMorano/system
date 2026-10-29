@@ -69,10 +69,10 @@
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
 
-extern char	*strncpylow(char *,const char *,int) ;
+extern char	*strncpylow(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -83,7 +83,7 @@ extern char	*strncpylow(char *,const char *,int) ;
 
 /* forward references */
 
-static void	checkfree() ;
+local void	checkfree() ;
 
 
 /* local static data */
@@ -300,7 +300,7 @@ SMSERVICES	*csp ;
 
 
 /* free up the resources occupied by a CONFIG_STRUCTURE */
-static void checkfree(vp)
+local void checkfree(vp)
 char	**vp ;
 {
 
