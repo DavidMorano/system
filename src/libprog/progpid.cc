@@ -77,10 +77,10 @@ extern "C" {
 /* exported subroutines */
 
 int progpidbegin(PI *pip,int to) noex {
-	int		rs = SR_OK ;
-	int		f ;
-
-	f = (pip->fl.named || pip->fl.passfd) ;
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
+	if (pip) ylikely {
+	bool f = (pip->fl.named || pip->fl.passfd) ;
 	if (! f) {
 	    int		cl = -1 ;
 	    cchar	*cp = pip->pidfname ;
@@ -94,7 +94,7 @@ int progpidbegin(PI *pip,int to) noex {
 	    if (cp[0] != '-') {
 
 	        if (cp[0] != '/') {
-	            if (strchr(cp,'/') != nullptr) {
+	            if (strchr(cp,'/') != np) {
 	                cl = mkpath2(tmpfname,pip->pr,cp) ;
 	            } else {
 	                cl = mkpath3(tmpfname,pip->pr,RUNDNAME,cp) ;
@@ -102,7 +102,7 @@ int progpidbegin(PI *pip,int to) noex {
 	            cp = tmpfname ;
 	        }
 
-	        if (cp != nullptr) {
+	        if (cp) {
 	            cchar	**vpp = &pip->pidfname ;
 	            rs = proginfo_setentry(pip,vpp,cp,cl) ;
 	        }
@@ -114,7 +114,7 @@ int progpidbegin(PI *pip,int to) noex {
 	            cchar	*nn = pip->nodename ;
 	            cchar	*un = pip->username ;
 	            cchar	*bn = pip->banner ;
-	            if ((rs = lfm_start(lmp,pf,lt,to,nullptr,nn,un,bn)) >= 0) {
+	            if ((rs = lfm_start(lmp,pf,lt,to,np,nn,un,bn)) >= 0) {
 	                pip->open.pidlock = true ;
 	            }
 	        }
@@ -123,6 +123,7 @@ int progpidbegin(PI *pip,int to) noex {
 
 	} /* end if */
 
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (progpidbegin) */
 
