@@ -51,25 +51,26 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<netdb.h>
 #include	<ctime>
 #include	<csignal>
-#include	<cstdlib>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<vecstr.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
+#include	<srvtab.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>
 
-#include	"srvtab.h"
-
-#include	"localmisc.h"
 #include	"srventry.h"
 #include	"builtin.h"
 #include	"standing.h"
@@ -80,21 +81,17 @@
 
 /* local defines */
 
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 #ifndef	TO_SVC
 #define	TO_SVC		30
 #endif
 #define	INETXADDRLEN	sizeof(struct in_addr)
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
 extern int	field_svcargs(FIELD *,VECSTR *) ;
-extern int	nlspeername(const char *,const char *,char *) ;
+extern int	nlspeername(cchar *,cchar *,char *) ;
 extern int	processargs(char *,VECSTR *) ;
 extern int	execute(struct proginfo *,int,char *,char *,
 			VECSTR *,VECSTR *) ;
@@ -104,9 +101,8 @@ extern int	handle_srventry(struct proginfo *,
 			struct clientinfo *,CONNECTION *,vecstr *,
 			SRVTAB_ENT *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*timestr_log(time_t,char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -269,7 +265,7 @@ struct clientinfo	*cip ;
 	fsb.lp[fsb.rlen] = '\0' ;
 
 	logfile_printf(&pip->lh,"%s service=%s\n",
-	    timestr_log(pip->daytime,timebuf),
+	    strtime_log(pip->daytime,timebuf),
 	    service) ;
 
 /* put the rest of the arguments into a string list */
