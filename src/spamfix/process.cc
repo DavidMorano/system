@@ -74,7 +74,7 @@
 
 /* forward references */
 
-static int	headkey(cchar *,int) ;
+local int	headkey(cchar *,int) ;
 
 
 /* local variables */
@@ -159,7 +159,7 @@ cchar	fname[] ;
 
 /* local subroutines */
 
-static int headkey(sp,sl)
+local int headkey(sp,sl)
 cchar	sp[] ;
 int		sl ;
 {
