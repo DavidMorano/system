@@ -24,7 +24,7 @@
 	proginfo_base
 
 	Description:
-	This module provides a very basic sets of simple subroutines
+	This module provides a very basic set of simple subroutines
 	for basic program management.
 
 *******************************************************************************/
@@ -148,9 +148,7 @@ export {
 	} ; /* end */
 	int operator () (ccharp,int = -1) noex ;
 	int operator () () noex ;
-	operator int () noex {
-	    return operator () (nullptr) ;
-	} ; /* end */
+	operator int () noex ;
     } ; /* end struct (proginfo_eprint) */
     struct proginfo_vals {
 	ccharp		argz ;		/* raw ARGZ */
