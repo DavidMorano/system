@@ -29,25 +29,12 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* POSIX */
-#include	<sys/param.h>		/* POSIX */
-#include	<climits>		/* CSTD */
-#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_{x}(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<nulstr.h>		/* LIBU */
-#include	<ucmem.h>		/* LIBUC */
-#include	<fmtstr.h>		/* LIBUC */
-#include	<sncpyx.h>		/* LIBUC */
-#include	<mkpathx.h>		/* LIBUC */
-#include	<isnot.h>		/* LIBUC */
-#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<logfile.h>		/* LIBDAM */
 #include	<userinfo.h>		/* LIBDAM */
-#include	<bfile.h>		/* LIBB */
 
 #include	"proginfo.hh"
 
