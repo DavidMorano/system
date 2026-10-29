@@ -33,10 +33,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<usystem.h>
-#include	<pwi.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<pwi.h>			/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 
 /* local defines */
@@ -87,7 +87,6 @@ int pwilookup(cchar *pr,cchar *dbname,char *rbuf,int rlen,cchar *name) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (pwilookup) */
+} /* end subroutine (pwilookup) */
 
 
