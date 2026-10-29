@@ -146,6 +146,15 @@ typedef recursive_directory_iterator	rdi ;
 /* local structures */
 
 namespace {
+    struct vars {
+	int		maxpath ;
+	int		maxline ;
+	int		pagesz ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
+
+namespace {
     enum proginfomems {
 	proginfomem_start,
 	proginfomem_finish,
@@ -184,11 +193,11 @@ namespace {
 	void operator () (proginfo *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int operator () (int = 0) noex ;
 	operator int () noex {
 	    return operator () (0) ;
-	} ;
+	} ; /* end */
     } ; /* end struct (proginfo_co) */
     struct proginfo {
 	friend		proginfo_co ;
@@ -233,7 +242,7 @@ namespace {
 	    argc = c ;
 	    argv = a ;
 	    envv = e ;
-	} ;
+	} ; /* end */
 	int argproc	() noex ;
 	int args	(argmgr *) noex ;
 	int argoptstr	(argmgr *,int) noex ;
@@ -262,7 +271,7 @@ namespace {
 	int tardiravail	() noex ;
 	int tardiradd	(cchar *,int) noex ;
 	int modtypeout	(cchar *,int) noex ;
-	int printf	(cchar *,...) noex ;
+	int eprintf	(cchar *,...) noex ;
     private:
 	int istart	() noex ;
 	int ifinish	() noex ;
@@ -347,9 +356,7 @@ constexpr MAPEX		mapexs[] = {
 	{ 0, 0 }
 } ; /* end array (mapex) */
 
-static cint		maxpathlen = ulibval.maxpathlen ;
-static cint		maxlinelen = ulibval.maxline ;
-
+static vars		var ;
 constexpr cchar		version[]	= "0.0.1" ; /* semantic-versioning */
 constexpr int		nents		= NENTS ;
 constexpr bool		f_debug		= CF_DEBUG ;
@@ -370,21 +377,23 @@ int main(int argc,mainv argv,mainv envv) {
 	debfd(dfd) ;
 	DEBPRINTF("ent\n") ;
 	spn = pnv ;
-	if (proginfo pi(argc,argv,envv) ; (rs = pi.start) >= 0) {
-	    {
-                rs = pi.argproc() ;
-	        if (pi.pname) spn = pi.pname ;
-	    }
-	    rs1 = pi.finish ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (proginfo) */
+	if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+	    if (proginfo pi(argc,argv,envv) ; (rs = pi.start) >= 0) {
+	        {
+                    rs = pi.argproc() ;
+	            if (pi.pname) spn = pi.pname ;
+	        }
+	        rs1 = pi.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (proginfo) */
+	} /* end if (vars) */
 	if ((ex == EX_OK) && (rs < 0)) {
             cchar fmt[] = "%s: error %s (%d)\n" ;
 	    cchar *cp = spn.c_str() ;
 	    DEBPRINTF("err cp=>%s<\n",cp) ;
             fprintf(stderr,fmt,ccp(cp),strabbrerr(rs),rs) ;
 	    ex = mapex(mapexs,rs) ;
-	}
+	} /* end if (error) */
 	DEBPRINTF("ret ex=%d\n",ex) ;
 	return ex ;
 } /* end subroutine (main) */
@@ -735,14 +744,14 @@ int proginfo::preamble() noex {
 	int		fcont = false ; /* return-value */
 	if ((rs = getpn(prognames)) >= 0) {
             if (fl.version) {
-                rs = printf("version=%s\n",version) ;
+                rs = eprintf("version=%s\n",version) ;
             } else {
                 if (debuglevel) {
                     if (rs >= 0) {
-                        rs = printf("pm=%s\n",pname) ;
+                        rs = eprintf("pm=%s\n",pname) ;
                     }
                     if (rs >= 0) {
-                        rs = printf("debuglevel=%d\n",debuglevel) ;
+                        rs = eprintf("debuglevel=%d\n",debuglevel) ;
                     }
                 } /* end if (debuglevel) */
                 fcont = true ;
@@ -796,7 +805,7 @@ int proginfo::process_pmbegin() noex {
 	int		fcontinue = (! fexit) ;
 	switch (pm) {
         case progmode_strerr:
-	    if ((rs = maxlinelen) >= 0) {
+	    if ((rs = var.maxline) >= 0) {
 	        llen = rs ;
 		rs = SR_NOMEM ;
 	        if ((lbuf = new(nt) char[llen + 1]) != nullptr) {
@@ -804,7 +813,7 @@ int proginfo::process_pmbegin() noex {
 	        } else {
 		    llen = 0 ;
 		}
-	    } /* end block */
+	    } /* end if (var.maxline) */
 	    break ;
 	} /* end switch */
 	return (rs >= 0) ? fcontinue : rs ;
@@ -829,7 +838,7 @@ int proginfo::argreadin() noex {
     	cnothrow	nt{} ;
 	int		rs ;
 	int		c = 0 ;
-	if ((rs = maxpathlen) >= 0) {
+	if ((rs = var.maxpath) >= 0) {
 	    cint	plen = rs ;
 	    rs = SR_NOMEM ;
 	    if (char *pbuf ; (pbuf = new(nt) char[plen + 1]) != np) {
@@ -842,7 +851,7 @@ int proginfo::argreadin() noex {
 	        } /* end if (reading lines) */
 	        delete [] pbuf ;
 	    } /* end if (m-a-f) */
-	} /* end if (maxpathlen) */
+	} /* end if (var.maxpath) */
 	return (rs >= 0) ? c : rs ;
 } /* end method (proginfo::argreadin) */
 
@@ -1067,7 +1076,7 @@ int proginfo::argdebug(argmgr *amp) noex {
 	return rs ;
 } /* end method (proginfo::argdebug) */
 
-int proginfo::printf(cchar *fmt,...) noex {
+int proginfo::eprintf(cchar *fmt,...) noex {
     	cnothrow	nt{} ;
 	cnullptr	np{} ;
     	va_list		ap ;
@@ -1077,7 +1086,7 @@ int proginfo::printf(cchar *fmt,...) noex {
 	    rs = SR_INVALID ;
 	    if (fmt[0]) {
 	        va_begin(ap,fmt) ;
-	        if ((rs = maxlinelen) >= 0) {
+	        if ((rs = var.maxline) >= 0) {
 		    cint µllen = rs ;
 		    if (char *µlbuf ; (µlbuf = new(nt) char[µllen + 1]) != np) {
 			if ((rs = snvprintf(µlbuf,µllen,fmt,ap)) >= 0) {
@@ -1086,12 +1095,12 @@ int proginfo::printf(cchar *fmt,...) noex {
 			} /* end if (snvprintf) */
 			delete [] µlbuf ;
 		    } /* end if (new-char) */
-	        } /* end if (maxlinelen) */
+	        } /* end if (var.maxline) */
 	        va_end(ap) ;
 	    } /* end if (non-empty) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-} /* end method (proginfo::argdebug) */
+} /* end method (proginfo::eprintf) */
 
 int proginfo_co::operator () (int) noex {
 	int		rs = SR_BUGCHECK ;
@@ -1119,5 +1128,19 @@ int proginfo_co::operator () (int) noex {
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (proginfo_co::operator) */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = ulibval.maxpathlen) >= 0) ylikely {
+	    maxpath = rs ;
+	    if ((rs = ulibval.maxline) >= 0) ylikely {
+		maxline = rs ;
+	        if ((rs = ulibval.pagesz) >= 0) ylikely {
+		    pagesz = rs ;
+	        } /* end */
+	    } /* end */
+	} /* end */
+    	return rs ;
+} /* end method (vars::operator) */
 
 
