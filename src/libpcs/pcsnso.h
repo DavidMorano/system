@@ -78,16 +78,14 @@ typedef	PCSNSO_FL	pcsnso_fl ;
 typedef	PCSNSO_PWD	pcsnso_pwd ;
 
 EXTERNC_begin
-
-extern int pcsnso_open(pcsnso *,cchar *) noex ;
-extern int pcsnso_setopts(pcsnso *,int) noex ;
-extern int pcsnso_get(pcsnso *,char *,int,cchar *,int) noex ;
-extern int pcsnso_curbegin(pcsnso *,pcsnso_cur *) noex ;
-extern int pcsnso_read(pcsnso *,pcsnso_cur *,char *,int,int) noex ;
-extern int pcsnso_curend(pcsnso *,pcsnso_cur *) noex ;
-extern int pcsnso_audit(pcsnso *) noex ;
-extern int pcsnso_close(pcsnso *) noex ;
-
+extern int pcsnso_open		(pcsnso *,cchar *) noex ;
+extern int pcsnso_setopts	(pcsnso *,int) noex ;
+extern int pcsnso_get		(pcsnso *,char *,int,cchar *,int) noex ;
+extern int pcsnso_curbegin	(pcsnso *,pcsnso_cur *) noex ;
+extern int pcsnso_read		(pcsnso *,pcsnso_cur *,char *,int,int) noex ;
+extern int pcsnso_curend	(pcsnso *,pcsnso_cur *) noex ;
+extern int pcsnso_audit		(pcsnso *) noex ;
+extern int pcsnso_close		(pcsnso *) noex ;
 EXTERNC_end
 
 
