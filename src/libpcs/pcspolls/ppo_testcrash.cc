@@ -1,0 +1,366 @@
+/* testcrash SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* this is a PCSPOLLS module for performing TESTCRASH polls */
+/* version %I% last-modified %G% */
+
+#define	CF_DEBUG	0		/* compile-time debugging */
+#define	CF_WORK		1		/* work */
+#define	CF_ENABLE	1		/* enabled */
+
+/* revision history:
+
+	= 2008-10-07, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Description:
+	This object is a PCSPOLLS module for performing TESTCRASH polls.
+
+	Synopsis:
+	int testcrash_start(PP *op,cc *pr,cc *sn,mainv envv,PC *pcp) noex
+
+	Arguments:
+	op		object pointer
+	pr		program-root
+	sn		search-name (of program calling us)
+	envv		calling environment
+	pcp		PCSCONF pointer
+
+	Returns:
+	>=0		OK
+	<0		error code (system-return)
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* POSIX® */
+#include	<sys/param.h>		/* POSIX® */
+#include	<unistd.h>		/* POSIX® */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<upt.h>			/* LIBU */
+#include	<estrings.h>		/* LIBUC */
+#include	<storebuf.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBUC */
+#include	<logfile.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<pcsconf.h>		/* LIBPCS */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+
+#include	"pcspolls.h"
+#include	"thrbase.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+
+/* local defines */
+
+#define	TESTCRASH		testcrash_head
+#define	TESTCRASH_FL		testcrash_flags
+#define	TESTCRASH_MAGIC		0x88773424
+#define	TESTCRASH_LCNAME	"log"
+#define	TESTCRASH_LBNAME	"pcspolls"
+
+#define	WORK		work_head
+#define	WORK_FL		work_flags
+#define	WORKARGS	work_args
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+struct testcrash_flags {
+	uint		working:1 ;
+} ; /* end struct */
+
+struct testcrash_head {
+	THRBASE		t ;
+	TESTCRASH_FL	f ;
+	WORKARGS	*wap ;
+	uint		magval ;
+	int		dummy ;
+} ; /* end struct */
+
+struct work_args {
+	TESTCRASH	*op ;
+	cchar		*pr ;
+	cchar		*sn ;
+	mainv		envv ;
+	PCSCONF		*pcp ;
+} ; /* end struct */
+
+struct work_flags {
+	uint		dummy:1 ;
+} ; /* end struct */
+
+struct work_head {
+	THRBASE		*tip ;
+	WORKARGS	*wap ;
+	uint		magval ;
+	vol int		f_term ;
+	WORK_FL		f ;
+} ; /* end struct */
+
+enum cmds {
+	cmd_noop,
+	cmd_exit,
+	cmd_overlast
+} ; /* end enum */
+
+
+/* forward references */
+
+local int workargs_load(WORKARGS *,TESTCRASH *,
+		cchar *,cchar *,cchar **,PCSCONF *) noex ;
+
+local int	worker(THRBASE *,WORKARGS *) noex ;
+
+local int work_start(WORK *,THRBASE *,WORKARGS *) noex ;
+local int work_term(WORK *) noex ;
+local int work_finish(WORK *) noex ;
+
+local int mklogentry(cchar *,cchar *,cchar **,PCSCONF *) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
+
+const PCSPOLLS_NAME	testcrash = {
+	"testcrash",
+	szof(TESTCRASH),
+	0
+} ; /* end array */
+
+
+/* exported subroutines */
+
+int testcrash_start(TESTCRASH *op,cchar *pr,cchar *sn,mainv envv,
+		PCSCONF *pcp) noex {
+	WORKARGS	*wap ;
+	cint	wsz = szof(WORKARGS) ;
+	int		rs ;
+
+	if (op == nullptr) return SR_FAULT ;
+
+#if	CF_DEBUG
+	debugprintf("testcrash_start: entered\n") ;
+	debugprintf("testcrash_start: pr=%s\n",pr) ;
+	debugprintf("testcrash_start: sn=%s\n",sn) ;
+#endif
+
+	memclear(op) ;
+
+	if ((rs = uc_malloc(wsz,&wap)) >= 0) {
+	    int	(*thr)(THRBASE *,void *) = (int (*)(THRBASE *,void *)) worker ;
+	    workargs_load(wap,op,pr,sn,envv,pcp) ;
+	    if ((rs = thrbase_start(&op->t,thr,wap)) >= 0) {
+		op->fl.working = TRUE ;
+		op->wap = wap ;
+		op->magval = TESTCRASH_MAGIC ;
+	    }
+	    if (rs < 0) {
+	        uc_free(wap) ;
+		op->wap = nullptr ;
+	    }
+	} /* end if (memory-allocation) */
+
+#if	CF_DEBUG
+	debugprintf("testcrash_start: ret rs=%d\n",rs) ;
+#endif
+
+	return rs ;
+} /* end subroutine (testcrash_start) */
+
+int testcrash_finish(TESTCRASH *op) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magval != TESTCRASH_MAGIC) return SR_NOTOPEN ;
+
+#if	CF_DEBUG
+	debugprintf("testcrash_finish: f_working=%d\n",op->fl.working) ;
+#endif
+
+	if (op->fl.working) {
+	    op->fl.working = FALSE ;
+	    rs1 = thrbase_finish(&op->t) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	if (op->wap) {
+	    rs1 = uc_free(op->wap) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->wap = nullptr ;
+	}
+
+#if	CF_DEBUG
+	debugprintf("testcrash_finish: ret rs=%d\n",rs) ;
+#endif
+
+	op->magval = 0 ;
+	return rs ;
+} /* end subroutine (testcrash_finish) */
+
+
+/* private subroutines */
+
+local int workargs_load(WORKARGS *wap,TESTCRASH *op,cchar *pr,cchar *sn,
+		mainv envv,PCSCONF *pcp) noex {
+	memclear(wap) ;
+	wap->op = op ;
+	wap->pr = pr ;
+	wap->sn = sn ;
+	wap->envv = envv ;
+	wap->pcp = pcp ;
+	return SR_OK ;
+} /* end subroutine (workargs_load) */
+
+local int worker(THRBASE *tip,WORKARGS *wap) noex {
+	WORK		w ;
+	cint	to = 1 ;
+	int		rs ;
+	int		ctime = 0 ;
+	int		f_exit = FALSE ;
+
+#if	CF_DEBUG
+	debugprintf("testcrash/worker: started\n") ;
+#endif
+
+#if	CF_WORK
+	if ((rs = work_start(&w,tip,wap)) >= 0) {
+
+	    while ((rs = thrbase_cmdrecv(tip,to)) >= 0) {
+		cint	cmd = rs ;
+
+	        switch (cmd) {
+		case cmd_noop:
+		    ctime += 1 ;
+#if	CF_DEBUG
+	debugprintf("testcrash/worker: timed-poll\n") ;
+#endif
+		    break ;
+	        case cmd_exit:
+		    f_exit = TRUE ;
+#if	CF_DEBUG
+	debugprintf("testcrash/worker: exit\n") ;
+#endif
+		    rs = work_term(&w) ;
+		    break ;
+	        } /* end switch */
+
+		if (f_exit) break ;
+	    } /* end while */
+
+	    work_finish(&w) ;
+	} /* end if (work) */
+#endif /* CF_WORK */
+
+#if	CF_DEBUG
+	debugprintf("testcrash/worker: ret rs=%d ctime=%u\n",rs,ctime) ;
+#endif
+
+	return (rs >= 0) ? ctime : rs ;
+} /* end subroutine (worker) */
+
+local int work_start(WORK *wp,THRBASE *tip,WORKARGS *wap) noex {
+	int		rs = SR_OK ;
+	int		c = 0 ;
+	cchar		*pr ;
+	cchar		*sn ;
+
+	if (wp == nullptr) return SR_FAULT ;
+
+	memclear(wp) ;
+	wp->tip = tip ;
+	wp->wap = wap ;
+
+	pr = wap->pr ;
+	sn = wap->sn ;
+
+#if	CF_DEBUG
+	debugprintf("testcrash/work_start: pr=%s\n",pr) ;
+	debugprintf("testcrash/work_start: sn=%s\n",sn) ;
+#endif
+
+#if	CF_ENABLED
+	if (pr != nullptr) {
+	    PCSCONF	*pcp = wap->pcp ;
+	    cchar	**envv = wap->envv ;
+	    rs = mklogentry(pr,sn,envv,pcp) ;
+	    c = rs ;
+	}
+#endif /* CF_ENABLED */
+
+#if	CF_DEBUG
+	debugprintf("testcrash/work_start: ret rs=%d c=%u\n",rs,c) ;
+#endif
+
+	return (rs >= 0) ? c : rs ;
+} /* end subroutine (work_start) */
+
+local int work_finish(WORK *wp) noex {
+	int	rs = SR_OK ;
+	if (wp == nullptr) return SR_FAULT ;
+#if	CF_DEBUG
+	debugprintf("testcrash/work_finish: ret rs=%d\n",rs) ;
+#endif
+	return rs ;
+} /* end subroutine (work_finish) */
+
+local int work_term(WORK *wp) noex {
+	if (wp == nullptr) return SR_FAULT ;
+#if	CF_DEBUG
+	debugprintf("testcrash/work_term: entered\n") ;
+#endif
+	return SR_OK ;
+} /* end subroutine (work_term) */
+
+local int mklogentry(cchar *pr,cchar *sn,cchar **envv,PCSCONF *pcp) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	cchar	*lcname = TESTCRASH_LCNAME ;
+	cchar	*lbname = TESTCRASH_LBNAME ;
+	char		lfname[MAXPATHLEN+1] ;
+
+	if ((rs = mkpath3(lfname,pr,lcname,lbname)) >= 0) {
+	    if (ustat sb ; (rs = u_stat(lfname,&sb) >= 0) {
+		userinfo	u ;
+		if ((rs = userinfo_start(&u,nullptr)) >= 0) {
+		    logfile	lh, *lhp = &lh ;
+		    cchar	*logid = u.logid ;
+		    if ((rs1 = logfile_open(lhp,lfname,0,0666,logid)) >= 0) {
+		        time_t	daytime = time(nullptr) ;
+			cchar	*pv = "¥" ;
+	                logfile_userinfo(lhp,&u,daytime,sn,pv) ;
+		        logfile_close(lhp) ;
+		    } else if (! isNotPresent(rs1)) {
+		        rs = rs1 ;
+		    }
+		    userinfo_finish(&u) ;
+		} /* end if (userinfo) */
+	    } /* end if (stat) */
+	} /* end if (mkpath) */
+
+	return rs ;
+} /* end subroutine (mklogentry) */
+
+
