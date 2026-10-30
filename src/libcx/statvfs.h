@@ -2,22 +2,34 @@
 /* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
+/* substitute subroutines for systems that do not have these */
+/* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 #ifndef STATVFS_INCLUDE
-#define	STATVFS_INCLUDE		1
+#define	STATVFS_INCLUDE
 
 
-#if	(! defined(SYSHAS_STATVFS)) || (SYSHAS_STATVFS == 0)
+#if	defined(SYSHAS_STATVFS) && (SYSHAS_STATVFS > 0)
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+/* **nothring needed** */
 
-/*
- * Structure returned by statvfs(2).
- */
+
+#else /* defined(SYSHAS_STATVFS) && (SYSHAS_STATVFS > 0) */
+
+
+/* * Structure returned by |statvfs(2)| */
 
 #ifndef	_FSTYPSZ
 #define	_FSTYPSZ	16
@@ -28,7 +40,6 @@ extern "C" {
 #define	FSTYPSZ	_FSTYPSZ
 #endif
 #endif /* !defined(_XPG4_2) || defined(__EXTENSIONS__) */
-
 
 
 #ifndef	_FILE_OFFSET_BITS
@@ -55,8 +66,6 @@ typedef unsigned long long	fsfilcnt64_t;
 #endif	/* _LARGEFILE64_SOURCE */
 
 
-
-
 typedef STATVFS {
 	unsigned long	f_bsize;	/* fundamental file system block size */
 	unsigned long	f_frsize;	/* fragment size */
@@ -75,8 +84,7 @@ typedef STATVFS {
 #if !defined(_LP64)
 	unsigned long 	f_filler[16];	/* reserved for future expansion */
 #endif
-} statvfs_t;
-
+} statvfs_t ;
 
 
 #define	ST_RDONLY	0x01	/* read-only file system */
@@ -84,10 +92,8 @@ typedef STATVFS {
 #define	ST_NOTRUNC	0x04	/* does not truncate long file names */
 
 
-
- 
-
 #if defined(__STDC__)
+EXTERNC_begin
 
 int statvfs(cchar *, statvfs_t *);
 int fstatvfs(int, statvfs_t *);
@@ -98,15 +104,12 @@ int fstatvfs(int, statvfs_t *);
 int statvfs64(cchar *, statvfs64_t *);
 int fstatvfs64(int, statvfs64_t *);
 #endif	/* _LARGEFILE64_SOURCE... */
+
+EXTERNC_end
 #endif	/* defined(__STDC__) */
 
 
-#ifdef	__cplusplus
-}
-#endif
-
-
-#endif /* (! defined(SYSHAS_STATVFS)) || (SYSHAS_STATVFS == 0) */
+#endif /* defined(SYSHAS_STATVFS) && (SYSHAS_STATVFS > 0) */
 
 
 #endif	/* _SYS_STATVFS_H */
