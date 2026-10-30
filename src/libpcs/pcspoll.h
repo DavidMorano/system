@@ -63,19 +63,19 @@ typedef	PCSPOLL_CA	pcspoll_ca ;
 typedef	PCSPOLL_FL	pcspoll_fl ;
 
 EXTERNC_begin
-
 struct pcspoll_calls {
 	int	(*start)(void *,pcsconf *,cchar *) noex ;
 	int	(*info)(void *,PCSPOLLS_INFO *) noex ;
 	int	(*cmd)(void *,int) noex ;
 	int	(*finish)(void *) noex ;
-} ;
+} ; /* end */
+EXTERNC_end
 
+EXTERNC_begin
 extern int	pcspoll_start(pcspoll *,pcsconf *,cchar *) noex ;
 extern int	pcspoll_info(pcspoll *,pcspoll_info *) noex ;
 extern int	pcspoll_cmd(pcspoll *,int) noex ;
 extern int	pcspoll_finish(pcspoll *) noex ;
-
 EXTERNC_end
 
 
