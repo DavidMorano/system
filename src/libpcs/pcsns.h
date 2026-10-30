@@ -69,7 +69,6 @@ typedef	PCSNS_CUR	pcsns_cur ;
 typedef	PCSNS_CALLS	pcsns_calls ;
 
 EXTERNC_begin
-
 extern int pcsns_open(pcsns *,cchar *) noex ;
 extern int pcsns_setopts(pcsns *,int) noex ;
 extern int pcsns_get(pcsns *,char *,int,cchar *,int) noex ;
@@ -78,7 +77,6 @@ extern int pcsns_curenum(pcsns *,pcsns_cur *,char *,int,int) noex ;
 extern int pcsns_curend(pcsns *,pcsns_cur *) noex ;
 extern int pcsns_audit(pcsns *) noex ;
 extern int pcsns_close(pcsns *) noex ;
-
 EXTERNC_end
 
 
