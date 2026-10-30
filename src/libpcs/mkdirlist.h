@@ -71,7 +71,6 @@ typedef MKDIRLIST_EFL	mkdirlist_efl ;
 typedef MKDIRLIST_ENT	mkdirlist_ent ;
 
 EXTERNC_begin
-
 extern int mkdirlist_start	(mkdirlist *,cchar *,cchar *) noex ;
 extern int mkdirlist_link	(mkdirlist *) noex ;
 extern int mkdirlist_defshow	(mkdirlist *) noex ;
@@ -82,7 +81,6 @@ extern int mkdirlist_showdef	(mkdirlist *) noex ;
 extern int mkdirlist_show	(mkdirlist *,cchar *,int) noex ;
 extern int mkdirlist_audit	(mkdirlist *) noex ;
 extern int mkdirlist_finish	(mkdirlist *) noex ;
-
 EXTERNC_end
 
 
