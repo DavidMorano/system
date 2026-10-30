@@ -28,7 +28,9 @@
 #include	<ischartype.h>
 
 
+EXTERNC_begin
 extern unixret_t	eaccess(cchar *,int) noex ;
+EXTERNC_end
 
 
 #endif	/* LIBCX_INCLUDE */
