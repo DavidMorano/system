@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	prmktmpdir(cchar *,char *,cc *,cc *,mode_t) noex ;
-
 EXTERNC_end
 
 
