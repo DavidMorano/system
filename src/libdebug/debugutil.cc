@@ -26,21 +26,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstdarg>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* |strwcpy(3u)| */
-#include	<uclibmem.h>
-#include	<snflagsx.h>
-#include	<localmisc.h>		/* |COLUMNS| */
+#include	<uclibmem.h>		/* LIBUC */
+#include	<snflagsx.h>		/* LINUC */
+#include	<localmisc.h>		/* LIBU |COLUMNS| */
 
 #include	"debugutil.hh"
 #include	"libdebug.h"
@@ -81,17 +76,17 @@ using libu::strwcpy ;			/* subroutine */
 /* exported subroutines */
 
 namespace libdebug {
-    int checkbasebounds(cchar *bbuf,int blen,void *vp) noex {
+    int checkbasebounds(cchar *bbuf,int blen,cvoid *vp) noex {
 	int		rs = SR_FAULT ;
 	if (bbuf && vp) {
 	    rs = SR_OK ;
 	    if (cchar *tp = ccharp(vp) ; tp >= bbuf) {
 	        if (tp >= (bbuf + blen)) {
 		    rs = SR_BADFMT ;
-	        }
+	        } /* end */
 	    } else {
 	        rs = SR_BADFMT ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (checkbasebounds) */
