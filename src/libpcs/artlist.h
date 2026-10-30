@@ -64,14 +64,12 @@ typedef ARTLIST		artlist ;
 typedef ARTLIST_ENT	artlist_ent ;
 
 EXTERNC_begin
-
 extern int	artlist_start(artlist *,TIMEB *,cchar *) noex ;
 extern int	artlist_finish(artlist *) noex ;
 extern int	artlist_add(artlist *,cchar *,cchar *) noex ;
 extern int	artlist_sort(artlist *,int,int) noex ;
 extern int	artlist_get(artlist *,int,cchar **,cchar **,time_t *) noex ;
 extern int	artlist_getentry(artlist *,int,artlist_ent **) noex ;
-
 EXTERNC_end
 
 
