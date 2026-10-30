@@ -42,14 +42,12 @@ struct pcsnsmgr_status {
 typedef	PCSNSMGR_STAT	pcsnsmgr_stat ;
 
 EXTERNC_begin
-
 extern int pcsnsmgr_init() noex ;
 extern int pcsnsmgr_set(cchar *,int,cchar *,int,int) noex ;
 extern int pcsnsmgr_get(char *,int,cchar *,int) noex ;
 extern int pcsnsmgr_invalidate(cchar *,int) noex ;
 extern int pcsnsmgr_stats(pcsnsmgr_stat *) noex ;
 extern int pcsnsmgr_fini() noex ;
-
 EXTERNC_end
 
 
