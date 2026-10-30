@@ -118,7 +118,7 @@ extern "C" {
 
 namespace {
     struct vars {
-	int		maxpathlen ;
+	int	maxpathlen ;
 	operator int () noex ;
     } ; /* end struct (vars) */
 } /* end namespace */
@@ -197,8 +197,7 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	    vechand *dlp = op->dlp ;
 	    rs = SR_INVALID ;
 	    if (pr[0] && ndn[0]) {
-		static cint	rsv = var ;
-		if ((rs = rsv) >= 0) {
+		if (static cint	rsv = var ; (rs = rsv) >= 0) {
 		    cint	vn = 20 ;
 		    cint	vo = 0 ;
 	            if ((rs = dlp->start(vn,vo)) >= 0) {
@@ -214,10 +213,10 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	                } else if (isNotPresent(rs)) {
 	                    rs = mkdirlist_pdn(op,ndn) ;
 	                    c = rs ;
-	                }
+	                } /* end if */
 	                if (rs >= 0) {
 			    op->magval = MKDIRLIST_MAGIC ;
-		        }
+		        } /* end if (ok) */
 	                if (rs < 0) {
 	                    mkdirlist_finents(op) ;
 	                    dlp->finish() ;
@@ -227,7 +226,7 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndn) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		mkdirlist_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (mkdirlist_ctor) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (mkdirlist_start) */
@@ -465,12 +464,12 @@ local int mkdirlist_newent(mkdirlist *op,ustat *sbp,cc *nbuf,int nlen) noex {
 	        rs = vechand_add(op->dlp,ep) ;
 	        if (rs < 0) {
 	            entry_finish(ep) ;
-		}
+		} /* end if (error) */
 	    } /* end if (entry) */
 	    if ((rs < 0) || (c == 0)) {
 	        lm_free(vp) ;
-	    }
-	} /* end if (memory-allocation) */
+	    } /* end if (error) */
+	} /* end if (memory-acquire) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (mkdirlist_newent) */
 
@@ -487,11 +486,11 @@ local int mkdirlist_finents(mkdirlist *op) noex {
 		{
 	    	    rs1 = entry_finish(ep) ;
 	    	    if (rs >= 0) rs = rs1 ;
-		}
+		} /* end if */
 		{
 	    	    rs1 = lm_free(ep) ;
 	    	    if (rs >= 0) rs = rs1 ;
-		}
+		} /* end if */
 	    } /* end if (non-null entry) */
 	} /* end for */
 	if ((rs >= 0) && (rs2 != rsn)) rs = rs2 ;
@@ -512,7 +511,7 @@ local int entry_start(ENT *ep,ustat *sbp,cchar *dbuf,int dlen) noex {
 	        ep->mtime = sbp->st_mtime ;
 	        ep->ino = sbp->st_ino ;
 	        ep->dev = sbp->st_dev ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (entry_start) */
@@ -525,7 +524,7 @@ local int entry_finish(ENT *ep) noex {
 	    rs1 = lm_free(vp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ep->name = nullptr ;
-	}
+	} /* end if (memory-release) */
 	return rs ;
 } /* end subroutine (entry_finish) */
 
@@ -548,7 +547,7 @@ local int entry_showdef(ENT *ep) noex {
 	if (!ep->fl.link) {
 	    ep->fl.show = ep->fl.subscribe ;
 	    if (ep->fl.show) rs = 1 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (entry_showdef) */
 
@@ -576,7 +575,7 @@ local int vcmporder(cvoid **v1pp,cvoid **v2pp) noex {
 		    rc = (e1p->order - e2p->order) ;
 		}
 	    }
-	}
+	} /* end */
 	return rc ;
 } /* end subroutine (vcmporder) */
 
@@ -584,7 +583,7 @@ vars::operator int () noex {
 	int		rs ;
 	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
 	    maxpathlen = rs ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vars::operator) */
 
