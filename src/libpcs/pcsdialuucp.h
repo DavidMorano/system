@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int	pcsdialuucp(cchar *,cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
