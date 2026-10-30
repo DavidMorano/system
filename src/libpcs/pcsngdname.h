@@ -18,9 +18,7 @@
 
 
 EXTERNC_begin
-
 extern int pcsngdname(cchar *,char *,cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
