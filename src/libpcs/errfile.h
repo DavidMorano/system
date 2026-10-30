@@ -27,11 +27,9 @@
 
 
 EXTERNC_begin
-
 extern int erropen	(cchar *,cchar *) noex ;
 extern int errclose	() noex ;
 extern int errprintf	(cchar *,...) noex ;
-
 EXTERNC_end
 
 
