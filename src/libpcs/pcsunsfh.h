@@ -53,9 +53,7 @@ struct pcsunsfh {
 } ; /* end struct */
 
 EXTERNC_begin
-
 extern int pcsunsfh(PCSUNSFH *,int,char *,int) noex ;
-
 EXTERNC_end
 
 
