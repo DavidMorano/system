@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int	pcstrustuser(cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
