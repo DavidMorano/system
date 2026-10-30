@@ -22,12 +22,12 @@
 #define	ENVSTANDARDS_INCLUDE
 
 
-#ifndef	OSNAME_IRIX
-#define	OSNAME_IRIX			8
+#ifndef	OSNAME_Irix
+#define	OSNAME_Irix			8
 #endif
 
 #ifndef	OSNAME
-#define	OSNAME				"IRIX"
+#define	OSNAME				"Irix"
 #endif
 
 #ifndef	OSTYPE_SYSV
