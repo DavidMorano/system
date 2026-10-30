@@ -39,7 +39,6 @@ typedef	NG		ng ;
 typedef	NG_ENT		ng_ent ;
 
 EXTERNC_begin
-
 extern int ng_start	(ng *) noex ;
 extern int ng_addparse	(ng *,cchar *,int) noex ;
 extern int ng_add	(ng *,cchar *,int,cchar *) noex ;
@@ -48,7 +47,6 @@ extern int ng_search	(ng *,cchar *,ng_ent **) noex ;
 extern int ng_get	(ng *,int,ng_ent **) noex ;
 extern int ng_count	(ng *) noex ;
 extern int ng_finish	(ng *) noex ;
-
 EXTERNC_end
 
 
