@@ -89,7 +89,6 @@ typedef	PCSCONF_CUR	pcsconf_cur ;
 typedef	PCSCONF_CA	pcsconf_ca ;
 
 EXTERNC_begin
-
 extern int pcsconf_start(pcsconf *,cchar *,mainv,cchar *) noex ;
 extern int pcsconf_curbegin(pcsconf *,pcsconf_cur *) noex ;
 extern int pcsconf_curfetch(pcsconf *,cc *,int,pcsconf_cur *,char *,int) noex ;
@@ -103,7 +102,6 @@ extern int pcsconf_getpcsusername(pcsconf *,char *,int) noex ;
 extern int pcsconf_getpr(pcsconf *,cchar **) noex ;
 extern int pcsconf_getenvv(pcsconf *,mainv **) noex ;
 extern int pcsconf_finish(pcsconf *) noex ;
-
 EXTERNC_end
 
 
