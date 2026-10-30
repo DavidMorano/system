@@ -25,14 +25,11 @@
 
 
 EXTERNC_begin
-
 extern int prmkfname(cc *,char *,cc *,int,int,cc *,cc *,cc *) noex ;
-
 local inline int prsetfname(cc *pr,char *fn,cc *ep,int el,int f,cc *dn,
 		cc *n,cc *s) noex {
 	return prmkfname(pr,fn,ep,el,f,dn,n,s) ;
 } /* end subroutine */
-
 EXTERNC_end
 
 
