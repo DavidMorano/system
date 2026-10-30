@@ -114,7 +114,7 @@ int pcsmsgid(cchar *pr,char *rbuf,int rlen) noex {
 	                   char	*dn = (a + (nlen + 1)) ;
 	                   if ((rs = getnodedomain(nn,dn)) >= 0) ylikely {
 	                       rs = mkstr(rbuf,rlen,dn,nn,sn) ;
-			       rv = rs;
+			       rv = rs ;
 	                   } /* end if (getnodedomain) */
 		           rs1 = lm_free(a) ;
 	        	   if (rs >= 0) rs = rs1 ;
