@@ -51,12 +51,10 @@ typedef	PCSCONFIG	pcsconfig ;
 typedef	PCSCONFIG_FL	pcsconfig_fl ;
 
 EXTERNC_begin
-
 extern int	pcsconfig_start(pcsconfig *,proginfo *,cchar *,int) noex ;
 extern int	pcsconfig_check(pcsconfig *) noex ;
 extern int	pcsconfig_read(pcsconfig *) noex ;
 extern int	pcsconfig_finish(pcsconfig *) noex ;
-
 EXTERNC_end
 
 
