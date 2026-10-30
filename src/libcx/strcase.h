@@ -26,11 +26,11 @@
 
 
 EXTERNC_begin
+extern charp	strcasestr(cchar *,cchar *) noex ;
+EXTERNC_end
 
-extern char *strcasestr(cchar *,cchar *) noex ;
-
-extern int strncasecmp(cchar *,cchar *,int) noex ;
-
+EXTERNC_begin
+extern int	strncasecmp(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 
