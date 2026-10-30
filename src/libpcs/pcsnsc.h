@@ -65,7 +65,6 @@ typedef	PCSNSC_OBJ	pcsnsc_obj ;
 typedef	PCSNSC_ST	pcsnsc_st ;
 
 EXTERNC_begin
-
 extern int pcsnsc_open(pcsnsc *,cchar *,int) noex ;
 extern int pcsnsc_getstat(pcsnsc *,pcsnsc_st *) noex ;
 extern int pcsnsc_help(pcsnsc *,char *,int,int) noex ;
@@ -74,7 +73,6 @@ extern int pcsnsc_getname(pcsnsc *,char *,int,cchar *) noex ;
 extern int pcsnsc_mark(pcsnsc *) noex ;
 extern int pcsnsc_exit(pcsnsc *,cchar *) noex ;
 extern int pcsnsc_close(pcsnsc *) noex ;
-
 EXTERNC_end
 
 
