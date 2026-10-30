@@ -88,7 +88,6 @@ typedef ARTICLE		article ;
 typedef ARTICLE_FL	article_fl ;
 
 EXTERNC_begin
-
 extern int article_start(article *) noex ;
 extern int article_addenvdate(article *,dater *) noex ;
 extern int article_addmsgdate(article *,dater *) noex ;
@@ -102,7 +101,6 @@ extern int article_getenvdate(article *,int,dater **) noex ;
 extern int article_getstr(article *,int,cchar **) noex ;
 extern int article_getaddrema(article *,int,ema **) noex ;
 extern int article_finish(article *) noex ;
-
 EXTERNC_end
 
 
