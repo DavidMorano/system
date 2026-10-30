@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int	pcsuucp(cchar *,cchar *,int *) noex ;
-
 EXTERNC_end
 
 
