@@ -459,7 +459,7 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	                ep->ptime = ep->atime = ta[0] ;
 	            } else if (n == 0) {
 	                ep->ptime = ep->atime = ep->mtime ;
-	            }
+	            } /* end if */
 		    /* get the message (composition) time (if there is one) */
 	            if (rs >= 0) {
 	                hn = HN_DATE ;
@@ -496,7 +496,7 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	                        }
 	                    }
 	                } /* end if (article-id) */
-	            }
+	            } /* end if (ok) */
 		    /* get the content length if it is specified */
 	            if (rs >= 0) {
 	                hn = HN_CLEN ;
@@ -504,7 +504,7 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	                    rs1 = cfdeci(hp,hl,&v) ;
 	                    ep->clen = v ;
 	                } /* end if (article content length) */
-	            }
+	            } /* end if (ok) */
 		    /* get number of lines in body */
 	            if (rs >= 0) {
 	                hn = HN_CLINES ;
@@ -521,7 +521,7 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	                    rs1 = cfdeci(hp,hl,&v) ;
 	                    ep->lines = v ;
 	                }
-	            }
+	            } /* end if (ok) */
 		    /* get the REPLYTO information */
 	            if (rs >= 0) {
 	                hn = HN_REPLYTO ;
@@ -531,7 +531,7 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	                        ep->replyto = cp ;
 	                    }
 	                } /* end if (from) */
-	            }
+	            } /* end if (ok) */
 		    /* get the FROM information */
 	            if (rs >= 0) {
 	                hn = HN_FROM ;
@@ -541,17 +541,16 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	                        ep->from = cp ;
 	                    }
 	                } /* end if (from) */
-	            }
+	            } /* end if (ok) */
 		    /* get the newsgroups */
 	            if (rs >= 0) {
 	                hn = HN_NEWSGROUPS ;
 	                if ((hl = mailmsg_hdrval(&am,hn,&hp)) >= 0) {
-	                    cchar	*cpp ;
-	                    if ((rs = mem.strw(hp,hl,&cpp)) >= 0) {
-	                        ep->newsgroups = cpp ;
-	                    }
+	                    if (ccharp cp ; (rs = mem.strw(hp,hl,&cp)) >= 0) {
+	                        ep->newsgroups = cp ;
+	                    } /* end if (memory-acquire) */
 	                } /* end if (newsgroups) */
-	            }
+	            } /* end if (ok) */
 		    /* get the subject */
 	            if (rs >= 0) {
 	                hn = HN_SUBJECT ;
@@ -559,11 +558,11 @@ local int entry_load(AL_ENT *ep,dater *dp,cchar *name) noex {
 	                if (hl <= 0) {
 	                    hn = HN_TITLE ;
 	                    hl = mailmsg_hdrval(&am,hn,&hp) ;
-	                }
+	                } /* end */
 	                if (hl <= 0) {
 	                    hn = HN_SUBJ ;
 	                    hl = mailmsg_hdrval(&am,hn,&hp) ;
-	                }
+	                } /* end */
 	                if (hl >= 0) {
 	                    int		bl = lenstr(hp,hl) ;
 	                    char	*bp ;
