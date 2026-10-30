@@ -73,24 +73,9 @@
 /* local defines */
 
 #define	DEFSERIAL	"/tmp/serial"
-#define	FILEMODE	0666
+#define	GS_FILEMODE	0666
 
 #define	TO_LOCK		4		/* seconds */
-
-#if	defined(IRIX)
-#ifndef	F_ULOCK
-#define F_ULOCK	0	/* Unlock a previously locked region */
-#endif
-#ifndef	F_LOCK
-#define F_LOCK	1	/* Lock a region for exclusive use */
-#endif
-#ifndef	F_TLOCK
-#define F_TLOCK	2	/* Test and lock a region for exclusive use */
-#endif
-#ifndef	F_TEST
-#define F_TEST	3	/* Test a region for other processes locks */
-#endif
-#endif /* defined(IRIX) */
 
 
 /* imported namespaces */
@@ -117,6 +102,8 @@ local int	getserial_write	(int,char *,int,int) noex ;
 
 /* local variables */
 
+cmode		fm = GS_FILEMODE ;
+
 
 /* exported variables */
 
@@ -129,7 +116,7 @@ int getserial(cchar *sfname) noex {
 	int		serial = 0 ; /* return-value */
 	if ((sfname == nullptr) || (sfname[0] == '\0')) {
 	    sfname = DEFSERIAL ;
-	}
+	} /* end */
 	if ((rs = getserial_open(sfname)) >= 0) ylikely {
 	    cint	to = TO_LOCK ;
 	    cint	cmd = F_LOCK ;
@@ -140,7 +127,7 @@ int getserial(cchar *sfname) noex {
 	        if ((rs = getserial_read(fd,dbuf,dlen)) >= 0) ylikely {
 	            serial = rs ; /* result for return */
 	            rs = getserial_write(fd,dbuf,dlen,serial) ;
-	        }
+	        } /* end */
 	    } /* end if (lockfile) */
 	    rs1 = uc_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -156,14 +143,13 @@ local int getserial_openc(cchar *) noex ;
 local int getserial_open(cchar *sfname) noex {
 	int		rs ;
 	int		fd = -1 ;
-	cmode		m = FILEMODE ;
-	rs = uc_open(sfname,O_RDWR,m) ;
+	rs = uc_open(sfname,O_RDWR,fm) ;
 	fd = rs ;
 	if (rs == SR_ACCESS) {
 	    if ((rs = uc_unlink(sfname)) >= 0) {
 	        rs = SR_NOENT ;
 	    }
-	}
+	} /* end */
 	if (rs == SR_NOENT) {
 	    rs = getserial_openc(sfname) ;
 	    fd = rs ;
@@ -172,6 +158,7 @@ local int getserial_open(cchar *sfname) noex {
 } /* end subroutine (getserial_open) */
 
 local int getserial_openc(cchar *sfname) noex {
+    	cnullptr	np{} ;
 	cint		of = (O_RDWR|O_CREAT) ;
 	int		rs ;
 	int		rs1 ;
@@ -181,7 +168,7 @@ local int getserial_openc(cchar *sfname) noex {
             fd = rs ;
             if ((rs = uc_fminmod(fd,om)) >= 0) ylikely {
                 cint        cmd = _PC_CHOWN_RESTRICTED ;
-                if ((rs = uc_fpathconf(fd,cmd,nullptr)) == 0) {
+                if ((rs = uc_fpathconf(fd,cmd,np)) == 0) {
                     cchar   *cp{} ;
                     if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
                         if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
@@ -191,7 +178,7 @@ local int getserial_openc(cchar *sfname) noex {
                                     const uid_t     u = sb.st_uid ;
                                     const gid_t     g = sb.st_gid ;
                                     rs = uc_fchown(fd,u,g) ;
-                                }
+                                } /* end if */
                             } /* end if (mkpath) */
                             rs1 = lm_free(pbuf) ;
                             if (rs >= 0) rs = rs1 ;
@@ -215,7 +202,7 @@ local int getserial_read(int fd,char *dbuf,int dlen) noex {
 	        } else if (isNotValid(rs)) {
 	            serial = 0 ;
 	            rs = SR_OK ;
-	        }
+	        } /* end */
 	    } /* end if (sfnext) */
 	} /* end if (u_read) */
 	return (rs >= 0) ? serial : rs ;
@@ -229,7 +216,7 @@ local int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
 	    if ((rs = uc_write(fd,dbuf,rs)) >= 0) ylikely {
 	        coff	uoff = off_t(rs) ;
 	        rs = uc_ftruncate(fd,uoff) ;
-	    }
+	    } /* end */
 	} /* end if (ctdec) */
 	return rs ;
 } /* end subroutine (getserial_write) */
