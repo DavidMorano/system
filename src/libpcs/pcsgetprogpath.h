@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int	pcsgetprogpath(cchar *,char *,cchar *) noex ;
-
 EXTERNC_end
 
 
