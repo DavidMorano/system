@@ -73,11 +73,9 @@ typedef PCSCLIENT_OBJ	pcsclient_obj ;
 typedef PCSCLIENT_DA	pcsclient_da ;
 
 EXTERNC_begin
-
 extern int	pcsclient_open(pcsclient *,cchar *) noex ;
 extern int	pcsclient_get(pcsclient *,time_t,int,pcsclient_da *) noex ;
 extern int	pcsclient_close(pcsclient *) noex ;
-
 EXTERNC_end
 
 
