@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int pcsopendircache(cchar *,cchar *,int,mode_t,int) noex ;
-
 EXTERNC_end
 
 
