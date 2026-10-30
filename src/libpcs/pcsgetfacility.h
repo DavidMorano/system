@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	pcsgetfacility(cchar *,char *,int,cchar *) noex ;
-
 EXTERNC_end
 
 
