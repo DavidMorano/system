@@ -1,4 +1,4 @@
-/* envstandards HEADER (GNU-Linux) */
+/* envstandards_linux HEADER (GNU-Linux) */
 /* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
@@ -44,6 +44,10 @@
 
 #ifndef	OSNAME_Linus
 #define	OSNAME_Linus			19
+#endif
+
+#ifndef	OSNAME
+#define	OSNAME				"Linux"
 #endif
 
 /* compilation environment definitions */
