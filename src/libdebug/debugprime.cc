@@ -145,8 +145,6 @@ int gdb() noex {
 /* audit a HOSTENT structure */
 int heaudit(HOSTENT *hep,cchar *buf,int buflen) noex {
 	int		rs = SR_OK ;
-	int		i ;
-	char		**cpp ;
 
 	if (hep == nullptr) return SR_FAULT ;
 	if (buf == nullptr) return SR_FAULT ;
@@ -158,33 +156,31 @@ int heaudit(HOSTENT *hep,cchar *buf,int buflen) noex {
 	}
 
 	if (rs >= 0) {
-	    cpp = hep->h_aliases ;
-	    if (cpp != nullptr) {
-	        if ((rs = checkbasebounds(buf,buflen,cpp)) >= 0) {
-	            for (i = 0 ; cpp[i] != nullptr ; i += 1) {
-	                rs = checkbasebounds(buf,buflen,(cpp + i)) ;
+	    if (charpp app = hep->h_aliases ; app) {
+	        if ((rs = checkbasebounds(buf,buflen,app)) >= 0) {
+	            for (int i = 0 ; app[i] ; i += 1) {
+	                rs = checkbasebounds(buf,buflen,(app + i)) ;
 	                if (rs >= 0) {
-	                    rs = checkbasebounds(buf,buflen,cpp[i]) ;
+	                    rs = checkbasebounds(buf,buflen,app[i]) ;
 			}
 	                if (rs < 0) break ;
 	            } /* end for */
 	        } /* end if (checkbasebounds) */
-	    }
+	    } /* end if (non-null) */
 	} /* end if (ok) */
 
 	if (rs >= 0) {
-	    cpp = hep->h_aliases ;
-	    if (cpp != nullptr) {
-	        if ((rs = checkbasebounds(buf,buflen,cpp)) >= 0) {
-	            for (i = 0 ; cpp[i] != nullptr ; i += 1) {
-	                rs = checkbasebounds(buf,buflen,(cpp + i)) ;
+	    if (charpp app = hep->h_aliases) {
+	        if ((rs = checkbasebounds(buf,buflen,app)) >= 0) {
+	            for (int i = 0 ; app[i] ; i += 1) {
+	                rs = checkbasebounds(buf,buflen,(app + i)) ;
 	                if (rs >= 0) {
-	                    rs = checkbasebounds(buf,buflen,cpp[i]) ;
+	                    rs = checkbasebounds(buf,buflen,app[i]) ;
 			}
 	                if (rs < 0) break ;
 	            } /* end for */
 	        } /* end if (checkbasebounds) */
-	    }
+	    } /* end if (non-null) */
 	} /* end if (ok) */
 
 	return rs ;
@@ -206,7 +202,7 @@ int debugprintfsize(cchar *id,int fd) noex {
 	    debugprintf("debugprintfsize: I32LPx\n") ;
 #endif
 	    debugprintf("debugprintfsize: %s size=%lu\n",id,fs) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (debugprintstat) */
 
