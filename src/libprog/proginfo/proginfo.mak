@@ -35,7 +35,7 @@ DEFS +=
 
 INCS += proginfo.hh
 
-MODS += proginfo_base.o proginfo_rand.o
+MODS += proginfo_base.o proginfo_rand.o proginfo_log.o
 
 LIBS= -luo -lu
 
@@ -211,7 +211,7 @@ pi_log.o:		$(PI_LOG)
 proginfo.o:		$(PR_PROG) $(MOD_BASE) $(MOD_RAND)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
-proginfo0.o:		proginfo.ccm $(PR_BASE) $(PR_RAND)		$(INCS)
+proginfo0.o:		proginfo.ccm $(PR_BASE) $(PR_RAND) $(PR_LOG)	$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # sub-module
