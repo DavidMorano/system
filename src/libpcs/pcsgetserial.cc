@@ -59,7 +59,9 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
+#include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
+#include	<ucfileop.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -77,15 +79,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int uc_unlink(cchar *) noex ;
-    extern int uc_create(cchar *,mode_t) noex ;
-    extern int uc_fminmod(int,mode_t) noex ;
-    extern int uc_fpathconf(int,int,long *) noex ;
-    extern int uc_fchown(int,uid_t,gid_t) noex ;
-    extern int uc_fstat(int,ustat *) noex ;
-} /* end extern */
 
 extern "C" {
     extern int	getserial(cchar *) noex ;
