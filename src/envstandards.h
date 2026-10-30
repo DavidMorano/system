@@ -1,4 +1,4 @@
-/* envstandards HEADER (Darwin) */
+/* envstandards_darwin HEADER (Darwin) */
 /* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
@@ -44,6 +44,10 @@
 
 #ifndef	OSNAME_Darwin
 #define	OSNAME_Darwin			19
+#endif
+
+#ifndef	OSNAME
+#define	OSNAME				"Darwin"
 #endif
 
 /* compilation environment definitions */
