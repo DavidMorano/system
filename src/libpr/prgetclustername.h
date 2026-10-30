@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	prgetclustername(cchar *,char *,int,cchar *) noex ;
-
 EXTERNC_end
 
 
