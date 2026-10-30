@@ -33,17 +33,14 @@ enum pcsnametypes {
 } ; /* end enum (pcsnametypes) */
 
 EXTERNC_begin
-
 extern int pcsgetnames(cchar *,char *,int,cchar *,int) noex ;
 extern int pcsgetname(cchar *,char *,int,cchar *) noex ;
 extern int pcsgetfullname(cchar *,char *,int,cchar *) noex ;
 extern int pcsgetprojinfo(cchar *,char *,int,cchar *) noex ;
-
 extern int pcsnames(cchar *,char *,int,cchar *,int) noex ;
 extern int pcsname(cchar *,char *,int,cchar *) noex ;
 extern int pcsfullname(cchar *,char *,int,cchar *) noex ;
 extern int pcsprojectinfo(cchar *,char *,int,cchar *) noex ;
-
 EXTERNC_end
 
 
