@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int	pcsmailhost(cchar *,char *,int,cchar *) noex ;
-
 EXTERNC_end
 
 
