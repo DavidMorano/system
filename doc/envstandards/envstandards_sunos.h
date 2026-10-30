@@ -1,4 +1,4 @@
-/* envstandards HEADER (SunOS) */
+/* envstandards_sunos HEADER (SunOS) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -19,7 +19,7 @@
 /* these are user-settable compile-time switches */
 
 #ifndef	ENVSTANDARDS_INCLUDE
-#define	ENVSTANDARDS_INCLUDE	1
+#define	ENVSTANDARDS_INCLUDE
 
 
 #ifndef	OSNAME_SunOS
@@ -27,11 +27,7 @@
 #endif
 
 #ifndef	OSNAME
-#define	OSNAME				SunOS
-#endif
-
-#ifndef	OSNUM
-#define	OSNUM				8
+#define	OSNAME				"SunOS"
 #endif
 
 #ifndef	OSTYPE_SYSV
@@ -63,11 +59,11 @@
 #define	_POSIX_PER_PROCESS_TIMER_SOURCE	1
 #endif
 
-#ifndef	_LARGEFILE_SOURCE /* 64-bit sized files */
+#ifndef	_LARGEFILE_SOURCE		/* 64-bit sized files */
 #define	_LARGEFILE_SOURCE		1
 #endif
 
-#ifndef	_FILE_OFFSET_BITS /* 64-bit sized file-offsets ('off_t' ?) */
+#ifndef	_FILE_OFFSET_BITS		/* 64-bit sized file-offsets */
 #define	_FILE_OFFSET_BITS		64
 #endif
 
