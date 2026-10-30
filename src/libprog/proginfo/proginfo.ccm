@@ -39,5 +39,6 @@ export module proginfo ;
 
 export import proginfo.base ;
 export import proginfo.rand ;
+export import proginfo.log ;
 
 
