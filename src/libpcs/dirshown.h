@@ -34,12 +34,10 @@ typedef	DIRSHOWN	dirshown ;
 typedef	DIRSHOWN_ENT	dirshown_ent ;
 
 EXTERNC_begin
-
 extern int dirshown_start(dirshown *) noex ;
 extern int dirshown_finish(dirshown *) noex ;
 extern int dirshown_set(dirshown *,dirshown_ent *) noex ;
 extern int dirshown_already(dirshown *,dirshown_ent *,dirshown_ent **) noex ;
-
 EXTERNC_end
 
 
