@@ -26,8 +26,8 @@
 
 
 namespace libdebug {
-    extern int	checkbasebounds(cchar *,int,void *) noex ;
-}
+    extern int	checkbasebounds(cchar *,int,cvoid *) noex ;
+} /* end if (namespace */
 
 
 #endif /* __cplusplus (C++ only) */
