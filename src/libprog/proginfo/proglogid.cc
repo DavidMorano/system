@@ -90,6 +90,8 @@
 
 /* local variables */
 
+cbool		f_serial		= CF_SERIAL ;
+
 
 /* exported variables */
 
@@ -103,8 +105,7 @@ int proglogid(PI *pip) noex {
 
 	if (pip->pid < 0) pip->pid = uc_getpid() ;
 
-#if	CF_SERIAL
-	{
+	if_constexpr (f_serial) {
 	    cchar	*sfname = SERIALFNAME ;
 	    cchar	*tdn ;
 	    char	tbuf[MAXPATHLEN + 1] ;
@@ -125,12 +126,11 @@ int proglogid(PI *pip) noex {
 		    }
 	        }
 	    }
-	} /* end block */
-#endif /* CF_SERIAL */
+	} /* end if_constexpr (f_serial) */
 
 	if ((rs >= 0) && (v < 0)) {
 	    v = ((int) pip->pid) ;
-	}
+	} /* end if */
 
 	if (rs >= 0) {
 	    cint	llen = LOGIDLEN ;
@@ -141,7 +141,7 @@ int proglogid(PI *pip) noex {
 		ll = rs ;
 	        rs = pip->setent(vpp,lbuf,ll) ;
 	    }
-	} /* end block (logid) */
+	} /* end if (logid) */
 
 	return (rs >= 0) ? ll : rs ;
 } /* end subroutine (proglogid) */
