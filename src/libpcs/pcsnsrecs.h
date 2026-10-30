@@ -50,15 +50,13 @@ typedef PCSNSRECS	pcsnsrecs ;
 typedef	PCSNSRECS_ST	pcsnsrecs_st ;
 
 EXTERNC_begin
-
-extern int pcsnsrecs_start(pcsnsrecs *,int,int) noex ;
-extern int pcsnsrecs_store(pcsnsrecs *,cchar *,int,cchar *,int,int) noex ;
-extern int pcsnsrecs_lookup(pcsnsrecs *,char *,int,cchar *,int) noex ;
-extern int pcsnsrecs_invalidate(pcsnsrecs *,cchar *,int) noex ;
-extern int pcsnsrecs_check(pcsnsrecs *,time_t) noex ;
-extern int pcsnsrecs_stats(pcsnsrecs *,pcsnsrecs_st *) noex ;
-extern int pcsnsrecs_finish(pcsnsrecs *) noex ;
-
+extern int pcsnsrecs_start	(pcsnsrecs *,int,int) noex ;
+extern int pcsnsrecs_store	(pcsnsrecs *,cchar *,int,cchar *,int,int) noex ;
+extern int pcsnsrecs_lookup	(pcsnsrecs *,char *,int,cchar *,int) noex ;
+extern int pcsnsrecs_invalidate	(pcsnsrecs *,cchar *,int) noex ;
+extern int pcsnsrecs_check	(pcsnsrecs *,time_t) noex ;
+extern int pcsnsrecs_stats	(pcsnsrecs *,pcsnsrecs_st *) noex ;
+extern int pcsnsrecs_finish	(pcsnsrecs *) noex ;
 EXTERNC_end
 
 
