@@ -34,9 +34,7 @@ enum pcsdatetypes {
 } ; /* end enum (pcsdatetypes) */
 
 EXTERNC_begin
-
 extern int pcsgetdate(cc *,tmtime *,cc *,int,pcsdatetypes) noex ;
-
 EXTERNC_end
 
 
