@@ -159,7 +159,6 @@ enum pcsmsgrcs {
 } ; /* end enum */
 
 EXTERNC_begin
-
 extern int pcsmsg_getstatus(struct pcsmsg_getstatus *,int,char *,int) ;
 extern int pcsmsg_gethelp(struct pcsmsg_gethelp *,int,char *,int) ;
 extern int pcsmsg_getval(struct pcsmsg_getval *,int,char *,int) ;
@@ -173,7 +172,6 @@ extern int pcsmsg_help(struct pcsmsg_help *,int,char *,int) ;
 extern int pcsmsg_name(struct pcsmsg_name *,int,char *,int) ;
 extern int pcsmsg_user(struct pcsmsg_user *,int,char *,int) ;
 extern int pcsmsg_ack(struct pcsmsg_ack *,int,char *,int) ;
-
 EXTERNC_end
 
 
