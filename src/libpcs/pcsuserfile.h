@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int pcsuserfile(cc *,cc *,cc *,cc *,cc *) noex ;
-
 EXTERNC_end
 
 
