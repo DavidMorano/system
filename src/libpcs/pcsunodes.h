@@ -41,7 +41,6 @@ typedef	PCSUNODES	pcsunodes ;
 typedef	PCSUNODES_CUR	pcsunodes_cur ;
 
 EXTERNC_begin
-
 extern int pcsunodes_start	(pcsunodes *,cchar *) noex ;
 extern int pcsunodes_get	(pcsunodes *,int,cchar **) noex ;
 extern int pcsunodes_mat	(pcsunodes *,cchar *,int) noex ;
@@ -50,7 +49,6 @@ extern int pcsunodes_curenum	(pcsunodes *,pcsunodes_cur *,char *,int) noex ;
 extern int pcsunodes_curend	(pcsunodes *,pcsunodes_cur *) noex ;
 extern int pcsunodes_audit	(pcsunodes *) noex ;
 extern int pcsunodes_finish	(pcsunodes *) noex ;
-
 EXTERNC_end
 
 
