@@ -55,6 +55,7 @@
 const bool	usysflags::sunos 	= F_SUNOS ;
 const bool	usysflags::darwin	= F_DARWIN ;
 const bool	usysflags::linux	= F_LINUX ;
+const bool	usysflags::irix		= F_IRIX ;
 
 constexpr usysflags		usysflag ;
 
