@@ -24,11 +24,10 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 
-EXTERNC_begin
 
+EXTERNC_begin
 extern bool	isdigex(int) noex ;
 extern bool	iswhite(int) noex ;
-
 EXTERNC_end
 
 
