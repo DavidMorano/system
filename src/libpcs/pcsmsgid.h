@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int pcsmsgid(cchar *,char *,int) noex ;
-
 EXTERNC_end
 
 
