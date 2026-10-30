@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int	prenvfile(cchar *,vecstr *,cchar *) noex ;
-
 EXTERNC_end
 
 
