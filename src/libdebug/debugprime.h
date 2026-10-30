@@ -20,21 +20,19 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<netdb.h>		/* |HOSTENT| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<sys/types.h>		/* POSIX® */
+#include	<netdb.h>		/* POSIX® |HOSTENT| */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
-
 extern int d_openfiles() noex ;
 extern int d_ispath(cchar *) noex ;
 extern void d_whoopen(int *) noex ;
 extern char *d_reventstr(int,char *,int) noex ;
 extern int heaudit(HOSTENT *,cchar *,int) noex ;
 extern char *stroflags(char *,int) noex ;
-
 EXTERNC_end
 
 
