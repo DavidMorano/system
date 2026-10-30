@@ -41,10 +41,8 @@
 
 
 EXTERNC_begin
-
 extern int	prqotd_open	(cchar *,int,int,int) noex ;
 extern int	prqotd_maint	(cchar *,int,int,int) noex ;
-
 EXTERNC_end
 
 
