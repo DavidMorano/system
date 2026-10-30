@@ -47,6 +47,21 @@
 #include	<fcntl.h>		/* |O_{x}| */
 
 
+#if	defined(OSNAME_Irix) && (OSNAME_Irix > 0)
+#ifndef	F_ULOCK
+#define F_ULOCK	0	/* Unlock a previously locked region */
+#endif
+#ifndef	F_LOCK
+#define F_LOCK	1	/* Lock a region for exclusive use */
+#endif
+#ifndef	F_TLOCK
+#define F_TLOCK	2	/* Test and lock a region for exclusive use */
+#endif
+#ifndef	F_TEST
+#define F_TEST	3	/* Test a region for other processes locks */
+#endif
+#endif /* defined(OSNAME_Irix) && (OSNAME_Irix > 0) */
+
 /* extra system flags for |uc_lockfile(3uc)| */
 #ifndef	F_UNLOCK
 #define	F_UNLOCK	F_ULOCK
