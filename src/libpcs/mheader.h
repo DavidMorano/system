@@ -16,9 +16,7 @@
 
 
 EXTERNC_begin
-
 extern int	mheader(cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
