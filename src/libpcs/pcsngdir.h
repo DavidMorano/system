@@ -18,9 +18,7 @@
 
 
 EXTERNC_begin
-
 extern int	pcsngdir(cc *,char *,cc *,cc *) noex ;
-
 EXTERNC_end
 
 
