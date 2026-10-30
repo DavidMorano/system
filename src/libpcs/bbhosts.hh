@@ -21,19 +21,17 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<vecpstr.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<vecpstr.h>		/* LIBUC */
 
 
 #define	BBHOSTS_MAGIC	0x86543267
 
 
 EXTERNC_begin
-
 typedef int (*bbhosts_vcmp)	(cchar **,cchar **) noex ;
 typedef int (*bbhosts_f)	(cchar **,cchar **) noex ;
-
 EXTERNC_end
 
 enum bbhostsmems {
@@ -75,7 +73,7 @@ struct bbhosts : vecpstr {
 	void dtor() noex ;
 	destruct bbhosts() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (bbhosts) */
 
 extern int	bbhosts_start(bbhosts *,cchar *,cchar *) noex ;
