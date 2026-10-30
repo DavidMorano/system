@@ -48,6 +48,12 @@
 #else
 #define	F_LINUX		0
 #endif
+#if defined(OSNAME_Irix) && (OSNAME_Irix > 0)
+#define	F_IRIX		1
+#else
+#define	F_IRIX		0
+#endif
+
 
 #ifdef	__cplusplus
 
@@ -55,6 +61,7 @@ struct usysflags {
     	static const bool	sunos ;
     	static const bool	darwin ;
     	static const bool	linux ;
+    	static const bool	irix ;
 } ; /* end struct (usysflags) */
 
 extern const usysflags		usysflag ;
