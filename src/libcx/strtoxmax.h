@@ -28,13 +28,13 @@
 
 
 EXTERNC_begin
-
 extern intmax_t	strtoimax(cchar *,char **,int) ;
 extern intmax_t	strtointmax(cchar *,char **,int) ;
+EXTERNC_end
 
+EXTERNC_begin
 extern uintmax_t strtoumax(cchar *,char **,int) ;
 extern uintmax_t strtouintmax(cchar *,char **,int) ;
-
 EXTERNC_end
 
 
