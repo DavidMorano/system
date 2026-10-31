@@ -25,16 +25,16 @@
 
 
 EXTERNC_begin
-
 extern int sncpyxw(char *,int,int,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int sncpy1w(char *,int,ccp,int) noex ;
 extern int sncpy2w(char *,int,ccp,ccp,int) noex ;
 extern int sncpy3w(char *,int,ccp,ccp,ccp,int) noex ;
 extern int sncpy4w(char *,int,ccp,ccp,ccp,ccp,int) noex ;
 extern int sncpy5w(char *,int,ccp,ccp,ccp,ccp,ccp,int) noex ;
 extern int sncpy6w(char *,int,ccp,ccp,ccp,ccp,ccp,ccp,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
