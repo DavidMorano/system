@@ -27,34 +27,50 @@
 
 #include	<strkeydictcmp.h>
 
-EXTERNC_begin
 
+EXTERNC_begin
 extern int strkeybasecmpo(cchar *,cchar *) noex ;
 extern int strkeybasecmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int strkeycasecmpo(cchar *,cchar *) noex ;
 extern int strkeycasecmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int strkeyfoldcmpo(cchar *,cchar *) noex ;
 extern int strkeyfoldcmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int strkeybasecmp(cchar *,cchar *) noex ;
 extern int strkeycasecmp(cchar *,cchar *) noex ;
 extern int strkeyfoldcmp(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int strkeycmp(cchar *s1,cchar *s2) noex {
     	return strkeybasecmp(s1,s2) ;
 } /* end */
+EXTERNC_end
 
+EXTERNC_begin
 extern int strkeyxbasecmpo(cchar *,cchar *) noex ;
 extern int strkeyxbasecmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int strkeyxcasecmpo(cchar *,cchar *) noex ;
 extern int strkeyxcasecmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int strkeyxfoldcmpo(cchar *,cchar *) noex ;
 extern int strkeyxfoldcmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int strkeyxbasecmp(cchar *s1,cchar *s2) noex {
     	return strkeyxbasecmpo(s1,s2) ;
 } /* end */
@@ -64,7 +80,6 @@ local inline int strkeyxcasecmp(cchar *s1,cchar *s2) noex {
 local inline int strkeyxfoldcmp(cchar *s1,cchar *s2) noex {
     	return strkeyxfoldcmpo(s1,s2) ;
 } /* end */
-
 EXTERNC_end
 
 
