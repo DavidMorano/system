@@ -93,7 +93,6 @@ typedef PTRWLOCK	ptrwlock ;
 
 
 EXTERNC_begin
-
 extern int	ptrwlock_create		(ptrwlock *,ptrwa *) noex ;
 extern int	ptrwlock_lockrd		(ptrwlock *) noex ;
 extern int	ptrwlock_lockrdtry	(ptrwlock *) noex ;
@@ -103,7 +102,6 @@ extern int	ptrwlock_lockwrtry	(ptrwlock *) noex ;
 extern int	ptrwlock_lockwrto	(ptrwlock *,int) noex ;
 extern int	ptrwlock_lockend	(ptrwlock *) noex ;
 extern int	ptrwlock_destroy	(ptrwlock *) noex ;
-
 EXTERNC_end
 
 
