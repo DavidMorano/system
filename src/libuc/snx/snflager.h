@@ -89,14 +89,12 @@ typedef SNFLAGER		snflager ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int snflager_start	(snflager *,char *,int) noex ;
 extern int snflager_addstr	(snflager *,cchar *) noex ;
 extern int snflager_addstrw	(snflager *,cchar *,int) noex ;
 extern int snflager_count	(snflager *) noex ;
 extern int snflager_len		(snflager *) noex ;
 extern int snflager_finish	(snflager *) noex ;
-
 EXTERNC_end
 
 
