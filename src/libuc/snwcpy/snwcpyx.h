@@ -38,7 +38,6 @@ inline int snwcpy(char *dbuf,int dlen,cchar *sp) noex {
 
 
 EXTERNC_begin
-
 extern int snwcpyclean		(char *,int,int,cchar *,int) noex ;
 extern int snwcpycompact	(char *,int,cchar *,int) noex ;
 extern int snwcpyhyphen		(char *,int,cchar *,int) noex ;
@@ -47,20 +46,19 @@ extern int snwcpyopaque		(char *,int,cchar *,int) noex ;
 extern int snwcpyshrink		(char *,int,cchar *,int) noex ;
 extern int snwcpyrev		(char *,int,cchar *,int) noex ;
 extern int snwcpywidehdr	(char *,int,const wchar_t *,int) noex ;
-
 EXTERNC_end
 
 EXTERNC_begin
-
 extern int snwcpyx(char *,int,int,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int snwcpy1(char *,int,ccp,int) noex ;
 extern int snwcpy2(char *,int,ccp,ccp,int) noex ;
 extern int snwcpy3(char *,int,ccp,ccp,ccp,int) noex ;
 extern int snwcpy4(char *,int,ccp,ccp,ccp,ccp,int) noex ;
 extern int snwcpy5(char *,int,ccp,ccp,ccp,ccp,ccp,int) noex ;
 extern int snwcpy6(char *,int,ccp,ccp,ccp,ccp,ccp,ccp,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
