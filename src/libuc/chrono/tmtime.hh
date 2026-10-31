@@ -83,8 +83,6 @@ struct tmtime {
 	} ; /* end */
 } ; /* end struct (tmtime) */
 
-EXTERNC_begin
-
 extern int tmtime_insert	(tmtime *,CTM *) noex ;
 extern int tmtime_timex		(tmtime *,time_t,bool) noex ;
 extern int tmtime_timegm	(tmtime *,time_t) noex ;
@@ -107,8 +105,6 @@ local inline int tmtime_gmtime(tmtime *tmp,time_t t) noex {
 local inline int tmtime_localtime(tmtime *tmp,time_t t) noex {
 	return tmtime_timelocal(tmp,t) ;
 } /* end */
-
-EXTERNC_end
 
 
 #endif /* __cpluplus */
