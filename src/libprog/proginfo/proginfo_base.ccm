@@ -237,6 +237,7 @@ export {
 	vecstr		*sdp ;		/* store-data-pointer */
 	ids		*idp ;
 	logfile		*lfp ;
+	void		*lzp ;
 	mainv		argv ;
 	mainv		envv ;
 	ulong		randvar ;
