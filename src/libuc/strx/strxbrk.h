@@ -27,10 +27,8 @@
 
 
 EXTERNC_begin
-
 extern char	*strobrk(cchar *,cchar *) noex ;
 extern char	*strrbrk(cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
