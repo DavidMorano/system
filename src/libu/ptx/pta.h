@@ -74,7 +74,6 @@ typedef PTA		pta ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	pta_create		(pta *) noex ;
 extern int	pta_destroy		(pta *) noex ;
 extern int	pta_setstacksize	(pta *,size_t) noex ;
@@ -90,11 +89,10 @@ extern int	pta_getscope		(pta *,int *) noex ;
 extern int	pta_setinheritsched	(pta *,int) noex ;
 extern int	pta_getinheritsched	(pta *,int *) noex ;
 extern int	pta_setschedpolicy	(pta *,int) noex ;
-extern int	pta_getschedpolicy(	pta *,int *) noex ;
+extern int	pta_getschedpolicy	(pta *,int *) noex ;
 extern int	pta_setschedparam	(pta *,const SCHEDPARAM *) noex ;
 extern int	pta_getschedparam	(pta *,SCHEDPARAM *) noex ;
 extern int	pta_setstack		(pta *,void *,size_t) noex ;
-
 EXTERNC_end
 
 
