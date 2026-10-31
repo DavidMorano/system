@@ -29,14 +29,15 @@
 
 
 EXTERNC_begin
-
 extern char *strnalpha(cchar *,int) noex ;
 extern char *strnalnum(cchar *,int) noex ;
 extern char *strndigit(cchar *,int) noex ;
 extern char *strndigex(cchar *,int) noex ;
 extern char *strnoctal(cchar *,int) noex ;
 extern char *strnblank(cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline char *strndig(cchar *sp,int sl) noex {
 	return strndigit(sp,sl) ;
 } /* end */
@@ -49,7 +50,6 @@ local inline char *strndec(cchar *sp,int sl) noex {
 local inline char *strnhex(cchar *sp,int sl) noex {
 	return strndigex(sp,sl) ;
 } /* end */
-
 EXTERNC_end
 
 
