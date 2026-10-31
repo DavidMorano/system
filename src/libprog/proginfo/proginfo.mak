@@ -37,7 +37,7 @@ INCS += proginfo.hh
 
 MODS += proginfo_base.o proginfo_rand.o proginfo_log.o
 
-LIBS= -luo -lu
+LIBS += -luo -lu
 
 
 # overall
@@ -72,13 +72,14 @@ MOD_RAND= proginfo_rand.o
 # log
 PR_LOG= proginfo_log0.o
 
-PI_LOG0= proginfo_log1.o
+PI_LOG0= proginfo_log1.o proginfo_log2.o
 PI_LOG1=
 PI_LOG2=
 PI_LOG3=
 
 PI_LOG= pi_log0.o
 
+MOD_LOG= proginfo_log.o
 
 OBJ0= proginfo_base.o
 OBJ1= proginfo_rand.o
@@ -208,7 +209,7 @@ pi_log.o:		$(PI_LOG)
 
 
 # module
-proginfo.o:		$(PR_PROG) $(MOD_BASE) $(MOD_RAND)
+proginfo.o:		$(PR_PROG) $(MOD_BASE) $(MOD_RAND) $(MOD_LOG)
 	$(LD) -r -o $@ $(LDFLAGS) $^
 
 proginfo0.o:		proginfo.ccm $(PR_BASE) $(PR_RAND) $(PR_LOG)	$(INCS)
@@ -257,5 +258,7 @@ proginfo_log5.o:	proginfo_log5.cc $(PR_BASE) $(PR_LOG)		$(INCS)
 progmsgid.o:		progmsgid.cc	progmsgid.h			$(INCS)
 proguserlist.o:		proguserlist.cc	proguserlist.h			$(INCS)
 progexpand.o:		progexpand.cc	progexpand.h			$(INCS)
+
+logzone.o:		logzone.cc	logzone.h
 
 
