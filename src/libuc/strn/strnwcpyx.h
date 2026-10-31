@@ -29,17 +29,17 @@
 
 
 EXTERNC_begin
-
 extern char *strnwcpyx(char *,int,int,int,...) noex ;
 extern char *strnwcpy (char *,int,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern char *strnwcpy1(char *,int,ccp,int) noex ;
 extern char *strnwcpy2(char *,int,ccp,ccp,int) noex ;
 extern char *strnwcpy3(char *,int,ccp,ccp,ccp,int) noex ;
 extern char *strnwcpy4(char *,int,ccp,ccp,ccp,ccp,int) noex ;
 extern char *strnwcpy5(char *,int,ccp,ccp,ccp,ccp,ccp,int) noex ;
 extern char *strnwcpy6(char *,int,ccp,ccp,ccp,ccp,ccp,ccp,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
