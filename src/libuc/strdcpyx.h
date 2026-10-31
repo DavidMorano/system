@@ -28,16 +28,16 @@
 
 
 EXTERNC_begin
-
 extern char *strdcpyx(char *,int,int,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern char *strdcpy1(char *,int,cc *) noex ;
 extern char *strdcpy2(char *,int,cc *,cc *) noex ;
 extern char *strdcpy3(char *,int,cc *,cc *,cc *) noex ;
 extern char *strdcpy4(char *,int,cc *,cc *,cc *,cc *) noex ;
 extern char *strdcpy5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
 extern char *strdcpy6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
