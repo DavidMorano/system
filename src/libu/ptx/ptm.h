@@ -36,6 +36,7 @@ enum ptmmems {
 	ptmmem_create,
 	ptmmem_destroy,
 	ptmmem_lockbegin,
+	ptmmem_lockbeg,
 	ptmmem_lockend,
 	ptmmem_overlast
 } ; /* end enum (ptmmems) */
@@ -68,12 +69,14 @@ struct ptm : pthread_mutex_t {
 	ptm_creater	create ;
 	ptm_co		destroy ;
 	ptm_co		lockbegin ;
+	ptm_co		lockbeg ;
 	ptm_co		lockend ;
 	uint		magval ;
 	constexpr ptm() noex {
 	    create	(this,ptmmem_create) ;
 	    destroy	(this,ptmmem_destroy) ;
 	    lockbegin	(this,ptmmem_lockbegin) ;
+	    lockbeg	(this,ptmmem_lockbeg) ;
 	    lockend	(this,ptmmem_lockend) ;
 	    magval = 0 ;
 	} ; /* end ctor */
@@ -89,7 +92,6 @@ typedef PTM		ptm ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	ptm_create		(ptm *,ptma *) noex ;
 extern int	ptm_destroy		(ptm *) noex ;
 extern int	ptm_lockbegin		(ptm *) noex ;
@@ -98,17 +100,15 @@ extern int	ptm_locktry		(ptm *) noex ;
 extern int	ptm_lockend		(ptm *) noex ;
 extern int	ptm_setprioceiling	(ptm *,int,int *) noex ;
 extern int	ptm_getprioceiling	(ptm *,int *) noex ;
-
 local inline int ptm_lock(ptm *op) noex {
     	return ptm_lockbegin(op) ;
-}
+} /* end */
 local inline int ptm_lockto(ptm *op,int to) noex {
     	return ptm_lockbeginto(op,to) ;
-}
+} /* end */
 local inline int ptm_unlock(ptm *op) noex {
     	return ptm_lockend(op) ;
-}
-
+} /* end */
 EXTERNC_end
 
 
