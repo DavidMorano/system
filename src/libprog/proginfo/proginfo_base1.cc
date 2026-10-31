@@ -1,4 +1,4 @@
-/* proginfo1 MODULE (Module-Implementation) */
+/* proginfo_base1 MODULE (Module-Implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -22,7 +22,7 @@
 /*******************************************************************************
 
 	Module:
-	proginfo
+	proginfo_base
 
 	Description:
 	This module provides a very basic set of simple subroutines
@@ -686,6 +686,7 @@ proginfo::proginfo(int ac,con mainv av,con mainv ev) noex {
 	sdp		= nullptr ;
 	idp		= nullptr ;
 	lfp		= nullptr ;
+	lzp		= nullptr ;
 	now		= {} ;
 	pwdlen		= 0 ;
 	pm		= -1 ;
