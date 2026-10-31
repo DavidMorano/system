@@ -27,15 +27,15 @@
 
 
 EXTERNC_begin
-
 extern int strwbasecmp(cchar *,cchar *,int) noex ;
 extern int strwcasecmp(cchar *,cchar *,int) noex ;
 extern int strwfoldcmp(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int strwcmp(cchar *bs,cchar *sp,int sl) noex {
 	return strwbasecmp(bs,sp,sl) ;
 } /* end */
-
 EXTERNC_end
 
 
