@@ -101,7 +101,6 @@ typedef PTC		ptc ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	ptc_create		(ptc *,ptca *) noex ;
 extern int	ptc_destroy		(ptc *) noex ;
 extern int	ptc_broadcast		(ptc *) noex ;
@@ -110,7 +109,6 @@ extern int	ptc_wait		(ptc *,ptm *) noex ;
 extern int	ptc_waiting		(ptc *,ptm *,int) noex ;
 extern int	ptc_waiter		(ptc *,ptm *,CTIMESPEC *) noex ;
 extern int	ptc_reltimedwaitnp	(ptc *,ptm *,CTIMESPEC *) noex ;
-
 EXTERNC_end
 
 
