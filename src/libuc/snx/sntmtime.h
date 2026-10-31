@@ -26,11 +26,7 @@
 #include	<tmtime.hh>		/* LIBUC <- the money shot! */
 
 
-EXTERNC_begin
-
 extern int sntmtime(char *,int,tmtime *,cchar *) noex ;
-
-EXTERNC_end
 
 
 #endif /* __cplusplus (C++ only) */
