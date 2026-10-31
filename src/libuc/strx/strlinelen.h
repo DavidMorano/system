@@ -27,15 +27,11 @@
 
 
 EXTERNC_begin
-
 extern int	strlinelen(cchar *,int,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 extern int	strlinelen(cchar *,int) noex ;
-
 #endif /* __cplusplus */
 
 
