@@ -63,7 +63,6 @@ typedef STRSTORE_CH	strstore_ch ;
 typedef STRSTORE_CUR	strstore_cur ;
 
 EXTERNC_begin
-
 extern int strstore_start	(strstore *,int,int) noex ;
 extern int strstore_already	(strstore *,cchar *,int) noex ;
 extern int strstore_add		(strstore *,cchar *,int) noex ;
@@ -75,7 +74,9 @@ extern int strstore_curend	(strstore *,strstore_cur *) noex ;
 extern int strstore_count	(strstore *) noex ;
 extern int strstore_size	(strstore *) noex ;
 extern int strstore_finish	(strstore *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int strstore_strsize	(strstore *) noex ;
 extern int strstore_strmk	(strstore *,char *,int) noex ;
 extern int strstore_recsize	(strstore *) noex ;
@@ -83,7 +84,6 @@ extern int strstore_recmk	(strstore *,int *,int) noex ;
 extern int strstore_indlen	(strstore *) noex ;
 extern int strstore_indsize	(strstore *) noex ;
 extern int strstore_indmk	(strstore *,int (*)[3],int,int) noex ;
-
 EXTERNC_end
 
 
