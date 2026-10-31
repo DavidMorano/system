@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern cchar	*straltwchar(int) noex ;
-
 EXTERNC_end
 
 
