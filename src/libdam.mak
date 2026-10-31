@@ -976,6 +976,7 @@ filemagic.o:		filemagic.ccm	filemagic.hh		$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 ccmutex.o:		ccmutex.ccm	ccmutex.hh		$(INCS)
+logzone.o:		logzone.cc	logzone.h		$(INCS)
 progval.o:		progval.cc	progbal.h		$(INCS)
 
 
