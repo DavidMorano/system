@@ -27,30 +27,45 @@
 
 
 EXTERNC_begin
-
 extern int	strcasecmp_latin(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strbasecmp(cchar *,cchar *) noex ;
 extern int	strfoldcmp(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strbasecmpo(cchar *,cchar *) noex ;
 extern int	strbasecmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strcasecmpo(cchar *,cchar *) noex ;
 extern int	strcasecmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strfoldcmpo(cchar *,cchar *) noex ;
 extern int	strfoldcmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strxbasecmpo(cchar *,cchar *) noex ;
 extern int	strxbasecmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strxcasecmpo(cchar *,cchar *) noex ;
 extern int	strxcasecmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strxfoldcmpo(cchar *,cchar *) noex ;
 extern int	strxfoldcmpr(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int strxbasecmp(cchar *s1,cchar *s2) noex {
     	return strxbasecmpo(s1,s2) ;
 } /* end */
@@ -60,14 +75,15 @@ local inline int strxcasecmp(cchar *s1,cchar *s2) noex {
 local inline int strxfoldcmp(cchar *s1,cchar *s2) noex {
     	return strxfoldcmpo(s1,s2) ;
 } /* end */
+EXTERNC_end
 
+EXTERNC_begin
 local inline int strbasecmp_latin(cchar *s1,cchar *s2) noex {
     	return strbasecmp(s1,s2) ;
 } /* end */
 local inline int strfoldcmp_latin(cchar *s1,cchar *s2) noex {
     	return strfoldcmp(s1,s2) ;
 } /* end */
-
 EXTERNC_end
 
 
