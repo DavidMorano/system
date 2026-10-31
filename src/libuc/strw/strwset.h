@@ -27,13 +27,13 @@
 
 
 EXTERNC_begin
-
 extern char	*strwset(char *dp,int ch,int n) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline char *strwblanks(char *dp,int n) noex {
     return strwset(dp,' ',n) ;
 } /* end */
-
 EXTERNC_end
 
 
