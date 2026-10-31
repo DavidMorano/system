@@ -28,12 +28,10 @@
 
 
 EXTERNC_begin
-
 extern int snwcpybc(char *,int,cchar *,int) noex ;
 extern int snwcpylc(char *,int,cchar *,int) noex ;
 extern int snwcpyuc(char *,int,cchar *,int) noex ;
 extern int snwcpyfc(char *,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
