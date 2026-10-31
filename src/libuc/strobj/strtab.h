@@ -108,7 +108,6 @@ typedef STRTAB		strtab ;
 typedef STRTAB_CH	strtab_ch ;
 
 EXTERNC_begin
-
 extern int	strtab_start	(strtab *,int) noex ;
 extern int	strtab_finish	(strtab *) noex ;
 extern int	strtab_add	(strtab *,cchar *,int) noex ;
@@ -122,7 +121,6 @@ extern int	strtab_recmk	(strtab *,int *,int) noex ;
 extern int	strtab_indlen	(strtab *) noex ;
 extern int	strtab_indsize	(strtab *) noex ;
 extern int	strtab_indmk	(strtab *,int (*)[3],int,int) noex ;
-
 EXTERNC_end
 
 
