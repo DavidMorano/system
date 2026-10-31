@@ -29,9 +29,7 @@
 
 
 EXTERNC_begin
-
 extern int snwcpyexpesc(char *,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
