@@ -69,7 +69,7 @@
 
 /* exported subroutines */
 
-cchar *trailaddr(cchar addr[],int addrlen) noex {
+cchar *trailaddr(cchar *addr,int addrlen) noex {
 	int		al ;
 	cchar	*cp ;
 
@@ -100,7 +100,6 @@ cchar *trailaddr(cchar addr[],int addrlen) noex {
 	    return cp ;
 
 	return cp ;
-}
-/* end subroutine (trailaddr) */
+} /* end subroutine (trailaddr) */
 
 
