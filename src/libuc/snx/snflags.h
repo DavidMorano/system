@@ -25,11 +25,9 @@
 
 
 EXTERNC_begin
-
 extern int snflagsfs	(char *,int,ulong) noex ;
 extern int snflagsopen	(char *,int,ulong) noex ;
 extern int snflagspoll	(char *,int,ulong) noex ;
-
 EXTERNC_end
 
 
