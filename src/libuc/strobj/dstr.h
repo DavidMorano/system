@@ -28,11 +28,9 @@ struct dstr_head {
 typedef DSTR		dstr ;
 
 EXTERNC_begin
-
 extern int dstr_start	(dstr *,cchar *,int) noex ;
 extern int dstr_assign	(dstr *,dstr *) noex ;
 extern int dstr_finish	(dstr *) noex ;
-
 EXTERNC_end
 
 
