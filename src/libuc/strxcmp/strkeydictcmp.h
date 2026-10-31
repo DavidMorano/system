@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern int strkeydictcmp(cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
