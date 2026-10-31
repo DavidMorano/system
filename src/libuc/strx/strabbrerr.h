@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern cchar	*strabbrerr(int) noex ;
-
 EXTERNC_end
 
 
