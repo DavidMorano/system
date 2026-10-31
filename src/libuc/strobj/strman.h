@@ -28,20 +28,20 @@ struct strman_head {
 typedef	STRMAN		strman ;
 
 EXTERNC_begin
-
 extern int	strman_start		(strman *,cchar *,int) noex ;
 extern int	strman_breakfield	(strman *,cchar *,cchar **) noex ;
 extern int	strman_span		(strman *,cchar *) noex ;
 extern int	strman_whitechr		(strman *,int) noex ;
 extern int	strman_finish		(strman *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int strman_whitecolon(strman *sop) noex {
 	return strman_whitechr(sop,':') ;
 } /* end */
 local inline int strman_whitedash(strman *sop) noex {
 	return strman_whitechr(sop,'-') ;
 } /* end */
-
 EXTERNC_end
 
 
