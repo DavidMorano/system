@@ -259,7 +259,7 @@ int ucptm::create(ptm *op) noex {
 	        rs = (neg rs) ;
 	    } else if (rs < 0) {
 		rs = SR_NOANODE ;
-	    }
+	    } /* end if */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (ucptm::create) */
@@ -311,6 +311,9 @@ int ptm_co::operator () (int to) noex {
 	    	op->magval = 0 ;
 	        break ;
 	    case ptmmem_lockbegin:
+	        rs = ptm_lockbeginto(op,to) ;
+	        break ;
+	    case ptmmem_lockbeg:
 	        rs = ptm_lockbeginto(op,to) ;
 	        break ;
 	    case ptmmem_lockend:
