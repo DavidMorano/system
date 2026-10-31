@@ -27,10 +27,8 @@
 
 
 EXTERNC_begin
-
 extern char *strnoterm(cchar *,int,cchar *) noex ;
 extern char *strnrterm(cchar *,int,cchar *) noex ;
-
 EXTERNC_end
 
 
