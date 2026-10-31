@@ -27,15 +27,15 @@
 
 
 EXTERNC_begin
-
 extern char	*strbasesub(cchar *,cchar *) noex ;
 extern char	*strcasesub(cchar *,cchar *) noex ;
 extern char	*strfoldsub(cchar *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline char *strsub(cchar *sp,cchar *ss) noex {
     	return strbasesub(sp,ss) ;
 } /* end */
-
 EXTERNC_end
 
 
