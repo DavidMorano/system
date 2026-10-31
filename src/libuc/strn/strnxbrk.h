@@ -27,14 +27,14 @@
 
 
 EXTERNC_begin
-
 extern char *strnobrk(cchar *,int,cchar *) noex ;
 extern char *strnrbrk(cchar *,int,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline char *strnbrk(cchar *sp,int sl,cchar *ss) noex {
 	return strnobrk(sp,sl,ss) ;
 } /* end */
-
 EXTERNC_end
 
 
