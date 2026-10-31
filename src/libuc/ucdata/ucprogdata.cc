@@ -220,7 +220,7 @@ int ucprogdata_init() noex {
 	        while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	            rs = msleep(1) ;
 	            if (rs == SR_INTR) rs = SR_OK ;
-	        }
+	        } /* end while */
 	        if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKFAIL ;
 	    } /* end if */
 	} /* end if (not-void) */
@@ -236,23 +236,23 @@ int ucprogdata_fini() noex {
 	    {
 	        rs1 = ucprogdata_end(uip) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        void_f	b = ucprogdata_atforkbefore ;
 	        void_f	a = ucprogdata_atforkafter ;
 	        rs1 = uc_atforkexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		ptc *cnp = &uip->cn ;
 	        rs1 = cnp->destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        ptm *mxp = &uip->mx ;
 	        rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    uip->f_init = false ;
 	    uip->f_initdone = false ;
 	} /* end if (was initialized) */
@@ -322,7 +322,7 @@ local int ucprogdata_struct(UCPD *uip) noex {
 	int		rs = SR_OK ;
 	if (uip->ents == nullptr) {
 	    rs = ucprogdata_begin(uip) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (ucprogdata_struct) */
 
@@ -352,12 +352,12 @@ local int ucprogdata_end(UCPD *uip) noex {
 	    {
 	        rs1 = ucprogdata_entfins(uip) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        varray	*ents = (varray *) uip->ents ;
 	        rs1 = varray_finish(ents) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = libmem.free(uip->ents) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -394,7 +394,7 @@ local int ucprogdata_capbegin(UCPD *uip,int to) noex {
 	        } /* end while */
 	        if (rs >= 0) {
 	            uip->f_capture = true ;
-	        }
+	        } /* end */
 	        uip->waiters -= 1 ;
 	    } /* end block */
 	    rs1 = mxp->lockend ;
@@ -444,8 +444,8 @@ local int ucprogdata_geter(UCPD *uip,int di,char *rbuf,int rlen) noex {
 	    if ((ep->et > 0) && ((dt-ep->et) < ep->ttl)) {
 		rs = sncpy1w(rbuf,rlen,ep->vp,ep->vl) ;
 		len = rs ;
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (ucprogdata_geter) */
 
@@ -503,7 +503,7 @@ local int entry_reload(UCPD_ENT *ep,cc *vp,int vl,int ttl) noex {
 	} /* end if (memory-release) */
 	if (rs >= 0) {
 	    rs = entry_start(ep,vp,vl,ttl) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (entry_reload) */
 
