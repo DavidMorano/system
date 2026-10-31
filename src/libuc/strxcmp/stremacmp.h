@@ -27,10 +27,8 @@
 
 
 EXTERNC_begin
-
 extern int	stremacmp	(cchar *,cchar *) noex ;
 extern int	strxemacmp	(cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
