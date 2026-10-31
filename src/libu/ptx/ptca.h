@@ -63,12 +63,10 @@ typedef PTCA		ptca ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	ptca_create	(ptca *) noex ;
 extern int	ptca_destroy	(ptca *) noex ;
 extern int	ptca_setpshared	(ptca *,int) noex ;
 extern int	ptca_getpshared	(ptca *,int *) noex ;
-
 EXTERNC_end
 
 
