@@ -74,7 +74,7 @@
 #include	<mhcom.h>
 #include	<comparse.h>
 #include	<dater.h>
-#include	<logzones.h>
+#include	<logzone.h>
 #include	<nulstr.h>
 #include	<sbuf.h>
 #include	<buffer.h>
@@ -3499,12 +3499,11 @@ int		vl ;
 			    cint	znlen = rs ;
 	                    if ((rs1 = getzname(tdp,znbuf,znlen)) >= 0) {
 	                        int	zoff ;
-
 	                	rs2 = dater_getzoneoff(tdp,&zoff) ;
-	                        if (rs2 < 0)
-	                            zoff = LOGZONES_NOZONEOFFSET ;
-    
-	                        rs = logzones_update(&pip->lz,znbuf,znlen,
+	                        if (rs2 < 0) {
+	                            zoff = LOGZONE_NOZONEOFFSET ;
+				}
+	                        rs = logzone_update(&pip->lz,znbuf,znlen,
 	                            zoff,pip->stamp) ;
 
 	                } /* end if */
