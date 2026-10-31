@@ -66,12 +66,10 @@ typedef	PTRWA		ptrwa ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	ptrwa_create		(ptrwa *) noex ;
 extern int	ptrwa_destroy		(ptrwa *) noex ;
 extern int	ptrwa_setpshared	(ptrwa *,int) noex ;
 extern int	ptrwa_getpshared	(ptrwa *,int *) noex ;
-
 EXTERNC_end
 
 
