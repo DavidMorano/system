@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern cchar *strlocktype(int) noex ;
-
 EXTERNC_end
 
 
