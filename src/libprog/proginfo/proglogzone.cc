@@ -27,17 +27,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>		/* POSIX® */
-#include	<fcntl.h>		/* POSIX® */
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdarg>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<bufsize.h>		/* LIBUC */
 #include	<estrings.h>		/* LIBUC */
-#include	<logzones.h>		/* LIBUC */
+#include	<logzone.h>		/* LIBUC */
+#include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"proginfo.hh"
@@ -50,6 +48,10 @@
 #define	LOGCNAME	"log"
 #endif
 
+#ifndef	LOGZONEFNAME
+#define LOGZONEFNAME    "zones"
+#endif
+
 
 /* external subroutines */
 
@@ -58,6 +60,13 @@
 
 
 /* local structures */
+
+namespace vars {
+    struct vars {
+	int		maxpathlen ;
+	operator int () noex ;
+    } ; /* end struct (vars) */
+} /* end namespace */
 
 
 /* forward references */
@@ -82,24 +91,25 @@ int proglogzone_begin(proginfo *pip) noex {
 		cchar	*logcname = LOGCNAME ;
 	        char	zfname[MAXPATHLEN+1] ;
 	        if ((rs = mkpath3(zfname,pip->pr,logcname,nbuf)) >= 0) {
-		    logzones	*lzp = &pip->lz ;
+		    logzone	*lzp = &pip->lz ;
 		    cmode	om = 0666 ;
 		    cint	of = O_RDWR ;
 		    cint	zl = rs ;
-	            if ((rs = logzones_open(lzp,zfname,of,om)) >= 0) {
+	            if ((rs = logzone_open(lzp,zfname,of,om)) >= 0) {
 			cchar	**vpp = &pip->zfname ;
-			pip->open.logzone = TRUE ;
-	        	rs = proginfo_setentry(pip,vpp,zfname,zl) ;
+			pip->pfopen.logzone = true ;
+	        	rs = pip->setent(vpp,zfname,zl) ;
 	        	if (pip->debuglevel > 0) {
-			    cchar	*pn = pip->progname ;
-	            	    bprintf(pip->efp,"%s: zf=%s\n",pn,zfname) ;
+	            	    pip->eprintf("zf=%s\n",zfname) ;
 			}
-			if (rs < 0)
-			    logzones_close(lzp) ;
-		    } else if (isNotPresent(rs))
+			if (rs < 0) {
+			    logzone_close(lzp) ;
+			} /* end if (error) */
+		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
-		}
-	    }
+		    } /* end if */
+		} /* end if */
+	    } /* end if */
 	} /* end if (log-zones) */
 	return rs ;
 } /* end subroutine (proglogzone_begin) */
@@ -107,20 +117,50 @@ int proglogzone_begin(proginfo *pip) noex {
 int proglogzone_end(proginfo *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->open.logzone) {
-	    pip->open.logzone = FALSE ;
-	    rs1 = logzones_close(&pip->lz) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
+	if (pip->pfopen.logzone) {
+	    rs = SR_BUGCHECK ;
+	    if (logzone *lzp = resumelife<logzone>(pip->lzp)) {
+	        pip->pfopen.logzone = false ;
+		{
+	            rs1 = logzone_close(lzp) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+		    rs1 = mem.free(lzp) ;
+	            if (rs >= 0) rs = rs1 ;
+		    lzp = nullptr ;
+		} /* end block (memory-release) */
+	    } /* end if (non-null) */
+	} /* end */
 	return rs ;
 } /* end subroutine (proglogzone_end) */
 
 int proglogzone_update(proginfo *pip,cchar *zn,int zl,int zoff,cchar *zs) noex {
-	int		rs = SR_OK ;
-	if (pip->open.logzone) {
-	    logzones_update(&pip->lz,zn,zl,zoff,zs) ;
-	}
+    	int		rs = SR_FAULT ;
+	if (pip) ylikely {
+	    rs = SR_OK ;
+	    if (pip->pfopen.logzone) {
+	        rs = SR_BUGCHECK ;
+	        if (logzone *lzp = resumelife<logzone>(pip->lzp)) {
+	            rs = logzone_update(lzp,zn,zl,zoff,zs) ;
+	        }
+	    } /* end */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (proglogzone_update) */
+
+
+/* local subroutines */
+
+vars::operator int () noex {
+    	int		rs ;
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
+	    maxnamelen = rs ;
+	    if ((rs = bufsizeget(bufsize_np)) >= 0) {
+	    	maxpathlen = rs ;
+	    }
+	} /* end */
+	return rs ;
+} /* end method (vars::operator) */
 
 
