@@ -128,7 +128,7 @@ ccharp strnul::proc(cchar *sp,int sl) noex {
 	    rp = sp ;
 	    fok = true ;
 	    if (sl >= 0) /* do-not-know */ {
-		if (rl = lenstr(sp,sl) ; sp[rl] != eos) {
+		if (rl = lenstr(sp,sl) ; sp[rl]) {
 		    if (rl > blen) {
 		        alloc(sp,rl) ;
 	            } else {
