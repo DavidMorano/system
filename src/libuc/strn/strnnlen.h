@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern int strnnlen(cchar *,int,int) noex ;
-
 EXTERNC_end
 
 
