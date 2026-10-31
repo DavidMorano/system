@@ -123,7 +123,7 @@
 #include	<localmisc.h>
 #include	<lockmemalloc.h>
 #include	<logbase.h>
-#include	<logzones.h>
+#include	<logzone.h>
 #include	<lookaddr.h>
 #include	<lookword.h>
 #include	<mailaddrquote.h>
