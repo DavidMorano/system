@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int strtabfind(cc *,int (*)[3],int,int,cc *,int) noex ;
-
 EXTERNC_end
 
 
