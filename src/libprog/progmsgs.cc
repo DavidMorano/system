@@ -71,7 +71,7 @@
 #include	<mhcom.h>
 #include	<comparse.h>
 #include	<dater.h>
-#include	<logzones.h>
+#include	<logzone.h>
 #include	<buffer.h>
 #include	<strw.h>		/* |strwset(3uc)| */
 #include	<char.h>
@@ -2010,9 +2010,9 @@ local int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 	                if (pip->open.logzone) {
 	                    char	*zname = tdp->zname ;
 	                    if ((rs1 = dater_getzonename(tdp,zbuf,zlen)) >= 0) {
-			        LOGZONES	*lzp = &pip->lz ;
-	                        if (rs2 < 0) zoff = LOGZONES_NOZONEOFFSET ;
-	                        logzones_update(lzp,zname,-1,zoff,pip->stamp) ;
+			        logzone *lzp = &pip->lz ;
+	                        if (rs2 < 0) zoff = LOGZONE_NOZONEOFFSET ;
+	                        logzone_update(lzp,zname,-1,zoff,pip->stamp) ;
 	                    } /* end if */
 
 	                } /* end if (logging time-zone information) */
