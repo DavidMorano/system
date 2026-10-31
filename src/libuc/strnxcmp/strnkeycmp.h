@@ -27,33 +27,48 @@
 
 
 EXTERNC_begin
+extern int	strnkeybasecmp		(cchar *,cchar *,int) noex ;
+extern int	strnkeycasecmp		(cchar *,cchar *,int) noex ;
+extern int	strnkeyfoldcmp		(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
-extern int	strnkeybasecmp	(cchar *,cchar *,int) noex ;
-extern int	strnkeycasecmp	(cchar *,cchar *,int) noex ;
-extern int	strnkeyfoldcmp	(cchar *,cchar *,int) noex ;
-
-local inline int	strnkeycmp(cchar *a,cchar *sp,int sl) noex {
+EXTERNC_begin
+local inline int	strnkeycmp	(cchar *a,cchar *sp,int sl) noex {
     	return strnkeybasecmp(a,sp,sl) ;
 } /* end */
+EXTERNC_end
 
-extern int	strnkeybasecmpo	(cchar *,cchar *,int) noex ;
-extern int	strnkeybasecmpr	(cchar *,cchar *,int) noex ;
+EXTERNC_begin
+extern int	strnkeybasecmpo		(cchar *,cchar *,int) noex ;
+extern int	strnkeybasecmpr		(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
-extern int	strnkeycasecmpo	(cchar *,cchar *,int) noex ;
-extern int	strnkeycasecmpr	(cchar *,cchar *,int) noex ;
+EXTERNC_begin
+extern int	strnkeycasecmpo		(cchar *,cchar *,int) noex ;
+extern int	strnkeycasecmpr		(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
-extern int	strnkeyfoldcmpo	(cchar *,cchar *,int) noex ;
-extern int	strnkeyfoldcmpr	(cchar *,cchar *,int) noex ;
+EXTERNC_begin
+extern int	strnkeyfoldcmpo		(cchar *,cchar *,int) noex ;
+extern int	strnkeyfoldcmpr		(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strnkeyxbasecmpo	(cchar *,cchar *,int) noex ;
 extern int	strnkeyxbasecmpr	(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strnkeyxcasecmpo	(cchar *,cchar *,int) noex ;
 extern int	strnkeyxcasecmpr	(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	strnkeyxfoldcmpo	(cchar *,cchar *,int) noex ;
 extern int	strnkeyxfoldcmpr	(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int strnkeyxbasecmp	(cchar *s1,cchar *s2,int n) noex {
     	return strnkeyxbasecmpo(s1,s2,n) ;
 } /* end */
@@ -63,7 +78,6 @@ local inline int strnkeyxcasecmp	(cchar *s1,cchar *s2,int n) noex {
 local inline int strnkeyxfoldcmp	(cchar *s1,cchar *s2,int n) noex {
     	return strnkeyxfoldcmpo(s1,s2,n) ;
 } /* end */
-
 EXTERNC_end
 
 
