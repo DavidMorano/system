@@ -176,7 +176,7 @@ enum progopts {
 	progopt_comsat,
 	progopt_spam,
 	progopt_loglen,
-	progopt_logzones,
+	progopt_logzone,
 	progopt_logenv,
 	progopt_divert,
 	progopt_logmsgid,
@@ -191,7 +191,7 @@ constexpr cpcchar	progopts[] = {
 	"comsat",
 	"spam",
 	"loglen",
-	"logzones",
+	"logzone",
 	"logenv",
 	"divert",
 	"logmsgid",
@@ -302,7 +302,7 @@ char	*envv[] ;
 
 	pip->fl.log = FALSE ;
 
-	pip->fl.optlogzones = TRUE ;
+	pip->fl.optlogzone = TRUE ;
 	pip->fl.optlogenv = TRUE ;
 	pip->fl.optlogmsgid = TRUE ;
 	pip->fl.optdivert = TRUE ;
@@ -1430,9 +1430,9 @@ vecstr		*setsp ;
 
 	            break ;
 
-	        case progopt_logzones:
+	        case progopt_logzone:
 	            if ((vlen > 0) && (cfdeci(vp,vlen,&val) >= 0))
-	                pip->fl.optlogzones = (val > 0) ;
+	                pip->fl.optlogzone = (val > 0) ;
 
 	            break ;
 
