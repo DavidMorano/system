@@ -1,4 +1,4 @@
-/* proginfo3 MODULE (Module-Implementation) */
+/* proginfo_base3 MODULE (Module-Implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -22,7 +22,7 @@
 /*******************************************************************************
 
 	Module:
-	proginfo
+	proginfo_base
 
 	Description:
 	This module provides a very basic set of simple subroutines
