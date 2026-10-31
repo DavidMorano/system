@@ -40,17 +40,13 @@
 
 
 EXTERNC_begin
-
 extern int snaddw(char *,int,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 local inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
 } /* end subroutine */
-
 #endif /* __cplusplus */
 
 
