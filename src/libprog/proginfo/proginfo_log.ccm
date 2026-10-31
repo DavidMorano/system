@@ -93,6 +93,10 @@ export {
     int proglog_flush		(PI *) noex ;
 } /* end export */
 
+export {
+    int proglog_out		(PI *,cchar *,cchar *) noex ;
+} /* end export */
+
 
 /* local subroutines */
 
