@@ -37,6 +37,9 @@
 
 EXTERNC_begin
 extern char *strwht(cchar *,int) noex ;
+EXTERNC_end
+
+EXTERNC_begin
 local inline char *strwhite(cchar *sp) noex {
     	return strwht(sp,-1) ;
 } /* end */
