@@ -29,27 +29,25 @@
 
 
 EXTERNC_begin
-
 extern int sncpy (char *,int,cchar *) noex ;
 extern int sncpyx(char *,int,int,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int sncpy1(char *,int,cc *) noex ;
 extern int sncpy2(char *,int,cc *,cc *) noex ;
 extern int sncpy3(char *,int,cc *,cc *,cc *) noex ;
 extern int sncpy4(char *,int,cc *,cc *,cc *,cc *) noex ;
 extern int sncpy5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
 extern int sncpy6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 template<concharp ... Args>
 inline int sncpy(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return sncpyx(dp,dl,na,args ...) ;
 } /* end subroutine-template (sncpy) */
-
 #endif /* __cplusplus */
 
 
