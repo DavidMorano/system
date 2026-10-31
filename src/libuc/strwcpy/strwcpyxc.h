@@ -27,12 +27,10 @@
 
 
 EXTERNC_begin
-
 extern char	* strwcpybc (char *,cchar *,int) noex ;
 extern char	* strwcpylc (char *,cchar *,int) noex ;
 extern char	* strwcpyuc (char *,cchar *,int) noex ;
 extern char	* strwcpyfc (char *,cchar *,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
