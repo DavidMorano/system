@@ -39,7 +39,7 @@ struct strnul_len {
 	void operator	() (strnul *p) noex {
 	    op = p ;
 	} ; /* end method */
-	operator int () const noex ;
+	operator int 	() const noex ;
 	int operator () () const noex {
 	    return operator int () ;
 	} ; /* end method */
