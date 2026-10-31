@@ -1169,7 +1169,7 @@ void vecstr_iter::increment(int n) noex {
 	    i += n ;
 	    while ((i < ii) && (va[i] == nullptr)) {
 	        i += 1 ;
-	    }
+	    } /* end while */
 	} /* end if */
 } /* end method (vecstr_iter::increment) */
 
