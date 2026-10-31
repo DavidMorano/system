@@ -49,10 +49,10 @@ struct lockrw_co {
 	void operator () (lockrw *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex {
 	    return (*this)() ;
-	} ;
+	} ; /* end */
 	int operator () (int = -1) noex ;
 } ; /* end struct (lockrw_co) */
 struct lockrw : lockrw_head {
@@ -81,14 +81,12 @@ typedef LOCKRW		lockrw ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	lockrw_create	(lockrw *,int) noex ;
 extern int	lockrw_rdlock	(lockrw *,int) noex ;
 extern int	lockrw_wrlock	(lockrw *,int) noex ;
 extern int	lockrw_unlock	(lockrw *) noex ;
 extern int	lockrw_readers	(lockrw *) noex ;
 extern int	lockrw_destroy	(lockrw *) noex ;
-
 EXTERNC_end
 
 
