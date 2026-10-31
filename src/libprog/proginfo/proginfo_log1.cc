@@ -1,4 +1,4 @@
-/* proglog_log1 MODULE (implementation[ ) */
+/* proginfo_log1 MODULE (implementation[ ) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
