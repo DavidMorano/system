@@ -28,7 +28,6 @@
 
 
 EXTERNC_begin
-
 local inline char * strcpybc (char *dp,cchar *sp) noex {
 	return stpcpybc(dp,sp) ;
 } /* end */
@@ -41,7 +40,6 @@ local inline char * strcpyuc (char *dp,cchar *sp) noex {
 local inline char * strcpyfc (char *dp,cchar *sp) noex {
 	return stpcpyfc(dp,sp) ;
 } /* end */
-
 EXTERNC_end
 
 
