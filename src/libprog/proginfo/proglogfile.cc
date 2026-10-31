@@ -45,6 +45,7 @@
 #include	<fmtstr.h>		/* LIBUC */
 #include	<userinfo.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	<proginfo.hh>
 
@@ -60,7 +61,7 @@
 
 extern "C" {
     extern int	proglogfname(PI *,char *,cchar *,cchar *) noex ;
-}
+} /* end extern (C) */
 
 
 /* external variables */
@@ -86,7 +87,7 @@ int progloger_begin(PI *pip,cchar *lfn,userinfo *uip) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("progloger_begin: f_log=%u lfn=%s\n",
+	    DEBUGPRINTF("progloger_begin: f_log=%u lfn=%s\n",
 	        pip->fl.logprog,lfn) ;
 #endif
 
@@ -98,7 +99,7 @@ int progloger_begin(PI *pip,cchar *lfn,userinfo *uip) noex {
 	        int	pl = rs ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            debugprintf("progloger_begin: logfname=%s\n",lbuf) ;
+	            DEBUGPRINTF("progloger_begin: logfname=%s\n",lbuf) ;
 #endif
 	        if ((rs = proginfo_setentry(pip,vpp,lbuf,pl)) >= 0) {
 	            lfn = pip->lfname ;
@@ -131,17 +132,14 @@ int progloger_begin(PI *pip,cchar *lfn,userinfo *uip) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("progloger_begin: ret rs=%d f_opened=%u\n",
+	    DEBUGPRINTF("progloger_begin: ret rs=%d f_opened=%u\n",
 	        rs,f_opened) ;
 #endif
 
 	return (rs >= 0) ? f_opened : rs ;
-}
-/* end subroutine (progloger_begin) */
+} /* end subroutine (progloger_begin) */
 
-
-int progloger_end(PI *pip)
-{
+int progloger_end(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -152,12 +150,9 @@ int progloger_end(PI *pip)
 	}
 
 	return rs ;
-}
-/* end subroutine (progloger_end) */
+} /* end subroutine (progloger_end) */
 
-
-int progloger_print(PI *pip,cchar *sp,int sl)
-{
+int progloger_print(PI *pip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (pip == nullptr) return SR_FAULT ;
 	if (sp == nullptr) return SR_FAULT ;
@@ -165,12 +160,10 @@ int progloger_print(PI *pip,cchar *sp,int sl)
 	    rs = logfile_print(&pip->lh,sp,sl) ;
 	}
 	return rs ;
-}
-/* end subroutine (progloger_print) */
+} /* end subroutine (progloger_print) */
 
 /* vprintf-like thing */
-int progloger_vprintf(PI *pip,cchar *fmt,va_list ap)
-{
+int progloger_vprintf(PI *pip,cchar *fmt,va_list ap) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -194,8 +187,8 @@ int progloger_printf(PI *pip,cchar *fmt,...) noex {
 	int		rs = SR_OK ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	debugprintf("progloger_printf: fmt=>%s<\n",fmt) ;
-	debugprintf("progloger_printf: open=%u\n",pip->open.logprog) ;
+	DEBUGPRINTF("progloger_printf: fmt=>%s<\n",fmt) ;
+	DEBUGPRINTF("progloger_printf: open=%u\n",pip->open.logprog) ;
 	}
 #endif
 	if (pip->open.logprog) {
