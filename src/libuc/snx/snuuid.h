@@ -19,9 +19,7 @@
 
 
 EXTERNC_begin
-
 extern int snuuid(char *,int,uuid_dat *) noex ;
-
 EXTERNC_end
 
 
