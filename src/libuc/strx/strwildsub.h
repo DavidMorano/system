@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern char	*strwildsub(cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
