@@ -138,14 +138,14 @@ struct vecstr_iter {
 		va = oit.va ;
 		i = oit.i ;
 		ii = oit.ii ;
-	    }
+	    } /* end */
 	} ; /* end */
 	vecstr_iter &operator = (const vecstr_iter &oit) noex {
 	    if (this != &oit) {
 		va = oit.va ;
 		i = oit.i ;
 		ii = oit.ii ;
-	    }
+	    } /* end */
 	    return *this ;
 	} ; /* end */
 	bool operator != (const vecstr_iter &) noex ;
@@ -266,7 +266,6 @@ typedef VECSTR		vecstr ;
 typedef	VECSTR_FL	vecstr_fl ;
 
 EXTERNC_begin
-
 extern int vecstr_start		(vecstr *,int,int) noex ;
 extern int vecstr_add		(vecstr *,cchar *,int) noex ;
 extern int vecstr_adduniq	(vecstr *,cchar *,int) noex ;
@@ -314,11 +313,12 @@ extern int vecstr_loadfile	(vecstr *,int,cchar *) noex ;
 extern int vecstr_loadgrusers	(vecstr *,gid_t) noex ;
 extern int vecstr_srvargs	(vecstr *,cchar *) noex ;
 extern int vecstr_svcargs	(vecstr *,int *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int vecstr_loaddirs(vecstr *op,cchar *newsdname) noex {
 	return vecstr_addsubdirs(op,newsdname) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
