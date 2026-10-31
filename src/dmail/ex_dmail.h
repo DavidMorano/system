@@ -24,7 +24,7 @@
 #include	<grmems.h>
 #include	<sysrealname.h>
 
-#include	"logzones.h"
+#include	"logzone.h"
 #include	"msgid.h"
 #include	"whitelist.h"
 
@@ -159,18 +159,18 @@ struct proginfo {
 	cchar		*msgsubject ;
 	cchar		*protospec ;
 	cchar		*zname ;
-	USERINFO	*uip ;
+	userinfo	*uip ;
 	PCSCONF		*pp ;
 	void		*lip ;
 	void		*efp ;
 	void		*namecache ;
 	vecstr		stores ;
 	TIMEB		now ;
-	DATER		tmpdate ;
-	LOGFILE		lh ;
-	LOGFILE		envsum ;
-	LOGZONES	lz ;
-	IDS		id ;
+	dater		tmpdate ;
+	logfile		lh ;
+	logfile		envsum ;
+	logzone		lz ;
+	idx		id ;
 	time_t		daytime ;
 	uid_t		uid, euid, uid_maildir, uid_divert ;
 	gid_t		gid, egid, gid_maildir ;
