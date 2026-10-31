@@ -20,9 +20,7 @@
 
 
 EXTERNC_begin
-
 extern int	dictdiff(int,int) noex ;
-
 EXTERNC_end
 
 
