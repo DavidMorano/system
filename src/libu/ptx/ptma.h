@@ -82,7 +82,6 @@ typedef PTMA		ptma ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	ptma_create		(ptma *) noex ;
 extern int	ptma_destroy		(ptma *) noex ;
 extern int	ptma_getprioceiling	(ptma *,int *) noex ;
@@ -95,7 +94,6 @@ extern int	ptma_getrobustnp	(ptma *,int *) noex ;
 extern int	ptma_setrobustnp	(ptma *,int) noex ;
 extern int	ptma_gettype		(ptma *,int *) noex ;
 extern int	ptma_settype		(ptma *,int) noex ;
-
 EXTERNC_end
 
 
