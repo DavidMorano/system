@@ -26,21 +26,17 @@
 
 
 EXTERNC_begin
-
 extern int snwvprintf	(char *,int,cchar *,va_list) noex ;
 extern int snwprintf	(char *,int,cchar *,...) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 namespace libuc {
     inline int snvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	return snwvprintf(rbuf,rlen,fmt,ap) ;
     } /* end subroutine (snvprintf) */
     extern int snprintf(char *,int,cchar *,...) noex ;
 } /* end namespace (libuc) */
-
 #endif /* __cplusplus */
 
 
