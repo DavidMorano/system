@@ -149,7 +149,7 @@ objb.o:			$(OBJB)
 
 
 strpack_envstore.o:		strpack_envstore.cc	$(DEPS)	$(INCS)
-strpack_prime.o:		strpack_prime.cc	$(DPES)	$(INCS)
+strpack_prime.o:		strpack_prime.cc	$(DEPS)	$(INCS)
 strpack_obj.o:			strpack_obj.cc		$(DEPS)	$(INCS)
 strpack_mag.o:			strpack_mag.ccm			$(INCS)
 
