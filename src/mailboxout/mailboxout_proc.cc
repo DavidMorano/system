@@ -67,7 +67,7 @@
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
-#include	"logzones.h"
+#include	"logzone.h"
 #include	"emainfo.h"
 #include	"config.h"
 #include	"defs.h"
@@ -159,7 +159,6 @@ constexpr char		atypes[] = "LUIR" ;	/* address types */
 int process(proginfo *pip,bfile *ifp,bfile *tfp,vecobj *fip) noex {
 	pcsconf		*pp = pip->pp ;
 	procdata	pd{} ;
-	LOGZONES	lz ;
 	cnullptr	np{} ;
 	int	rs = SR_OK ;
 	int	len = 0 ;
@@ -981,8 +980,8 @@ int		len ;
 
 		if ((rs >= 0) && (info.zname[0] != '\0')) {
 
-		    zoff = (info.f.zoff) ? info.zoff : LOGZONES_NOZONEOFFSET ;
-		    logzones_update(&pip->lz,info.zname,TMZ_ZNAMESIZE,
+		    zoff = (info.f.zoff) ? info.zoff : LOGZONE_NOZONEOFFSET ;
+		    logzone_update(&pip->lz,info.zname,TMZ_ZNAMESIZE,
 			zoff,pip->stamp) ;
 
 		}
