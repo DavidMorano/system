@@ -56,6 +56,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<ptm.h>			/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
@@ -92,17 +93,58 @@
 
 /* local structures */
 
+enum varmgrmems {
+    varmgrmem_lockbeg,
+    varmgrmem_lockend,
+    varmgrmem_overlast
+} ; /* end enum (varmgrmems) */
+
+namespace {
+    struct varmgr ;
+    struct varmgr_co {
+	varmgr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (varmgr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ; /* end */
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ; /* end */
+    } ; /* end struct (varmgr_co) */
+    struct varmgr {
+	friend		varmgr_co ;
+	ptm		mx ;
+	varmgr_co	lockbeg ;
+	varmgr_co	lockend ;
+	bool		finit ;
+	operator int () noex ;
+	varmgr() noex {
+	    lockbeg	(this,varmgrmem_lockbeg) ;
+	    lockend	(this,varmgrmem_lockend) ;
+	    finit	= false ;
+	} /* end ctor */
+	destruct varmgr() ;
+    private:
+	int plockbeg	() noex ;
+	int plockend	() noex ;
+    } ; /* end struct (varmgr) */
+} /* end namespace */
+
 
 /* forward references */
 
 local int	getserial_open	(cchar *) noex ;
+local int	getserial_proc	(int) noex ;
 local int	getserial_read	(int,char *,int) noex ;
 local int	getserial_write	(int,char *,int,int) noex ;
 
 
 /* local variables */
 
-cmode		fm = GS_FILEMODE ;
+static varmgr		var ;
+cmode			fm = GS_FILEMODE ;
 
 
 /* exported variables */
@@ -117,21 +159,23 @@ int getserial(cchar *sfname) noex {
 	if ((sfname == nullptr) || (sfname[0] == '\0')) {
 	    sfname = DEFSERIAL ;
 	} /* end */
-	if ((rs = getserial_open(sfname)) >= 0) ylikely {
-	    cint	to = TO_LOCK ;
-	    cint	cmd = F_LOCK ;
-	    cint	fd = rs ;
-	    if ((rs = lockfile(fd,cmd,0z,0z,to)) >= 0) ylikely {
-		cint	dlen = DIGBUFLEN ;
-		char	dbuf[DIGBUFLEN+1] ;
-	        if ((rs = getserial_read(fd,dbuf,dlen)) >= 0) ylikely {
-	            serial = rs ; /* result for return */
-	            rs = getserial_write(fd,dbuf,dlen,serial) ;
-	        } /* end */
-	    } /* end if (lockfile) */
-	    rs1 = uc_close(fd) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (opened successfully) */
+	if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
+	    if ((rs = getserial_open(sfname)) >= 0) ylikely {
+	        cint	fd = rs ;
+		if ((rs = var.lockbeg) >= 0) {
+	            cint	cmd = F_LOCK ;
+	            cint	to = TO_LOCK ;
+	            if ((rs = lockfile(fd,cmd,0z,0z,to)) >= 0) ylikely {
+			rs = getserial_proc(fd) ;
+			serial = rs ;
+		    } /* end if (lockfile) */
+		    rs1 = var.lockend ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (var-lock) */
+	        rs1 = uc_close(fd) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (opened successfully) */
+	} /* end if (varmgr) */
 	return (rs >= 0) ? serial : rs ;
 } /* end subroutine (getserial) */
 
@@ -173,8 +217,7 @@ local int getserial_openc(cchar *sfname) noex {
                     if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
                         if (char *pbuf ; (rs = lm_mp(&pbuf)) >= 0) {
                             if ((rs = mkpath1w(pbuf,cp,cl)) >= 0) {
-                                ustat sb ;
-                                if ((rs = uc_stat(pbuf,&sb)) >= 0) {
+                                if (ustat sb ; (rs = uc_stat(pbuf,&sb)) >= 0) {
                                     const uid_t     u = sb.st_uid ;
                                     const gid_t     g = sb.st_gid ;
                                     rs = uc_fchown(fd,u,g) ;
@@ -190,10 +233,22 @@ local int getserial_openc(cchar *sfname) noex {
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (getserial_copenc) */
 
+local int getserial_proc(int fd) noex {
+	cint		dlen = DIGBUFLEN ;
+    	int		rs ;
+	int		serial = 0 ; /* return-value */
+	char		dbuf[DIGBUFLEN+1] ;
+	if ((rs = getserial_read(fd,dbuf,dlen)) >= 0) ylikely {
+	    serial = rs ; /* result for return */
+	    rs = getserial_write(fd,dbuf,dlen,serial) ;
+	} /* end */
+	return (rs >= 0) ? serial : rs ;
+} /* end subroutine (getserial_proc) */
+
 local int getserial_read(int fd,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		serial = 0 ; /* return-value */
-	if ((rs = u_read(fd,dbuf,dlen)) > 0) ylikely {
+	if ((rs = uc_read(fd,dbuf,dlen)) > 0) ylikely {
 	    cint	dl = rs ;
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfnext(dbuf,dl,&cp)) > 0) ylikely {
@@ -220,5 +275,45 @@ local int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
 	} /* end if (ctdec) */
 	return rs ;
 } /* end subroutine (getserial_write) */
+
+varmgr_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case varmgrmem_lockbeg:
+	        rs = op->plockbeg() ;
+	        break ;
+	    case varmgrmem_lockend:
+	        rs = op->plockend() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (varmgr_co::operator) */
+
+int varmgr::plockbeg() noex {
+    	return mx.lockbeg ;
+} /* end method (varmgr::plockbeg) */
+
+int varmgr::plockend() noex {
+    	return mx.lockend ;
+} /* end method (varmgr::plockend) */
+
+varmgr::operator int () noex {
+    	int		rs = SR_OK ;
+	if (! finit) {
+	    if ((rs = mx.create) >= 0) {
+	        finit = true ;
+	    }
+	} /* end if */
+	return rs ;
+} /* end subroutine (varmgr::operator) */
+
+varmgr::destruct varmgr() {
+	if (finit) {
+	    mx.destroy() ;
+	    finit = false ;
+	} 
+} /* end dtor (varmgr::destruct) */
 
 
