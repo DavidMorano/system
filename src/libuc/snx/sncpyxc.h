@@ -26,17 +26,17 @@
 
 
 EXTERNC_begin
-
 extern int sncpybcx	(char *,int,int,...) noex ;
 extern int sncpylcx	(char *,int,int,...) noex ;
 extern int sncpyucx	(char *,int,int,...) noex ;
 extern int sncpyfcx	(char *,int,int,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int sncpybc	(char *,int,cchar *) noex ;
 extern int sncpylc	(char *,int,cchar *) noex ;
 extern int sncpyuc	(char *,int,cchar *) noex ;
 extern int sncpyfc	(char *,int,cchar *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
