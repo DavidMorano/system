@@ -197,9 +197,8 @@ local bool	fieldmatch(cchar *,cchar *,int,int) noex ;
 
 /* local variables */
 
-static sysval		pagesize(sysval_ps) ;
-
-constexpr bool		f_creat = CF_CREAT ;
+static sysval		pagesz		(sysval_ps) ;
+constexpr bool		f_creat		= CF_CREAT ;
 
 
 /* exported variables */
@@ -208,7 +207,7 @@ constexpr bool		f_creat = CF_CREAT ;
 /* exported subroutines */
 
 int logzone_open(LZ *op,cchar *fname,int of,mode_t om) noex {
-    	LOGZONE	*hop = op ;
+    	LOGZONE		*hop = op ;
 	int		rs = SR_FAULT ;
 	if (op && fname) ylikely {
 	    rs = SR_INVALID ;
@@ -218,10 +217,10 @@ int logzone_open(LZ *op,cchar *fname,int of,mode_t om) noex {
 	        if_constexpr (f_creat) {
 	            of |= O_CREAT ;
 	        } /* end if_constexpr (f_creat) */
-		if ((rs = pagesize) >= 0) {
+		if ((rs = pagesz) >= 0) {
 		    op->pagesz = rs ;
 		    rs = logzone_opener(op,fname,of,om) ;
-		} /* end if (pagesize) */
+		} /* end if (pagesz) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -270,7 +269,7 @@ int logzone_curend(LZ *op,LZ_CUR *curp) noex {
 	if ((rs = logzone_magic(op,curp)) >= 0) {
 	    if (op->fl.cursoracc) {
 	        custime		dt = getustime ;
-	        op->accesstime = dt ;
+	        op->tiaccess = dt ;
 	    }
 	    op->fl.cursor = false ;
 	    if (op->fl.lockedread || op->fl.lockedwrite) {
@@ -365,7 +364,7 @@ int logzone_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 		        }
 			/* update access time as appropriate */
 	                if (! op->fl.cursor) {
-	                    op->accesstime = dt ;
+	                    op->tiaccess = dt ;
 	                } else {
 	                    op->fl.cursoracc = true ;
 	                }
@@ -395,8 +394,8 @@ int logzone_check(LZ *op,time_t dt) noex {
 	    if (op->fd >= 0) {
 	        bool	f = false ;
 	        if (dt == 0) dt = getustime ;
-	        f = f || ((dt - op->accesstime) > TO_ACCESS) ;
-	        f = f || ((dt - op->opentime) > TO_OPEN) ;
+	        f = f || ((dt - op->tiaccess) > TO_ACCESS) ;
+	        f = f || ((dt - op->tiopen) > TO_OPEN) ;
 	        if (f) {
 	            rs = logzone_fileclose(op) ;
 	        }
@@ -422,8 +421,8 @@ local int logzone_opener(LZ *op,cc *fname,int of,mode_t om) noex {
 		    if ((am == O_WRONLY) || (am == O_RDWR)) {
 	                op->fl.writable = true ;
 		    }
-	            op->opentime = dt ;
-	            op->accesstime = dt ;
+	            op->tiopen = dt ;
+	            op->tiaccess = dt ;
 	            if (ustat sb ; (rs = u_fstat(op->fd,&sb)) >= 0) {
 			rs = SR_TOOBIG ;
 			if (sb.st_size <= INT_MAX) {
@@ -576,15 +575,15 @@ local int logzone_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
 	            } /* end if (entry update) */
 	            if ((rs >= 0) && op->fl.remote) {
 	                rs = uc_fsync(op->fd) ;
-	            }
+	            } /* end */
 		    /* optionally release our lock */
 	            if ((rs >= 0) && (! op->fl.cursor)) {
 	                logzone_lockrel(op) ;
-	            }
+	            } /* end */
 		    /* update access time as appropriate */
 		    if (rs >= 0) {
 	                if (! op->fl.cursor) {
-	                    op->accesstime = dt ;
+	                    op->tiaccess = dt ;
 	                } else {
 	                    op->fl.cursoracc = true ;
 	                }
@@ -645,7 +644,7 @@ local int logzone_fileopen(LZ *op,time_t dt) noex {
 	    if ((rs = u_open(op->fname,of,om)) >= 0) {
 	        op->fd = rs ;
 	        rs = uc_closeonexec(op->fd,true) ;
-	        op->opentime = dt ;
+	        op->tiopen = dt ;
 	        if (rs < 0) {
 	            u_close(op->fd) ;
 	            op->fd = -1 ;
@@ -830,6 +829,52 @@ local int entry_finish(LZ_ENT *ep) noex {
 	} /* end */
 	return rs ;
 } /* end subroutine (entry_finish) */
+
+int logzone::open(cchar *fn,int of,mode_t om) noex {
+	return logzone_open(this,fn,of,om) ;
+} /* end method (logzone::open) */
+
+int logzone::curbegin(LZ_CUR *curp) noex {
+	return logzone_curbegin(this,curp) ;
+} /* end method (logzone::curbegin) */
+
+int logzone::curend(LZ_CUR *curp) noex {
+	return logzone_curend(this,curp) ;
+} /* end method (logzone::curend) */
+
+int logzone::curenum(LZ_CUR *curp,LZ_ENT *ep) noex {
+	return logzone_curenum(this,curp,ep) ;
+} /* end method (logzone::curenum) */
+
+int logzone::match(cchar *znb,int znl,int off,LZ_ENT *ep) noex {
+	return logzone_match(this,znb,znl,off,ep) ;
+} /* end method (logzone::match) */
+
+int logzone::update(cchar *znb,int znl,int off,cchar *st) noex {
+	return logzone_update(this,znb,znl,off,st) ;
+} /* end method (logzone::update) */
+
+int logzone::check(time_t dt) noex {
+	return logzone_check(this,dt) ;
+} /* end method (logzone::check) */
+
+void logzone::dtor() noex {
+	if (cint rs = close ; rs < 0) {
+	    ulogerror("logzone",rs,"fini-close") ;
+	} /* end */
+} /* end method (logzone::dtor) */
+
+logzone_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case logzonemem_close:
+	        rs = logzone_close(op) ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (logzone_co::operator) */
 
 local bool hasoffset(int off) noex {
 	return (abs(off) <= (12 * 60)) ;
