@@ -45,20 +45,14 @@
 #include	<hasx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<vardefs.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"sunas_conf.h"
 #include	"defs.h"
 
 
 /* local defines */
-
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
 
 #define	PI		proginfo
 #define	VS		vecpstr
@@ -69,13 +63,6 @@
 extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
 extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
 
-#if	CF_DEBUGS
-extern int	debugopen(cchar *) noex ;
-extern int	debugprintf(cchar *,...) noex ;
-extern int	debugclose() noex ;
-extern int	strlinelen(cchar *,int,int) noex ;
-#endif
-
 
 /* external variables */
 
@@ -85,19 +72,19 @@ extern int	strlinelen(cchar *,int,int) noex ;
 
 /* forward references */
 
-static int	proc_devino(PI *) noex ;
-static int	proc_idsbegin(PI *) noex ;
-static int	proc_idsend(PI *) noex ;
-static int	proc_find(PI *,envhelp *,cchar *,cchar **) noex ;
-static int	proc_progok(PI *,cchar *) noex ;
-static int	proc_exec(PI *,cchar *,cchar **,cchar **) noex ;
-static int	proc_args(PI *,VS *,cchar **) noex ;
-static int	proc_savecopy(PI *,cchar *) noex ;
+local int	proc_devino(PI *) noex ;
+local int	proc_idsbegin(PI *) noex ;
+local int	proc_idsend(PI *) noex ;
+local int	proc_find(PI *,envhelp *,cchar *,cchar **) noex ;
+local int	proc_progok(PI *,cchar *) noex ;
+local int	proc_exec(PI *,cchar *,cchar **,cchar **) noex ;
+local int	proc_args(PI *,VS *,cchar **) noex ;
+local int	proc_savecopy(PI *,cchar *) noex ;
 
-static int	mkcfname(char *,cchar *,cchar *) noex ;
+local int	mkcfname(char *,cchar *,cchar *) noex ;
 
 #if	CF_DEBUGS && CF_DEBUGARGS
-static int	debugargs(cchar **) noex ;
+local int	debugargs(cchar **) noex ;
 #endif
 
 
@@ -305,7 +292,7 @@ badprogstart:
 
 /* local subroutines */
 
-static int proc_devino(PI *pip) noex {
+local int proc_devino(PI *pip) noex {
 	cint		tlen = MAXPATHLEN ;
 	int		rs ;
 	char		tbuf[MAXPATHLEN+1] ;
@@ -332,17 +319,17 @@ static int proc_devino(PI *pip) noex {
 }
 /* end subroutine (proc_devino) */
 
-static int proc_idsbegin(PI *pip) noex {
+local int proc_idsbegin(PI *pip) noex {
 	return ids_load(&pip->id) ;
 }
 /* end subroutine (proc_idsbegin) */
 
-static int proc_idsend(PI *pip) noex {
+local int proc_idsend(PI *pip) noex {
 	return ids_release(&pip->id) ;
 }
 /* end subroutine (proc_idsend) */
 
-static int proc_find(PI *pip,envhelp *elp,cchar *bn,mainv argv) noex {
+local int proc_find(PI *pip,envhelp *elp,cchar *bn,mainv argv) noex {
 	cint		clen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -370,7 +357,7 @@ static int proc_find(PI *pip,envhelp *elp,cchar *bn,mainv argv) noex {
 }
 /* end subroutine (proc_find) */
 
-static int proc_progok(PI *pip,cchar *progfname) noex {
+local int proc_progok(PI *pip,cchar *progfname) noex {
 	int		rs ;
 	int		f = false ;
 #if	CF_DEBUGS
@@ -412,7 +399,7 @@ static int proc_progok(PI *pip,cchar *progfname) noex {
 }
 /* end subroutine (proc_progok) */
 
-static int proc_exec(PI *pip,cc *rbuf,cc **argv,cc **penvv) noex {
+local int proc_exec(PI *pip,cc *rbuf,cc **argv,cc **penvv) noex {
 	VS		a ;
 	int		rs ;
 	int		rs1 ;
@@ -448,7 +435,7 @@ static int proc_exec(PI *pip,cc *rbuf,cc **argv,cc **penvv) noex {
 }
 /* end subroutine (proc_exec) */
 
-static int proc_args(PI *pip,VS *alp,cchar **argv) noex {
+local int proc_args(PI *pip,VS *alp,cchar **argv) noex {
 	int		rs ;
 	if ((rs = vecpstr_add(alp,argv[0],-1)) >= 0) {
 	    bool	f_del = false ;
@@ -476,7 +463,7 @@ static int proc_args(PI *pip,VS *alp,cchar **argv) noex {
 }
 /* end subroutine (proc_args) */
 
-static int proc_savecopy(PI *pip,cchar *a) noex {
+local int proc_savecopy(PI *pip,cchar *a) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
@@ -508,7 +495,7 @@ static int proc_savecopy(PI *pip,cchar *a) noex {
 }
 /* end subroutine (proc_savecopy) */
 
-static int mkcfname(char *cbuf,cchar *dn,cchar *a) noex {
+local int mkcfname(char *cbuf,cchar *dn,cchar *a) noex {
 	int		rs = SR_OK ;
 	cchar		*bp ;
 	if (int bl ; (bl = sfbasename(a,-1,&bp)) > 0) {
@@ -521,7 +508,7 @@ static int mkcfname(char *cbuf,cchar *dn,cchar *a) noex {
 /* end subroutine (mkcfname) */
 
 #if	CF_DEBUGS && CF_DEBUGARGS
-static int debugargs(cchar **va) noex {
+local int debugargs(cchar **va) noex {
 	int	i ;
 	for (i = 0 ; va[i] != nullptr ; i += 1) {
 	   debugprintf("main: a[%02u]=%s\n",i,va[i]) ;
