@@ -26,10 +26,8 @@
 
 
 EXTERNC_begin
-
 extern int	uc_getpid() noex ;
 extern int	uc_setpid(pid_t) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
