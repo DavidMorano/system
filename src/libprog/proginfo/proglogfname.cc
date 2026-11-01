@@ -46,11 +46,16 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	<proginfo.hh>
 
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* run-time debugging */
+#endif
 
 
 /* external subroutines */
@@ -79,46 +84,43 @@ int proglogfname(PI *pip,char *rbuf,cchar *logcname,cchar *lfname) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("proglogfname: ent lfname=%s\n",lfname) ;
+	DEBUGPRINTF("ent lfname=%s\n",lfname) ;
 #endif
 
 	rbuf[0] = '\0' ;
-	if ((lfname == NULL) || (lfname[0] == '+'))
+	if ((lfname == nullptr) || (lfname[0] == '+'))
 	    lfname = pip->searchname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	debugprintf("proglogfname: adj lfname=%s\n",lfname) ;
+	DEBUGPRINTF("adj lfname=%s\n",lfname) ;
 #endif
 
-	if ((lfname != NULL) && (lfname[0] != '\0') && (lfname[0] != '-')) {
-
+	if ((lfname != nullptr) && (lfname[0] != '\0') && (lfname[0] != '-')) {
 	    if (lfname[0] != '/') {
-
-	        if (strchr(lfname,'/') != NULL) {
+	        if (strchr(lfname,'/') != nullptr) {
 	            rs = mkpath2(rbuf,pip->pr,lfname) ;
 	        } else {
 		    cchar	*logdname ;
 		    char	tmpdname[MAXPATHLEN+1] ;
-	            if (logcname == NULL) logcname = LOGCNAME ;
+	            if (logcname == nullptr) logcname = LOGCNAME ;
 		    logdname = logcname ;
 		    if (logdname[0] != '/') {
 			rs = mkpath2(tmpdname,pip->pr,logcname) ;
 		        logdname = tmpdname ;
 		    }
-		    if (rs >= 0)
+		    if (rs >= 0) {
 	                rs = mkpath2(rbuf,logdname,lfname) ;
+		    }
 	        }
 	        pl = rs ;
-
 	    } /* end if */
-
 	} /* end if */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	debugprintf("proglogfname: ret rbuf=%s\n",rbuf) ;
-	debugprintf("proglogfname: ret rs=%d pl=%u\n",rs,pl) ;
+	DEBUGPRINTF("ret rbuf=%s\n",rbuf) ;
+	DEBUGPRINTF("ret rs=%d pl=%u\n",rs,pl) ;
 	}
 #endif
 
