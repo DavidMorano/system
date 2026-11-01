@@ -1068,12 +1068,6 @@ int vecstr::del(int ai) noex {
 	return vecstr_del(this,ai) ;
 } /* end method */
 
-void vecstr::dtor() noex {
-	if (cint rs = finish ; rs < 0) {
-	    ulogerror("vecstr",rs,"fini-finish") ;
-	} /* end */
-} /* end method (vecstr::dtor) */
-
 vecstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
 	if (vext >= 0) {
@@ -1081,6 +1075,12 @@ vecstr::operator int () noex {
 	} /* end */
 	return rs ;
 } /* end method (vecstr::operator) */
+
+void vecstr::dtor() noex {
+	if (cint rs = finish ; rs < 0) {
+	    ulogerror("vecstr",rs,"fini-finish") ;
+	} /* end */
+} /* end method (vecstr::dtor) */
 
 int vecstr_st::operator () (int vn,int vo) noex {
 	int		rs = SR_BUGCHECK ;
