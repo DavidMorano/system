@@ -57,8 +57,8 @@ struct logzone_flags {
 struct logzone_head {
 	cchar		*fname ;
 	char		*bufp ;
-	time_t		opentime ;		/* file open time */
-	time_t		accesstime ;		/* file access time */
+	time_t		tiopen ;		/* file open time */
+	time_t		tiaccess ;		/* file access time */
 	time_t		timod ;			/* file modification time */
 	off_t		fsize ;
 	LOGZONE_FL	fl ;
@@ -75,7 +75,7 @@ struct logzone_cursor {
 } ; /* end struct */
 
 enum logzonemems {
-	logzonemem_finish,
+	logzonemem_close,
 	logzonemem_overlast
 } ; /* end enum (logzonemems) */
 
@@ -93,15 +93,33 @@ struct logzone_co {
 	    return operator int () ;
 	} ; /* end */
 } ; /* end struct (logzone_co) */
-
-
+struct logzone : logzone_head {
+	logzone_co	close ;
+	logzone() noex {
+	    close	(this,logzonemem_close) ;
+	    bufp	= nullptr ;
+	} ; /* end ctor */
+	logzone(const logzone &) = delete ;
+	logzone &operator = (const logzone &) = delete ;
+	int open	(cchar *,int,mode_t) noex ;
+	int curbegin	(LOGZONE_CUR *) noex ;
+	int curend	(LOGZONE_CUR *) noex ;
+	int curenum	(LOGZONE_CUR *,LOGZONE_ENT *) noex ;
+	int match	(cchar *,int,int,LOGZONE_ENT *) noex ;
+	int update	(cchar *,int,int,cchar *) noex ;
+	int check	(time_t) noex ;
+	void dtor	() noex ;
+	destruct logzone() {
+	    if (bufp) dtor() ;
+	} ; /* end */
+} ; /* end struct (logzone) */
+#else	/* __cplusplus */
 typedef LOGZONE		logzone ;
+#endif /* __cplusplus */
 
-
-
+typedef	LOGZONE_FL	logzone_fl ;
 typedef	LOGZONE_ENT	logzone_ent ;
 typedef	LOGZONE_CUR	logzone_cur ;
-typedef	LOGZONE_FL	logzone_fl ;
 
 EXTERNC_begin
 extern int logzone_open(logzone *,cchar *,int,mode_t) noex ;
