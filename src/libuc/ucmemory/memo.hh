@@ -93,6 +93,10 @@ class memo {
 	    rp		= nullptr ;
 	    rl		= -1 ;
 	} ; /* end ctor */
+	memo(memo &) = delete ;
+	memo(memo &&) noex ;
+	void operator = (memo &) = delete ;
+	void operator = (memo &&) noex ;
 	operator int	() const noex ;
 	operator bool	() const noex {
 	    return bool(rp) ;
