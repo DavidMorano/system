@@ -73,11 +73,11 @@ MOD_RAND= proginfo_rand.o
 PR_LOG= proginfo_log0.o
 
 PI_LOG0= proginfo_log1.o proginfo_log2.o
-PI_LOG1=
+PI_LOG1= proginfo_log3.o
 PI_LOG2=
 PI_LOG3=
 
-PI_LOG= pi_log0.o
+PI_LOG= pi_log0.o pi_log1.o
 
 MOD_LOG= proginfo_log.o
 
@@ -245,20 +245,20 @@ proginfo_log0.o:	proginfo_log.ccm $(PR_BASE)			$(INCS)
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 proginfo_log1.o:	proginfo_log1.cc $(PR_BASE) $(PR_LOG)		$(INCS)
-
 proginfo_log2.o:	proginfo_log2.cc $(PR_BASE) $(PR_LOG)		$(INCS)
-
 proginfo_log3.o:	proginfo_log3.cc $(PR_BASE) $(PR_LOG)		$(INCS)
-
 proginfo_log4.o:	proginfo_log4.cc $(PR_BASE) $(PR_LOG)		$(INCS)
-
 proginfo_log5.o:	proginfo_log5.cc $(PR_BASE) $(PR_LOG)		$(INCS)
-
 
 progmsgid.o:		progmsgid.cc	progmsgid.h			$(INCS)
 proguserlist.o:		proguserlist.cc	proguserlist.h			$(INCS)
 progexpand.o:		progexpand.cc	progexpand.h			$(INCS)
 
 logzone.o:		logzone.cc	logzone.h
+
+# LOGFILE
+logfile.o:		logfile.dir
+logfile.dir:
+	makesubdir $@
 
 
