@@ -74,7 +74,7 @@
 
 /* external subroutines */
 
-extern int	findfilepath(const char *,char *,const char *,int) ;
+extern int	findfilepath(cchar *,char *,cchar *,int) ;
 
 
 /* external variables */
@@ -89,8 +89,8 @@ ustat	*sbp ;
 char		interpreter[], interpretarg[] ;
 char		progfname[] ;
 int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
+cchar	*argv[] ;
+cchar	*envv[] ;
 {
 	int	rs ;
 	int	i, j ;
