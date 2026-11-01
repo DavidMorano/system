@@ -3,15 +3,11 @@
 .SH NAME
 hostrfs \- print out the Transport Layer Interface address for a TCP host
 .SH SYNOPSIS
-.\"_
-.so tmac.att
-.\"_
-.BR hostrfs
+.B hostsrfs
 .I host
-.RI [ " port" ]
+.OP "" "  port" ] [
 .\"_
 .SH DESCRIPTION
-.\"_
 .PP
 .SS Introduction
 .PP
@@ -73,12 +69,11 @@ This is often at
 .MW "${NCMP}/bin"
 on some systems.
 .\"_
-.SH ACKNOWLEDGMENTS
-This program is snarfed from the R&D UNIX folks out
-in Illinois.
-.\"_
 .SH AUTHOR
 R&D UNIX folks
 .\"_
+.SH ACKNOWLEDGMENTS
+This program is snarfed from the R&D UNIX folks out
+in Illinois.
 .\"_
 .\"_
