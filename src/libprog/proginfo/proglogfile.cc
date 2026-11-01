@@ -56,6 +56,10 @@
 #define	LOGCNAME	"log"
 #endif
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* switchable print-outs */
+#endif
+
 
 /* external subroutines */
 
@@ -87,7 +91,7 @@ int progloger_begin(PI *pip,cchar *lfn,userinfo *uip) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    DEBUGPRINTF("progloger_begin: f_log=%u lfn=%s\n",
+	    DEBUGPRINTF("f_log=%u lfn=%s\n",
 	        pip->fl.logprog,lfn) ;
 #endif
 
@@ -99,7 +103,7 @@ int progloger_begin(PI *pip,cchar *lfn,userinfo *uip) noex {
 	        int	pl = rs ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
-	            DEBUGPRINTF("progloger_begin: logfname=%s\n",lbuf) ;
+	            DEBUGPRINTF("logfname=%s\n",lbuf) ;
 #endif
 	        if ((rs = proginfo_setentry(pip,vpp,lbuf,pl)) >= 0) {
 	            lfn = pip->lfname ;
@@ -112,7 +116,7 @@ int progloger_begin(PI *pip,cchar *lfn,userinfo *uip) noex {
 			    cchar	*sn = pip->searchname ;
 			    cchar	*vn = pip->version ;
 	                    f_opened = true ;
-	                    pip->open.logprog = true ;
+	                    pip->pfopen.logprog = true ;
 
 	                    if (pip->debuglevel > 0)
 	                        bprintf(pip->efp,"%s: lf=%s\n",pn,lfn) ;
@@ -132,7 +136,7 @@ int progloger_begin(PI *pip,cchar *lfn,userinfo *uip) noex {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    DEBUGPRINTF("progloger_begin: ret rs=%d f_opened=%u\n",
+	    DEBUGPRINTF("ret rs=%d f_opened=%u\n",
 	        rs,f_opened) ;
 #endif
 
@@ -143,8 +147,8 @@ int progloger_end(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip->open.logprog) {
-	    pip->open.logprog = false ;
+	if (pip->pfopen.logprog) {
+	    pip->pfopen.logprog = false ;
 	    rs1 = logfile_close(&pip->lh) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -156,7 +160,7 @@ int progloger_print(PI *pip,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	if (pip == nullptr) return SR_FAULT ;
 	if (sp == nullptr) return SR_FAULT ;
-	if (pip->open.logprog) {
+	if (pip->pfopen.logprog) {
 	    rs = logfile_print(&pip->lh,sp,sl) ;
 	}
 	return rs ;
@@ -170,7 +174,7 @@ int progloger_vprintf(PI *pip,cchar *fmt,va_list ap) noex {
 	if (pip == nullptr) return SR_FAULT ;
 	if (fmt == nullptr) return SR_FAULT ;
 
-	if (pip->open.logprog) {
+	if (pip->pfopen.logprog) {
 	    cint	flen = LINEBUFLEN ;
 	    char	fbuf[LINEBUFLEN+1] ;
 	    if ((rs = fmtstr(fbuf,flen,0x01,fmt,ap)) >= 0) {
@@ -187,11 +191,11 @@ int progloger_printf(PI *pip,cchar *fmt,...) noex {
 	int		rs = SR_OK ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	DEBUGPRINTF("progloger_printf: fmt=>%s<\n",fmt) ;
-	DEBUGPRINTF("progloger_printf: open=%u\n",pip->open.logprog) ;
+	DEBUGPRINTF("fmt=>%s<\n",fmt) ;
+	DEBUGPRINTF("open=%u\n",pip->pfopen.logprog) ;
 	}
 #endif
-	if (pip->open.logprog) {
+	if (pip->pfopen.logprog) {
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    rs = progloger_vprintf(pip,fmt,ap) ;
@@ -204,7 +208,7 @@ int progloger_flush(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
 	    rs = SR_OK ;
-	   if (pip->open.logprog) {
+	   if (pip->pfopen.logprog) {
 	       rs = logfile_flush(&pip->lh) ;
 	   }
 	} /* end if (non-null) */
