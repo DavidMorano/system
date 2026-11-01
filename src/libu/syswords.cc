@@ -82,5 +82,6 @@ cchar syswords::w_defprovider[]	= "Rightcore Network Services" ;
 cchar syswords::w_localhost[]	= "localhost" ;
 cchar syswords::w_mailhost[]	= "mailhost" ;
 cchar syswords::w_loghost[]	= "loghost" ;
+cchar syswords::w_serial[]	= "serial" ;
 
 
