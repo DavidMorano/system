@@ -37,6 +37,8 @@ module ;
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<nulstr.h>		/* LIBU */
+#include	<new>			/* C++STD placement-new */
+#include	<memory>		/* C++STD |destroy_at(3c++)| */
 #include	<ucmem.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<fmtstr.h>		/* LIBUC */
@@ -49,16 +51,24 @@ module ;
 
 #include	"proginfo.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 module proginfo.log ;
 
+import libutil ;			/* |lenstr(3u)| */
 import proginfo.base ;
 
 /* local defines */
 
+#ifndef	UI
+#define	UI	userinfo
+#endif
+
 
 /* imported namespaces */
 
-using libuc::mem ;		/* variable */
+using std::destroy_at ;			/* subroutine */
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -75,7 +85,10 @@ using libuc::mem ;		/* variable */
 
 /* forward references */
 
-local int	proglog_file(proginfo *) noex ;
+local int proglog_lfname	(PI *) noex ;
+local int proglog_lfopen	(PI *,UI *) noex ;
+local int proglog_lfobjbeg	(PI *) noex ;
+local int proglog_lfobjend	(PI *) noex ;
 
 
 /* local variables */
@@ -88,145 +101,149 @@ statcexpr bool		f_comment = false ;
 
 /* exported subroutines */
 
-    int proglog_begin(proginfo *pip,userinfo *uip) noex {
+int proglog_begin(PI *pip,userinfo *uip) noex {
 	int		rs = SR_FAULT ;
-	int		f_opened = false ; /* return-value */
+	int		fopened = false ; /* return-value */
 	if (pip && uip) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pf.logprog) {
-	        if ((rs = proglog_file(pip)) >= 0) {
-	            if (pip->lfname != nullptr) {
-		        logfile	*lfp = pip->lfp ;
-	                cchar	*lf = pip->lfname ;
-	                cchar	*li = pip->logid ;
-	                if ((rs = lfp->open(lf,0,0666,li)) >= 0) {
-	                    f_opened = true ;
-	                    pip->pfopen.logprog = true ;
-			    if_constexpr (f_comment) {
-	                        if (pip->debuglevel > 0) {
-	                            pip->eprintf("lf=%s\n",lf) ;
-			        }
-			    } /* end if_constexpr (f_comment) */
-			    if ((rs = proglog_intro(pip,uip)) >= 0) {
-	                        rs = proglog_cksize(pip) ;
+	        if ((rs = proglog_lfname(pip)) >= 0) ylikely {
+	            if (pip->lfname) ylikely {
+			if ((rs = proglog_lfobjbeg(pip)) >= 0) {
+			    {
+			        rs = proglog_lfopen(pip,uip) ;
+			        fopened = (rs > 0) ;
 			    }
-	                } else if (isNotPresent(rs)) {
-	                    rs = SR_OK ;
-		        } /* end */
+			    if (rs < 0) {
+				proglog_lfobjend(pip) ;
+			    } /* end if (error) */
+			} /* end if (proglog_lfobjbeg) */
 	            } /* end if */
 	        } /* end if (log-file) */
 	    } /* end if (enabled) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? f_opened : rs ;
-    } /* end subroutine (proglog_begin) */
+	return (rs >= 0) ? fopened : rs ;
+} /* end subroutine (proglog_begin) */
 
-    int proglog_end(proginfo *pip) noex {
+int proglog_end(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (pip) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
-	        logfile	*lfp = pip->lfp ;
-	        pip->pfopen.logprog = false ;
-	        rs1 = lfp->close ;
-	        if (rs >= 0) rs = rs1 ;
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+		    {
+	                pip->pfopen.logprog = false ;
+	                rs1 = lfp->close ;
+	                if (rs >= 0) rs = rs1 ;
+		    } /* end */
+		    {
+			rs1 = proglog_lfobjend(pip) ;
+	                if (rs >= 0) rs = rs1 ;
+		    } /* end */
+		} /* end if (non-null) */
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (proglog_end) */
+} /* end subroutine (proglog_end) */
 
-    int proglog_intro(proginfo *pip,userinfo *uip) noex {
+int proglog_intro(PI *pip,userinfo *uip) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	if (pip) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog && pip->pf.logprog) {
-	        logfile	*lfp = pip->lfp ;
-	        if (uip != nullptr) {
-		    custime	dt = pip->daytime ;
-		    cchar	*pn = pip->progname ;
-		    cchar	*ver = pip->version ;
-	            rs = logfile_userinfo(lfp,uip,dt,pn,ver) ;
-		    wlen += rs ;
-	        } /* end if (non-null) */
-	        if (rs >= 0) {
-	            rs = lfp->printf("pr=%s\n",pip->pr) ;
-		    wlen += rs ;
-	        } /* end if (ok) */
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	            if (uip) {
+		        custime	dt = pip->daytime ;
+		        cchar	*pn = pip->progname ;
+		        cchar	*ver = pip->version ;
+	                rs = logfile_userinfo(lfp,uip,dt,pn,ver) ;
+		        wlen += rs ;
+	            } /* end if (non-null) */
+	            if (rs >= 0) {
+	                rs = lfp->printf("pr=%s\n",pip->pr) ;
+		        wlen += rs ;
+	            } /* end if (ok) */
+		} /* end if (non-null) */
 	    } /* end if (enabled and open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (proglog_intro) */
+} /* end subroutine (proglog_intro) */
 
-    int proglog_checksize(proginfo *pip) noex {
+int proglog_checksize(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog && (pip->logsize > 0)) {
-	        logfile	*lfp = pip->lfp ;
-	        rs = lfp->cksize(pip->logsize) ;
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	            rs = lfp->cksize(pip->logsize) ;
+		}
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (proglog_checksize) */
+} /* end subroutine (proglog_checksize) */
 
-    int proglog_check(proginfo *pip) noex {
+int proglog_check(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
-	        logfile	*lfp = pip->lfp ;
-	        rs = lfp->check(pip->daytime) ;
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	            rs = lfp->check(pip->daytime) ;
+		}
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (proglog_check) */
 
-    int proglog_getid(proginfo *pip,char *rbuf,int rlen) noex {
+int proglog_getid(PI *pip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (pip && rbuf) {
 	    rs = sncpy1(rbuf,rlen,pip->logid) ;
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (proglog_getid) */
+} /* end subroutine (proglog_getid) */
 
-    int proglog_setid(proginfo *pip,cchar *sp,int sl) noex {
+int proglog_setid(PI *pip,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (pip && sp) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
-	        logfile	*lfp = pip->lfp ;
-	        cchar	*logid ;
-	        if (nulstr ls ; (rs = ls.start(sp,sl,&logid)) >= 0) {
-		    {
-	                rs = lfp->setid(logid) ;
-		        c = rs ;
-		    }
-		    rs1 = ls.finish ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (nulstr) */
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	           ccharp logid ;
+	           if (nulstr ls ; (rs = ls.start(sp,sl,&logid)) >= 0) {
+		       {
+	                   rs = lfp->setid(logid) ;
+		           c = rs ;
+		       }
+		       rs1 = ls.finish ;
+		       if (rs >= 0) rs = rs1 ;
+	           } /* end if (nulstr) */
+		} /* end if (non-null) */
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
-    } /* end subroutine (proglog_setid) */
+} /* end subroutine (proglog_setid) */
 
-    int proglog_print(proginfo *pip,cchar *sp,int sl) noex {
+int proglog_print(PI *pip,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (pip && sp) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
-	        logfile	*lfp = pip->lfp ;
-	        rs = lfp->print(sp,sl) ;
-		wlen += rs ;
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	            rs = lfp->print(sp,sl) ;
+		    wlen += rs ;
+		}
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (proglog_print) */
+} /* end subroutine (proglog_print) */
 
-    int proglog_vprintf(proginfo *pip,cchar *fmt,va_list ap) noex {
+int proglog_vprintf(PI *pip,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -245,9 +262,9 @@ statcexpr bool		f_comment = false ;
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (proglog_vprintf) */
+} /* end subroutine (proglog_vprintf) */
 
-    int proglog_printf(proginfo *pip,cchar *fmt,...) noex {
+int proglog_printf(PI *pip,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
@@ -261,30 +278,30 @@ statcexpr bool		f_comment = false ;
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (proglog_printf) */
+} /* end subroutine (proglog_printf) */
 
-    int proglog_printfold(proginfo *pip,cchar *pre,cchar *sp,int sl) noex {
+int proglog_printfold(PI *pip,cchar *pre,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (pip && pre && sp) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
-	        logfile	*lfp = pip->lfp ;
-	        rs = lfp->printfold(pre,sp,sl) ;
-		wlen += rs ;
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	            rs = lfp->printfold(pre,sp,sl) ;
+		    wlen += rs ;
+		}
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (proglog_printfold) */
+} /* end subroutine (proglog_printfold) */
 
-    int proglog_ssprint(proginfo *pip,cchar *id,cchar *sp,int sl) noex {
+int proglog_ssprint(PI *pip,cchar *id,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (pip && sp) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
-	        logfile		*lfp = pip->lfp ;
-	        if (id != nullptr) {
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
 	            if ((rs = lfp->setid(id)) >= 0) {
 	                if ((rs = lfp->print(sp,sl)) >= 0) {
 	    	            rs = lfp->setid(pip->logid) ;
@@ -298,9 +315,9 @@ statcexpr bool		f_comment = false ;
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (proglog_ssprint) */
+} /* end subroutine (proglog_ssprint) */
 
-    int proglog_ssvprintf(proginfo *pip,cchar *id,cchar *fmt,va_list ap) noex {
+int proglog_ssvprintf(PI *pip,cchar *id,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -319,9 +336,9 @@ statcexpr bool		f_comment = false ;
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (proglog_ssvprintf) */
+} /* end subroutine (proglog_ssvprintf) */
 
-    int proglog_ssprintf(proginfo *pip,cchar *id,cchar *fmt,...) noex {
+int proglog_ssprintf(PI *pip,cchar *id,cchar *fmt,...) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (pip && id && fmt) {
@@ -335,24 +352,25 @@ statcexpr bool		f_comment = false ;
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-    } /* end subroutine (proglog_ssprintf) */
+} /* end subroutine (proglog_ssprintf) */
 
-    int proglog_flush(proginfo *pip) noex {
+int proglog_flush(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
-	        logfile	*lfp = pip->lfp ;
-	        rs = lfp->flush ;
+	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	            rs = lfp->flush ;
+		}
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end subroutine (proglog_flush) */
+} /* end subroutine (proglog_flush) */
 
 
 /* local subroutines */
 
-local int proglog_file(proginfo *pip) noex {
+local int proglog_lfname(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pip->pf.logprog) {
@@ -369,7 +387,7 @@ local int proglog_file(proginfo *pip) noex {
 	                    rs = mkpath(tbuf,pip->pr,cp) ;
 			    cl = rs ;
 	                } else {
-			    cchar	*logcname = LOGCNAME ;
+			    ccharp logcname = LOGCNAME ;
 	                    rs = mkpath(tbuf,pip->pr,logcname,cp) ;
 			    cl = rs ;
 	                } /* end */
@@ -389,6 +407,62 @@ local int proglog_file(proginfo *pip) noex {
 	    } /* end if */
 	} /* end if (opened) */
 	return rs ;
-} /* end subroutine (proglog_file) */
+} /* end subroutine (proglog_lfname) */
+
+local int proglog_lfopen(PI *pip,UI *uip) noex {
+	int		rs = SR_BUGCHECK ;
+	int		fopened = false ;
+	if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	   ccharp lfn = pip->lfname ;
+	   ccharp lid = pip->logid ;
+           if ((rs = lfp->open(lfn,0,0666,lid)) >= 0) {
+               fopened = true ;
+               pip->pfopen.logprog = true ;
+               if_constexpr (f_comment) {
+                   if (pip->debuglevel > 0) {
+                       pip->eprintf("lf=%s\n",lfn) ;
+                   }
+               } /* end if_constexpr (f_comment) */
+               if ((rs = proglog_intro(pip,uip)) >= 0) {
+                   rs = proglog_cksize(pip) ;
+               }
+           } else if (isNotPresent(rs)) {
+               rs = SR_OK ;
+           } /* end */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fopened : rs ;
+} /* end subroutine (proglog_lfopen) */
+
+local int proglog_lfobjbeg(PI *pip) noex {
+    	cint		sz = szof(logfile) ;
+    	int		rs ;
+	if (voidp p ; (rs = mem.mall(sz,&p)) >= 0) {
+    	    rs = SR_BUGCHECK ;
+	    if (logfile *lfp = new(p) logfile) {
+		rs = SR_OK ;
+		pip->lfp = lfp ;
+	    } /* end if (new-logfile) */
+	    if (rs < 0) {
+		mem.free(p) ;
+	    } /* end if (error) */
+	} /* end if (memory-acquire) */
+	return rs ;
+} /* end subroutine (proglog_lfobjbeg) */
+
+local int proglog_lfobjend(PI *pip) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (logfile *lfp = resumelife<logfile>(pip->lzp)) {
+	    {
+		destroy_at(lfp) ;
+	    } /* end */
+	    {
+		rs1 = mem.free(lfp) ;
+		if (rs >= 0) rs = rs1 ;
+		pip->lfp = nullptr ;
+	    } /* end */
+	} /* end if (non-nul) */
+	return rs ;
+} /* end subroutine (proglog_lfobjbeg) */
 
 
