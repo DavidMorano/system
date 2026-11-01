@@ -172,7 +172,7 @@ namespace {
     } ; /* end struct (adder) */
 } /* end namespace */
 
-namespace {
+namespace libu {
     int snaddpath(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (pbuf && sp) ylikely {
