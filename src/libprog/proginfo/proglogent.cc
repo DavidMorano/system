@@ -24,12 +24,12 @@
 	Check the given named file for a log length limit.
 
 	Synopsis:
-	int proglogent(PI *pip,cchar *name,int logsize) noex
+	int proglogent(PI *pip,cchar *name,int logsz) noex
 
 	Arguments:
 	pip		global data pointer
 	name		log file name
-	logsize		size to check for
+	logsz		size to check for
 
 	Returns:
 	>0		skip this directory entry in directory walk
@@ -78,7 +78,7 @@ local int	checkfile	(PI *,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int proglogent(PI *pip,cchar *name,int logsize) noex {
+int proglogent(PI *pip,cchar *name,int logsz) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl, l2 ;
@@ -135,17 +135,16 @@ int proglogent(PI *pip,cchar *name,int logsize) noex {
 
 	if (f_star) {
 
-	    rs = checkstar(pip,fname,logsize) ;
+	    rs = checkstar(pip,fname,logsz) ;
 
 	} else {
-	    ustat	sb ;
-	    if ((rs1 = u_stat(fname,&sb)) >= 0) {
+	    if (ustat sb ; (rs1 = u_stat(fname,&sb)) >= 0) {
 
 	        if (S_ISDIR(sb.st_mode)) {
-	            rs = checkdir(pip,fname,logsize) ;
+	            rs = checkdir(pip,fname,logsz) ;
 	        } else if (S_ISREG(sb.st_mode)) {
 	            pip->stab.total += 1 ;
-	            rs = checkfile(pip,fname,logsize) ;
+	            rs = checkfile(pip,fname,logsz) ;
 	        } /* end */
 
 	    } else if (pip->debuglevel > 0) {
@@ -163,7 +162,7 @@ ret0:
 
 /* local subroutines */
 
-local int checkstar(PI *pip,cchar *name,int logsize) noex {
+local int checkstar(PI *pip,cchar *name,int logsz) noex {
 	int		rs, rs1 ;
 	int		cl ;
 	cchar	*cp ;
@@ -195,7 +194,7 @@ local int checkstar(PI *pip,cchar *name,int logsize) noex {
 	        pip->stab.total += 1 ;
 	        if (starmat(bname,ds.name)) {
 	            if ((rs = mkpath2(fname,dname,ds.name)) >= 0) {
-	                rs = checkfile(pip,fname,logsize) ;
+	                rs = checkfile(pip,fname,logsz) ;
 		    }
 	        } /* end if */
 
@@ -213,7 +212,7 @@ ret0:
 	return rs ;
 } /* end subroutine (checkstar) */
 
-local int checkdir(PI *pip,cc *dname,int logsize) noex {
+local int checkdir(PI *pip,cc *dname,int logsz) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	char		fname[MAXPATHLEN + 1] ;
@@ -226,7 +225,7 @@ local int checkdir(PI *pip,cc *dname,int logsize) noex {
 
 	        pip->stab.total += 1 ;
 	        if ((rs = mkpath2(fname,dname,ds.name)) >= 0) {
-	            rs = checkfile(pip,fname,logsize) ;
+	            rs = checkfile(pip,fname,logsz) ;
 		}
 
 	        if (rs < 0) break ;
@@ -243,7 +242,7 @@ ret0:
 	return rs ;
 } /* end subroutine (checkdir) */
 
-local int checkfile(PI *pip,cc *fname,int logsize) noex {
+local int checkfile(PI *pip,cc *fname,int logsz) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		perm ;
@@ -261,7 +260,7 @@ local int checkfile(PI *pip,cc *fname,int logsize) noex {
 	    pip->stab.checked += 1 ;
 	    rs = 0 ;
 	    if (! pip->fl.nogo) {
-	        rs = logfile_cksize(&cur,logsize) ;
+	        rs = logfile_cksize(&cur,logsz) ;
 	    }
 
 	    if (rs > 0) {
