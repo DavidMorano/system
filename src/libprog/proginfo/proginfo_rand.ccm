@@ -47,13 +47,8 @@
 module ;
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>		/* POSIX */
-#include	<sys/param.h>		/* POSIX */
-#include	<sys/time.h>		/* POSIX |gethrtime(3c)| */
-#include	<unistd.h>		/* POSIX */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
@@ -238,7 +233,7 @@ local int mkrand_heavy(PI *pip) noex {
 	    } /* end if_constexpr (f_environ) */
 	    if (rs >= 0) {
 	        pip->randvar += rv ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (bufsizeget) */
 	return rs ;
 } /* end subroutine (mkrand_heavy) */
