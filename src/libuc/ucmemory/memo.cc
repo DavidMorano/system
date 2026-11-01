@@ -85,6 +85,25 @@ cbool		f_debug		= CF_DEBUG ;
 
 /* exported subroutines */
 
+memo::memo(memo &&o) noex {
+    	if (this != &o) {
+    	    len		(this) ;
+    	    rp		= o.rp ;
+	    rl		= o.rl ;
+	    o.rp	= nullptr ;
+	    o.rl	= -1 ;
+	} /* end if (not-self-construct) */
+} /* end ctor */
+
+void memo::operator = (memo &&o) noex {
+    	if (this != &o) {
+    	    rp		= o.rp ;
+	    rl		= o.rl ;
+	    o.rp	= nullptr ;
+	    o.rl	= -1 ;
+	} /* end if (not-self-construct) */
+} /* end method (memo::operator) */
+
 int memo::mall	(voidp vpp,int sz) noex {
 	int rs ;
 	if ((rs = mem.mall(sz,vpp)) >= 0) {
