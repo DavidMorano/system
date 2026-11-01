@@ -1,4 +1,6 @@
-/* badback */
+/* syshealer_badback SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* write a bad status back to indicate a connection failure */
 /* version %I% last-modified %G% */
@@ -21,6 +23,7 @@
 
 /*******************************************************************************
 
+  	Description:
 	Handle a request for which we have a matching server entry.
 
 *******************************************************************************/
@@ -31,19 +34,21 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<varsub.h>
 #include	<vecstr.h>
 #include	<srvtab.h>
 #include	<acctab.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"srventry.h"
 #include	"builtin.h"
@@ -54,12 +59,8 @@
 
 /* local defines */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	LOGBUFLEN	(LOGNAMELEN + 20)
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 
 /* external subroutines */
@@ -69,7 +70,6 @@ extern int	processargs(char *,vecstr *) ;
 extern int	execute(struct proginfo *,int,char *,char *,vecstr *,vecstr *) ;
 
 extern char	*strbasename(char *) ;
-extern char	*timestr_log(), *timestr_edate(), *timestr_elapsed() ;
 
 
 /* external variables */
