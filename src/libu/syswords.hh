@@ -82,6 +82,7 @@ struct syswords {
 	static cchar w_localhost[] ;
 	static cchar w_mailhost[] ;
 	static cchar w_loghost[] ;
+	static cchar w_serial[] ;
 } ; /* end struct (syswords) */
 
 
