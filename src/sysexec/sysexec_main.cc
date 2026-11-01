@@ -60,14 +60,6 @@
 
 /* local defines */
 
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
-
 #ifndef	PROGINFO
 #define	PROGINFO	PROGINFO
 #endif
