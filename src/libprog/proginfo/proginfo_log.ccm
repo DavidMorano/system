@@ -29,6 +29,7 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdarg>		/* CSTD |va_{x}(3c)| */
 #include	<clanguage.h>		/* LIBU */
@@ -95,6 +96,16 @@ export {
 
 export {
     int proglog_out		(PI *,cchar *,cchar *) noex ;
+} /* end export */
+
+export {
+    int proglogzone_begin	(PI *) noex ;
+    int proglogzone_end		(PI *) noex ;
+    int proglogzone_update	(PI *,cchar *,int,int,cchar *) noex ;
+} /* end export */
+
+export {
+    int proglog_id		(PI *) noex ;
 } /* end export */
 
 
