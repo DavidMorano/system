@@ -67,10 +67,13 @@ export {
 	uint		errfile:1 ;
 	uint		outfile:1 ;
 	uint		pcsconf:1 ;
+	uint		hfname:1 ;
 	uint		cfname:1 ;
 	uint		lfname:1 ;
+	uint		zfname:1 ;
 	uint		pidfname:1 ;
 	uint		logprog:1 ;
+	uint		logzone:1 ;
 	uint		config:1 ;
 	uint		watch:1 ;
 	uint		background:1 ;
@@ -93,6 +96,7 @@ export {
 	uint		intdis:1 ;
 	uint		reuseaddr:1 ;
 	uint		to:1 ;
+	uint		optlogzone:1 ;
     } ; /* end struct (proginfo_fl) */
     struct proginfo_start {
 	using		mv = mainv ;
@@ -189,8 +193,9 @@ export {
 	cchar		*newsdname ;
 	cchar		*hfname ;
 	cchar		*cfname ;
-	cchar		*lfname ;
-	cchar		*pidfname ;
+	cchar		*lfname ;	/* log-file */
+	cchar		*zfname ;	/* logzone-file */
+	cchar		*pidfname ;	/* pid-file */
 	cchar		*zname ;	/* time-zone abbreviation */
 	cchar		*pwdbuf ;	/* present-wirkubg-directory */
 	void		*efp ;
