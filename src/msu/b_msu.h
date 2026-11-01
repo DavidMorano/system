@@ -1,4 +1,9 @@
-/* config */
+/* msu_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* MSU program */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,8 +15,15 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MSU_INCLUDE
-#define	MSU_INCLUDE	1
+#ifndef	MSUCONFIG_INCLUDE
+#define	MSUCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<stddef.h>		/* POSIX® */
+#include	<stdlib.h>		/* POSIX® */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	VERSION		"0a"
@@ -43,7 +55,10 @@
 #define	VARLFNAME	"MSU_LF"
 #define	VARAFNAME	"MSU_AF"
 #define	VAREFNAME	"MSU_EF"
+#define	VAROFNAME	"MSU_OF"
+#define	VARIFNAME	"MSU_IF"
 
+#define	VARDEBUGLEVEL	"MSU_DEBUGLEVEL"
 #define	VARDEBUGFNAME	"MSU_DEBUGFILE"
 #define	VARDEBUGFD1	"MSU_DEBUGFD"
 #define	VARDEBUGFD2	"DEBUGFD"
@@ -120,6 +135,6 @@
 #define	OPT_LOGPROG	TRUE
 
 
-#endif /* MSU_INCLUDE */
+#endif /* MSUCONFIG_INCLUDE */
 
 
