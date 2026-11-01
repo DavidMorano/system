@@ -72,8 +72,8 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	putpair(PROGINFO *,int,double,double) ;
-static int	getval(PROGINFO	*,cchar *,int,double *) ;
+local int	putpair(PROGINFO *,int,double,double) ;
+local int	getval(PROGINFO	*,cchar *,int,double *) ;
 
 
 /* local variables */
@@ -100,7 +100,7 @@ int progfile(PROGINFO *pip,cchar *fname)
 	if (fname[0] == '-') fname = BFILE_STDIN ;
 
 	if ((rs = bopen(&ifile,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		line = 1 ;
 	    int		fl ;
 	    int		n ;
@@ -194,7 +194,7 @@ int progfile(PROGINFO *pip,cchar *fname)
 /* local subroutines */
 
 
-static int putpair(pip,i,x,y)
+local int putpair(pip,i,x,y)
 PROGINFO	*pip ;
 int		i ;
 double		x, y ;
@@ -239,7 +239,7 @@ double		x, y ;
 /* end subroutine (putpair) */
 
 
-static int getval(PROGINFO *pip,cchar *sp,int sl,double *vp)
+local int getval(PROGINFO *pip,cchar *sp,int sl,double *vp)
 {
 	int		rs ;
 
