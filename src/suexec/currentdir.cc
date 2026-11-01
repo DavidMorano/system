@@ -81,9 +81,9 @@
 
 /* external subroutines */
 
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
