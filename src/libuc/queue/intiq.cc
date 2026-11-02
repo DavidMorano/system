@@ -168,7 +168,7 @@ int intiq_ins(intiq *op,int ch) noex {
 	int		c = 0 ;
 	if ((rs = intiq_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            cint	esz = szof(int) ;
 	            rs = fifoitem_ins(op->fqp,&ch,esz) ;
@@ -187,7 +187,7 @@ int intiq_rem(intiq *op,int *chp) noex {
 	int		c = 0 ;
 	if ((rs = intiq_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 		    cint	esz = szof(int) ;
 	            rs = fifoitem_rem(op->fqp,chp,esz) ;
@@ -206,7 +206,7 @@ int intiq_count(intiq *op) noex {
 	int		c = 0 ;
 	if ((rs = intiq_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            rs = fifoitem_count(op->fqp) ;
 		    c = rs ;
