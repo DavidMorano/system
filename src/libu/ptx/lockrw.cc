@@ -95,7 +95,7 @@ local inline int lockrw_ctor(lockrw *op,Args ... args) noex {
 	 	if (rs < 0) {
 		    delete op->mxp ;
 		    op->mxp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-ptm) */
 	} /* end if (non-null) */
 	return rs ;
@@ -119,13 +119,13 @@ local inline int lockrw_magic(lockrw *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == LOCKRW_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (lockrw_magic) */
 
-local int	lockrw_ptminit(lockrw *,int) noex ;
-local int	lockrw_ptcinit(lockrw *,int) noex ;
-local int	lockrw_notready(lockrw *,int) noex ;
+local int	lockrw_ptminit	(lockrw *,int) noex ;
+local int	lockrw_ptcinit	(lockrw *,int) noex ;
+local int	lockrw_notready	(lockrw *,int) noex ;
 
 
 /* local variables */
@@ -172,16 +172,16 @@ int lockrw_destroy(lockrw *op) noex {
 	    {
 		rs1 = lockrw_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (lockrw_destroy) */
 
-int lockrw_rdlock(lockrw *op,int to) noex {
+int lockrw_lockrd(lockrw *op,int to) noex {
 	int		rs ;
 	int		rs1 ;
-	int		n = 0 ;
+	int		n = 0 ; /* return-value */
 	if ((rs = lockrw_magic(op)) >= 0) ylikely {
 	    TIMESPEC	ts{} ;
 	    ptm *mxp = op->mxp ;
@@ -191,30 +191,33 @@ int lockrw_rdlock(lockrw *op,int to) noex {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    } /* end if (handle possible time-out) */
-	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg(to)) >= 0) ylikely {
 	        op->waitreaders += 1 ;
-	        while ((rs >= 0) && lockrw_notready(op,1)) {
-		    if (to >= 0) {
-	                rs = cvp->waiter(op->mxp,&ts) ;
-		    } else {
-	                rs = cvp->wait(op->mxp) ;
-		    }
-	        } /* end while */
-	        if (rs >= 0) {
-		    n = op->readers ;
-		    op->readers += 1 ;
-	        }
+		{
+	            while ((rs >= 0) && lockrw_notready(op,1)) {
+		        if (to >= 0) {
+	                    rs = cvp->waiter(op->mxp,&ts) ;
+		        } else {
+	                    rs = cvp->wait(op->mxp) ;
+		        } /* end */
+	            } /* end while */
+	            if (rs >= 0) {
+		        n = op->readers ;
+		        op->readers += 1 ;
+	            } /* end */
+		} /* end block */
 	        op->waitreaders -= 1 ;
 	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
-} /* end subroutine (lockrw_rdlock) */
+} /* end subroutine (lockrw_lockrd) */
 
-int lockrw_wrlock(lockrw *op,int to) noex {
+int lockrw_lockwr(lockrw *op,int to) noex {
 	int		rs ;
 	int		rs1 ;
+	int		n = 0 ; /* return-value */
 	if ((rs = lockrw_magic(op)) >= 0) ylikely {
 	    TIMESPEC	ts{} ;
 	    ptm *mxp = op->mxp ;
@@ -224,44 +227,47 @@ int lockrw_wrlock(lockrw *op,int to) noex {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    } /* end if (time-out requested) */
-	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg(to)) >= 0) ylikely {
 	        op->waitwriters += 1 ;
-	        while ((rs >= 0) && lockrw_notready(op,0)) {
-		    if (to >= 0) {
-	                rs = cvp->waiter(op->mxp,&ts) ;
-		    } else {
-	                rs = cvp->wait(op->mxp) ;
-		    }
-	        } /* end while */
-	        if (rs >= 0) {
-		    op->writers += 1 ;
-		} /* end if (ok) */
+		{
+	            while ((rs >= 0) && lockrw_notready(op,0)) {
+		        if (to >= 0) {
+	                    rs = cvp->waiter(op->mxp,&ts) ;
+		        } else {
+	                    rs = cvp->wait(op->mxp) ;
+		        } /* end */
+	            } /* end while */
+	            if (rs >= 0) {
+			n = op->writers ;
+		        op->writers += 1 ;
+		    } /* end if (ok) */
+		} /* end block */
 	        op->waitwriters -= 1 ;
 	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (ptm) */
 	} /* end if (magic) */
-	return rs ;
-} /* end subroutine (lockrw_wrlock) */
+	return (rs >= 0) ? n : rs ;
+} /* end subroutine (lockrw_lockwr) */
 
-int lockrw_unlock(lockrw *op) noex {
+int lockrw_lockun(lockrw *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = lockrw_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    ptc *cvp = op->cvp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (op->readers > 0) op->readers -= 1 ;
 	        if (op->writers > 0) op->writers -= 1 ;
 	        if ((op->waitreaders > 0) || (op->waitwriters > 0)) {
 	            rs = cvp->broadcast ;
-	        }
+	        } /* end */
 	        rs1 = mxp->lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (lockrw_unlock) */
+} /* end subroutine (lockrw_lockun) */
 
 int lockrw_readers(lockrw *op) noex {
 	int		rs ;
@@ -269,7 +275,7 @@ int lockrw_readers(lockrw *op) noex {
 	int		v = 0 ;
 	if ((rs = lockrw_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 		{
 	            v = op->readers ; /* this is really already atomic! */
 		}
@@ -292,11 +298,11 @@ local int lockrw_ptminit(lockrw *op,int f_shared) noex {
 	    if (f_shared) {
 		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptma_setpshared(&a,v) ;
-	    }
+	    } /* end */
 	    if (rs >= 0) ylikely {
 	        rs = mxp->create(&a) ;
 		f_ptm = (rs >= 0) ;
-	    }
+	    } /* end */
 	    rs1 = ptma_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_ptm) {
@@ -315,7 +321,7 @@ local int lockrw_ptcinit(lockrw *op,int f_shared) noex {
 	    if (f_shared) {
 		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptca_setpshared(&a,v) ;
-	    }
+	    } /* end */
 	    if (rs >= 0) ylikely {
 	        rs = cvp->create(&a) ;
 		f_ptc = (rs >= 0) ;
@@ -345,21 +351,21 @@ int lockrw_co::operator () (int to) noex {
 	    switch (w) {
 	    case lockrwmem_create:
 	        {
-		    cint	f = (to > 0) ;
+		    cint f = (to > 0) ;
 	            rs = lockrw_create(op,f) ;
 	        }
 	        break ;
 	    case lockrwmem_destroy:
 	        rs = lockrw_destroy(op) ;
 	        break ;
-	    case lockrwmem_rdlock:
-	        rs = lockrw_rdlock(op,to) ;
+	    case lockrwmem_lockrd:
+	        rs = lockrw_lockrd(op,to) ;
 	        break ;
-	    case lockrwmem_wrlock:
-	        rs = lockrw_wrlock(op,to) ;
+	    case lockrwmem_lockwr:
+	        rs = lockrw_lockwr(op,to) ;
 	        break ;
-	    case lockrwmem_unlock:
-	        rs = lockrw_unlock(op) ;
+	    case lockrwmem_lockun:
+	        rs = lockrw_lockun(op) ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
@@ -369,7 +375,7 @@ int lockrw_co::operator () (int to) noex {
 void lockrw::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("lockrw",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (lockrw::dtor) */
 
 
