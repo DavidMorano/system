@@ -32,14 +32,13 @@
 
 
 #ifdef	__cplusplus
-enum ptmmems {
-	ptmmem_create,
-	ptmmem_destroy,
-	ptmmem_lockbegin,
-	ptmmem_lockbeg,
-	ptmmem_lockend,
-	ptmmem_overlast
-} ; /* end enum (ptmmems) */
+enum ptmsubs {
+	ptmsub_create,
+	ptmsub_destroy,
+	ptmsub_lockbeg,
+	ptmsub_lockend,
+	ptmsub_overlast
+} ; /* end enum (ptmsubs) */
 struct ptm ;
 struct ptm_creater {
 	ptm		*op = nullptr ;
@@ -68,21 +67,19 @@ struct ptm_co {
 struct ptm : pthread_mutex_t {
 	ptm_creater	create ;
 	ptm_co		destroy ;
-	ptm_co		lockbegin ;
 	ptm_co		lockbeg ;
 	ptm_co		lockend ;
 	uint		magval ;
 	constexpr ptm() noex {
-	    create	(this,ptmmem_create) ;
-	    destroy	(this,ptmmem_destroy) ;
-	    lockbegin	(this,ptmmem_lockbegin) ;
-	    lockbeg	(this,ptmmem_lockbeg) ;
-	    lockend	(this,ptmmem_lockend) ;
-	    magval = 0 ;
+	    create	(this,ptmsub_create) ;
+	    destroy	(this,ptmsub_destroy) ;
+	    lockbeg	(this,ptmsub_lockbeg) ;
+	    lockend	(this,ptmsub_lockend) ;
+	    magval	= 0 ;
 	} ; /* end ctor */
 	ptm(const ptm &) = delete ;
-	ptm &operator = (const ptm &) = delete ;
-	void dtor() noex ;
+	ptm &operator = (con ptm &) = delete ;
+	void dtor	() noex ;
 	destruct ptm() {
 	    if (magval) dtor() ;
 	} ; /* end dtor (ptm) */
@@ -92,21 +89,24 @@ typedef PTM		ptm ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-extern int	ptm_create		(ptm *,ptma *) noex ;
-extern int	ptm_destroy		(ptm *) noex ;
-extern int	ptm_lockbegin		(ptm *) noex ;
-extern int	ptm_lockbeginto		(ptm *,int) noex ;
-extern int	ptm_locktry		(ptm *) noex ;
-extern int	ptm_lockend		(ptm *) noex ;
-extern int	ptm_setprioceiling	(ptm *,int,int *) noex ;
-extern int	ptm_getprioceiling	(ptm *,int *) noex ;
-local inline int ptm_lock(ptm *op) noex {
-    	return ptm_lockbegin(op) ;
+extern int ptm_create		(ptm *,ptma *) noex ;
+extern int ptm_destroy		(ptm *) noex ;
+extern int ptm_lockbeg		(ptm *) noex ;
+extern int ptm_lockbegto	(ptm *,int) noex ;
+extern int ptm_locktry		(ptm *) noex ;
+extern int ptm_lockend		(ptm *) noex ;
+extern int ptm_setprioceiling	(ptm *,int,int *) noex ;
+extern int ptm_getprioceiling	(ptm *,int *) noex ;
+EXTERNC_end
+
+EXTERNC_begin
+local inline int ptm_lock	(ptm *op) noex {
+    	return ptm_lockbeg(op) ;
 } /* end */
-local inline int ptm_lockto(ptm *op,int to) noex {
-    	return ptm_lockbeginto(op,to) ;
+local inline int ptm_lockto	(ptm *op,int to) noex {
+    	return ptm_lockbegto(op,to) ;
 } /* end */
-local inline int ptm_unlock(ptm *op) noex {
+local inline int ptm_unlock	(ptm *op) noex {
     	return ptm_lockend(op) ;
 } /* end */
 EXTERNC_end
