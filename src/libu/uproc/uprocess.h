@@ -23,6 +23,7 @@
 	u_fork
 	u_atexit
 	u_getgroups
+	u_getpid
 	u_getpgid
 	u_getrlimit
 	u_getsid
@@ -88,6 +89,7 @@ extern int u_atexit(void_f) noex ;
 extern int u_exit(int ex) noex ;
 extern int u_fork() noex ;
 extern int u_getgroups(int n,gid_t *a) noex ;
+extern int u_getpid() noex ;
 extern int u_getpgid(pid_t pid) noex ;
 extern int u_getrlimit(int rn,RLIMIT *rp) noex ;
 extern int u_getsid(pid_t pid) noex ;
