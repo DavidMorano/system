@@ -118,7 +118,7 @@ enum flavors {
 } ; /* end enum (flavors) */
 
 enum uopenermems {
-	uopenmem_lockbegin,
+	uopenmem_lockbeg,
 	uopenmem_lockend,
 	uopenmem_overlast
 } ; /* end struct (uopenermems) */
@@ -142,7 +142,7 @@ namespace {
     } ; /* end struct (uopen_co) */
     struct uopen {
 	friend		uopen_co ;
-	uopen_co	lockbegin ;
+	uopen_co	lockbeg ;
 	uopen_co	lockend ;
 	ptm		mx ;		/* data mutex */
 	aflag		fvoid ;
@@ -150,13 +150,13 @@ namespace {
 	aflag		finitdone ;
 	uopen_fl	fl ;
 	uopen() noex {
-	    lockbegin(this,uopenmem_lockbegin) ;
+	    lockbeg(this,uopenmem_lockbeg) ;
 	    lockend(this,uopenmem_lockend) ;
 	} ;
 	int init() noex ;
 	int fini() noex ;
 	void forkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
 	} ;
 	void forkafter() noex {
 	    mx.lockend() ;
@@ -170,7 +170,7 @@ namespace {
             }
 	} ; /* end dtor */
     private:
-	int ilockbegin() noex ;
+	int ilockbeg() noex ;
 	int ilockend() noex ;
     } ; /* end struct (uopen) */
 } /* end namespace */
@@ -282,8 +282,8 @@ int uopen_fini() noex {
 } /* end subroutine (uopen_fini) */
 
 namespace libu {
-    sysret_t uopen_lockbegin() noex {
-	return uopen_data.lockbegin ;
+    sysret_t uopen_lockbeg() noex {
+	return uopen_data.lockbeg ;
     }
     sysret_t uopen_lockend() noex {
 	return uopen_data.lockend ;
@@ -463,13 +463,13 @@ int uopen::fini() noex {
 	return rs ;
 } /* end method (uopen::fini) */
 
-int uopen::ilockbegin() noex {
+int uopen::ilockbeg() noex {
 	int		rs ;
 	if ((rs = init()) >= 0) {
-	    rs = mx.lockbegin ;
+	    rs = mx.lockbeg ;
 	}
 	return rs ;
-} /* end subroutine (uopen::ilockbegin) */
+} /* end subroutine (uopen::ilockbeg) */
 
 int uopen::ilockend() noex {
     	return mx.lockend ;
@@ -492,7 +492,7 @@ int stdcaller::callready(cchar *fn,int of,mode_t om) noex {
 	int		rs1 ;
 	int		fd = -1 ;
 	if (usigblock b ; (rs = b.start) >= 0) {
-	    if ((rs = uopen_data.lockbegin) >= 0) {
+	    if ((rs = uopen_data.lockbeg) >= 0) {
 		if (fl.acceptpass) {
 		    rs = special_acceptpass(dfd,streamp,to) ;
 		    fd = rs ;
@@ -799,8 +799,8 @@ uopen_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    switch (w) {
-	    case uopenmem_lockbegin:
-	        rs = op->ilockbegin() ;
+	    case uopenmem_lockbeg:
+	        rs = op->ilockbeg() ;
 	        break ;
 	    case uopenmem_lockend:
 	        rs = op->ilockend() ;
