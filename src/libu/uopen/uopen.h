@@ -79,7 +79,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 namespace libu {
-    extern sysret_t uopen_lockbegin() noex ;
+    extern sysret_t uopen_lockbeg() noex ;
     extern sysret_t uopen_lockend() noex ;
 }
 
