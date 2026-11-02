@@ -320,7 +320,7 @@ int uctimeout::init() noex {
 		} /* end if (error) */
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		lrs = SR_OK ;
 	            if (!finit) {
 		        lrs = SR_LOCKFAIL ;
@@ -370,7 +370,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	if (valp->metf) {
 	    cint	esize = szof(TIMEOUT) ;
 	    if (TIMEOUT *ep ; (rs = libmem.mall(esize,&ep)) >= 0) ylikely {
-	        if ((rs = mtx.lockbegin) >= 0) {
+	        if ((rs = mtx.lockbeg) >= 0) {
 	            if ((rs = ents.add(ep)) >= 0) {
 	                cint	ei = rs ;
 	                *ep = *valp ;
@@ -396,7 +396,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mtx.lockbegin) >= 0) ylikely {
+	if ((rs = mtx.lockbeg) >= 0) ylikely {
 	    vechand	*elp = &ents ;
 	    cint	id = valp->id ;
 	    if (void *vp ; (rs = vechand_get(elp,id,&vp)) >= 0) {
@@ -474,7 +474,7 @@ int uctimeout::timerset(time_t val) noex {
 int uctimeout::capbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mtx.lockbegin(to)) >= 0) ylikely {
+	if ((rs = mtx.lockbeg(to)) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
 	        rs = cnv.wait(&mtx,to) ;
@@ -492,7 +492,7 @@ int uctimeout::capbegin(int to) noex {
 int uctimeout::capend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mtx.lockbegin) >= 0) ylikely {
+	if ((rs = mtx.lockbeg) >= 0) ylikely {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = cnv.signal ;
@@ -877,7 +877,7 @@ int uctimeout::sigersignal() noex {
         cint       	to = TO_CAPTURE ;
         int             rs ;
 	int		rs1 ;
-	if ((rs = mtx.lockbegin(to)) >= 0) ylikely {
+	if ((rs = mtx.lockbeg(to)) >= 0) ylikely {
 	    {
 		fcmd = true ;
 		rs = cnv.signal ;
@@ -956,7 +956,7 @@ int uctimeout::disprecv() noex {
 	int		rs1 ;
 	int		to = TO_DISPRECV ;
 	int		cmd = dispcmd_exit ;
-	if ((rs = mtx.lockbegin) >= 0) ylikely {
+	if ((rs = mtx.lockbeg) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && (! fcmd)) {
 	        rs = cnv.wait(&mtx,to) ;
@@ -1027,7 +1027,7 @@ local int uctimeout_dispworker(uctimeout *uip) noex {
 } /* end subroutine */
 
 local void uctimeout_atforkbefore() noex {
-	uctimeout_data.mtx.lockbegin() ;
+	uctimeout_data.mtx.lockbeg() ;
 } /* end subroutine (uctimeout_atforkbefore) */
 
 local void uctimeout_atforkparent() noex {
