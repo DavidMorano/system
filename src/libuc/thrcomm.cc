@@ -167,7 +167,7 @@ int thrcomm_cmdsend(thrcomm *op,int cmd,int to) noex {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    } /* end if (time-out requested) */
-	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg(to)) >= 0) ylikely {
 		ptc *cnp = op->cvp ;
 	        op->f_cmd = true ;
 	        while ((rs >= 0) && (op->cmd != 0) && (! op->f_exiting)) {
@@ -205,7 +205,7 @@ int thrcomm_cmdrecv(thrcomm *op,int to) noex {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    }
-	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg(to)) >= 0) ylikely {
 		ptc *cnp = op->cvp ;
 	        while ((rs >= 0) && (op->cmd == 0)) {
 		    if (to >= 0) {
@@ -235,7 +235,7 @@ int thrcomm_rspsend(thrcomm *op,int rrs,int to) noex {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    }
-	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg(to)) >= 0) ylikely {
 		ptc *cnp = op->cvp ;
 	        while ((rs >= 0) && (op->rrs != SR_INPROGRESS)) {
 		    if (to >= 0) {
@@ -266,7 +266,7 @@ int thrcomm_rsprecv(thrcomm *op,int to) noex {
 	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    } /* end if (time-out requested) */
-	    if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg(to)) >= 0) ylikely {
 		ptc *cnp = op->cvp ;
 	        while ((rs >= 0) && (op->rrs == SR_INPROGRESS)) {
 		    if (to >= 0) {
