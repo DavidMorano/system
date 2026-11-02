@@ -73,10 +73,10 @@ namespace {
 	uexecbase_m	m{} ;
 	uexecflags	f{} ;
 	int operator () (cchar *,mainv,mainv = nullptr) noex ;
-	int callstd(cchar *,mainv,mainv) noex ;
-	int iexecve(cchar *,mainv,mainv) noex ;
-	int iexecv(cchar *,mainv,mainv) noex ;
-	int iexecvp(cchar *,mainv,mainv) noex ;
+	int callstd	(cchar *,mainv,mainv) noex ;
+	int iexecve	(cchar *,mainv,mainv) noex ;
+	int iexecv	(cchar *,mainv,mainv) noex ;
+	int iexecvp	(cchar *,mainv,mainv) noex ;
     } ; /* end struct (uexecbase) */
 } /* end namespace */
 
@@ -147,15 +147,15 @@ int uexecbase::iexecvp(cchar *fn,mainv argv,mainv) noex {
 	    if ((rs = execv(fn,eav)) < 0) {
 		rs = (neg errno) ;
 	    }
-	}
+	} /* end if */
 	return rs ;
 } /* end method (uexecbase::iexecvp) */
 
 int uexecbase::operator () (cchar *fn,mainv argv,mainv envv) noex {
 	int		rs = SR_FAULT ;
-	if (fn && argv) {
+	if (fn && argv) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0]) {
+	    if (fn[0]) ylikely {
 	        errtimer	to_again	= utimeout[uto_again] ;
 	        errtimer	to_busy		= utimeout[uto_busy] ;
 	        errtimer	to_nomem	= utimeout[uto_nomem] ;
