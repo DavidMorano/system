@@ -25,10 +25,8 @@
 
 
 EXTERNC_begin
-
 extern int	uc_execve	(cchar *,con mainv,con mainv) noex ;
 extern int	uc_isaexecve	(cchar *,con mainv,con mainv) noex ;
-
 EXTERNC_end
 
 
