@@ -172,10 +172,10 @@ local int mkrand_light(PI *pip) noex {
 
 local int mkrand_heavy(PI *pip) noex {
     	cnullptr	np{} ;
-	ulong		rv = 0 ;
 	int		rs ;
 	if ((rs = bufsizeget(bufsize_mp)) >= 0) {
-	    cint bsz = (BSZMULT * rs) ;
+	    ulong	rv = 0 ;
+	    cint	bsz = (BSZMULT * rs) ;
 	    if (buffer hb ; (rs = buffer_start(&hb,bsz)) >= 0) {
 	        int	bl ;
 		cchar	*cp ;
