@@ -6,6 +6,7 @@
 /* special handling for |fork(2)| */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -20,7 +21,7 @@
 
 	Mame:
 	uc_fork() noex
-	uc_forklockbegin(int) noex
+	uc_forklockbeg(int) noex
 	uc_forklockend() noex
 
 	Description:
@@ -47,11 +48,16 @@
 #include	<ucgetpid.h>		/* LIBUC */
 #include	<lockrw.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
 #include	"ucfork.h"
 
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -74,22 +80,22 @@ extern "C" {
 /* local structures */
 
 namespace {
-    struct ucfork {
+    struct forker_fl {
+	uint		lock:1 ;
+    } ; /* end struct (forker_fl) */
+    struct forker {
 	lockrw		lock ;		/* critical-section lock */
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
-	int init() noex ;
-	int fini() noex ;
-	int stdfork() noex ;
-	int lockbegin(int) noex ;
-	int lockend() noex ;
-	destruct ucfork() noex {
-	    if (cint rs = fini() ; rs < 0) {
-		ulogerror("ucfork",rs,"dtor-fini") ;
-	    }
-	} ; /* end dtor (ucfork) */
-    } ; /* end struct (ucfork) */
+	forler_fl	fl ;
+	int init	() noex ;
+	int fini	() noex ;
+	int sysfork	() noex ;
+	int lockbeg	(int) noex ;
+	int lockend	() noex ;
+	destruct forker	() noex ;
+    } ; /* end struct (forker) */
 } /* end namespace */
 
 
@@ -102,7 +108,8 @@ extern "C" {
 
 /* local variables */
 
-static ucfork			ucfork_data ;
+static forker		ucfork_data ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -119,11 +126,11 @@ int ucfork_fini() noex {
 } /* end subroutine */
 
 int uc_fork() noex {
-	return ucfork_data.stdfork() ;
+	return ucfork_data.sysfork() ;
 } /* end subroutine */
 
-int uc_forklockbegin(int to) noex {
-	return ucfork_data.lockbegin(to) ;
+int uc_forklockbeg(int to) noex {
+	return ucfork_data.lockbeg(to) ;
 } /* end subroutine */
 
 int uc_forklockend() noex {
@@ -133,65 +140,69 @@ int uc_forklockend() noex {
 
 /* local subroutines */
 
-int ucfork::init() noex {
+int forker::init() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
-	if (!fvoid) {
+	DPRINTF("ent fvoid=%u\n",uint(fvoid)) ;
+	if (! fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = lock.create) >= 0) {
+		    fl.lock = true ;
 	            if ((rs = uc_atexit(ucfork_exit)) >= 0) {
 	                f = true ;
 	                finitdone.set() ;
-	            }
+	            } /* end */
 	            if (rs < 0) {
 	                lock.destroy() ;
-	            }
+	            } /* end if (error) */
 	        } /* end if (lockrw-create) */
 	        if (rs < 0) {
 	            finit.clear() ;
-		}
+		} /* end if (error) */
 	    } else if (! finitdone) {
-	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
-	            int		rsl = SR_OK ;
-	            if (!finit) {
+	        timewatch tw(to) ;
+	        cauto lamb = [this] () -> int {
+	            int rsl = SR_OK ;
+	            if (! finit) {
 		        rsl = SR_LOCKFAIL ;
 	            } else if (finitdone) {
 		        rsl = 1 ;
-	            }
+	            } /* end */
 	            return rsl ;
 	        } ; /* end lambda */
 	        rs = tw(lamb) ;
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
+	DPRINTF("ret rs=%d f=%u\n",rs,f) ;
 	return (rs >= 0) ? f : rs ;
-} /* end method (ucfork::init) */
+} /* end method (forker::init) */
 
-int ucfork::fini() noex {
+int forker::fini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone) {
 	    fvoid.set() ;
 	    finitdone.clear() ;
-	    {
+	    if (fl.lock) {
+		fl.lock = false ;
 	        rs1 = lock.destroy() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit.clear() ;
-	    finitdone.clear() ;
 	} /* end if (atexit registered) */
 	return rs ;
-} /* end method (ucfork::fini) */
+} /* end method (forker::fini) */
 
-int ucfork::stdfork() noex {
+int forker::sysfork() noex {
 	int		rs ;
 	int		rs1 ;
-	int		pid = 0 ;
+	int		pid = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
 	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
-	        if ((rs = lock.wrlock) >= 0) {
+	        if ((rs = lock.lockwr) >= 0) {
 	            if ((rs = u_fork()) == 0) { /* child */
 	                fini() ;
 			uc_setpid(0) ;
@@ -200,47 +211,58 @@ int ucfork::stdfork() noex {
 	                }
 	            } else if (rs > 0) {
 			pid = rs ;
-	                lock.unlock() ;
-	            }
+	                lock.lockun() ;
+	            } /* end */
 	        } /* end if (lockrw) */
 	    } /* end if (ucfork_init) */
 	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
+	DPRINTF("ret rs=%d pid=%d\n",rs,pid) ;
 	return (rs >= 0) ? pid : rs ;
-} /* end mrthod (ucfork::stdfork) */
+} /* end mrthod (forker::sysfork) */
 
-int ucfork::lockbegin(int to) noex {
+int forker::lockbeg(int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
 	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
-	        rs = lock.rdlock(to) ;
+	        rs = lock.lockrd(to) ;
 		rv = rs ;
 	    } /* end if (ucfork_init) */
 	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
+	DPRINTF("ret rs=%d rv=%u\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
-} /* end subroutine (ucfork::lockbegin) */
+} /* end subroutine (forker::lockbeg) */
 
-int ucfork::lockend() noex {
+int forker::lockend() noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
 	if (sigblocker b ; (rs = b.start) >= 0) {
 	    if (finit) {
-	        rs = lock.unlock ;
+	        rs = lock.lockun ;
 		rv = rs ;
 	    } else {
 	        rs = SR_NOANODE ;
-	    }
+	    } /* end */
 	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblocker) */
+	DPRINTF("ret rs=%d rv=%u\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
-} /* end subroutine (ucfork::lockend) */
+} /* end subroutine (forker::lockend) */
+
+forker::destruct forker() noex {
+	if (cint rs = fini() ; rs < 0) {
+	    ulogerror("ucfork",rs,"dtor-fini") ;
+	} /* end */
+} /* end dtor (forker::destruct) */
 
 local void ucfork_exit() noex {
 	ucfork_data.fvoid = true ;
