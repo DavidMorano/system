@@ -151,7 +151,7 @@ int chariq_ins(chariq *op,int ch) noex {
 	int		c = 0 ;
 	if (op) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            rs = charq_ins(op->cqp,ch) ;
 		    c = rs ;
@@ -169,7 +169,7 @@ int chariq_rem(chariq *op,char *chp) noex {
 	int		c = 0 ;
 	if (op) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            rs = charq_rem(op->cqp,chp) ;
 		    c = rs ;
@@ -187,7 +187,7 @@ int chariq_remall(chariq *op) noex {
 	int		rv = 0 ; /* return-value */
 	if (op) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 		{
 		    rs = charq_remall(op->cqp) ;
 		    rv = rs ;
@@ -205,7 +205,7 @@ int chariq_size(chariq *op) noex {
 	int		rv = 0 ; /* return-value */
 	if (op) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            rs = charq_size(op->cqp) ;
 		    rv = rs ;
@@ -223,7 +223,7 @@ int chariq_count(chariq *op) noex {
 	int		c = 0 ;
 	if (op) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            rs = charq_count(op->cqp) ;
 		    c = rs ;
