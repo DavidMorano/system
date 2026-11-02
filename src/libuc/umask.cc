@@ -76,7 +76,7 @@ namespace {
 	int get		() noex ;
 	int setmode	(mode_t) noex ;
 	void forkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
 	} ; /* end */
 	void forkafter() noex {
 	    mx.lockend() ;
@@ -219,8 +219,8 @@ int umasker::get() noex {
 	int		rs1 ;
 	int		omask = 0 ;
 	if ((rs = init()) >= 0) ylikely {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely { /* multi */
-	        if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
+	    if ((rs = uc_forklockbeg(-1)) >= 0) ylikely { /* multi */
+	        if ((rs = mx.lockbeg) >= 0) ylikely { /* single */
 		    {
 			mode_t cm = umask(0) ; /* in case of race! */
 			umask(cm) ;
@@ -242,8 +242,8 @@ int umasker::setmode(mode_t cmask) noex {
 	int		rs1 ;
 	int		omask = 0 ;
 	if ((rs = init()) >= 0) ylikely {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely { /* multi */
-	        if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
+	    if ((rs = uc_forklockbeg(-1)) >= 0) ylikely { /* multi */
+	        if ((rs = mx.lockbeg) >= 0) ylikely { /* single */
 		    {
 			omask = umask(cmask) ;
 		    } /* end */
