@@ -118,7 +118,7 @@ namespace {
 	int get(int,cchar **) noex ;
 	int gets(int,cchar **) noex ;
         void atforkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
         } /* end */
         void atforkafter() noex {
 	    mx.lockend() ;
@@ -207,7 +207,7 @@ int sysdbmgr::init() noex {
 		} /* end if (error) */
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		rsl = SR_OK ;
 	            if (!finit) {
 		        rsl = SR_LOCKFAIL ;
@@ -258,7 +258,7 @@ int sysdbmgr::get(int w,cchar **rpp) noex {
 	int		len = 0 ; /* return-value */
 	if ((*rpp = strs[w]) == nullptr) {
 	    if ((rs = init()) >= 0) ylikely {
-		if ((rs = mx.lockbegin) >= 0) ylikely {
+		if ((rs = mx.lockbeg) >= 0) ylikely {
 		    if ((*rpp = strs[w]) == nullptr) {
 			rs = gets(w,rpp) ;
 			len = rs ;
