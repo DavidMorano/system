@@ -359,28 +359,28 @@ local int si_copyaddrs(SI *ibp,HE *hep,CHE *lp) noex {
 
 local int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = ccharpp(pp) ;
-	*cpp = nullptr ;
+	cchar		**chpp = ccharpp(pp) ;
+	*chpp = nullptr ;
 	if (s1) ylikely {
-	    rs = ibp->strw(s1,-1,cpp) ;
-	}
+	    rs = ibp->strw(s1,-1,chpp) ;
+	} /* end */
 	return rs ;
 } /* end subroutine (si_copystr) */
 
 local int si_copybuf(SI *ibp,char **pp,cchar *bp,int bl) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = ccharpp(pp) ;
-	*cpp = nullptr ;
+	cchar		**chpp = ccharpp(pp) ;
+	*chpp = nullptr ;
 	if (bp) ylikely {
-	    rs = ibp->buf(bp,bl,cpp) ;
-	}
+	    rs = ibp->buf(bp,bl,chpp) ;
+	} /* end */
 	return rs ;
 } /* end subroutine (si_copybuf) */
 
 #ifdef	COMMENT
 using typename storeitem {
     	int	copybuf(char *pp,cchar *bp,int bl) noex ;
-} ;
+} ; /* end */
 #endif /* COMMENT */
 
 
