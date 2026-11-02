@@ -385,7 +385,7 @@ local int ucprogdata_capbegin(UCPD *uip,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	ptm *mxp = &uip->mx ;
-	if ((rs = mxp->lockbegin(to)) >= 0) {
+	if ((rs = mxp->lockbeg(to)) >= 0) {
 	    ptc *cnp = &uip->cn ;
 	    {
 	        uip->waiters += 1 ;
@@ -407,7 +407,7 @@ local int ucprogdata_capend(UCPD *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	ptm *mxp = &uip->mx ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbeg) >= 0) {
 	    {
 		ptc *cnp = &uip->cn ;
 	        uip->f_capture = false ;
