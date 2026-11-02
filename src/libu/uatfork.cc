@@ -105,11 +105,11 @@ namespace {
 	void_f		sub_before ;
 	void_f		sub_parent ;
 	void_f		sub_child ;
-    } ;
+    } ; /* end */
     struct uatfork_list {
 	uatfork_ent	*head ;
 	uatfork_ent	*tail ;
-    } ;
+    } ; /* end */
     struct uatfork_head {
 	ptm		mx ;		/* data mutex */
 	uatfork_list	hlist ;		/* memory allocated */
@@ -129,7 +129,7 @@ namespace {
 	destruct uatfork_head() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("uatfork",rs,"dtor-fini") ;
-	    }
+	    } /* end */
 	} ; /* end dtor (uatfork) */
     } ; /* end struct (uatfork_head) */
 } /* end namespace */
@@ -165,7 +165,7 @@ int u_atforkrec(void_f b,void_f p,void_f c) noex {
 	int		rs = SR_INVALID ;
 	if (b || p || c) {
 	    rs = uatfork_data.record(b,p,c) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine */
 
@@ -173,7 +173,7 @@ int u_atforkexp(void_f b,void_f p,void_f c) noex {
 	int		rs = SR_INVALID ;
 	if (b || p || c) {
 	    rs = uatfork_data.expunge(b,p,c) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine */
 
@@ -211,11 +211,11 @@ int uatfork_head::init() noex {
 	            } /* end if (uatfork) */
 		    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm-create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
@@ -224,7 +224,7 @@ int uatfork_head::init() noex {
 		        rsl = SR_LOCKFAIL ;		/* <- failure */
 	            } else if (finitdone) {
 		        rsl = 1 ;			/* <- OK ready */
-	            }
+	            } /* end */
 	            return rsl ;
 	        } ; /* end lambda (lamb) */
 	        rs = tw(lamb) ;		/* <- time-watching occurs in there */
@@ -241,11 +241,11 @@ int uatfork_head::fini() noex {
 	    if (ftrack) {
 	        rs1 = trackend() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mx.destroy() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit = false ;
 	    finitdone = false ;
 	} /* end if (was initialized) */
@@ -257,7 +257,7 @@ int uatfork_head::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs1 ;
 	if (usigblock b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
-	        if ((rs = mx.lockbegin) >= 0) { /* single */
+	        if ((rs = mx.lockbeg) >= 0) { /* single */
 		    uatfork_ent	*ep{} ;
 		    if ((rs = uatfork_trackbegin()) >= 0) {
 	                cint	esz = szof(UAF_ENT) ;
@@ -283,7 +283,7 @@ int uatfork_head::expunge(void_f sb,void_f sp,void_f sc) noex {
 	int		c = 0 ;
 	if (usigblock b ; (rs = b.start) >= 0) {
 	    if ((rs = init()) >= 0) {
-                if ((rs = mx.lockbegin) >= 0) { /* single */
+                if ((rs = mx.lockbeg) >= 0) { /* single */
                     uatfork_list    *lp = &hlist ;
                     if ((rs = uatfork_trackbegin()) >= 0) {    
                         UAF_ENT     *ep = lp->head ;
@@ -336,7 +336,7 @@ int uatfork_head::trackend() noex {
 void uatfork_head::atforkbefore() noex {
 	int		rs = SR_OK ;
 	if (finitdone) {
-	    if ((rs = mx.lockbegin) >= 0) {
+	    if ((rs = mx.lockbeg) >= 0) {
 	        uatfork_ent	*ep = hlist.tail ;
 	        uatfork_ent	*pep ;
 	        while (ep) {
@@ -347,7 +347,7 @@ void uatfork_head::atforkbefore() noex {
 	            ep = pep ;
 	        } /* end if while */
 	    } /* end if (locked) */
-	}
+	} /* end if (finitdone) */
 	(void) rs ;
 } /* end subroutine (uatfork_head::atforkbefore) */
 
@@ -368,8 +368,8 @@ void uatfork_head::atforkparent() noex {
 	    {
 	        rs1 = mx.lockend() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
-	}
+	    } /* end */
+	} /* end if (finitdone) */
 	(void) rs ;
 } /* end subroutine (uatfork_head::atforkparent) */
 
@@ -390,8 +390,8 @@ void uatfork_head::atforkchild() noex {
 	    {
 	        rs1 = mx.lockend() ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
-	}
+	    } /* end */
+	} /* end if (finitdone) */
 	(void) rs ;
 } /* end subroutine (uatfork_head::atforkchild) */
 
@@ -419,11 +419,11 @@ local int list_add(uatfork_list *lp,uatfork_ent *ep) noex {
 	    ep->prev = lep ;
 	} else {
 	    ep->prev = nullptr ;
-	}
+	} /* end */
 	lp->tail = ep ;
 	if (lp->head == nullptr) {
 	    lp->head = ep ;
-	}
+	} /* end */
 	return SR_OK ;
 } /* end subroutine (list_add) */
 
@@ -435,12 +435,12 @@ local int list_rem(uatfork_list *lp,uatfork_ent *ep) noex {
 	    nep->prev = ep->prev ;
 	} else {
 	    lp->tail = pep ;
-	}
+	} /* end */
 	if (pep) {
 	    pep->next = ep->next ;
 	} else {
 	    lp->head = nep ;
-	}
+	} /* end */
 	return SR_OK ;
 } /* end subroutine (list_rem) */
 
