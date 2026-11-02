@@ -334,9 +334,9 @@ local int ucclustername_allocbegin(CN *uip,time_t dt,int ttl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	if ((rs = uc_forklockbeg(-1)) >= 0) ylikely {
 	    ptm *mxp = &uip->mx ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if ((uip->a == nullptr) || ((dt-uip->et) >= ttl)) {
 	            if (! uip->f_allocget) {
 	                uip->f_allocget = true ;
@@ -356,9 +356,9 @@ local int ucclustername_allocend(CN *uip,CN_A *ap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ap && ap->a) ylikely {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	    if ((rs = uc_forklockbeg(-1)) >= 0) ylikely {
 	        ptm *mxp = &uip->mx ;
-	        if ((rs = mxp->lockbegin) >= 0) ylikely {
+	        if ((rs = mxp->lockbeg) >= 0) ylikely {
 	            {
 	                uip->f_allocget = false ;
 	                uip->a = ap->a ;
@@ -381,7 +381,7 @@ local void ucclustername_atforkbefore() noex {
 	CN	*uip = &ucclustername_data ;
 	{
 	    ptm *mxp = &uip->mx ;
-	    mxp->lockbegin() ;
+	    mxp->lockbeg() ;
 	}
 } /* end subroutine (ucclustername_atforkbefore) */
 
@@ -424,9 +424,9 @@ local int subinfo_cacheget(SI *sip,CN *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
+	if ((rs = uc_forklockbeg(-1)) >= 0) ylikely {
 	    ptm *mxp = &uip->mx ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (uip->a != nullptr) {
 	            if ((uip->et > 0) && ((sip->dt-uip->et) < uip->ttl)) {
 	                if (strcmp(sip->nn,uip->nn) == 0) {
