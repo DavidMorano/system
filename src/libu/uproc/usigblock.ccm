@@ -87,7 +87,7 @@ export {
     } ; /* end class (sigblock) */
 } /* end export (usigblock) */
 
-    int usigblock::istart(cint *sigs) noex {
+int usigblock::istart(cint *sigs) noex {
 	int		rs = SR_OK ;
 	sigset_t	nsm ;
 	if (sigs) {
@@ -105,9 +105,9 @@ export {
 	    }
 	} /* end if (ok) */
 	return rs ;
-    } /* end method (usigblock::istart) */
+} /* end method (usigblock::istart) */
 
-    int usigblock::ifinish() noex {
+int usigblock::ifinish() noex {
 	int		rs = SR_NOTOPEN ;
 	if (fl.open) ylikely {
 	    fl.open = false ;
@@ -116,15 +116,15 @@ export {
 	return rs ;
     } /* end method (usigblock::ifinish) */
 
-    int usigblock_co::operator () (cint *sigs) noex {
+int usigblock_co::operator () (cint *sigs) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    rs = op->istart(sigs) ;
 	} /* end if (non-null) */
 	return rs ;
-    } /* end method (usigblock_co::operator) */
+} /* end method (usigblock_co::operator) */
 
-    usigblock_co::operator int () noex {
+usigblock_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    switch (w) {
@@ -137,12 +137,12 @@ export {
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
-    } /* end method (usigblock_co::operator) */
+} /* end method (usigblock_co::operator) */
 
-    void usigblock::dtor() noex {
+void usigblock::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("usigblock",rs,"fini-finish") ;
 	} /* end */
-    } /* end method (usigblock::dtor) */
+} /* end method (usigblock::dtor) */
 
 
