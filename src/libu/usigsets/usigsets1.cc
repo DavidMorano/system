@@ -24,7 +24,7 @@ module ;
 #include	<pthread.h>		/* POSIX |pthread_setmask(3c)| */
 #include	<cerrno>		/* CSTD */
 #include	<csignal>		/* CSTD */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -93,7 +93,7 @@ int u_sigmask(int w,con usigset *nsp,mut usigset *osp) noex {
 	sigset_t *tnsp = nullptr ;
 	sigset_t *tosp = nullptr ;
         rs = u_sigmask(w,tnsp,tosp) ;
-    }
+    } /* end */
     return rs ;
 } /* end subroutine */
 
@@ -117,7 +117,7 @@ int u_sigmask(int w,con sigset_t *nsp,mut usigset *osp) noex {
     } else {
 	sigset_t *tosp = nullptr ;
         rs = u_sigmask(w,nsp,tosp) ;
-    }
+    } /* end */
     return rs ;
 } /* end subroutine (u_sigmask) */
 #endif /* COMMENT */
