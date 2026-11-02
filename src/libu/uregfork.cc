@@ -126,11 +126,7 @@ namespace {
 	void		atforkbefore() noex ;
 	void		atforkparent() noex ;
 	void		atforkchild() noex ;
-	destruct uregfork() noex {
-	    if (cint rs = fini() ; rs < 0) {
-		ulogerror("uregfork",rs,"dtor-fini") ;
-	    }
-	} ; /* end dtor (uregfork) */
+	destruct	uregfork() noex ;
     } ; /* end struct (uregfork) */
 } /* end namespace */
 
@@ -206,11 +202,11 @@ int uregfork::init() noex {
 	            } /* end if (uregfork_rec) */
 		    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm-create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
@@ -219,7 +215,7 @@ int uregfork::init() noex {
 		        rsl = SR_LOCKFAIL ;		/* <- failure */
 	            } else if (finitdone) {
 		        rsl = 1 ;			/* <- OK ready */
-	            }
+	            } /* end */
 	            return rsl ;
 	        } ; /* end lambda (lamb) */
 	        rs = tw(lamb) ;		/* <- time-watching occurs in there */
@@ -252,7 +248,7 @@ int uregfork::record(void_f sb,void_f sp,void_f sc) noex {
 	int		rs1 ;
 	if (usigblock b ; (rs = b.start) >= 0) ylikely {
 	    if ((rs = init()) >= 0) ylikely {
-	        if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
+	        if ((rs = mx.lockbeg) >= 0) ylikely { /* single */
 		    uregfork_ent	*ep{} ;
 	            if ((rs = trackbegin()) >= 0) ylikely {
 	                cint	esz = szof(URF_ENT) ;
@@ -278,7 +274,7 @@ int uregfork::expunge(void_f sb,void_f sp,void_f sc) noex {
 	int		c = 0 ;
 	if (usigblock b ; (rs = b.start) >= 0) ylikely {
 	    if ((rs = init()) >= 0) ylikely {
-                if ((rs = mx.lockbegin) >= 0) ylikely { /* single */
+                if ((rs = mx.lockbeg) >= 0) ylikely { /* single */
                     uregfork_list   *lp = &hlist ;
                     if ((rs = trackbegin()) >= 0) ylikely {    
                         URF_ENT     *ep = lp->head ;
@@ -331,7 +327,7 @@ int uregfork::trackend() noex {
 void uregfork::atforkbefore() noex {
 	int		rs = SR_OK ;
 	if (finitdone) {
-	    if ((rs = mx.lockbegin) >= 0) {
+	    if ((rs = mx.lockbeg) >= 0) {
 	        uregfork_ent	*ep = hlist.tail ;
 	        uregfork_ent	*pep ;
 	        while (ep) {
@@ -342,7 +338,7 @@ void uregfork::atforkbefore() noex {
 	            ep = pep ;
 	        } /* end if while */
 	    } /* end if (locked) */
-	}
+	} /* end if (finitdone) */
 	(void) rs ;
 } /* end subroutine (uregfork::atforkbefore) */
 
@@ -363,8 +359,8 @@ void uregfork::atforkparent() noex {
 	    {
 	        rs1 = mx.lockend() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
-	}
+	    } /* end */
+	} /* end if (finitdone) */
 	(void) rs ;
 } /* end subroutine (uregfork::atforkparent) */
 
@@ -386,9 +382,15 @@ void uregfork::atforkchild() noex {
 	        rs1 = mx.lockend() ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end */
-	} /* end */
+	} /* end if (finitdone) */
 	(void) rs ;
 } /* end subroutine (uregfork::atforkchild) */
+
+uregfork::destruct uregfork() noex {
+	    if (cint rs = fini() ; rs < 0) {
+		ulogerror("uregfork",rs,"dtor-fini") ;
+	    } /* end if (error) */
+} /* end dtor (uregfork) */
 
 local void uregfork_atforkbefore() noex {
 	uregfork_data.atforkbefore() ;
