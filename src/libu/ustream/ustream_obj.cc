@@ -180,10 +180,10 @@ int ustream::stat(ustat *sbp) noex {
 	return rs ;
 } /* end method (ustream::stat) */
 
-int ustream::lockbegin(int lt,int to) noex {
+int ustream::lockbeg(int lt,int to) noex {
     	int		rs ;
 	if ((rs = magic) >= 0) ylikely {
-    	    rs = ustream_lockbegin(this,lt,to) ;
+    	    rs = ustream_lockbeg(this,lt,to) ;
 	}
 	return rs ;
 } /* end method (ustream::lockbrgin) */
