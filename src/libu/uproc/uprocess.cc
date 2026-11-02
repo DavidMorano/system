@@ -1,4 +1,4 @@
-/* uprocess SUPPORT */
+/* uprkcess SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -24,6 +24,7 @@
 	u_exit
 	u_fork
 	u_getgroups
+	u_getpid
 	u_getpgid
 	u_getrlimit
 	u_getsid
@@ -200,31 +201,31 @@ namespace {
 	uprocer(void_f b,void_f ap,void_f ac) noex : bf(b) {
 	    apf = ap ;
 	    acf = ac ;
-	} ;
+	} ; /* end */
 	operator int () noex {
 	    return operator () () ;
-	} ;
+	} ; /* end */
 	int callstd() noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
 		rs = (this->*m)() ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end */
 	void submem(uprocer_m mem) noex {
 	    m = mem ;
-	} ;
-	int ifork() noex ;
-	int ivfork() noex ;
-	int isetuid() noex ;
-	int isetreuid() noex ;
-	int iseteuid() noex ;
-	int isetgid() noex ;
-	int isetregid() noex ;
-	int isetegid() noex ;
-	int isetpgid() noex ;
-	int isetsid() noex ;
-	int isetgroups() noex ;
+	} ; /* end */
+	int ifork	() noex ;
+	int ivfork	() noex ;
+	int isetuid	() noex ;
+	int isetreuid	() noex ;
+	int iseteuid	() noex ;
+	int isetgid	() noex ;
+	int isetregid	() noex ;
+	int isetegid	() noex ;
+	int isetpgid	() noex ;
+	int isetsid	() noex ;
+	int isetgroups	() noex ;
     } ; /* end struct (uprocess) */
 } /* end namespace */
 
@@ -249,10 +250,10 @@ int u_alarm(cuint secs) noex {
 	int		rs  = SR_OK ;
 	if ((rem = alarm(secs)) == uint(-1)) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	if (rs >= 0) {
 	    rs = intsat(rem) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_alarm) */
 
@@ -278,15 +279,23 @@ int u_getgroups(int n,gid_t *a) noex {
 	    if ((rs = getgroups(n,a)) < 0) {
 	        rs = (neg errno) ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_getgroups) */
+
+int u_getpid() noex {
+	int		rs ;
+	if ((rs = getpid()) < 0) {
+	    rs = (neg errno) ;
+	} /* end */
+	return rs ;
+} /* end subroutine (u_getpid) */
 
 int u_getpgid(pid_t pid) noex {
 	int		rs ;
 	if ((rs = getpgid(pid)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_getpgid) */
 
@@ -296,7 +305,7 @@ int u_getrlimit(int rn,RLIMIT *rp) noex {
 	    if ((rs = getrlimit(rn,rp)) < 0)  {
 	        rs = (neg errno) ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_getrlimit) */
 
@@ -304,7 +313,7 @@ int u_getsid(pid_t pid) noex {
 	int		rs ;
 	if ((rs = getsid(pid)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_getsid) */
 
@@ -316,10 +325,10 @@ int u_nice(int value,int *rip) noex {
 	    if (errno != 0) {
 		rs = (neg errno) ;
 	    }
-	}
+	} /* end */
 	if (rip) {
 	    *rip = (rs >= 0) ? v : 0 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_nice) */
 
@@ -392,7 +401,7 @@ int u_times(TMS *rp) noex {
 	    rs = (neg errno) ;
 	} else {
 	    rs = intsat(tics) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_times) */
 
@@ -412,7 +421,7 @@ int u_ulimit(int cmd,...) noex {
 		   long	nval = long(sz & LONG_MAX) ;
 	           rval = ulimit(cmd,nval) ;
 		}
-	    }
+	    } /* end */
 	    va_end(ap) ;
 	    break ;
 	} /* end switch */
@@ -421,10 +430,10 @@ int u_ulimit(int cmd,...) noex {
 		rs = (neg errno) ;
 	    } else {
 		rs = INT_MAX ;
-	    }
+	    } /* end */
 	} else {
 	    rs = intsat(rval) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_ulimit) */
 
@@ -445,7 +454,7 @@ int u_wait(int *sp) noex {
 	} until (rs != SR_INTR) ;
 	if (rs >= 0) {
 	    rs = int(rpid) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_wait) */
 
@@ -470,7 +479,7 @@ int u_waitpid(pid_t pid,int *sp,int flags) noex {
 	} until (rs != SR_INTR) ;
 	if (rs >= 0) {
 	    rs = intsat(rpid) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (u_waitpid) */
 
@@ -501,7 +510,7 @@ int uprocer::ifork() noex {
 	    rs = int(pid) ;
 	} else {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (uprocer::ifork) */
 
