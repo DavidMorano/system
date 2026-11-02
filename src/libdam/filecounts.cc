@@ -179,7 +179,7 @@ local int	filecounts_updateone(FC *,cchar *,WKR_ENT *) noex ;
 local int	filecounts_append(FC *,cchar *,WKR_ENT *) noex ;
 local int	filecounts_snaper(FC *,vecobj *) noex ;
 local int	filecounts_snaperline(FC *,dater *,vecobj *,char *,int) noex ;
-local int	filecounts_lockbegin(FC *) noex ;
+local int	filecounts_lockbeg(FC *) noex ;
 local int	filecounts_lockend(FC *) noex ;
 
 local int	worker_start(WKR *,FC_N *) noex ;
@@ -393,7 +393,7 @@ local int filecounts_proclist(FC *op,FC_N *nlp) noex {
 	int		rs1 ;
 	int		vo = 0 ;
 	if (WKR work ; (rs = worker_start(&work,nlp)) >= 0) ylikely {
-	    if ((rs = filecounts_lockbegin(op)) >= 0) ylikely {
+	    if ((rs = filecounts_lockbeg(op)) >= 0) ylikely {
 		cint	fd = op->fd ;
 	        if (filer fb ; (rs = fb.start(fd,0z,0,vo)) >= 0) ylikely {
 	            if ((rs = filecounts_scan(op,&work,&fb)) >= 0) ylikely {
@@ -672,11 +672,11 @@ local int filecounts_snaperline(FC *op,dater *dmp,vecobj *ilp,
 	return rs ;
 } /* end subroutine (filecounts_snaperline) */
 
-local int filecounts_lockbegin(FC *op) noex {
+local int filecounts_lockbeg(FC *op) noex {
 	cint		to = TO_LOCK ;
 	cint		cmd = (op->fl.rdonly) ? F_RLOCK : F_WLOCK ;
 	return lockfile(op->fd,cmd,0z,0z,to) ;
-} /* end subroutine (filecounts_lockbegin) */
+} /* end subroutine (filecounts_lockbeg) */
 
 local int filecounts_lockend(FC *op) noex {
 	cint		cmd = F_ULOCK ;
