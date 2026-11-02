@@ -422,7 +422,7 @@ int txtindexes_curbegin(TIS *op,TIS_CUR *curp) noex {
 	if ((rs = txtindexes_magic(op,curp)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    memclear(curp) ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        op->ncursors += 1 ;
 	        rs1 = mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
@@ -442,7 +442,7 @@ int txtindexes_curend(TIS *op,TIS_CUR *curp) noex {
 	        curp->taglist = nullptr ;
 	    } /* end if (memory-release) */
 	    curp->taglen = 0 ;
-	    if ((rs1 = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs1 = mxp->lockbeg) >= 0) ylikely {
 	        if (op->ncursors > 0) {
 	            op->ncursors -= 1 ;
 	        }
