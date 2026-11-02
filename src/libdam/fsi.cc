@@ -148,7 +148,7 @@ int fsi_add(fsi *op,cchar *sbuf,int slen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if ((rs = mxp->lockbegin) >= 0) ylikely {
+	if ((rs = mxp->lockbeg) >= 0) ylikely {
 	    {
 	        rs = fifostr_add(op->qsp,sbuf,slen) ;
 		rv = rs ;
@@ -164,7 +164,7 @@ int fsi_remove(fsi *op,char *sbuf,int slen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if ((rs = mxp->lockbegin) >= 0) ylikely {
+	if ((rs = mxp->lockbeg) >= 0) ylikely {
 	    {
 	        rs = fifostr_rem(op->qsp,sbuf,slen) ;
 	        rl = rs ;
@@ -184,7 +184,7 @@ int fsi_count(fsi *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mxp->lockbegin) >= 0) ylikely {
+	if ((rs = mxp->lockbeg) >= 0) ylikely {
 	    {
 	        rs = fifostr_count(op->qsp) ;
 	        c = rs ;
