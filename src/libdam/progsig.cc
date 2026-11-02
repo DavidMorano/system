@@ -775,7 +775,7 @@ local int progsig_workdef(progsig *uip,msgdata *mip) noex {
 	int		rs1 ;
 	if (mip) {
 	    ptm *mxp = &uip->mx ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbeg) >= 0) {
 		{
 	            uip->cdefs += 1 ;
 		}
@@ -965,7 +965,7 @@ local void progsig_atforkbefore() noex {
 	progsig		*uip = &progsig_data ;
 	{
 	    ptm *mxp = &uip->mx ;
-	    mxp->lockbegin() ;
+	    mxp->lockbeg() ;
 	}
 } /* end subroutine (progsig_atforkbefore) */
 
@@ -1029,7 +1029,7 @@ local int progsig_capbegin(progsig *uip,int to) noex {
 	ptm		*mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mxp->lockbegin(to)) >= 0) {
+	if ((rs = mxp->lockbeg(to)) >= 0) {
 	    {
 	        ptc *cnp = &uip->cn ;
 	        uip->waiters += 1 ;
@@ -1051,7 +1051,7 @@ local int progsig_capend(progsig *uip) noex {
 	ptm		*mxp = &uip->mx ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbeg) >= 0) {
 	    {
 	        ptc *cnp = &uip->cn ;
 	        uip->f_capture = false ;
