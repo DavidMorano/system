@@ -18,19 +18,17 @@
 
 /* Copyright © 1998,2020 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CCMUTES_INCLUDE
-#define	CCMUTES_INCLUDE
+#ifndef	CCMUTEX_INCLUDE
+#define	CCMUTEX_INCLUDE
 #ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #endif /* __cplusplus */
-#endif /* CCMUTES_INCLUDE */
+#endif /* CCMUTEX_INCLUDE */
 
 
