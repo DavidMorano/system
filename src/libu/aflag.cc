@@ -71,75 +71,81 @@
 
 bool aflag_co::operator () () noex {
 	bool		rf = false ;
-	switch (w) {
-	case aflagmem_set:
-	    rf = op->af.test(memord_relaxed) ;
-	    (void) op->af.test_and_set() ;
-	    break ;
-	case aflagmem_clear:
-	    rf = op->af.test(memord_relaxed) ;
-	    (void) op->af.clear() ;
-	    break ;
-	case aflagmem_test:
-	    rf = op->af.test(memord_relaxed) ;
-	    break ;
-	case aflagmem_testandset:
-	    rf = op->af.test_and_set() ;
-	    break ;
-	case aflagmem_wait:
-	    rf = op->af.test(memord_relaxed) ;
-	    op->af.wait(false,memord_acquire) ;
-	    break ;
-	case aflagmem_notify:
-	    rf = op->af.test(memord_relaxed) ;
-	    op->af.notify_one() ;
-	    break ;
-	case aflagmem_notifyall:
-	    rf = op->af.test(memord_relaxed) ;
-	    op->af.notify_all() ;
-	    break ;
-	} /* end switch */
+	if (op) ylikely {
+	    switch (w) {
+	    case aflagmem_set:
+	        rf = op->af.test(memord_relaxed) ;
+	        (void) op->af.test_and_set() ;
+	        break ;
+	    case aflagmem_clear:
+	        rf = op->af.test(memord_relaxed) ;
+	        (void) op->af.clear() ;
+	        break ;
+	    case aflagmem_test:
+	        rf = op->af.test(memord_relaxed) ;
+	        break ;
+	    case aflagmem_testandset:
+	        rf = op->af.test_and_set() ;
+	        break ;
+	    case aflagmem_wait:
+	        rf = op->af.test(memord_relaxed) ;
+	        op->af.wait(false,memord_acquire) ;
+	        break ;
+	    case aflagmem_notify:
+	        rf = op->af.test(memord_relaxed) ;
+	        op->af.notify_one() ;
+	        break ;
+	    case aflagmem_notifyall:
+	        rf = op->af.test(memord_relaxed) ;
+	        op->af.notify_all() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rf ;
 } /* end method (aflag_co::operator) */
 
 bool aflag_co::operator () (bool a) noex {
 	bool		rf = false ;
-	switch (w) {
-	case aflagmem_set:
-	case aflagmem_clear:
-	case aflagmem_test:
-	case aflagmem_testandset:
-	case aflagmem_wait:
-	    rf = (*this) ;
-	    break ;
-	case aflagmem_notify:
-	    rf = op->af.test(memord_relaxed) ;
-	    (*op) = a ;
-	    op->af.notify_one() ;
-	    break ;
-	case aflagmem_notifyall:
-	    rf = op->af.test(memord_relaxed) ;
-	    (*op) = a ;
-	    op->af.notify_all() ;
-	    break ;
-	} /* end switch */
+	if (op) ylikely {
+	    switch (w) {
+	    case aflagmem_set:
+	    case aflagmem_clear:
+	    case aflagmem_test:
+	    case aflagmem_testandset:
+	    case aflagmem_wait:
+	        rf = (*this) ;
+	        break ;
+	    case aflagmem_notify:
+	        rf = op->af.test(memord_relaxed) ;
+	        (*op) = a ;
+	        op->af.notify_one() ;
+	        break ;
+	    case aflagmem_notifyall:
+	        rf = op->af.test(memord_relaxed) ;
+	        (*op) = a ;
+	        op->af.notify_all() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rf ;
 } /* end method (aflag_co::operator) */
 
 int aflag_mx::operator () (int to) noex {
 	int		rs = SR_BUGCHECK ;
-	switch (w) {
-	case aflagmx_lockbegin:
-	    rs = op->ilockbegin(to) ;
-	    break ;
-	case aflagmx_lockend:
-	    rs = op->ilockend() ;
-	    break ;
-	} /* end switch */
+	if (op) ylikely {
+	    switch (w) {
+	    case aflagmx_lockbeg:
+	        rs = op->ilockbeg(to) ;
+	        break ;
+	    case aflagmx_lockend:
+	        rs = op->ilockend() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 } /* end method (aflag_mx::operator) */
 
-int aflag::ilockbegin(int to) noex {
+int aflag::ilockbeg(int to) noex {
 	int		rs = SR_OK ;
 	if (to >= 0) {
 	    timewatch	tw(to) ;
@@ -153,7 +159,7 @@ int aflag::ilockbegin(int to) noex {
 	    } /* end while */
 	} /* end if */
 	return rs ;
-} /* end method (aflag::ilockbegin) */
+} /* end method (aflag::ilockbeg) */
 
 int aflag::ilockend() noex {
 	af.clear(memord_release) ;
