@@ -96,7 +96,7 @@ namespace {
 	int getusend() noex ;
 	int getusent(char *,int) noex ;
         void atforkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
         } ;
         void atforkafter() noex {
 	    mx.lockend() ;
@@ -169,7 +169,7 @@ int ucgetus::init() noex {
 	        if (rs < 0) finit = false ;
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		rsl = SR_OK ; /* GCC 'shadow' complaint */
 	            if (!finit) {
 		        rsl = SR_LOCKFAIL ;		/* <- failure */
@@ -212,8 +212,8 @@ int ucgetus::getusbegin() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = init()) >= 0) ylikely {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	 	if ((rs = mx.lockbegin) >= 0) { /* single */
+	    if ((rs = uc_forklockbeg(-1)) >= 0) { /* multi */
+	 	if ((rs = mx.lockbeg) >= 0) { /* single */
 		    {
 			errno = 0 ;
 		        factive = true ;
@@ -234,8 +234,8 @@ int ucgetus::getusend() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = init()) >= 0) ylikely {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	 	if ((rs = mx.lockbegin) >= 0) { /* single */
+	    if ((rs = uc_forklockbeg(-1)) >= 0) { /* multi */
+	 	if ((rs = mx.lockbeg) >= 0) { /* single */
 		    {
 			errno = 0 ;
 		        factive = false ;
@@ -260,8 +260,8 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 	    rs = SR_OVERFLOW ;
 	    if (rlen > 0) ylikely {
 	        if ((rs = init()) >= 0) ylikely {
-	            if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	 	        if ((rs = mx.lockbegin) >= 0) { /* single */
+	            if ((rs = uc_forklockbeg(-1)) >= 0) { /* multi */
+	 	        if ((rs = mx.lockbeg) >= 0) { /* single */
 		            cchar	*rp ;
 		            factive = true ;
 		            errno = 0 ;
@@ -270,7 +270,7 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 			        len = rs ;
 		            } else { /* this is really extra safety */
 			        if (errno != 0) rs = (neg errno) ;
-		            }
+		            } /* end if */
 		            rs1 = mx.lockend ;
 		            if (rs >= 0) rs = rs1 ;
 		        } /* end if (mutex) */
