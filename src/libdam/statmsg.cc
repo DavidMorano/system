@@ -603,7 +603,7 @@ local int statmsg_checker(SM *op,time_t dt) noex {
 	int		nchanged = 0 ;/* return-value */
 	if (op->nmaps > 0) {
 	    ptm	*mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbeg) >= 0) {
 	        if (dt == 0) dt = getustime ;
 	        if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	            rs = mapper_check(&op->mapper,dt) ;
@@ -838,7 +838,7 @@ local int mapper_check(MA *mmp,time_t dt) noex {
 	if (mmp) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (mmp->magval == MA_MAGIC) ylikely {
-	         if ((rs = lockrw_wrlock(&mmp->rwm,to_lock)) >= 0) {
+	         if ((rs = lockrw_lockwr(&mmp->rwm,to_lock)) >= 0) {
 	             if (dt == 0) dt = getustime ;
 	             if ((dt - mmp->ti_check) >= TO_MAPCHECK) {
 		         if_constexpr (f_paramfile) {
@@ -868,7 +868,7 @@ local int mapper_check(MA *mmp,time_t dt) noex {
 	                    mmp->ti_check = dt ;
 	                } /* end if_constexpr (f_paramfile) */
 	            } /* end if (map-object check) */
-	            rs1 = lockrw_unlock(&mmp->rwm) ;
+	            rs1 = lockrw_lockun(&mmp->rwm) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (read-write lock) */
 	    } /* end if (valid) */
@@ -885,12 +885,12 @@ local int mapper_process(MA *mmp,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	    rs = SR_NOTOPEN ;
 	    if (mmp->magval == MA_MAGIC) ylikely {
 	        lockrw	*lp = &mmp->rwm ;
-	        if ((rs = lockrw_rdlock(lp,to_lock)) >= 0) ylikely {
+	        if ((rs = lockrw_lockrd(lp,to_lock)) >= 0) ylikely {
 	            {
 	                rs = mapper_processor(mmp,ev,adms,gn,kn,fd) ;
 	                wlen += rs ;
 	            }
-	            rs1 = lockrw_unlock(lp) ;
+	            rs1 = lockrw_lockun(lp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (read-write lock) */
 	    } /* end if (valid) */
@@ -1161,13 +1161,13 @@ local int mapdir_proc(MD *ep,cc **ev,mv adms,cc *gn,cc *kn,int fd) noex {
 	        }
 	        if (rs >= 0) {
 	            if ((ep->dirname[0] == '/') || (ep->dname != nullptr)) {
-	                if ((rs = lockrw_rdlock(&ep->rwm,to_lock)) >= 0) {
+	                if ((rs = lockrw_lockrd(&ep->rwm,to_lock)) >= 0) {
 			    cchar	*dn = ep->dirname ;
 	                    if ((dn[0] != '~') || (ep->dname != nullptr)) {
 	                        rs = mapdir_procer(ep,ev,gn,kn,fd) ;
 	            		wlen += rs ;
 	    		    } /* end if */
-	    		    rs1 = lockrw_unlock(&ep->rwm) ;
+	    		    rs1 = lockrw_lockun(&ep->rwm) ;
 	    		    if (rs >= 0) rs = rs1 ;
 			} /* end if (locked) */
 		    } /* end if (acceptable) */
@@ -1182,12 +1182,12 @@ local int mapdir_expand(MD *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if ((rs = lockrw_wrlock(&ep->rwm,to_lock)) >= 0) {
+	if ((rs = lockrw_lockwr(&ep->rwm,to_lock)) >= 0) {
 	    if ((ep->dirname[0] != '/') && (ep->dname == nullptr)) {
 	        rs = mapdir_expander(ep) ;
 		rv = rs ;
 	    } /* end if */
-	    rs1 = lockrw_unlock(&ep->rwm) ;
+	    rs1 = lockrw_lockun(&ep->rwm) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (read-write lock) */
 	return (rs >= 0) ? rv : rs ;
