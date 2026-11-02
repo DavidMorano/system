@@ -331,7 +331,7 @@ int votdc_titleloads(votdc *op,cchar *lang,cchar **tv) noex {
 	    if (lang[0]) ylikely {
 	        if (sigblocker s ; (rs = s.start) >= 0) ylikely {
 	            ptm *mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) ylikely {
+	            if ((rs = mxp->lockbeg) >= 0) ylikely {
 		        if ((rs = votdc_access(op)) >= 0) {
 		            custime	dt = getustime ;
 	                    if ((rs = votdc_bookslotfind(op,lang)) >= 0) {
@@ -360,7 +360,7 @@ int votdc_titlelang(votdc *op,cchar *lang) noex {
 	    if (lang[0]) ylikely {
 	        if (sigblocker s ; (rs = sigblocker_start(&s,np)) >= 0) {
 	            ptm *mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbeg) >= 0) {
 	                for (int bi = 0 ; bi < VOTDC_NBOOKS ; bi += 1) {
 		            cchar	*blang = op->books[bi].lang ;
 		            f = (strcasecmp(blang,lang) == 0) ;
@@ -391,7 +391,7 @@ int votdc_titleget(votdc *op,char *rbuf,int rlen,int li,int ti) noex {
 	    if (f) ylikely {
 	        if (sigblocker s ; (rs = sigblocker_start(&s,np)) >= 0) {
 	            ptm		*mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbeg) >= 0) {
 		        if ((rs = votdc_access(op)) >= 0) {
 		            votdc_book	*bep = (op->books+li) ;
 		            cint	ac = rs ;
@@ -424,7 +424,7 @@ int votdc_titlefetch(votdc *op,char *rbuf,int rlen,cchar *lang,int ti) noex {
 	    if (f) ylikely {
 	        if (sigblocker s ; (rs = sigblocker_start(&s,np)) >= 0) {
 	            ptm		*mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbeg) >= 0) {
 		        if ((rs = votdc_access(op)) >= 0) {
 		            cint	ac = rs ;
 	                    int		bi ; /* used-afterwards */
@@ -464,7 +464,7 @@ int votdc_titlematch(votdc *op,cchar *lang,cchar *sp,int sl) noex {
 	    if (lang[0] && sp[0]) ylikely {
 	        if (sigblocker s ; (rs = sigblocker_start(&s,np)) >= 0) {
 	            ptm		*mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbeg) >= 0) {
 		        if ((rs = votdc_access(op)) >= 0) {
 		            cint	n = int(op->hdr.booklen) ;
 		            cint	ac = rs ;
@@ -511,7 +511,7 @@ int votdc_versefetch(votdc *op,votdc_cite *citep,char *rbuf,int rlen,
 	    if (lang[0] && (mjd >= 0)) ylikely {
 	        if (sigblocker s ; (rs = sigblocker_start(&s,np)) >= 0) {
 	            ptm		*mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbeg) >= 0) {
 	                if ((rs = votdc_booklanghave(op,lang)) >= 0) {
 	                    int	li = rs ;
 		            if ((rs = votdc_versehave(op,li,mjd)) >= 0) {
@@ -564,7 +564,7 @@ int votdc_verseload(votdc *op,cc *lang,votdc_cite *citep,int mjd,
 	    if (vp[0] && (mjd >= 0)) {
 	        if (sigblocker s ; (rs = sigblocker_start(&s,np)) >= 0) {
 	            ptm		*mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbeg) >= 0) {
 		        if ((rs = votdc_access(op)) >= 0) {
 		            cint	ac = rs ;
 	                    if ((rs = votdc_booklanghave(op,lang)) >= 0) {
@@ -612,7 +612,7 @@ int votdc_getinfo(votdc *op,VOTDC_INFO *bip) noex {
 	if ((rs = votdc_magic(op,bip)) >= 0) ylikely {
 	    if (sigblocker s ; (rs = sigblocker_start(&s,np)) >= 0) {
 	        ptm		*mxp = op->mxp ;
-	        if ((rs = mxp->lockbegin) >= 0) {
+	        if ((rs = mxp->lockbeg) >= 0) {
 	            votdchdr	*hdrp = &op->hdr ;
 	            bip->wtime = (hdrp->wtime & UINT_MAX) ;
 	            bip->atime = (hdrp->atime & UINT_MAX) ;
@@ -669,7 +669,7 @@ int votdc_vcurenum(votdc *op,VOTDC_VCUR *curp,votdc_cite *citep,
 	if ((rs = votdc_magic(op,curp,citep,rbuf)) >= 0) ylikely {
 	    if (sigblocker s ; (rs = sigblocker_start(&s,np)) >= 0) {
 	        ptm		*mxp = op->mxp ;
-	        if ((rs = mxp->lockbegin) >= 0) {
+	        if ((rs = mxp->lockbeg) >= 0) {
 		    cint	vi = (curp->i >= 0) ? (curp->i+1) : 0 ;
 		    if ((rs = votdc_verseslotnext(op,vi)) >= 0) {
 		        votdc_verse	*vep = (op->verses+rs) ;
