@@ -271,9 +271,9 @@ local int ucsyncer_run(US *uip) noex {
 	int		rs1 ;
 	int		f = false ;
 	if (! uip->f_running) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
+	    if ((rs = uc_forklockbeg(-1)) >= 0) { /* multi */
 		ptm *mxp = &uip->mx ;
-	        if ((rs = mxp->lockbegin) >= 0) { /* single */
+	        if ((rs = mxp->lockbeg) >= 0) { /* single */
 		    if (! uip->f_running) {
 		        rs = ucsyncer_runner(uip) ;
 		        f = rs ;
@@ -363,7 +363,7 @@ local int ucsyncer_cmdsend(US *uip,int cmd) noex {
 	int		rs1 ;
 	int		to = 5 ;
 	ptm *mxp = &uip->mx ;
-	if ((rs = mxp->lockbegin(to)) >= 0) {
+	if ((rs = mxp->lockbeg(to)) >= 0) {
 	    if (! uip->f_exiting) {
 		ptc *cnp = &uip->cn ;
 	        uip->waiters += 1 ;
@@ -393,7 +393,7 @@ local int ucsyncer_cmdrecv(US *uip) noex {
 	int		to = 1 ;
 	int		cmd = 0 ;
 	ptm *mxp = &uip->mx ;
-	if ((rs = mxp->lockbegin(to)) >= 0) {
+	if ((rs = mxp->lockbeg(to)) >= 0) {
 	    {
 	        ptc *cnp = &uip->cn ;
 	        uip->waiters += 1 ;
@@ -444,7 +444,7 @@ local void ucsyncer_atforkbefore() noex {
 	US	*uip = &ucsyncer_data ;
 	{
 	    ptm *mxp = &uip->mx ;
-	    mxp->lockbegin() ;
+	    mxp->lockbeg() ;
 	}
 } /* end subroutine (ucsyncer_atforkbefore) */
 
