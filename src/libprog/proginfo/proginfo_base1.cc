@@ -44,6 +44,7 @@ module ;
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
+#include	<ucgetpid.h>		/* LIBUC */
 #include	<getnodename.h>		/* LIBUC */
 #include	<getpwd.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
@@ -235,10 +236,20 @@ int proginfo::pfinish() noex {
 	return rs ;
 } /* end subroutine (proginfo::pfinish) */
 
+int proginfo::pretpid() noex {
+    	int		rs ;
+	if ((rs = intconv(pid)) < 0) {
+	    if ((rs = ucpid) >= 0) {
+	        pid = pid_t(rs) ;
+	    }
+	} /* end if (needed) */
+	return rs ;
+} /* end method (proginfo:pretpid) */
+
 int proginfo::pncpu() noex {
-	int		rs = ncpus ;
-	if (rs == 0) {
-	    rs = 1 ;
+	int		rs ;
+	if ((rs = ncpus) == 0) {
+	    rs = unprocessors ;
 	} /* end if (default value) */
 	return rs ;
 } /* end method (proginfo::pncpu) */
@@ -640,20 +651,20 @@ local int proginfo_setdefdn(PI *pip) noex {
 local int proginfo_setdefpn(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->progname == nullptr) {
-	    int		cl ;
-	    cchar	*cp ;
-	    if (pip->progename != nullptr) {
+	    if (pip->progename) {
+	        int	cl ;
+	        cchar	*cp ;
 	        if ((cl = sfbasename(pip->progename,-1,&cp)) > 0) {
 	            cl = rmext(cp,cl) ;
 	            if (cl == 0) {
 	                cp = NOPROGNAME ;
 	                cl = -1 ;
 	            }
-	        }
+	        } /* end */
 	        if ((cp != nullptr) && (cl != 0)) {
 	            cchar	**vpp = &pip->progdname ;
 	            rs = pip->setent(vpp,cp,cl) ;
-	        }
+	        } /* end */
 	    } /* end if */
 	} /* end if */
 	return rs ;
@@ -690,12 +701,13 @@ proginfo::proginfo(int ac,con mainv av,con mainv ev) noex {
 	now		= {} ;
 	pwdlen		= 0 ;
 	pm		= -1 ;
+	pid		= pid_t(-1) ;
 	eprint.init	(this,0) ;
 	start		(this) ;
 	hwserial	(this) ;
+	retpid		(this,proginfomem_retpid) ;
 	ncpu		(this,proginfomem_ncpu) ;
 	finish		(this,proginfomem_finish) ;
-	rootdname	(this,proginfomem_rootdname) ;
 	progname	(this,proginfomem_progname) ;
 	progename	(this,proginfomem_progename) ;
 	progdname	(this,proginfomem_progdname) ;
@@ -752,6 +764,9 @@ int proginfo_co::operator () (int) noex {
 	int		rs = SR_BADFMT ;
 	if (op) ylikely {
 	    switch (w) {
+	    case proginfomem_retpid:
+		rs = op->pretpid() ;
+		break ;
 	    case proginfomem_ncpu:
 		rs = op->pncpu() ;
 		break ;
