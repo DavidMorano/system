@@ -164,7 +164,7 @@ int piq_ins(piq *op,void *vp) noex {
 	int		c = 0 ;
 	if ((rs = piq_magic(op,vp)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 		    pq_ent	*pep = (pq_ent *) vp ;
 	            rs = pq_ins(op->qlp,pep) ;
@@ -184,7 +184,7 @@ int piq_rem(piq *op,void *vrp) noex {
 	if ((rs = piq_magic(op)) >= 0) ylikely {
 	    void	**vpp = (void **) vrp ;
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = pq_remtail(op->qlp,&pep)) >= 0) {
 	            c = rs ;
 	            if (vpp) *vpp = pep ;
@@ -202,7 +202,7 @@ int piq_count(piq *op) noex {
 	int		c = 0 ;
 	if ((rs = piq_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            rs = pq_count(op->qlp) ;
 	            c = rs ;
@@ -220,7 +220,7 @@ int piq_audit(piq *op) noex {
 	int		c = 0 ;
 	if ((rs = piq_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            rs = pq_audit(op->qlp) ;
 		    c = rs ;
