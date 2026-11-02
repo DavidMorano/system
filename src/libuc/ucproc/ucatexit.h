@@ -48,9 +48,7 @@
 
 
 EXTERNC_begin
-
 extern int uc_atexit(void_f func) noex ;
-
 EXTERNC_end
 
 
