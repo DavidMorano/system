@@ -607,7 +607,7 @@ int debugwrite(cchar *sbuf,int µslen) noex {
 	        if (((rs = debugmgr_init()) >= 0) && (slen > 0)) {
 	            DEBUGMGR	*uip = &ef ;
 	            ptm *mxp = &uip->mx ;
-	            if ((rs = mxp->lockbegin) >= 0) { /* single */
+	            if ((rs = mxp->lockbeg) >= 0) { /* single */
 		        int	cmd = F_LOCK ;
 		        if ((rs = u_lockf(ef.fd,cmd,0z)) >= 0) {
 			    if ((rs = ef.advend()) >= 0) {
@@ -700,7 +700,7 @@ local void debugmgr_atforkbefore() noex {
 	DEBUGMGR	*uip = &ef ;
 	{
 	    ptm *mxp = &uip->mx ;
-	    mxp->lockbegin() ;
+	    mxp->lockbeg() ;
 	}
 } /* end subroutine (debugmgr_atforkbefore) */
 
