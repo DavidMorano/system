@@ -249,7 +249,7 @@ int rtags_add(rtags *op,RT_TAG *tip,cchar *fp,int fl) noex {
 	int		rs1 ;
 	if ((rs = rtags_magic(op,tip,fp)) >= 0) ylikely {
 	    ptm		*mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        hdb_dat		key ;
 	        hdb_dat		val ;
 	        cint		nrs = SR_NOTFOUND ;
@@ -313,7 +313,7 @@ int rtags_sort(rtags *op,rtags_f cf) noex {
 	if (cf == nullptr) cf = vcmpdef ;
 	if ((rs = rtags_magic(op)) >= 0) {
 	    ptm		*mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbeg) >= 0) {
 		{
 	            rs = vecobj_sort(op->tlp,cf) ;
 		    rv = rs ;
@@ -346,7 +346,7 @@ int rtags_curdump(rtags *op,RT_CUR *curp) noex {
 	int		rs1 ;
 	if ((rs = rtags_magic(op,curp)) >= 0) {
 	    ptm		*mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbeg) >= 0) {
 	        void	*vp{} ;
 	        for (int i = 0 ; vecobj_get(op->flp,i,&vp) >= 0 ; i += 1) {
 	            FNAME	*fep = (FNAME *) vp ;
@@ -381,7 +381,7 @@ int rtags_curenum(rtags *op,RT_CUR *curp,RT_TAG *tip,char *rb,int rl) noex {
 	int		fl = 0 ; /* file-length */
 	if ((rs = rtags_magic(op,curp,tip)) >= 0) {
 	    ptm		*mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbeg) >= 0) {
 		RT_TAG	*tep{} ; /* used-throughout */
 	        int	i = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	        void	*vp{} ;
@@ -421,7 +421,7 @@ int rtags_count(rtags *op) noex {
 	int		c = 0 ;
 	if ((rs = rtags_magic(op)) >= 0) {
 	    ptm		*mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) {
+	    if ((rs = mxp->lockbeg) >= 0) {
 	        {
 	            rs = vecobj_count(op->tlp) ;
 	            c = rs ;
