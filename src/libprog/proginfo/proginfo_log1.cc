@@ -171,7 +171,7 @@ int proglog_intro(PI *pip,userinfo *uip) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (proglog_intro) */
 
-int proglog_checksize(PI *pip) noex {
+int proglog_cksize(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	if (pip) {
 	    rs = SR_OK ;
@@ -182,7 +182,7 @@ int proglog_checksize(PI *pip) noex {
 	    } /* end if (log-open) */
 	} /* end if (non-null) */
 	return rs ;
-} /* end subroutine (proglog_checksize) */
+} /* end subroutine (proglog_chsize) */
 
 int proglog_check(PI *pip) noex {
 	int		rs = SR_FAULT ;
