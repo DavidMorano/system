@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	uc_exit(int) noex ;
-
+extern int uc_exit(int) noex ;
 EXTERNC_end
 
 
