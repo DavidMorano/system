@@ -367,8 +367,8 @@ int filemap::read(int rlen,void *rbuf) noex {
     	return filemap_read(this,rlen,rbuf) ;
 } /* end method */
 
-int filemap::getln(cchar **cpp) noex {
-    	return filemap_getln(this,cpp) ;
+int filemap::getln(cchar **rpp) noex {
+    	return filemap_getln(this,rpp) ;
 } /* end method */
 
 int filemap::seek(off_t fo,int w) noex {
