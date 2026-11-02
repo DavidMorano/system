@@ -25,13 +25,13 @@
 
 
 EXTERNC_begin
+extern int ucfilemask_init() noex ;
+extern int ucfilemask_fini() noex ;
+EXTERNC_end
 
-extern int uc_filemask_init() noex ;
-extern int uc_filemask_fini() noex ;
-
+EXTERNC_begin
 extern int uc_filemaskset(mode_t) noex ;
 extern int uc_filemaskget() noex ;
-
 EXTERNC_end
 
 
