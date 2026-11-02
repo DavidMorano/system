@@ -52,7 +52,7 @@
 #include	<cfdec.h>
 #include	<matxstr.h>
 #include	<optval.h>
-#include	<ischarx.h>
+#include	<isch.h>
 #include	<isbad.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
@@ -97,18 +97,18 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-static int	usage(proginfo *) ;
+local int	usage(proginfo *) ;
 
-static int	procopts(proginfo *,keyopt *) ;
-static int	istrack(proginfo *) ;
+local int	procopts(proginfo *,keyopt *) ;
+local int	istrack(proginfo *) ;
 
-static void	int_exit(int) ;
+local void	int_exit(int) ;
 
 
 /* local variables */
 
-static volatile int	if_exit ;
-static volatile int	if_int ;
+local volatile int	if_exit ;
+local volatile int	if_int ;
 
 enum argopts {
 	argopt_root,
@@ -308,7 +308,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -582,7 +582,7 @@ int main(int argc,mainv argv,mainv envv) {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = (*akp & 0xff) ;
+	                    cint	kc = (*akp & 0xff) ;
 
 	                    switch (kc) {
 
@@ -888,7 +888,7 @@ int main(int argc,mainv argv,mainv envv) {
 	    }
 
 	    if ((rs = bopen(afp,afname,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        char	lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = breadln(afp,lbuf,llen)) > 0) {
@@ -1279,7 +1279,7 @@ badnofiles:
 
 
 /* ARGSUSED */
-static void int_exit(int sn)
+local void int_exit(int sn)
 {
 
 	if_exit = TRUE ;
@@ -1287,7 +1287,7 @@ static void int_exit(int sn)
 /* end subroutine (int_exit) */
 
 
-static int usage(proginfo *pip)
+local int usage(proginfo *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -1316,7 +1316,7 @@ static int usage(proginfo *pip)
 }
 /* end subroutine (usage) */
 
-static int procopts(proginfo *pip,keyopt *kop) noex {
+local int procopts(proginfo *pip,keyopt *kop) noex {
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	cchar		*cp ;
@@ -1332,7 +1332,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 	        int	kl, vl ;
 	        cchar	*kp, *vp ;
 
-	        while ((kl = keyopt_enumkeys(kop,&cur,&kp)) >= 0) {
+	        while ((kl = keyopt_curenumkeys(kop,&cur,&kp)) >= 0) {
 
 	            vl = keyopt_fetch(kop,kp,NULL,&vp) ;
 
@@ -1453,7 +1453,7 @@ static int procopts(proginfo *pip,keyopt *kop) noex {
 /* end subroutine (procopts) */
 
 
-static int istrack(proginfo *pip)
+local int istrack(proginfo *pip)
 {
 	int		f_track = TRUE ;
 
