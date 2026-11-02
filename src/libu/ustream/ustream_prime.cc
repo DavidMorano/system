@@ -565,7 +565,7 @@ local int ustream_opener(ustream *op) noex {
 	return u_fstat(op->fd,sbp) ;
     } /* end subroutine (ustream_stat) */
 
-    int ustream_lockbegin(ustream *op,int lt,int to) noex {
+    int ustream_lockbeg(ustream *op,int lt,int to) noex {
     	int		rs = SR_INVALID ;
 	(void) to ;
 	    if (lt >= 0) {
@@ -573,7 +573,7 @@ local int ustream_opener(ustream *op) noex {
 		rs = u_lockfile(op->fd,cmd,0z,0z,to) ;
 	    }
 	return rs ;
-    } /* end subroutine (ustream_lockbegin) */
+    } /* end subroutine (ustream_lockbeg) */
 
     int ustream_lockend(ustream *op) noex {
 	return u_lockf(op->fd,F_UNLOCK,0z) ;
