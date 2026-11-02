@@ -598,7 +598,7 @@ int filer_stat(filer *op,ustat *sbp) noex {
 	return rs ;
 } /* end subroutine (filer_stat) */
 
-int filer_lockbegin(filer *op,int lt,int to) noex {
+int filer_lockbeg(filer *op,int lt,int to) noex {
     	int		rs ;
 	(void) to ;
 	if ((rs = filer_magic(op)) >= 0) ylikely {
@@ -609,7 +609,7 @@ int filer_lockbegin(filer *op,int lt,int to) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (filer_lockbegin) */
+} /* end subroutine (filer_lockbeg) */
 
 int filer_lockend(filer *op) noex {
     	int		rs ;
