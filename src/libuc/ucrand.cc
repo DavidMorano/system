@@ -149,7 +149,7 @@ namespace {
 	int get(char *,int) noex ;
 	int geter(char *,int) noex ;
 	void atbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
 	} ;
 	void atafter() noex {
 	    mx.lockend() ;
@@ -229,7 +229,7 @@ int rander::iinit() noex {
 		}
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		lrs = SR_OK ;
 	            if (!finit) {
 		        lrs = SR_LOCKFAIL ;		/* <- failure */
@@ -399,7 +399,7 @@ int rander::irandend() noex {
 int rander::capbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin(to)) >= 0) ylikely {
+	if ((rs = mx.lockbeg(to)) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
 	        rs = cv.wait(&mx,to) ;
@@ -417,7 +417,7 @@ int rander::capbegin(int to) noex {
 int rander::icapend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin) >= 0) ylikely {
+	if ((rs = mx.lockbeg) >= 0) ylikely {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = cv.signal ;
