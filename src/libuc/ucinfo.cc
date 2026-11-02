@@ -160,7 +160,7 @@ namespace {
 	int getaux_load(setaux *) noex ;
 	int getaux_install(setaux *) noex ;
 	void atforkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
 	} ;
 	void atforkafter() noex {
 	    mx.lockend() ;
@@ -363,8 +363,8 @@ int ucinfo::getname_load(setname *setp) noex {
 int ucinfo::getname_install(setname *setp) noex {
 	int		rs ;
 	int		rs1 ;
-        if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
-            if ((rs = mx.lockbegin) >= 0) ylikely {
+        if ((rs = uc_forklockbeg(-1)) >= 0) ylikely {
+            if ((rs = mx.lockbeg) >= 0) ylikely {
                 if (ao.name == nullptr) {
                     ao.name = setp->strp ;
                     name = setp->tmpname ;
@@ -469,8 +469,8 @@ int ucinfo::getaux_load(setaux *setp) noex {
 int ucinfo::getaux_install(setaux *setp) noex {
 	int		rs ;
 	int		rs1 ;
-        if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
-            if ((rs = mx.lockbegin) >= 0) ylikely {
+        if ((rs = uc_forklockbeg(-1)) >= 0) ylikely {
+            if ((rs = mx.lockbeg) >= 0) ylikely {
                 if (ao.aux == nullptr) {
                     ao.aux = setp->strp ;
                     aux = setp->tmpaux ;
