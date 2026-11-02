@@ -58,20 +58,24 @@
 
 
 EXTERNC_begin
-
-extern int uc_atforkrec(void_f b,void_f p,void_f c) noex ;
-extern int uc_atforkexp(void_f b,void_f p,void_f c) noex ;
 extern int ucatfork_init() noex ;
 extern int ucatfork_fini() noex ;
-extern int ucatfork_trackbegin() noex ;
+extern int ucatfork_trackbeg() noex ;
+extern int ucatfork_trackend() noex ;
+EXTERNC_end
 
+EXTERNC_begin
+extern int uc_atforkrec(void_f b,void_f p,void_f c) noex ;
+extern int uc_atforkexp(void_f b,void_f p,void_f c) noex ;
+EXTERNC_end
+
+EXTERNC_begin
 local inline int uc_atforkrecord(void_f b,void_f p,void_f c) noex {
 	return uc_atforkrec(b,p,c) ;
-}
+} /* end */
 local inline int uc_atforkexpunge(void_f b,void_f p,void_f c) noex {
 	return uc_atforkexp(b,p,c) ;
-}
-
+} /* end */
 EXTERNC_end
 
 
