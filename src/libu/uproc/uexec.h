@@ -40,11 +40,9 @@
 
 
 EXTERNC_begin
-
-extern int	u_execve(cchar *,mainv,mainv) noex ;
-extern int	u_execv(cchar *,mainv) noex ;
-extern int	u_execvp(cchar *,mainv) noex ;
-
+extern int u_execve	(cchar *,mainv,mainv) noex ;
+extern int u_execv	(cchar *,mainv) noex ;
+extern int u_execvp	(cchar *,mainv) noex ;
 EXTERNC_end
 
 
