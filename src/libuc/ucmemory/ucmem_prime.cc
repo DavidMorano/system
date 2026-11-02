@@ -197,7 +197,7 @@ namespace {
 	int ifini	() noex ;
 	int pvars	() noex ;
 	void atforkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
 	} ; /* end */
 	void atforkafter() noex {
 	    mx.lockend() ;
@@ -688,7 +688,7 @@ int submgr::trackstart(int opts) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	if (! ftrack) ylikely {
-	    if ((rs = mx.lockbegin) >= 0) ylikely {
+	    if ((rs = mx.lockbeg) >= 0) ylikely {
 	        {
 	            rs = trackstarter(opts) ;
 		    rv = rs ;
@@ -713,7 +713,7 @@ int submgr::trackfinish() noex {
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
 	if (ftrack) ylikely {
-	    if ((rs = mx.lockbegin) >= 0) ylikely {
+	    if ((rs = mx.lockbeg) >= 0) ylikely {
 		{
 	            ftrack = false ;
 		    rs1 = mt.finish ;
@@ -731,8 +731,8 @@ int submgr::trackcall(void *cp,int sz,void *vp) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	if ((rs = init) >= 0) ylikely {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
-		if ((rs = mx.lockbegin) >= 0) ylikely {
+	    if ((rs = uc_forklockbeg(-1)) >= 0) ylikely {
+		if ((rs = mx.lockbeg) >= 0) ylikely {
 		    {
 		        rs = (this->*m)(cp,sz,vp) ;
 			rv = rs ;
@@ -781,8 +781,8 @@ int submgr::trackcurenum(ucmem_cur *curp,ucmem_ent *rp) noex {
 	int		rs1 ;
 	int		rsz = 0 ;
 	if ((rs = init) >= 0) ylikely {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
-	        if ((rs = mx.lockbegin) >= 0) ylikely {
+	    if ((rs = uc_forklockbeg(-1)) >= 0) ylikely {
+	        if ((rs = mx.lockbeg) >= 0) ylikely {
 		    {
 			rs = callcurenum(curp,rp) ;
 			rsz = rs ;
@@ -900,8 +900,8 @@ int submgr::mallstats(ucmem_stats *statp) noex {
 	int		rs1 ;
 	int		rv = 0 ;
 	if ((rs = init) >= 0) ylikely {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) ylikely {
-	        if ((rs = mx.lockbegin) >= 0) ylikely {
+	    if ((rs = uc_forklockbeg(-1)) >= 0) ylikely {
+	        if ((rs = mx.lockbeg) >= 0) ylikely {
 		    {
 		        *statp = st ;
 	    	        rv = intsat(st.out_size) ;
