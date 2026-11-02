@@ -37,7 +37,7 @@ enum aflagmems {
 	aflagmem_overlast
 } ; /* end enum */
 enum aflagmxs {
-	aflagmx_lockbegin,
+	aflagmx_lockbeg,
 	aflagmx_lockend,
 	aflagmx_overlast
 } ; /* end enum */
@@ -76,7 +76,7 @@ struct aflag {
 	aflag_co	wait ;
 	aflag_co	notify ;
 	aflag_co	notifyall ;
-	aflag_mx	lockbegin ;
+	aflag_mx	lockbeg ;
 	aflag_mx	lockend ;
 	std::atomic_flag	af{} ;
 	constexpr aflag() noex {
@@ -87,7 +87,7 @@ struct aflag {
 	    wait	(this,aflagmem_wait) ;
 	    notify	(this,aflagmem_notify) ;
 	    notifyall	(this,aflagmem_notifyall) ;
-	    lockbegin	(this,aflagmx_lockbegin) ;
+	    lockbeg	(this,aflagmx_lockbeg) ;
 	    lockend	(this,aflagmx_lockend) ;
 	} ; /* end ctor */
 	operator bool () const noex {
@@ -95,6 +95,9 @@ struct aflag {
 	} ; /* end */
 	operator int () const noex {
 	    return int(af.test()) ;
+	} ; /* end */
+	operator uint () const noex {
+	    return uint(af.test()) ;
 	} ; /* end */
 	bool operator = (const bool f) noex {
 	    bool	rf = false ;
@@ -107,7 +110,7 @@ struct aflag {
 	    return rf ;
 	} ; /* end method (operator-assignment) */
     private:
-	int ilockbegin	(int = -1) noex ;
+	int ilockbeg	(int = -1) noex ;
 	int ilockend	() noex ;
 } ; /* end struct (aflag) */
 
