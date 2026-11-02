@@ -46,6 +46,7 @@ export module proginfo.base ;
 
 
 enum proginfomems {
+	proginfomem_retpid,
 	proginfomem_ncpu,
 	proginfomem_finish,
 	proginfomem_progname,		/* program name */
@@ -232,6 +233,7 @@ export {
     	statcexpr auto	np = nullptr ;
 	proginfo_hwser	hwserial ;
 	proginfo_start	start ;
+	proginfo_co	retpid ;
 	proginfo_co	ncpu ;
 	proginfo_co	finish ;
 	proginfo_eprint	eprint ;
@@ -275,6 +277,7 @@ export {
    private:
 	int pstart	(int,mainv,mainv,ccharp) noex ;
 	int pfinish	() noex ;
+	int pretpid	() noex ;
 	int pncpu	() noex ;
     } ; /* end struct (proginfo) */
 } /* end export */
