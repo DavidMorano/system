@@ -173,7 +173,7 @@ local int	lfm_lockwrite(lfm *,lfm_lin *,int) noex ;
 local int	lfm_lockwriter(lfm *,lfm_lin *,int) noex ;
 local int	lfm_lockwritedate(lfm *,time_t) noex ;
 local int	lfm_lockreadpid(lfm *) noex ;
-local int	lfm_lockbegin(lfm *) noex ;
+local int	lfm_lockbeg(lfm *) noex ;
 local int	lfm_lockend(lfm *) noex ;
 local int	lfm_checklock(lfm *,time_t) noex ;
 local int	lfm_ourdevino(lfm *,USTAT *) noex ;
@@ -790,7 +790,7 @@ local int lfm_lockwritedate(lfm *op,time_t dt) noex {
 	return rs ;
 } /* end subroutine (lfm_lockwritedate) */
 
-local int lfm_lockbegin(lfm *op) noex {
+local int lfm_lockbeg(lfm *op) noex {
 	int		rs = SR_OK ;
 	int		f_open = false ;
 	if (op->lfd < 0) {
@@ -801,7 +801,7 @@ local int lfm_lockbegin(lfm *op) noex {
 	    op->lfd = rs ;
 	}
 	return (rs >= 0) ? f_open : rs ;
-} /* end subroutine (lfm_lockbegin) */
+} /* end subroutine (lfm_lockbeg) */
 
 local int lfm_lockend(lfm *op) noex {
 	int		rs = SR_OK ;
@@ -820,7 +820,7 @@ local int lfm_checklock(lfm *op,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
 	int		v = 0 ;
-	if ((rs = lfm_lockbegin(op)) >= 0) ylikely {
+	if ((rs = lfm_lockbeg(op)) >= 0) ylikely {
 	    bool	f_open = (rs > 0) ;
 	    if ((rs = lfm_lockreadpid(op)) >= 0) ylikely {
 	        const pid_t	pid_lock = rs ;
