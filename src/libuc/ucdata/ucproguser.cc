@@ -262,9 +262,9 @@ int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
 		if (sigblocker b ; (rs = b.start) >= 0) {
 	            if ((rs = ucproguser_init()) >= 0) {
 	                pumgr	*uip = &ucproguser_data ;
-	                if ((rs = uc_forklockbegin(-1)) >= 0) {
+	                if ((rs = uc_forklockbeg(-1)) >= 0) {
 			    ptm *mxp = &uip->mx ;
-	                    if ((rs = mxp->lockbegin) >= 0) {
+	                    if ((rs = mxp->lockbeg) >= 0) {
 				if ((rs = uip->namer(cbuf,clen)) >= 0) {
 				    ul = rs ;
 				    uip->et = time(nullptr) ;
@@ -300,9 +300,9 @@ int ucproguser_nameget(char *rbuf,int rlen,uid_t uid) noex {
 	        if (uip->username[0] != '\0') {
 	            if (sigblocker b ; (rs = b.start) >= 0) {
 	                if ((rs = ucproguser_init()) >= 0) {
-	                    if ((rs = uc_forklockbegin(-1)) >= 0) {
+	                    if ((rs = uc_forklockbeg(-1)) >= 0) {
 			        ptm *mxp = &uip->mx ;
-	                        if ((rs = mxp->lockbegin) >= 0) {
+	                        if ((rs = mxp->lockbeg) >= 0) {
 				    {
 				        rs = uip->namegeter(rbuf,rlen,uid) ;
 				        len = rs ;
@@ -394,7 +394,7 @@ local void ucproguser_atforkbefore() noex {
 	pumgr	*uip = &ucproguser_data ;
 	{
 	    ptm *mxp = &uip->mx ;
-	    mxp->lockbegin() ;
+	    mxp->lockbeg() ;
 	}
 } /* end subroutine (ucproguser_atforkbefore) */
 
