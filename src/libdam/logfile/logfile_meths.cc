@@ -27,8 +27,10 @@
 
 		logfile_open
 		logfile_write
-		logfile_printf
 		logfile_vprintf
+		logfile_print
+		logfile_printf
+		logfile_printfold
 		logfile_setid
 		logfile_check
 		logfile_cksize
@@ -127,6 +129,10 @@ int logfile::check(time_t dt) noex {
 int logfile::write(cchar *sp,int sl) noex {
 	return logfile_write(this,sp,sl) ;
 } /* end method (logfile::write) */
+
+int logfile::printfold(cchar *pre,cchar *sp,int sl) noex {
+	return logfile_printfold(this,pre,sp,sl) ;
+} /* end method (logfile::printfold) */
 
 int logfile::print(cchar *sp,int sl) noex {
 	return logfile_write(this,sp,sl) ;
