@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	uc_procpid(cchar *,uid_t) noex ;
-
+extern int uc_procpid(cchar *,uid_t) noex ;
 EXTERNC_end
 
 
