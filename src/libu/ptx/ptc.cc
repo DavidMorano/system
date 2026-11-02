@@ -57,7 +57,7 @@ template<typename ... Args> int ptc_ma::operator () (Args ... args) noex {
         int             rs = SR_FAULT ;
         if ((... && args)) {
             rs = (op->magval == ptc_magicval) ? SR_OK : SR_NOTOPEN ;
-        }
+        } /* end */
         return rs ;
 } /* end method (ptc_ma::operator) */
 
@@ -71,7 +71,7 @@ local sysret_t std_ptcinit(ptc *op,ptca *ap) noex {
 	    rs = (neg rs) ;
 	} else if (rs < 0) {
 	    rs = SR_NOANODE ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (std_ptcinit) */
 
@@ -131,7 +131,7 @@ int ptc_destroy(ptc *op) noex {
 	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 	            rs = SR_NOANODE ;
-	        }
+	        } /* end */
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -159,7 +159,7 @@ int ptc_signal(ptc *op) noex {
 	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 	            rs = SR_NOANODE ;
-	        }
+	        } /* end */
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -173,7 +173,7 @@ int ptc_wait(ptc *op,ptm *mp) noex {
 	            rs = (neg rs) ;
 	        } else if (rs < 0) {
 	            rs = SR_NOANODE ;
-	        }
+	        } /* end */
 	    } until (rs != SR_INTR) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -190,7 +190,7 @@ int ptc_waiting(ptc *op,ptm *mp,int to) noex {
 	        rs = ptc_waiter(op,mp,&ts) ;
 	    } else {
 	        rs = ptc_wait(op,mp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ptc_waiting) */
@@ -204,11 +204,11 @@ int ptc_waiter(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	                rs = (neg rs) ;
 	            } else if (rs < 0) {
 	                rs = SR_NOANODE ;
-	            }
+	            } /* end */
 		} until (rs != SR_INTR) ;
 	    } else {
 	        rs = ptc_wait(op,mp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ptc_waiter) */
@@ -224,14 +224,14 @@ int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 	                    rs = (neg rs) ;
 		        } else if (rs < 0) {
 			    rs = SR_NOANODE ;
-	                }
+	                } /* end */
 	            } until (rs != SR_INTR) ;
 		} else {
 	            rs = ptc_wait(op,mp) ;
 	        } /* end if (sushas_rltimedwait) */
 	    } else {
 	        rs = ptc_wait(op,mp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (ptc_reltimedwaitnp) */
@@ -266,14 +266,14 @@ int ptc::reltimedwaitnp(ptm *mxp,CTIMESPEC *tsp) noex {
 void ptc::dtor() noex {
 	if (cint rs = destroy ; rs < 0) {
 	    ulogerror("ptc",rs,"dtor-destroy") ;
-	}
+	} /* end */
 } /* end method (ptc::dtor) */
 
 int ptc_creater::operator () (ptca *ap) noex {
     	int		rs ;
 	if ((rs = ptc_create(op,ap)) >= 0) ylikely {
 	    op->magval = PTC_MAGIC ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (ptc_creater::operator) */
 
