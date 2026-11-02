@@ -202,7 +202,7 @@ int cachetime_lookup(CT *op,cchar *sp,int µsl,time_t *timep) noex {
 	if ((rs = cachetime_magic(op,sp)) >= 0) ylikely {
 	    if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	        ptm *mxp = op->mxp ;
-	        if ((rs = mxp->lockbegin) >= 0) ylikely {
+	        if ((rs = mxp->lockbeg) >= 0) ylikely {
 		    {
 	                rs = cachetime_lookuper(op,sp,sl,timep) ;
 		        rv = rs ;
@@ -224,7 +224,7 @@ int cachetime_curbegin(CT *op,CT_CUR *curp) noex {
 	    rs = SR_NOMEM ;
 	    if ((curp->hcp = new(nt) hdb_cur) != np) ylikely {
 	        ptm *mxp = op->mxp ;
-	        if ((rs = mxp->lockbegin) >= 0) ylikely {
+	        if ((rs = mxp->lockbeg) >= 0) ylikely {
 	            rs = hdb_curbegin(op->dbp,curp->hcp) ;
 	            if (rs < 0) {
 		        mxp->lockend() ;
@@ -284,7 +284,7 @@ int cachetime_stats(CT *op,st *statp) noex {
 	int		rv = 0 ;
 	if ((rs = cachetime_magic(op,statp)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            statp->req = op->c_req ;
 	            statp->hit = op->c_hit ;
