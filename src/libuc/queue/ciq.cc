@@ -197,7 +197,7 @@ int ciq_ins(ciq *op,void *vp) noex {
 	int		c = 0 ;
 	if ((rs = ciq_magic(op,vp)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        pq_ent	*pep{} ; /* used-afterwards */
 	        cint	rse = SR_EMPTY ;
 	        if ((rs = pq_remtail(op->freep,&pep)) == rse) {
@@ -224,7 +224,7 @@ int ciq_rem(ciq *op,void *vrp) noex {
 	if ((rs = ciq_magic(op,vrp)) >= 0) ylikely {
 	    void	**vpp = voidpp(vrp) ;
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = pq_rem(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (vpp) {
@@ -248,7 +248,7 @@ int ciq_gettail(ciq *op,void *vrp) noex {
 	if ((rs = ciq_magic(op)) >= 0) ylikely {
 	    void	**rpp = (void **) vrp ;
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = pq_gettail(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (rpp) {
@@ -270,7 +270,7 @@ int ciq_remtail(ciq *op,void *vrp) noex {
 	if ((rs = ciq_magic(op)) >= 0) ylikely {
 	    void	**rpp = (void **) vrp ;
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = pq_remtail(op->fifop,&pep)) >= 0) {
 	            c = rs ;
 	            if (rpp) {
@@ -295,7 +295,7 @@ int ciq_rement(ciq *op,void *ep) noex {
 	int		c = 0 ;
 	if ((rs = ciq_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (pq_ent *pep{} ; (rs = ciq_findent(op,&pep,ep)) > 0) {
 	            if ((rs = pq_unlink(op->fifop,pep)) >= 0) ylikely {
 	                c = rs ;
@@ -320,7 +320,7 @@ int ciq_count(ciq *op) noex {
 	int		c = 0 ;
 	if ((rs = ciq_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            rs = pq_count(op->fifop) ;
 	            c = rs ;
@@ -338,7 +338,7 @@ int ciq_audit(ciq *op) noex {
 	int		rv = 0 ; /* return-value */
 	if ((rs = ciq_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if ((rs = pq_audit(op->freep)) >= 0) ylikely {
 	            rs = pq_audit(op->fifop) ;
 		    rv = rs ;
