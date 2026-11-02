@@ -91,19 +91,19 @@ namespace {
 	int init() noex ;
 	int fini() noex ;
         void atforkbefore() noex {
-	    mx.lockbegin() ;
-        } ;
+	    mx.lockbeg() ;
+        } ; /* end */
         void atforkparent() noex {
 	    mx.lockend() ;
-        } ;
+        } ; /* end */
         void atforkchild() noex {
 	    pid = 0 ;
 	    mx.lockend() ;
-        } ;
+        } ; /* end */
 	destruct ucgetpid() noex {
 	    if (cint rs = fini() ; rs < 0) {
 		ulogerror("ucgetpid",rs,"dtor-fini") ;
-	    }
+	    } /* end */
 	} ; /* end dtor */
 	int igetpid() noex ;
     } ; /* end structure (ucgetpid) */
@@ -137,7 +137,7 @@ int uc_getpid(void) noex {
 	int		rs ;
 	if ((rs = ucgetpid_data.igetpid()) == SR_NXIO) {
 	    rs = ucgetpid_data.pid ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine */
 
@@ -174,7 +174,7 @@ int ucgetpid::init() noex {
 	                if ((rs = uc_atexit(e)) >= 0) {
 	                    finitdone = true ;
 	                    fr = true ;
-	                }
+	                } /* end */
 	                if (rs < 0) {
 	                    uc_atforkexp(b,ap,ac) ;
 			} /* end if (error) */
@@ -194,7 +194,7 @@ int ucgetpid::init() noex {
 		        rsl = SR_LOCKFAIL ;
 	            } else if (finitdone) {
 		        rsl = 1 ;
-	            }
+	            } /* end */
 	            return rsl ;
 	        } ; /* end lambda */
 	        rs = tw(lamb) ;
@@ -213,11 +213,11 @@ int ucgetpid::fini() noex {
 	        void_f	ac = ucgetpid_atforkchild ;
 	        rs1 = uc_atforkexp(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finitdone = false ;
 	    finit = false ;
 	} /* end if (was initialized) */
@@ -229,8 +229,8 @@ int ucgetpid::igetpid() noex {
 	if (!finit) rs = init() ;
 	if (rs >= 0) {
 	    if (pid == 0) pid = getpid() ;
-	    rs = pid ;
-	}
+	    rs = conv<int>(pid) ;
+	} /* end */
 	return rs ;
 } /* end subroutine (ucgetpid::igetpid) */
 
