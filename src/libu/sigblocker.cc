@@ -94,7 +94,7 @@ int sigblocker_co::operator () (cint *sigs) noex {
 	int		rs = SR_BUGCHECK ;
 	if (op) ylikely {
 	    rs = sigblocker_start(op,sigs) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (sigblocker::operator) */
 
@@ -116,7 +116,7 @@ sigblocker_co::operator int () noex {
 void sigblocker::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("sigblocker",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (sigblocker::dtor) */
 
 local int mksignew(sigset_t *rp,cint *sigs) noex {
@@ -129,6 +129,7 @@ local int mksignew(sigset_t *rp,cint *sigs) noex {
 	    } /* end if */
 	} else {
 	    rs = usigseter.fill(rp) ;
+	    usigseter.del(rp,SIGINT) ;
 	} /* end if */
 	return rs ;
 } /* end subroutine (mksignew) */
