@@ -853,11 +853,11 @@ local int dater_ldzname(dater *op,cchar *sp,int sl) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (dater_ldzname) */
 
-local int dater_ldcomzone(dater *op,comparse *cpp) noex {
+local int dater_ldcomzone(dater *op,comparse *comp) noex {
 	int		rs = SR_OK ;
 	if (op->zname[0] == '\0') {
 	    cchar	*cp{} ;
-	    if (int cl ; (cl = comparse_getcom(cpp,&cp)) > 0) {
+	    if (int cl ; (cl = comparse_getcom(comp,&cp)) > 0) {
 	        dater_ldzname(op,cp,cl) ;
 	    } /* end if (comparse_getcom) */
 	} /* end if (zname) */
