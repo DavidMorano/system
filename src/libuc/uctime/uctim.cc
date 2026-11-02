@@ -513,7 +513,7 @@ int timemgr::pinit() noex {
 		} /* end if (error) */
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		rsl = SR_OK ;
 	            if (!finit) ylikely {
 		        rsl = SR_LOCKFAIL ;
@@ -571,7 +571,7 @@ int timemgr::pfini() noex {
 int timemgr::pcapbeg(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mtx.lockbegin(to)) >= 0) {
+	if ((rs = mtx.lockbeg(to)) >= 0) {
 	    {
 	        waiters += 1 ;
 	        while ((rs >= 0) && fcapture) { /* busy */
@@ -591,7 +591,7 @@ int timemgr::pcapbeg(int to) noex {
 int timemgr::pcapend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mtx.lockbegin) >= 0) {
+	if ((rs = mtx.lockbeg) >= 0) {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = cnv.signal ;
@@ -606,7 +606,7 @@ int timemgr::pcapsignal() noex {
     	int		rs ;
 	int		rs1 ;
 	DEBPRINTF("ent\n") ;
-	if ((rs = mtx.lockbegin) >= 0) {
+	if ((rs = mtx.lockbeg) >= 0) {
 	    {
 		fcmd = true ;
 		rs = cnv.signal ;
@@ -1255,7 +1255,7 @@ int timemgr::disprecv() noex {
 	int		rs1 ;
 	int		cmd = dispcmd_exit ;
 	DEBPRINTF("ent\n") ;
-	if ((rs = mtx.lockbegin) >= 0) ylikely {
+	if ((rs = mtx.lockbeg) >= 0) ylikely {
 	    {
 	        waiters += 1 ;
 		DEBPRINTF("fcmd=%d\n",int(fcmd)) ;
@@ -1401,7 +1401,7 @@ local int timemgr_dispworker(timemgr *tmp) noex {
 } /* end subroutine */
 
 local void timemgr_atforkbefore() noex {
-	timemgr_data.mtx.lockbegin() ;
+	timemgr_data.mtx.lockbeg() ;
 } /* end subroutine (timemgr_atforkbefore) */
 
 local void timemgr_atforkparent() noex {
