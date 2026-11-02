@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	uc_nprocs(int) noex ;
-
+extern int uc_nprocs(int) noex ;
 EXTERNC_end
 
 
