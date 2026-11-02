@@ -59,17 +59,17 @@ export {
     public:
 	ccmutex() {
 	    mx.create(nullptr) ;
-	} ;
+	} ; /* end */
 	destruct ccmutex() {
 	    mx.destroy() ;
-	} ;
+	} ; /* end */
 	ccmutex &operator = (const ccmutex &) = delete ;
 	int lock() {
-	    return mx.lockbegin ;
-	} ;
+	    return mx.lockbeg ;
+	} ; /* end */
 	int unlock() {
 	    return mx.lockend ;
-	} ;
+	} ; /* end */
     } ; /* end class (ccmutex) */
     class guardmutex {
 	ccmutex		&rm ;
@@ -77,15 +77,15 @@ export {
     public:
 	guardmutex(ccmutex &m) : rm(m) { 
 	    rs = rm.lock() ;
-	} ;
-	~guardmutex() {
+	} ; /* end */
+	destruct guardmutex() {
 	    if (rs >= 0) {
 	        rm.unlock() ;
 	    }
-	} ;
+	} ; /* end */
 	int caputured() {
 	    return rs ;
-	} ;
+	} ; /* end */
     } ; /* end class (guardmutex) */
 } /* end export */
 
