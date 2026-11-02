@@ -1,14 +1,14 @@
-/* handle */
+/* syshaler_handle SUPPOET */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
 
 /* handle a connect request for a service */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0
 #define	CF_DEBUG	1
 #define	CF_SVCSHELLARG	0
 #define	CF_PEERNAME	1
-
 
 /* revision history:
 
@@ -19,53 +19,53 @@
 	I added the ability to specify the "address_from"
 	for the case when we add an envelope header to the message.
 
-
 */
 
 /* Copyright © 1996,1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This subrotuine processes a new connection that just came in. This
-        connection may have been passwed to us by our own daemon or it may have
-        been passed to us by executing us with the connection on standard input.
+  	Description:
+	This subrotuine processes a new connection that just came
+	in.  This connection may have been passwed to us by our own
+	daemon or it may have been passed to us by executing us
+	with the connection on standard input.
 
 	We:
-
 	1. get the service name, which is terminated by a line feed
 	2. search for the service if we have it
 	3. acknowledge the client, positively or negatively
 	4. call 'process' to finish the processing of this connection
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<ctime>
-#include	<cstring>
+#include	<netdb.h>
 #include	<pwd.h>
 #include	<grp.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<vecstr.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<srvtab.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"srventry.h"
 #include	"builtin.h"
@@ -77,11 +77,7 @@
 
 /* local defines */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 #ifndef	TO_SVC
 #define	TO_SVC		30
 #endif
@@ -101,8 +97,6 @@ extern int	handle_srventry(struct proginfo *,struct serverinfo *,
 			vecstr *) ;
 
 extern char	*strwcpy(char *,char *,int) ;
-extern char	*strwcpylc(char *,char *,int) ;
-extern char	*timestr_log(), *timestr_edate(), *timestr_elapsed() ;
 
 
 /* external variables */
@@ -161,7 +155,7 @@ struct clientinfo	*cip ;
 	connection_start(&conn,gp->domainname) ;
 
 	logfile_printf(&gp->lh,"%s request pid=%d\n",
-	    timestr_log(daytime,timebuf),gp->pid) ;
+	    strtime_log(daytime,timebuf),gp->pid) ;
 
 
 /* can we get the peername of the other end of this socket, if a socket ? */
@@ -271,7 +265,7 @@ struct clientinfo	*cip ;
 	fsb.lp[fsb.rlen] = '\0' ;
 
 	logfile_printf(&gp->lh,"%s service=%s\n",
-	    timestr_log(daytime,timebuf),
+	    strtime_log(daytime,timebuf),
 	    service) ;
 
 
