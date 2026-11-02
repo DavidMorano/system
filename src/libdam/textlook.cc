@@ -1229,7 +1229,7 @@ local int disp_setstate(DISP *dop,DISP_THR *tip,int f) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_prev = false ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbeg) >= 0) {
 	    f_prev = tip->f_busy ;
 	    tip->f_busy = f ;
 	    if ((! f) && f_prev) {
@@ -1380,7 +1380,7 @@ local int disp_readyset(DISP *dop) noex {
 	ptm		*mxp = dop->mxp ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbeg) >= 0) {
 	    {
 	        ptc *cnp = dop->cvp ;
 	        dop->f_ready = true ;
@@ -1397,7 +1397,7 @@ local int disp_readywait(DISP *dop) noex {
 	ptm		*mxp = dop->mxp ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mxp->lockbegin) >= 0) {
+	if ((rs = mxp->lockbeg) >= 0) {
 	    {
 	        ptc *cnp = dop->cvp ;
 	        while ((! dop->f_ready) && (! dop->f_exit)) {
