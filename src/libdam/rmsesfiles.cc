@@ -116,7 +116,7 @@ struct openstate {
 
 local int	rmsesfiler(ids *,char *,cchar *) noex ;
 
-local int	lockbegin(char *,int) noex ;
+local int	lockbeg(char *,int) noex ;
 local int	lockend(char *,int,int) noex ;
 
 local int	rmsesdir(ids *,char *,int) noex ;
@@ -183,7 +183,7 @@ local int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	    if (char *nbuf ; (rs = lm_mn(&nbuf)) >= 0) ylikely {
 		cint	nlen = rs ;
 	        if (sigblocker s ; (rs = s.start) >= 0) ylikely {
-	            if ((rs = lockbegin(pbuf,pl)) >= 0) ylikely {
+	            if ((rs = lockbeg(pbuf,pl)) >= 0) ylikely {
 	                cint	lfd = rs ;
 	                if (fsdir d ; (rs = d.open(pbuf)) >= 0) ylikely {
 	                    fsdir_ent	de ;
@@ -218,7 +218,7 @@ local int rmsesfiler(ids *idp,char *pbuf,cchar *dname) noex {
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (rmsesfiler) */
 
-local int lockbegin(char *pbuf,int plen) noex {
+local int lockbeg(char *pbuf,int plen) noex {
 	int		rs ;
 	int		lfd = -1 ;
 	cchar		*lfn = RMSESFILES_LOCKFILE ;
@@ -243,7 +243,7 @@ local int lockbegin(char *pbuf,int plen) noex {
 	    pbuf[plen] = '\0' ; /* <- restore */
 	} /* end if (pathadd) */
 	return (rs >= 0) ? lfd : rs ;
-} /* end subroutine (lockbegin) */
+} /* end subroutine (lockbeg) */
 
 local int lockend(char *pbuf,int plen,int lfd) noex {
 	int		rs ;
