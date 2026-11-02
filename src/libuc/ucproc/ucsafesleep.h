@@ -43,9 +43,7 @@
 
 
 EXTERNC_begin
-
-extern int	uc_safesleep(int) noex ;
-
+extern int uc_safesleep(int) noex ;
 EXTERNC_end
 
 
