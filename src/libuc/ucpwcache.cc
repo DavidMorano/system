@@ -248,7 +248,7 @@ int ucpwcache::iinit() noex {
 	        }
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
-	        auto lamb = [this] () -> int {
+	        cauto lamb = [this] () -> int {
 	            int		rsl = SR_OK ; /* XX GCC complaint */
 	            if (!finit) {
 		        rsl = SR_LOCKFAIL ;
@@ -366,7 +366,7 @@ int ucpwcache::getstat(ucpwcache_st *usp) noex {
 int ucpwcache::icapbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin(to)) >= 0) ylikely {
+	if ((rs = mx.lockbeg(to)) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
 	        rs = cv.wait(&mx,to) ;
@@ -384,7 +384,7 @@ int ucpwcache::icapbegin(int to) noex {
 int ucpwcache::icapend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = mx.lockbegin) >= 0) ylikely {
+	if ((rs = mx.lockbeg) >= 0) ylikely {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = cv.signal ;
