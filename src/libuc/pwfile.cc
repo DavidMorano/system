@@ -448,7 +448,7 @@ local int pwfile_filefronter(PF *op) noex {
 	    cint	llen = rs ;
 	    if (ucstream pf ; (rs = pf.open(op->fname,"rc")) >= 0) ylikely {
 	        if (! op->fl.locked) {
-	            rs = pf.lockbegin(0,TO_LOCK) ;
+	            rs = pf.lockbeg(0,TO_LOCK) ;
 	        }
 	        if (rs >= 0) ylikely {
 	            while ((rs = pf.readln(lbuf,llen)) > 0) ylikely {
