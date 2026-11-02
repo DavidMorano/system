@@ -776,7 +776,7 @@ int utmpacc::ifini() noex {
 int utmpacc::icapbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = omx.lockbegin(to)) >= 0) ylikely {
+	if ((rs = omx.lockbeg(to)) >= 0) ylikely {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
 	        rs = ocv.wait(&omx,to) ;
@@ -794,7 +794,7 @@ int utmpacc::icapbegin(int to) noex {
 int utmpacc::icapend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = omx.lockbegin) >= 0) ylikely {
+	if ((rs = omx.lockbeg) >= 0) ylikely {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = ocv.signal ;
