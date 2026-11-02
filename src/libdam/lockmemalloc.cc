@@ -437,7 +437,7 @@ local int lockmemalloc_lockmalloc(int sz,void *vp) noex {
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
 	if ((rs = lockmemalloc_init()) >= 0) {
-	    if ((rs = uip->mx.lockbegin) >= 0) {
+	    if ((rs = uip->mx.lockbeg) >= 0) {
 		{
 	            rs = lockmemalloc_basemalloc(sz,vp) ;
 		    rv = rs ;
@@ -454,7 +454,7 @@ local int lockmemalloc_lockvalloc(int sz,void *vp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = lockmemalloc_init()) >= 0) {
-	    if ((rs = uip->mx.lockbegin) >= 0) {
+	    if ((rs = uip->mx.lockbeg) >= 0) {
 		{
 	            rs = lockmemalloc_basevalloc(sz,vp) ;
 		}
@@ -471,7 +471,7 @@ local int lockmemalloc_lockrealloc(cvoid *cp,int sz,void *vp) noex {
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
 	if ((rs = lockmemalloc_init()) >= 0) {
-	    if ((rs = uip->mx.lockbegin) >= 0) {
+	    if ((rs = uip->mx.lockbeg) >= 0) {
 		{
 	            rs = lockmemalloc_baserealloc(cp,sz,vp) ;
 		    rv = rs ;
@@ -489,7 +489,7 @@ local int lockmemalloc_lockfree(cvoid *vp) noex {
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
 	if ((rs = lockmemalloc_init()) >= 0) {
-	    if ((rs = uip->mx.lockbegin) >= 0) {
+	    if ((rs = uip->mx.lockbeg) >= 0) {
 		{
 	            rs = lockmemalloc_basefree(vp) ;
 		    rv = rs ;
@@ -503,7 +503,7 @@ local int lockmemalloc_lockfree(cvoid *vp) noex {
 
 local void lockmemalloc_atforkbefore() noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
-	uip->mx.lockbegin() ;
+	uip->mx.lockbeg() ;
 } /* end subroutine (lockmemalloc_atforkbefore) */
 
 local void lockmemalloc_atforkafter() noex {
