@@ -118,7 +118,7 @@ local int logfile_pfi(logfile *lhp,int li,cc *pp,int pl,cc *sp,int sl) noex {
 	} else {
 	    cchar	*f1 = "%*s| %r" ;
 	    rs = logfile_printf(lhp,f1,pl," ",sp,sl) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (logfile_pfi) */
 
