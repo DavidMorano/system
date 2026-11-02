@@ -164,7 +164,7 @@ int uobjlock::ifini() noex {
 int uobjlock::icallbegin(int to) noex {
 	int		rs ;
 	if ((rs = init) >= 0) {
-	    if ((rs = mx.lockbegin(to)) >= 0) {
+	    if ((rs = mx.lockbeg(to)) >= 0) {
 		rs = setupbegin() ;
 	    }
 	}
