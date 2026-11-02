@@ -140,7 +140,7 @@ namespace {
 	int valpath	(int) noex ;
 	int valenv	(int) noex ;
         void atforkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
         }
         void atforkafter() noex {
 	    mx.lockend() ;
@@ -155,7 +155,7 @@ namespace {
 	int imonbegin() noex {
 	    int		rs ;
 	    if ((rs = init) >= 0) {
-		rs = mx.lockbegin ;
+		rs = mx.lockbeg ;
 	    }
 	    return rs ;
 	} ;
