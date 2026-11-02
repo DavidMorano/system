@@ -83,7 +83,7 @@ export {
 	virtual int kernen() noex ;
     private:
 	void iforkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
 	} ; /* end */
 	void iforkafter() noex {
 	    mx.lockend() ;
@@ -210,8 +210,8 @@ int kernlocker::get() noex {
 	int		rs1 ;
 	int		cmask = 0 ;
 	if ((rs = init()) >= 0) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	        if ((rs = mx.lockbegin) >= 0) { /* single */
+	    if ((rs = uc_forklockbeg(-1)) >= 0) { /* multi */
+	        if ((rs = mx.lockbeg) >= 0) { /* single */
 		    {
 			cmask = kernlock(0) ; /* in case of race! */
 			kernlock(cmask) ;
@@ -232,8 +232,8 @@ int kernlocker::setmode(mode_t cmask) noex {
 	int		rs1 ;
 	int		omask = 0 ;
 	if ((rs = init()) >= 0) {
-	    if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
-	        if ((rs = mx.lockbegin) >= 0) { /* single */
+	    if ((rs = uc_forklockbeg(-1)) >= 0) { /* multi */
+	        if ((rs = mx.lockbeg) >= 0) { /* single */
 		    {
 			omask = kernlock(cmask) ;
 		    }
