@@ -142,7 +142,7 @@ export {
 	int seek	(off_t,int) noex ;
 	int tell	(off_t *) noex ;
 	int stat	(ustat *) noex ;
-	int lockbegin	(int,int) noex ;
+	int lockbeg	(int,int) noex ;
 	int writefill	(cchar *,int) noex ;
 	int writefd	(char *,int,int,int) noex ;
 	destruct ustream() {
@@ -194,7 +194,7 @@ export {
     int	ustream_tell		(ustream *,off_t *) noex ;
     int	ustream_poll		(ustream *,int) noex ;
     int	ustream_stat		(ustream *,ustat *) noex ;
-    int	ustream_lockbegin	(ustream *,int,int) noex ;
+    int	ustream_lockbeg		(ustream *,int,int) noex ;
     int	ustream_lockend		(ustream *) noex ;
     int	ustream_close		(ustream *) noex ;
     int	ustream_writeblanks	(ustream *,int) noex ;
