@@ -123,7 +123,7 @@ class uobjlock {
 	} ; /* end dtor */
     private:
 	void forkbefore() noex {
-	    mx.lockbegin() ;
+	    mx.lockbeg() ;
 	} ;
 	void forkafter() noex {
 	    mx.lockend() ;
