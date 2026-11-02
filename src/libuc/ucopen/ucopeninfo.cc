@@ -353,7 +353,7 @@ local int ucopeninfos(OI *oip) noex {
 	int	rs1 ;
 	int	fd = -1 ;
 	DPRINTF("ent fname=%s\n",oip->fname) ;
-	if ((rs = var.mx.lockbegin) >= 0) ylikely {
+	if ((rs = var.mx.lockbeg) >= 0) ylikely {
 	    DPRINTF("lock-acquired rs=%d\n",rs) ;
             if (haspathprefix(oip->fname,-1)) {
 		char *tfbuf = var.tfbuf ;
