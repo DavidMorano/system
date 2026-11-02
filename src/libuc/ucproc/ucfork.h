@@ -24,7 +24,7 @@
 	ucfork_init
 	ucfork_fini
 	uc_fork
-	uc_forklockbegin
+	uc_forklockbeg
 	uc_forklockend
 
 	Description:
@@ -35,7 +35,7 @@
 	int ucfork_init() noex
 	int ucfork_fini() noex
 	int uc_fork() noex
-	int uc_forklockbegin(int to) noex
+	int uc_forklockbeg(int to) noex
 	int uc_forklockend() noex
 
 	Arguments:
@@ -58,13 +58,14 @@
 
 
 EXTERNC_begin
-
 extern int ucfork_init() noex ;
 extern int ucfork_fini() noex ;
-extern int uc_fork() noex ;
-extern int uc_forklockbegin(int) noex ;
-extern int uc_forklockend() noex ;
+EXTERNC_end
 
+EXTERNC_begin
+extern int uc_fork() noex ;
+extern int uc_forklockbeg(int) noex ;
+extern int uc_forklockend() noex ;
 EXTERNC_end
 
 
