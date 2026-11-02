@@ -202,7 +202,7 @@ int csem_decr(csem *op,int c,int to) noex {
                     clock_gettime(cid,&ts) ;
                     ts.tv_sec += to ;
                 } /* end if (time-out requested) */
-                if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+                if ((rs = mxp->lockbeg(to)) >= 0) ylikely {
 		    {
                         op->nwaiting += 1 ;
                         while ((rs >= 0) && (op->cnt < c)) {
@@ -238,7 +238,7 @@ int csem_incr(csem *op,int c) noex {
 	    ptc *cvp = op->cvp ;
 	    rs = SR_INVALID ;
 	    if (c > 0) {
-	        if ((rs = mxp->lockbegin) >= 0) ylikely {
+	        if ((rs = mxp->lockbeg) >= 0) ylikely {
 		    {
 	                ocount = op->cnt ;
 	                op->cnt += c ;
@@ -268,7 +268,7 @@ int csem_count(csem *op) noex {
 	assert(op) ;
 	if ((rs = csem_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            ocount = op->cnt ;
 	        }
@@ -286,7 +286,7 @@ int csem_waiters(csem *op) noex {
 	assert(op) ;
 	if ((rs = csem_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        {
 	            c = op->nwaiting ;
 	        }
