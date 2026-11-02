@@ -26,7 +26,7 @@
 	u_sbrk
 	u_mmapbegin
 	u_mmapend
-	u_mlockbegin
+	u_mlockbeg
 	u_mlockend
 	u_mlockallbegin
 	u_mlockallend
@@ -145,7 +145,7 @@ namespace {
 	int operator () (void *,size_t) noex ;
 	int mapbegin	(void *,size_t) noex ;
 	int mapend	(void *,size_t) noex ;
-	int lockbegin	(void *,size_t) noex ;
+	int lockbeg	(void *,size_t) noex ;
 	int lockend	(void *,size_t) noex ;
 	int lockallbegin(void *,size_t) noex ;
 	int lockallend	(void *,size_t) noex ;
@@ -276,11 +276,11 @@ int u_mmapend(void *ma,size_t ms) noex {
 	return umo(ma,ms) ;
 } /* end subroutine (u_mmapend) */
 
-int u_mlockbegin(void *ma,size_t ms) noex {
+int u_mlockbeg(void *ma,size_t ms) noex {
 	umemop	umo ;
-	umo.m = &umemop::lockbegin ;
+	umo.m = &umemop::lockbeg ;
 	return umo(ma,ms) ;
-} /* end subroutine (u_mlockbegin) */
+} /* end subroutine (u_mlockbeg) */
 
 int u_mlockend(void *ma,size_t ms) noex {
 	umemop	umo ;
@@ -367,10 +367,6 @@ int u_munmap(void *ma,size_t ms) noex {
 int u_mmapbeg(void *ma,size_t ms,int pr,int fl,int fd,
 			off_t off,void *vp) noex {
 	return u_mmapbegin(ma,ms,pr,fl,fd,off,vp) ;
-} /* end subroutine */
-
-int u_mlockbeg(void *ma,size_t ms) noex {
-	return u_mlockbegin(ma,ms) ;
 } /* end subroutine */
 
 int u_mlockallbeg(int fl) noex {
@@ -476,7 +472,7 @@ int umemop::mapend(void *ma,size_t ms) noex {
 	return rs ;
 } /* end method (umemop::mapend) */
 
-int umemop::lockbegin(void *ma,size_t ms) noex {
+int umemop::lockbeg(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
 	if (ma) {
 	    rs = SR_INVALID ;
@@ -487,7 +483,7 @@ int umemop::lockbegin(void *ma,size_t ms) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
-} /* end method (umemop::lockbegin) */
+} /* end method (umemop::lockbeg) */
 
 int umemop::lockend(void *ma,size_t ms) noex {
 	int		rs = SR_FAULT ;
