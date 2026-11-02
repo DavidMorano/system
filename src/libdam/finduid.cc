@@ -228,7 +228,7 @@ int finduid_lookup(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	    ptm *mxp = op->mxp ;
 	    op->s.total += 1 ;
 	    ubuf[0] = '\0' ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 		if ((rs = finduid_tmpxready(op)) >= 0) ylikely {
 		    rs = finduid_lookuper(op,ubuf,ulen,uid) ;
 		    ul = rs ;
@@ -247,7 +247,7 @@ int finduid_check(finduid *op,time_t dt) noex {
 	if ((rs = finduid_magic(op)) >= 0) ylikely {
 	    ptm *mxp = op->mxp ;
 	    if (dt == 0) dt = getustime ;
-	    if ((rs = mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (op->open.ut) {
 	            if ((dt - op->ti_utopen) >= INTUTOPEN) {
 	                rs = finduid_tmpxclose(op) ;
