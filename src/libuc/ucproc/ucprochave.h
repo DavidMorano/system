@@ -25,13 +25,13 @@
 
 
 EXTERNC_begin
+extern int uc_prochave(pid_t) noex ;
+EXTERNC_end
 
-extern int	uc_prochave(pid_t) noex ;
-
+EXTERNC_begin
 local inline int isproc(pid_t pid) noex {
 	return uc_prochave(pid) ;
-}
-
+} /* end */
 EXTERNC_end
 
 
