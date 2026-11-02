@@ -44,6 +44,8 @@
 
 *******************************************************************************/
 
+module ;
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
@@ -51,6 +53,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucmemory.h>		/* LIBUC */
 #include	<ucgetpid.h>		/* LIBUC */
 #include	<getserial.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
@@ -59,6 +62,13 @@
 
 #include	"proginfo.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+module proginfo.log ;
+
+import libutil ;			/* |lenstr(3u)| */
+import uconstants ;			/* |sysword(3u)| */
+import proginfo.base ;
 
 /* local defines */
 
@@ -71,6 +81,8 @@
 
 
 /* imported namespaces */
+
+using libuc::mem ;			/* variable */
 
 
 /* local typedefs */
@@ -85,15 +97,17 @@
 /* local structures */
 
 namespace {
-    ider {
-	priginfo	*pip ;
+    struct ider {
+	proginfo	*pip ;
 	int		v ;
 	ider(proginfo *p) noex : pip(p), v(-1) { } ;
 	operator int	() noex ;
 	int retpid	() noex ;
 	int make	() noex ;
+	int serialpr	(char *,int) noex ;
+	int serialtmp	(char *,int) noex ;
     } ; /* end struct (ider) */
-    typedef int (ider::*ider_m)() noex ;
+    typedef int (ider::*ider_m)(char *,int) noex ;
 } /* end namespace */
 
 
@@ -103,9 +117,13 @@ namespace {
 /* local variables */
 
 constexpr ider_m	tries[] = {
+    	&ider::serialpr,
+    	&ider::serialtmp
 } ; /* end array */
 
-cbool		f_serial		= CF_SERIAL ;
+ccharp			serial		= sysword.w_serial ;
+cchar			vcname[]	= "var" ;
+cbool			f_serial	= CF_SERIAL ;
 
 
 /* exported variables */
@@ -131,63 +149,69 @@ int proglog_id(PI *pip) noex {
 /* local subroutines */
 
 ider::operator int () noex {
-    	int		rs = SR_OK ;
+    	int		rs ;
+	int		rs1 ;
 	int		ll = 0 ; /* return-value */
-	if ((rs = retpidi()) >= 0) {
-
-	} /* end if (retpid) */} 
+	if ((rs = retpid()) >= 0) {
+	    if (char *tbuf ; (rs = mem.mp(&tbuf)) >= 0) {
+		cint tlen = rs ;
+		for (cauto &m : tries) {
+		    rs = (this->*m)(tbuf,tlen) ;
+		    if (rs) break ;
+		} /* end for */
+		rs1 = mem.free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (maxpathlen) */
+	} /* end if (retpid) */
 	return (rs >= 0) ? ll : rs ;
 } /* end method (ider::operator) */
 
 int ider::retpid() noex {
     	int		rs = SR_OK ;
-	if (pip->pid < 0) {
+	if ((rs = pip->pid) < 0) {
 	    if ((rs = ucpid) >= 0) {
 	        pip->pid = rs ;
 	    }
-	} /* end if (neede) */
+	} /* end if (needed) */
 	return rs ;
 } /* end method (ider:retpid) */
 
-
-	if_constexpr (f_serial) {
-	    cchar	*sfname = SERIALFNAME ;
-	    cchar	*tdn ;
-	    char	tbuf[MAXPATHLEN + 1] ;
-
-	    tbuf[0] = '\0' ;
-	    rs = mkpath3(tbuf,pip->pr,VCNAME,sfname) ;
-	    if ((rs >= 0) && (tbuf[0] != '\0')) {
-	        v = getserial(tbuf) ;
-	    }
-
-	    if ((rs >= 0) && (v < 0)) {
-	        tdn = pip->tmpdname ;
-	        if ((tdn != nullptr) && (tdn[0] != '0')) {
-	            if ((rs = mkpath2(tbuf,pip->tmpdname,sfname)) >= 0) {
-	                if (tbuf[0] != '\0') {
-	                    v = getserial(tbuf) ;
-			}
-		    }
-	        }
-	    }
-	} /* end if_constexpr (f_serial) */
-
-	if ((rs >= 0) && (v < 0)) {
-	    v = ((int) pip->pid) ;
-	} /* end if */
-
-	if (rs >= 0) {
-	    cint	llen = LOGIDLEN ;
-	    cchar	*nn = pip->nodename ;
-	    char	lbuf[LOGIDLEN + 1] ;
-	    if ((rs = mklogid(lbuf,llen,nn,-1,v)) > 0) {
-		ccharp vpp = &pip->logid ;
-		ll = rs ;
-	        rs = pip->setent(vpp,lbuf,ll) ;
-	    }
-	} /* end if (logid) */
+int ider::make() noex {
+	cint		llen = LOGIDLEN ;
+    	int		rs ;
+	int		ll = 0 ; /* return-value */
+	cchar		*nn = pip->nodename ;
+	char		lbuf[LOGIDLEN + 1] ;
+	if ((rs = mklogid(lbuf,llen,nn,-1,v)) > 0) {
+	    ccharpp vpp = &pip->logid ;
+	    ll = rs ;
+	    rs = pip->setent(vpp,lbuf,ll) ;
+	} /* end if (mklogid) */
 	return (rs >= 0) ? ll : rs ;
 } /* end method (ider::make) */
+
+int ider::serialpr(char *tbuf,int) noex {
+    	int		rs = SR_OK ;
+	if (ccharp pr = pip->pr) {
+	    if ((rs = mkpath(tbuf,pr,vcname,serial)) >= 0) {
+	        if ((rs = getserial(tbuf)) >= 0) {
+	 	    rs = make() ;
+	        } /* end if (getserial) */
+	    } /* end if (make) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ider::serialpr) */
+
+int ider::serialtmp(char *tbuf,int) noex {
+    	int		rs = SR_OK ;
+	if (ccharp tmpdir = pip->tmpdname) {
+	    if ((rs = mkpath(tbuf,tmpdir,serial)) >= 0) {
+	        if ((rs = getserial(tbuf)) >= 0) {
+	 	    rs = make() ;
+	        } /* end if (getserial) */
+	    } /* end if (make) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ider::serialtmp) */
 
 
