@@ -179,7 +179,7 @@ int q_ins(q *op,Q_ENT *ep) noex {
 	int		rs1 ;
 	int		rc = 0 ;
 	if (op && ep) ylikely {
-	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = op->mxp->lockbeg) >= 0) ylikely {
 		{
 		    entp	qep = entp(ep) ;
 		    rs = plainq_ins(op->pqp,qep) ;
@@ -197,7 +197,7 @@ int q_inshead(q *op,Q_ENT *ep) noex {
 	int		rs1 ;
 	int		rc = 0 ;
 	if (op && ep) ylikely {
-	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = op->mxp->lockbeg) >= 0) ylikely {
 		{
 		    entp	qep = entp(ep) ;
 		    rs = plainq_inshead(op->pqp,qep) ;
@@ -215,7 +215,7 @@ int q_rem(q *op,Q_ENT **epp) noex {
 	int		rs1 ;
 	int		rc = 0 ;
 	if (op) ylikely {
-	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = op->mxp->lockbeg) >= 0) ylikely {
 		{
 		    entp	*qepp = (entp *) epp ;
 		    rs = plainq_rem(op->pqp,qepp) ;
@@ -234,7 +234,7 @@ int q_remtail(q *op,Q_ENT **epp) noex {
 	int		rs1 ;
 	int		rc = 0 ;
 	if (op) ylikely {
-	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = op->mxp->lockbeg) >= 0) ylikely {
 		{
 		    entp	*qepp = (entp *) epp ;
 		    rs = plainq_remtail(op->pqp,qepp) ;
@@ -253,7 +253,7 @@ int q_count(q *op) noex {
 	int		rs1 ;
 	int		rc = 0 ;
 	if (op) ylikely {
-	    if ((rs = op->mxp->lockbegin) >= 0) ylikely {
+	    if ((rs = op->mxp->lockbeg) >= 0) ylikely {
 		{
 		    rs = plainq_count(op->pqp) ;
 		    rc = rs ;
