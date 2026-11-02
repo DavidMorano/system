@@ -893,7 +893,7 @@ local int babycalcs_lookshm(BC *op,time_t dt,time_t datereq,uint *rp) noex {
 	if (op) ylikely {
 	    if (op->mapdata && op->mxp) ylikely {
 	        if (sigblocker sb ; (rs = sb.start) >= 0) ylikely {
-	            if (ptm *mxp = op->mxp ; (rs = mxp->lockbegin) >= 0) {
+	            if (ptm *mxp = op->mxp ; (rs = mxp->lockbeg) >= 0) {
 	                if ((rs = babycalcs_shmaccess(op,dt)) >= 0) {
 	                    rs = babycalcs_lookproc(op,datereq,rp) ;
 		            rv = rs ;
@@ -991,7 +991,7 @@ local int babycalcs_shminfo(BC *op,BC_INFO *bip) noex {
 	    if (op->mapdata && op->mxp) ylikely {
 	        if (sigblocker sb ; (rs = sb.start) >= 0) ylikely {
 	            ptm *mxp = op->mxp ;
-	            if ((rs = mxp->lockbegin) >= 0) {
+	            if ((rs = mxp->lockbeg) >= 0) {
 		        {
 	                    rs = babycalcs_lookinfo(op,bip) ;
 		            rv = rs ;
@@ -1052,7 +1052,7 @@ local int babycalcs_reloadshm(BC *op,time_t dt,con ustat *sbp) noex {
 	    bool	f = false ;
 	    if (sigblocker sb ; (rs = sb.start) >= 0) ylikely {
 	        ptm *mxp = op->mxp ;
-	        if ((rs = mxp->lockbegin) >= 0) ylikely {
+	        if ((rs = mxp->lockbeg) >= 0) ylikely {
 	            if ((rs = babycalcs_shmcheck(op,sbp)) >= 0) ylikely {
 	                f = (rs > 0) ;
 	                if (f) {
