@@ -29,7 +29,7 @@
 	u_sbrk
 	u_mmapbegin
 	u_mmapend
-	u_mlockbegin
+	u_mlockbeg
 	u_mlockend
 	u_mlockallbegin
 	u_mlockallend
@@ -67,7 +67,7 @@ extern int u_brk(cvoid *,void **) noex ;
 extern int u_sbrk(int,void **) noex ;
 extern int u_mmapbegin(void *,size_t,int,int,int,off_t,void *) noex ;
 extern int u_mmapend(void *,size_t) noex ;
-extern int u_mlockbegin(void *,size_t) noex ;
+extern int u_mlockbeg(void *,size_t) noex ;
 extern int u_mlockend(void *,size_t) noex ;
 extern int u_mlockallbegin(int) noex ;
 extern int u_mlockallend() noex ;
@@ -80,7 +80,6 @@ extern int u_minherit(void *,size_t,int) noex ;
 extern int u_mlockp(int) noex ;
 
 extern int u_mmapbeg(void *,size_t,int,int,int,off_t,void *) noex ;
-extern int u_mlockbeg(void *,size_t) noex ;
 extern int u_mlockallbeg(int) noex ;
 
 /* legacy */
