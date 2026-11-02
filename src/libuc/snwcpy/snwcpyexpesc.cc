@@ -249,7 +249,6 @@ int expmgr::handle_octal() noex {
 } /* end method (expmgr::handle_octal) */
 
 int expmgr::handle_o() noex {
-    	cnullptr	np{} ;
     	int		rs = SR_OK ;
 	if (sl > 0) {
 	    if (*sp == CH_LBRACE) {
@@ -273,7 +272,6 @@ int expmgr::handle_o() noex {
 } /* end method (expmgr::handle_o) */
 
 int expmgr::handle_x() noex {
-    	cnullptr	np{} ;
     	int		rs = SR_OK ;
 	if (sl > 0) {
 	    if (*sp == CH_LBRACE) {
