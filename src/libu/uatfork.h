@@ -14,21 +14,21 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
-
 extern int uatfork_init() noex ;
 extern int uatfork_fini() noex ;
 extern int uatfork_trackbegin() noex ;
+EXTERNC_end
+
+EXTERNC_begin
 extern int u_atforkrec(void_f,void_f,void_f) noex ;
 extern int u_atforkexp(void_f,void_f,void_f) noex ;
-
 EXTERNC_end
+
 
 #endif /* UATFORK_INCLUDE */
 
