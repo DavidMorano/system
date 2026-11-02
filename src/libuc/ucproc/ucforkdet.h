@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	uc_forkdet() noex ;
-
+extern int uc_forkdet() noex ;
 EXTERNC_end
 
 
