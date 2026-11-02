@@ -56,7 +56,7 @@ struct sigblocker : sigblocker_head {
 	sigblocker() noex {
 	    start	(this,sigblockermem_start) ;
 	    finish	(this,sigblockermem_finish) ;
-	    magval = 0 ;
+	    magval	= 0 ;
 	} ; /* end ctor */
 	void dtor() noex ;
 	destruct sigblocker() {
@@ -68,10 +68,8 @@ typedef	SIGBLOCKER	sigblocker ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	sigblocker_start(sigblocker *,cint *) noex ;
 extern int	sigblocker_finish(sigblocker *) noex ;
-
 EXTERNC_end
 
 
