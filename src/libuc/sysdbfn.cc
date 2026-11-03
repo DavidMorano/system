@@ -68,7 +68,7 @@
 #include	<ptm.h>			/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<sysdbfiles.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -117,10 +117,10 @@ namespace {
 	int fini() noex ;
 	int get(int,cchar **) noex ;
 	int gets(int,cchar **) noex ;
-        void atforkbefore() noex {
+        void forkatbefore() noex {
 	    mx.lockbeg() ;
         } /* end */
-        void atforkafter() noex {
+        void forkatafter() noex {
 	    mx.lockend() ;
         } /* end */
 	void dtor() noex ;
@@ -134,8 +134,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	sysdbmgr_atforkbefore() noex ;
-    local void	sysdbmgr_atforkafter() noex ;
+    local void	sysdbmgr_forkatbefore() noex ;
+    local void	sysdbmgr_forkatafter() noex ;
     local void	sysdbmgr_exit() noex ;
 } /* end extern (C) */
 
@@ -187,17 +187,17 @@ int sysdbmgr::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
-	            con void_f	b = sysdbmgr_atforkbefore ;
-	            con void_f	a = sysdbmgr_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	            con void_f	b = sysdbmgr_forkatbefore ;
+	            con void_f	a = sysdbmgr_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) ylikely {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexp(b,a,a) ;
+	                    uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
 		    } /* end if (error) */
@@ -237,9 +237,9 @@ int sysdbmgr::fini() noex {
 		} /* end for */
 	    }
 	    {
-	        con void_f	b = sysdbmgr_atforkbefore ;
-	        con void_f	a = sysdbmgr_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        con void_f	b = sysdbmgr_forkatbefore ;
+	        con void_f	a = sysdbmgr_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -291,13 +291,13 @@ int sysdbmgr::gets(int w,cchar **rpp) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end method (sysdbmgr::gets) */
 
-local void sysdbmgr_atforkbefore() noex {
-	sysdbmgr_data.atforkbefore() ;
-} /* end subroutine (sysdbmgr_atforkbefore) */
+local void sysdbmgr_forkatbefore() noex {
+	sysdbmgr_data.forkatbefore() ;
+} /* end subroutine (sysdbmgr_forkatbefore) */
 
-local void sysdbmgr_atforkafter() noex {
-	sysdbmgr_data.atforkafter() ;
-} /* end subroutine (sysdbmgr_atforkafter) */
+local void sysdbmgr_forkatafter() noex {
+	sysdbmgr_data.forkatafter() ;
+} /* end subroutine (sysdbmgr_forkatafter) */
 
 local void sysdbmgr_exit() noex {
 	if (cint rs = sysdbmgr_data.fini() ; rs < 0) {
