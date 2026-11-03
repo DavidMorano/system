@@ -94,7 +94,7 @@
 #include	<usupport.h>		/* LIBU |strwcpy(3u)| */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<bufsize.h>		/* LIBUC */
 #include	<timewatch.hh>		/* LIBU */
@@ -196,10 +196,10 @@ namespace {
 	int iinit	() noex ; 
 	int ifini	() noex ;
 	int pvars	() noex ;
-	void atforkbefore() noex {
+	void forkatbefore() noex {
 	    mx.lockbeg() ;
 	} ; /* end */
-	void atforkafter() noex {
+	void forkatafter() noex {
 	    mx.lockend() ;
 	} ; /* end */
 	constexpr submgr() noex {
@@ -229,8 +229,8 @@ extern "C" {
 } /* end extern (C) */
 
 extern "C" {
-    local void	submgr_atforkbefore() noex ;
-    local void	submgr_atforkafter() noex ;
+    local void	submgr_forkatbefore() noex ;
+    local void	submgr_forkatafter() noex ;
     local void	submgr_exit() noex ;
 } /* end extern (C) */
 
@@ -595,9 +595,9 @@ int submgr::iinit() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {		/* <- the money shot */
 	        if ((rs = mx.create) >= 0) {
-	            void_f	b = submgr_atforkbefore ;
-	            void_f	a = submgr_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	            void_f	b = submgr_forkatbefore ;
+	            void_f	a = submgr_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 			void_f	e = submgr_exit ;
 	                if ((rs = uc_atexit(e)) >= 0) {
 			    if ((rs = vars) >= 0) {
@@ -606,9 +606,9 @@ int submgr::iinit() noex {
 			    } /* end if (vars) */
 	                } /* end if (uc_atexit) */
 	                if (rs < 0) {
-	                    uc_atforkexp(b,a,a) ;
+	                    uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	            if (rs < 0) {
 	                mx.destroy() ;
 		    } /* end if (error) */
@@ -642,9 +642,9 @@ int submgr::ifini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = submgr_atforkbefore ;
-	        void_f	a = submgr_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = submgr_forkatbefore ;
+	        void_f	a = submgr_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -916,17 +916,17 @@ int submgr::mallstats(ucmem_stats *statp) noex {
 	return (rs >= 0) ? rv : rs ;
 } /* end method (submgr::mallstats) */
 
-local void submgr_atforkbefore() noex {
-	submgr_data.atforkbefore() ;
-} /* end subroutine (submgr_atforkbefore) */
+local void submgr_forkatbefore() noex {
+	submgr_data.forkatbefore() ;
+} /* end subroutine (submgr_forkatbefore) */
 
-local void submgr_atforkafter() noex {
-	submgr_data.atforkafter() ;
-} /* end subroutine (submgr_atforkafter) */
+local void submgr_forkatafter() noex {
+	submgr_data.forkatafter() ;
+} /* end subroutine (submgr_forkatafter) */
 
 local void submgr_exit() noex {
 	/* submgr_data.fvoid = true ; */
-} /* end subroutine (submgr_atforkafter) */
+} /* end subroutine (submgr_forkatafter) */
 
 submgr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
