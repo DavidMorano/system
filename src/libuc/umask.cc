@@ -41,7 +41,7 @@
 #include	<ptm.h>			/* LIBU */
 #include	<ucsysmisc.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -93,8 +93,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	umask_atforkbefore() noex ;
-    local void	umask_atforkafter() noex ;
+    local void	umask_forkatbefore() noex ;
+    local void	umask_forkatafter() noex ;
     local void	umask_exit() noex ;
 } /* end extern (C) */
 
@@ -158,18 +158,18 @@ int umasker::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
-	            void_f	b = umask_atforkbefore ;
-	            void_f	a = umask_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	            void_f	b = umask_forkatbefore ;
+	            void_f	a = umask_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) ylikely {
 			void_f	e = umask_exit ;
 	                if ((rs = uc_atexit(e)) >= 0) ylikely {
 	    	            finitdone = true ;
 		            f = true ;
 		        }
 		        if (rs < 0) {
-		            uc_atforkexp(b,a,a) ;
+		            uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
 		    } /* end if (error) */
@@ -199,9 +199,9 @@ int umasker::fini() noex {
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
-	        void_f	b = umask_atforkbefore ;
-	        void_f	a = umask_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = umask_forkatbefore ;
+	        void_f	a = umask_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
@@ -258,13 +258,13 @@ int umasker::setmode(mode_t cmask) noex {
 	return (rs >= 0) ? omask : rs ;
 } /* end subroutine (umasker::set) */
 
-local void umask_atforkbefore() noex {
+local void umask_forkatbefore() noex {
 	umask_data.forkbefore() ;
-} /* end subroutine (umask_atforkbefore) */
+} /* end subroutine (umask_forkatbefore) */
 
-local void umask_atforkafter() noex {
+local void umask_forkatafter() noex {
 	umask_data.forkafter() ;
-} /* end subroutine (umask_atforkafter) */
+} /* end subroutine (umask_forkatafter) */
 
 local void umask_exit() noex {
 	umask_data.fini() ;
