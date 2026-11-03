@@ -83,7 +83,7 @@
 #include	<aflag.hh>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC |uc_forklock{x}(3uc)| */
 #include	<sigblocker.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
@@ -163,8 +163,8 @@ struct subinfo {
 /* forward references */
 
 extern "C" {
-    local void	ucclustername_atforkbefore() noex ;
-    local void	ucclustername_atforkafter() noex ;
+    local void	ucclustername_forkatbefore() noex ;
+    local void	ucclustername_forkatafter() noex ;
     local void	ucclustername_exit() noex ;
 } /* end extern (C) */
 
@@ -197,18 +197,18 @@ int ucclustername_init() noex {
 	        ptm *mxp = &uip->mx ;
 	        uip->f_init = true ;
 	        if ((rs = mxp->create) >= 0) ylikely {
-	            void_f	b = ucclustername_atforkbefore ;
-	            void_f	a = ucclustername_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	            void_f	b = ucclustername_forkatbefore ;
+	            void_f	a = ucclustername_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) ylikely {
 			cauto esub = ucclustername_exit ;
 	                if ((rs = uc_atexit(esub)) >= 0) ylikely {
 	                    uip->f_initdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexp(b,a,a) ;
+	                    uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	            if (rs < 0) {
 	                mxp->destroy() ;
 		    } /* end if (error) */
@@ -238,9 +238,9 @@ int ucclustername_fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = ucclustername_atforkbefore ;
-	        void_f	a = ucclustername_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = ucclustername_forkatbefore ;
+	        void_f	a = ucclustername_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -377,21 +377,21 @@ local int ucclustername_allocend(CN *uip,CN_A *ap) noex {
 	return rs ;
 } /* end subroutine (ucclustername_allocend) */
 
-local void ucclustername_atforkbefore() noex {
+local void ucclustername_forkatbefore() noex {
 	CN	*uip = &ucclustername_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbeg() ;
 	}
-} /* end subroutine (ucclustername_atforkbefore) */
+} /* end subroutine (ucclustername_forkatbefore) */
 
-local void ucclustername_atforkafter() noex {
+local void ucclustername_forkatafter() noex {
 	CN	*uip = &ucclustername_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-} /* end subroutine (ucclustername_atforkafter) */
+} /* end subroutine (ucclustername_forkatafter) */
 
 local void ucclustername_exit() noex {
 	if (cint rs = ucclustername_fini() ; rs < 0) {
