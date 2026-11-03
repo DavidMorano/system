@@ -27,15 +27,15 @@
 
 
 EXTERNC_begin
-
 extern int ctcharsi	(char *,int,int,int)			noex ;
 extern int ctcharsl	(char *,int,int,long)			noex ;
 extern int ctcharsll	(char *,int,int,longlong)		noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int ctcharsui	(char *,int,int,uint)			noex ;
 extern int ctcharsul	(char *,int,int,ulong)			noex ;
 extern int ctcharsull	(char *,int,int,ulonglong)		noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
