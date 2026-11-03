@@ -74,23 +74,19 @@
 #define	DEBUGLEVEL(n)	(pip->debuglevel >= (n))
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
 extern int	snddd(char *,int,uint,uint) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	dupup(int,int) ;
 
 extern int	progtmpdir(struct proginfo *,char *) ;
 extern int	progcheckdir(struct proginfo *,char *,int,int) ;
 extern int	progreqfile(struct proginfo *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -106,7 +102,7 @@ union conmsg {
 
 /* forward references */
 
-static int	cmsg_passfd(struct cmsghdr *,int) ;
+local int	cmsg_passfd(struct cmsghdr *,int) ;
 
 
 /* local variables */
@@ -282,7 +278,7 @@ ret0:
 /* local subroutines */
 
 
-static int cmsg_passfd(cmp,fd)
+local int cmsg_passfd(cmp,fd)
 struct cmsghdr	*cmp ;
 int		fd ;
 {
