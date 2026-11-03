@@ -56,7 +56,7 @@
 #include	<usysflag.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
 #include	<ucatexit.h>		/* |uc_atexit(3uc)| */
-#include	<ucatfork.h>		/* |uc_atfork{x}(3uc)| */
+#include	<ucforkat.h>		/* |uc_forkat{x}(3uc)| */
 #include	<ucfork.h>		/* |uc_forklock{x}(3uc)| */
 #include	<timewatch.hh>
 #include	<sncpyx.h>
@@ -95,10 +95,10 @@ namespace {
 	int getusbegin() noex ;
 	int getusend() noex ;
 	int getusent(char *,int) noex ;
-        void atforkbefore() noex {
+        void forkatbefore() noex {
 	    mx.lockbeg() ;
         } ;
-        void atforkafter() noex {
+        void forkatafter() noex {
 	    mx.lockend() ;
         } ;
 	destruct ucgetus() noex {
@@ -113,8 +113,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void		ucgetus_atforkbefore() noex ;
-    local void		ucgetus_atforkafter() noex ;
+    local void		ucgetus_forkatbefore() noex ;
+    local void		ucgetus_forkatafter() noex ;
     local void		ucgetus_exit() noex ;
 } /* end extern (C) */
 
@@ -151,17 +151,17 @@ int ucgetus::init() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
-	            void_f	b = ucgetus_atforkbefore ;
-	            void_f	a = ucgetus_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	            void_f	b = ucgetus_forkatbefore ;
+	            void_f	a = ucgetus_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(ucgetus_exit)) >= 0) ylikely {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexp(b,a,a) ;
+	                    uc_forkatexp(b,a,a) ;
 			}
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
 		    }
@@ -193,9 +193,9 @@ int ucgetus::fini() noex {
 		endusershell() ;
 	    }
 	    {
-	        void_f	b = ucgetus_atforkbefore ;
-	        void_f	a = ucgetus_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = ucgetus_forkatbefore ;
+	        void_f	a = ucgetus_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -283,13 +283,13 @@ int ucgetus::getusent(char *rbuf,int rlen) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (ucgetus::getusent) */
 
-local void ucgetus_atforkbefore() noex {
-	ucgetus_data.atforkbefore() ;
-} /* end subroutine (ucgetus_atforkbefore) */
+local void ucgetus_forkatbefore() noex {
+	ucgetus_data.forkatbefore() ;
+} /* end subroutine (ucgetus_forkatbefore) */
 
-local void ucgetus_atforkafter() noex {
-	ucgetus_data.atforkafter() ;
-} /* end subroutine (ucgetus_atforkafter) */
+local void ucgetus_forkatafter() noex {
+	ucgetus_data.forkatafter() ;
+} /* end subroutine (ucgetus_forkatafter) */
 
 local void ucgetus_exit() noex {
 	if (cint rs = ucgetus_data.fini() ; rs < 0) {
