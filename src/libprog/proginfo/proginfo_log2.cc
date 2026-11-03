@@ -124,7 +124,7 @@ local int procfile(PI *pip,cchar *sp,int sl,cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ; /* return-value */
-	if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) {
+	if (char *lbuf ; (rs = mem.ml(&lbuf)) >= 0) ylikely {
 	    cint llen = rs ;
 	    if (bfile of ; (rs = of.open(fname,"r",0666)) >= 0) {
 	        int	line = 0 ;
