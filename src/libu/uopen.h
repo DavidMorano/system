@@ -49,31 +49,36 @@
 
 
 EXTERNC_begin
+extern int u_open	(cchar *,int,mode_t) noex ;
+extern int u_creat	(cchar *,mode_t) noex ;
+extern int u_openat	(int,cchar *,int,mode_t) noex ;
+extern int u_socket	(int,int,int) noex ;
+extern int u_accept	(int,SOCKADDR *,int *) noex ;
+extern int u_acceptpass	(int,STRRECVFD *,int) noex ;
+extern int u_dup	(int) noex ;
+extern int u_dupmin	(int,int) noex ;
+extern int u_dupminer	(int,int,int) noex ;
+extern int u_dupover	(int,int) noex ;
+extern int u_close	(int) noex ;
+EXTERNC_end
 
-extern int u_open(cchar *,int,mode_t) noex ;
-extern int u_creat(cchar *,mode_t) noex ;
-extern int u_openat(int,cchar *,int,mode_t) noex ;
-extern int u_socket(int,int,int) noex ;
-extern int u_accept(int,SOCKADDR *,int *) noex ;
-extern int u_acceptpass(int,STRRECVFD *,int) noex ;
-extern int u_dup(int) noex ;
-extern int u_dupmin(int,int) noex ;
-extern int u_dupminer(int,int,int) noex ;
-extern int u_dupover(int,int) noex ;
-extern int u_close(int) noex ;
 /* special */
+EXTERNC_begin
 extern int u_socketpair(int,int,int,int *) noex ;
 extern int u_pipe(int *) noex ;
 extern int u_pipe2(int *,int) noex ;
 extern int u_piper(int *,int,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int u_pipes(int *pipes,int of) noex {
 	return u_pipe2(pipes,of) ;
-}
+} /* end */
+EXTERNC_end
 
+EXTERNC_begin
 extern int uopen_init() noex ;
 extern int uopen_fini() noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -81,11 +86,11 @@ EXTERNC_end
 namespace libu {
     extern sysret_t uopen_lockbeg() noex ;
     extern sysret_t uopen_lockend() noex ;
-}
+} /* end */
 
 namespace libu {
     extern int special_acceptpass(int,STRRECVFD *,int) noex ;
-}
+} /* end */
 
 #endif /* __cplusplus */
 
