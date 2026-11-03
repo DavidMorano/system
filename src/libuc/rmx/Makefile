@@ -40,7 +40,7 @@ MODS +=
 LIBS +=
 
 
-OBJ0= rmx_chr.o rmx_class.o rmx_misc.o
+OBJ0= rmxchr.o rmxclass.o rmxmisc.o
 OBJ1=
 OBJ2=
 OBJ3=
@@ -145,8 +145,8 @@ objb.o:			$(OBJB)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-rmx_chr.o:		rmx_chr.cc	rmx_chr.h		$(INCS)
-rmx_class.o:		rmx_class.cc	rmx_class.h		$(INCS)
-rmx_misc.o:		rmx_misc.cc	rmx_misc.h		$(INCS)
+rmxchr.o:		rmxchr.cc	rmxchr.h		$(INCS)
+rmxclass.o:		rmxclass.cc	rmxclass.h		$(INCS)
+rmxmisc.o:		rmxmisc.cc	rmxmisc.h		$(INCS)
 
 
