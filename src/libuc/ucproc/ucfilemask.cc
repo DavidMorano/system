@@ -42,7 +42,7 @@
 #include	<ptm.h>			/* LIBU */
 #include	<ucsysmisc.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -94,8 +94,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	ucfilemask_atforkbefore() noex ;
-    local void	ucfilemask_atforkafter() noex ;
+    local void	ucfilemask_forkatbefore() noex ;
+    local void	ucfilemask_forkatafter() noex ;
     local void	ucfilemask_exit() noex ;
 } /* end extern (C) */
 
@@ -159,18 +159,18 @@ int ucfilemasker::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
-	            void_f	b = ucfilemask_atforkbefore ;
-	            void_f	a = ucfilemask_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	            void_f	b = ucfilemask_forkatbefore ;
+	            void_f	a = ucfilemask_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) ylikely {
 			void_f	e = ucfilemask_exit ;
 	                if ((rs = uc_atexit(e)) >= 0) ylikely {
 	    	            finitdone = true ;
 		            f = true ;
 		        } /* end */
 		        if (rs < 0) {
-		            uc_atforkexp(b,a,a) ;
+		            uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
 		    } /* end if (error) */
@@ -200,9 +200,9 @@ int ucfilemasker::fini() noex {
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
-	        void_f	b = ucfilemask_atforkbefore ;
-	        void_f	a = ucfilemask_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = ucfilemask_forkatbefore ;
+	        void_f	a = ucfilemask_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
@@ -259,13 +259,13 @@ int ucfilemasker::setmode(mode_t cmask) noex {
 	return (rs >= 0) ? omask : rs ;
 } /* end subroutine (ucfilemasker::set) */
 
-local void ucfilemask_atforkbefore() noex {
+local void ucfilemask_forkatbefore() noex {
 	ucfilemask_data.forkbefore() ;
-} /* end subroutine (ucfilemask_atforkbefore) */
+} /* end subroutine (ucfilemask_forkatbefore) */
 
-local void ucfilemask_atforkafter() noex {
+local void ucfilemask_forkatafter() noex {
 	ucfilemask_data.forkafter() ;
-} /* end subroutine (ucfilemask_atforkafter) */
+} /* end subroutine (ucfilemask_forkatafter) */
 
 local void ucfilemask_exit() noex {
 	ucfilemask_data.fini() ;
