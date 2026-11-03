@@ -26,15 +26,18 @@
 
 
 EXTERNC_begin
-
 extern int cfoctsi	(cchar *,int,sint *)		noex ;
 extern int cfoctsl	(cchar *,int,slong *)		noex ;
 extern int cfoctsll	(cchar *,int,slonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int cfoctui	(cchar *,int,uint *)		noex ;
 extern int cfoctul	(cchar *,int,ulong *)		noex ;
 extern int cfoctull	(cchar *,int,ulonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int cfocti(cchar *sp,int sl,int *rp)		noex {
 	return cfoctsi(sp,sl,rp) ;
 } /* end */
@@ -44,7 +47,6 @@ local inline int cfoctl(cchar *sp,int sl,long *rp)		noex {
 local inline int cfoctll(cchar *sp,int sl,longlong *rp)		noex {
 	return cfoctsll(sp,sl,rp) ;
 } /* end */
-
 EXTERNC_end
 
 #if	__cplusplus
