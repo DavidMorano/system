@@ -88,7 +88,7 @@
 #include	<ptc.h>			/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<varray.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<sncpyxw.h>		/* LIBUC */
@@ -154,8 +154,8 @@ struct ucprogdata_entry {
 /* forward references */
 
 extern "C" {
-    local void	ucprogdata_atforkbefore() noex ;
-    local void	ucprogdata_atforkafter() noex ;
+    local void	ucprogdata_forkatbefore() noex ;
+    local void	ucprogdata_forkatafter() noex ;
     local void	ucprogdata_exit() noex ;
 } /* end extern (C) */
 
@@ -194,17 +194,17 @@ int ucprogdata_init() noex {
 	        if ((rs = mxp->create) >= 0) {
 		    ptc *cnp = &uip->cn ;
 	            if ((rs = cnp->create) >= 0) {
-	                void_f	b = ucprogdata_atforkbefore ;
-	                void_f	a = ucprogdata_atforkafter ;
-	                if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	                void_f	b = ucprogdata_forkatbefore ;
+	                void_f	a = ucprogdata_forkatafter ;
+	                if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 	                    if ((rs = uc_atexit(ucprogdata_exit)) >= 0) {
 	                        uip->f_initdone = true ;
 	                        f = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexp(b,a,a) ;
+	                        uc_forkatexp(b,a,a) ;
 			    } /* end if (error) */
-	                } /* end if (uc_atfork) */
+	                } /* end if (uc_forkat) */
 	                if (rs < 0) {
 	                    cnp->destroy() ;
 			} /* end if (error) */
@@ -238,9 +238,9 @@ int ucprogdata_fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
-	        void_f	b = ucprogdata_atforkbefore ;
-	        void_f	a = ucprogdata_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = ucprogdata_forkatbefore ;
+	        void_f	a = ucprogdata_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
@@ -449,15 +449,15 @@ local int ucprogdata_geter(UCPD *uip,int di,char *rbuf,int rlen) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (ucprogdata_geter) */
 
-local void ucprogdata_atforkbefore() noex {
+local void ucprogdata_forkatbefore() noex {
 	UCPD	*uip = &ucprogdata_data ;
 	ucprogdata_capbegin(uip,-1) ;
-} /* end subroutine (ucprogdata_atforkbefore) */
+} /* end subroutine (ucprogdata_forkatbefore) */
 
-local void ucprogdata_atforkafter() noex {
+local void ucprogdata_forkatafter() noex {
 	UCPD	*uip = &ucprogdata_data ;
 	ucprogdata_capend(uip) ;
-} /* end subroutine (ucprogdata_atforkafter) */
+} /* end subroutine (ucprogdata_forkatafter) */
 
 local void ucprogdata_exit() noex {
 	if (cint rs = ucprogdata_fini() ; rs < 0) {
