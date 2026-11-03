@@ -6,7 +6,7 @@
 /* virtual per-process timer management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_CHILDTHRS	0		/* start threads in child process */
 
 /* revision history:
@@ -89,7 +89,7 @@
 #include	<ucmpx.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucsigset.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC vector-handles */
 #include	<vecsorthand.h>		/* LIBUC vector-sorted-handles */
@@ -321,9 +321,9 @@ local int	cmpqent(cvoid *,cvoid *) noex ;
 extern "C" {
     local int	timemgr_sigerwork	(timemgr *) noex ;
     local int	timemgr_dispworker	(timemgr *) noex ;
-    local void	timemgr_atforkbefore	() noex ;
-    local void	timemgr_atforkparent	() noex ;
-    local void	timemgr_atforkchild	() noex ;
+    local void	timemgr_forkatbefore	() noex ;
+    local void	timemgr_forkatparent	() noex ;
+    local void	timemgr_forkatchild	() noex ;
     local void	timemgr_exit		() noex ;
 } /* end extern */
 
@@ -443,10 +443,10 @@ int timemgr::pinit() noex {
 	    if (! finit.testandset) {
 	        if ((rs = mtx.create) >= 0) ylikely {
 	            if ((rs = cnv.create) >= 0) ylikely {
-	                void_f	b = timemgr_atforkbefore ;
-	                void_f	ap = timemgr_atforkparent ;
-	                void_f	ac = timemgr_atforkchild ;
-	                if ((rs = uc_atforkrec(b,ap,ac)) >= 0) ylikely {
+	                void_f	b = timemgr_forkatbefore ;
+	                void_f	ap = timemgr_forkatparent ;
+	                void_f	ac = timemgr_forkatchild ;
+	                if ((rs = uc_forkatrec(b,ap,ac)) >= 0) ylikely {
 			    void_f	e = timemgr_exit ;
 	                    if ((rs = uc_atexit(e)) >= 0) ylikely {
 				if ((rs = initx) >= 0) {
@@ -455,9 +455,9 @@ int timemgr::pinit() noex {
 				} /* end if (initx) */
 	                    } /* end if (ready) */
 	                    if (rs < 0) {
-	                        uc_atforkexp(b,ap,ac) ;
+	                        uc_forkatexp(b,ap,ac) ;
 			    } /* end if (error) */
-	                } /* end if (uc_atfork) */
+	                } /* end if (uc_forkat) */
 	                if (rs < 0) {
 	                    cnv.destroy() ;
 			} /* end if (error) */
@@ -506,10 +506,10 @@ int timemgr::pfini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
-	        void_f	b = timemgr_atforkbefore ;
-	        void_f	ap = timemgr_atforkparent ;
-	        void_f	ac = timemgr_atforkchild ;
-	        rs1 = uc_atforkexp(b,ap,ac) ;
+	        void_f	b = timemgr_forkatbefore ;
+	        void_f	ap = timemgr_forkatparent ;
+	        void_f	ac = timemgr_forkatchild ;
+	        rs1 = uc_forkatexp(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
@@ -1352,15 +1352,15 @@ local int timemgr_dispworker(timemgr *tmp) noex {
 	return tmp->dispworker() ;
 } /* end subroutine */
 
-local void timemgr_atforkbefore() noex {
+local void timemgr_forkatbefore() noex {
 	timemgr_data.mtx.lockbeg() ;
-} /* end subroutine (timemgr_atforkbefore) */
+} /* end subroutine (timemgr_forkatbefore) */
 
-local void timemgr_atforkparent() noex {
+local void timemgr_forkatparent() noex {
 	timemgr_data.mtx.lockend() ;
-} /* end subroutine (timemgr_atforkparent) */
+} /* end subroutine (timemgr_forkatparent) */
 
-local void timemgr_atforkchild() noex {
+local void timemgr_forkatchild() noex {
         timemgr		*tmp = &timemgr_data ;
         if (tmp->fl.workready) {
             tmp->fl.running_siger = false ;
@@ -1376,11 +1376,11 @@ local void timemgr_atforkchild() noex {
 	    } /* end if */
         } /* end if (was "working") */
         tmp->capend() ;
-} /* end subroutine (timemgr_atforkchild) */
+} /* end subroutine (timemgr_forkatchild) */
 
 local void timemgr_exit() noex {
 	timemgr_data.fvoid = true ;
-} /* end subroutine (timemgr_atforkparent) */
+} /* end subroutine (timemgr_forkatparent) */
 
 int uctimxnote::load (void *op,psem *psp,uctimx_f fp,int a) noex {
     	int		rs = SR_FAULT ;
