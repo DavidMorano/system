@@ -55,7 +55,7 @@
 #include	<sigblocker.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucgetrandom.h>		/* LIBUC */
 #include	<randomvar.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
@@ -169,8 +169,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	rander_atforkbefore() noex ;
-    local void	rander_atforkafter() noex ;
+    local void	rander_forkatbefore() noex ;
+    local void	rander_forkatafter() noex ;
     local void	rander_exit() noex ;
 } /* end extern (C) */
 
@@ -205,17 +205,17 @@ int rander::iinit() noex {
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
 	            if ((rs = cv.create) >= 0) ylikely {
-	    	        void_f	b = rander_atforkbefore ;
-	    	        void_f	a = rander_atforkafter ;
-	                if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	    	        void_f	b = rander_forkatbefore ;
+	    	        void_f	a = rander_forkatafter ;
+	                if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 	                    if ((rs = uc_atexit(rander_exit)) >= 0) {
 	                        finitdone = true ;
 		 	        f = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexp(b,a,a) ;
+	                        uc_forkatexp(b,a,a) ;
 			    }
-	                } /* end if (uc_atfork) */
+	                } /* end if (uc_forkat) */
 	                if (rs < 0) {
 	                    cv.destroy() ;
 			}
@@ -253,9 +253,9 @@ int rander::ifini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = rander_atforkbefore ;
-	        void_f	a = rander_atforkafter ;
-	        rs1= uc_atforkexp(b,a,a) ;
+	        void_f	b = rander_forkatbefore ;
+	        void_f	a = rander_forkatafter ;
+	        rs1= uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -428,13 +428,13 @@ int rander::icapend() noex {
 	return rs ;
 } /* end method (rander::icapend) */
 
-local void rander_atforkbefore() noex {
+local void rander_forkatbefore() noex {
 	rander_data.atbefore() ;
-} /* end subroutine (rander_atforkbefore) */
+} /* end subroutine (rander_forkatbefore) */
 
-local void rander_atforkafter() noex {
+local void rander_forkatafter() noex {
 	rander_data.atafter() ;
-} /* end subroutine (rander_atforkafter) */
+} /* end subroutine (rander_forkatafter) */
 
 local void rander_exit() noex {
 	if (cint rs = rander_data.fini() ; rs < 0) {
