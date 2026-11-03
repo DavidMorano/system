@@ -61,16 +61,16 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	mkpath4(char *,
-			const char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
+			cchar *,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
 
 /* external variables */
@@ -78,41 +78,41 @@ extern int	cfdeci(const char *,int,int *) ;
 
 /* forward references */
 
-static int	tailemod_searchdirs(TAILEMOD *,const char *,
+local int	tailemod_searchdirs(TAILEMOD *,cchar *,
 			TAILEMOD_MODULE **) ;
-static int	tailemod_checkdir(TAILEMOD *,const char *,const char *,
+local int	tailemod_checkdir(TAILEMOD *,cchar *,cchar *,
 			TAILEMOD_MODULE **) ;
 
-static ini	module_init(TAILEMOD_MODULE *,void *) ;
-static ini	module_inc(TAILEMOD_MODULE *) ;
-static ini	module_free(TAILEMOD_MODULE *) ;
+local ini	module_init(TAILEMOD_MODULE *,void *) ;
+local ini	module_inc(TAILEMOD_MODULE *) ;
+local ini	module_free(TAILEMOD_MODULE *) ;
 
-static int	entry_init(TAILEMOD_ENT *,const char *,
+local int	entry_init(TAILEMOD_ENT *,cchar *,
 			TAILEMOD_MODULE *) ;
-static int	entry_subs(TAILEMOD_ENT *,void *) ;
-static int	entry_hasname(TAILEMOD_ENT *,void *,const char *) ;
-static int	entry_free(TAILEMOD_ENT *) ;
+local int	entry_subs(TAILEMOD_ENT *,void *) ;
+local int	entry_hasname(TAILEMOD_ENT *,void *,cchar *) ;
+local int	entry_free(TAILEMOD_ENT *) ;
 
-static int	vcmpname(TAILEMOD_ENT **,TAILEMOD_ENT **) ;
+local int	vcmpname(TAILEMOD_ENT **,TAILEMOD_ENT **) ;
 
 
 /* local variables */
 
-static const char	*exts[] = {
+static cchar	*exts[] = {
 	".so",
 	".o",
 	"",
 	NULL
 } ;
 
-static const char	*dirs64[] = {
+static cchar	*dirs64[] = {
 	"lib/tailemod/sparcv9",
 	"lib/tailemod/sparc",
 	"lib/tailemod",
 	NULL
 } ;
 
-static const char	*dirs32[] = {
+static cchar	*dirs32[] = {
 	"lib/tailemod/sparcv8",
 	"lib/tailemod/sparcv7",
 	"lib/tailemod/sparc",
@@ -120,7 +120,7 @@ static const char	*dirs32[] = {
 	NULL
 } ;
 
-static const char	*subs[] = {
+static cchar	*subs[] = {
 	"init",
 	"store",
 	"check",
@@ -150,8 +150,8 @@ enum subs {
 
 int tailemod_init(op,pr,dirs)
 TAILEMOD	*op ;
-const char	pr[] ;
-const char	*dirs[] ;
+cchar	pr[] ;
+cchar	*dirs[] ;
 {
 	int	rs ;
 	int	i ;
@@ -190,7 +190,7 @@ const char	*dirs[] ;
 
 	    if (rs >= 0) {
 
-	        op->dirs = (const char **) op->dirlist.va ;
+	        op->dirs = (cchar **) op->dirlist.va ;
 
 	    }
 
@@ -240,7 +240,7 @@ bad0:
 /* load a plugin module */
 int tailemod_load(op,name)
 TAILEMOD	*op ;
-const char	name[] ;
+cchar	name[] ;
 {
 	struct tailemod_module	*mp ;
 
@@ -334,7 +334,7 @@ bad0:
 
 int tailemod_unload(op,name)
 TAILEMOD	*op ;
-const char	name[] ;
+cchar	name[] ;
 {
 	TAILEMOD_ENT	te, *dep ;
 
@@ -447,9 +447,9 @@ TAILEMOD	*op ;
 /* private subroutines */
 
 
-static int tailemod_searchdirs(op,name,mpp)
+local int tailemod_searchdirs(op,name,mpp)
 TAILEMOD	*op ;
-const char	name[] ;
+cchar	name[] ;
 TAILEMOD_MODULE	**mpp ;
 {
 	int	rs ;
@@ -488,10 +488,10 @@ TAILEMOD_MODULE	**mpp ;
 
 
 /* try to load a file with the given name */
-static int tailemod__checkdir(op,dname,name,mpp)
+local int tailemod__checkdir(op,dname,name,mpp)
 TAILEMOD	*op ;
-const char	dname[] ;
-const char	name[] ;
+cchar	dname[] ;
+cchar	name[] ;
 TAILEMOD_MODULE	**mpp ;
 {
 	ustat	sb ;
@@ -659,7 +659,7 @@ ret0:
 /* end subroutine (tailemod_checkdir) */
 
 
-static ini module_init(mp,dhp)
+local ini module_init(mp,dhp)
 TAILEMOD_MODULE	*mp ;
 coid		*dhp ;
 {
@@ -673,7 +673,7 @@ coid		*dhp ;
 }
 
 
-static int module_inc(mp)
+local int module_inc(mp)
 TAILEMOD_MODULE	*mp ;
 {
 
@@ -683,7 +683,7 @@ TAILEMOD_MODULE	*mp ;
 }
 
 
-static int module_free(mp)
+local int module_free(mp)
 TAILEMOD_MODULE	*mp ;
 {
 
@@ -696,9 +696,9 @@ TAILEMOD_MODULE	*mp ;
 
 
 
-static int entry_init(ep,name,mp)
+local int entry_init(ep,name,mp)
 TAILEMOD_ENT	*ep ;
-const char	name[] ;
+cchar	name[] ;
 struct tailemod_module	*mp ;
 {
 	int	rs = SR_OK ;
@@ -722,7 +722,7 @@ struct tailemod_module	*mp ;
 /* end subroutine (entry_init) */
 
 
-static int entry_free(ep)
+local int entry_free(ep)
 TAILEMOD_ENT	*ep ;
 {
 	TAILEMOD_MODULE		*mp ;
@@ -762,7 +762,7 @@ TAILEMOD_ENT	*ep ;
 
 
 /* load up the available subroutines from this module */
-static int entry_subs(ep,dhp)
+local int entry_subs(ep,dhp)
 TAILEMOD_ENT	*ep ;
 void		*dhp ;
 {
@@ -843,10 +843,10 @@ void		*dhp ;
 /* end subroutine (entry_subs) */
 
 
-static int entry_hasname(ep,dhp,name)
+local int entry_hasname(ep,dhp,name)
 TAILEMOD_ENT	*ep ;
 void		*dhp ;
-const char	name[] ;
+cchar	name[] ;
 {
 	TAILEMOD_INFO	*dip ;
 
@@ -868,7 +868,7 @@ const char	name[] ;
 
 
 /* compare the whole entries (including the netgroup) */
-static int vcmpname(e1pp,e2pp)
+local int vcmpname(e1pp,e2pp)
 TAILEMOD_ENT	**e1pp, **e2pp ;
 {
 
