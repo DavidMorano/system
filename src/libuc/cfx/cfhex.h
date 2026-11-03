@@ -26,15 +26,18 @@
 
 
 EXTERNC_begin
-
 extern int cfhexsi	(cchar *,int,sint *)		noex ;
 extern int cfhexsl	(cchar *,int,slong *)		noex ;
 extern int cfhexsll	(cchar *,int,slonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int cfhexui	(cchar *,int,uint *)		noex ;
 extern int cfhexul	(cchar *,int,ulong *)		noex ;
 extern int cfhexull	(cchar *,int,ulonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int cfhexi(cchar *sp,int sl,int *rp)		noex {
 	return cfhexsi(sp,sl,rp) ;
 } /* end */
@@ -44,7 +47,6 @@ local inline int cfhexl(cchar *sp,int sl,long *rp)		noex {
 local inline int cfhexll(cchar *sp,int sl,longlong *rp)		noex {
 	return cfhexsll(sp,sl,rp) ;
 } /* end */
-
 EXTERNC_end
 
 #if	__cplusplus
