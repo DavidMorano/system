@@ -48,7 +48,7 @@ OBJPRIME=
 
 OBJ0= uexec.o 
 OBJ1= uexecname.o uprogname.o
-OBJ2= uprocess.o
+OBJ2= uprocess.o uforkat.o
 OBJ3= usigx.o usigblock.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
@@ -156,6 +156,7 @@ uprocess.o:		uprocess.cc	uprocess.h			$(INCS)
 usigs.o:		usigx.cc	usigx.h				$(INCS)
 uexecname.o:		uexecname.cc	uexecname.h			$(INCS)
 uprogname.o:		uprogname.cc	uprogname.h			$(INCS)
+uforkat.o:		uforkat.cc	uforkat.h			$(INCS)
 
 usigblock.o:		usigblock.ccm	usigblock.hh			$(INCS)
 
