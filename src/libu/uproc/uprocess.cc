@@ -212,8 +212,8 @@ namespace {
 	    }
 	    return rs ;
 	} ; /* end */
-	void submem(uprocer_m mem) noex {
-	    m = mem ;
+	void submem(uprocer_m ªm) noex {
+	    m = ªm ;
 	} ; /* end */
 	int ifork	() noex ;
 	int ivfork	() noex ;
