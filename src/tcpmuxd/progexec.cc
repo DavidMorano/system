@@ -58,11 +58,11 @@
 
 /* external subroutines */
 
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strnnlen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strnnlen(cchar *,int,int) ;
 #endif
 
 
