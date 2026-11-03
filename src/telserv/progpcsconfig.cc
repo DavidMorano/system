@@ -75,8 +75,8 @@
 
 /* forward references */
 
-static int	procsets(struct proginfo *,vecstr *) ;
-static int	matme(cchar *,cchar *,cchar **,cchar **) ;
+local int	procsets(struct proginfo *,vecstr *) ;
+local int	matme(cchar *,cchar *,cchar **,cchar **) ;
 
 
 /* local variables */
@@ -109,7 +109,7 @@ int progpcsconf(PROGINFO *pip)
 
 	if ((rs = vecstr_start(&sets,10,0)) >= 0) {
 	    PCSCONF	pc ;
-	    const int	plen = PCSCONF_LEN ;
+	    cint	plen = PCSCONF_LEN ;
 	    char	pbuf[PCSCONF_LEN + 1] ;
 	    cchar	*pr = pip->pr ;
 	    if ((rs1 = pcsconf(cp,nullptr,&pc,&sets,nullptr,pbuf,plen)) >= 0) {
@@ -138,7 +138,7 @@ int progpcsconf(PROGINFO *pip)
 
 
 /* get any of my values from the main configuration */
-static int procsets(PROGINFO *pip,vecstr *slp)
+local int procsets(PROGINFO *pip,vecstr *slp)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -192,7 +192,7 @@ static int procsets(PROGINFO *pip,vecstr *slp)
 
 
 /* does a key match my search name? */
-static int matme(key,ts,kpp,vpp)
+local int matme(key,ts,kpp,vpp)
 cchar	key[] ;
 cchar	ts[] ;
 cchar	**kpp, **vpp ;
