@@ -19,7 +19,7 @@
 /*******************************************************************************
 
   	Names:
-	uatfork
+	uforkat
 	uatæxit
 
 	Description:
@@ -37,7 +37,7 @@ module ;
 #include	<sys/mount.h>		/* |statfs| */
 #include	<sys/statvfs.h>		/* |statvfs| */
 #include	<sys/stat.h>		/* |stat(3c)| */
-#include	<pthread.h>		/* |pthread_atfork(3c)| */
+#include	<pthread.h>		/* |pthread_forkat(3c)| */
 #include	<cerrno>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD |atexit(3c)| */
@@ -103,14 +103,14 @@ namespace {
             }
             return rs ;
         } ; /* end method (callstd) */
-	int stdatfork() noex ;
-	int stdatexit() noex ;
-	int stdstat() noex ;
-	int stdstatfs() noex ;
-	int stdstatvfs() noex ;
-	int stdgetcwd() noex ;
-	int stdaccess() noex ;
-	operator int () noex ;
+	int stdforkat	() noex ;
+	int stdatexit	() noex ;
+	int stdstat	() noex ;
+	int stdstatfs	() noex ;
+	int stdstatvfs	() noex ;
+	int stdgetcwd	() noex ;
+	int stdaccess	() noex ;
+	operator int 	() noex ;
     } ; /* end struct (ucaller) */
 } /* end namespace */
 
@@ -123,15 +123,15 @@ namespace {
 
 /* exported subroutines */
 
-int uatfork(void_f b,void_f ap,void_f ac) noex {
+int uforkat(void_f b,void_f ap,void_f ac) noex {
 	int		rs = SR_FAULT ;
 	if (b || ap || ac) {
 	    ucaller	po(b,ap,ac) ;
-	    po.m = &ucaller::stdatfork ;
+	    po.m = &ucaller::stdforkat ;
 	    rs = po ;
 	} /* end if (non-null) */
 	return rs ;
-} /* end subroutine (uatfork) */
+} /* end subroutine (uforkat) */
 int uatexit(void_f func) noex {
 	int		rs = SR_FAULT ;
 	if (func) ylikely {
@@ -261,19 +261,19 @@ ucaller::operator int () noex {
 	return rs ;
 } /* end subroutine (ucaller::operator) */
 
-sysret_t ucaller::stdatfork() noex {
+sysret_t ucaller::stdforkat() noex {
 	int		rs ;
 	if ((rs = pthread_atfork(bf,apf,acf)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
-} /* end method (ucaller::stdatfork) */
+} /* end method (ucaller::stdforkat) */
 
 sysret_t ucaller::stdatexit() noex {
 	int		rs ;
 	if ((rs = atexit(func)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (ucaller::stdatexit) */
 
@@ -282,7 +282,7 @@ sysret_t ucaller::stdstat() noex {
 	int		rs ;
 	if ((rs = statfile(fn,p)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (ucaller::stdstat) */
 
@@ -291,7 +291,7 @@ sysret_t ucaller::stdstatfs() noex {
 	int		rs ;
 	if ((rs = statfilefs(fn,p)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (ucaller::stdstatfs) */
 
@@ -300,7 +300,7 @@ sysret_t ucaller::stdstatvfs() noex {
 	int		rs ;
 	if ((rs = statfilevfs(fn,p)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (ucaller::stdstatvfs) */
 
@@ -311,7 +311,7 @@ sysret_t ucaller::stdgetcwd() noex {
 	    rs = lenstr(rp) ;
 	} else {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (ucaller::stdgetcwd) */
 
@@ -319,7 +319,7 @@ sysret_t ucaller::stdaccess() noex {
 	int		rs ;
 	if ((rs = access(fn,am)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (ucaller::stdaccess) */
 
