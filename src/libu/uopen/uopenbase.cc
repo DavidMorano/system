@@ -101,11 +101,11 @@ namespace {
 	void operator () (uopen *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (uopen_co) */
     struct uopen {
 	friend		uopen_co ;
@@ -117,28 +117,28 @@ namespace {
 	aflag		finitdone ;
 	uopen_fl	fl ;
 	uopen() noex {
-	    lockbeg(this,uopenmem_lockbeg) ;
-	    lockend(this,uopenmem_lockend) ;
-	} ;
-	int init() noex ;
-	int fini() noex ;
-	void forkbefore() noex {
+	    lockbeg	(this,uopenmem_lockbeg) ;
+	    lockend	(this,uopenmem_lockend) ;
+	} ; /* end */
+	int init	() noex ;
+	int fini	() noex ;
+	void forkbefore	() noex {
 	    mx.lockbeg() ;
-	} ;
-	void forkafter() noex {
+	} ; /* end */
+	void forkafter	() noex {
 	    mx.lockend() ;
-	} ;
-	void exitnow() noex {
+	} ; /* end */
+	void exitnow	() noex {
 	    fl.exit = true ;
-	} ;
+	} ; /* end */
 	destruct uopen() {
             if (cint rs = fini() ; rs < 0) {
                 ulogerror("uopen",rs,"dtor-fini") ;
-            }
+            } /* end if (error) */
 	} ; /* end dtor */
     private:
-	int ilockbeg() noex ;
-	int ilockend() noex ;
+	int ilockbeg	() noex ;
+	int ilockend	() noex ;
     } ; /* end struct (uopen) */
 } /* end namespace */
 
@@ -176,12 +176,12 @@ namespace {
 	} ; /* end ctor */
 	stdcaller(int afd,SOCKADDR *fp,int *lp) noex : dfd(afd), sap(fp) {
 	    lenp = lp ;
-	} ;
+	} ; /* end */
 	stdcaller(int afd,STRRECVFD *sp,int ato) noex : dfd(afd) {
 	    fl.acceptpass = true ;
 	    streamp = sp ;
 	    to = ato ;
-	} ;
+	} ; /* end */
 	stdcaller(int *apipes,int mfd = 0) noex : pipes(apipes), tfd(mfd) { 
 	    if (pipes) {
 		pipes[0] = -1 ;
@@ -190,11 +190,11 @@ namespace {
 	} ; /* end ctor */
 	int operator () (cchar *fn,int of,mode_t om) noex {
 	    return callready(fn,of,om) ;
-	} ;
+	} ; /* end */
 	operator int () noex {
 	    cnullptr	np{} ;
 	    return callready(np,0,0) ;
-	} ;
+	} ; /* end */
 	int callready	(cchar *,int,mode_t) noex ;
 	int loopcall	(cchar *,int,mode_t) noex ;
 	int callstd	(cchar *,int,mode_t) noex ;
@@ -213,7 +213,7 @@ namespace {
 	int iclose	(cchar *,int,mode_t) noex ;
     private:
 	int icloseonexec(int) noex ;
-	void fderror(int) noex ;
+	void fderror	(int) noex ;
     } ; /* end struct (stdcaller) */
 } /* end namespace */
 
@@ -221,8 +221,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	uopen_atforkbefore() noex ;
-    local void	uopen_atforkafter() noex ;
+    local void	uopen_forkatbefore() noex ;
+    local void	uopen_forkatafter() noex ;
     local void	uopen_exit() noex ;
 } /* end extern */
 
@@ -230,7 +230,6 @@ extern "C" {
 /* local variables */
 
 static uopen		uopen_data ;
-
 constexpr bool		f_sunos = F_SUNOS ;
 
 
@@ -378,35 +377,35 @@ int uopen::init() noex {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
-	        if ((rs = mx.create) >= 0) {
-	            void_f	b = uopen_atforkbefore ;
-	            void_f	a = uopen_atforkafter ;
-	            if ((rs = uregfork_rec(b,a,a)) >= 0) {
+	        if ((rs = mx.create) >= 0) ylikely {
+	            void_f	b = uopen_forkatbefore ;
+	            void_f	a = uopen_forkatafter ;
+	            if ((rs = uregfork_rec(b,a,a)) >= 0) ylikely {
 			void_f	e = uopen_exit ;
-	                if ((rs = uatexit(e)) >= 0) {
+	                if ((rs = uatexit(e)) >= 0) ylikely {
 	    	            finitdone = true ;
 		            f = true ;
-		        }
+		        } /* end */
 		        if (rs < 0) {
 		            uregfork_exp(b,a,a) ;
-			}
-	            } /* end if (uatfork) */
+			} /* end if (error) */
+	            } /* end if (uregfork_rec) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
             } else if (! finitdone) { 
-                timewatch       tw(to) ;
+                timewatch tw(to) ;
                 auto lamb = [this] () -> int {
-                    int         rsl = SR_OK ;
+                    int rsl = SR_OK ;
                     if (!finit) {
                         rsl = SR_LOCKFAIL ;              /* <- failure */
                     } else if (finitdone) {
                         rsl = 1 ;                        /* <- OK ready */
-                    }                       
+                    } /* end */
                     return rsl ;
                 } ; /* end lambda (lamb) */ 
                 rs = tw(lamb) ;         /* <- time-watching occurs in there */
@@ -420,15 +419,15 @@ int uopen::fini() noex {
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
-	        void_f	b = uopen_atforkbefore ;
-	        void_f	a = uopen_atforkafter ;
+	        void_f	b = uopen_forkatbefore ;
+	        void_f	a = uopen_forkatafter ;
 	        rs1 = uregfork_exp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit = false ;
 	    finitdone = false ;
 	} /* end if (atexit registered) */
@@ -439,7 +438,7 @@ int uopen::ilockbeg() noex {
 	int		rs ;
 	if ((rs = init()) >= 0) {
 	    rs = mx.lockbeg ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (uopen::ilockbeg) */
 
@@ -447,13 +446,13 @@ int uopen::ilockend() noex {
     	return mx.lockend ;
 } /* end subroutine (uopen::ilockend) */
 
-local void uopen_atforkbefore() noex {
+local void uopen_forkatbefore() noex {
 	uopen_data.forkbefore() ;
-} /* end subroutine (uopen_atforkbefore) */
+} /* end subroutine (uopen_forkatbefore) */
 
-local void uopen_atforkafter() noex {
+local void uopen_forkatafter() noex {
 	uopen_data.forkafter() ;
-} /* end subroutine (uopen_atforkafter) */
+} /* end subroutine (uopen_forkatafter) */
 
 local void uopen_exit() noex {
 	uopen_data.exitnow() ;
@@ -463,15 +462,15 @@ int stdcaller::callready(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (usigblock b ; (rs = b.start) >= 0) {
-	    if ((rs = uopen_data.lockbeg) >= 0) {
+	if (usigblock b ; (rs = b.start) >= 0) ylikely {
+	    if ((rs = uopen_data.lockbeg) >= 0) ylikely {
 		if (fl.acceptpass) {
 		    rs = special_acceptpass(dfd,streamp,to) ;
 		    fd = rs ;
 		} else {
 		    rs = loopcall(fn,of,om) ;
 		    fd = rs ;
-	        }
+	        } /* end */
 	        rs1 = uopen_data.lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (uopen_data) */
@@ -484,10 +483,10 @@ int stdcaller::callready(cchar *fn,int of,mode_t om) noex {
 
 int stdcaller::callstd(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
-	of &= (~ OM_SPECIAL) ;
+	of &= (compl OM_SPECIAL) ;
 	if ((rs = (this->*m)(fn,of,om)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (stdcaller::callstd) */
 
@@ -556,19 +555,19 @@ int stdcaller::loopcall(cchar *fn,int of,mode_t om) noex {
 	if_constexpr (f_sunos) {
 	    if ((rs >= 0) && (of & O_CLOEXEC)) {
 		rs = icloseonexec(fd) ;
-	    }
+	    } /* end */
 	} /* end if_constexpr (f_sunos) */
 	return (rs >= 0) ? fd : rs ;
 } /* end method (stdcaller::loopcall) */
 
 int stdcaller::iopen(cchar *fn,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
-	if (fn) {
+	if (fn) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0] && (of >= 0)) {
+	    if (fn[0] && (of >= 0)) ylikely {
 	        if ((rs = open(fn,of,om)) < 0) {
 		    rs = (neg errno) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -576,12 +575,12 @@ int stdcaller::iopen(cchar *fn,int of,mode_t om) noex {
 
 int stdcaller::iopenat(cchar *fn,int of,mode_t om) noex {
 	int		rs = SR_FAULT ;
-	if (fn) {
+	if (fn) ylikely {
 	    rs = SR_INVALID ;
-	    if (fn[0] && (of >= 0)) {
+	    if (fn[0] && (of >= 0)) ylikely {
 	        if ((rs = openat(dfd,fn,of,om)) < 0) {
 		    rs = (neg errno) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -589,24 +588,24 @@ int stdcaller::iopenat(cchar *fn,int of,mode_t om) noex {
 
 int stdcaller::isocket(cchar *,int,mode_t) noex {
 	int		rs = SR_INVALID ;
-	if ((pf >= 0) && (st >= 0) && (pr >= 0)) {
+	if ((pf >= 0) && (st >= 0) && (pr >= 0)) ylikely {
 	    if ((rs = socket(pf,st,pr)) < 0) {
 		rs = (neg errno) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (valid) */
 	return rs ;
 } /* end method (stdcaller::isocket) */
 
 int stdcaller::iaccept(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
-	if (sap && lenp) {
+	if (sap && lenp) ylikely {
 	    socklen_t	salen = socklen_t(*lenp) ;
 	    if ((rs = accept(dfd,sap,&salen)) < 0) {
 		rs = (neg errno) ;
-	    }
+	    } /* end if (error) */
 	    if (rs >= 0) {
 	        *lenp = int(salen & INT_MAX) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (stdcaller::iaccept) */
@@ -615,59 +614,59 @@ int stdcaller::idup1(cchar *,int,mode_t) noex {
 	int		rs ;
 	if ((rs = dup(dfd)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (stdcaller::idup1) */
 
 int stdcaller::idupover(cchar *,int,mode_t) noex {
 	int		rs = SR_BADF ;
-	if ((dfd >= 0) && (tfd >= 0)) {
+	if ((dfd >= 0) && (tfd >= 0)) ylikely {
 	    if ((rs = dup2(dfd,tfd)) < 0) {
 	        rs = (neg errno) ;
-	    }
-	}
+	    } /* end if (error) */
+	} /* end if (valid) */
 	return rs ;
 } /* end method (stdcaller::idupover) */
 
 int stdcaller::idupmin(cchar *,int,mode_t) noex {
 	int		rs = SR_BADF ;
-	if ((dfd >= 0) && (tfd >= 0)) {
+	if ((dfd >= 0) && (tfd >= 0)) ylikely {
 	    cint	cmd = F_DUPFD ;
 	    if ((rs = fcntl(dfd,cmd,tfd)) < 0) {
 	        rs = (neg errno) ;
-	    }
-	}
+	    } /* end if (error) */
+	} /* end if (valid) */
 	return rs ;
 } /* end method (stdcaller::idupmin) */
 
 int stdcaller::idupminer(cchar *,int of,mode_t) noex {
 	int		rs = SR_BADF ;
 	int		fd = -1 ;
-	if ((dfd >= 0) && (tfd >= 0)) {
-	    cint	cmd = (fl.closeonexec) ? F_DUPFD_CLOEXEC : F_DUPFD ;
-	    if ((rs = fcntl(dfd,cmd,tfd)) >= 0) {
+	if ((dfd >= 0) && (tfd >= 0)) ylikely {
+	    cint cmd = (fl.closeonexec) ? F_DUPFD_CLOEXEC : F_DUPFD ;
+	    if ((rs = fcntl(dfd,cmd,tfd)) >= 0) ylikely {
 		fd = rs ;
 	        if (of & O_NONBLOCK) {
 		    rs = unonblock(fd,true) ;
 		    if (rs < 0) {
 			close(fd) ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (O_NONBLOCK was specified) */
 	    } else {
 	        rs = (neg errno) ;
-	    }
-	}
+	    } /* end if (error) */
+	} /* end if (valid) */
 	return (rs >= 0) ? fd : rs ;
 } /* end method (stdcaller::idupminer) */
 
 int stdcaller::isocketpair(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
-	if (pipes) {
+	if (pipes) ylikely {
 	    rs = SR_INVALID ;
-	    if ((pf >= 0) && (st >= 0) && (pr >= 0)) {
+	    if ((pf >= 0) && (st >= 0) && (pr >= 0)) ylikely {
 	        if ((rs = socketpair(pf,st,pf,pipes)) < 0) {
 		    rs = (neg errno) ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -675,41 +674,41 @@ int stdcaller::isocketpair(cchar *,int,mode_t) noex {
 
 int stdcaller::ipipe(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
-	if (pipes) {
+	if (pipes) ylikely {
 	    if ((rs = pipe(pipes)) < 0) {
 		rs = (neg errno) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (valid) */
 	return rs ;
 } /* end method (stdcaller::ipipe) */
 
 int stdcaller::ipipe2(cchar *,int of,mode_t) noex {
 	int		rs = SR_FAULT ;
-	if (pipes) {
+	if (pipes) ylikely {
 	    if ((rs = pipe2(pipes,of)) < 0) {
 		rs = (neg errno) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (valid) */
 	return rs ;
 } /* end method (stdcaller::ipipe2) */
 
 int stdcaller::ipiper(cchar *,int of,mode_t) noex {
 	int		rs = SR_FAULT ;
-	if (pipes) {
+	if (pipes) ylikely {
 	    if ((rs = pipe2(pipes,of)) < 0) {
-		rs = (neg errno) ;
-	    }
+		rs = (neg errno) ; /* end if (error) */
+	    } /* end if (error) */
 	} /* end if (valid) */
 	return rs ;
 } /* end method (stdcaller::ipiper) */
 
 int stdcaller::iclose(cchar *,int,mode_t) noex {
 	int		rs = SR_BADF ;
-	if (dfd >= 0) {
+	if (dfd >= 0) ylikely {
 	    if ((rs = close(dfd)) < 0) {
 		rs = (neg errno) ;
-	    }
-	}
+	    } /* end if (error) */
+	} /* end */
 	return rs ;
 } /* end method (stdcaller::iclose) */
 
@@ -719,20 +718,20 @@ int stdcaller::icloseonexec(int fd) noex {
 	int		rs1 ;
 	switch (flavor) {
 	case flavor_single:
-	    if (fd >= 0) {
+	    if (fd >= 0) ylikely {
 	        rs = ucloseonexec(fd,true) ;
 	        if (rs < 0) u_close(fd) ;
 	    }
 	    break ;
 	case flavor_pipes:
-	    if (pipes) {
+	    if (pipes) ylikely {
 		for (int i = 0 ; i < 2 ; i += 1) {
 		    if (pipes[i] >= 0) {
 			rs1 = ucloseonexec(pipes[i],true) ;
 			if (rs >= 0) rs = rs1 ;
 		    }
 	        } /* end for */
-	    }
+	    } /* end */
 	    break ;
 	default:
 	    rs = SR_BUGCHECK ;
@@ -746,17 +745,17 @@ void stdcaller::fderror(int fd) noex {
 	case flavor_single:
 	    if (fd >= 0) {
 		close(fd) ;
-	    }
+	    } /* end */
 	    break ;
 	case flavor_pipes:
-	    if (pipes) {
+	    if (pipes) ylikely {
 		for (int i = 0 ; i < 2 ; i += 1) {
 		    if (pipes[i] >= 0) {
 			close(pipes[i]) ;
 			pipes[i] = -1 ;
 		    }
 	        } /* end for */
-	    }
+	    } /* end */
 	    break ;
 	default:
 	    break ;
