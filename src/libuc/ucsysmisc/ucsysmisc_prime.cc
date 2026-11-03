@@ -199,7 +199,7 @@ import libutil ;			/* |memclear(3u)| */
 #endif
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 #ifndef	CF_OPTIMIZE
 #define	CF_OPTIMIZE	0		/* try to optimize */
