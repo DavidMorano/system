@@ -26,15 +26,15 @@
 
 
 EXTERNC_begin
-
 extern int cfromansi	(cchar *,int,sint *)		noex ;
 extern int cfromansl	(cchar *,int,slong *)		noex ;
 extern int cfromansll	(cchar *,int,slonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int cfromanui	(cchar *,int,uint *)		noex ;
 extern int cfromanul	(cchar *,int,ulong *)		noex ;
 extern int cfromanull	(cchar *,int,ulonglong *)	noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
