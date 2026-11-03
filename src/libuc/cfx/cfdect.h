@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int cfdecti	(cchar *,int,int *)			noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
