@@ -134,11 +134,11 @@ namespace {
 	void operator () (uopen *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (uopen_co) */
     struct uopen {
 	friend		uopen_co ;
@@ -150,24 +150,24 @@ namespace {
 	aflag		finitdone ;
 	uopen_fl	fl ;
 	uopen() noex {
-	    lockbeg(this,uopenmem_lockbeg) ;
-	    lockend(this,uopenmem_lockend) ;
-	} ;
+	    lockbeg	(this,uopenmem_lockbeg) ;
+	    lockend	(this,uopenmem_lockend) ;
+	} ; /* end */
 	int init() noex ;
 	int fini() noex ;
 	void forkbefore() noex {
 	    mx.lockbeg() ;
-	} ;
+	} ; /* end */
 	void forkafter() noex {
 	    mx.lockend() ;
-	} ;
+	} ; /* end */
 	void exitnow() noex {
 	    fl.exit = true ;
-	} ;
+	} ; /* end */
 	destruct uopen() {
             if (cint rs = fini() ; rs < 0) {
                 ulogerror("uopen",rs,"dtor-fini") ;
-            }
+            } /* end if (error) */
 	} ; /* end dtor */
     private:
 	int ilockbeg() noex ;
@@ -205,16 +205,16 @@ namespace {
 	    if (pipes) {
 		pipes[0] = -1 ;
 		pipes[1] = -1 ;
-	    }
+	    } /* end */
 	} ; /* end ctor */
 	stdcaller(int afd,SOCKADDR *fp,int *lp) noex : dfd(afd), sap(fp) {
 	    lenp = lp ;
-	} ;
+	} ; /* end */
 	stdcaller(int afd,STRRECVFD *sp,int ato) noex : dfd(afd) {
 	    fl.acceptpass = true ;
 	    streamp = sp ;
 	    to = ato ;
-	} ;
+	} ; /* end */
 	stdcaller(int *apipes,int mfd = 0) noex : pipes(apipes), tfd(mfd) { 
 	    if (pipes) {
 		pipes[0] = -1 ;
@@ -223,11 +223,11 @@ namespace {
 	} ; /* end ctor */
 	int operator () (cchar *fn,int of,mode_t om) noex {
 	    return callready(fn,of,om) ;
-	} ;
+	} ; /* end */
 	operator int () noex {
 	    cnullptr	np{} ;
 	    return callready(np,0,0) ;
-	} ;
+	} ; /* end */
 	int callready	(cchar *,int,mode_t) noex ;
 	int loopcall	(cchar *,int,mode_t) noex ;
 	int callstd	(cchar *,int,mode_t) noex ;
@@ -246,7 +246,7 @@ namespace {
 	int iclose	(cchar *,int,mode_t) noex ;
     private:
 	int icloseonexec(int) noex ;
-	void fderror(int) noex ;
+	void fderror	(int) noex ;
     } ; /* end struct (stdcaller) */
 } /* end namespace */
 
@@ -254,8 +254,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	uopen_atforkbefore() noex ;
-    local void	uopen_atforkafter() noex ;
+    local void	uopen_forkatbefore() noex ;
+    local void	uopen_forkatafter() noex ;
     local void	uopen_exit() noex ;
 } /* end extern */
 
@@ -263,7 +263,6 @@ extern "C" {
 /* local variables */
 
 static uopen		uopen_data ;
-
 constexpr bool		f_sunos = F_SUNOS ;
 constexpr bool		f_debug	= CF_DEBUG ;
 
@@ -284,10 +283,10 @@ int uopen_fini() noex {
 namespace libu {
     sysret_t uopen_lockbeg() noex {
 	return uopen_data.lockbeg ;
-    }
+    } /* end */
     sysret_t uopen_lockend() noex {
 	return uopen_data.lockend ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 int u_open(cchar *fname,int of,mode_t om) noex {
@@ -407,8 +406,8 @@ int uopen::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
-	            void_f	b = uopen_atforkbefore ;
-	            void_f	a = uopen_atforkafter ;
+	            void_f	b = uopen_forkatbefore ;
+	            void_f	a = uopen_forkatafter ;
 	            if ((rs = uregfork_rec(b,a,a)) >= 0) {
 			void_f	e = uopen_exit ;
 	                if ((rs = uatexit(e)) >= 0) {
@@ -417,15 +416,15 @@ int uopen::init() noex {
 		        }
 		        if (rs < 0) {
 		            uregfork_exp(b,a,a) ;
-			}
-	            } /* end if (uatfork) */
+			} /* end if (error) */
+	            } /* end if (uregfork_rec) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (ptm_create) */
 	        if (rs < 0) {
 	            finit = false ;
-		}
+		} /* end if (error) */
             } else if (! finitdone) { 
                 timewatch       tw(to) ;
                 auto lamb = [this] () -> int {
@@ -434,7 +433,7 @@ int uopen::init() noex {
                         rsl = SR_LOCKFAIL ;              /* <- failure */
                     } else if (finitdone) {
                         rsl = 1 ;                        /* <- OK ready */
-                    }                       
+                    } /* end */
                     return rsl ;
                 } ; /* end lambda (lamb) */ 
                 rs = tw(lamb) ;         /* <- time-watching occurs in there */
@@ -448,15 +447,15 @@ int uopen::fini() noex {
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
-	        void_f	b = uopen_atforkbefore ;
-	        void_f	a = uopen_atforkafter ;
+	        void_f	b = uopen_forkatbefore ;
+	        void_f	a = uopen_forkatafter ;
 	        rs1 = uregfork_exp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finit = false ;
 	    finitdone = false ;
 	} /* end if (atexit registered) */
@@ -467,7 +466,7 @@ int uopen::ilockbeg() noex {
 	int		rs ;
 	if ((rs = init()) >= 0) {
 	    rs = mx.lockbeg ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (uopen::ilockbeg) */
 
@@ -475,13 +474,13 @@ int uopen::ilockend() noex {
     	return mx.lockend ;
 } /* end subroutine (uopen::ilockend) */
 
-local void uopen_atforkbefore() noex {
+local void uopen_forkatbefore() noex {
 	uopen_data.forkbefore() ;
-} /* end subroutine (uopen_atforkbefore) */
+} /* end subroutine (uopen_forkatbefore) */
 
-local void uopen_atforkafter() noex {
+local void uopen_forkatafter() noex {
 	uopen_data.forkafter() ;
-} /* end subroutine (uopen_atforkafter) */
+} /* end subroutine (uopen_forkatafter) */
 
 local void uopen_exit() noex {
 	uopen_data.exitnow() ;
@@ -499,7 +498,7 @@ int stdcaller::callready(cchar *fn,int of,mode_t om) noex {
 		} else {
 		    rs = loopcall(fn,of,om) ;
 		    fd = rs ;
-	        }
+	        } /* end */
 	        rs1 = uopen_data.lockend ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (uopen_data) */
@@ -512,10 +511,10 @@ int stdcaller::callready(cchar *fn,int of,mode_t om) noex {
 
 int stdcaller::callstd(cchar *fn,int of,mode_t om) noex {
 	int		rs ;
-	of &= (~ OM_SPECIAL) ;
+	of &= (compl OM_SPECIAL) ;
 	if ((rs = (this->*m)(fn,of,om)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (stdcaller::callstd) */
 
@@ -584,7 +583,7 @@ int stdcaller::loopcall(cchar *fn,int of,mode_t om) noex {
 	if_constexpr (f_sunos) {
 	    if ((rs >= 0) && (of & O_CLOEXEC)) {
 		rs = icloseonexec(fd) ;
-	    }
+	    } /* end */
 	} /* end if_constexpr (f_sunos) */
 	return (rs >= 0) ? fd : rs ;
 } /* end method (stdcaller::loopcall) */
@@ -598,7 +597,7 @@ int stdcaller::iopen(cchar *fn,int of,mode_t om) noex {
 		CDPRINTF("-> open(2)\n") ;
 	        if ((rs = open(fn,of,om)) < 0) {
 		    rs = (neg errno) ;
-	        }
+	        } /* end */
 		CDPRINTF("open(2)-out rs=%d\n",rs) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -638,7 +637,7 @@ int stdcaller::iaccept(cchar *,int,mode_t) noex {
 	    }
 	    if (rs >= 0) {
 	        *lenp = int(salen & INT_MAX) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (stdcaller::iaccept) */
@@ -657,7 +656,7 @@ int stdcaller::idupover(cchar *,int,mode_t) noex {
 	    if ((rs = dup2(dfd,tfd)) < 0) {
 	        rs = (neg errno) ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end method (stdcaller::idupover) */
 
@@ -668,7 +667,7 @@ int stdcaller::idupmin(cchar *,int,mode_t) noex {
 	    if ((rs = fcntl(dfd,cmd,tfd)) < 0) {
 	        rs = (neg errno) ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end method (stdcaller::idupmin) */
 
@@ -687,8 +686,8 @@ int stdcaller::idupminer(cchar *,int of,mode_t) noex {
 	        } /* end if (O_NONBLOCK was specified) */
 	    } else {
 	        rs = (neg errno) ;
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return (rs >= 0) ? fd : rs ;
 } /* end method (stdcaller::idupminer) */
 
@@ -740,8 +739,8 @@ int stdcaller::iclose(cchar *,int,mode_t) noex {
 	if (dfd >= 0) {
 	    if ((rs = close(dfd)) < 0) {
 		rs = (neg errno) ;
-	    }
-	}
+	    } /* end */
+	} /* end if (valid) */
 	return rs ;
 } /* end method (stdcaller::iclose) */
 
@@ -764,7 +763,7 @@ int stdcaller::icloseonexec(int fd) noex {
 			if (rs >= 0) rs = rs1 ;
 		    }
 	        } /* end for */
-	    }
+	    } /* end if (pipes) */
 	    break ;
 	default:
 	    rs = SR_BUGCHECK ;
@@ -778,7 +777,7 @@ void stdcaller::fderror(int fd) noex {
 	case flavor_single:
 	    if (fd >= 0) {
 		close(fd) ;
-	    }
+	    } /* end if (valid) */
 	    break ;
 	case flavor_pipes:
 	    if (pipes) {
@@ -788,7 +787,7 @@ void stdcaller::fderror(int fd) noex {
 			pipes[i] = -1 ;
 		    }
 	        } /* end for */
-	    }
+	    } /* end */
 	    break ;
 	default:
 	    break ;
