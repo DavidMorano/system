@@ -69,7 +69,7 @@
 #include	<sigblocker.h>		/* LIBU */
 #include	<ucsysauxinfo.h>	/* LIBUC |SAI_{xx}| */
 #include	<ucfork.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<ptm.h>			/* LIBU */
@@ -159,10 +159,10 @@ namespace {
 	int getaux_setup() noex ;
 	int getaux_load(setaux *) noex ;
 	int getaux_install(setaux *) noex ;
-	void atforkbefore() noex {
+	void forkatbefore() noex {
 	    mx.lockbeg() ;
 	} ;
-	void atforkafter() noex {
+	void forkatafter() noex {
 	    mx.lockend() ;
 	} ;
 	destruct ucinfo() noex {
@@ -177,8 +177,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	ucinfo_atforkbefore() noex ;
-    local void	ucinfo_atforkafter() noex ;
+    local void	ucinfo_forkatbefore() noex ;
+    local void	ucinfo_forkatafter() noex ;
     local void	ucinfo_exit() noex ;
 } /* end extern (C) */
 
@@ -228,17 +228,17 @@ int ucinfo::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
-	            void_f	b = ucinfo_atforkbefore ;
-	            void_f	a = ucinfo_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	            void_f	b = ucinfo_forkatbefore ;
+	            void_f	a = ucinfo_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(ucinfo_exit)) >= 0) ylikely {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexp(b,a,a) ;
+	                    uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
 		    } /* end if (error) */
@@ -281,9 +281,9 @@ int ucinfo::fini() noex {
 	        } /* end if (memory-release) */
 	    } /* end block */
 	    {
-	        void_f	b = ucinfo_atforkbefore ;
-	        void_f	a = ucinfo_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = ucinfo_forkatbefore ;
+	        void_f	a = ucinfo_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end block */
 	    {
@@ -569,12 +569,12 @@ int auxinfo::load() noex {
 	return (rs >= 0) ? sz : rs ;
 } /* end method (auxinfo::load) */
 
-local void ucinfo_atforkbefore() noex {
-	ucinfo_data.atforkbefore() ;
+local void ucinfo_forkatbefore() noex {
+	ucinfo_data.forkatbefore() ;
 } /* end subroutine */
 
-local void ucinfo_atforkafter() noex {
-	ucinfo_data.atforkafter() ;
+local void ucinfo_forkatafter() noex {
+	ucinfo_data.forkatafter() ;
 } /* end subroutine */
 
 local void ucinfo_exit() noex {
