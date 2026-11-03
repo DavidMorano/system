@@ -289,7 +289,7 @@ int proginfo::setversion(ccharp ver) noex {
 
 int proginfo::setbanner(cchar *valp) noex {
 	int		rs = SR_FAULT ;
-	if (valp) {
+	if (valp) ylikely {
 	    ccharpp vpp = &banner ;
 	    rs = setent(vpp,valp,-1) ;
 	} /* end */
@@ -505,7 +505,7 @@ int proginfo_progpname(PI *pip) noex {
     	int		rs ;
 	int		rs1 ;
 	if (pip->progname.valp == nullptr) {
-	    if (charp nbuf ; (rs = mem.mn(&nbuf)) >= 0) {
+	    if (charp nbuf ; (rs = mem.mn(&nbuf)) >= 0) ylikely {
 	        cint	ac = pip->argc ;
 	        mainv	av = pip->argv ;
 	        mainv	ev = pip->envv ;
@@ -532,9 +532,9 @@ int proginfo_progpname(PI *pip) noex {
 
 int proginfo_getpname(PI *pip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (pip && rbuf) {
+	if (pip && rbuf) ylikely {
 	    rbuf[0] = eos ;
-	    if ((rs = proginfo_progpname(pip)) >= 0) {
+	    if ((rs = proginfo_progpname(pip)) >= 0) ylikely {
 	        if (pip->progname.valp) {
 	            rs = sncpy(rbuf,rlen,pip->progname.valp) ;
 	        } /* end */
@@ -545,9 +545,9 @@ int proginfo_getpname(PI *pip,char *rbuf,int rlen) noex {
 
 int proginfo_getename(PI *pip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (pip && rbuf) {
+	if (pip && rbuf) ylikely {
 	    rbuf[0] = eos ;
-	    if ((rs = proginfo_progename(pip)) >= 0) {
+	    if ((rs = proginfo_progename(pip)) >= 0) ylikely {
 	        if (pip->progename.valp) {
 	            rs = sncpy(rbuf,rlen,pip->progename.valp) ;
 	        } /* end */
@@ -589,9 +589,9 @@ int proginfo_nodename(PI *pip) noex {
 	int		rs1 ;
 	int		nl = 0 ; /* return-value */
 	if (pip->nodename == nullptr) {
-	    if (charp nbuf ; (rs = mem.nn(&nbuf)) >= 0) {
+	    if (charp nbuf ; (rs = mem.nn(&nbuf)) >= 0) ylikely {
 		cint	nlen = rs ;
-	        if ((rs = getnodename(nbuf,nlen)) >= 0) {
+	        if ((rs = getnodename(nbuf,nlen)) >= 0) ylikely {
 	            ccharpp vpp = &pip->nodename ;
 	            nl = rs ;
 	            rs = pip->setent(vpp,nbuf,nl) ;
@@ -739,7 +739,7 @@ int proginfo::progmode(mainv names) noex {
 int proginfo_start::operator () (int ac,mainv av,mainv ev,ccp v) noex {
     	int		rs = SR_BUGCHECK ;
 	DEBUGPRINTF("proginfo_start-args-ent\n") ;
-	if (op) {
+	if (op) ylikely {
 	    rs = op->pstart(ac,av,ev,v) ;
 	} /* end if (non-null) */
 	DEBUGPRINTF("proginfo_start-args ret rs=%d\n",rs) ;
