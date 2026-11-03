@@ -30,15 +30,18 @@
 
 
 EXTERNC_begin
-
 extern int cfdecsi	(cchar *,int,sint *)		noex ;
 extern int cfdecsl	(cchar *,int,slong *)		noex ;
 extern int cfdecsll	(cchar *,int,slonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int cfdecui	(cchar *,int,uint *)		noex ;
 extern int cfdecul	(cchar *,int,ulong *)		noex ;
 extern int cfdecull	(cchar *,int,ulonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local  inline int cfdeci(cchar *sp,int sl,int *rp)		noex {
 	return cfdecsi(sp,sl,rp) ;
 } /* end */
@@ -48,7 +51,6 @@ local  inline int cfdecl(cchar *sp,int sl,long *rp)		noex {
 local  inline int cfdecll(cchar *sp,int sl,longlong *rp)	noex {
 	return cfdecsll(sp,sl,rp) ;
 } /* end */
-
 EXTERNC_end
 
 #if	__cplusplus
