@@ -75,10 +75,10 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkdirs(const char *,mode_t) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkdirs(cchar *,mode_t) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* forward references */
