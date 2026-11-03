@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int cfhexstr	(cchar *,int,uchar *)		noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
