@@ -29,15 +29,18 @@
 
 
 EXTERNC_begin
-
 extern int ctxxxsi	(char *,int,int,sint)		noex ;
 extern int ctxxxsl	(char *,int,int,slong)		noex ;
 extern int ctxxxsll	(char *,int,int,slonglong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int ctxxxui	(char *,int,int,uint)		noex ;
 extern int ctxxxul	(char *,int,int,ulong)		noex ;
 extern int ctxxxull	(char *,int,int,ulonglong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int ctxxxi(char *bp,int bl,int b,int v)		noex {
 	return ctxxxsi(bp,bl,b,v) ;
 } /* end */
@@ -47,7 +50,6 @@ local inline int ctxxxl(char *bp,int bl,int b,long v)		noex {
 local inline int ctxxxll(char *bp,int bl,int b,longlong v)	noex {
 	return ctxxxsll(bp,bl,b,v) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
