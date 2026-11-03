@@ -30,15 +30,13 @@
 	3) check if it is a local username
 	4) check if there is a "default" service table entry
 
-        Note: Note (carefully) that zero-length service strings *are*
+        Note: 
+	Note (carefully) that zero-length service strings *are*
         acceptable. They cause a default service to be invoked.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -46,19 +44,22 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<vecstr.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
-#include	<localmisc.h>
+#include	<isfd.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
 #include	"defs.h"
@@ -77,10 +78,6 @@
 #define	INETXADDRLEN	sizeof(struct in_addr)
 #endif
 
-#ifndef	PASSWDLEN
-#define	PASSWDLEN	32
-#endif
-
 #ifndef	SVCBUFLEN
 #define	SVCBUFLEN	(2*LINEBUFLEN)
 #endif
@@ -89,41 +86,21 @@
 #define	SVCSPECLEN	MAXNAMELEN
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 #ifndef	TO_SVC
 #define	TO_SVC		30
 #endif
 
-#define	ISEOL(c)	(((c) == '\n') || ((c) == '\r'))
-
 
 /* external subroutines */
 
-extern int	sisub(const char *,int,const char *) ;
-extern int	field_svcargs(FIELD *,VECSTR *) ;
-extern int	isasocket(int) ;
-
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
-			const char *,const char **) ;
+			cchar *,cchar **) ;
 
 extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 extern int	proglog_flush(PROGINFO *) ;
-
-#if	CF_DEBUG || CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -131,8 +108,8 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* forward references */
 
-static int	procsvcspec(struct proginfo *,struct clientinfo *,
-			char *,int,vecstr *,const char *,int) ;
+local int	procsvcspec(struct proginfo *,struct clientinfo *,
+			char *,int,vecstr *,cchar *,int) ;
 
 
 /* local variables */
@@ -161,7 +138,7 @@ struct clientinfo	*cip ;
 {
 	vecstr		svcargs ;
 
-	const int	svclen = SVCBUFLEN ;
+	cint	svclen = SVCBUFLEN ;
 
 	int	rs = SR_OK ;
 	int	ifd = cip->fd_input ;
@@ -171,15 +148,15 @@ struct clientinfo	*cip ;
 	int	to ;
 	int	f_socket = FALSE ;
 
-	const char	**sav ;
-	const char	*cp ;
+	cchar	**sav ;
+	cchar	*cp ;
 
 	char	svcspec[SVCSPECLEN + 1] ;
 	char	svcbuf[SVCBUFLEN + 1] ;
 
 
 	to = TO_READSVC ;
-	f_socket = isasocket(ifd) ;
+	f_socket = isfdsocket(ifd) ;
 
 /* pop off the service name */
 
@@ -257,13 +234,13 @@ bad0:
 /* local subroutines */
 
 
-static int procsvcspec(pip,cip,snbuf,snlen,sap,svcbuf,svclen)
+local int procsvcspec(pip,cip,snbuf,snlen,sap,svcbuf,svclen)
 struct proginfo		*pip ;
 struct clientinfo	*cip ;
 char			snbuf[] ;
 int			snlen ;
 vecstr			*sap ;
-const char		svcbuf[] ;
+cchar		svcbuf[] ;
 int			svclen ;
 {
 	FIELD	fsb ;
@@ -273,8 +250,8 @@ int			svclen ;
 	int	fl ;
 	int	len = 0 ;
 
-	const char	*ols = "/w" ;
-	const char	*fp ;
+	cchar	*ols = "/w" ;
+	cchar	*fp ;
 
 	char	fbuf[SVCSPECLEN + 1] ;
 
