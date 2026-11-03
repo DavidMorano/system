@@ -54,7 +54,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ucfork.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<sigblocker.h>		/* LIBUC */
 #include	<ptm.h>			/* LIBU */
@@ -125,9 +125,9 @@ local int	ucsyncer_cmdrecv	(US *) noex ;
 local int	ucsyncer_waitdone	(US *) noex ;
 
 extern "C" {
-    local void	ucsyncer_atforkbefore() noex ;
-    local void	ucsyncer_atforkparent() noex ;
-    local void	ucsyncer_atforkchild() noex ;
+    local void	ucsyncer_forkatbefore() noex ;
+    local void	ucsyncer_forkatparent() noex ;
+    local void	ucsyncer_forkatchild() noex ;
     local void	ucsyncer_exit() noex ;
 } /* end extern (C) */
 
@@ -154,19 +154,19 @@ int ucsyncer_init() noex {
 	        if ((rs = mxp->create) >= 0) {
 		    ptc *cnp = &uip->cn ;
 	            if ((rs = cnp->create) >= 0) {
-	    	        void_f	b = ucsyncer_atforkbefore ;
-	    	        void_f	ap = ucsyncer_atforkparent ;
-	    	        void_f	ac = ucsyncer_atforkchild ;
-	                if ((rs = uc_atforkrec(b,ap,ac)) >= 0) {
+	    	        void_f	b = ucsyncer_forkatbefore ;
+	    	        void_f	ap = ucsyncer_forkatparent ;
+	    	        void_f	ac = ucsyncer_forkatchild ;
+	                if ((rs = uc_forkatrec(b,ap,ac)) >= 0) {
 	                    if ((rs = uc_atexit(ucsyncer_exit)) >= 0) {
 	    	                uip->f_initdone = true ;
 			        uip->pid = getpid() ;
 			        f = true ;
 		            }
 		            if (rs < 0) {
-		                uc_atforkexp(b,ap,ac) ;
+		                uc_forkatexp(b,ap,ac) ;
 			    }
-	                } /* end if (uc_atfork) */
+	                } /* end if (uc_forkat) */
 	                if (rs < 0) {
 	                    cnp->destroy() ;
 		        }
@@ -200,10 +200,10 @@ int ucsyncer_fini() noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = ucsyncer_atforkbefore ;
-	        void_f	ap = ucsyncer_atforkparent ;
-	        void_f	ac = ucsyncer_atforkchild ;
-	        rs1 = uc_atforkexp(b,ap,ac) ;
+	        void_f	b = ucsyncer_forkatbefore ;
+	        void_f	ap = ucsyncer_forkatparent ;
+	        void_f	ac = ucsyncer_forkatchild ;
+	        rs1 = uc_forkatexp(b,ap,ac) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -440,23 +440,23 @@ local int ucsyncer_waitdone(US *uip) noex {
 	return rs ;
 } /* end subroutine (ucsyncer_waitdone) */
 
-local void ucsyncer_atforkbefore() noex {
+local void ucsyncer_forkatbefore() noex {
 	US	*uip = &ucsyncer_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbeg() ;
 	}
-} /* end subroutine (ucsyncer_atforkbefore) */
+} /* end subroutine (ucsyncer_forkatbefore) */
 
-local void ucsyncer_atforkparent() noex {
+local void ucsyncer_forkatparent() noex {
 	US	*uip = &ucsyncer_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-} /* end subroutine (ucsyncer_atforkparent) */
+} /* end subroutine (ucsyncer_forkatparent) */
 
-local void ucsyncer_atforkchild() noex {
+local void ucsyncer_forkatchild() noex {
 	US	*uip = &ucsyncer_data ;
 	{
 	    ptm *mxp = &uip->mx ;
@@ -465,7 +465,7 @@ local void ucsyncer_atforkchild() noex {
 	    uip->pid = getpid() ;
 	    mxp->lockend() ;
 	}
-} /* end subroutine (ucsyncer_atforkchild) */
+} /* end subroutine (ucsyncer_forkatchild) */
 
 local void ucsyncer_exit() noex {
 	(void) ucsyncer_fini() ;
