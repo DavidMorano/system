@@ -35,6 +35,7 @@
 
 #include	<uexec.h>
 #include	<uexecname.h>
+#include	<uforkat.h>
 #include	<unanosleep.h>
 #include	<uprocess.h>
 #include	<uprogname.h>
