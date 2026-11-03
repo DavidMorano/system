@@ -26,15 +26,18 @@
 
 
 EXTERNC_begin
-
 extern int ctbinsi	(char *,int,sint)		noex ;
 extern int ctbinsl	(char *,int,slong)		noex ;
 extern int ctbinsll	(char *,int,slonglong)		noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int ctbinui	(char *,int,uint)		noex ;
 extern int ctbinul	(char *,int,ulong)		noex ;
 extern int ctbinull	(char *,int,ulonglong)		noex ;
+EXTERNC_end
 
+EXTERNC_begin
 inline int ctbini(char *bp,int bl,int v)			noex {
 	return ctbinsi(bp,bl,v) ;
 } /* end */
@@ -44,7 +47,6 @@ inline int ctbinl(char *bp,int bl,long v)		noex {
 inline int ctbinll(char *bp,int bl,longlong v)		noex {
 	return ctbinsll(bp,bl,v) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
