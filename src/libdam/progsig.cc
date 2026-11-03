@@ -48,7 +48,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC */
 #include	<bufsizeget.h>		/* LIBUC */
 #include	<sighand.h>		/* LIBUC */
@@ -198,8 +198,8 @@ enum cmds {
 /* forward references */
 
 extern "C" {
-    local void	progsig_atforkbefore() noex ;
-    local void	progsig_atforkafter() noex ;
+    local void	progsig_forkatbefore() noex ;
+    local void	progsig_forkatafter() noex ;
     local void	progsig_exit() noex ;
     local void	progsig_sighand(int,siginfo_t *,void *) noex ;
 } /* end extern (C) */
@@ -287,9 +287,9 @@ int progsig_init(void) noex {
 	    if ((rs = mxp->create) >= 0) {
 	        ptc *cnp = &uip->cn ;
 	        if ((rs = cnp->create) >= 0) {
-	            void_f	b = progsig_atforkbefore ;
-	            void_f	a = progsig_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	            void_f	b = progsig_forkatbefore ;
+	            void_f	a = progsig_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(progsig_exit)) >= 0) {
 			    uip->pid = getpid() ;
 			    uip->sfd = -1 ;
@@ -297,9 +297,9 @@ int progsig_init(void) noex {
 	    	            uip->f_initdone = true ;
 		        } /* end if (ok) */
 		        if (rs < 0) {
-		            uc_atforkexp(b,a,a) ;
+		            uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	            if (rs < 0) {
 	                cnp->destroy() ;
 		    } /* end if (error) */
@@ -333,9 +333,9 @@ int progsig_fini(void) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
-	        void_f	b = progsig_atforkbefore ;
-	        void_f	a = progsig_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = progsig_forkatbefore ;
+	        void_f	a = progsig_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
@@ -961,25 +961,25 @@ local int progsig_cmdsend(progsig *uip,int cmd) noex {
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (progsig_cmdsend) */
 
-local void progsig_atforkbefore() noex {
+local void progsig_forkatbefore() noex {
 	progsig		*uip = &progsig_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbeg() ;
 	}
-} /* end subroutine (progsig_atforkbefore) */
+} /* end subroutine (progsig_forkatbefore) */
 
-local void progsig_atforkafter() noex {
+local void progsig_forkatafter() noex {
 	progsig		*uip = &progsig_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-} /* end subroutine (progsig_atforkafter) */
+} /* end subroutine (progsig_forkatafter) */
 
 local void progsig_exit() noex {
 	(void) progsig_fini() ;
-} /* end subroutine (progsig_atforkafter) */
+} /* end subroutine (progsig_exit) */
 
 local void progsig_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	progsig		*kip = &progsig_data ;
