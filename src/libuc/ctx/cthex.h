@@ -26,19 +26,22 @@
 
 
 EXTERNC_begin
-
 extern int cthexsc	(char *,int,schar)		noex ;
 extern int cthexss	(char *,int,sshort)		noex ;
 extern int cthexsi	(char *,int,sint)		noex ;
 extern int cthexsl	(char *,int,slong)		noex ;
 extern int cthexsll	(char *,int,slonglong)		noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int cthexuc	(char *,int,uchar)		noex ;
 extern int cthexus	(char *,int,ushort)		noex ;
 extern int cthexui	(char *,int,uint)		noex ;
 extern int cthexul	(char *,int,ulong)		noex ;
 extern int cthexull	(char *,int,ulonglong)		noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int cthexc(char *bp,int bl,char v)		noex {
 	return cthexsc(bp,bl,v) ;
 } /* end */
@@ -54,7 +57,6 @@ local inline int cthexl(char *bp,int bl,long v)		noex {
 local inline int cthexll(char *bp,int bl,longlong v)	noex {
 	return cthexsll(bp,bl,v) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
