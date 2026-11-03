@@ -51,7 +51,7 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<timewatch.hh>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -90,13 +90,13 @@ namespace {
 	aflag		finitdone ;
 	int init() noex ;
 	int fini() noex ;
-        void atforkbefore() noex {
+        void forkatbefore() noex {
 	    mx.lockbeg() ;
         } ; /* end */
-        void atforkparent() noex {
+        void forkatparent() noex {
 	    mx.lockend() ;
         } ; /* end */
-        void atforkchild() noex {
+        void forkatchild() noex {
 	    pid = 0 ;
 	    mx.lockend() ;
         } ; /* end */
@@ -113,9 +113,9 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	ucgetpid_atforkbefore() noex ;
-    local void	ucgetpid_atforkparent() noex ;
-    local void	ucgetpid_atforkchild() noex ;
+    local void	ucgetpid_forkatbefore() noex ;
+    local void	ucgetpid_forkatparent() noex ;
+    local void	ucgetpid_forkatchild() noex ;
     local void	ucgetpid_exit() noex ;
 } /* end extern (C) */
 
@@ -166,19 +166,19 @@ int ucgetpid::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
-	            void_f	b = ucgetpid_atforkbefore ;
-	            void_f	ap = ucgetpid_atforkparent ;
-	            void_f	ac = ucgetpid_atforkchild ;
-	            if ((rs = uc_atforkrec(b,ap,ac)) >= 0) {
+	            void_f	b = ucgetpid_forkatbefore ;
+	            void_f	ap = ucgetpid_forkatparent ;
+	            void_f	ac = ucgetpid_forkatchild ;
+	            if ((rs = uc_forkatrec(b,ap,ac)) >= 0) {
 			void_f	e = ucgetpid_exit ;
 	                if ((rs = uc_atexit(e)) >= 0) {
 	                    finitdone = true ;
 	                    fr = true ;
 	                } /* end */
 	                if (rs < 0) {
-	                    uc_atforkexp(b,ap,ac) ;
+	                    uc_forkatexp(b,ap,ac) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
 		    } /* end if (error) */
@@ -208,10 +208,10 @@ int ucgetpid::fini() noex {
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
-	        void_f	b = ucgetpid_atforkbefore ;
-	        void_f	ap = ucgetpid_atforkparent ;
-	        void_f	ac = ucgetpid_atforkchild ;
-	        rs1 = uc_atforkexp(b,ap,ac) ;
+	        void_f	b = ucgetpid_forkatbefore ;
+	        void_f	ap = ucgetpid_forkatparent ;
+	        void_f	ac = ucgetpid_forkatchild ;
+	        rs1 = uc_forkatexp(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
@@ -234,17 +234,17 @@ int ucgetpid::igetpid() noex {
 	return rs ;
 } /* end subroutine (ucgetpid::igetpid) */
 
-local void ucgetpid_atforkbefore() noex {
-	ucgetpid_data.atforkbefore() ;
-} /* end subroutine (ucgetpid_atforkbefore) */
+local void ucgetpid_forkatbefore() noex {
+	ucgetpid_data.forkatbefore() ;
+} /* end subroutine (ucgetpid_forkatbefore) */
 
-local void ucgetpid_atforkparent() noex {
-	ucgetpid_data.atforkparent() ;
-} /* end subroutine (ucgetpid_atforkparent) */
+local void ucgetpid_forkatparent() noex {
+	ucgetpid_data.forkatparent() ;
+} /* end subroutine (ucgetpid_forkatparent) */
 
-local void ucgetpid_atforkchild() noex {
-	ucgetpid_data.atforkchild() ;
-} /* end subroutine (ucgetpid_atforkchild) */
+local void ucgetpid_forkatchild() noex {
+	ucgetpid_data.forkatchild() ;
+} /* end subroutine (ucgetpid_forkatchild) */
 
 local void ucgetpid_exit() noex {
 	ucgetpid_data.fini() ;
