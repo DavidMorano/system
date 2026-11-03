@@ -36,11 +36,9 @@
 
 
 EXTERNC_begin
-
 extern int converte(double,int,int *,int *,char *) noex ;
 extern int convertf(double,int,int *,int *,char *) noex ;
 extern int convertg(double,int,int,char *) noex ;
-
 EXTERNC_end
 
 
