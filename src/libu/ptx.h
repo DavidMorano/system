@@ -18,8 +18,8 @@
 
 /* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	USYSCALLS_INCLUDE
-#define	USYSCALLS_INCLUDE
+#ifndef	PTX_INCLUDE
+#define	PTX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -38,6 +38,6 @@
 #include	<lockrw.h>
 
 
-#endif /* USYSCALLS_INCLUDE */
+#endif /* PTX_INCLUDE */
 
 
