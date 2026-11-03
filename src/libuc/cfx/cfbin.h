@@ -26,15 +26,18 @@
 
 
 EXTERNC_begin
-
 extern int cfbinsi	(cchar *,int,sint *)		noex ;
 extern int cfbinsl	(cchar *,int,slong *)		noex ;
 extern int cfbinsll	(cchar *,int,slonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int cfbinui	(cchar *,int,uint *)		noex ;
 extern int cfbinul	(cchar *,int,ulong *)		noex ;
 extern int cfbinull	(cchar *,int,ulonglong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int cfbini(cchar *sp,int sl,int *rp)		noex {
 	return cfbinsi(sp,sl,rp) ;
 } /* end */
@@ -44,7 +47,6 @@ local inline int cfbinl(cchar *sp,int sl,long *rp)		noex {
 local inline int cfbinll(cchar *sp,int sl,longlong *rp)		noex {
 	return cfbinsll(sp,sl,rp) ;
 } /* end */
-
 EXTERNC_end
 
 #if	__cplusplus
