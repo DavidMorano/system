@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	ctdecf(char *,int,double,int,int,int,int) noex ;
-
 EXTERNC_end
 
 
