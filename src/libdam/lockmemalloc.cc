@@ -146,8 +146,8 @@ local int	lockmemalloc_lockvalloc(int,void *) noex ;
 local int	lockmemalloc_lockrealloc(cvoid *,int,void *) noex ;
 local int	lockmemalloc_lockfree(cvoid *) noex ;
 
-local void	lockmemalloc_atforkbefore() noex ;
-local void	lockmemalloc_atforkafter() noex ;
+local void	lockmemalloc_forkatbefore() noex ;
+local void	lockmemalloc_forkatafter() noex ;
 local void	lockmemalloc_exit() noex ;
 
 
@@ -168,17 +168,17 @@ int lockmemalloc_init() noex {
 	if (! uip->f_init) {
 	    uip->f_init = true ;
 	    if ((rs = uip->mx.create) >= 0) {
-	        void_f	b = lockmemalloc_atforkbefore ;
-	        void_f	a = lockmemalloc_atforkafter ;
-	        if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	        void_f	b = lockmemalloc_forkatbefore ;
+	        void_f	a = lockmemalloc_forkatafter ;
+	        if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 	            if ((rs = uc_atexit(lockmemalloc_exit)) >= 0) {
 	                uip->f_initdone = true ;
 			f = true ;
 	            } /* end if (uc_atexit) */
 	            if (rs < 0) {
-	                uc_atforkexp(b,a,a) ;
+	                uc_forkatexp(b,a,a) ;
 		    }
-		} /* end if (uc_atfork) */
+		} /* end if (uc_forkat) */
 		if (rs < 0) {
 		    uip->mx.destroy() ;
 		}
@@ -200,9 +200,9 @@ int lockmemalloc_fini() noex {
 	if (uip->f_initdone && (! uip->f_void)) {
 	    uip->f_void = true ;
 	    {
-	        void_f	b = lockmemalloc_atforkbefore ;
-	        void_f	a = lockmemalloc_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = lockmemalloc_forkatbefore ;
+	        void_f	a = lockmemalloc_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -501,15 +501,15 @@ local int lockmemalloc_lockfree(cvoid *vp) noex {
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (lockmemalloc_lockfree) */
 
-local void lockmemalloc_atforkbefore() noex {
+local void lockmemalloc_forkatbefore() noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
 	uip->mx.lockbeg() ;
-} /* end subroutine (lockmemalloc_atforkbefore) */
+} /* end subroutine (lockmemalloc_forkatbefore) */
 
-local void lockmemalloc_atforkafter() noex {
+local void lockmemalloc_forkatafter() noex {
 	LOCKMEMALLOC	*uip = &lockmemalloc_data ;
 	uip->mx.lockend() ;
-} /* end subroutine (lockmemalloc_atforkafter) */
+} /* end subroutine (lockmemalloc_forkatafter) */
 
 local void lockmemalloc_exit() noex {
 	return ;
