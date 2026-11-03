@@ -73,7 +73,7 @@
 int progexec(pip,cip,progfname,argz,alp,elp)
 struct proginfo		*pip ;
 struct clientinfo	*cip ;
-const char		progfname[], argz[] ;
+cchar		progfname[], argz[] ;
 VECSTR		*alp ;
 VECSTR		*elp ;
 {
@@ -116,8 +116,8 @@ VECSTR		*elp ;
 		u_close(i) ;
 	    }
 	    }
-	        const char	**eav = (const char **) alp->va ;
-	        const char	**eev = (const char **) elp->va ;
+	        cchar	**eav = (cchar **) alp->va ;
+	        cchar	**eev = (cchar **) elp->va ;
 	        rs = u_execve(progfname,eav,eev) ;
 	    }
 	}
