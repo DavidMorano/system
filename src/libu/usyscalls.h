@@ -54,7 +54,6 @@
 #include	<ufileop.h>	/* file-operations */
 #include	<upt.h>
 #include	<uproc.h>
-#include	<uatfork.h>
 #include	<ulogerror.h>
 #include	<umem.hh>
 #include	<utimeoutdefs.h>
