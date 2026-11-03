@@ -3,7 +3,7 @@
 /* lang=C++20 */
 
 /* interface components for UNIX® library-3c */
-/* an enhanced UNIX®-like |pthread_atfork(3pthread)| subroutine */
+/* an enhanced UNIX®-like |pthread_forkat(3pthread)| subroutine */
 /* version %I% last-modified %G% */
 
 
@@ -11,13 +11,13 @@
 
 	= 2014-05-09, David A­D­ Morano
 	This is being written to add an "unregister" feature to the
-	'atfork' capability that came with POSIX threads.  In the
+	'forkat' capability that came with POSIX threads.  In the
 	past we always had pure reentrant subroutines without hidden
 	locks associated with them.  But more recently we have
 	started to dabble with hidden locks.  The problem is that
 	there is no way to put these hidden locks into a library
 	that also gets unloaded (unmapped) after it is done being
-	used.  The standard |pthread_atfork(3pthread)| does not
+	used.  The standard |pthread_forkat(3pthread)| does not
 	have an "unregister" feature associated with it.  This is
 	what we are creating here.
 
@@ -35,7 +35,7 @@
 
 	Description:
 	We are attempting to add an "unregister" feature to the
-	|pthread_atfork(3pthread)| facility.  We need to create a
+	|pthread_forkat(3pthread)| facility.  We need to create a
 	whole new interface for this.  This new interface will consist
 	of:
 
@@ -43,7 +43,7 @@
 	+ uregfork_exp(3uc)
 
 	We suffered a lot when first learning that
-	|pthread_atfork(3pthread)| does not get its registered
+	|pthread_forkat(3pthread)| does not get its registered
 	subroutines removed at module unload time (as though using
 	something like |dlclose(3dl)|) on all OSes (even POSIX-compliant
 	OSes).  So we attempt here to provide something that does
@@ -123,9 +123,9 @@ namespace {
 	int		expunge(void_f,void_f,void_f) noex ;
 	int		trackbegin() noex ;
 	int		trackend() noex ;
-	void		atforkbefore() noex ;
-	void		atforkparent() noex ;
-	void		atforkchild() noex ;
+	void		forkatbefore() noex ;
+	void		forkatparent() noex ;
+	void		forkatchild() noex ;
 	destruct	uregfork() noex ;
     } ; /* end struct (uregfork) */
 } /* end namespace */
@@ -134,9 +134,9 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void uregfork_atforkbefore() noex ;
-    local void uregfork_atforkparent() noex ;
-    local void uregfork_atforkchild() noex ;
+    local void uregfork_forkatbefore() noex ;
+    local void uregfork_forkatparent() noex ;
+    local void uregfork_forkatchild() noex ;
     local void uregfork_exit() noex ;
 } /* end extern */
 
@@ -191,15 +191,15 @@ int uregfork::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
-	            void_f	sb = uregfork_atforkbefore ;
-	            void_f	sp = uregfork_atforkparent ;
-	            void_f	sc = uregfork_atforkchild ;
-	            if ((rs = uatfork(sb,sp,sc)) >= 0) {
+	            void_f	sb = uregfork_forkatbefore ;
+	            void_f	sp = uregfork_forkatparent ;
+	            void_f	sc = uregfork_forkatchild ;
+	            if ((rs = uforkat(sb,sp,sc)) >= 0) {
 	                if ((rs = uatexit(uregfork_exit)) >= 0) {
 	        	    finitdone = true ;
 	        	    f = true ;
 	                } /* end if (uatexit) */
-	            } /* end if (uregfork_rec) */
+	            } /* end if (uforkat) */
 		    if (rs < 0) {
 		        mx.destroy() ;
 		    } /* end if (error) */
@@ -324,7 +324,7 @@ int uregfork::trackend() noex {
 } /* end subroutine (uregfork::trackend) */
 
 /* traverse the list backwards (tail to head) */
-void uregfork::atforkbefore() noex {
+void uregfork::forkatbefore() noex {
 	int		rs = SR_OK ;
 	if (finitdone) {
 	    if ((rs = mx.lockbeg) >= 0) {
@@ -340,10 +340,10 @@ void uregfork::atforkbefore() noex {
 	    } /* end if (locked) */
 	} /* end if (finitdone) */
 	(void) rs ;
-} /* end subroutine (uregfork::atforkbefore) */
+} /* end subroutine (uregfork::forkatbefore) */
 
 /* traverse the list forwards (head to tail) */
-void uregfork::atforkparent() noex {
+void uregfork::forkatparent() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone) {
@@ -362,10 +362,10 @@ void uregfork::atforkparent() noex {
 	    } /* end */
 	} /* end if (finitdone) */
 	(void) rs ;
-} /* end subroutine (uregfork::atforkparent) */
+} /* end subroutine (uregfork::forkatparent) */
 
 /* traverse the list forwards (head to tail) */
-void uregfork::atforkchild() noex {
+void uregfork::forkatchild() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone) {
@@ -384,7 +384,7 @@ void uregfork::atforkchild() noex {
 	    } /* end */
 	} /* end if (finitdone) */
 	(void) rs ;
-} /* end subroutine (uregfork::atforkchild) */
+} /* end subroutine (uregfork::forkatchild) */
 
 uregfork::destruct uregfork() noex {
 	    if (cint rs = fini() ; rs < 0) {
@@ -392,16 +392,16 @@ uregfork::destruct uregfork() noex {
 	    } /* end if (error) */
 } /* end dtor (uregfork) */
 
-local void uregfork_atforkbefore() noex {
-	uregfork_data.atforkbefore() ;
+local void uregfork_forkatbefore() noex {
+	uregfork_data.forkatbefore() ;
 } /* end */
 
-local void uregfork_atforkparent() noex {
-	uregfork_data.atforkparent() ;
+local void uregfork_forkatparent() noex {
+	uregfork_data.forkatparent() ;
 } /* end */
 
-local void uregfork_atforkchild() noex {
-	uregfork_data.atforkchild() ;
+local void uregfork_forkatchild() noex {
+	uregfork_data.forkatchild() ;
 } /* end */
 
 local void uregfork_exit() noex {
