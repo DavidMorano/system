@@ -32,15 +32,18 @@
 
 
 EXTERNC_begin
-
 extern int ctdecsi	(char *,int,sint)		noex ;
 extern int ctdecsl	(char *,int,slong)		noex ;
 extern int ctdecsll	(char *,int,slonglong)		noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int ctdecui	(char *,int,uint)		noex ;
 extern int ctdecul	(char *,int,ulong)		noex ;
 extern int ctdecull	(char *,int,ulonglong)		noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int ctdeci(char *bp,int bl,int v)		noex {
 	return ctdecsi(bp,bl,v) ;
 } /* end */
@@ -50,7 +53,6 @@ local inline int ctdecl(char *bp,int bl,long v)		noex {
 local inline int ctdecll(char *bp,int bl,longlong v)	noex {
 	return ctdecsll(bp,bl,v) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
