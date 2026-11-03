@@ -149,18 +149,18 @@ int kernlocker::init() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
-	            void_f	b = kernlock_atforkbefore ;
-	            void_f	a = kernlock_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	            void_f	b = kernlock_forkatbefore ;
+	            void_f	a = kernlock_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 			void_f	e = kernlock_exit ;
 	                if ((rs = uc_atexit(e)) >= 0) {
 	    	            finitdone = true ;
 		            f = true ;
 		        } /* end if */
 		        if (rs < 0) {
-		            uc_atforkexp(b,a,a) ;
+		            uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
 		    } /* end if (error) */
@@ -190,9 +190,9 @@ int kernlocker::fini() noex {
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
-	        void_f	b = kernlock_atforkbefore ;
-	        void_f	a = kernlock_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = kernlock_forkatbefore ;
+	        void_f	a = kernlock_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
