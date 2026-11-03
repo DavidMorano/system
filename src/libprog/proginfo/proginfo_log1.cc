@@ -128,7 +128,7 @@ int proglog_begin(PI *pip,userinfo *uip) noex {
 int proglog_end(PI *pip) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (pip) {
+	if (pip) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -150,7 +150,7 @@ int proglog_end(PI *pip) noex {
 int proglog_intro(PI *pip,userinfo *uip) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
-	if (pip) {
+	if (pip) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog && pip->pf.logprog) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -173,7 +173,7 @@ int proglog_intro(PI *pip,userinfo *uip) noex {
 
 int proglog_cksize(PI *pip) noex {
 	int		rs = SR_FAULT ;
-	if (pip) {
+	if (pip) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog && (pip->logsize > 0)) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -186,7 +186,7 @@ int proglog_cksize(PI *pip) noex {
 
 int proglog_check(PI *pip) noex {
 	int		rs = SR_FAULT ;
-	if (pip) {
+	if (pip) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -199,7 +199,7 @@ int proglog_check(PI *pip) noex {
 
 int proglog_getid(PI *pip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
-	if (pip && rbuf) {
+	if (pip && rbuf) ylikely {
 	    rs = sncpy1(rbuf,rlen,pip->logid) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -209,7 +209,7 @@ int proglog_setid(PI *pip,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (pip && sp) {
+	if (pip && sp) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -231,7 +231,7 @@ int proglog_setid(PI *pip,cchar *sp,int sl) noex {
 int proglog_print(PI *pip,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (pip && sp) {
+	if (pip && sp) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -247,7 +247,7 @@ int proglog_vprintf(PI *pip,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (pip && fmt) {
+	if (pip && fmt) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (char *fbuf ; (rs = mem.ml(&fbuf)) >= 0) {
@@ -268,7 +268,7 @@ int proglog_printf(PI *pip,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (pip && fmt) {
+	if (pip && fmt) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        va_begin(ap,fmt) ;
@@ -283,7 +283,7 @@ int proglog_printf(PI *pip,cchar *fmt,...) noex {
 int proglog_printfold(PI *pip,cchar *pre,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (pip && pre && sp) {
+	if (pip && pre && sp) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -298,7 +298,7 @@ int proglog_printfold(PI *pip,cchar *pre,cchar *sp,int sl) noex {
 int proglog_ssprint(PI *pip,cchar *id,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (pip && sp) {
+	if (pip && sp) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -321,7 +321,7 @@ int proglog_ssvprintf(PI *pip,cchar *id,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if (pip && id && fmt) {
+	if (pip && id && fmt) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (char *fbuf ; (rs = mem.ml(&fbuf)) >= 0) {
@@ -339,12 +339,12 @@ int proglog_ssvprintf(PI *pip,cchar *id,cchar *fmt,va_list ap) noex {
 } /* end subroutine (proglog_ssvprintf) */
 
 int proglog_ssprintf(PI *pip,cchar *id,cchar *fmt,...) noex {
+	va_list		ap ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	if (pip && id && fmt) {
+	if (pip && id && fmt) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
-	        va_list	ap ;
 	        va_begin(ap,fmt) ;
 	        rs = proglog_ssvprintf(pip,id,fmt,ap) ;
 		wlen += rs ;
@@ -356,7 +356,7 @@ int proglog_ssprintf(PI *pip,cchar *id,cchar *fmt,...) noex {
 
 int proglog_flush(PI *pip) noex {
 	int		rs = SR_FAULT ;
-	if (pip) {
+	if (pip) ylikely {
 	    rs = SR_OK ;
 	    if (pip->pfopen.logprog) {
 	        if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
@@ -412,7 +412,7 @@ local int proglog_lfname(PI *pip) noex {
 local int proglog_lfopen(PI *pip,UI *uip) noex {
 	int		rs = SR_BUGCHECK ;
 	int		fopened = false ;
-	if (logfile *lfp = resumelife<logfile>(pip->lfp)) {
+	if (logfile *lfp = resumelife<logfile>(pip->lfp)) ylikely {
 	   ccharp lfn = pip->lfname ;
 	   ccharp lid = pip->logid ;
            if ((rs = lfp->open(lfn,0,0666,lid)) >= 0) {
@@ -436,7 +436,7 @@ local int proglog_lfopen(PI *pip,UI *uip) noex {
 local int proglog_lfobjbeg(PI *pip) noex {
     	cint		sz = szof(logfile) ;
     	int		rs ;
-	if (voidp p ; (rs = mem.mall(sz,&p)) >= 0) {
+	if (voidp p ; (rs = mem.mall(sz,&p)) >= 0) ylikely {
     	    rs = SR_BUGCHECK ;
 	    if (logfile *lfp = new(p) logfile) {
 		rs = SR_OK ;
@@ -452,7 +452,7 @@ local int proglog_lfobjbeg(PI *pip) noex {
 local int proglog_lfobjend(PI *pip) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	if (logfile *lfp = resumelife<logfile>(pip->lzp)) {
+	if (logfile *lfp = resumelife<logfile>(pip->lzp)) ylikely {
 	    {
 		destroy_at(lfp) ;
 	    } /* end */
