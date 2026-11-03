@@ -149,7 +149,7 @@ int aflag::ilockbeg(int to) noex {
 	int		rs = SR_OK ;
 	if (to >= 0) {
 	    timewatch	tw(to) ;
-	    auto lamb = [this] () -> int {
+	    cauto lamb = [this] () -> int {
 	        return int(! af.test_and_set(memord_acquire)) ;
 	    } ; /* end lambda (lamb) */
 	    rs = tw(lamb) ;		/* <- time-watching occurs in there */
