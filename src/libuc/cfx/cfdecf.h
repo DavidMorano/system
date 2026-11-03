@@ -26,16 +26,16 @@
 
 
 EXTERNC_begin
-
 extern int	cfdecf	(cchar *,int,float *)		noex ;
 extern int	cfdecd	(cchar *,int,double *)		noex ;
 extern int	cfdecld	(cchar *,int,longdouble *)	noex ;
+EXTERNC_end
 
 /* historical (from about 1995 or earlier) */
+EXTERNC_begin
 local inline int cfdouble(cchar *sp,int sl,double *rp)	noex {
     	return cfdecd(sp,sl,rp) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
