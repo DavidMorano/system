@@ -58,7 +58,7 @@ OBJ06= ulibvals.o uconstants.o usupport.o
 OBJ07= umem.o usigsets.o umisc.o
 
 OBJ08= usys.o usyscallbase.o usysutility.o 
-OBJ09= uregfork.o uatfork.o uopen.o 
+OBJ09= uregfork.o uopen.o 
 OBJ10= uipc.o 
 OBJ11= ustr.o uobjlock.o ureserve.o
 
@@ -398,7 +398,6 @@ ulogerror.o:		ulogerror.cc	ulogerror.h		$(INCS)
 ucodenames.o:		ucodenames.cc	ucodenames.h		$(INCS)
 
 # requires USYSBASIC
-uatfork.o:		uatfork.cc uatfork.h umods.o	$(DEPS_FORK)	$(INCS)
 uregfork.o:		uregfork.cc uregfork.hh umods.o	$(DEPS_FORK)	$(INCS)
 uobjlock.o:		uobjlock.cc uobjlock.cc umods.o			$(INCS)
 
