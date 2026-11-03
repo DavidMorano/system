@@ -58,11 +58,7 @@
 /* local defines */
 
 #define	LOGBUFLEN	(LOGNAMELEN + 20)
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 
 #define	DEBUGLEVEL(n)	(pip->debuglevel >= (n))
 
