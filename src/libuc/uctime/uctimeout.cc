@@ -69,7 +69,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucsig.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<uctimer.h>		/* LIBUC */
 #include	<sigevent.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC vector-handles */
@@ -215,9 +215,9 @@ enum dispcmds {
 extern "C" {
     local int	uctimeout_sigerworker(uctimeout *) noex ;
     local int	uctimeout_dispworker(uctimeout *) noex ;
-    local void	uctimeout_atforkbefore() noex ;
-    local void	uctimeout_atforkparent() noex ;
-    local void	uctimeout_atforkchild() noex ;
+    local void	uctimeout_forkatbefore() noex ;
+    local void	uctimeout_forkatparent() noex ;
+    local void	uctimeout_forkatchild() noex ;
     local void	uctimeout_exit() noex ;
     local int	cmpent(cvoid *,cvoid *) noex ;
 } /* end extern (C) */
@@ -294,19 +294,19 @@ int uctimeout::init() noex {
 	    if (! finit.testandset) {
 	        if ((rs = mtx.create) >= 0) ylikely {
 	            if ((rs = cnv.create) >= 0) ylikely {
-	                void_f	b = uctimeout_atforkbefore ;
-	                void_f	ap = uctimeout_atforkparent ;
-	                void_f	ac = uctimeout_atforkchild ;
-	                if ((rs = uc_atforkrec(b,ap,ac)) >= 0) {
+	                void_f	b = uctimeout_forkatbefore ;
+	                void_f	ap = uctimeout_forkatparent ;
+	                void_f	ac = uctimeout_forkatchild ;
+	                if ((rs = uc_forkatrec(b,ap,ac)) >= 0) {
 			    void_f	e = uctimeout_exit ;
 	                    if ((rs = uc_atexit(e)) >= 0) {
 	                        finitdone = true ;
 	                        f = true ;
 	                    } /* end if (ready) */
 	                    if (rs < 0) {
-	                        uc_atforkexp(b,ap,ac) ;
+	                        uc_forkatexp(b,ap,ac) ;
 			    } /* end if (error) */
-	                } /* end if (uc_atfork) */
+	                } /* end if (uc_forkat) */
 	                if (rs < 0) {
 	                    cnv.destroy() ;
 			} /* end if (error) */
@@ -344,10 +344,10 @@ int uctimeout::fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = uctimeout_atforkbefore ;
-	        void_f	ap = uctimeout_atforkparent ;
-	        void_f	ac = uctimeout_atforkchild ;
-	        rs1 = uc_atforkexp(b,ap,ac) ;
+	        void_f	b = uctimeout_forkatbefore ;
+	        void_f	ap = uctimeout_forkatparent ;
+	        void_f	ac = uctimeout_forkatchild ;
+	        rs1 = uc_forkatexp(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -1026,15 +1026,15 @@ local int uctimeout_dispworker(uctimeout *uip) noex {
 	return uip->dispworker() ;
 } /* end subroutine */
 
-local void uctimeout_atforkbefore() noex {
+local void uctimeout_forkatbefore() noex {
 	uctimeout_data.mtx.lockbeg() ;
-} /* end subroutine (uctimeout_atforkbefore) */
+} /* end subroutine (uctimeout_forkatbefore) */
 
-local void uctimeout_atforkparent() noex {
+local void uctimeout_forkatparent() noex {
 	uctimeout_data.mtx.lockend() ;
-} /* end subroutine (uctimeout_atforkparent) */
+} /* end subroutine (uctimeout_forkatparent) */
 
-local void uctimeout_atforkchild() noex {
+local void uctimeout_forkatchild() noex {
         uctimeout       *uip = &uctimeout_data ;
         if (uip->fl.workready) {
             uip->fl.running_siger = false ;
@@ -1050,11 +1050,11 @@ local void uctimeout_atforkchild() noex {
 	    } /* end if_constexpr (f_childthrs) */
         } /* end if (was "working") */
         uip->capend() ;
-} /* end subroutine (uctimeout_atforkchild) */
+} /* end subroutine (uctimeout_forkatchild) */
 
 local void uctimeout_exit() noex {
 	uctimeout_data.fvoid = true ;
-} /* end subroutine (uctimeout_atforkparent) */
+} /* end subroutine (uctimeout_forkatparent) */
 
 local int cmpent(cvoid *v1p,cvoid *v2p) noex {
 	const TIMEOUT	*e1p = ctimeoutp(v1p) ;
