@@ -90,7 +90,7 @@
 #include	<usyscalls.h>		/* LIBU |ulogerror(3u)| */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC */
 #include	<sigblocker.h>		/* LIBU */
 #include	<ptm.h>			/* LIBU */
@@ -164,8 +164,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	ucproguser_atforkbefore() noex ;
-    local void	ucproguser_atforkafter() noex ;
+    local void	ucproguser_forkatbefore() noex ;
+    local void	ucproguser_forkatafter() noex ;
     local void	ucproguser_exit() noex ;
 } /* end extern (C) */
 
@@ -192,17 +192,17 @@ int ucproguser_init() noex {
 		ptm *mxp = &uip->mx ;
 	        uip->f_init = true ;
 	        if ((rs = mxp->create) >= 0) {
-	            void_f	b = ucproguser_atforkbefore ;
-	            void_f	a = ucproguser_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	            void_f	b = ucproguser_forkatbefore ;
+	            void_f	a = ucproguser_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(ucproguser_exit)) >= 0) {
 	                    uip->f_initdone = true ;
 	                    f = true ;
 	                } /* end if (good) */
 	                if (rs < 0) {
-	                    uc_atforkexp(b,a,a) ;
+	                    uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	            if (rs < 0) {
 	                mxp->destroy() ;
 		    } /* end if (error) */
@@ -234,9 +234,9 @@ int ucproguser_fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = ucproguser_atforkbefore ;
-	        void_f	a = ucproguser_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = ucproguser_forkatbefore ;
+	        void_f	a = ucproguser_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -390,21 +390,21 @@ int pumgr::namegeter(char *rbuf,int rlen,uid_t uid) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end method (pumgr::namegeter) */
 
-local void ucproguser_atforkbefore() noex {
+local void ucproguser_forkatbefore() noex {
 	pumgr	*uip = &ucproguser_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbeg() ;
 	}
-} /* end subroutine (ucproguser_atforkbefore) */
+} /* end subroutine (ucproguser_forkatbefore) */
 
-local void ucproguser_atforkafter() noex {
+local void ucproguser_forkatafter() noex {
 	pumgr	*uip = &ucproguser_data ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-} /* end subroutine (ucproguser_atforkafter) */
+} /* end subroutine (ucproguser_forkatafter) */
 
 local void ucproguser_exit() noex {
 	if (cint rs = ucproguser_fini() ; rs < 0) {
