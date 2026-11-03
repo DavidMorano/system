@@ -69,7 +69,7 @@
 #include	<ptm.h>			/* LIBU */
 #include	<ptc.h>			/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<ucentpw.h>		/* LIBUC */
 #include	<timewatch.hh>		/* LIBUC */
@@ -176,8 +176,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	ucpwcache_atforkbefore() noex ;
-    local void	ucpwcache_atforkafter() noex ;
+    local void	ucpwcache_forkatbefore() noex ;
+    local void	ucpwcache_forkatafter() noex ;
     local void	ucpwcache_exit() noex ;
 } /* end extern (C) */
 
@@ -224,17 +224,17 @@ int ucpwcache::iinit() noex {
 	    if (! finit.testandset) {	/* <- the money shot */
 	        if ((rs = mx.create) >= 0) ylikely {
 	            if ((rs = cv.create) >= 0) ylikely {
-	    	        void_f	b = ucpwcache_atforkbefore ;
-	    	        void_f	a = ucpwcache_atforkafter ;
-	                if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	    	        void_f	b = ucpwcache_forkatbefore ;
+	    	        void_f	a = ucpwcache_forkatafter ;
+	                if ((rs = uc_forkatrec(b,a,a)) >= 0) ylikely {
 	                    if ((rs = uc_atexit(ucpwcache_exit)) >= 0) ylikely {
 	                        finitdone = true ;
 	                        f = true ;
 	                    }
 	                    if (rs < 0) {
-	                        uc_atforkexp(b,a,a) ;
+	                        uc_forkatexp(b,a,a) ;
 			    }
-	                } /* end if (uc_atfork) */
+	                } /* end if (uc_forkat) */
 	                if (rs < 0) {
 	                    cv.destroy() ;
 		        }
@@ -272,9 +272,9 @@ int ucpwcache::ifini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = ucpwcache_atforkbefore ;
-	        void_f	a = ucpwcache_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = ucpwcache_forkatbefore ;
+	        void_f	a = ucpwcache_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -442,13 +442,13 @@ int ucpwcache::iopend() noex {
 	return rs ;
 } /* end method (ucpwcache::iopend) */
 
-local void ucpwcache_atforkbefore() noex {
+local void ucpwcache_forkatbefore() noex {
 	ucpwcache_data.capbegin(-1) ;
-} /* end subroutine (ucpwcache_atforkbefore) */
+} /* end subroutine (ucpwcache_forkatbefore) */
 
-local void ucpwcache_atforkafter() noex {
+local void ucpwcache_forkatafter() noex {
 	ucpwcache_data.capend() ;
-} /* end subroutine (ucpwcache_atforkafter) */
+} /* end subroutine (ucpwcache_forkatafter) */
 
 local void ucpwcache_exit() noex {
 	if (cint rs = ucpwcache_data.fini ; rs < 0) {
