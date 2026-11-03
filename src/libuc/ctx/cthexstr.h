@@ -26,14 +26,14 @@
 
 
 EXTERNC_begin
-
 extern int	cthexstr(char *,int,int,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int cthexstring(char *dp,int dl,cchar *sp,int sl) noex {
 	cint	f = true ;
 	return cthexstr(dp,dl,f,sp,sl) ;
 } /* end subroutine */
-
 EXTERNC_end
 
 
