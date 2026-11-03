@@ -41,7 +41,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucsysconf.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<timewatch.hh>		/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
@@ -128,10 +128,10 @@ namespace {
 	int valmaildir	(int) noex ;
 	int valpath	(int) noex ;
 	int valenv	(int) noex ;
-        void atforkbefore() noex {
+        void forkatbefore() noex {
 	    mx.lockbeg() ;
         }
-        void atforkafter() noex {
+        void forkatafter() noex {
 	    mx.lockend() ;
         }
 	void dtor() noex ;
@@ -186,8 +186,8 @@ constexpr strvarenv::strvarenv() noex {
 /* forward references */
 
 extern "C" {
-    local void	valstore_atforkbefore() noex ;
-    local void	valstore_atforkafter() noex ;
+    local void	valstore_forkatbefore() noex ;
+    local void	valstore_forkatafter() noex ;
     local void	valstore_exit() noex ;
 } /* end extern (C) */
 
@@ -238,17 +238,17 @@ int valstore::iinit() noex {
 	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) ylikely {
-	            void_f	b = valstore_atforkbefore ;
-	            void_f	a = valstore_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) ylikely {
+	            void_f	b = valstore_forkatbefore ;
+	            void_f	a = valstore_forkatafter ;
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) ylikely {
 	                if ((rs = uc_atexit(valstore_exit)) >= 0) {
 	                    finitdone = true ;
 	                    fr = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexp(b,a,a) ;
+	                    uc_forkatexp(b,a,a) ;
 			}
-	            } /* end if (uc_atfork) */
+	            } /* end if (uc_forkat) */
 	 	    if (rs < 0) {
 		        mx.destroy() ;
 		    }
@@ -287,9 +287,9 @@ int valstore::ifini() noex {
 		} /* end for */
 	    }
 	    {
-	        void_f	b = valstore_atforkbefore ;
-	        void_f	a = valstore_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = valstore_forkatbefore ;
+	        void_f	a = valstore_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -430,13 +430,13 @@ valstore_co::operator int () noex {
 	return rs ;
 } /* end method (valstore_co) */
 
-local void valstore_atforkbefore() noex {
-	data.atforkbefore() ;
-} /* end subroutine (valstore_atforkbefore) */
+local void valstore_forkatbefore() noex {
+	data.forkatbefore() ;
+} /* end subroutine (valstore_forkatbefore) */
 
-local void valstore_atforkafter() noex {
-	data.atforkafter() ;
-} /* end subroutine (valstore_atforkafter) */
+local void valstore_forkatafter() noex {
+	data.forkatafter() ;
+} /* end subroutine (valstore_forkatafter) */
 
 local void valstore_exit() noex {
 	data.fini() ;
