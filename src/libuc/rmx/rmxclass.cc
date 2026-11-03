@@ -1,0 +1,175 @@
+/* rmxclass SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 */
+
+/* remove characters from the end of the given counted c-string */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-11-01, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Names:
+	rmeol
+	rmwht
+	rmblk
+	rmtrailclass
+	rmtrailchr
+
+	Description:
+	Search the given counted c-string, from its end, for a
+	character (or set of characters) that meet the given criteria
+	and return the remaining length of the up until that point.
+
+	Synopsis:
+	int rmeol	(cchar *sp,int sl) noex
+	int rmwht	(cchar *sp,int sl) noex
+	int rmblk	(cchar *sp,int sl) noex
+	int rmtailclass	(cchar *sp,int sl,cchar *ss) noex
+	int rmtrailchr	(cchar *sp,int sl,int sch) noex
+
+	Arguments:
+	sp		counted c-string pinter
+	sl		counted c-string length
+	ss		c-string of characters representing a class
+	sch		character to search for
+
+	Returns:
+	>=0		index of found criteria
+	<0		critera was not found
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* CSTD |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<strn.h>		/* LIBUC |strn{x}chr(3uc)| */
+#include	<isch.h>		/* LIBUC |ischeol(3uc)| */
+#include	<localmisc.h>		/* LIBU */
+
+#include	"rmxclass.h"
+
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+extern "C" {
+    typedef bool (*iscond_f)(int) noex ;
+} /* end extern (C) */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+namespace {
+    struct rmtrailer {
+	iscond_f	ourcond = nullptr ;
+	rmtrailer() noex = default ;
+	rmtrailer(iscond_f fun) noex : ourcond(fun) { } ;
+	virtual bool iscond(int ch) const noex {
+	    return ourcond(ch) ;
+	} ; /* end */
+	int operator () (cchar *,int) noex ;
+    } ; /* end struct (rmtrailer) */
+    struct rmtrailer_class : rmtrailer {
+	cchar	*ss ;
+	rmtrailer_class(cchar *s) noex {
+	    ss = s ;
+	} ; /* end */
+	bool iscond(int ch) const noex override final {
+	    ch &= UCHAR_MAX ;
+    	    return (strchr(ss,ch) != nullptr) ;
+	} ; /* end */
+    } ; /* end struct (rmtrailer_class) */
+    struct rmtrailer_chr : rmtrailer {
+	int	chx_s ;
+	rmtrailer_chr(int c) noex {
+	    chx_s = c ;
+	} ; /* end */
+	bool iscond(int ch) const noex override final {
+	    ch &= UCHAR_MAX ;
+	    return (ch == chx_s) ;
+	} ; /* end */
+    } ; /* end struct (rmtrail_chr) */
+} /* end namespace */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int rmeol(cchar *sp,int sl) noex {
+    	rmtrailer to(ischeol) ;
+	return to(sp,sl) ;
+} /* end subroutine (rmeol) */
+
+int rmwht(cchar *sp,int sl) noex {
+    	rmtrailer to(ischwht) ;
+	return to(sp,sl) ;
+} /* end subroutine (rmwht) */
+
+int rmblk(cchar *sp,int sl) noex {
+    	rmtrailer to(ischblk) ;
+	return to(sp,sl) ;
+} /* end subroutine (rmblk) */
+
+int rmtrailclass(cchar *sp,int sl,cchar *ss) noex {
+    	rmtrailer_class to(ss) ;
+	return to(sp,sl) ;
+} /* end subroutine (rmtrailclass) */
+
+int rmtrailchr(cchar *sp,int sl,int sch) noex {
+    	rmtrailer_chr to(sch) ;
+	return to(sp,sl) ;
+} /* end subroutine (rmtrailchr) */
+
+
+/* local subroutines */
+
+int rmtrailer::operator () (cchar *sp,int sl) noex {
+    	if (sp) ylikely {
+	    if (sl < 0) sl = lenstr(sp) ;
+	    while (sl && iscond(sp[sl - 1])) {
+	        sl -= 1 ;
+	    } /* end while */
+	} else {
+	    sl = -1 ;
+	} /* end */
+	return sl ;
+} /* end method (rmtrailer::operator) */
+
+
