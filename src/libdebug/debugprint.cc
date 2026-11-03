@@ -232,8 +232,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	debugmgr_atforkbefore() noex ;
-    local void	debugmgr_atforkafter() noex ;
+    local void	debugmgr_forkatbefore() noex ;
+    local void	debugmgr_forkatafter() noex ;
 } /* end */
 
 local int	debugprinter(cchar *,int) noex ;
@@ -277,18 +277,18 @@ int debugmgr_init() noex {
 	    ptm *mxp = &uip->mx ;
 	    uip->f_init = true ;
 	    if ((rs = mxp->create) >= 0) {
-	        void_f b = debugmgr_atforkbefore ;
-	        void_f a = debugmgr_atforkafter ;
-	        if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	        void_f b = debugmgr_forkatbefore ;
+	        void_f a = debugmgr_forkatafter ;
+	        if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 		    con void_f funexit = void_f(debugmgr_fini) ;
 	            if ((rs = uc_atexit(funexit)) >= 0) {
 	                rs = 0 ;
 	                uip->f_initdone = true ;
 	            } /* end if (ok) */
 	            if (rs < 0) {
-	                uc_atforkexp(b,a,a) ;
+	                uc_forkatexp(b,a,a) ;
 		    } /* end if (error) */
-	        } /* end if (uc_atfork) */
+	        } /* end if (uc_forkat) */
 	        if (rs < 0) {
 	            mxp->destroy() ;
 		} /* end if (error) */
@@ -319,9 +319,9 @@ int debugmgr_fini() noex {
 	        uip->fd = 0 ; /* special case (use zero) */
 	    } /* end */
 	    {
-	        void_f	b = debugmgr_atforkbefore ;
-	        void_f	a = debugmgr_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = debugmgr_forkatbefore ;
+	        void_f	a = debugmgr_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    {
@@ -696,21 +696,21 @@ local int debugprinter(cchar *sbuf,int µslen) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (debugprinter) */
 
-local void debugmgr_atforkbefore() noex {
+local void debugmgr_forkatbefore() noex {
 	DEBUGMGR	*uip = &ef ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockbeg() ;
 	}
-} /* end subroutine (debugmgr_atforkbefore) */
+} /* end subroutine (debugmgr_forkatbefore) */
 
-local void debugmgr_atforkafter() noex {
+local void debugmgr_forkatafter() noex {
 	DEBUGMGR	*uip = &ef ;
 	{
 	    ptm *mxp = &uip->mx ;
 	    mxp->lockend() ;
 	}
-} /* end subroutine (debugmgr_atforkafter) */
+} /* end subroutine (debugmgr_forkatafter) */
 
 int debugmgr_head::advend() noex {
     	int		rs = SR_OK ;
