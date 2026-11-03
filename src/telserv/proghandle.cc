@@ -150,18 +150,6 @@
 #define	VARTERM		"TERM"
 #endif
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#ifndef	LOGNAMELEN
-#define	LOGNAMELEN	32
-#endif
-
 #ifndef	SVCLEN
 #define	SVCLEN		MAXNAMELEN
 #endif
@@ -210,10 +198,10 @@
 
 extern int	progserve(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,vecstr *,
-			const char *,const char **) ;
+			cchar *,cchar **) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 
@@ -248,7 +236,7 @@ local int	procsvcspec(struct proginfo *,vecstr *,char *,int) ;
 local int	doit(struct proginfo *,STANDING *,BUILTIN *,
 			struct clientinfo *,int,struct sockaddr_storage *) ;
 local int	telnet(struct proginfo *,struct clientinfo *,pid_t,int,int) ;
-local int	mkpam(struct proginfo *,const char *,const char *) ;
+local int	mkpam(struct proginfo *,cchar *,cchar *) ;
 
 local int	tcsetdefault(int) ;
 local int	tcspeednonzero(int) ;
@@ -256,22 +244,22 @@ local int	tcnoecho(int) ;
 local int	readstream();
 local int	telrcv() ;
 local int	send_oob(int fd, char *ptr, int count);
-local int	setenv(const char *name, const char *value, int rdebugwrite);
+local int	setenv(cchar *name, cchar *value, int rdebugwrite);
 local int	removemod(int f, char *modname);
-local int	fatal(int,const char *) ;
+local int	fatal(int,cchar *) ;
 
-local int	termsecure(const char *,char *) ;
-local int	telserv_service(const char *,const char *) ;
+local int	termsecure(cchar *,char *) ;
+local int	telserv_service(cchar *,cchar *) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-local int	debugfstat(const char *,int) ;
+local int	debugfstat(cchar *,int) ;
 #endif
 
-static void	drainstream();
-static void	unsetenv(const char *name);
-static void	suboption();
-static void	showbanner() ;
-static void	cleanup();
+local void	drainstream();
+local void	unsetenv(cchar *name);
+local void	suboption();
+local void	showbanner() ;
+local void	cleanup();
 
 local int	fd_allzero(fd_set *) ;
 
@@ -411,7 +399,7 @@ char	*envinit[2];
 
 #if	CF_LOCALSVC
 
-static const char *termtypes[] = {
+static cchar *termtypes[] = {
 	"screen",
 	"vt100",
 	"vt101",
@@ -429,7 +417,7 @@ static const char *termtypes[] = {
 	NULL
 } ;
 
-static const char *services[] = {
+static cchar *services[] = {
 	"talker",			/* historical */
 	"talk",
 	"weather",
@@ -447,7 +435,7 @@ static const char *services[] = {
  */
 
 local int
-new_env(const char *name, const char *value)
+new_env(cchar *name, cchar *value)
 {
 	struct envlist *env, *index;
 
@@ -478,7 +466,7 @@ new_env(const char *name, const char *value)
  */
 
 local int
-del_env(const char *name)
+del_env(cchar *name)
 {
 	struct envlist *env;
 
@@ -561,7 +549,7 @@ struct clientinfo	*cip ;
 		exit(1);
 	}
 
-	if (setsockopt(0, SOL_SOCKET, SO_KEEPALIVE, (const char *)&on,
+	if (setsockopt(0, SOL_SOCKET, SO_KEEPALIVE, (cchar *)&on,
 						sizeof (on)) < 0) {
 		syslog(LOG_WARNING, "setsockopt (SO_KEEPALIVE): %m");
 	}
@@ -599,8 +587,8 @@ int			svcspeclen ;
 	int	sl ;
 	int	len = 0 ;
 
-	const char	*tp, *cp ;
-	const char	*sp ;
+	cchar	*tp, *cp ;
+	cchar	*sp ;
 
 
 	if (nelp == NULL)
@@ -1237,7 +1225,7 @@ gotpty:
 	opts = VECSTR_OCOMPACT ;
 	if ((rs = vecstr_start(&envs,10,opts)) >= 0) {
 
-		const char	*sav[1] ;
+		cchar	*sav[1] ;
 
 
 		rs = vecstr_envadd(&envs,VARTERM,(terminaltype + 5),-1) ;
@@ -1302,7 +1290,7 @@ gotpty:
 
 local int fatal(f, msg)
 int 		f ;
-const char	*msg;
+cchar	*msg;
 {
 	char buf[BUFSIZ];
 
@@ -2160,7 +2148,7 @@ int option;
  *	Terminal type is
  */
 
-static void
+local void
 suboption()
 {
 	int subchar;
@@ -2659,7 +2647,7 @@ netflush()
 	}
 }
 
-static void cleanup()
+local void cleanup()
 {
 
 	/*
@@ -2879,7 +2867,7 @@ readstream(fd, buf, offset)
 	/*NOTREACHED*/
 }
 
-static void
+local void
 drainstream(size)
 	int	size;
 {
@@ -2941,7 +2929,7 @@ local int send_oob(int fd, char *ptr, int count)
 #define	__P(x)	()
 #endif
 
-static char *__findenv __P((const char *, int *));
+static char *__findenv __P((cchar *, int *));
 
 /*
  * setenv --
@@ -2949,8 +2937,8 @@ static char *__findenv __P((const char *, int *));
  *	"value".  If rdebugwrite is set, replace any current value.
  */
 setenv(name, value, rdebugwrite)
-	const char *name;
-	const char *value;
+	cchar *name;
+	cchar *value;
 	int rdebugwrite;
 {
 	extern char **environ;
@@ -3026,7 +3014,7 @@ setenv(name, value, rdebugwrite)
  */
 void
 unsetenv(name)
-	const char *name;
+	cchar *name;
 {
 	extern char **environ;
 	register char **p;
@@ -3044,7 +3032,7 @@ unsetenv(name)
  */
 char *
 getenv(name)
-	const char *name;
+	cchar *name;
 {
 	int offset;
 
@@ -3060,12 +3048,12 @@ getenv(name)
  */
 static char *
 __findenv(name, offset)
-	register const char *name;
+	register cchar *name;
 	int *offset;
 {
 	extern char **environ;
 	register int len;
-	register const char *np;
+	register cchar *np;
 	register char **p, *c;
 
 	if (name == NULL || environ == NULL)
@@ -3239,7 +3227,7 @@ local int removemod(int f, char *modname)
 
 /* check if a terminal/service specification is allowed */
 local int termsecure(terminaltype,svc)
-const char	terminaltype[] ;
+cchar	terminaltype[] ;
 char		svc[] ;
 {
 	int	svcoff, i, j ;
@@ -3296,8 +3284,8 @@ char		svc[] ;
 
 /* see if this service is allowed from the "services" file */
 local int telserv_service(fname,service)
-const char	fname[] ;
-const char	service[] ;
+cchar	fname[] ;
+cchar	service[] ;
 {
 	FILE	*fp ;
 
@@ -3474,12 +3462,12 @@ int	fd ;
 
 local int mkpam(pip,rhost,slavename)
 struct proginfo	*pip ;
-const char	rhost[] ;
-const char	slavename[] ;
+cchar	rhost[] ;
+cchar	slavename[] ;
 {
 	pam_handle_t    *pamh;
 	int		rs1 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 #if	P_TELSERV
 	cp = "telserv" ;
