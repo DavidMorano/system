@@ -37,8 +37,9 @@
 #include	<cstring>
 #include	<clanguage.h>
 #include	<usysbase.h>
-#include	<bfile.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
+#include	<bfile.h>
 
 #include	"config.h"
 #include	"defs.h"
@@ -124,7 +125,7 @@ struct proginfo	*pip ;
 	    if ((rs = sncpy3(ebuf,elen,nn,"!",un)) >= 0) {
 		cchar	*name = pip->name ;
 		cchar	*fmt = "%s %s\n" ;
-	        timestr_logz(pip->daytime,timebuf) ;
+	        strtime_logz(pip->daytime,timebuf) ;
 		if ((name != NULL) && (name[0] != '\0'))
 	            fmt = "%s %s (%s)\n" ;
 	        rs = bprintf(tfp,fmt,timebuf,ebuf,name) ;
