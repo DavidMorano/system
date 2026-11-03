@@ -26,15 +26,15 @@
 
 
 EXTERNC_begin
-
 extern int cfcharsi	(cchar *,int,int *)		noex ;
 extern int cfcharsl	(cchar *,int,long *)		noex ;
 extern int cfcharsll	(cchar *,int,longlong *)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int cfcharsui	(cchar *,int,uint *)		noex ;
 extern int cfcharsul	(cchar *,int,ulong *)		noex ;
 extern int cfcharsull	(cchar *,int,ulonglong *)	noex ;
-
 EXTERNC_end
 
 #if	__cplusplus
