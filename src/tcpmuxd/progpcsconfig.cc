@@ -5,7 +5,6 @@
 /* process any PCS configuration information */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_DEBUG	0		/* switchable print-outs */
 #define	CF_PCSCONF	0		/* compile in PCSCONF */
 
@@ -61,10 +60,6 @@
 
 #ifndef	ARCHBUFLEN
 #define	ARCHBUFLEN	80
-#endif
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
 
