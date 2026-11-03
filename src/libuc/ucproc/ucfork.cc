@@ -6,7 +6,7 @@
 /* special handling for |fork(2)| */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -79,22 +79,59 @@ extern "C" {
 
 /* local structures */
 
+enum forkermems {
+	forkermem_init,
+	forkermem_fini,
+	forkermem_clear,
+	forkermem_sysfork,
+	forkermem_lockend,
+	forkermem_overlast
+} ; /* end enum (forkermems) */
+
 namespace {
     struct forker_fl {
 	uint		lock:1 ;
     } ; /* end struct (forker_fl) */
+    struct forker ;
+    struct forker_co {
+	forker		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (forker *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ; /* end */
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ; /* end */
+    } ; /* end struct (forker_co) */
     struct forker {
+	friend		forker_co ;
 	lockrw		lock ;		/* critical-section lock */
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
-	forler_fl	fl ;
-	int init	() noex ;
-	int fini	() noex ;
-	int sysfork	() noex ;
+	forker_co	init ;
+	forker_co	fini ;
+	forker_co	clear ;
+	forker_co	sysfork ;
+	forker_co	lockend ;
+	forker_fl	fl ;
+	forker() noex {
+	    init	(this,forkermem_init) ;
+	    fini	(this,forkermem_fini) ;
+	    clear	(this,forkermem_clear) ;
+	    sysfork	(this,forkermem_sysfork) ;
+	    lockend	(this,forkermem_lockend) ;
+	} ; /* end ctor */
 	int lockbeg	(int) noex ;
-	int lockend	() noex ;
 	destruct forker	() noex ;
+    private:
+	int pinit	() noex ;
+	int pfini	() noex ;
+	int pclear	() noex ;
+	int psysfork	() noex ;
+	int plockend	() noex ;
     } ; /* end struct (forker) */
 } /* end namespace */
 
@@ -109,6 +146,7 @@ extern "C" {
 /* local variables */
 
 static forker		ucfork_data ;
+cint			to_lockwr	= 4 ;
 cbool			f_debug		= CF_DEBUG ;
 
 
@@ -140,7 +178,7 @@ int uc_forklockend() noex {
 
 /* local subroutines */
 
-int forker::init() noex {
+int forker::pinit() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	DPRINTF("ent fvoid=%u\n",uint(fvoid)) ;
@@ -179,7 +217,7 @@ int forker::init() noex {
 	return (rs >= 0) ? f : rs ;
 } /* end method (forker::init) */
 
-int forker::fini() noex {
+int forker::pfini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone) {
@@ -187,7 +225,7 @@ int forker::fini() noex {
 	    finitdone.clear() ;
 	    if (fl.lock) {
 		fl.lock = false ;
-	        rs1 = lock.destroy() ;
+	        rs1 = lock.destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end */
 	    finit.clear() ;
@@ -195,25 +233,52 @@ int forker::fini() noex {
 	return rs ;
 } /* end method (forker::fini) */
 
-int forker::sysfork() noex {
+int forker::pclear() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (fl.lock) {
+	    fl.lock = false ;
+	    rs1 = lock.destroy ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end */
+	fvoid		= false ;
+	finit		= false ;
+	finitdone	= false ;
+	fl = {} ;
+	return rs ;
+} /* end method (forker::clear) */
+
+int forker::psysfork() noex {
 	int		rs ;
 	int		rs1 ;
 	int		pid = 0 ; /* return-value */
 	DPRINTF("ent\n") ;
 	if (sigblocker b ; (rs = b.start) >= 0) {
-	    if ((rs = init()) >= 0) {
-	        if ((rs = lock.lockwr) >= 0) {
+	    if ((rs = init) >= 0) {
+	        DPRINTF("lock.lockwr\n") ;
+	        if ((rs = lock.lockwr(to_lockwr)) >= 0) {
+	            DPRINTF("lock.lockwr() rs=%d\n",rs) ;
+	            DPRINTF("-> u_fork\n") ;
 	            if ((rs = u_fork()) == 0) { /* child */
-	                fini() ;
+	        DPRINTF("child\n") ;
+	                clear() ;
+	        DPRINTF("fini-after\n") ;
+	        DPRINTF("uc_setpid\n") ;
 			uc_setpid(0) ;
-	                if ((rs = init()) > 0) {
+	        DPRINTF("uc_setpid-after\n") ;
+	        DPRINTF("init\n") ;
+	                if ((rs = init) > 0) {
+	        	    DPRINTF("init() rs=%d\n",rs) ;
 	                    rs = 0 ;
 	                }
+	        DPRINTF("init-out rs=%d\n",rs) ;
 	            } else if (rs > 0) {
+	        DPRINTF("parent rs=%d\n",rs) ;
 			pid = rs ;
 	                lock.lockun() ;
 	            } /* end */
 	        } /* end if (lockrw) */
+	        DPRINTF("lock.lockwr-out rs=%d\n",rs) ;
 	    } /* end if (ucfork_init) */
 	    rs1 = b.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -239,7 +304,7 @@ int forker::lockbeg(int to) noex {
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (forker::lockbeg) */
 
-int forker::lockend() noex {
+int forker::plockend() noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
@@ -263,6 +328,30 @@ forker::destruct forker() noex {
 	    ulogerror("ucfork",rs,"dtor-fini") ;
 	} /* end */
 } /* end dtor (forker::destruct) */
+
+forker_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) ylikely {
+	    switch (w) {
+	    case forkermem_init:
+	        rs = op->pinit() ;
+	        break ;
+	    case forkermem_fini:
+	        rs = op->pfini() ;
+	        break ;
+	    case forkermem_clear:
+	        rs = op->pclear() ;
+	        break ;
+	    case forkermem_sysfork:
+	        rs = op->psysfork() ;
+	        break ;
+	    case forkermem_lockend:
+	        rs = op->plockend() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (forker_co::operator) */
 
 local void ucfork_exit() noex {
 	ucfork_data.fvoid = true ;
