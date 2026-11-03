@@ -75,7 +75,7 @@
 #include	<ulogerror.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucfork.h>		/* LIBUC */
-#include	<ucatfork.h>		/* LIBUC */
+#include	<ucforkat.h>		/* LIBUC */
 #include	<ucatexit.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
@@ -256,8 +256,8 @@ namespace {
 /* forward references */
 
 extern "C" {
-    local void	utmpacc_atforkbefore() noex ;
-    local void	utmpacc_atforkafter() noex ;
+    local void	utmpacc_forkatbefore() noex ;
+    local void	utmpacc_forkatafter() noex ;
     local void	utmpacc_exit() noex ;
 } /* end extern (C) */
 
@@ -706,17 +706,17 @@ int utmpacc::iinit() noex {
 	    if (! finit.testandset) {
 	        if ((rs = omx.create) >= 0) ylikely {
 	            if ((rs = ocv.create) >= 0) ylikely {
-	                void_f	b = utmpacc_atforkbefore ;
-	                void_f	a = utmpacc_atforkafter ;
-	                if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	                void_f	b = utmpacc_forkatbefore ;
+	                void_f	a = utmpacc_forkatafter ;
+	                if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 	                    if ((rs = uc_atexit(utmpacc_exit)) >= 0) {
 	                        f = true ;
 	                        finitdone = true ;
 	                    } /* end if (uc_atexit) */
 	                    if (rs < 0) {
-	                        uc_atforkexp(b,a,a) ;
+	                        uc_forkatexp(b,a,a) ;
 			    } /* end if (error) */
-	                } /* end if (uc_atfork) */
+	                } /* end if (uc_forkat) */
 	                if (rs < 0) {
 	                    ocv.destroy() ;
 			} /* end if (error) */
@@ -754,9 +754,9 @@ int utmpacc::ifini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void_f	b = utmpacc_atforkbefore ;
-	        void_f	a = utmpacc_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        void_f	b = utmpacc_forkatbefore ;
+	        void_f	a = utmpacc_forkatafter ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -1259,13 +1259,13 @@ int utmpacc::load_boottime(custime dt,con utmpx *up) noex {
 	return SR_OK ;
 } /* end method (utmpacc::load_boottime) */
 
-local void utmpacc_atforkbefore() noex {
+local void utmpacc_forkatbefore() noex {
 	utmpacc_data.capbegin() ;
-} /* end subroutine (utmpacc_atforkbefore) */
+} /* end subroutine (utmpacc_forkatbefore) */
 
-local void utmpacc_atforkafter() noex {
+local void utmpacc_forkatafter() noex {
 	utmpacc_data.capend() ;
-} /* end subroutine (utmpacc_atforkafter) */
+} /* end subroutine (utmpacc_forkatafter) */
 
 local void utmpacc_exit() noex {
 	if (cint rs = utmpacc_fini() ; rs < 0) {
