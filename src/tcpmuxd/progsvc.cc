@@ -42,6 +42,7 @@
 #include	<vecstr.h>
 #include	<logfile.h>
 #include	<svcfile.h>
+#include	<strtime.h>		/* LIBUC */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -71,7 +72,7 @@ extern int	proglog_flush(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(ccharg *,...) ;
-extern int	nprintf(ccharg *,const char *,...) ;
+extern int	nprintf(ccharg *,cchar *,...) ;
 #endif
 
 
@@ -87,7 +88,7 @@ int	progsvcopen(PROGINFO *) ;
 int	progsvcclose(PROGINFO *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-static int	proclist(PROGINFO *,ccharg *) ;
+local int	proclist(PROGINFO *,ccharg *) ;
 #endif
 
 
@@ -382,7 +383,7 @@ PROGINFO	*pip ;
 
 	if (pip->open.logprog && c) {
 	    proglog_printf(pip,"%s services changed (%u)\n",
-	        timestr_logz(pip->daytime,timebuf),c) ;
+	        strtime_logz(pip->daytime,timebuf),c) ;
 	}
 
 #if	CF_DEBUG && CF_DEBUGN && defined(DEBFNAME)
@@ -417,7 +418,7 @@ ret0:
 
 #if	CF_DEBUGS || CF_DEBUG
 
-static int proclist(pip,s)
+local int proclist(pip,s)
 PROGINFO	*pip ;
 ccharg	*s ;
 {
