@@ -115,7 +115,7 @@ int proglogzone_begin(proginfo *pip) noex {
 	if (pip->pf.optlogzone) {
 	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		cint sz = szof(logzone) ;
-		if (void *p ; (rs = mem.mall(sz,&p)) >= 0) {
+		if (void *p ; (rs = mem.mall(sz,&p)) >= 0) ylikely {
 		    if (logzone *lzp = new(p) logzone ; lzp) {
 			pip->lzp = lzp ;
 			{
@@ -133,7 +133,7 @@ beginer::operator int () noex {
     	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ; /* return-value */
-	if (charp pbuf ; (rs = mem.mp(&pbuf)) >= 0) {
+	if (charp pbuf ; (rs = mem.mp(&pbuf)) >= 0) ylikely {
 	    if ((rs = zfmake(pbuf)) >= 0) {
 		rs = zfopen(pbuf,rs) ;
 		rv = rs ;
@@ -150,7 +150,7 @@ int beginer::zfmake(char *pbuf) noex {
 	int		rs1 ;
 	int		pl = 0 ; /* return-value */
 	ccharp		sn = pip->searchname ;
-	if (char *nbuf ; (rs = mem.mn(&nbuf)) >= 0) {
+	if (char *nbuf ; (rs = mem.mn(&nbuf)) >= 0) ylikely {
 	    cint	nlen = rs ;
 	    if ((rs = snsds(nbuf,nlen,sn,lzfname)) >= 0) {
 		ccharp	logcname = LOGCNAME ;
@@ -238,9 +238,9 @@ int proglogzone_update(proginfo *pip,cchar *zn,int zl,int zoff,cchar *zs) noex {
 
 vars::operator int () noex {
     	int		rs ;
-	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
+	if ((rs = bufsizeget(bufsize_nn)) >= 0) ylikely {
 	    maxnamelen = rs ;
-	    if ((rs = bufsizeget(bufsize_mp)) >= 0) {
+	    if ((rs = bufsizeget(bufsize_mp)) >= 0) ylikely {
 	    	maxpathlen = rs ;
 	    }
 	} /* end */
