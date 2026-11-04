@@ -5,7 +5,7 @@
 /* string-find a file-name extension */
 /* version %I% last-modified %G% */
 
-#define	CF_SIRCHR	1		/* used |sirchr(3uc)| */
+#define	CF_MANUAL	1		/* do not use |sfbaseme(3uc)| */
 
 /* revision history:
 
@@ -46,7 +46,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<six.h>			/* LIBUC |sirchr(3uc)| */
+#include	<six.h>			/* LIBU |sirchr(3uc)| */
 #include	<ascii.h>		/* LIBU |CH_DOT| + |CH_SLASH| */
 #include	<localmisc.h>		/* LIBU */
 
@@ -61,8 +61,8 @@ import chrset ;
 
 /* local defines */
 
-#ifndef	CF_SIRCHR
-#define	CF_SIRCHR	1		/* used |sirchr(3uc)| */
+#ifndef	CF_MANUAL
+#define	CF_MANUAL	0		/* do not use |sfbasename(3uc)| */
 #endif
 
 
@@ -80,13 +80,13 @@ extern "C++" {
 /* local structures */
 
 namespace {
-    struct brkinit {
+    struct trailbreak {
         chrset  brks ;
-        constexpr brkinit() noex {
+        consteval trailbreak() noex {
             brks.set(CH_SLASH) ;
             brks.set(CH_DOT) ;
         } ; /* end ctor */
-    } ; /* end struct (brkinit) */
+    } ; /* end struct (trailbreak) */
 } /* end namespace */
 
 
@@ -95,9 +95,8 @@ namespace {
 
 /* local variables */
 
-local brkinit		bi ;
-
-cbool			f_sirchr = CF_SIRCHR ;
+constexpr trailbreak	bi ;
+cbool			f_manual = CF_MANUAL ;
 
 
 /* exported variables */
@@ -109,14 +108,13 @@ int sfext(cchar *sp,int µsl,cchar **rpp) noex {
 	int		el = -1 ; /* return-value */
 	if (sp && rpp) ylikely {
 	    cchar	*ep = nullptr ;
-	    if_constexpr (f_sirchr) {
+	    if_constexpr (f_manual) {
 		if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 		    while ((sl > 0) && (sp[sl - 1] == CH_SLASH)) {
 		        sl -= 1 ;
 		    } /* end while */
 		    if (int si ; (si = sirbrk(sp,sl,&bi.brks)) >= 0) {
-                        if (sp[si] == CH_DOT) {
-                            si += 1 ;
+                        if (sp[si++] == CH_DOT) {
 		            el = (sl - si) ; /* <- signal FOUND */
 		            ep = (sp + si) ;
                         } /* end if (got) */
@@ -129,9 +127,9 @@ int sfext(cchar *sp,int µsl,cchar **rpp) noex {
 			si += 1 ;
 		        el = (bl - si) ; /* <- signal FOUND */
 		        ep = (bp + si) ;
-		    }
+		    } /* end */
 	        } /* end if (sibasename) */
-	    } /* end if_constexpr (f_sirchr) */
+	    } /* end if_constexpr (f_manual) */
 	    *rpp = ep ;
 	} /* end if (non-null) */
 	return el ;
