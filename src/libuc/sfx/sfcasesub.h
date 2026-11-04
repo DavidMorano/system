@@ -27,11 +27,9 @@
 
 
 EXTERNC_begin
-
 extern int	sfbasesub(cchar *,int,cchar *,cchar **) noex ;
 extern int	sfcasesub(cchar *,int,cchar *,cchar **) noex ;
 extern int	sffoldsub(cchar *,int,cchar *,cchar **) noex ;
-
 EXTERNC_end
 
 
