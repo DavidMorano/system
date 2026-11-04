@@ -29,15 +29,18 @@
 
 
 EXTERNC_begin
-
 extern int	vstrbasecmp(cchar **,cchar **) noex ;
 extern int	vstrcasecmp(cchar **,cchar **) noex ;
 extern int	vstrfoldcmp(cchar **,cchar **) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	vstrbasecmpx(cchar **,cchar **,vstrorders) noex ;
 extern int	vstrcasecmpx(cchar **,cchar **,vstrorders) noex ;
 extern int	vstrfoldcmpx(cchar **,cchar **,vstrorders) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int vstrcmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrbasecmp(s1pp,s2pp) ;
 } /* end */
@@ -47,28 +50,33 @@ local inline int vstrcmpo(cchar **s1pp,cchar **s2pp) noex {
 local inline int vstrcmpr(cchar **s1pp,cchar **s2pp) noex {
 	return vstrbasecmpx(s1pp,s2pp,vstrorder_reverse) ;
 } /* end */
+EXTERNC_end
 
+EXTERNC_begin
 local inline int vstrbasecmpo(cchar **s1pp,cchar **s2pp) noex {
 	return vstrbasecmpx(s1pp,s2pp,vstrorder_obverse) ;
 } /* end */
 local inline int vstrbasecmpr(cchar **s1pp,cchar **s2pp) noex {
 	return vstrbasecmpx(s1pp,s2pp,vstrorder_reverse) ;
 } /* end */
+EXTERNC_end
 
+EXTERNC_begin
 local inline int vstrcasecmpo(cchar **s1pp,cchar **s2pp) noex {
 	return vstrcasecmpx(s1pp,s2pp,vstrorder_obverse) ;
 } /* end */
 local inline int vstrcasecmpr(cchar **s1pp,cchar **s2pp) noex {
 	return vstrcasecmpx(s1pp,s2pp,vstrorder_reverse) ;
 } /* end */
+EXTERNC_end
 
+EXTERNC_begin
 local inline int vstrfoldcmpo(cchar **s1pp,cchar **s2pp) noex {
 	return vstrfoldcmpx(s1pp,s2pp,vstrorder_obverse) ;
 } /* end */
 local inline int vstrfoldcmpr(cchar **s1pp,cchar **s2pp) noex {
 	return vstrfoldcmpx(s1pp,s2pp,vstrorder_reverse) ;
 } /* end */
-
 EXTERNC_end
 
 
