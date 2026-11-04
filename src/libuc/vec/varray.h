@@ -84,8 +84,8 @@ struct varray : varray_head {
 	int del		(int = -1) noex ;
 	int find	(void *) noex ;
 	int search	(void *,varray_vcmp,void *) noex ;
-	operator int () noex ;
-	void dtor() noex ;
+	operator int	() noex ;
+	void dtor	() noex ;
 	destruct varray() {
 	    if (va) dtor() ;
 	} ; /* end destruct */
@@ -95,7 +95,6 @@ typedef VARRAY		varray ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int varray_start		(varray *,int,int) noex ;
 extern int varray_enumer	(varray *,int,void *) noex ;
 extern int varray_acc		(varray *,int,void *) noex ;
@@ -107,7 +106,6 @@ extern int varray_find		(varray *,void *) noex ;
 extern int varray_search	(varray *,void *,varray_vcmp,void *) noex ;
 extern int varray_audit		(varray *) noex ;
 extern int varray_finish	(varray *) noex ;
-
 EXTERNC_end
 
 
