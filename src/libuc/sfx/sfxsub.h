@@ -27,13 +27,14 @@
 
 
 EXTERNC_begin
-
 extern int sfosub(cchar *,int,cchar *,cchar **) noex ;
 extern int sfrsub(cchar *,int,cchar *,cchar **) noex ;
+EXTERNC_end
+
+EXTERNC_begin
 local inline int sfsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
     	return sfosub(sp,sl,ss,rpp) ;
 } /* end */
-
 EXTERNC_end
 
 
