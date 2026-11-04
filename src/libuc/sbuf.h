@@ -170,7 +170,6 @@ typedef SBUF		sbuf ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int	sbuf_start	(sbuf *,char *,int) noex ;
 extern int	sbuf_finish	(sbuf *) noex ;
 extern int	sbuf_reset	(sbuf *) noex ;
@@ -217,20 +216,23 @@ extern int	sbuf_printf	(sbuf *,cchar *,...) noex ;
 extern int	sbuf_vprintf	(sbuf *,cchar *,va_list) noex ;
 extern int	sbuf_termconseq	(sbuf *,int,cchar *,int,...) noex ;
 extern int	sbuf_addquoted	(sbuf *,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int sbuf_hexpuc	(sbuf *,int,uchar)	noex ;
 extern int sbuf_hexpus	(sbuf *,int,ushort)	noex ;
 extern int sbuf_hexpui	(sbuf *,int,uint)	noex ;
 extern int sbuf_hexpul	(sbuf *,int,ulong)	noex ;
 extern int sbuf_hexpull	(sbuf *,int,ulonglong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int sbuf_str(sbuf *op,cchar *sp)	noex {
 	return sbuf_strw(op,sp,-1) ;
 } /* end */
 local inline int sbuf_char(sbuf *op,int ch)	noex {
 	return sbuf_chr(op,ch) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
