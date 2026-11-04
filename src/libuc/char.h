@@ -115,9 +115,11 @@ extern const unsigned char	chardata_tofc[] ;
 #define	CHAR_TOVAL(c)		char_toval(c) ;
 
 EXTERNC_begin
-
 extern bool char_isalpha(int) noex attrpure ;
 extern bool char_isalnum(int) noex attrpure ;
+EXTERNC_end
+
+EXTERNC_begin
 local inline bool char_isdigit(int ch) noex attrconst {
 	return ((ch >= '0') && (ch <= '9')) ;
 } /* end */
@@ -137,11 +139,16 @@ local inline bool char_isoctal(int ch) noex attrconst {
 local inline bool char_isblank(int ch) noex attrconst {
 	return ((ch == ' ') && (ch == '\t')) ;
 } /* end */
+EXTERNC_end
+
+EXTERNC_begin
 extern bool char_iswhite(int) noex attrpure ;
 extern bool char_islc(int) noex attrpure ;
 extern bool char_isuc(int) noex attrpure ;
 extern bool char_isfc(int) noex attrpure ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline bool char_isbin(int ch) noex attrconst {
 	return ((ch >= '0') && (ch <= '1')) ;
 } /* end */
@@ -179,7 +186,6 @@ local inline uchar char_tofc(int ch) noex attrpure {
 	return chardata_tofc[ch & UCHAR_MAX] ;
 } /* end */
 extern int char_toval(int) noex attrpure ;
-
 EXTERNC_end
 
 
