@@ -94,10 +94,8 @@ struct vechand_head {
 } ; /* end struct (vechand_head) */
 
 EXTERNC_begin
-
 typedef int (*vechand_vcmp)(cvoid **,cvoid **) noex ;
 typedef int (*vechand_f)(cvoid **,cvoid **) noex ;
-
 EXTERNC_end
 
 typedef	VECHAND_FL	vechand_fl ;
@@ -167,7 +165,6 @@ typedef VECHAND		vechand ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int vechand_start	(vechand *,int,int) noex ;
 extern int vechand_add		(vechand *,cvoid *) noex ;
 extern int vechand_count	(vechand *) noex ;
@@ -185,7 +182,6 @@ extern int vechand_getvec	(vechand *,void *) noex ;
 extern int vechand_extent	(vechand *) noex ;
 extern int vechand_audit	(vechand *) noex ;
 extern int vechand_finish	(vechand *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
