@@ -103,10 +103,8 @@ typedef VECITEM_FL	vecitem_fl ;
 typedef VECITEM_CUR	vecitem_cur ;
 
 EXTERNC_begin
-
 typedef int (*vecitem_cmpf)(cvoid **,cvoid **) noex ;
 typedef int (*vecitem_f)(cvoid **,cvoid **) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -139,7 +137,7 @@ struct vecitem_iter {
 		ii = oit.ii ;
 	    }
 	    return *this ;
-	} ;
+	} ; /* end */
 	bool operator != (const vecitem_iter &) noex ;
 	bool operator == (const vecitem_iter &) noex ;
 	void *operator * () noex {
@@ -207,10 +205,11 @@ typedef VECITEM		vecitem ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 typedef int (*vecitem_cmpf)(cvoid **,cvoid **) noex ;
 typedef int (*vecitem_f)(cvoid **,cvoid **) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int vecitem_start	(vecitem *,int,int) noex ;
 extern int vecitem_finish	(vecitem *) noex ;
 extern int vecitem_add		(vecitem *,cvoid *,int) noex ;
@@ -226,7 +225,6 @@ extern int vecitem_getvec	(vecitem *,void **) noex ;
 extern int vecitem_audit	(vecitem *) noex ;
 extern int vecitem_curbegin	(vecitem *,vecitem_cur *) noex ;
 extern int vecitem_curend	(vecitem *,vecitem_cur *) noex ;
-
 EXTERNC_end
 
 #if	__cplusplus
