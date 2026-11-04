@@ -27,16 +27,17 @@
 
 
 EXTERNC_begin
-
 extern int sfnext	(cchar *,int,cchar **) noex ;
 extern int sfnextchr	(cchar *,int,int,cchar **) noex ;
 extern int sfnextbrk	(cchar *,int,cchar *,cchar **) noex ;
 extern int sfnextterm	(cchar *,int,cchar *,cchar **) noex ;
 extern int sfnextqtok	(cchar *,int,cchar **) noex ;
+EXTERNC_end
+
+EXTERNC_begin
 local inline int nextfield(cchar *sp,int sl,cchar **rpp) noex {
 	return sfnext(sp,sl,rpp) ;
 } /* end */
-
 EXTERNC_end
 
 
