@@ -134,7 +134,6 @@ typedef VECSORTHAND	vecsorthand ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int vecsorthand_start	(vecsorthand *,vecsorthand_cmpf,int) noex ;
 extern int vecsorthand_finish	(vecsorthand *) noex ;
 extern int vecsorthand_add	(vecsorthand *,cvoid *) noex ;
@@ -144,7 +143,6 @@ extern int vecsorthand_delent	(vecsorthand *,cvoid *) noex ;
 extern int vecsorthand_count	(vecsorthand *) noex ;
 extern int vecsorthand_present	(vecsorthand *,cvoid *) noex ;
 extern int vecsorthand_search	(vecsorthand *,cvoid *,void *) noex ;
-
 EXTERNC_end
 
 
