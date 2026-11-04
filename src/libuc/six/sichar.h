@@ -25,7 +25,6 @@
 
 
 EXTERNC_begin
-
 extern int	sialpha(cchar *,int) noex ;
 extern int	sialnum(cchar *,int) noex ;
 extern int	sidigit(cchar *,int) noex ;
@@ -33,7 +32,9 @@ extern int	sidigex(cchar *,int) noex ;
 extern int	sioctal(cchar *,int) noex ;
 extern int	siwhite(cchar *,int) noex ;
 extern int	siblank(cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int sidig(cchar *sp,int sl) noex {
     	return sidigit(sp,sl) ;
 } /* end */
@@ -51,11 +52,9 @@ local inline int siwht(cchar *sp,int sl) noex {
     	return siwhite(sp,sl) ;
 } /* end */
 #endif /* COMMENT */
-
 local inline int siblk(cchar *sp,int sl) noex {
 	return siblank(sp,sl) ;
 } /* end */
-
 EXTERNC_end
 
 
