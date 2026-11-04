@@ -27,11 +27,11 @@
 
 
 EXTERNC_begin
-
 typedef int	(*vstrsort_f)(cchar **,cchar **) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern void	vstrsort(cchar **,int,vstrsort_f) noex ;
-
 EXTERNC_end
 
 
