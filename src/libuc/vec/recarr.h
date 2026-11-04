@@ -95,9 +95,10 @@ typedef	RECARR		recarr ;
 typedef	RECARR_FL	recarr_fl ;
 
 EXTERNC_begin
-
 typedef int (*recarr_cf)(cvoid **,cvoid **) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int recarr_start		(recarr *,int,int) noex ;
 extern int recarr_add		(recarr *,cvoid *) noex ;
 extern int recarr_count		(recarr *) noex ;
@@ -114,7 +115,6 @@ extern int recarr_getvec	(recarr *,void *) noex ;
 extern int recarr_extent	(recarr *) noex ;
 extern int recarr_audit		(recarr *) noex ;
 extern int recarr_finish	(recarr *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
