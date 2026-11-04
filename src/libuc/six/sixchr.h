@@ -25,14 +25,14 @@
 
 
 EXTERNC_begin
-
 extern int	siochr(cchar *,int,int) noex ;
 extern int	sirchr(cchar *,int,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int sichr(cchar *sp,int sl,int sch) noex {
 	return siochr(sp,sl,sch) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
