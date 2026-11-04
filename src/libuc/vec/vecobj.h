@@ -104,9 +104,7 @@ struct vecobj_cursor {
 typedef VECOBJ_CUR	vecobj_cur ;
 
 EXTERNC_begin
-
 typedef int (*vecobj_vcf)(cvoid **,cvoid **) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -168,9 +166,10 @@ typedef VECOBJ		vecobj ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 typedef int (*vecobj_vcf)(cvoid **,cvoid **) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int vecobj_start		(vecobj *,int,int,int) noex ;
 extern int vecobj_add		(vecobj *,cvoid *) noex ;
 extern int vecobj_adduniq	(vecobj *,cvoid *) noex ;
@@ -192,7 +191,6 @@ extern int vecobj_getvec	(vecobj *,void ***) noex ;
 extern int vecobj_audit		(vecobj *) noex ;
 extern int vecobj_finish	(vecobj *) noex ;
 extern int vecobj_addnew	(vecobj *,void **) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
