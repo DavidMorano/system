@@ -71,10 +71,8 @@
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* CSTD */
 #include	<cstdint>		/* CSTD |uintptr_t| */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD placement-new */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<string>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
@@ -108,7 +106,6 @@ import libutil ;			/* |lenstr(3u)| + |getlenstr(3u)| */
 using std::string ;			/* type */
 using std::min ;			/* subroutine-template */
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -821,6 +818,7 @@ int vecpstr_add(vecpstr *op,string *strp) noex {
 
 local int vecpstr_ctor(vecpstr *op) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_NOMEM ;
@@ -834,7 +832,7 @@ local int vecpstr_ctor(vecpstr *op) noex {
 	    op->magval = 0 ;
 	    op->chsize = 0 ;
 	    op->addnum = 0 ;
-	    if ((op->clp = new(nothrow) vechand) != np) ylikely {
+	    if ((op->clp = new(nt) vechand) != np) ylikely {
 	        rs = SR_OK ;
 	    } /* end if (new) */
 	} /* end if (non-null) */
