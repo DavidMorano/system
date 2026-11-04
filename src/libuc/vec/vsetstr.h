@@ -37,7 +37,6 @@ typedef	VSETSTR		vsetstr ;
 typedef	VSETSTR_CUR	vsetstr_cur ;
 
 EXTERNC_begin
-
 extern int vsetstr_start	(vsetstr *,int) noex ;
 extern int vsetstr_already	(vsetstr *,cchar *,int) noex ;
 extern int vsetstr_del		(vsetstr *,cchar *,int) noex ;
@@ -49,7 +48,6 @@ extern int vsetstr_curdel	(vsetstr *,vsetstr_cur *) noex ;
 extern int vsetstr_curenum	(vsetstr *,vsetstr_cur *,cchar **) noex ;
 extern int vsetstr_curnext	(vsetstr *,vsetstr_cur *) noex ;
 extern int vsetstr_finish	(vsetstr *) noex ;
-
 EXTERNC_end
 
 
