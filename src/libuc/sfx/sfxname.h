@@ -27,12 +27,10 @@
 
 
 EXTERNC_begin
-
 extern int sfbasename	(cchar *,int,cchar **) noex ;
 extern int sfdirname	(cchar *,int,cchar **) noex ;
 extern int sfprogname	(cchar *,int,cchar **) noex ;
 extern int sfrootname	(cchar *,int,cchar **) noex ;
-
 EXTERNC_end
 
 
