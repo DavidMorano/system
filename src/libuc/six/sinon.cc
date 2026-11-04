@@ -97,6 +97,10 @@ local int sinon(isnon_f isx,cchar *sp,int sl) noex {
 
 /* exported subroutines */
 
+int sinonbin(cchar *sp,int sl) noex {
+    	return sinon(ischbin,sp,sl) ;
+} /* end subroutine */
+
 int sinonoct(cchar *sp,int sl) noex {
     	return sinon(ischoct,sp,sl) ;
 } /* end subroutine */
