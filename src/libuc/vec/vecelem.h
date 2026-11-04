@@ -165,7 +165,6 @@ typedef VECELEM		vecelem ;
 typedef VECELEM_FL	vecelem_fl ;
 
 EXTERNC_begin
-
 extern int vecelem_start	(vecelem *,int,int,int) noex ;
 extern int vecelem_finish	(vecelem *) noex ;
 extern int vecelem_add		(vecelem *,cvoid *) noex ;
@@ -182,7 +181,6 @@ extern int vecelem_extent	(vecelem *) noex ;
 extern int vecelem_del		(vecelem *,int) noex ;
 extern int vecelem_delall	(vecelem *) noex ;
 extern int vecelem_audit	(vecelem *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
