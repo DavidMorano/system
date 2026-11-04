@@ -27,16 +27,16 @@
 
 
 EXTERNC_begin
-
 extern char *strbcpyxw(char *,int,int,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern char *strbcpy1w(char *,int,cc *,int) noex ;
 extern char *strbcpy2w(char *,int,cc *,cc *,int) noex ;
 extern char *strbcpy3w(char *,int,cc *,cc *,cc *,int) noex ;
 extern char *strbcpy4w(char *,int,cc *,cc *,cc *,cc *,int) noex ;
 extern char *strbcpy5w(char *,int,cc *,cc *,cc *,cc *,cc *,int) noex ;
 extern char *strbcpy6w(char *,int,cc *,cc *,cc *,cc *,cc *,cc *,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus

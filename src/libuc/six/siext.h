@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	siext(cchar *,int) noex ;
-
 EXTERNC_end
 
 
