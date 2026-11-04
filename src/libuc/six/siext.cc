@@ -110,7 +110,7 @@ int siext(cchar *fp,int µfl) noex {
 		    si += 1 ;
 		} else {
 		    si = -1 ;
-		}
+		} /* end */
 	    } /* end if (hit something) */
 	} /* end if (getlenstr) */
 	return si ;
