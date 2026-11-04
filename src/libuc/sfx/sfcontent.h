@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern int	sfcontent	(cchar *,int,cchar **) noex ;
-
 EXTERNC_end
 
 
