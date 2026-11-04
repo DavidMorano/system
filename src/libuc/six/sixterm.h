@@ -25,14 +25,14 @@
 
 
 EXTERNC_begin
-
 extern int	sioterm(cchar *,int,cchar *) noex ;
 extern int	sirterm(cchar *,int,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int siterm(cchar *sp,int sl,cchar *ss) noex {
     	return sioterm(sp,sl,ss) ;
 } /* end */
-
 EXTERNC_end
 
 
