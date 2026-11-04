@@ -93,8 +93,8 @@ using libuc::libmem ;			/* variable */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*rls_f)(filer *,char *,int,int,int *) noex ;
-    typedef int (*vs_f)(cchar **,cchar **) noex ;
+    typedef int (*rls_f)	(filer *,char *,int,int,int *) noex ;
+    typedef int (*vs_f)		(cchar **,cchar **) noex ;
 } /* end extern (C) */
 
 
@@ -116,10 +116,10 @@ namespace {
 	int		llen ;
 	int		elen ;
 	subinfo(vecstrx *p,cchar *t) noex : vsp(p), ft(t) { } ;
-	int start() noex ;
-	int finish() noex ;
-	int line(cchar *,int) noex ;
-	int parse(field *,cchar *,int) noex ;
+	int start	() noex ;
+	int finish	() noex ;
+	int line	(cchar *,int) noex ;
+	int parse	(field *,cchar *,int) noex ;
     } ; /* end struct (subinfo) */
 } /* end namespace */
 
@@ -148,8 +148,8 @@ local int	mkterms() noex ;
 /* local variables */
 
 static vars	var ;
-static char	fterms[fieldterms_termsize] ;
-cbool		f_debug = CF_DEBUG ;
+static char	fterms		[fieldterms_termsize] ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -255,11 +255,11 @@ int subinfo::line(cchar *lp,int ll) noex {
 	    if (int fl ; (fl = fsb.get(ft,&fp)) > 0) {
 	        if ((fl == ew.l) && (strncasecmp(ew.p,fp,fl) == 0)) {
 	            fl = fsb.get(ft,&fp) ;
-	        }
+	        } /* end */
 	        if (fl > 0) {
 	            rs = parse(&fsb,fp,fl) ;
 	            c = rs ;
-	        }
+	        } /* end */
 	    } /* end if (field_get) */
 	    rs1 = fsb.finish ;
 	    if (rs >= 0) rs = rs1 ;
@@ -297,7 +297,7 @@ int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 	            if (fl > 0) {
 	                ep += fl ;
 	                el += fl ;
-	            }
+	            } /* end */
 	            if (fsp->term == '#') break ;
 	        } /* end while */
 		if (fl != rsn) rs = fl ;
