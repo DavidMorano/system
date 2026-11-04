@@ -27,13 +27,14 @@
 
 
 EXTERNC_begin
-
 extern int sfochr(cchar *,int,int,cchar **) noex ;
 extern int sfrchr(cchar *,int,int,cchar **) noex ;
+EXTERNC_end
+
+EXTERNC_begin
 local inline int sfchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	return sfochr(sp,sl,sch,rpp) ;
 } /* end */
-
 EXTERNC_end
 
 
