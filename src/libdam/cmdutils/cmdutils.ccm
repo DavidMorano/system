@@ -30,7 +30,7 @@ export {
     int	optval(cchar *,int) noex ;
     int optbool(cchar *sp,int sl) noex {
 	return optval(sp,sl) ;
-    }
+    } /* end */
 } /* end export */
 
 export {
