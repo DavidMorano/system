@@ -25,12 +25,11 @@
 
 
 EXTERNC_begin
-
+extern int sinonbin(cchar *,int) noex ;
 extern int sinonoct(cchar *,int) noex ;
 extern int sinondec(cchar *,int) noex ;
 extern int sinonhex(cchar *,int) noex ;
 extern int sinonwht(cchar *,int) noex ;
-
 EXTERNC_end
 
 
