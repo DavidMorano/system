@@ -235,7 +235,6 @@ typedef VECINT		vecint ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int vecint_start		(vecint *,int,int) noex ;
 extern int vecint_finish	(vecint *) noex ;
 extern int vecint_add		(vecint *,VECINT_TYPE) noex ;
@@ -258,7 +257,6 @@ extern int vecint_curbegin	(vecint *,vecint_cur *) noex ;
 extern int vecint_curenum	(vecint *,vecint_cur *,VECINT_TYPE *) noex ;
 extern int vecint_curend	(vecint *,vecint_cur *) noex ;
 extern int vecint_audit		(vecint *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
