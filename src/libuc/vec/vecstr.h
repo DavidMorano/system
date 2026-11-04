@@ -107,10 +107,8 @@ struct vecstr_head {
 } ; /* end struct (vecstr_head) */
 
 EXTERNC_begin
-
 typedef int (*vecstr_vcmp)	(cchar **,cchar **) noex ;
 typedef int (*vecstr_f)		(cchar **,cchar **) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
