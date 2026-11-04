@@ -122,10 +122,8 @@ struct vecpstr_head {
 } ; /* end struct (vecpstr_head) */
 
 EXTERNC_begin
-
 typedef int (*vecpstr_vcmp)(cchar **,cchar **) noex ;
 typedef int (*vecpstr_f)(cchar **,cchar **) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -281,7 +279,6 @@ typedef VECPSTR_FL	vecpstr_fl ;
 typedef VECPSTR_CH	vecpstr_ch ;
 
 EXTERNC_begin
-
 extern int vecpstr_start	(vecpstr *,int,int,int) noex ;
 extern int vecpstr_finish	(vecpstr *) noex ;
 extern int vecpstr_add		(vecpstr *,cchar *,int) noex ;
@@ -334,11 +331,12 @@ extern int vecpstr_loadfile	(vecpstr *,int,cchar *) noex ;
 extern int vecpstr_loadgrusers	(vecpstr *,gid_t) noex ;
 extern int vecpstr_srvargs	(vecpstr *,cchar *) noex ;
 extern int vecpstr_svcargs	(vecpstr *,int *,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int vecpstr_loaddirs(vecpstr *op,cchar *newsdname) noex {
 	return vecpstr_addsubdirs(op,newsdname) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
