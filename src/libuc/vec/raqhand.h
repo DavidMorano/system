@@ -97,7 +97,6 @@ typedef RAQHAND		raqhand ;
 typedef RAQHAND_FL	raqhand_fl ;
 
 EXTERNC_begin
-
 extern int raqhand_start	(raqhand *,int,int) noex ;
 extern int raqhand_ins		(raqhand *,cvoid *) noex ;
 extern int raqhand_rem		(raqhand *,void **) noex ;
@@ -109,7 +108,6 @@ extern int raqhand_acclast	(raqhand *,void **) noex ;
 extern int raqhand_get		(raqhand *,int,void **) noex ; 
 extern int raqhand_ent		(raqhand *,cvoid *) noex ;
 extern int raqhand_finish	(raqhand *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
