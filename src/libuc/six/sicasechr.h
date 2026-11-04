@@ -25,11 +25,9 @@
 
 
 EXTERNC_begin
-
 extern int	sibasechr(cchar *,int,int) noex ;
 extern int	sicasechr(cchar *,int,int) noex ;
 extern int	sifoldchr(cchar *,int,int) noex ;
-
 EXTERNC_end
 
 
