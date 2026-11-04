@@ -227,7 +227,7 @@ local int vecstrx_loadline(vecstrx *vsp,int fu,cchar *lbuf,int len) noex {
 		    } else {
 			c += 1 ;
 			rs = vsp->add(fp,fl) ;
-		    }
+		    } /* end */
 		} /* end if (got one) */
 		if (fsb.term == '#') break ;
 		if (rs < 0) break ;
