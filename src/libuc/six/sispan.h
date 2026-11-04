@@ -25,7 +25,6 @@
 
 
 EXTERNC_begin
-
 extern int	sispan(cchar *,int,cchar *) noex ;
 extern int	sispanalpha(cchar *,int) noex ;
 extern int	sispanalnum(cchar *,int) noex ;
@@ -34,7 +33,9 @@ extern int	sispandigex(cchar *,int) noex ;
 extern int	sispanoctal(cchar *,int) noex ;
 extern int	sispanwhite(cchar *,int) noex ;
 extern int	sispanblank(cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int sispandig(cchar *sp,int sl) noex {
     	return sispandigit(sp,sl) ;
 } /* end */
@@ -56,7 +57,6 @@ local inline int sispanblk(cchar *sp,int sl) noex {
 local inline int siskipwhite(cchar *sp,int sl) noex {
     	return sispanwhite(sp,sl) ;
 } /* end */
-
 EXTERNC_end
 
 
