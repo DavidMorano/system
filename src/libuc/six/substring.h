@@ -27,9 +27,7 @@
 
 
 EXTERNC_begin
-
 extern int	substring(cchar *,int,cchar *) noex ;
-
 EXTERNC_end
 
 
