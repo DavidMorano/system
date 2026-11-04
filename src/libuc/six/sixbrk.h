@@ -25,14 +25,14 @@
 
 
 EXTERNC_begin
-
 extern int	siobrk(cchar *,int,cchar *) noex ;
 extern int	sirbrk(cchar *,int,cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int sibrk(cchar *sp,int sl,cchar *ss) noex {
     	return siobrk(sp,sl,ss) ;
 } /* end */
-
 EXTERNC_end
 
 
