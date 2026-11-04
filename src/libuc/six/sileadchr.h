@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	sileadchr(cchar *,int,int) noex ;
-
 EXTERNC_end
 
 
