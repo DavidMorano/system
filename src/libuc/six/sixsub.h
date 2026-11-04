@@ -25,15 +25,15 @@
 
 
 EXTERNC_begin
-
 extern int sibasesub(cchar *sp,int sl,cchar *ss) noex ;
 extern int sicasesub(cchar *sp,int sl,cchar *ss) noex ;
 extern int sifoldsub(cchar *sp,int sl,cchar *ss) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int sisub(cchar *sp,int sl,cchar *ss) noex {
 	return sibasesub(sp,sl,ss) ;
 } /* end */
-
 EXTERNC_end
 
 
