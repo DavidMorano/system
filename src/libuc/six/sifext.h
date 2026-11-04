@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	sifext(cchar *,int,con mainv) noex ;
-
 EXTERNC_end
 
 
