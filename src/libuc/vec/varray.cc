@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdlib>		/* CSTD */
 #include	<new>			/* C++STD |nothrow(3c++) */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -92,7 +91,7 @@ local inline int varray_dtor(varray *op) noex {
 	    if (op->lap) ylikely {
 		delete op->lap ;
 		op->lap = nullptr ;
-	    } /* end if (memory-release) */
+	    } /* end if (delete-lookaside) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (varray_dtor) */
@@ -154,7 +153,7 @@ int varray_finish(varray *op) noex {
 	    {
 		rs1 = varray_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->cnt = 0 ;
 	    op->ext = 0 ;
 	} /* end if (non-null) */
@@ -244,14 +243,13 @@ int varray_del(varray *op,int i) noex {
 	    if (op->va) ylikely {
 		rs = SR_INVALID ;
 	        if ((i > 0) && (i < op->ext)) {
-		    void	*ep = op->va[i] ;
-	            if (ep) {
+		    if (void *ep = op->va[i]) {
 	                if ((rs = lookaside_release(op->lap,ep)) >= 0) {
 	                    op->va[i] = nullptr ;
 	                    op->cnt -= 1 ;
 		            c = op->cnt ;
 	                }
-	            }
+	            } /* end */
 		} /* end if (valid) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -266,12 +264,11 @@ int varray_delall(varray *op) noex {
 	    if (op->va) ylikely {
 		rs = SR_OK ;
 	        for (int i = 0 ; i < op->ext ; i += 1) {
-		    void	*ep = op->va[i] ;
-	    	    if (ep) {
+		    if (void *ep = op->va[i]) {
 			rs1 = lookaside_release(op->lap,ep) ;
 			if (rs >= 0) rs = rs1 ;
 			op->va[i] = nullptr ;
-	    	    }
+	    	    } /* end */
 		} /* end for */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -284,24 +281,23 @@ int varray_count(varray *op) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 		rs = op->cnt ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (varray_count) */
 
 int varray_find(varray *op,void *oep) noex {
 	int		rs = SR_FAULT ;
-	int		i = 0 ;
+	int		i = 0 ; /* return-value */
 	if (op && oep) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) ylikely {
 		cint	esz = op->esz ;
 		for (i = 0 ; i < op->ext ; i += 1) {
-		    void	*ep = op->va[i] ;
-	            if (ep) {
+		    if (void *ep = op->va[i]) {
 			csize	esize = size_t(esz) ;
 	                if (memcmp(oep,ep,esize) == 0) break ;
-		    }
+		    } /* end */
 	        } /* end for */
 	        rs = (i < op->ext) ? SR_OK : SR_NOTFOUND ;
 	    } /* end if (open) */
@@ -326,7 +322,7 @@ int varray_search(varray *op,void *oep,varray_vcmp fvcmp,void *vrp) noex {
 	        rs = (i < op->ext) ? SR_OK : SR_NOTFOUND ;
 	        if (rpp) {
 	            *rpp = (rs >= 0) ? op->va[i] : nullptr ;
-	        }
+	        } /* end */
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
@@ -348,7 +344,7 @@ int varray_audit(varray *op) noex {
 	        rs = (c == op->cnt) ? SR_OK : SR_BADFMT ;
 	        if (rs >= 0) {
 	            rs = lookaside_audit(op->lap) ;
-	        }
+	        } /* end */
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
@@ -411,7 +407,7 @@ int varray::del(int ai) noex {
 	    rs = varray_del(this,ai) ;
 	} else {
 	    rs = varray_delall(this) ;
-	}
+	} /* end */
 	return rs ;
 } /* emd method (varray::del) */
 
@@ -426,14 +422,14 @@ int varray::search(void *oep,varray_vcmp fvcmp,void *vrp) noex {
 void varray::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("varray",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (varray::dtor) */
 
 varray::operator int () noex {
     	int		rs = SR_NOTOPEN ;
 	if (ext >= 0) {
 	    rs = cnt ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (varray::operator) */
 
