@@ -33,7 +33,7 @@ LINT		?= lint
 
 DEFS +=
 
-INCS += ureserve.h
+INCS += ureserve.hh
 
 MODS += 
 
@@ -56,7 +56,7 @@ OBJ00= ureserve1.o ureserve2.o
 OBJ01= ureserve3.o ureserve4.o
 OBJ02= ureserve5.o ureserve6.o
 OBJ03= ureserve7a.o ureserve7b.o 
-OBJ04= ureserve8a.o ureserve8b.o
+OBJ04= ureserve8a.o ureserve8b.o ureserve8c.o
 OBJ06=
 OBJ07=
 
@@ -220,34 +220,16 @@ ureserve0.o:		ureserve.ccm objpart.o
 	gxx -c -x c++ -o $@ $(CPPFLAGS) $(CXXFLAGS) $<
 
 # module implementation
-ureserve1.o:		ureserve1.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve2.o:		ureserve2.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve3.o:		ureserve3.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve4.o:		ureserve4.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve5.o:		ureserve5.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve6.o:		ureserve6.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve7a.o:		ureserve7a.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve7b.o:		ureserve7b.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve8a.o:		ureserve8a.cc ureserve0.o
-	$(COMPILE.cc) $<
-
-ureserve8b.o:		ureserve8b.cc ureserve0.o
-	$(COMPILE.cc) $<
+ureserve1.o:		ureserve1.cc	ureserve0.o			$(INCS)
+ureserve2.o:		ureserve2.cc	ureserve0.o			$(INCS)
+ureserve3.o:		ureserve3.cc	ureserve0.o			$(INCS)
+ureserve4.o:		ureserve4.cc	ureserve0.o			$(INCS)
+ureserve5.o:		ureserve5.cc	ureserve0.o			$(INCS)
+ureserve6.o:		ureserve6.cc	ureserve0.o			$(INCS)
+ureserve7a.o:		ureserve7a.cc	ureserve0.o			$(INCS)
+ureserve7b.o:		ureserve7b.cc	ureserve0.o			$(INCS)
+ureserve8a.o:		ureserve8a.cc	ureserve0.o			$(INCS)
+ureserve8b.o:		ureserve8b.cc	ureserve0.o			$(INCS)
+ureserve8c.o:		ureserve8b.cc	ureserve0.o			$(INCS)
 
 
