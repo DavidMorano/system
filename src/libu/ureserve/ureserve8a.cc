@@ -107,7 +107,7 @@ int vecstr::add(cchar *sp,int sl) noex {
 		    }
 	        } catch (...) {
 		    rs = SR_NOMEM ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
@@ -129,7 +129,7 @@ int vecstr::adduniq(cchar *sp,int sl) noex {
 	    rs = INT_MAX ;
 	} else if (rs == SR_NOTFOUND) {
 	    rs = add(sp,sl) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecstr::adduniq) */
 
@@ -152,7 +152,7 @@ int vecstr::get(int ai,ccharpp rpp) noex {
 			    }
 		        } catch (const std::out_of_range &) {
 		            rs = SR_BUGCHECK ;
-		        }
+		        } /* end if (error) */
 		    } /* end if (request in-range) */
 	        } /* end if (valid) */
 	    } /* end if (non-null) */
@@ -172,8 +172,8 @@ int vecstr::del(int ai) noex {
 		    iterator it = begin() ;
 		    erase(it + ai) ;
 		    rs = SR_OK ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	} /* end if (open) */
 	return rs ;
 } /* end method (vecstr::del) */
@@ -188,13 +188,13 @@ int vecstr::search(cchar *sp,int sl) noex {
 		if (sl < 0) sl = lenstr(sp) ;
 		if (fl.sorted) {
     		    strview	s(sp,sl) ;
-    		    rs = int(binary_search(*this,s)) ;
+    		    rs = int(binary_search(*this,s)) ; /* <- range-search */
 		} else {
 		    if ((rs = ifind(sp,sl)) >= 0) {
 			f = true ;
 		    } else if (rs == rsn) {
 			rs = SR_OK ;
-		    }
+		    } /* end */
 		} /* end if (sorted or not) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -238,7 +238,7 @@ int vecstr::findkey(cchar *sp,int sl,cchar **rpp) noex {
 	} /* end if (non-null) */
 	if ((rs >= 0) && (rl < 0)) {
 	    rs = SR_NOTFOUND ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? rl : rs ;
 } /* end method (vecstr::findkey) */
 
@@ -278,7 +278,7 @@ int vecstr::curenum(vecstr_cur *curp,ccharpp rpp) noex {
 		    *rpp = s.c_str() ;
 		    curp->it++ ;
 		    rs = intconv(s.size()) ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -292,7 +292,7 @@ int vecstr::istart(int ne) noex {
 		rs = SR_OK ;
 	    } catch (...) {
 		rs = SR_NOMEM ;
-	    }
+	    } /* end if (error) */
 	} /* end if (non-zero positive) */
 	fl.open = true ;
 	return rs ;
@@ -303,7 +303,7 @@ int vecstr::ifinish() noex {
 	if (fl.open) ylikely {
 	    rs = SR_OK ;
 	    fl.open = false ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecstr::ifinish) */
 
@@ -313,7 +313,7 @@ int vecstr::isort() noex {
 	    std::ranges::sort(*this) ;
 	    fl.sorted = true ;
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecstr::isort) */
 
@@ -331,7 +331,7 @@ int vecstr::ifind(cchar *sp,int sl) noex {
 	    if (! f) rs = SR_NOTFOUND ;
 	} catch (...) {
 	    rs = SR_NOMEM ;
-	}
+	} /* end if (error) */
 	return (rs >= 0) ? idx : rs ;
 } /* end method (vecstr::ifind) */
 
@@ -340,7 +340,7 @@ int vecstr::idelall() noex {
 	if (fl.open) ylikely {
 	    resize(0) ;
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecstr::idelall) */
 
@@ -349,7 +349,7 @@ int vecstr::icount() const noex {
 	if (fl.open) ylikely {
 	    csize cnt = size() ;
 	    rs = intconv(cnt) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecstr::icount) */
 
@@ -361,7 +361,7 @@ int vecstr_add(vecstr *op,string *strp) noex {
 void vecstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecstr",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (vecstr::dtor) */
 
 vecstr::operator int () noex {
@@ -369,7 +369,7 @@ vecstr::operator int () noex {
 	if (fl.open) ylikely {
 	    csize	c = size() ;
 	    rs = intconv(c) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecstr::operator) */
 
@@ -391,6 +391,9 @@ int vecstr_co::operator () (int a) noex {
 	        break ;
 	    case vecstrmem_finish:
 	        rs = op->ifinish() ;
+	        break ;
+	    case vecstrmem_audit:
+	        rs = SR_OK ;		/* <- not implemented */
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
