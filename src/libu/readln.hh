@@ -26,8 +26,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-extern int readln(std::istream *,char *,int,int = 0) noex ;
-extern int istr_readln(std::istream *,char *,int,int = 0) noex ;
+extern int readln	(std::istream *,char *,int,int = 0) noex ;
+extern int istr_readln	(std::istream *,char *,int,int = 0) noex ;
 
 
 #endif /* __cplusplus */
