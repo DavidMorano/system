@@ -113,7 +113,7 @@ int siochr(cchar *sp,int sl,int sch) noex {
 		    if (cchar *tp ; (tp = strchr(sp,sch)) != np) {
 			f = true ;
 			i = intconv(tp - sp) ;
-		    }
+		    } /* end */
 	        } /* end if */
 	    } else {
 	        for (i = 0 ; sl-- && sp[i] ; i += 1) {
