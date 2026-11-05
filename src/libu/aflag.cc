@@ -32,7 +32,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<atomic>		/* C++SYD */
+#include	<atomic>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<timewatch.hh>		/* LIBU |timewatch(3u)| */
