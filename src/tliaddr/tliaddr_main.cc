@@ -1,4 +1,4 @@
-/* tliaddr_main */
+/* tliaddr_main SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -39,21 +39,21 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctype.h>
 #include	<netdb.h>
-#include	<usystem.h>
-#include	<keyopt.h>
-#include	<bits.h>
-#include	<sockaddress.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<keyopt.h>		/* LIBUC */
+#include	<bits.h>		/* LIBUC */
+#include	<sockaddress.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 #include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 #include	<bfile.h>		/* LIBB */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"tliaddr_config.h"
 
 
 /* local defines */
@@ -64,10 +64,10 @@
 
 /* external subroutines */
 
-extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-extern int	prograw(PROGINFO *,cchar *,cchar *,cchar *) ;
-extern int	progsock(PROGINFO *,cchar *,cchar *,cchar *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) noex ;
+extern int	proginfo_setpiv(PI *,cchar *,const pivars *) noex ;
+extern int	prograw(PI *,cchar *,cchar *,cchar *) noex ;
+extern int	progsock(PI *,cchar *,cchar *,cchar *) noex ;
 
 
 /* external variables */
@@ -75,25 +75,13 @@ extern int	progsock(PROGINFO *,cchar *,cchar *,cchar *) ;
 
 /* forward references */
 
-local int	usage(PROGINFO *) ;
+local int	usage(PI *) noex ;
 
 
 /* local structures */
 
 
 /* local variables */
-
-static cchar *argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -105,7 +93,19 @@ enum argopts {
 	argopt_ef,
 	argopt_of,
 	argopt_overlast
-} ;
+} ; /* end enum */
+
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	nullptr
+} ; /* end array */
 
 constexpr pivars	initvars = {
 	VARPROGRAMROOT1,
@@ -113,7 +113,7 @@ constexpr pivars	initvars = {
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRLOCAL
-} ;
+} ; /* end array */
 
 static const struct mapex	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -125,33 +125,36 @@ static const struct mapex	mapexs[] = {
 	{ SR_REMOTE, EX_PROTOCOL },
 	{ SR_NOSPC, EX_TEMPFAIL },
 	{ 0, 0 }
-} ;
-
-static cchar	*interfaces[] = {
-	"raw",
-	"loopback",
-	"socket",
-	NULL
-} ;
+} ; /* end array */
 
 enum interfaces {
 	interface_raw,
 	interface_loopback,
 	interface_socket,
 	interface_overlast
-} ;
+} ; /* end enum */
+
+static cchar	*interfaces[] = {
+	"raw",
+	"loopback",
+	"socket",
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int main(int argc,cchar **argv,cchar **envv) {
-	PROGINFO	pi, *pip = &pi ;
+int main(int argc,con mainv argv,con mainv envv) {
+	PI		pi, *pip = &pi ;
 	bits		pargs ;
 	keyopt		akopts ;
 	bfile		errfile ;
 	bfile		outfile, *ofp = &outfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	CF_DEBUG && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -169,28 +172,28 @@ int main(int argc,cchar **argv,cchar **envv) {
 	int		f ;
 
 	cchar	*argp, *aop, *akp, *avp ;
-	cchar	*argval = NULL ;
-	cchar	*pr = NULL ;
-	cchar	*sn = NULL ;
-	cchar	*afname = NULL ;
-	cchar	*efname = NULL ;
-	cchar	*ofname = NULL ;
-	cchar	*netaddr1 = NULL ;
-	cchar	*netaddr2 = NULL ;
-	cchar	*interfacename = NULL ;
-	cchar	*familyname = NULL ;
+	cchar	*argval = nullptr ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*netaddr1 = nullptr ;
+	cchar	*netaddr2 = nullptr ;
+	cchar	*interfacename = nullptr ;
+	cchar	*familyname = nullptr ;
 	cchar	*cp ;
 	char		interfacebuf[INTERFACENAMELEN + 1] ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("main: starting DFD=%d\n",rs) ;
+#if	CF_DEBUG
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
+	    rs = DEBUGOPEN(cp) ;
+	    DEBUGPRINTF("starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -201,7 +204,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	proginfo_setbanner(pip,cp) ;
 
 /* initialize */
@@ -220,7 +223,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -248,14 +251,14 @@ int main(int argc,cchar **argv,cchar **envv) {
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -510,8 +513,8 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getenv(VAREFNAME) ;
-	if (efname == NULL) efname = BFILE_STDERR ;
+	if (efname == nullptr) efname = getenv(VAREFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -525,7 +528,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("main: debuglevel=%u\n",pip->debuglevel) ;
+	    DEBUGPRINTF("debuglevel=%u\n",pip->debuglevel) ;
 #endif
 
 	if (f_version) {
@@ -555,7 +558,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 /* help file */
 
 	if (f_help)
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_usage || f_help)
 	    goto retearly ;
@@ -565,9 +568,9 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 /* initialized */
 
-	if (afname == NULL) afname = getenv(VARAFNAME) ;
+	if (afname == nullptr) afname = getenv(VARAFNAME) ;
 
-	if ((ofname == NULL) || (ofname[0] == '\0')) ofname = BFILE_STDOUT ;
+	if ((ofname == nullptr) || (ofname[0] == '\0')) ofname = BFILE_STDOUT ;
 
 	if (rs >= 0) {
 	    rs = proginfo_setentry(pip,&pip->ofname,ofname,-1) ;
@@ -579,7 +582,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	    for (ai = 1 ; ai < argc ; ai += 1) {
 
 	        f = (ai <= ai_max) && (bits_test(&pargs,ai) > 0) ;
-	        f = f || ((ai > ai_pos) && (argv[ai] != NULL)) ;
+	        f = f || ((ai > ai_pos) && (argv[ai] != nullptr)) ;
 	        if (f) {
 	            cp = argv[ai] ; /* no NUL check on purpose */
 	            switch (pan) {
@@ -597,26 +600,26 @@ int main(int argc,cchar **argv,cchar **envv) {
 	} /* end if */
 
 #ifdef	COMMENT
-	if ((netaddr1 == NULL) || (netaddr1[0] == '\0'))
+	if ((netaddr1 == nullptr) || (netaddr1[0] == '\0'))
 	    rs = SR_INVALID ;
 #else
-	if ((netaddr1 == NULL) || (netaddr1[0] == '\0'))
+	if ((netaddr1 == nullptr) || (netaddr1[0] == '\0'))
 	    netaddr1 = "anyhost" ;
 #endif
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1) {
-	    debugprintf("main: netaddr1=%s\n",netaddr1) ;
-	    debugprintf("main: netaddr2=%s\n",netaddr2) ;
+	    DEBUGPRINTF("netaddr1=%s\n",netaddr1) ;
+	    DEBUGPRINTF("netaddr2=%s\n",netaddr2) ;
 	}
 #endif
 
 /* check some stuff */
 
-	if (interfacename == NULL)
+	if (interfacename == nullptr)
 	    interfacename = DEFINTERFACE ;
 
-	if ((cp = strchr(interfacename,':')) != NULL) {
+	if ((cp = strchr(interfacename,':')) != nullptr) {
 
 	    sl = MIN((cp - interfacename),INTERFACENAMELEN) ;
 	    strwcpy(interfacebuf,interfacename,sl) ;
@@ -628,7 +631,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	} /* end if */
 
 #ifdef	COMMENT
-	if (familyname == NULL) familyname = DEFSOCKFAMILY ;
+	if (familyname == nullptr) familyname = DEFSOCKFAMILY ;
 #endif
 
 	if (pip->debuglevel > 0) {
@@ -639,7 +642,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("main: interface=%s family=%s\n",
+	    DEBUGPRINTF("interface=%s family=%s\n",
 	        interfacename,familyname) ;
 #endif
 
@@ -687,13 +690,13 @@ retearly:
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("main: exiting ex=%u (%d)\n",ex,rs) ;
+	    DEBUGPRINTF("exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    pip->open.errfile = FALSE ;
 	    bclose(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	if (pip->open.akopts) {
@@ -708,17 +711,17 @@ badpargs:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	CF_DEBUG && CF_DEBUGMALL
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
-	    debugprintf("main: final mallout=%u\n",(mo-mo_start)) ;
+	    DEBUGPRINTF("final mallout=%u\n",(mo-mo_start)) ;
 	    uc_mallset(0) ;
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
+#if	CF_DEBUG
+	DEBUGCLOSE() ;
 #endif
 
 	return ex ;
@@ -731,15 +734,12 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
 
-
-local int usage(PROGINFO *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar	*pn = pip->progname ;
@@ -762,7 +762,6 @@ local int usage(PROGINFO *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 
