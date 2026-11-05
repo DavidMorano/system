@@ -43,6 +43,7 @@
 #include	<usysdefs_pf.h>		/* protocol families */
 #include	<usysdefs_errno.h>
 #include	<usysdefs_fcntl.h>
+#include	<usysdefs_fnmat.h>	/* for |fnmatch(3c)| */
 #include	<usysdefs_ioctl.h>
 #include	<usysdefs_itimers.h>
 #include	<usysdefs_len.h>
