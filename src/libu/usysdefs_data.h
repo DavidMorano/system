@@ -23,13 +23,6 @@
 	sizes.  The real run-time system buffer sizes are (indeed)
 	determined at runtime where they may exist.
 
-	Usage:
-	Among the most important uses for the data contained herein
-	is the BUFSIZE management facility.  It uses the data below
-	to set default buffer sizes for those systems that do not
-	have dynamicly managed buffer size support in the system
-	kernel.
-
 *******************************************************************************/
 
 #ifndef	USYSDEFSDATA_INCLUDE
