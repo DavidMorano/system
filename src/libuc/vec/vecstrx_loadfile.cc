@@ -38,11 +38,11 @@
 	<0		error (system-return)
 
 	Notes:
-	Why use filer over BFILE? Yes, filer is a tiny bit more
-	lightweight than BFILE -- on a good day. But the real reason
+	Why use filer over BFILE?  Yes, filer is a tiny bit more
+	lightweight than BFILE -- on a good day.  But the real reason
 	may be so that we do not need to load BFILE in code that
 	resides very deep in a software stack if we do not need it
-	-- like deep inside loadable modules. Anyway, just a thought!
+	-- like deep inside loadable modules.  Anyway, just a thought!
 
 	Why are we using field as opposed to |sffield(3uc)| or
 	something similar?  Because our sematics are to process
@@ -116,10 +116,10 @@ namespace {
 
 /* forward references */
 
-local int	vecstrx_loadfiler(vecstrx *,int,cchar *) noex ;
-local int	vecstrx_loadfd(vecstrx *,int,int) noex ;
-local int	vecstrx_loadline(vecstrx *,int,cchar *,int) noex ;
-local int	mkterms() noex ;
+local int	vecstrx_loadfiler	(vecstrx *,int,cchar *) noex ;
+local int	vecstrx_loadfd		(vecstrx *,int,int) noex ;
+local int	vecstrx_loadline	(vecstrx *,int,cchar *,int) noex ;
+local int	mkterms			() noex ;
 
 
 /* local variables */
