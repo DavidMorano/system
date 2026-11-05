@@ -32,7 +32,7 @@
 #include	<new>			/* C++STD |nothrow(3c++) */
 #include	<utility>		/* C++STD |pair(3c++)| */
 #include	<string>		/* C++STD |string(3c++)| */
-#include	<set>			/* C++SYD */
+#include	<set>			/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
