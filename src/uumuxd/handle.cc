@@ -3,11 +3,9 @@
 /* handle a connect request for a service */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0
 #define	CF_DEBUG	1
 #define	CF_SRVSHELLARG	0
-
 
 /* revision history:
 
@@ -21,42 +19,42 @@
 
 /*******************************************************************************
 
-	This subrotuine processes a new connection that just came in.
-	This connection may have been passwed to us by our own daemon
-	or it may have been passed to us by executing us with the connection
-	on standard input.
+  	Description:
+	This subrotuine processes a new connection that just came
+	in.  This connection may have been passwed to us by our own
+	daemon or it may have been passed to us by executing us
+	with the connection on standard input.
 
-	We:
-
+	Thgis code:
 	1. get the service name, which is terminated by a line feed
 	2. search for the service if we have it
 	3. acknowledge the client, positively or negatively
 	4. call 'process' to finish the processing of this connection
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/utsname.h>
 #include	<sys/param.h>
 #include	<fcntl.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<ctime>
-#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
-
-#include	<usystem.h>
-#include	<bfile.h>
+#include	<ctime>			/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<field.h>
 #include	<vecstr.h>
 #include	<srvtab.h>
-#include	<localmisc.h>
+#include	<strtime.h>		/* LIBUC */
+#include	<isfd.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"srvpe.h"
 #include	"srventry.h"
@@ -67,11 +65,7 @@
 
 /* local defines */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#define	O_FLAGS		(O_CREAT | O_RDWR | O_TRUNC)
+#define	OX_FL		(O_CREAT | O_RDWR | O_TRUNC)
 #ifndef	SRVTO
 #define	SRVTO		30
 #endif
@@ -83,9 +77,8 @@ extern int	field_srvargs(FIELD **,VECSTR *) ;
 extern int	processargs(char *,VECSTR *) ;
 extern int	execute(struct global *,int,char *,char *,VECSTR *,VECSTR *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*timestr_log(), *timestr_edate(), *timestr_elapsed() ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -137,12 +130,12 @@ BUILTIN		*bip ;
 	daytime = time(NULL) ;
 
 	logfile_printf(&gp->lh,"%s request pid=%d\n",
-	    timestr_log(daytime,timebuf),gp->pid) ;
+	    strtime_log(daytime,timebuf),gp->pid) ;
 
 /* can we get the peername of the other end of this socket, if a socket ? */
 
 #ifdef	COMMENT
-	if (isasocket(s)) {
+	if (isfdsocket(s)) {
 
 	    char	inethost[MAXHOSTNAMELEN + 1] ;
 
@@ -221,7 +214,7 @@ BUILTIN		*bip ;
 	    u_time(&daytime) ;
 
 	    logfile_printf(&gp->lh,"%s starting server=%s\n",
-	        timestr_log(daytime,timebuf),srvname) ;
+	        strtime_log(daytime,timebuf),srvname) ;
 
 #if	CF_DEBUG
 	    if (gp->debuglevel > 1)
