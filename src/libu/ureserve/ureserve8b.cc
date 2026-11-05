@@ -1,4 +1,4 @@
-/* ureserve9 MODULE (vecstr - implementation) */
+/* ureserve8b MODULE (vecstr - implementation) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -103,10 +103,10 @@ namespace {
 	int		llen ;
 	int		elen ;
 	subinfo(vecstr *p,cchar *t) noex : vsp(p), ft(t) { } ;
-	int start() noex ;
-	int finish() noex ;
-	int line(cchar *,int) noex ;
-	int parse(field *,cchar *,int) noex ;
+	int start	() noex ;
+	int finish	() noex ;
+	int line	(cchar *,int) noex ;
+	int parse	(field *,cchar *,int) noex ;
     } ; /* end struct (subinfo) */
 } /* end namespace */
 
@@ -128,15 +128,15 @@ namespace {
 
 /* forward references */
 
-local int	vecstr_envfiler(vecstr *,cchar *) noex ;
-local int	mkinit() noex ;
-local int	mkterms() noex ;
+local int	vecstr_envfiler	(vecstr *,cchar *) noex ;
+local int	mkinit		() noex ;
+local int	mkterms		() noex ;
 
 
 /* local variables */
 
 static vars	var ;
-static char	fterms[fieldterms_termsize] ;
+static char	fterms		[fieldterms_termsize] ;
 
 
 /* exported variables */
