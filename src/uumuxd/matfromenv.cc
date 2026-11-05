@@ -62,8 +62,8 @@
 
 /* external subroutines */
 
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	sibrk(const char *,int,const char *) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	sibrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -74,20 +74,20 @@ extern int	sibrk(const char *,int,const char *) ;
 
 /* forward references */
 
-int		matfromenv(const char *,int) ;
+int		matfromenv(cchar *,int) ;
 
-static int	nexttoken(const char *,int,char **) ;
+local int	nexttoken(cchar *,int,char **) ;
 
 
 /* local variables */
 
-static const char	*months[] = {
+static cchar	*months[] = {
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 	NULL
 } ;
 
-static const char	*days[] = {
+static cchar	*days[] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", NULL
 } ;
 
@@ -119,7 +119,7 @@ static const char	*days[] = {
 	Synopsis:
 
 	int matfromenv(s,slen)
-	const char	s[] ;
+	cchar	s[] ;
 	int		slen ;
 
 	Arguments:
@@ -137,7 +137,7 @@ static const char	*days[] = {
 
 
 int matfromenv(s,slen)
-const char	s[] ;
+cchar	s[] ;
 int		slen ;
 {
 	int	fromlen ;
@@ -313,8 +313,8 @@ int	len ;
 
 
 
-static int nexttoken(buf,len,spp)
-const char	buf[] ;
+local int nexttoken(buf,len,spp)
+cchar	buf[] ;
 int		len ;
 char		**spp ;
 {
