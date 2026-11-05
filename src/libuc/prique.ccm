@@ -51,11 +51,11 @@ module ;
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++SYD */
-#include	<utility>		/* C++SYD */
-#include	<queue>			/* C++SYD */
-#include	<vector>		/* C++SYD */
-#include	<functional>		/* C++SYD */
+#include	<new>			/* C++STD */
+#include	<utility>		/* C++STD */
+#include	<queue>			/* C++STD */
+#include	<vector>		/* C++STD */
+#include	<functional>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
