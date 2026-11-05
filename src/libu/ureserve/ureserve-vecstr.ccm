@@ -52,6 +52,7 @@ enum vecstrmems {
     	vecstrmem_count,
     	vecstrmem_sort,
     	vecstrmem_delall,
+    	vecstrmem_audit,
     	vecstrmem_overlast
 } ; /* end enum (vecstrmems) */
 
@@ -81,6 +82,7 @@ export {
 	vecstr_co	count ;
 	vecstr_co	sort ;
 	vecstr_co	delall ;
+	vecstr_co	audit ;
 	vecstr_fl	fl{} ;
 	vecstr &operator = (const vecstr &) = delete ;
 	vecstr(const vecstr &) = delete ;
@@ -90,11 +92,13 @@ export {
 	    count	(this,vecstrmem_count) ;
 	    sort	(this,vecstrmem_sort) ;
 	    delall	(this,vecstrmem_delall) ;
+	    audit	(this,vecstrmem_audit) ;
 	} ; /* end ctor */
 	int add		(cchar *,int = -1) noex ;
 	int adduniq	(cchar *,int = -1) noex ;
 	int add		(string *) noex ;
 	int addenvfile	(cchar *) noex ;
+	int addstrfile	(cchar *) noex ;
 	int search	(cchar *,int = -1) noex ;
 	int find	(cchar *,int = -1) noex ;
 	int findkey	(cchar *,int = -1,cchar ** = nullptr) noex ;
