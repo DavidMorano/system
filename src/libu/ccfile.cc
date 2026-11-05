@@ -127,15 +127,13 @@ namespace {
 
 /* forward references */
 
-local ios_base::openmode mkmode(cchar *) noex ;
-
-local bool	isnomode(omode) noex ;
+local ios_base::openmode 	mkmode(cchar *) noex ;
+local bool			isnomode(omode) noex ;
 
 
 /* local variables */
 
 constexpr devnames	dev ;
-
 cbool			f_debug = false ;
 
 
@@ -284,16 +282,14 @@ int ccfile::readln(char *ibuf,int ilen,int dch) noex {
 
 int ccfile::readln(string &s,int dch) noex {
     	cnothrow	nt{} ;
-    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		len = 0 ; /* return-value */
 	if (! fl.fnulling) ylikely {
 	    cint	llen = MAXLINE ;
 	    rs = SR_NOMEM ;
-	    if (char *lbuf ; (lbuf = new(nt) char[llen+1]) != np) ylikely {
+	    if (char *lbuf = new(nt) char[llen+1]) ylikely {
 	        if ((rs = readln(lbuf,llen,char(dch))) >= 0) ylikely {
 		    len = rs ;
-		    lbuf[rs] = eos ;
 		    try {
 		        s = lbuf ;
 		    } catch (...) {
