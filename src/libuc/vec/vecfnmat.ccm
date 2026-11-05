@@ -38,13 +38,12 @@ enum vecfnmatmems {
 	vecfnmatmem_overlast
 } ; /* end enum (vecfnmatmems) */
 
-struct vecfnmat ;
-
-struct vecfnmat_fl {
+export {
+    struct vecfnmat ;
+    struct vecfnmat_fl {
     	uint		sopen:1 ;
-} ; /* end struct (vecregx_fl) */
-
-struct vecfnmat_co {
+    } ; /* end struct (vecregx_fl) */
+    struct vecfnmat_co {
 	vecfnmat	*op = nullptr ;
 	int		w = -1 ;
 	void operator () (vecfnmat *p,int m) noex {
@@ -55,9 +54,8 @@ struct vecfnmat_co {
 	operator int () noex {
 	    return operator () (-1) ;
 	} ; /* end */
-} ; /* end struct (vecfnmat_co) */
-
-struct vecfnmat {
+    } ; /* end struct (vecfnmat_co) */
+    struct vecfnmat {
 	vecfnmat_co	start ;
 	vecfnmat_co	count ;
 	vecfnmat_co	del ;
@@ -83,12 +81,13 @@ struct vecfnmat {
 	int add		(ccharp,int = -1) noex ;
 	int addfile	(ccharp) noex ;
 	int enumer	(int,cchar **) noex ;
-	int match	(cchar *,int = -1) noex ;
+	int match	(cchar *,int = -1,int = 0) noex ;
 	void dtor	() noex ;
 	operator int	() noex ;
 	destruct vecfnmat() {
 	    if (fl.sopen || slp) dtor() ;
 	} ; /* end destruct */
-} ; /* end struct (vecfnmat) */
+    } ; /* end struct (vecfnmat) */
+} /* end export */
 
 
