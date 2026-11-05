@@ -1312,7 +1312,7 @@ int main(int argc,mainv argv,mainv envv) {
 	            pip->fl.logconf = pip->fl.optlogconf ;
 	            pip->fl.logmsg = pip->fl.optlogmsg ;
 	            if (pip->logsize > 0)
-	                logfile_checksize(&pip->lh,pip->logsize) ;
+	                logfile_cksize(&pip->lh,pip->logsize) ;
 	            rs1 = logfile_userinfo(&pip->lh,&u,pip->daytime,
 	                pip->progname,pip->version) ;
 	            if (pip->fl.optlogconf)
@@ -1422,7 +1422,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        if (DEBUGLEVEL(2))
 	            debugprintf("main: zfname=%s\n",zfname) ;
 #endif
-	        rs1 = logzones_open(&pip->lz,zfname,O_RDWR,0666) ;
+	        rs1 = logzone_open(&pip->lz,zfname,O_RDWR,0666) ;
 	        pip->open.logzone = (rs1 >= 0) ;
 	    }
 
@@ -2305,7 +2305,7 @@ badinit2:
 
 	if (pip->open.logzone) {
 	    pip->open.logzone = FALSE ;
-	    logzones_close(&pip->lz) ;
+	    logzone_close(&pip->lz) ;
 	}
 
 	if (pip->open.logenv) {
