@@ -64,7 +64,7 @@
 #include	<strx.h>		/* LIBUC */
 #include	<jobdb.h>		/* LIBUC */
 #include	<srvfile.h>		/* LIBUC */
-#include	<timestr.h>		/* LIBUC */
+#include	<strtime.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
@@ -614,7 +614,7 @@ struct jobentry	**jepp ;
 	(void) time(&daytime) ;
 
 	logfile_printf(&g.lh, "%s job entering\n",
-	    timestr_log(daytime,timebuf)) ;
+	    strtime_log(daytime,timebuf)) ;
 
 #if	CF_DEBUG
 	if (g.debuglevel > 1)
