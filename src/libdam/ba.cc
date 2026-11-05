@@ -29,7 +29,7 @@
 #include	<climits>		/* CSTD |INT_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<bit>			/* C++SYD |popcount(2c++)| */
+#include	<bit>			/* C++STD |popcount(2c++)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
