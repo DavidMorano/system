@@ -1,4 +1,4 @@
-/* ureserve5 MODULE (sfx -- module-implementation-unit) */
+/* ureserve4 MODULE (sfx -- module-implementation-unit) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -117,15 +117,15 @@ int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
 	    } else {
 	        while (char_iswht(*sp)) {
 	            sp += 1 ;
-	        }
+	        } /* end while */
 	        sl = lenstr(sp) ;
 	    } /* end if */
 	    while ((sl > 0) && char_iswht(sp[sl - 1])) {
 	        sl -= 1 ;
-	    }
+	    } /* end while */
 	} else {
 	    sl = -1 ;
-	}
+	} /* end */
 	if (rpp) *rpp = sp ;
 	return sl ;
 } /* end subroutine (sfshrink) */
@@ -141,10 +141,10 @@ int sfbasename(cchar *sp,int µsl,cchar **rpp) noex {
 	        int	si ; /* used-afterwards */
 	        for (si = sl ; si > 0 ; si -= 1) {
 	            if (sp[si - 1] == '/') break ;
-	        }
+	        } /* end for */
 	        if ((sl == 1) && (si == 1) && (sp[0] == '/')) {
 	            si -= 1 ;
-	        }
+	        } /* end */
 	        rp = (sp + si) ;
 	        rl = (sl - si) ;
 	    } /* end block */
@@ -171,7 +171,7 @@ int sfdirname(cchar *sp,int µsl,cchar **rpp) noex {
 	        rl = 0 ;
 	    } else {
 	        rl = (i - 1) ;
-	    }
+	    } /* end */
 	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
 	return rl ;
@@ -184,11 +184,11 @@ int sfprogname(cchar *sp,int sl,cchar **rpp) noex {
 	    if ((cl = sfbasename(sp,sl,&cp)) > 0) {
 	        if (int si ; (si = sirchr(cp,cl,'.')) >= 0) {
 		    cl -= si ;
-	        }
+	        } /* end */
 	        if ((cl > 0) && (cp[0] == '=')) {
 		    cp += 1 ;
 		    cl -= 1 ;
-	        }
+	        } /* end */
 	    } /* end if (sfbasename) */
 	} /* end if (non-null) */
 	if (rpp) *rpp = cp ;
@@ -199,7 +199,7 @@ int sfrootname(cchar *sp,int sl,cchar **rpp) noex {
 	int		rl = -1 ;
 	if (sp && rpp) {
 	    rl = sfbasename(sp,sl,rpp) ;
-	}
+	} /* end */
 	return rl ;
 } /* end subroutine (sfrootname) */
 
@@ -277,7 +277,7 @@ int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 		    rl = sfshrink(sp,sl,&rp) ;
 		} else {
 		    rp = sp ;
-		}
+		} /* end */
 	    } /* end if (non-zero positive) */
 	} /* end if (non-null) */
 	if (rpp) *rpp = rp ;
@@ -302,7 +302,7 @@ int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex {
 	} /* end if (non-null) */
 	if (rpp) {
 	    *rpp = (vl >= 0) ? vp : nullptr ;
-	}
+	} /* end */
 	return vl ;
 } /* end subroutine (sfkeyval) */
 
