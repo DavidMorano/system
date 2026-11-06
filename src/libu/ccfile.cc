@@ -5,6 +5,7 @@
 /* C++ file I-O operations */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -81,6 +82,10 @@
 #endif
 #endif /* MAXLINE */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
@@ -134,7 +139,7 @@ local bool			isnomode(omode) noex ;
 /* local variables */
 
 constexpr devnames	dev ;
-cbool			f_debug = false ;
+cbool			f_debug = CF_DEBUG ;
 
 
 /* exported variables */
