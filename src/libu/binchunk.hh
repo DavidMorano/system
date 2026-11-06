@@ -66,11 +66,11 @@ struct binchunk_co {
 	void operator () (binchunk *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (binchunk_co) */
 
 class binchunk {
@@ -104,7 +104,7 @@ class binchunk {
 	operator int () noex ;
 	destruct binchunk() {
 	    if (binbuf) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end structure (binchunk) */
 
 
