@@ -88,6 +88,7 @@
 #include	<baops.h>
 #include	<mkchar.h>
 #include	<funcodes.h>
+#include	<fnm.hh>
 
 #include	<stdintx.h>
 #include	<ccfile.hh>
