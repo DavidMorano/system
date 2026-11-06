@@ -85,13 +85,13 @@ cint		nents = BINCHUNK_NENTS ;
 /* exported subroutines */
 
 binchunk::binchunk() noex : ql(0), qe(0) {
-	start	(this,binchunkmem_start ) ;
-	finish	(this,binchunkmem_finish) ;
-	count	(this,binchunkmem_count) ;
-	len	(this,binchunkmem_len) ;
-	extent	(this,binchunkmem_extent) ;
-	reset	(this,binchunkmem_reset) ;
-	binbuf = nullptr ;
+	start		(this,binchunkmem_start ) ;
+	finish		(this,binchunkmem_finish) ;
+	count		(this,binchunkmem_count) ;
+	len		(this,binchunkmem_len) ;
+	extent		(this,binchunkmem_extent) ;
+	reset		(this,binchunkmem_reset) ;
+	binbuf		= nullptr ;
 } /* end ctor (binchunk) */
 
 int binchunk::istart() noex {
@@ -145,7 +145,7 @@ int8_t binchunk::at(int i) const noex {
 	int8_t	rv = 0 ;
 	if ((i >= 0) && (i < ql) && binbuf) {
 	    rv = binbuf[i] ;
-	}
+	} /* end */
 	return rv ;
 } /* end method (binchunk::at) */
 
@@ -188,7 +188,7 @@ int binchunk::get(con int8_t **rpp) noex {
 	    rs = SR_OK ;
 	    if (rpp) {
 		*rpp = binbuf ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? ql : rs ;
 } /* end method (binchunk::get) */
@@ -216,7 +216,7 @@ int binchunk::read(int8_t *rbuf,int rlen) noex {
 void binchunk::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("binchunk",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (binchunk::dtor) */
 
 binchunk::operator int () noex {
