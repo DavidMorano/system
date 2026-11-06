@@ -1,0 +1,105 @@
+/* vecfnmat MODULE (primary - Vector-Regular-Extression) */
+/* charset=ISO8859-1 */
+/* lang=C20 */
+
+/* vector of regular expressions */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-09-16, David A­D­ Morano
+	This code was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+  	Object:
+	vecfnmat
+
+	Description:
+	This object is a vector of file-globbing patterns.
+	A single "match" function is available to check for
+	a file-name match against all of the patterns in the vector.
+
+*******************************************************************************/
+
+module ;
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+#include	"vecfnmat.hh"
+
+export module vecfnmat ;
+
+
+enum vecfnmatmems {
+	vecfnmatmem_start,
+	vecfnmatmem_count,
+    	vecfnmatmem_del,
+    	vecfnmatmem_delall,
+	vecfnmatmem_audit,
+	vecfnmatmem_finish,
+	vecfnmatmem_overlast
+} ; /* end enum (vecfnmatmems) */
+
+export {
+    struct vecfnmat ;
+    struct vecfnmat_fl {
+    	uint		sopen:1 ;
+    } ; /* end struct (vecregx_fl) */
+    struct vecfnmat_co {
+	vecfnmat	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (vecfnmat *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ; /* end */
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () (-1) ;
+	} ; /* end */
+    } ; /* end struct (vecfnmat_co) */
+    struct vecfnmat {
+	vecfnmat_co	start ;
+	vecfnmat_co	count ;
+	vecfnmat_co	del ;
+	vecfnmat_co	delall ;
+	vecfnmat_co	audit ;
+	vecfnmat_co	finish ;
+	void		*slp ;		/* store-list-pointer */
+	vecfnmat_fl	fl ;
+	uint		magval ;
+	vecfnmat() noex {
+	    start	(this,vecfnmatmem_start) ;
+	    count	(this,vecfnmatmem_count) ;
+	    del		(this,vecfnmatmem_del) ;
+	    delall	(this,vecfnmatmem_delall) ;
+	    audit	(this,vecfnmatmem_audit) ;
+	    finish	(this,vecfnmatmem_finish) ;
+	    fl		= {} ;
+	    slp		= nullptr ;
+	    magval	= 0 ;
+	} ; /* end ctor */
+	vecfnmat(const vecfnmat &) = delete ;
+	vecfnmat &operator = (const vecfnmat &) = delete ;
+	int add		(ccharp,int = -1) noex ;
+	int addfile	(ccharp) noex ;
+	int enumer	(int,cchar **) noex ;
+	int match	(cchar *,int = -1,int = 0) noex ;
+	void dtor	() noex ;
+	operator int	() noex ;
+	destruct vecfnmat() {
+	    if (fl.sopen || slp) dtor() ;
+	} ; /* end destruct */
+    } ; /* end struct (vecfnmat) */
+} /* end export */
+
+
