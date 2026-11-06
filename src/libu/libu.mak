@@ -42,7 +42,7 @@ MODS += libutil.o chrset.o bitgrp.o
 MODS += digtab.o xxtostr.o
 MODS += usigsets.o umisc.o
 MODS += constdiv.o
-MODS += usysbasic.o ureserve.cmm vecbool.o
+MODS += usysbasic.o ureserve.cmm vecbool.o vecfnmat.o
 
 LIBS += -lf -liconv -lproc
 
@@ -78,7 +78,7 @@ OBJ22= ugetloadavg.o uiconv.o bitgrp.o
 OBJ23= syscontain.o 
 
 OBJ24= posixdir.o nulstr.o vecbool.o
-OBJ25= fonce.o filerec.o 
+OBJ25= fonce.o filerec.o vecfnmat.o
 OBJ26= ustd.o ugetx.o
 OBJ27= ucomposite.o upt.o ucmpx.o
 
@@ -98,7 +98,7 @@ OBJ38= typecodes.o charnames.o
 OBJ39= strtox.o atox.o
 
 OBJ40= ascii.o ubufdefs.o vardefs.o
-OBJ41= memord.o
+OBJ41= memord.o fnm.o
 OBJ42=
 OBJ43=
 
@@ -112,7 +112,7 @@ OBJG= obj24.o obj25.o obj26.o obj27.o
 OBJH= obj28.o obj29.o obj30.o obj31.o
 OBJI= obj32.o obj33.o obj34.o obj35.o
 OBJJ= obj36.o obj37.o obj38.o obj39.o
-OBJK= obj40.o
+OBJK= obj40.o obj41.o
 
 OBJ += obja.o objb.o objc.o objd.o 
 OBJ += obje.o objf.o objg.o objh.o
@@ -330,6 +330,19 @@ obj38.o:		$(OBJ38)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj39.o:		$(OBJ39)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
+obj40.o:		$(OBJ40)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj41.o:		$(OBJ41)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj42.o:		$(OBJ42)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj43.o:		$(OBJ43)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -556,6 +569,11 @@ vecbool.o:		vecbool.dir
 vecbool.dir:
 	makesubdir $@
 
+# VECFNMAT
+vecfnmat.o:		vecfnmat.dir
+vecfnmat.dir:
+	makesubdir $@
+
 # POSIXDIR
 posixdir.o:		posixdir.dir
 posixdir.dir:
@@ -659,5 +677,6 @@ ascii.o:		ascii.cc		ascii.h			$(INCS)
 ubufdefs.o:		ubufdefs.cc		ubufdefs.h		$(INCS)
 vardefs.o:		vardefs.cc		vardefs.h		$(INCS)
 memord.o:		memord.cc		memord.hh		$(INCS)
+fnm.o:			fnm.cc			fnm.hh			$(INCS)
 
 
