@@ -22,7 +22,10 @@
 	pathbuf
 
 	Description:
-	This object is used for path manipulation.
+	This object is used for path manipulation.  This is really
+	a specialized version of |storebuf(3uc)| or |snaddpath(3uc|.
+	This was primarily created for use in the |pathclean(3uc)|
+	subroutine.
 
 	Arguments:
 	rbuf		buffer to receive cleaned up path string
