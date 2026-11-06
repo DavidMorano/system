@@ -137,7 +137,7 @@ int vecstr::get(int ai,ccharpp rpp) noex {
     	int		rs = SR_NOTOPEN ;
 	if (fl.open) ylikely {
 	    rs = SR_FAULT ;
-	    if (rpp) {
+	    if (rpp) ylikely {
 	        csize cnt = size() ;
 	        rs = SR_INVALID ;
 	        if (ai >= 0) ylikely {
@@ -219,7 +219,7 @@ int vecstr::findkey(cchar *sp,int sl,cchar **rpp) noex {
     	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = -1 ;
-	if (sp) {
+	if (sp) ylikely {
 	    if (vecstr_cur cur ; (rs = curbegin(&cur)) >= 0) {
 		for (cc *ep ; (rs = curenum(&cur,&ep)) >= 0 ; ) {
 		    if (strnkeycmp(ep,sp,sl) == 0) {
