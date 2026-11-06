@@ -5,7 +5,7 @@
 /* read characters from a C++ input stream */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -183,9 +183,7 @@ local int reader(istream *isp,char *rbuf,int rlen,int delim) noex {
 	    bool	feof = false ;
 	    bool	ffail = false ;
 	    while ((rs >= 0) && (len < rlen)) {
-		DPRINTF("top len=%d\n",len) ;
 		isp->get(c) ;
-		DPRINTF("get c=%02x\n",c) ;
 	        if ((feof = isp->eof())) break ;
 	        if ((ffail = isp->fail())) break ;
 	        rbuf[len++] = c ;
