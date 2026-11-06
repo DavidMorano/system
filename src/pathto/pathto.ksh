@@ -21,43 +21,31 @@ CMDS=
 S=cmds
 OS=""
 for A in "${@}" ; do
-
   case $A in
-
   '-D' )
     F_DEBUG=1
     ;;
-
   '-s' )
     F_SINGLE=1
     ;;
-
   '-'* )
     echo "${PNAME}: unknown option \"${A}\"" >&2
     exit 1
     ;;
-
   * )
-    case $S in
-
+    case ${S} in
     cmds )
       CMDS="${CMDS} ${A}"
       ;;
-
     esac
     ;;
-
   esac
-
 done
 
-
 if [[ -z "${CMDS}" ]] ; then
-
   echo "${PNAME}: argument required" >&2
   echo "${PNAME}: USAGE> ${USAGE}" >&2
   exit 1
-
 fi
 
 if [[ -z "${PATH}" ]] ; then
