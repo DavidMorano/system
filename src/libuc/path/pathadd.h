@@ -25,21 +25,25 @@
 
 
 EXTERNC_begin
-
 extern int pathnaddw(char *,int,int,cchar *,int) noex ;
 extern int pathnaddx(char *,int,int,int,cchar *,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp) noex {
 	return pathnaddw(pbuf,plen,pl,sp,-1) ;
 } /* end subroutine */
+EXTERNC_end
 
+EXTERNC_begin
 extern int pathaddw(char *,int,cchar *,int) noex ;
 extern int pathaddx(char *,int,int,cchar *,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int pathadd(char *pbuf,int pl,cchar *sp) noex {
 	return pathaddw(pbuf,pl,sp,-1) ;
 } /* end subroutine */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
