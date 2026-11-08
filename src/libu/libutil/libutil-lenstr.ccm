@@ -34,7 +34,7 @@ export module libutil:lenstr ;
 
 export {
     constexpr inline int clenstr(cchar *sp,int sl = -1) noex {
-	int len = -1 ;
+	int len = -1 ; /* return-value */
 	if (sp) ylikely {
     	    cchar *cp = sp ;
 	    while (sl-- && *cp) {
@@ -45,7 +45,7 @@ export {
 	return len ;
     } /* end subroutine (clenstr) */
     constexpr inline int lenstr(cchar *sp,int sl = -1) noex {
-    	int		len = -1 ;
+    	int len = -1 ; /* return-value */
 	if (sp) ylikely {
 	    if consteval {
 		len = clenstr(sp,sl) ;
@@ -61,7 +61,7 @@ export {
     	return len ;
     } /* end subroutine (lenstr) */
     constexpr inline int getlenstr(cchar *sp,int sl = -1) noex {
-	int		len = -1 ;
+	int len = -1 ; /* return-value */
 	if (sp) ylikely {
 	    if (sl >= 0) {
 		len = sl ;
