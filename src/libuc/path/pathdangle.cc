@@ -5,7 +5,7 @@
 /* find the sub-path of a dangling soft-link */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -37,25 +37,32 @@
 	>=0		length of cleaned up path
 	<0		error code (system-return)
 
+	Notes:
+	1. Implementation: This subroutine has been coerced to compile
+	and link using only the lIBU library.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<usysbase.h>		/* LIBU */
-#include	<aflag.hh>		/* LIBU */
-#include	<uclibmem.h>		/* LIBUC */
-#include	<bufsizevar.hh>		/* LIBUC */
+#include	<usyscalls.h>		/* LIBU */
+#include	<umem.hh>		/* LIBU */
+#include	<strnul.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<deb.hh>		/* LIBU |DPRINTF(3u)| */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
 
+#include	"pathnext.h"
+#include	"pathadd.h"
 #include	"pathdangle.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import deb ;
+import ureserve ;			/* |isnotpresent(3u)| */
+import deb ;				/* debugging (LIBU) */
 
 /* local defines */
 
@@ -63,12 +70,12 @@ import deb ;
 #define	CF_DEBUG	0		/* debugging */
 #endif
 
-#define	VARPATHDANGLE	"PATHDANGLE_DEBFN"
+#define	ISNOTPRES(rs)	isnotpresent(rs)
 
 
 /* imported namespaces */
 
-using libuc::libmem ;			/* variable */
+using libu::umem ;			/* variable */
 
 
 /* local typedefs */
@@ -82,13 +89,6 @@ using libuc::libmem ;			/* variable */
 
 /* local structures */
 
-namespace {
-    struct initer {
-	aflag		finit{} ;
-	operator int () noex ;
-    } ; /* end struct (initer) */
-} /* end namespace */
-
 
 /* local structures */
 
@@ -96,13 +96,10 @@ namespace {
 /* forward references */
 
 local int pathdangler(cchar *sp,int sl) noex ;
-[[maybe_unused]]
-local int	nextname(cchar *,int,cchar **) noex ;
 
 
 /* local variables */
 
-static initer		init ;
 cbool			f_debug		= CF_DEBUG ;
 
 
@@ -114,13 +111,19 @@ cbool			f_debug		= CF_DEBUG ;
 int pathdangle(cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
+	DEBPRINTF("ent\n") ;
 	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	    rs = SR_OK ;
 	    if (sl > 0) ylikely {
-	        if (static cint rsi = init ; (rs = rsi) >= 0) {
-	            rs = pathdangler(sp,sl) ;
-		    len = rs ;
-	        } /* end if (initer) */
+		rs = SR_NOMEM ;
+		if (strnul ss(sp,sl) ; ss.fok) ylikely {
+		    if (ustat sb ; (rs = u_stat(ss,&sb)) >= 0) {
+			rs = SR_OK ;
+		    } else if (ISNOTPRES(rs)) {
+	                rs = pathdangler(sp,sl) ;
+		        len = rs ;
+		    } /* end if */
+		} /* end if (strnul) */
 	    } /* end if (non-empty) */
 	} /* end if (non-null) */
 	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
@@ -132,55 +135,45 @@ int pathdangle(cchar *sp,int µsl) noex {
 
 local int pathdangler(cchar *sp,int sl) noex {
     	cint		plen = sl ;
-    	int		rs = SR_OK ;
+    	int		rs ;
 	int		rs1 ;
-	int		pl = 0 ; /* return-value */
-	(void) sp ;
-	(void) sl ;
-	if (char *pbuf ; (rs = libmem.mall((plen + 1),&pbuf)) >= 0) {
+	int		len = 0 ; /* return-value */
+	DEBPRINTF("ent\n") ;
+	DEBPRINTSTR("s=",sp,sl) ;
+	if (char *pbuf ; (rs = umem.mall((plen + 1),&pbuf)) >= 0) ylikely {
+	    int pl = 0 ;
 	    int	cl ;
+	    cchar *src = sp ;
 	    cchar *cp ;
-	    while ((rs >= 0) && ((cl = nextname(sp,sl,&cp)) >= 0)) {
-		if ((
+	    while ((sl > 0) && ((cl = pathnext(sp,sl,&cp)) >= 0)) {
+		DEBPRINTF("pathnext() cl=%d\n",cl) ;
+		DEBPRINTSTR("c=",cp,cl) ;
+		if (cl > 0) {
+		    DEBPRINTF("pathnaddw plen=%d pl=%d\n",plen,pl) ;
+		    if ((rs = pathnaddw(pbuf,plen,pl,cp,cl)) >= 0) ylikely {
+		        DEBPRINTF("pathnaddw() rs=%d\n",rs) ;
+		        pl = rs ;
+			DEBPRINTF("pl=%d testpath=%s\n",pl,pbuf) ;
+		        if (ustat sb ; (rs = u_stat(pbuf,&sb)) >= 0) {
+			    rs = SR_OK ;
+		        } else if (isNotPresent(rs)) {
+			    len = conv<int>((cp + cl) - src) ;
+			    rs = SR_OK ;
+			    DEBPRINTF("ret_on len=%d\n",len) ;
+			    break ;
+		        } /* end if */
+		    } /* end if (pathnaddw) */
+		    DEBPRINTF("pathnaddw-out rs=%d\n",rs) ;
+		} /* end if (non-empty) */
+		sl -= conv<int>((cp + cl) - sp) ;
+		sp = (cp + cl) ;
+		if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = libmem.free(pbuf) ;
+	    rs1 = umem.free(pbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-	return (rs >= 0) ? pl : rs ;
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
+	return (rs >= 0) ? len : rs ;
 } /* end subroutine (pathdangler) */
-
-local int nextname(cchar *sp,int sl,cchar **rpp) noex {
-    	int		rl = 0 ; /* return-value */
-	cchar		*rp = nullptr ;
-	bool		f_len = (sl >= 0) ;
-	while (((! f_len) || (sl > 0)) && (*sp == '/')) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	rp = sp ;
-	while ((((! f_len) && *sp) || (sl > 0)) && (*sp != '/')) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	rl = intconv(sp - rp) ;
-	if (rpp) {
-	    *rpp = rp ;
-	} /* end */
-	return rl ;
-} /* end subroutine (nextname) */
-
-initer::operator int () noex {
-    	int		rs = SR_OK ;
-	if_constexpr (f_debug) {
-	    if (! finit.testandset) {
-	        if (ccharp dfn = getenv(VARPATHDANGLE)) {
-		    if (cint rs1 = DEBOPEN(dfn) ; rs1 >= 0) {
-		        DEBPRINTF("debinit fd=%d\n",rs1) ;
-		    } /* end if (DEBOPEN) */
-	        } /* end if (getenv) */
-	    } /* end if (needed) */
-	} /* end if_constexpr (f_debug) */
-	return rs ;
-} /* end method (initer::operator) */
 
 
