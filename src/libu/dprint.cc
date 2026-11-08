@@ -36,7 +36,7 @@
 #include	<strnul.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"dprint.hh"
+#include	"dprint.hh"		/* LIBU */
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -47,21 +47,41 @@ using libu::rmeol ;			/* subroutine */
 
 
 static FILE	*efp = stderr ;
+cint		llen = MAXLINELEN ;
 
 
-int dprintline(cc *funcname,cc *inbuf,int len) noex {
-	cint	rl = rmeol(inbuf,len) ;
-	int	retlen = 0 ; /* return-value */
-	{
-	    cint pl = lenstrline(inbuf,rl) ;
-	    {
-		strnul ps(inbuf,pl) ;
-		retlen = pl ;
-		fprintf(efp,"%s: ",funcname) ;
-		fprintf(efp,"len=%d inbuf=>%s<\n",len,ccp(ps)) ;
-	    }
-	}
-	return retlen ;
+int dprint(cc *func,cc *sp,int 탎l) noex {
+    	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (int sl ; func && (sl = lenstrline(sp,탎l)) >= 0) {
+	    cint pl = rmeol(sp,sl) ;
+	    rs = SR_NOMEM ;
+	    if (strnul ss(sp,pl) ; ss.fok) {
+		ccharp fmt = "%s: %s\n" ;
+		rs = fprintf(stderr,fmt,func,ccp(ss)) ;
+		len = rs ;
+	    } /* end if (strnul) */
+	} /* end if (lenstrline) */
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (dprint) */
+
+int dprintstr(cc *func,cc *str,cc *sp,int 탎l) noex {
+    	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (int sl ; func && str && (sl = lenstrline(sp,탎l)) >= 0) {
+	    cint pl = rmeol(sp,sl) ;
+	    rs = SR_NOMEM ;
+	    if (strnul ss(sp,pl) ; ss.fok) {
+		ccharp fmt = "%s: %s%s\n" ;
+		rs = fprintf(stderr,fmt,func,str,ccp(ss)) ;
+		len = rs ;
+	    } /* end if (strnul) */
+	} /* end if (lenstrline) */
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (dprintstr) */
+
+int dprintline(cc *func,cc *sp,int sl) noex {
+    	return dprint(func,sp,sl) ;
 } /* end subroutine (dprintline) */
 
 
