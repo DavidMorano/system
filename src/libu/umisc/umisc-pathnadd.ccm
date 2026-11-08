@@ -36,16 +36,23 @@ module ;
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 export module umisc:pathnadd ;
 
 export {
-    int pathnaddw(char *,int,int,ccp,int) noex ;
+    int pathnaddw(char *,int,int,ccp,int = -1) noex ;
     int pathnaddx(char *,int,int,int,ccp,...) noex ;
+} /* end export */
+
+export {
     inline int pathnadd(char *pbuf,int plen,int pl,ccp sp,int sl = -1) noex {
 	return pathnaddw(pbuf,plen,pl,sp,sl) ;
     } /* end */
-    template<typename ... Args>
+} /* end export */
+
+export {
+    template<conccharp ... Args>
     inline int pathnadd(char *dbuf,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return pathnaddx(dbuf,dl,na,args ...) ;
