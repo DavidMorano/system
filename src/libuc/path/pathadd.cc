@@ -5,6 +5,7 @@
 /* add a component (c-string) to an existing path (c-string) */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -46,8 +47,8 @@
 	>=0		new length of new path; total length from beginning
 	<0		error (system-return)
 
-	Note:
-	These subroutines return the total length of the final path
+	Notes:
+	1. These subroutines return the total length of the final path
 	that resides in the given path-result-buffer.  If you want
 	a subroutine that returns just the added part, then check
 	out the |storebuf(3uc)| facility or the |snadd(3uc)| facility,
@@ -74,6 +75,12 @@
 	    }
 	}}
 
+	2. Implementation: With some (extreme) difficulty, these
+	subroutines have been coerced to compile and link using
+	only the LIBU library.  Actually, almost all of this
+	functionality is already in LIBU, so why am I complaining
+	so much?
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -82,20 +89,30 @@
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<bufsizevar.hh>		/* LIBUC */
-#include	<storebuf.h>		/* LIBUC */
+#include	<usupport.h>		/* LIBU |snadd(3u)| */
+#include	<aflag.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU */
 
 #include	"pathadd.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
 import libutil ;			/* ?? */
+import ulibvals ;			/* |ulibval(3u)| */
+import deb ;				/* debugging (LIBU) */
 
 /* local defines */
 
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
+
+using libu::snaddslash ;		/* subroutine */
+using libu::snaddw ;			/* subroutine */
 
 
 /* local typedefs */
@@ -109,15 +126,24 @@ import libutil ;			/* ?? */
 
 /* local structures */
 
+namespace {
+    struct initer {
+	int		maxpathlen ;
+	aflag		finit ;
+	operator int () noex ;
+    } ; /* end struct (initer) */
+} /* end namespace */
+
 
 /* forward references */
 
-local int		local_pathadd(char *,int,int,cchar *,int) noex ;
+local int local_pathnaddw(char *,int,int,ccharp,int = -1) noex ;
 
 
 /* local variables */
 
-static bufsizevar	maxpathlen(bufsize_mp) ;
+static initer		init ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -127,13 +153,15 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 
 int pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
     	int		rs = SR_FAULT ;
+	DEBPRINTF("ent\n") ;
 	if (pbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    if ((plen >= 0) && (pl >= 0)) ylikely {
-		rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
+		rs = local_pathnaddw(pbuf,plen,pl,sp,sl) ;
 		pl = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (pathnaddw) */
 
@@ -146,9 +174,9 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	        va_begin(ap,n) ;
 		rs = SR_OK ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		    ccharp sp = (char *) va_arg(ap,char *) ;
+		    ccharp sp = (ccharp) va_arg(ap,ccharp) ;
 		    if (! sp) break ;
-		    rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
+		    rs = local_pathnaddw(pbuf,plen,pl,sp) ;
 		    pl = rs ;
 	        } /* end for */
 	        va_end(ap) ;
@@ -159,16 +187,18 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 
 int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
+	DEBPRINTF("ent\n") ;
 	if (pbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    if (pl >= 0) ylikely {
-	        if ((rs = maxpathlen) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
 		    cint plen = rs ;
-		    rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
+		    rs = local_pathnaddw(pbuf,plen,pl,sp,sl) ;
 		    pl = rs ;
-	        } /* end if (maxpathlen) */
+	        } /* end if (initer) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? pl : rs ;
 } /* end subroutine (pathaddw) */
 
@@ -178,17 +208,17 @@ int pathaddx(char *pbuf,int pl,int n,...) noex {
 	if (pbuf) ylikely {
 	    rs = SR_INVALID ;
 	    if (pl >= 0) ylikely {
-	        if ((rs = maxpathlen) >= 0) ylikely {
+	        if ((rs = init) >= 0) ylikely {
 		    cint plen = rs ;
 	            va_begin(ap,n) ;
 	            for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		        ccharp sp = (char *) va_arg(ap,char *) ;
+		        ccharp sp = (ccharp) va_arg(ap,ccharp) ;
 			if (! sp) break ;
-		        rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
+		        rs = local_pathnaddw(pbuf,plen,pl,sp) ;
 		        pl = rs ;
 	            } /* end for */
 	            va_end(ap) ;
-	        } /* end if (maxpathlen) */
+	        } /* end if (initer) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
@@ -197,17 +227,26 @@ int pathaddx(char *pbuf,int pl,int n,...) noex {
 
 /* local subroutines */
 
-local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	if ((pl > 0) && (pbuf[pl - 1] != '/')) {
-	    rs = storebuf_chr(pbuf,plen,pl,'/') ;
+local int local_pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = snaddslash(pbuf,plen,pl)) >= 0) {
 	    pl += rs ;
-	} /* end */
-	if (rs >= 0) ylikely {
-	    rs = storebuf_strw(pbuf,plen,pl,sp,sl) ;
+	    rs = snaddw(pbuf,plen,pl,sp,sl) ;
 	    pl += rs ;
 	} /* end */
 	return (rs >= 0) ? pl : rs ;
-} /* end subroutine (local_pathadd) */
+} /* end subroutine (local_pathnaddw) */
+
+initer::operator int () noex {
+    	int		rs = maxpathlen ;
+	if (! finit) {
+    	    if (! finit.testandset) {
+	        if ((rs = ulibval.maxpathlen) >= 0) {
+		    maxpathlen = rs ;
+	        } /* end */
+	    } /* end if (initialized once) */
+	} /* end if */
+	return rs ;
+} /* end method (initer::operator) */
 
 
