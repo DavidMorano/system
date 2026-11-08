@@ -21,10 +21,14 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
 
 
 namespace libu {
@@ -41,7 +45,7 @@ namespace libu {
 } /* end namespace */
 
 namespace libu {
-    template<typename ... Args>
+    template<conccharp ... Args>
     inline char *strdcpy(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return libu::strdcpyx(dp,dl,na,args ...) ;
