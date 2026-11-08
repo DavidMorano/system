@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	conallof(cchar *,int,cchar *) noex ;
-
 EXTERNC_end
 
 
