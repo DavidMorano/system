@@ -37,6 +37,7 @@ module ;
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 export module umisc:mknpathx ;
 
@@ -48,7 +49,10 @@ export {
     int mknpath4(char *,int,cc *,cc *,cc *,cc *) noex ;
     int mknpath5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
     int mknpath6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
-    template<typename ... Args>
+} /* end export */
+
+export {
+    template<conccharp ... Args>
     inline int mknpath(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return mknpathx(dp,dl,na,args ...) ;
