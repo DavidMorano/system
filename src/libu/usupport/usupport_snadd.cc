@@ -142,7 +142,7 @@ namespace libu {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && (rl >= 0)) ylikely {
 	        rs = SR_OK ;
-		if ((rl == 0) || (rbuf[rl - 1] != '/')) {
+		if ((rl > 0) && (rbuf[rl - 1] != '/')) {
 		    rs = SR_OVERFLOW ;
 		    if (rl < rlen) {
 		        rs = SR_OK ;
