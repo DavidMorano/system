@@ -120,12 +120,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<termios.h>
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<string>
-#include	<string_view>
+#include	<termios.h>		/* POSIX® */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<string>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -165,7 +164,6 @@ import libutil ;			/* |memclear(3u)| */
 
 /* imported namespaces */
 
-using std::string_view ;		/* type */
 using libu::upoll ;			/* subroutine */
 using libu::uselect ;			/* subroutine */
 using libu::uterminal ;			/* subroutine */
@@ -176,8 +174,6 @@ using libu::sichr ;			/* subroutine */
 
 
 /* local typedefs */
-
-typedef string_view	strview ;
 
 
 /* external subroutines */
