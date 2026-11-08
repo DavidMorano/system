@@ -51,16 +51,13 @@
 #include	"pathbuf.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import deb ;
+import deb ;				/* debugging */
 
 
 /* local defines */
-
-#define	PB_BUFP		pbuf
-#define	PB_BUFL		plen
-#define	PB_IDX		idx
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
@@ -105,10 +102,13 @@ int pathbuf::start(char *rb,int rl) noex {
 	int		rs = SR_FAULT ;
 	DEBPRINTF("ent rl=%d\n",rl) ;
 	if (rb) ylikely {
-	    rs		= SR_OK ;
-	    pbuf	= rb ;
-	    plen	= rl ;
-	    idx		= 0 ;
+	    rs = SR_INVALID ;
+	    if (rl >= 0) {
+	        rs	= SR_OK ;
+	        pbuf	= rb ;
+	        plen	= rl ;
+	        idx	= 0 ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
@@ -130,10 +130,11 @@ int pathbuf::pfinish() noex {
 	return (rs >= 0) ? len : rs ;
 } /* end method (pathbuf::pfinish) */
 
-int pathbuf::str(cchar *sp,int sl) noex {
+int pathbuf::str(cchar *sp,int µsl) noex {
 	int		rs = SR_FAULT ;
-	DEBPRINTF("ent\n") ;
-	if (sp) ylikely {
+	DEBPRINTF("ent idx=%d\n",idx) ;
+	DEBPRINTSTR("s=",sp,µsl) ;
+	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	    if ((rs = idx) >= 0) {
 	        charp ep = (pbuf + plen) ;
 	        charp bp = (pbuf + idx) ;
@@ -146,18 +147,18 @@ int pathbuf::str(cchar *sp,int sl) noex {
 		    rs = intconv(bp - (pbuf + idx)) ;
 	            idx += rs ;
 	        } else {
-		    idx = rs ;
+		    idx = SR_OVERFLOW ;
 	        } /* end if (ok) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
-	DEBPRINTF("ret rs=%d\n",rs) ;
+	} /* end if (getlenstr) */
+	DEBPRINTF("ret rs=%d idx=%d\n",rs,idx) ;
 	return rs ;
 } /* end method (pathbuf::str) */
 
 int pathbuf::chr(int ch) noex {
     	int		rs ;
+	DEBPRINTF("ent idx=%d\n",idx) ;
 	if ((rs = idx) >= 0) {
-	    rs = SR_OVERFLOW  ;
 	    if (idx < plen) ylikely {
 	        charp bp = (pbuf + idx) ;
 	        *bp++ = char(ch) ;
@@ -165,32 +166,25 @@ int pathbuf::chr(int ch) noex {
 		rs = 1 ; /* number of bytes stored */
 		idx += rs ;
 	    } else {
-		idx = rs ;
+		idx = SR_OVERFLOW ;
 	    } /* end if (good) */
 	} /* end if (valid) */
+	DEBPRINTF("ret rs=%d idx=%d\n",rs,idx) ;
 	return rs ;
 } /* end method (pathbuf::chr) */
 
 int pathbuf::premslash() noex {
 	int		rs ;
-	DEBPRINTF("ent\n") ;
-	if ((rs = PB_IDX) >= 0) ylikely {
-	    charp bp = (PB_BUFP + PB_IDX) ;
-	    if ((PB_BUFL > 0) && (bp[-1] == '/')) {
-	        PB_BUFL -= 1 ;
-	        bp -= 1 ;
+	DEBPRINTF("ent idx=%d\n",idx) ;
+	if ((rs = idx) >= 0) ylikely {
+	    charp bp = (pbuf + idx) ;
+	    if ((idx > 0) && (bp[-1] == '/')) {
+	        idx -= 1 ;
+		bp -= 1 ;
+		*bp = eos ;
 	    } /* end if */
-	    while ((PB_BUFL > 0) && (bp[-1] != '/')) {
-	        PB_BUFL -= 1 ;
-	        bp -= 1 ;
-	    } /* end while */
-	    if ((PB_BUFL > 0) && (bp[-1] == '/')) {
-	        PB_BUFL -= 1 ;
-	        bp -= 1 ;
-	    } /* end if */
-	    PB_IDX = intconv(bp - PB_BUFP) ;
 	} /* end if (ok) */
-	DEBPRINTF("ret rs=%d\n",rs) ;
+	DEBPRINTF("ret rs=%d idx=%d\n",rs,idx) ;
 	return rs ;
 } /* end method (pathbuf::premslash) */
 
