@@ -53,7 +53,7 @@ export {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magval == CONFIGVARS_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
     } /* end subroutine (configvars_magic) */
 } /* end export */
