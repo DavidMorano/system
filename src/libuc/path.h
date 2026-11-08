@@ -24,7 +24,10 @@
 #include	<usysbase.h>		/* LIBU */
 
 #include	<pathadd.h>
+#include	<pathbuf.hh>
 #include	<pathclean.h>
+#include	<pathdangle.h>
+#include	<pathnext.h>
 
 
 #endif /* PATH_INCLUDE */
