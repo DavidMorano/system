@@ -5,6 +5,7 @@
 /* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -24,19 +25,20 @@
 	debon
 	debfd
 	debprintf
+	debprintstr
 
 	Description:
 	These subroutines are a hack for deb-printfs where the normal
 	debugging facilities are not available (for whatever reason).
 
 	Synopsis:
-	int debprinthex(cchar *func,int cols,cvoid *vdp,int vdl) noex
+	int debprintstr(cchar *func,cchar *str,cchar *vdp,int vdl) noex
 
 	Arguments:
 	func		c-string function-name pointer
-	cols		total number of columns wanted
-	vdp		data-pointer
-	vdl		data-length
+	str		c-string to print (pinter)
+	vdp		data c-string pointer
+	vdl		data c-string length
 
 	Returns:
 	>=0		OK
@@ -50,13 +52,13 @@ module ;
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdarg>		/* CSTD |va_list(3c)| */
+#include	<cstdarg>		/* CSTD */
 #include	<new>			/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |sncpy(3u)| */
-#include	<localmisc.h>		/* LIBU |COLUMNS| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"deb.hh"
 
@@ -68,10 +70,18 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
+#ifndef	MAXLINELEN
+#define	MAXLINELEN	(4 * 1024)
+#endif
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
 
 /* imported namespaces */
 
-using libu::mkhexstr ;			/* subroutine */
+using libu::snaddw ;			/* subroutine */
 
 
 /* external subroutines */
@@ -79,24 +89,8 @@ using libu::mkhexstr ;			/* subroutine */
 
 /* local variables */
 
-namespace {
-    struct mkprinter {
-	ccharp	sp ;
-	ccharp	idp ;
-	int	sl ;
-	int	idl ;
-	int	cols ;
-	mkprinter(ccp ªidp,int ªidl,int ªcols,ccp ªsp,int ªsl) noex {
-	    sp		= ªsp ;
-	    idp		= ªidp ;
-	    idl		= ªidl ;
-	    sl		= ªsl ;
-	    cols	= ªcols ;
-	} ; /* end ctor */
-	operator int	() noex ;
-	int mkprint	(int) noex ;
-    } ; /* end struct (mkprinter) */
-} /* end namespace */
+constexpr int	tlen		= MAXLINELEN ;
+cbool		f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -104,51 +98,32 @@ namespace {
 
 /* exported subroutines */
 
-int debprinthex(cchar *idp,int cols,cchar *vdp,int vdl) noex {
+int debprintstr(cchar *idp,cchar *str,cchar *vdp,int vdl) noex {
+    	cnothrow	nt{} ;
     	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
-	if (vdp) ylikely {
-	    cint	idl = lenstr(idp) ;
-	    cint	sl = vdl ;
-	    ccharp	sp = charp(vdp) ;
-	    if (cols < 0) cols = COLUMNS ;
-	    {
-		mkprinter po(idp,idl,cols,sp,sl) ;
-		rs = po ;
-		len = rs ;
-	    }
+	if (idp && str && vdp) ylikely {
+	    rs = SR_NOMEM ;
+	    if (char *tbuf = new(nt) char[tlen + 1]) ylikely {
+		int	tl = 0 ;
+		if ((rs = snaddw(tbuf,tlen,tl,str)) >= 0) ylikely {
+		    tl += rs ;
+		    if ((rs = snaddw(tbuf,tlen,tl,vdp,vdl)) >= 0) ylikely {
+			tl += rs ;
+			if ((rs = snaddw(tbuf,tlen,tl,"\n")) >= 0) {
+			    tl += rs ;
+	                    rs = debprint(idp,tbuf,tl) ;
+			    len = rs ;
+			}
+		    } /* end if (sncpy) */
+		} /* end if (sncpy) */
+		delete [] tbuf ;
+	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (debprinthex) */
+} /* end subroutine (debprintstr) */
 
 
 /* local subroutines */
-
-mkprinter::operator int () noex {
-    	int		rs ;
-	int		len = 0 ; /* return-value */
-	{
-	    if (cint rcol = (cols - (idl + 2)) ; (sl * 2) > rcol) {
-		sl = (rcol * 2) ;
-	    } /* end if */
-	    rs = mkprint(sl * 2) ;
-	    len = rs ;
-	} /* end block */
-	return (rs >= 0) ? len : rs ;
-} /* end method (mkprinter::operator) */
-
-int mkprinter::mkprint(int plen) noex {
-    	cnothrow	nt{} ;
-    	int		rs ;
-	int		len = 0 ; /* return-value */
-	if (char *pbuf = new(nt) char[plen + 1]) ylikely {
-	    if ((rs = mkhexstr(pbuf,plen,sp,sl)) >= 0) {
-	        rs = debprintf(idp,"%s\n",pbuf) ;
-	        len = rs ;
-	    } /* end if (mkhexstr) */
-	    delete [] pbuf ;
-	} /* end if (m-a-f) */
-	return (rs >= 0) ? len : rs ;
-} /* end method (mkprinter::mkprint) */
 
 
