@@ -113,7 +113,7 @@ int lenstrline(cchar *sp,int sl,int ll) noex {
 	if (sp) ylikely {
 	    rl = 0 ;
 	    if (ll < 0) ll = COLUMNS ;
-	    if (sl < 0) sl = INT_MAX ;
+	    if (sl < 0) sl = COLUMNS ;
 	    while ((rl < sl) && (rl < ll) && *sp++) {
 		rl += 1 ;
 	    } /* end while */
