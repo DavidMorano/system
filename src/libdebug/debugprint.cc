@@ -365,7 +365,7 @@ int debugprintx(cchar *fun,cchar *fmt,...) noex {
 	    if (ef.fd > 0) {
 		cint flen = (lenstr(__func__) + 2 + lenstr(fmt)) ;
 		rs = SR_NOMEM ;
-		if (char *fbuf = new(nt) char [flen + 1] ; fbuf) {
+		if (char *fbuf = new(nt) char [flen + 1]) {
 		    if ((rs = sncpy(fbuf,flen,fun,": ",fmt)) >= 0) {
 	                va_begin(ap,fmt) ;
 	                rs = debugvprintf(fbuf,ap) ;
@@ -388,7 +388,7 @@ int debugvprintf(cchar *fmt,va_list ap) noex {
 	    rs = SR_NOTOPEN ;
 	    if (ef.fd > 0) {
 		rs = SR_NOMEM ;
-		if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
+		if (char *lbuf = new(nt) char [llen + 1]) {
 	            if ((rs = snvprintf(lbuf,llen,fmt,ap)) >= 0) {
 			DPRINTF("fmtstr() rs=%d\n",rs) ;
 	        	rs = debugprinter(lbuf,rs) ;
@@ -413,7 +413,7 @@ int debugprintdeci(cchar *s,int v) noex {
 	int		rs = SR_FAULT ;
 	if (s) {
 	    rs = SR_NOMEM ;
-	    if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
+	    if (char *lbuf = new(nt) char [llen + 1]) {
 		if ((rs = snprintf(lbuf,llen,"%s %d\n",s,v)) >= 0) {
 	            rs = debugwrite(lbuf,rs) ;
 	        } /* end if (snprintf) */
@@ -428,7 +428,7 @@ int debugprinthexi(cchar *s,int v) noex {
 	int		rs = SR_FAULT ;
 	if (s) {
 	    rs = SR_NOMEM ;
-	    if (char *lbuf = new(nt) char [llen + 1] ; lbuf) {
+	    if (char *lbuf = new(nt) char [llen + 1]) {
 		if ((rs = snprintf(lbuf,llen,"%s %08x\n",s,v)) >= 0) {
 	            rs = debugwrite(lbuf,rs) ;
 	        } /* end if (snprintf) */
@@ -646,7 +646,7 @@ local int debugprinter(cchar *sbuf,int µslen) noex {
 	    cint clen = slen ;
 	    rs = SR_NOMEM ;
 	    DPRINTF("getlen() slen=%d\n",slen) ;
-	    if (char *cbuf = new(nt) char[clen + 1] ; cbuf) {
+	    if (char *cbuf = new(nt) char[clen + 1]) {
 		    int		kl = slen ; /* check-length */
 	            bool	f_needeol = false ;
 	            bool	f_cleaned = false ;
