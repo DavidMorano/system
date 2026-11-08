@@ -24,6 +24,7 @@
 	debon
 	debfd
 	debprintf
+	debprintstr
 	debprinthex
 
 	Description:
@@ -31,14 +32,18 @@
 	debging facilities are not available (for whatever reason).
 
 	Synopsis:
-	int debfd(int dfd) noex
-	int debprintf(cchar *func,cchar *fmt,...) noex
+	int debfd	(int dfd) noex
+	int debprintf	(cchar *func,cchar *fmt,...) noex
+	int debprintstr	cchar *func,cchar *sp,int sl) noex
+    	int debprinthex	(cchar *,int,cchar *,int) noex
 
 	Arguments:
 	dfd		file-description to use for deb output
 	func		c-string function-name pointer
 	fmt		c-string formatting specification pointer
 	...		|printf|-like arguments
+	sp		c-string pointer
+	sl		c-string length (optional)
 
 	Returns:
 	>=0		OK
@@ -65,7 +70,9 @@ export {
     int debopen		(cchar *) noex ;
     int debclose	() noex ;
     int debfd		(int) noex ;
+    int debprint	(cchar *,cchar *,int) noex ;
     int debprintf	(cchar *,cchar *,...) noex ;
+    int debprintstr	(cchar *,cchar *,cchar *,int) noex ;
     int debprinthex	(cchar *,int,cchar *,int) noex ;
 } /* end export */
 
