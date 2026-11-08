@@ -89,14 +89,12 @@ typedef CONNECTION	connection ;
 typedef	CONNECTION_FL	connection_fl ;
 
 EXTERNC_begin
-
 extern int connection_start(connection *,cchar *) noex ;
 extern int connection_socklocname(connection *,char *,int,int) noex ;
 extern int connection_sockremname(connection *,char *,int,int) noex ;
 extern int connection_peername(connection *,sockaddress *,int,char *,int) noex ;
 extern int connection_mknames(connection *,vecstr *) noex ;
 extern int connection_finish(connection *) noex ;
-
 EXTERNC_end
 
 
