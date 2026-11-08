@@ -30,21 +30,21 @@
 namespace libu {
     extern int	rmochr(cchar *,int,int) noex ;
     extern int	rmrchr(cchar *,int,int) noex ;
-    local inline int rmchr(cchar *sp,int sl,int sch) noex {
+} /* end namespace (libu) */
+
+namespace libu {
+    inline int rmchr(cchar *sp,int sl,int sch) noex {
 	return libu::rmochr(sp,sl,sch) ;
     } /* end subroutine */
-    local inline int rmdot(cchar *sp,int sl) noex {
+    inline int rmdot(cchar *sp,int sl = -1) noex {
 	return libu::rmrchr(sp,sl,'.') ;
-    } /* end subroutine */
-    local inline int rmdot(cchar *sp) noex {
-	return libu::rmrchr(sp,-1,'.') ;
     } /* end subroutine */
 } /* end namespace (libu) */
 
 namespace libu {
-    extern int rmeol(cchar *sp,int sl) noex ;
-    extern int rmwht(cchar *sp,int sl) noex ;
-    extern int rmblk(cchar *sp,int sl) noex ;
+    extern int rmeol(cchar *sp,int sl = -1) noex ;
+    extern int rmwht(cchar *sp,int sl = -1) noex ;
+    extern int rmblk(cchar *sp,int sl = -1) noex ;
     extern int rmtrailclass(cchar *sp,int sl,cchar *ss) noex ;
     extern int rmtrailchr(cchar *sp,int sl,int sch) noex ;
 } /* end namespace (libu) */
