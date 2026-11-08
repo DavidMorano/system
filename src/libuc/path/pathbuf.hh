@@ -36,6 +36,7 @@
 
 #ifndef	PATHBUF_INCLUDE
 #define	PATHBUF_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -43,7 +44,6 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<localmisc.h>		/* LIBU */
 
 
 enum struct pathbufmems {
@@ -85,6 +85,7 @@ struct pathbuf {
 } ; /* end struct (pathbuf) */
 
 
+#endif /* __cplusplus */
 #endif /* PATHBUF_INCLUDE */
 
 
