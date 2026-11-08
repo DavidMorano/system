@@ -76,7 +76,7 @@ module umisc ;
 
 /* forward references */
 
-local int	local_pathadd(char *,int,int,cchar *,int = -1) noex ;
+local int	local_pathnaddw(char *,int,int,cchar *,int = -1) noex ;
 
 
 /* local variables */
@@ -92,7 +92,7 @@ int pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	if (pbuf && sp) ylikely {
 	    rs = SR_INVALID ;
 	    if ((plen >= 0) && (pl >= 0)) ylikely {
-		rs = local_pathadd(pbuf,plen,pl,sp,sl) ;
+		rs = local_pathnaddw(pbuf,plen,pl,sp,sl) ;
 		pl = rs ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -108,9 +108,9 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	        va_begin(ap,n) ;
 		rs = SR_OK ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		    ccharp sp = (char *) va_arg(ap,char *) ;
+		    ccharp sp = (ccharp) va_arg(ap,ccharp) ;
 		    if (! sp) break ;
-		    rs = local_pathadd(pbuf,plen,pl,sp,-1) ;
+		    rs = local_pathnaddw(pbuf,plen,pl,sp,-1) ;
 		    pl = rs ;
 	        } /* end for */
 	        va_end(ap) ;
@@ -122,17 +122,14 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 
 /* local subroutines */
 
-local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	if ((pl > 0) && (pbuf[pl - 1] != '/')) {
-	    rs = snaddslash(pbuf,plen,pl) ;
+local int local_pathnaddw(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = snaddslash(pbuf,plen,pl)) >= 0) {
 	    pl += rs ;
-	} /* end */
-	if (rs >= 0) ylikely {
 	    rs = snaddw(pbuf,plen,pl,sp,sl) ;
 	    pl += rs ;
 	} /* end */
 	return (rs >= 0) ? pl : rs ;
-} /* end subroutine (local_pathadd) */
+} /* end subroutine (local_pathnaddw) */
 
 
