@@ -24,11 +24,15 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 
 namespace libu {
     extern int sncpy (char *,int,cchar *) noex ;
     extern int sncpyx(char *,int,int,...) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int sncpy1(char *dp,int dl,
 	    	cc *s1) noex {
 	return libu::sncpyx(dp,dl,1,s1) ;
@@ -57,7 +61,7 @@ namespace libu {
 } /* end namespace (libu) */
 
 namespace libu {
-    template<typename ... Args>
+    template<concharp ... Args>
     inline int sncpy(char *dp,int dl,Args ... args) noex {
         cint	na = npack(Args) ;
         return libu::sncpyx(dp,dl,na,args ...) ;
