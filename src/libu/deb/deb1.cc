@@ -65,14 +65,15 @@ module deb ;
 
 /* local defines */
 
-#ifndef	MAXPATHLEN
-#define	MAXPATHLEN	(4 * 1024)
+#ifndef	MAXLINELEN
+#define	MAXLINELEN	(4 * 1024)
 #endif
 
 
 /* imported namespaces */
 
 using libu::sncpy ;			/* subroutine */
+using libu::snaddw ;			/* subroutine */
 using libu::snprintf ;			/* subroutine */
 using libu::snvprintf ;			/* subroutine */
 
@@ -80,15 +81,18 @@ using libu::snvprintf ;			/* subroutine */
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local variables */
 
-constexpr int	flen = MAXPATHLEN ;
-int		dfd = -1 ;
+constexpr int	flen = MAXLINELEN ;
 
 
 /* exported variables */
 
 debon_mgr	debon ;
+int		dfd = -1 ;
 
 
 /* exported subroutines */
@@ -137,6 +141,29 @@ int debfd(int fd) noex {
 	return rs ;
 } /* end subroutine (debfd) */
 
+int debprint(cchar *func,cchar *sp,int sl) noex {
+	cnothrow	nt{} ;
+    	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
+	if (func && sp) ylikely {
+	    rs = SR_OK ;
+	    if (dfd >= 0) ylikely {
+    	        rs = SR_NOMEM ;
+	        if (char *fbuf = new(nt) char[flen + 1]) ylikely {
+		    if ((rs = sncpy(fbuf,flen,func,": ")) >= 0) {
+		        len += rs ;
+	                if ((rs = snaddw(fbuf,flen,len,sp,sl)) >= 0) {
+			    len += rs ;
+		            rs = u_write(dfd,fbuf,len) ;
+	                } /* end if (snvprintf) */
+		    } /* end if (sncpy) */
+		    delete [] fbuf ;
+	        } /* end if (m-a-f) */
+	    } /* end if (enabled) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (debprint) */
+
 int debprintf(cchar *func,cchar *fmt,...) noex {
     	va_list		ap ;
 	cnothrow	nt{} ;
@@ -149,8 +176,8 @@ int debprintf(cchar *func,cchar *fmt,...) noex {
     	        rs = SR_NOMEM ;
 	        if (char *fbuf = new(nt) char[flen + 1]) ylikely {
 		    if ((rs = sncpy(fbuf,flen,func,": ")) >= 0) {
+		        charp	bp = (fbuf + rs) ;
 		        cint	bl = (flen - rs) ;
-		        char	*bp = (fbuf + rs) ;
 		        len += rs ;
 	                if ((rs = snvprintf(bp,bl,fmt,ap)) >= 0) {
 			    len += rs ;
