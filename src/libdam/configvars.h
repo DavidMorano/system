@@ -80,7 +80,6 @@ typedef CONFIGVARS_CUR	configvars_cur ;
 typedef CONFIGVARS_VFL	configvars_vfl ;
 
 EXTERNC_begin
-
 int configvars_open(configvars *,cchar *,vecobj *) noex ;
 int configvars_addfile(configvars *,cchar *,vecobj *) noex ;
 int configvars_check(configvars *,time_t) noex ;
@@ -88,7 +87,6 @@ int configvars_curbegin(configvars *,configvars_cur *) noex ;
 int configvars_curend(configvars *,configvars_cur *) noex ;
 int configvars_fetch(configvars *,cchar *,configvars_cur *,cchar **) noex ;
 int configvars_close(configvars *) noex ;
-
 EXTERNC_end
 
 
