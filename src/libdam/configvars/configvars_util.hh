@@ -39,23 +39,23 @@
         extern int configvars_finvars(CV *) noex ;
         extern int configvars_finfiles(CV *) noex ;
         extern int configvars_addvar(CV *,int,int,cc *,int,cc *,int) noex ;
-    }
+    } /* end namespace */
 
     namespace configvars_obj {
         extern int file_start(CV_FILE *,cchar *) noex ;
         extern int file_addvar(CV_FILE *,int,int,cc *,int,cc *,int) noex ;
         extern int file_finish(CV_FILE *) noex ;
         extern int file_finone(CV_FILE *,int) noex ;
-    }
+    } /* end namespace */
 
     namespace configvars_obj {
         extern int var_start(CV_VAR *,int,cc *,int,cc *,int) noex ;
         extern int var_finish(CV_VAR *) noex ;
-    }
+    } /* end namespace */
 
     namespace configvars_obj {
         extern void	badline(vecobj *,char *,int) noex ;
-    }
+    } /* end namespace */
 
 
 #endif /* __cplusplus */
