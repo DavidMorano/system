@@ -28,9 +28,10 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int dprintline(cc *,cc *,int) noex ;
-EXTERNC_end
+extern int dprint	(cc *,cc *,int = -1) noex ;
+extern int dprintline	(cc *,cc *,int = -1) noex ;
+extern int dprintstr	(cc *,cc *,cc *,int = -1) noex ;
+
 
 #define DPRINTR(FMT, ...) 						\
     if_constexpr (f_debug) {						\
@@ -41,6 +42,16 @@ EXTERNC_end
     if_constexpr (f_debug) {						\
         fprintf(stderr,"%s: ",__func__) ;				\
         fprintf(stderr,FMT __VA_OPT__(,) __VA_ARGS__) ;			\
+    }
+
+#define DPRINT(DBUF,DLEN)						\
+    if_constexpr (f_debug) {						\
+        dprint(__func__,DBUF,DLEN) ;					\
+    }
+
+#define DPRINTSTR(str,DBUF,DLEN)					\
+    if_constexpr (f_debug) {						\
+        dprintstr(__func__,(str),(DBUF),(DLEN)) ;			\
     }
 
 #define DPRINTLINE(DBUF,DLEN)						\
