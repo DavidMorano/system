@@ -22,6 +22,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 
 EXTERNC_begin
@@ -43,31 +44,38 @@ EXTERNC_end
 EXTERNC_begin
 local inline int pathadd(char *pbuf,int pl,cchar *sp) noex {
 	return pathaddw(pbuf,pl,sp,-1) ;
-} /* end subroutine */
+} /* end subroutine (pathadd) */
 EXTERNC_end
 
 #ifdef	__cplusplus
+local inline int pathaddw(char *pbuf,int pl,cchar *sp) noex {
+	return pathaddw(pbuf,pl,sp,-1) ;
+} /* end subroutine (pathaddw) */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int pathnadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 	return pathnaddw(pbuf,plen,pl,sp,sl) ;
 } /* end subroutine */
+inline int pathnaddw(char *pbuf,int plen,int pl,cchar *sp) noex {
+	return pathnaddw(pbuf,plen,pl,sp,-1) ;
+} /* end subroutine */
+#endif /* __cplusplus */
 
-template<typename ... Args>
+#ifdef	__cplusplus
+template<conccharp ... Args>
 inline int pathnadd(char *dbuf,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return pathnaddx(dbuf,dl,na,args ...) ;
 } /* end subroutine */
-
 inline int pathadd(char *pbuf,int pl,cchar *sp,int sl) noex {
 	return pathaddw(pbuf,pl,sp,sl) ;
 } /* end subroutine */
-
-template<typename ... Args>
+template<conccharp ... Args>
 inline int pathadd(char *dbuf,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return pathaddx(dbuf,dl,na,args ...) ;
 } /* end subroutine */
-
 #endif /* __cplusplus */
 
 
