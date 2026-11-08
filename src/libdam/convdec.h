@@ -27,15 +27,15 @@
 
 
 EXTERNC_begin
-
 extern char	*convdecsi	(sint,		char *) noex ;
 extern char	*convdecsl	(slong,		char *) noex ;
 extern char	*convdecsll	(slonglong,	char *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern char	*convdecui	(uint,		char *) noex ;
 extern char	*convdecul	(ulong,		char *) noex ;
 extern char	*convdecull	(ulonglong,	char *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
