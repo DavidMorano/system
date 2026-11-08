@@ -83,10 +83,8 @@ struct configfile_head {
 typedef	CONFIGFILE	configfile ;
 
 EXTERNC_begin
-
 extern int configfile_start(configfile *,cchar *) noex ;
 extern int configfile_finish(configfile *) noex ;
-
 EXTERNC_end
 
 
