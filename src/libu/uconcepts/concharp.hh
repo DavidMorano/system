@@ -32,11 +32,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>
-#include	<cstdlib>
-#include	<type_traits>
-#include	<concepts>
-#include	<clanguage.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<type_traits>		/* C++STD */
+#include	<concepts>		/* C++STD */
+#include	<clanguage.h>		/* LIBU */
 
 
 template <typename T>
@@ -47,6 +47,11 @@ concept concharp =
     /* Case 2: Is it an array of (possibly const) char? */
     (std::is_array_v<T> &&
      std::same_as<std::remove_cv_t<std::remove_extent_t<T>>, char>) ;
+
+
+template<typename T>
+concept conccharp =
+    std::convertible_to<T,const char *> ;
 
 
 #endif /* CONCHARP_INCLUDE */
