@@ -152,5 +152,6 @@ deb0.o:		deb.ccm					$(INCS)
 
 deb1.o:		deb1.cc deb0.o				$(INCS)
 deb2.o:		deb2.cc deb0.o				$(INCS)
+deb3.o:		deb3.cc deb0.o				$(INCS)
 
 
