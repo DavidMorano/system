@@ -38,7 +38,7 @@ enum missingfnms {
 	missingfnm_BEGIN = 10,
 	missingfnm_ignorecase,
 	missingfnm_icase,
-	missingfnm_argumented,
+	missingfnm_augmented,
 	missingfnm_extmatch,
 	missingfnm_overlast
 } ; /* end enum (missingfnms)) */
