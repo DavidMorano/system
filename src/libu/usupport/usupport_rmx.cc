@@ -130,7 +130,7 @@ namespace {
 local int rmxchr(strnx_f sx,cchar *sp,int sl,int ch) noex {
     	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *tp ; (tp = sx(sp,sl,ch)) != nullptr) {
+	    if (cchar *tp = sx(sp,sl,ch)) {
 	        sl = intconv(tp - sp) ;
 	    } /* end */
 	} else {
