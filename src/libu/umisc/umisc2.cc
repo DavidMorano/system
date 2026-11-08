@@ -118,7 +118,7 @@ int mknpathxw(char *pbuf,int µplen,int n,...) noex {
 		int	sl = -1 ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	            ccp  sp = (ccharp) va_arg(ap,char *) ;
+	            ccharp sp = (ccharp) va_arg(ap,ccharp) ;
 	            if (i == (n - 1)) sl = (int) va_arg(ap,int) ;
 		    if (! sp) break ;
 		    rs = pathnadd(pbuf,plen,pl,sp,sl) ;
