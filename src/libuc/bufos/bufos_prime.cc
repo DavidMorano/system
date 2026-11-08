@@ -121,7 +121,7 @@ int bufos::push(int ch) noex {
 	    }
 	} catch (...) {
 	    rs = SR_NOMEM ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end method (bufos::push) */
 
@@ -138,7 +138,7 @@ int bufos::add(cchar *sp,int µsl) noex {
 	        }
 	    } catch (...) {
 	        rs = SR_NOMEM ;
-	    }
+	    } /* end if (error) */
 	} /* end if (getlenstr) */
 	return rs ;
 } /* end method (bufos::add) */
@@ -174,7 +174,7 @@ int bufos::readat(int ei,char *rbuf,int rlen) const noex {
 		    } /* end if */
 	        } /* end if (ilen) */
 	    } /* end if (valid) */
-	    rbuf[rl] = '\0' ;
+	    rbuf[rl] = eos ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 } /* end method (bufos::readat) */
@@ -195,12 +195,12 @@ int bufos::iremove(char *rp) noex {
 		    *rp = c ;
 		} catch (...) {
 		    rs = SR_BUGCHECK ;
-		}
+		} /* end if (error) */
 	    } /* end if (caller wants the result) */
 	    if (rs >= 0) {
 	        oi += 1 ;
 	        rl -= 1 ;
-	    }
+	    } /* end if (ok) */
 	} /* end if (something to remove) */
 	return (rs >= 0) ? rl : rs ;
 } /* end method (bufos::iremove) */
