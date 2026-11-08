@@ -160,6 +160,38 @@ namespace {
     } ; /* end struct (opener) */
 } /* end namespace */
 
+int ccfile::open(const strview &sv,cchar *ofs,mode_t om) noex {
+	csize		svz = sv.length() ;
+	cchar		*svp = sv.data() ;
+	int		rs = SR_FAULT ;
+	if (svp && ofs) ylikely {
+	    rs = SR_NOENT ;
+	    if (cint svl = int(svz) ; svl > 0) {
+		rs = SR_NOMEM ;
+	        if (strnul fn(svp,svl) ; fn.fok) {
+		    rs = open(fn,ofs,om) ;
+		}
+	    } /* end block */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ccfile::open) */
+
+int ccfile::open(const string &str,cchar *ofs,mode_t om) noex {
+	csize		ssz = str.length() ;
+	cchar		*sp = str.c_str() ;
+	int		rs = SR_FAULT ;
+	if (sp && ofs) ylikely {
+	    rs = SR_NOENT ;
+	    if (cint sl = int(ssz) ; sl > 0) {
+		rs = SR_NOMEM ;
+	        if (strnul fn(sp,sl) ; fn.fok) {
+		    rs = open(fn,ofs,om) ;
+		}
+	    } /* end block */
+	} /* end if (non-null) */
+	return rs ;
+} /* end method (ccfile::open) */
+
 int ccfile::open(cchar *fn,cchar *ofs,mode_t) noex {
 	int		rs = SR_FAULT ;
 	if (fn) ylikely {
@@ -240,34 +272,6 @@ int opener::openfile() noex {
         } /* end if (not fnulling) */
 	return rs ;
 } /* end method (opener::openfile) */
-
-int ccfile::open(const strview &sv,cchar *ofs,mode_t om) noex {
-	csize		svz = sv.length() ;
-	cchar		*svp = sv.data() ;
-	int		rs = SR_FAULT ;
-	if (svp && ofs) ylikely {
-	    cint	svl = int(svz) ;
-	    {
-	        strnul	fn(svp,svl) ;
-		rs = open(fn,ofs,om) ;
-	    } /* end block */
-	} /* end if (non-null) */
-	return rs ;
-} /* end method (ccfile::open) */
-
-int ccfile::open(const string &str,cchar *ofs,mode_t om) noex {
-	csize		ssz = str.length() ;
-	cchar		*sp = str.c_str() ;
-	int		rs = SR_FAULT ;
-	if (sp && ofs) ylikely {
-	    cint	sl = int(ssz) ;
-	    {
-	        strnul	fn(sp,sl) ;
-		rs = open(fn,ofs,om) ;
-	    } /* end block */
-	} /* end if (non-null) */
-	return rs ;
-} /* end method (ccfile::open) */
 
 int ccfile::readln(char *ibuf,int ilen,int dch) noex {
     	istream		*isp = this ;
