@@ -35,23 +35,27 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 
 namespace libu {
     extern int snaddx(char *,int,int,int,...) noex ;
-    extern int snaddw(char *,int,int,cchar *,int) noex ;
-    inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
-	return snaddw(dbuf,dlen,dl,sp,-1) ;
-    } /* end subroutine (snadd) */
-    inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
-	return snaddw(dbuf,dlen,dl,sp,-1) ;
-    } /* end subroutine (snaddw) */
+    extern int snaddw(char *,int,int,cchar *,int = -1) noex ;
 } /* end namespace (libu) */
 
 namespace libu {
-    template<typename ... Args>
+    inline int snadd(char *dbuf,int dlen,int dl,cchar *sp,int sl = -1) noex {
+	return snaddw(dbuf,dlen,dl,sp,sl) ;
+    } /* end subroutine (snadd) */
+} /* end namespace (libu) */
+
+namespace libu {
+    template<conccharp ... Args>
     inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return snaddx(dbuf,dlen,dl,na,args ...) ;
