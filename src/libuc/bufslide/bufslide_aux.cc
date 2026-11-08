@@ -29,7 +29,6 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<string>		/* CSTD |string(3c++)| */
-#include	<string_view>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
@@ -47,12 +46,8 @@ import libutil ;			/* |getlenstr(3u)| */
 
 /* local namespaces */
 
-using std::string_view ;		/* type */
-
 
 /* local typedefs */
-
-typedef string_view	strview ;
 
 
 /* external subroutines */
