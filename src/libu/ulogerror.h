@@ -27,16 +27,14 @@
 #include	<usysrets.h>		/* LIBU */
 
 
-#ifdef	__cplusplus
-
-extern "C" {
-    extern int ulogerror(cchar *,int,cchar * = nullptr) noex ;
-} /* end extern (C) */
-
-#else /* __cplusplus */
-
+EXTERNC_begin
 extern int ulogerror(cchar *,int,cchar *) noex ;
+EXTERNC_end
 
+#ifdef	__cplusplus
+inline int ulogerror(cchar *fac,int r) noex {
+    	return ulogerror(fac,r,nullptr) ;
+} /* end */
 #endif /* __cplusplus */
 
 
