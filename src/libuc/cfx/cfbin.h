@@ -50,7 +50,6 @@ local inline int cfbinll(cchar *sp,int sl,longlong *rp)		noex {
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfbin(cchar *sp,int sl,int *rp)		noex {
 	return cfbini(sp,sl,rp) ;
 } /* end */
@@ -60,7 +59,9 @@ inline int cfbin(cchar *sp,int sl,long *rp)		noex {
 inline int cfbin(cchar *sp,int sl,longlong *rp)		noex {
 	return cfbinll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfbin(cchar *sp,int sl,uint *rp)		noex {
 	return cfbinui(sp,sl,rp) ;
 } /* end */
@@ -70,7 +71,6 @@ inline int cfbin(cchar *sp,int sl,ulong *rp)		noex {
 inline int cfbin(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfbinull(sp,sl,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
