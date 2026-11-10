@@ -32,11 +32,9 @@ struct uiconv_head {
 typedef UICONV		uiconv ;
 
 EXTERNC_begin
-
 extern int	uiconv_open(uiconv *,cchar *,cchar *) noex ;
 extern int	uiconv_trans(uiconv *,cchar **,int *,char **,int *) noex ;
 extern int	uiconv_close(uiconv *) noex ;
-
 EXTERNC_end
 
 
