@@ -38,7 +38,6 @@ extern int cfdecmfull	(cchar *,int,ulonglong *)	noex ;
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfdecmf(cchar *sp,int sl,int *rp = nullptr)		noex {
 	return cfdecmfi(sp,sl,rp) ;
 } /* end */
@@ -48,7 +47,9 @@ inline int cfdecmf(cchar *sp,int sl,long *rp = nullptr)		noex {
 inline int cfdecmf(cchar *sp,int sl,longlong *rp = nullptr)	noex {
 	return cfdecmfll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfdecmf(cchar *sp,int sl,uint *rp = nullptr)		noex {
 	return cfdecmfui(sp,sl,rp) ;
 } /* end */
@@ -58,7 +59,6 @@ inline int cfdecmf(cchar *sp,int sl,ulong *rp = nullptr)	noex {
 inline int cfdecmf(cchar *sp,int sl,ulonglong *rp = nullptr)	noex {
 	return cfdecmfull(sp,sl,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
