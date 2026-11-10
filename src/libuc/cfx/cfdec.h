@@ -54,7 +54,6 @@ local  inline int cfdecll(cchar *sp,int sl,longlong *rp)	noex {
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfdec(cchar *sp,int sl,int *rp)		noex {
 	return cfdeci(sp,sl,rp) ;
 } /* end */
@@ -64,7 +63,9 @@ inline int cfdec(cchar *sp,int sl,long *rp)		noex {
 inline int cfdec(cchar *sp,int sl,longlong *rp)		noex {
 	return cfdecll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfdec(cchar *sp,int sl,uint *rp)		noex {
 	return cfdecui(sp,sl,rp) ;
 } /* end */
@@ -74,7 +75,6 @@ inline int cfdec(cchar *sp,int sl,ulong *rp)		noex {
 inline int cfdec(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfdecull(sp,sl,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
