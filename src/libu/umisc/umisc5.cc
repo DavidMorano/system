@@ -75,16 +75,20 @@ int snaddx(char *rbuf,int rlen,int rl,int n,...) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf) ylikely {
-	    va_begin(ap,n) ;
-	    rs = SR_OK ;
-	    for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
-		ccharp sp = (ccharp) va_arg(ap,ccharp) ;
-		if (! sp) break ;
-		rs = snadd(rbuf,rlen,rl,sp) ;
-		len += rs ;
-		rl += rs ;
-	    } /* end for */
-	    va_end(ap) ;
+	    rs = SR_INVALID ;
+	    if ((rlen >= 0) && (rl >= 0)) ylikely {
+	        cint rls = rl ;
+	        va_begin(ap,n) ;
+	        rs = SR_OK ;
+	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
+		    ccharp sp = (ccharp) va_arg(ap,ccharp) ;
+		    if (! sp) break ;
+		    rs = snadd(rbuf,rlen,rl,sp) ;
+		    rl += rs ;
+	        } /* end for */
+	        len = (rl - rls) ;
+	        va_end(ap) ;
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (snaddx) */
