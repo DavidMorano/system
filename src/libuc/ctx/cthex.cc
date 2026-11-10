@@ -61,7 +61,7 @@ import cvtdig ;
 
 /* local variables */
 
-constexpr int	b = OURBASE ;
+constexpr int		b = OURBASE ;
 
 
 /* exported variables */
