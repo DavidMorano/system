@@ -102,7 +102,7 @@ namespace libu {
 	if (dbuf && vdp) ylikely {
 	    ccharp	sp = ccharp(vdp) ;
 	    rs = SR_INVALID ;
-	    dbuf[0] = '\0' ;
+	    dbuf[0] = eos ;
 	    if (dlen >= 0) ylikely {
 		cint	m = (b16 - 1) ;
 	        cint	sl = (vdl < 0) ? lenstr(sp) : vdl ;
@@ -113,7 +113,7 @@ namespace libu {
 	            dbuf[j++] = getdig((ch>>0)& m) ;
 	            dlen -= twodig ;
 	        } /* end for */
-	        dbuf[j] = '\0' ;
+	        dbuf[j] = eos ;
 		if (j < (sl * twodig)) rs = SR_OVERFLOW ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
