@@ -69,21 +69,23 @@ namespace uipc {
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
 extern int u_shmget(key_t,size_t,int) noex ;
 extern int u_shmat(int,void *,int,void **) noex ;
 extern int u_shmctl(int,int,SHMIDDS *) noex ;
 extern int u_shmdt(void *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int u_msgget(key_t,int) noex ;
 extern int u_msgsnd(int,void *,int,int) noex ;
 extern int u_msgrcv(int,void *,int,long,int) noex ;
 extern int u_msgctl(int,int,MSQIDDS *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int u_semget(key_t,int,int) noex ;
 extern int u_semop(int,SEMBUF *,size_t) noex ;
 extern int u_semctl(int,int,int,...) noex ;
-
 EXTERNC_end
 
 
