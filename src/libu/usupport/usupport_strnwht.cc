@@ -48,7 +48,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>		/* CSTD |CHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -118,7 +117,7 @@ namespace libu {
 	if (sp && ss) ylikely {
     	    chrset	sset(ss) ;
 	    rsp = strnwhtbrk(sp,sl,&sset) ;
-	}
+	} /* end */
 	return rsp ;
     } /* end subroutine (strnwhtbrk) */
     char *strnwhtchr(cchar *sp,int sl,int sch) noex {
@@ -129,7 +128,7 @@ namespace libu {
 	        rsp = strnwhtbrk(sp,sl,&sset) ;
 	    } else {
 		rsp = strnwht(sp,sl) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rsp ;
     } /* end subroutine (strnwhtchr) */
@@ -159,7 +158,7 @@ namespace libu {
     } /* end subroutine (strnwhtbrk) */
     char *strnwhtchr(cchar *sp,int sl,const chrset *setp) noex {
 	return strnwhtbrk(sp,sl,setp) ;
-    }
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
