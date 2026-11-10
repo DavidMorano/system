@@ -50,7 +50,6 @@
 
 /* internal API - begin */
 #ifdef	__cplusplus
-
 namespace libu {
     extern int ufstype(int fd,char *rbuf,int rlen) noex ;
     extern int ulockf(int fd,int cmd,off_t sz) noex ;
@@ -68,7 +67,6 @@ namespace libu {
     extern int utermattrget(int,TERMIOS *) noex ;
     extern int utermattrset(int,int,const TERMIOS *) noex ;
 } /* end namespace (libu) */
-
 #endif /* __cplusplus */
 /* internal API - end */
 
