@@ -38,7 +38,6 @@ extern int cfnumull	(cchar *,int,ulonglong *)	noex ;
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfnum(cchar *sp,int sl,int *rp)		noex {
 	return cfnumi(sp,sl,rp) ;
 } /* end */
@@ -48,7 +47,9 @@ inline int cfnum(cchar *sp,int sl,long *rp)		noex {
 inline int cfnum(cchar *sp,int sl,longlong *rp)		noex {
 	return cfnumll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfnum(cchar *sp,int sl,uint *rp)		noex {
 	return cfnumui(sp,sl,rp) ;
 } /* end */
@@ -58,7 +59,6 @@ inline int cfnum(cchar *sp,int sl,ulong *rp)		noex {
 inline int cfnum(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfnumull(sp,sl,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
