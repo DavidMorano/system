@@ -46,9 +46,7 @@ struct mapex_map {
 #define	EXTERN_MAXEX
 
 EXTERNC_begin
-
 extern int	mapex(const mapex_map *,int) noex ;
-
 EXTERNC_end
 
 #endif /* EXTERN_MAXPEX */
