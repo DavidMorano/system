@@ -26,7 +26,8 @@
 	subroutines.
 
 	Synopsis:
-	int sncpy{x}(char *dp,int dl,char *s1, ...) noex
+    	int sncpy	(char *dp,int dl,cchar *s1) noex
+	int sncpy{x}	(char *dp,int dl,cchar *s1, ...) noex
 
 	Arguments:
 	dp		destination buffer pointer
