@@ -27,12 +27,10 @@
 
 
 EXTERNC_begin
-
 extern bool	iswhite(int) noex attrpure ;
 extern bool	isbinar(int) noex attrconst ;
 extern bool	isoctal(int) noex attrconst ;
 extern bool	isdigex(int) noex attrpure ;
-
 EXTERNC_end
 
 
