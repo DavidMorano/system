@@ -62,7 +62,6 @@
 
 
 EXTERNC_begin
-
 extern int u_brk(cvoid *,void **) noex ;
 extern int u_sbrk(int,void **) noex ;
 extern int u_mmapbegin(void *,size_t,int,int,int,off_t,void *) noex ;
@@ -78,15 +77,18 @@ extern int u_msync(void *,size_t,int) noex ;
 extern int u_mcntl(void *,size_t,int,void *,int,int) noex ;
 extern int u_minherit(void *,size_t,int) noex ;
 extern int u_mlockp(int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int u_mmapbeg(void *,size_t,int,int,int,off_t,void *) noex ;
 extern int u_mlockallbeg(int) noex ;
+EXTERNC_end
 
 /* legacy */
+EXTERNC_begin
 extern int u_mapfile(void *,size_t,int,int,int,off_t,void *) noex ;
 extern int u_mmap(void *,size_t,int,int,int,off_t,void *) noex ;
 extern int u_munmap(void *,size_t) noex ;
-
 EXTERNC_end
 
 
