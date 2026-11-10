@@ -113,6 +113,9 @@ namespace libu {
 	} /* end if (non-null) */
     	return si ;
     } /* end subroutine (siwhtchr) */
+} /* end namespace (libu) */
+
+namespace libu {
     int siwhtbrk(cchar *sp,int sl,cchar *ss) noex {
     	int		si = -1 ;
 	if (sp) ylikely {
