@@ -37,7 +37,6 @@
 #include	<snxti.h>
 
 EXTERNC_begin
-
 extern int	ut_open(cchar *,int,UTINFO *) noex ;
 extern int	ut_bind(int,UTBIND *,UTBIND *) noex ;
 extern int	ut_listen(int,UTCALL *) noex ;
@@ -46,10 +45,11 @@ extern int	ut_accept(int,int,const UTCALL *) noex ;
 extern int	ut_look(int) noex ;
 extern int	ut_sync(int) noex ;
 extern int	ut_close(int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	ut_alloc(int,int,int,void **) noex ;
 extern int	ut_free(void *,int) noex ;
-
 EXTERNC_end
 
 
