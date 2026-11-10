@@ -54,37 +54,42 @@
 
 
 EXTERNC_begin
+extern char *sitostr	(sint,		char *) noex ;
+extern char *sltostr	(slong,		char *) noex ;
+extern char *slltostr	(slonglong,	char *) noex ;
+EXTERNC_end
 
-extern char *sitostr(sint,		char *) noex ;
-extern char *sltostr(slong,		char *) noex ;
-extern char *slltostr(slonglong,	char *) noex ;
+EXTERNC_begin
+extern char *uitostr	(uint,		char *) noex ;
+extern char *ultostr	(ulong,		char *) noex ;
+extern char *ulltostr	(ulonglong,	char *) noex ;
+EXTERNC_end
 
-extern char *uitostr(uint,		char *) noex ;
-extern char *ultostr(ulong,		char *) noex ;
-extern char *ulltostr(ulonglong,	char *) noex ;
-
-local inline char *itostr(int v,char *endp) noex {
+EXTERNC_begin
+local inline char *itostr	(int v,		char *endp) noex {
     	return sitostr(v,endp) ;
 } /* end subroutine */
-local inline char *ltostr(long v,char *endp) noex {
+local inline char *ltostr	(long v,	char *endp) noex {
     	return sltostr(v,endp) ;
 } /* end subroutine */
-local inline char *lltostr(longlong v,char *endp) noex {
+local inline char *lltostr	(longlong v,	char *endp) noex {
     	return slltostr(v,endp) ;
 } /* end subroutine */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 extern char *sitostr(sint,		char *,int) noex ;
 extern char *sltostr(slong,		char *,int) noex ;
 extern char *slltostr(slonglong,	char *,int) noex ;
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 extern char *uitostr(uint,		char *,int) noex ;
 extern char *ultostr(ulong,		char *,int) noex ;
 extern char *ulltostr(ulonglong,	char *,int) noex ;
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline char *xtostr(sint sv,		char *endp,int b = 10) noex {
     return sitostr(sv,endp,b) ;
 } /* end */
@@ -94,7 +99,9 @@ inline char *xtostr(slong sv,		char *endp,int b = 10) noex {
 inline char *xtostr(slonglong sv,	char *endp,int b = 10) noex {
     return slltostr(sv,endp,b) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline char *xtostr(uint uv,		char *endp,int b = 10) noex {
     return uitostr(uv,endp,b) ;
 } /* end */
@@ -104,7 +111,6 @@ inline char *xtostr(ulong uv,		char *endp,int b = 10) noex {
 inline char *xtostr(ulonglong uv,	char *endp,int b = 10) noex {
     return ulltostr(uv,endp,b) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
