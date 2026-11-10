@@ -54,12 +54,10 @@ typedef long		sysvmsgtype ;
 #endif
 
 EXTERNC_begin
-
 extern int u_msgget(key_t,int) noex ;
 extern int u_msgctl(int,int,MSQIDDS *) noex ;
 extern int u_msgrcv(int,void *,int,sysvmsgtype,int) noex ;
 extern int u_msgsnd(int,void *,int,int) noex ;
-
 EXTERNC_end
 
 
