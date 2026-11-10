@@ -61,14 +61,19 @@ OBJ14_USYS= usys_environ.o usys_onc.o usys_getnetname.o
 OBJ15_USYS= usys_getauid.o usys_atox.o usys_strtox.o
 
 OBJ16_USYS= usys_getprocuid.o usys_sysctl.o
-OBJ17_USYS= usys_in4in6addr.o
-OBJ18_USYS= usys_strw.o usys_snx.o
+OBJ17_USYS= usys_snwcpy.o usys_snx.o 
+OBJ18_USYS= usys_strw.o usys_in4in6addr.o
 OBJ19_USYS= usys_execname.o usys_termios.o
 
 OBJ20_USYS= usys_strxbrk.o 
 OBJ21_USYS= usys_stpcpy.o usys_stpncpy.o
 OBJ22_USYS= usys_strbcpy.o
 OBJ23_USYS= usys_lenstr.o usys_hasx.o
+
+OBJ24_USYS= usys_cmp.o
+OBJ25_USYS=
+OBJ26_USYS=
+OBJ27_USYS=
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
 OBJB= obj03_usys.o obj04_usys.o obj05_usys.o
@@ -78,11 +83,13 @@ OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
 OBJG= obj18_usys.o obj19_usys.o obj20_usys.o
 OBJH= obj21_usys.o obj22_usys.o obj23_usys.o
+OBJI= obj24_usys.o 
 
 OBJ_J0= obja.o objb.o objc.o objd.o 
 OBJ_J1= obje.o objf.o objg.o objh.o
+OBJ_J2= obji.o
 
-OBJ_USYS = obj_j0.o obj_j1.o
+OBJ_USYS = obj_j0.o obj_j1.o obj_j2.o
 
 
 INCDIRS= -I inc -I /usr/local/include
@@ -224,6 +231,19 @@ obj23_usys.o:		$(OBJ23_USYS)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj24_usys.o:		$(OBJ24_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj25_usys.o:		$(OBJ25_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj26_usys.o:		$(OBJ26_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj27_usys.o:		$(OBJ27_USYS)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -248,11 +268,17 @@ objg.o:			$(OBJG)
 objh.o:			$(OBJH)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obji.o:			$(OBJI)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obj_j0.o:		$(OBJ_J0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 obj_j1.o:		$(OBJ_J1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj_j2.o:		$(OBJ_J2)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -276,6 +302,7 @@ usys_pathpid.o:		usys_pathpid.cc		usys_pathpid.h		$(INCS)
 usys_umaxmsglen.o:	usys_umaxmsglen.cc	usys_umaxmsglen.h	$(INCS)
 usys_plock.o:		usys_plock.cc		usys_plock.h		$(INCS)
 usys_execname.o:	usys_execname.cc	usys_execname.hh	$(INCS)
+usys_snwcpy.o:		usys_snwcpy.cc		usys_snwcpy.hh		$(INCS)
 usys_snx.o:		usys_snx.cc		usys_snx.hh		$(INCS)
 usys_strw.o:		usys_strbcpy.cc		usys_strbcpy.hh		$(INCS)
 usys_strw.o:		usys_strw.cc		usys_strw.hh		$(INCS)
@@ -318,6 +345,7 @@ usys_in4in6addr.o:	usys_in4in6addr.cc	usys_in4in6addr.h	$(INCS)
 usys_timezone.o:	usys_timezone.cc	usys_timezone.h		$(INCS)
 usys_sysctl.o:		usys_sysctl.cc		usys_sysctl.h		$(INCS)
 usys_termios.o:		usys_termios.cc		usys_termios.h		$(INCS)
+usys_cmp.o:		usys_cmp.cc		usys_cmp.h		$(INCS)
 
 # special
 usysargz.o:		usysargz.cc		usysargz.hh		$(INCS)
