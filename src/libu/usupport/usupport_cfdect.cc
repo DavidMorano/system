@@ -117,7 +117,7 @@ local int	cfloop(cchar *,int,int *) noex ;
 /* local variables */
 
 constexpr chvalid	tabval ;
-cint		oneday		= 24 * 60 * 60 ;
+const int		oneday		= 24 * 60 * 60 ;
 const bool		f_debug		= CF_DEBUG ;
 
 
@@ -150,7 +150,7 @@ namespace libu {
 	} /* end if (non-null) */
 	if (rp) {
 	    *rp = ((rs >= 0) ? res : 0) ;
-	}
+	} /* end */
 	if (res < 0) res = 0 ;
 	return (rs >= 0) ? res : rs ;
     } /* end subroutine (cfdecti) */
@@ -201,7 +201,7 @@ template<typename T> local int convert(cchar *sp,int sl,int mc,T *rp) noex {
 		        rs = intsat(res) ;
 		    } else {
 			rs = SR_RANGE ;
-		    }
+		    } /* end */
 	        } /* end if (cfdeci) */
 	    } /* end if (ok) */
 	} else {
