@@ -101,16 +101,16 @@ namespace {
 	uint		mnooverr:1 ;	/* mode: return-error */
     } ;
     struct subinfo {
-	char		*ubuf ;		/* user buffer */
+	charp		ubuf ;		/* user buffer */
 	int		ulen ;		/* buffer length */
 	int		len ;		/* current usage count */
 	int		mode ;		/* format mode */
 	SUBINFO_FL	f ;		/* flags */
-	int start(char *,int,int) noex ;
-	int finish() noex ;
-	int addstrw(cchar *,int) noex ;
-	int addchr(int) noex ;
-	int addfloat(int,double,int,int,int,char *) noex ;
+	int start	(char *,int,int) noex ;
+	int finish	() noex ;
+	int addstrw	(cchar *,int) noex ;
+	int addchr	(int) noex ;
+	int addfloat	(int,double,int,int,int,char *) noex ;
     } ; /* end struct (subinfo) */
 } /* end namespace */
 
@@ -160,7 +160,7 @@ int subinfo::start(char *bufp,int bufl,int am) noex {
 
 int subinfo::finish() noex {
 	int		rs = SR_OK ;
-	ubuf[len] = '\0' ;
+	ubuf[len] = eos ;
 	if (f.ov) {
 	    if (! f.mnooverr) rs = SR_OVERFLOW ;
 	}
@@ -227,7 +227,7 @@ int subinfo::addfloat(int fcode,double v,
 	        } else {
 	            j -= 1 ;
 	            outlen -= 1 ;
-	        }
+	        } /* end */
 	    } /* end while */
 	    /* output any needed zeros after the decimal point */
 	    outlen = -dpp ;
@@ -250,22 +250,22 @@ int subinfo::addfloat(int fcode,double v,
 	        stage[--i] = buf[--j] ;
 	        remlen -= 1 ;
 	        outlen -= 1 ;
-	    }
+	    } /* end while */
 	    /* output any leading zero digit if needed */
 	    if ((! f_leading) && (remlen > 0)) {
 	        stage[--i] = '0' ;
 	        remlen -= 1 ;
-	    }
+	    } /* end */
 	    /* output any leading fill zeros if called for */
 	    while ((! f_varwidth) && (fill == 0) && (remlen > 1)) {
 	        stage[--i] = '0' ;
 	        remlen -= 1 ;
-	    }
+	    } /* end while */
 	    /* output any sign if called for */
 	    if (f_sign && (remlen > 0)) {
 	        stage[--i] = '-' ;
 	        remlen -= 1 ;
-	    }
+	    } /* end */
 	    /* output any leading fill zeros if called for */
 	    while ((! f_varwidth) && (fill == 0) && (remlen > 0)) {
 	        stage[--i] = '0' ;
@@ -290,7 +290,7 @@ int subinfo::addchr(int ch) noex {
 	if (ch != 0) {
 	    buf[0] = charconv(ch) ;
 	    rs = addstrw(buf,1) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (subinfo::addchr) */
 
