@@ -50,7 +50,6 @@ local inline int cfhexll(cchar *sp,int sl,longlong *rp)		noex {
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfhex(cchar *sp,int sl,int *rp)		noex {
 	return cfhexi(sp,sl,rp) ;
 } /* end */
@@ -60,7 +59,9 @@ inline int cfhex(cchar *sp,int sl,long *rp)		noex {
 inline int cfhex(cchar *sp,int sl,longlong *rp)		noex {
 	return cfhexll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfhex(cchar *sp,int sl,uint *rp)		noex {
 	return cfhexui(sp,sl,rp) ;
 } /* end */
@@ -70,7 +71,6 @@ inline int cfhex(cchar *sp,int sl,ulong *rp)		noex {
 inline int cfhex(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfhexull(sp,sl,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
