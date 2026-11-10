@@ -38,7 +38,6 @@ extern int cfcharsull	(cchar *,int,ulonglong *)	noex ;
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfchars(cchar *sp,int sl,int *rp)		noex {
 	return cfcharsi(sp,sl,rp) ;
 } /* end */
@@ -48,7 +47,9 @@ inline int cfchars(cchar *sp,int sl,long *rp)		noex {
 inline int cfchars(cchar *sp,int sl,longlong *rp)	noex {
 	return cfcharsll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfchars(cchar *sp,int sl,uint *rp)		noex {
 	return cfcharsui(sp,sl,rp) ;
 } /* end */
@@ -58,7 +59,6 @@ inline int cfchars(cchar *sp,int sl,ulong *rp)		noex {
 inline int cfchars(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfcharsull(sp,sl,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
