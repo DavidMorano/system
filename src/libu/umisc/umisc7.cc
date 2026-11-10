@@ -63,9 +63,9 @@ module umisc ;
 
 namespace {
     struct adder {
-	char	*rbuf ;
-	int	rlen ;
-	int	rl ;
+	charp		rbuf ;
+	int		rlen ;
+	int		rl ;
 	adder(charp ªrb,int ªrl,int ªl) noex {
 	    rbuf	= ªrb ;
 	    rlen	= ªrl ;
@@ -118,16 +118,14 @@ int adder::operator () (cchar *sp,int sl) noex {
 
 int adder::aslash() noex {
 	int		rs = SR_OK ;
-    	int		len = 0 ;
 	if ((rl > 0) && (rbuf[rl - 1] != '/')) {
 	    rs = SR_OVERFLOW ;
-	    if (rl < rlen) {
-		rs = SR_OK ;
+	    if (rl < rlen) ylikely {
 	        rbuf[rl++] = '/' ;
-	        len += 1 ;
+		rs = 1 ;		/* <- return-value */
 	    } /* end if (good) */
 	} /* end if (needed) */
-	return (rs >= 0) ? len : rs ;
+	return rs ;
 } /* end method (adder::operator) */
 
 int adder::astr(cchar *sp,int sl) noex {
