@@ -95,7 +95,7 @@ namespace usysauxinfo {
 		    rs = darwin_usysctl(rbuf,rlen,name) ;
 	        } else if (vp) {
 		    rs = sncpy(rbuf,rlen,vp) ;
-	        }
+	        } /* end */
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return rs ;
