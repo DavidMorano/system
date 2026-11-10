@@ -326,25 +326,25 @@ namespace {
 
 namespace {
     struct strer {
-	cchar	*startp ;
-	cchar	*sp ;
-	char	**endpp ;
-	int	base ;
-	int	verr = 0 ;
-	int	cutlim ;
-	bool	fneg{} ;
+	cchar		*startp ;
+	cchar		*sp ;
+	char		**endpp ;
+	int		base ;
+	int		verr = 0 ;
+	int		cutlim ;
+	bool		fneg{} ;
 	strer(cc *s,char **e,int b) noex : startp(s), endpp(e), base(b) { 
 	    sp = startp ;
 	} ; /* end ctor */
-	void suber() noex ;
-	void signer() noex {
+	void suber	() noex ;
+	void signer	() noex {
 	    if (cint si = getsign(sp,-1,&fneg) ; si > 0) {
 		sp += si ;
 	    } /* end if (getsign) */
 	} ; /* end method */
-	void baser() noex ;
-	void cooker() noex ;
-	void ender() noex {
+	void baser	() noex ;
+	void cooker	() noex ;
+	void ender	() noex {
             if (endpp) {
                 *endpp = charp(verr ? sp : startp) ;
             } /* end */
@@ -391,7 +391,7 @@ local inline void strtox(cchar *,char **,int,T *rp) noex {
 template<>
 inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 	cint		nb = nbits<long> ;
-	int		res = 0 ;
+	int		res = 0 ; /* return-value */
 	errno_t		ec = EOK ;
 	bool		fneg ;
 	if (sp) ylikely {
@@ -430,7 +430,7 @@ inline void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 
 template<>
 inline void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
-	uint		res = 0 ;
+	uint		res = 0 ; /* return-value */
 	errno_t		ec = EOK ;
 	if (sp) ylikely {
 	    ulong	uv = strtoul(sp,epp,b) ;
@@ -503,7 +503,7 @@ constexpr bool		f_debug = CF_DEBUG ;
 
 /* signed-int */
 sint		strtoxsi(cchar *sp,char **epp,int b)	noex {
-	sint		res{} ;
+	sint		res{} ; /* return-value */
 	if (sp) {
 	    strtox(sp,epp,b,&res) ;
 	} else {
@@ -514,7 +514,7 @@ sint		strtoxsi(cchar *sp,char **epp,int b)	noex {
 
 /* signed-long */
 slong		strtoxsl(cchar *sp,char **epp,int b)	noex {
-    	slong		res{} ;
+    	slong		res{} ; /* return-value */
 	if (sp) {
 	    res = strtol(sp,epp,b) ;
 	} else {
@@ -531,7 +531,7 @@ slonglong	strtoxsll(cchar *sp,char **epp,int b)	noex {
 
 /* unsigned-int */
 uint		strtoxui(cchar *sp,char **epp,int b)	noex {
-	uint		ures{} ;
+	uint		ures{} ; /* return-value */
 	if (sp) {
 	    strtox(sp,epp,b,&ures) ;
 	} else {
@@ -542,7 +542,7 @@ uint		strtoxui(cchar *sp,char **epp,int b)	noex {
 
 /* unsigned-long */
 ulong		strtoxul(cchar *sp,char **epp,int b)	noex {
-    	ulong		ures{} ;
+    	ulong		ures{} ; /* return-value */
 	if (sp) {
 	    ures = strtoul(sp,epp,b) ;
 	} else {
