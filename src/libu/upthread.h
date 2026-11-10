@@ -37,14 +37,12 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
+EXTERNC_begin
 typedef void (*void_f)() noex ;
-#endif
-
 EXTERNC_end
+#endif /* TYPEDEF_VOIDF */
 
 
 #endif /* UPTHREAD_INCLUDE */
