@@ -28,16 +28,21 @@
 
 
 EXTERNC_begin
-
 extern sint		strtoxsi(cchar *,char **,int) noex ;	/* 32-bits */
 extern uint		strtoxui(cchar *,char **,int) noex ;	/* 32-bits */
+EXTERNC_end
 
+EXTERNC_begin
 extern slong		strtoxsl(cchar *,char **,int) noex ;	/* 64-bits */
 extern ulong		strtoxul(cchar *,char **,int) noex ;	/* 64-bits */
+EXTERNC_end
 
+EXTERNC_begin
 extern slonglong	strtoxsll(cchar *,char **,int) noex ;	/* 128-bits */
 extern ulonglong	strtoxull(cchar *,char **,int) noex ;	/* 128-bits */
+EXTERNC_end
 
+EXTERNC_begin
 local inline int	strtoxi	(cchar *sp,char **endpp,int b) noex {
     	return strtoxsi(sp,endpp,b) ;
 } /* end subroutine */
@@ -47,7 +52,6 @@ local inline long	strtoxl	(cchar *sp,char **endpp,int b) noex {
 local inline longlong	strtoxll(cchar *sp,char **endpp,int b) noex {
     	return strtoxsll(sp,endpp,b) ;
 } /* end subroutine */
-
 EXTERNC_end
 
 #ifdef	COMMENT /* this is a 256-bit integer; but it does not yet exist */
