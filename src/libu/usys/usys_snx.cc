@@ -29,7 +29,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getprogname(3c)| |execname(3c) */
-#include	<cstring>		/* CSTD |strncpy(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -59,28 +58,6 @@ namespace usys {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
     } /* end subroutine (sncpy1) */
-} /* end namespace (usys) */
-
-namespace usys {
-    int snwcpy(char *dp,int dl,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (dp && sp) ylikely {
-	    if (dl >= 0) {
-	        if (sl >= 0) {
-	            if (sl > dl) {
-	                rs = sncpy1(dp,dl,sp) ;
-	            } else {
-	                rs = intconv(strwcpy(dp,sp,sl) - dp) ;
-		    } /* end */
-	        } else {
-	            rs = sncpy1(dp,dl,sp) ;
-	        } /* end */
-	    } else {
-	        rs = intconv(strwcpy(dp,sp,sl) - dp) ;
-	    } /* end */
-	} /* end if (non-null) */
-	return rs ;
-    } /* end subroutine (snwcpy) */
 } /* end namespace (usys) */
 
 
