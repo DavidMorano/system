@@ -28,19 +28,18 @@
 
 
 EXTERNC_begin
-
 extern int	ffbsi	(int)		noex ;
 extern int	ffbsl	(long)		noex ;
 extern int	ffbsll	(longlong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	ffbsui	(uint)		noex ;
 extern int	ffbsul	(ulong)		noex ;
 extern int	ffbsull	(ulonglong)	noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int ffbs(int v)			noex {
 	return ffbsi(v) ;
 } /* end */
@@ -50,7 +49,9 @@ inline int ffbs(long v)			noex {
 inline int ffbs(longlong v)		noex {
 	return ffbsll(v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int ffbs(uint uv)		noex {
 	return ffbsui(uv) ;
 } /* end */
@@ -60,7 +61,6 @@ inline int ffbs(ulong uv)		noex {
 inline int ffbs(ulonglong uv)		noex {
 	return ffbsull(uv) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
