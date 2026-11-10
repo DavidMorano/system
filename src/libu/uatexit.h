@@ -29,9 +29,7 @@ EXTERNC_end
 
 
 EXTERNC_begin
-
 extern int u_atexit(atexit_f f) noex ;
-
 EXTERNC_end
 
 
