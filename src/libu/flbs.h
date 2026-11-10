@@ -50,15 +50,15 @@
 
 
 EXTERNC_begin
-
 extern int	flbsi	(int)		noex ;
 extern int	flbsl	(long)		noex ;
 extern int	flbsll	(longlong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int	flbsui	(uint)		noex ;
 extern int	flbsul	(ulong)		noex ;
 extern int	flbsull	(ulonglong)	noex ;
-
 EXTERNC_end
 
 
