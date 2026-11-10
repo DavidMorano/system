@@ -208,7 +208,6 @@ constexpr int		reqs[] = {
 } ; /* end array */
 
 constexpr cchar		defmachine[] = "Intel(R) Core(TM) i7" ;
-
 constexpr cbool		f_sunos		= F_SUNOS ;
 constexpr cbool		f_darwin	= F_DARWIN ;
 constexpr cbool		f_linux		= F_LINUX ;
