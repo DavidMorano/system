@@ -38,7 +38,6 @@ extern int cfa26ull	(cchar *,int,ulonglong *)	noex ;
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfa26(cchar *sp,int sl,int *rp)		noex {
 	return cfa26i(sp,sl,rp) ;
 } /* end */
@@ -48,7 +47,9 @@ inline int cfa26(cchar *sp,int sl,long *rp)		noex {
 inline int cfa26(cchar *sp,int sl,longlong *rp)		noex {
 	return cfa26ll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfa26(cchar *sp,int sl,uint *rp)		noex {
 	return cfa26ui(sp,sl,rp) ;
 } /* end */
@@ -58,7 +59,6 @@ inline int cfa26(cchar *sp,int sl,ulong *rp)		noex {
 inline int cfa26(cchar *sp,int sl,ulonglong *rp) 	noex {
 	return cfa26ull(sp,sl,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
