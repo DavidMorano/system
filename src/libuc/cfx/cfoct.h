@@ -50,7 +50,6 @@ local inline int cfoctll(cchar *sp,int sl,longlong *rp)		noex {
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfoct(cchar *sp,int sl,int *rp)		noex {
 	return cfocti(sp,sl,rp) ;
 } /* end */
@@ -60,7 +59,9 @@ inline int cfoct(cchar *sp,int sl,long *rp)		noex {
 inline int cfoct(cchar *sp,int sl,longlong *rp)		noex {
 	return cfoctll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfoct(cchar *sp,int sl,uint *rp)		noex {
 	return cfoctui(sp,sl,rp) ;
 } /* end */
@@ -70,7 +71,6 @@ inline int cfoct(cchar *sp,int sl,ulong *rp)		noex {
 inline int cfoct(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfoctull(sp,sl,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
