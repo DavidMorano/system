@@ -50,8 +50,8 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"usupport_snwcpy.hh"
 #include	"usupport_sncpyx.hh"
+#include	"usupport_snwcpy.hh"
 
 
 /* local defines */
