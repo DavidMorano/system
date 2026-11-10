@@ -103,24 +103,22 @@ enum filetypes {
 
 
 EXTERNC_begin
-
 local inline filetypes filetype(mode_t m) noex {
 	cushort	uv = ushort(m) ;
 	return filetypes((uv & S_IFMT) >> 12) ;
 } /* end subroutine (filetype) */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 struct filetyper {
     	cchar	*name[filetype_overlast + 1] ;
 	consteval void mkname() noex ;
 	consteval filetyper() noex ;
 } ; /* end struct */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 extern const filetyper	filetype_data ;
-
 #endif /* __cplusplus */
 
 
