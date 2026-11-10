@@ -5,7 +5,7 @@
 /* convert a long (signed or unsigned) integer to its decimal string */
 /* version %I% last-modified %G% */
 
-#define	CF_XTOSTR	1	/* use |xtostr(3u)| subroutine */
+#define	CF_XTOSTR	0	/* use |xtostr(3u)| subroutine */
 
 /* revision history:
 
@@ -147,7 +147,7 @@ local char *local_xtostrux(UT unum,char *endptr) noex {
 	    } /* end for */
 	} else {
 	    *--bp = '0' ;
-	}
+	} /* end */
 	return bp ;
 } /* end subroutine (local_xtostrux) */
 
@@ -159,8 +159,8 @@ char *convdecux(UT unum,char *endptr) noex {
 	    if_constexpr (f_xtostr) {
 	        bp = xtostr(unum,endptr) ;
 	    } else {
-	        bp = local_xtostr(unum,endptr) ;
-	    }
+	        bp = local_xtostrux(unum,endptr) ;
+	    } /* end */
 	} /* end if (non-null) */
 	return bp ;
 } /* end subroutine (convdecux) */
