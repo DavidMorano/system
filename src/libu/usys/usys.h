@@ -53,6 +53,7 @@
 #include	<usys_onc.hh>
 #include	<usys_pathpid.h>
 #include	<usys_plock.h>		/* defines |usys_plock()| */
+#include	<usys_snwcpy.hh>
 #include	<usys_snx.hh>
 #include	<usys_strbcpy.hh>
 #include	<usys_strw.hh>
@@ -65,6 +66,7 @@
 /* missing operating system calls or facilities */
 #include	<usys_atox.h>
 #include	<usys_eaccess.h>
+#include	<usys_cmp.h>
 #include	<usys_environ.hh>
 #include	<usys_getauid.h>
 #include	<usys_getexecname.h>
