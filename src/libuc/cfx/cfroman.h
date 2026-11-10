@@ -38,7 +38,6 @@ extern int cfromanull	(cchar *,int,ulonglong *)	noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int cfroman(cchar *sp,int sl,sint *rp)		noex {
 	return cfromansi(sp,sl,rp) ;
 } /* end */
@@ -48,6 +47,9 @@ inline int cfroman(cchar *sp,int sl,slong *rp)		noex {
 inline int cfroman(cchar *sp,int sl,slonglong *rp)	noex {
 	return cfromansll(sp,sl,rp) ;
 } /* end */
+#endif /* __cplusplus */
+
+#if	__cplusplus
 inline int cfroman(cchar *sp,int sl,uint *rp)		noex {
 	return cfromanui(sp,sl,rp) ;
 } /* end */
@@ -57,7 +59,6 @@ inline int cfroman(cchar *sp,int sl,ulong *rp)		noex {
 inline int cfroman(cchar *sp,int sl,ulonglong *rp)	noex {
 	return cfromanull(sp,sl,rp) ; /* end */
 } /* end */
-
 #endif /* __cplusplus */
 
 
