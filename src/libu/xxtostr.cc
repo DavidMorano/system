@@ -130,7 +130,7 @@
 
 #pragma		GCC dependency		"mod/digtab.ccm"
 
-import digtab ;				/* |getdig(3u)| + |digtab_enc(3u)| */
+import digtab ;				/* |digtab_enc(3u)| */
 
 /* local defines */
 
