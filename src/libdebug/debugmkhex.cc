@@ -70,7 +70,7 @@ using libdebug::checkbasebounds ;	/* subroutine */
 
 struct debug_oflags {
 	int		m ;
-	char		*s ;
+	charp		s ;
 } ; /* end struct (debug_oflags) */
 
 
@@ -102,7 +102,7 @@ int mkhexstr(char *dbuf,int dlen,cvoid *vp,int vl) noex {
 	        dbuf[j++] = getdig((ch>>0)&15) ;
 	        dlen -= ((i > 0) ? 3 : 2) ;
 	    } /* end for */
-	    dbuf[j] = '\0' ;
+	    dbuf[j] = eos ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? j : rs ;
 } /* end subroutine (mkhexstr) */
@@ -124,16 +124,18 @@ int mkhexblock(cchar *ids,cchar *ap,int n) noex {
 	cint		hexlen = HEXBUFLEN ;
 	char		hexbuf[HEXBUFLEN + 3] ;
 	if (ap) ylikely {
-	    if (ids) {
-	        debugprint(ids,-1) ;
-	    } /* end if */
 	    rs = SR_OK ;
-	    for (int i = 0 ; i < n ; i += 1) {
-	        int sl = mkhexstr(hexbuf,hexlen,ap,4) ;
-	        hexbuf[sl++] = '\n' ;
-	        hexbuf[sl] = '\0' ;
-	        ap += 4 ;
-	        debugprint(hexbuf,-1) ;
+	    if (ids) {
+	        rs = debugprint(ids,-1) ;
+	    } /* end if */
+	    for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+		if ((rs = mkhexstr(hexbuf,hexlen,ap,4)) >= 0) {
+	            int sl = rs ;
+	            hexbuf[sl++]	= eol ;
+	            hexbuf[sl]		= eos ;
+	            ap += 4 ;
+	            rs = debugprint(hexbuf,-1) ;
+		} /* end if (mkhexstr) */
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
