@@ -50,7 +50,6 @@ inline int cfxxxll(cchar *sp,int sl,int b,longlong *rp)	noex {
 EXTERNC_end
 
 #if	__cplusplus
-
 inline int cfxxx(cchar *sp,int sl,int b,sint *rp)	noex {
 	return cfxxxsi(sp,sl,b,rp) ;
 } /* end */
@@ -60,7 +59,9 @@ inline int cfxxx(cchar *sp,int sl,int b,slong *rp)	noex {
 inline int cfxxx(cchar *sp,int sl,int b,slonglong *rp)	noex {
 	return cfxxxsll(sp,sl,b,rp) ;
 } /* end */
+#endif /* __cplusplus */
 
+#if	__cplusplus
 inline int cfxxx(cchar *sp,int sl,int b,uint *rp)	noex {
 	return cfxxxui(sp,sl,b,rp) ;
 } /* end */
@@ -70,7 +71,6 @@ inline int cfxxx(cchar *sp,int sl,int b,ulong *rp)	noex {
 inline int cfxxx(cchar *sp,int sl,int b,ulonglong *rp)	noex {
 	return cfxxxull(sp,sl,b,rp) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
