@@ -26,10 +26,8 @@
 
 
 EXTERNC_begin
-
 extern int u_timezone	(TIMEZONE *) noex ;
 extern int u_tzname	(char *,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
