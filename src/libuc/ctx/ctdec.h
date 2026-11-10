@@ -56,7 +56,6 @@ local inline int ctdecll(char *bp,int bl,longlong v)	noex {
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int ctdec(char *bp,int bl,int v)			noex {
 	return ctdeci(bp,bl,v) ;
 } /* end */
@@ -66,7 +65,9 @@ inline int ctdec(char *bp,int bl,long v)		noex {
 inline int ctdec(char *bp,int bl,longlong v)		noex {
 	return ctdecll(bp,bl,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int ctdec(char *bp,int bl,uint v)		noex {
 	return ctdecui(bp,bl,v) ;
 } /* end */
@@ -76,7 +77,6 @@ inline int ctdec(char *bp,int bl,ulong v)		noex {
 inline int ctdec(char *bp,int bl,ulonglong v)		noex {
 	return ctdecull(bp,bl,v) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
