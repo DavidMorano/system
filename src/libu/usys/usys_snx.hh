@@ -52,13 +52,6 @@ namespace usys {
 } /* end namespace (usys) */
 #endif /* DECLARATION_SNWCPY */
 
-#ifndef	DECLARATION_SNWCPY
-#define	DECLARATION_SNWCPY
-namespace usys {
-    extern int snwcpy(char *,int,cchar *,int = -1) noex ;
-} /* end namespace (usys) */
-#endif /* DECLARATION_SNWCPY */
-
 
 #endif /* __cplusplus */
 #endif /* USYSSNX_INCLUDE */
