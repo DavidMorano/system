@@ -97,7 +97,7 @@ int ctdecpx(int (*ctx)(char *,int,int,UT),char *dp,int dl,int p,T v) noex {
 	    int		rl = dl ;
 	    char	*rp = dp ;
 	    if (v < 0) {
-	        uv = -uv ;
+	        uv = (neg uv) ;
 	        rp += 1 ;
 	        rl -= 1 ;
 	    } /* end */
