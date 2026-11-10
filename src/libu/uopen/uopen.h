@@ -82,16 +82,16 @@ extern int uopen_fini() noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 namespace libu {
     extern sysret_t uopen_lockbeg() noex ;
     extern sysret_t uopen_lockend() noex ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 namespace libu {
     extern int special_acceptpass(int,STRRECVFD *,int) noex ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
