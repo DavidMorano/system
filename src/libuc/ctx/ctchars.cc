@@ -100,10 +100,10 @@ local int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
 	char		*ep = (dbuf + dlen) ;
 	dbuf[0] = '\0' ;
 	if (r = to_chars(dbuf,ep,v,base) ; (r.ec == ec_ok)) {
-	    *r.ptr = '\0' ;
+	    *r.ptr = eos ;
 	} else {
 	    using enum std::errc ;
-	    dbuf[0] = '\0' ;
+	    dbuf[0] = eos ;
 	    switch (r.ec) {
 	    case value_too_large:
 		rs = SR_OVERFLOW ;
