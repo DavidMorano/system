@@ -29,18 +29,16 @@ EXTERNC_begin
 extern int cfdecti	(cchar *,int,int *)			noex ;
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-local inline int cfdect(cchar *sp,int sl,int *rp = nullptr)	noex {
-	return cfdecti(sp,sl,rp) ;
-} /* end subroutine */
-
-#else /* __cplusplus */
-
+EXTERNC_begin
 local inline int cfdect(cchar *sp,int sl,int *rp)		noex {
 	return cfdecti(sp,sl,rp) ;
 } /* end subroutine */
+EXTERNC_end
 
+#ifdef	__cplusplus
+local inline int cfdect(cchar *sp,int sl = -1)			noex {
+	return cfdecti(sp,sl,nullptr) ;
+} /* end subroutine */
 #endif /* __cplusplus */
 
 
