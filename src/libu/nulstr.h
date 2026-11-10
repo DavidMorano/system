@@ -71,10 +71,8 @@ typedef NULSTR		nulstr ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern int	nulstr_start(nulstr *,cchar *,int,cchar **) noex ;
-extern int	nulstr_finish(nulstr *) noex ;
-
+extern int	nulstr_start	(nulstr *,cchar *,int,cchar **) noex ;
+extern int	nulstr_finish	(nulstr *) noex ;
 EXTERNC_end
 
 
