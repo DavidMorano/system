@@ -25,11 +25,9 @@
 
 
 EXTERNC_begin
-
 extern int	u_writefd(int,int) noex ;
 extern int	u_writefile(int,cchar *) noex ;
 extern int	u_filecopy(cchar *,cchar *) noex ;
-
 EXTERNC_end
 
 
