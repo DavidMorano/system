@@ -81,9 +81,9 @@ export module digtab ;
 constexpr int		div100 = 100 ;
 
 struct digtaber {
-    static constexpr int	maxbase = MAXBASE ;
-    uchar	dig[maxbase] ;
-    char	dig100[div100][2] ;
+    statcexpr int	maxbase = MAXBASE ; /* <- part of variables */
+    uchar		dig[maxbase] ;
+    char		dig100[div100][2] ;
     consteval void mkdig() noex {
     	int	i = 0 ;
 	for (int j = 0 ; j < 10 ; j += 1) {
