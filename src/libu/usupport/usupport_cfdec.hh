@@ -37,11 +37,13 @@ namespace libu {
     extern int cfdec(cchar *,int,uint *)	noex ;
     extern int cfdec(cchar *,int,ulong *)	noex ;
     extern int cfdec(cchar *,int,ulonglong *)	noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int cfdeci(cchar *sp,int sl,int *vp = nullptr) noex {
     	int		rs ;
 	if (int v ; (rs = libu::cfdec(sp,sl,&v)) >= 0) {
-	    cint va = abs(v) ;
-	    rs = va ;
+	    rs = abs(v) ;
 	    if (vp) *vp = v ;
 	} /* end if */
 	return rs ;
