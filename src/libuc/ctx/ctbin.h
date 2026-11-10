@@ -50,7 +50,6 @@ inline int ctbinll(char *bp,int bl,longlong v)		noex {
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int ctbin(char *bp,int bl,int v)			noex {
 	return ctbini(bp,bl,v) ;
 } /* end */
@@ -60,7 +59,9 @@ inline int ctbin(char *bp,int bl,long v)		noex {
 inline int ctbin(char *bp,int bl,longlong v)		noex {
 	return ctbinll(bp,bl,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int ctbin(char *bp,int bl,uint v)		noex {
 	return ctbinui(bp,bl,v) ;
 } /* end */
@@ -70,7 +71,6 @@ inline int ctbin(char *bp,int bl,ulong v)		noex {
 inline int ctbin(char *bp,int bl,ulonglong v)		noex {
 	return ctbinull(bp,bl,v) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
