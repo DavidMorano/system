@@ -41,19 +41,21 @@
 
 
 EXTERNC_begin
-
 extern int u_fattach(int,cchar *) noex ;
 extern int u_strmsgget(int,STRBUF *,STRBUF *,int *) noex ;
 extern int u_strmsggetp(int,STRBUF *,STRBUF *,int *,int *) noex ;
 extern int u_strmsgput(int,STRBUF *,STRBUF *,int) noex ;
 extern int u_strmsgputp(int,STRBUF *,STRBUF *,int,int) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int u_detach(cchar *) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int u_fdetach(cchar *fname) noex {
     	return u_detach(fname) ;
 } /* end subroutine */
-
 EXTERNC_end
 
 
