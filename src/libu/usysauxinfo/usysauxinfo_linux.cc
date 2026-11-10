@@ -84,7 +84,7 @@ namespace usysauxinfo {
 	    } /* end switch */
 	    if (vp) {
 		rs = sncpy(rbuf,rlen,vp) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
     } /* end subroutine (ugetauxinfo) */
