@@ -18,41 +18,51 @@
 
 
 EXTERNC_begin
-
 extern int storebuf_buf		(char *,int,int,cchar *,int)	noex ;
 extern int storebuf_strw	(char *,int,int,cchar *,int)	noex ;
 extern int storebuf_chr		(char *,int,int,int)		noex ;
 extern int storebuf_chrs	(char *,int,int,int,int)	noex ;
-extern int storebuf_remslash	(char *,int,int)		noex ;
+extern int storebuf_addslash	(char *,int,int)		noex ;
+extern int storebuf_checknul	(char *)			noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int storebuf_bini	(char *,int,int,int)		noex ;
 extern int storebuf_binl	(char *,int,int,long)		noex ;
 extern int storebuf_binll	(char *,int,int,longlong)	noex ;
 extern int storebuf_binui	(char *,int,int,uint)		noex ;
 extern int storebuf_binul	(char *,int,int,ulong)		noex ;
 extern int storebuf_binull	(char *,int,int,ulonglong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int storebuf_octi	(char *,int,int,int)		noex ;
 extern int storebuf_octl	(char *,int,int,long)		noex ;
 extern int storebuf_octll	(char *,int,int,longlong)	noex ;
 extern int storebuf_octui	(char *,int,int,uint)		noex ;
 extern int storebuf_octul	(char *,int,int,ulong)		noex ;
 extern int storebuf_octull	(char *,int,int,ulonglong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int storebuf_deci	(char *,int,int,int)		noex ;
 extern int storebuf_decl	(char *,int,int,long)		noex ;
 extern int storebuf_decll	(char *,int,int,longlong)	noex ;
 extern int storebuf_decui	(char *,int,int,uint)		noex ;
 extern int storebuf_decul	(char *,int,int,ulong)		noex ;
 extern int storebuf_decull	(char *,int,int,ulonglong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int storebuf_hexi	(char *,int,int,int)		noex ;
 extern int storebuf_hexl	(char *,int,int,long)		noex ;
 extern int storebuf_hexll	(char *,int,int,longlong)	noex ;
 extern int storebuf_hexui	(char *,int,int,uint)		noex ;
 extern int storebuf_hexul	(char *,int,int,ulong)		noex ;
 extern int storebuf_hexull	(char *,int,int,ulonglong)	noex ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline int storebuf_str(char *bp,int bl,int i,cchar *sp)	noex {
 	return storebuf_strw(bp,bl,i,sp,-1) ;
 } /* end */
@@ -62,11 +72,9 @@ local inline int storebuf_char(char *bp,int bl,int i,int ch)	noex {
 local inline int storebuf_blanks(char *bp,int bl,int i,int n)	noex {
 	return storebuf_chrs(bp,bl,i,' ',n) ;
 } /* end */
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int storebuf_bin(char *bp,int bl,int i,int v)		noex {
 	return storebuf_bini(bp,bl,i,v) ;
 } /* end */
@@ -76,7 +84,9 @@ inline int storebuf_bin(char *bp,int bl,int i,long v)		noex {
 inline int storebuf_bin(char *bp,int bl,int i,longlong v)	noex {
 	return storebuf_binll(bp,bl,i,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int storebuf_bin(char *bp,int bl,int i,uint uv)		noex {
 	return storebuf_binui(bp,bl,i,uv) ;
 } /* end */
@@ -86,7 +96,9 @@ inline int storebuf_bin(char *bp,int bl,int i,ulong uv)		noex {
 inline int storebuf_bin(char *bp,int bl,int i,ulonglong uv)	noex {
 	return storebuf_binull(bp,bl,i,uv) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int storebuf_oct(char *bp,int bl,int i,int v)		noex {
 	return storebuf_octi(bp,bl,i,v) ;
 } /* end */
@@ -96,7 +108,9 @@ inline int storebuf_oct(char *bp,int bl,int i,long v)		noex {
 inline int storebuf_oct(char *bp,int bl,int i,longlong v)	noex {
 	return storebuf_octll(bp,bl,i,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int storebuf_oct(char *bp,int bl,int i,uint uv)		noex {
 	return storebuf_octui(bp,bl,i,uv) ;
 } /* end */
@@ -106,7 +120,9 @@ inline int storebuf_oct(char *bp,int bl,int i,ulong uv)		noex {
 inline int storebuf_oct(char *bp,int bl,int i,ulonglong uv)	noex {
 	return storebuf_octull(bp,bl,i,uv) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int storebuf_dec(char *bp,int bl,int i,int v)		noex {
 	return storebuf_deci(bp,bl,i,v) ;
 } /* end */
@@ -116,7 +132,9 @@ inline int storebuf_dec(char *bp,int bl,int i,long v)		noex {
 inline int storebuf_dec(char *bp,int bl,int i,longlong v)	noex {
 	return storebuf_decll(bp,bl,i,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int storebuf_dec(char *bp,int bl,int i,uint uv)		noex {
 	return storebuf_decui(bp,bl,i,uv) ;
 } /* end */
@@ -126,7 +144,9 @@ inline int storebuf_dec(char *bp,int bl,int i,ulong uv)		noex {
 inline int storebuf_dec(char *bp,int bl,int i,ulonglong uv)	noex {
 	return storebuf_decull(bp,bl,i,uv) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int storebuf_hex(char *bp,int bl,int i,int v)		noex {
 	return storebuf_hexi(bp,bl,i,v) ;
 } /* end */
@@ -136,7 +156,9 @@ inline int storebuf_hex(char *bp,int bl,int i,long v)		noex {
 inline int storebuf_hex(char *bp,int bl,int i,longlong v)	noex {
 	return storebuf_hexll(bp,bl,i,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int storebuf_hex(char *bp,int bl,int i,uint uv)		noex {
 	return storebuf_hexui(bp,bl,i,uv) ;
 } /* end */
@@ -146,7 +168,17 @@ inline int storebuf_hex(char *bp,int bl,int i,ulong uv)		noex {
 inline int storebuf_hex(char *bp,int bl,int i,ulonglong uv)	noex {
 	return storebuf_hexull(bp,bl,i,uv) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
+enum storebufmems {
+    	storebufmem_addslash,
+    	storebufmem_checknul,
+    	storebufmem_overlast
+} ; /* end enum (storebufmems) */
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 struct storebuf ;
 struct storebuf_co {
     	storebuf	*op ;
@@ -156,14 +188,19 @@ struct storebuf_co {
 	    w = m ;
 	} ; /* end methodd */
 	operator int () noex ;
+	int operator () () noex {
+	    return operator int () ;
+	} ; /* end */
 } ; /* end struct (storebuf_co) */
 struct storebuf {
-    	storebuf_co	remslash ;
+    	storebuf_co	addslash ;
+    	storebuf_co	checknul ;
 	charp		bufp ;
 	int		bufl ;
 	int		idx ;
 	storebuf(char *p,int l,int i = 0) noex : bufp(p), bufl(l), idx(i) { 
-	    remslash	(this,0) ;
+	    addslash	(this,storebufmem_addslash) ;
+	    checknul	(this,storebufmem_checknul) ;
 	} ; /* end ctor */
 	storebuf() noex : storebuf(nullptr,0,0) { } ;
 	int chrs	(int ch,int n) noex ;
@@ -207,7 +244,6 @@ struct storebuf {
 	    return idx ;
 	} ; /* end */
 } ; /* end struct (storebuf) */
-
 #endif /* __cplusplus */
 
 
