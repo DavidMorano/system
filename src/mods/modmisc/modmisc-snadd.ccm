@@ -39,23 +39,24 @@ module ;
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 export module modmisc:snadd ;
 
 export {
-    int snaddw(char *,int,int,cchar *,int) noex ;
-    inline int snaddw(char *dbuf,int dlen,int dl,cchar *sp) noex {
+    int snaddw(char *,int,int,cchar *,int = -1) noex ;
+    int snaddx(char *,int,int,int,...) noex ;
+} /* end export */
+
+export {
+    inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
     } /* end */
 } /* end export */
 
 export {
-    int snaddx(char *,int,int,int,...) noex ;
-    inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
-	return snaddw(dbuf,dlen,dl,sp,-1) ;
-    } /* end */
-    template<typename ... Args>
+    template<conccharp ... Args>
     inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return snaddx(dbuf,dlen,dl,na,args ...) ;
