@@ -78,7 +78,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local variables */
 
-constexpr int ch_comma = CH_COMMA ;
+constexpr int		chx_comma = CH_COMMA ;
 
 
 /* exported variables */
@@ -93,7 +93,7 @@ int snflager_start(snflager *op,char *bp,int bl) noex {
 	    rs = memclear(hop) ;
 	    op->bp = bp ;
 	    op->bl = bl ;
-	    *bp = '\0' ;
+	    *bp = eos ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (snflager_start) */
@@ -109,7 +109,7 @@ int snflager_addstrw(snflager *op,cchar *sp,int sl) noex {
 	    rs = SR_OK ;
 	    if ((sl > 0) || sp[0]) ylikely {
 	        if (op->c++ > 0) {
-	            rs = storebuf_chr(op->bp,op->bl,op->bi,ch_comma) ;
+	            rs = storebuf_chr(op->bp,op->bl,op->bi,chx_comma) ;
 	            op->bi += rs ;
 		    rl += rs ;
 	        } /* end */
