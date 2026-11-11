@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	mknonpath(char *,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
