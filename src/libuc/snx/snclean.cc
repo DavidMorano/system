@@ -85,7 +85,7 @@ local inline bool	ischarok(int) noex ;
 
 /* local variables */
 
-cint		ch_sub = mkchar('¿') ;
+constexpr int		ch_sub = mkchar('¿') ;
 
 
 /* exported variables */
