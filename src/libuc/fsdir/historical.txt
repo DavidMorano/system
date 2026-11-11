@@ -20,7 +20,7 @@ FSDIR (historical information)
 	in length (1048 in this case) -- defined in the stupid Solaris
 	'/usr/include/dirent.h' include-file -- in order to prevent
 	the OS |readdir_r(3c)| implementation from overflowing that
-	character array.  This is likely just a coincidence and not
+	character array.  This is likely just a accidental bug and not
 	an actual intended behavior.  But an array size larger than 1024
 	(or generally larger than MAXNAMELEN) is required nonetheless.
 
