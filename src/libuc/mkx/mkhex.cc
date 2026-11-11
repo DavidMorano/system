@@ -78,14 +78,9 @@ import digtab ;				/* |getdig(3u)| */
 
 /* forward references */
 
-#ifdef	COMMENT
-local char	getdig(int v) noex ;
-#endif /* COMMENT */
-
 
 /* local variables */
 
-cint		b10	= 10 ;
 cint		b16	= 16 ;
 cint		twodig	= 2 ;
 
@@ -112,7 +107,7 @@ int mkhexstr(char *dbuf,int dlen,cvoid *vdp,int vdl) noex {
 	            dbuf[j++] = getdig((ch>>0)& m) ;
 	            dlen -= twodig ;
 	        } /* end for */
-	        dbuf[j] = '\0' ;
+	        dbuf[j] = eos ;
 		if (j < (sl * twodig)) rs = SR_OVERFLOW ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -121,17 +116,5 @@ int mkhexstr(char *dbuf,int dlen,cvoid *vdp,int vdl) noex {
 
 
 /* local subroutines */
-
-#ifdef	COMMENT
-local char getdig(int v) noex {
-    	char	c = '¿' ;
-	if ((v >= 0) && (v < b10)) {
-	    c = '0' + char(v) ;
-	} else if ((v >= b10) && (v < b16)) {
-	    c = 'a' + char(v) ;
-	} /* end if */
-	return c ;
-} /* end subroutine (getdig) */
-#endif /* COMMENT */
 
 
