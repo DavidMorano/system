@@ -48,7 +48,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<bufsizevar.hh>		/* |maxnamelen(3uc)| */
+#include	<bufsizevar.hh>		/* LIBUC |maxnamelen(3uc)| */
 #include	<storebuf.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC |strnnlen(3uc)| */
 #include	<localmisc.h>		/* LIBU */
@@ -105,16 +105,16 @@ int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl) noex {
 	            if (fl < 0) fl = lenstr(fp) ;
 	            fp += 1 ;
 	            fl -= 1 ;
-	        }
+	        } /* end */
 	        ml = strnnlen(fp,fl,SHMPREFIXLEN) ;
 	        rs = sb.strw(fp,ml) ;
 	        if (rs >= 0) ylikely {
 	            rs = sb.chr('$') ;
-	        }
+	        } /* end */
 	        if (rs >= 0) ylikely {
 	            ml = strnnlen(dp,dl,SHMPOSTFIXLEN) ;
 	            rs = sb.strw(dp,ml) ;
-	        }
+	        } /* end */
 	        len = sb.idx ;
 	    } /* end if (storebuf) */
 	} /* end if (maxnamelen) */
