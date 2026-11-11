@@ -48,10 +48,10 @@ OBJ3= strwhite.o
 OBJ4= strlinelen.o strlocktype.o
 OBJ5= strbasename.o strdirname.o
 OBJ6= strabbrexi.o
-OBJ7=
+OBJ7= strabbr.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
-OBJB= obj4.o obj5.o obj6.o
+OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= $(OBJA) $(OBJB)
 
@@ -155,12 +155,15 @@ strxbrk.o:		strxbrk.cc	strxbrk.h		$(INCS)
 strwhite.o:		strwhite.cc	strwhite.h		$(INCS)
 strsub.o:		strsub.cc	strsub.h		$(INCS)
 strwoldsub.o:		strwildsub.cc	strwildsub.h		$(INCS)
-strabbrerr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
-strabbrsig.o:		strabbrsig.cc	strabbrsig.h		$(INCS)
-strabbrexi.o:		strabbrexi.cc	strabbrexi.h		$(INCS)
 straltwchar.o:		straltwchar.cc	straltwchar.h		$(INCS)
 strlinelen.o:		strlinelen.cc	strlinelen.h		$(INCS)
 strlocktype.o:		strlocktype.cc	strlocktype.h		$(INCS)
+
+# number-abbreviation group
+strabbr.o:		strabbr.cc	strabbr.h		$(INCS)
+strabbrerr.o:		strabbrerr.cc	strabbrerr.h		$(INCS)
+strabbrsig.o:		strabbrsig.cc	strabbrsig.h		$(INCS)
+strabbrexi.o:		strabbrexi.cc	strabbrexi.h		$(INCS)
 
 # these subroutines (below) are very close to retirement!
 strbasename.o:		strbasename.cc	strxname.h		$(INCS)
