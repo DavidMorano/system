@@ -155,19 +155,19 @@ int ctwords(string *sp,int v) noex {
 		            } else {
 		                speak_group(sp,v) ;
 		                v = 0 ;
-		            }
+		            } /* end */
 	                } /* end while */
 	            } else {
 	                sp->append(" ") ;
 	                sp->append(ones[0]) ;
-	            }
+	            } /* end if */
 		    {
 			csize	rsize = sp->length() ;
 	                rs = intsat(rsize) ;
 		    }
 	        } catch (...) {
 	            rs = SR_NOMEM ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -211,7 +211,7 @@ local int speak_group(string *sp,int v) {
 	    } else if (v > 0) {
 		speak_ones(sp,v) ;
 		v = 0 ;
-	    }
+	    } /* end if */
 	} /* end while */
 	return 0 ;
 } /* end subroutine (speak_group) */
