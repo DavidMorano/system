@@ -5,7 +5,7 @@
 /* generic front-end for SHELL built-ins */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -35,7 +35,6 @@
 #include	<localmisc.h>		/* LIBU */
 
 #include	"b_lspell.h"
-#include	"defs.h"
 
 
 /* local defines */
@@ -43,7 +42,7 @@
 
 /* external subroutines */
 
-extern int	p_lspell(int,cchar **,cchar **,void *) ;
+extern int	p_lspell(int,cchar **,cchar **,void *) noex ;
 
 
 /* external variables */
