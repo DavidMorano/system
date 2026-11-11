@@ -87,13 +87,21 @@
 
 namespace {
     struct snxxx {
-	cchar	*s1 = nullptr ;
-	cchar	*s2 = nullptr ;
-	uint	d1 = 0 ;
-	uint	d2 = 0 ;
-	int	mch = 0 ;
-	int operator () (char *,int) noex ;
+	storebuf	sb ;
+	cchar		*s1 = nullptr ;
+	cchar		*s2 = nullptr ;
+	uint		d1 = 0 ;
+	uint		d2 = 0 ;
+	int		mch = 0 ;
+	snxxx (charp db,int dl) noex : sb(db,dl) { 
+	    sb.checknul() ;
+	} ; /* end ctor */
+	operator int	() noex ;
+	int subpre	() noex ;
+	int submid	() noex ;
+	int subpost	() noex ;
     } ; /* end struct (snxxx) */
+    typedef int (snxxx::*snxxx_m)() noex ;
 } /* end namespace */
 
 
@@ -102,6 +110,11 @@ namespace {
 
 /* local variables */
 
+constexpr snxxx_m	subs[] = {
+    	&snxxx::subpre,
+    	&snxxx::submid,
+    	&snxxx::subpost
+} ; /* end array */
 
 /* exported variables */
 
@@ -109,51 +122,51 @@ namespace {
 /* exported subroutines */
 
 int snsdd(char *dbuf,int dlen,cchar *s1,uint d2) noex {
-	snxxx		sxo ;
+	snxxx sxo(dbuf,dlen) ;
 	sxo.s1 = s1 ;
 	sxo.mch = '.' ;
 	sxo.d2 = d2 ;
-	return sxo(dbuf,dlen) ;
+	return sxo ;
 } /* end subroutine */
 
 int snddd(char *dbuf,int dlen,uint d1,uint d2) noex {
-	snxxx		sxo ;
+	snxxx sxo(dbuf,dlen) ;
 	sxo.d1 = d1 ;
 	sxo.mch = '.' ;
 	sxo.d2 = d2 ;
-	return sxo(dbuf,dlen) ;
+	return sxo ;
 } /* end subroutine */
 
 int snses(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
-	snxxx		sxo ;
+	snxxx sxo(dbuf,dlen) ;
 	sxo.s1 = s1 ;
 	sxo.mch = '=' ;
 	sxo.s2 = s2 ;
-	return sxo(dbuf,dlen) ;
+	return sxo ;
 } /* end subroutine */
 
 int snscs(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
-	snxxx		sxo ;
+	snxxx sxo(dbuf,dlen) ;
 	sxo.s1 = s1 ;
 	sxo.mch = ':' ;
 	sxo.s2 = s2 ;
-	return sxo(dbuf,dlen) ;
+	return sxo ;
 } /* end subroutine */
 
 int snsds(char *dbuf,int dlen,cchar *s1,cchar *s2) noex {
-	snxxx		sxo ;
+	snxxx sxo(dbuf,dlen) ;
 	sxo.s1 = s1 ;
 	sxo.mch = '.' ;
 	sxo.s2 = s2 ;
-	return sxo(dbuf,dlen) ;
+	return sxo ;
 } /* end subroutine */
 
 int snsd(char *dbuf,int dlen,cchar *s1,uint d2) noex {
-	snxxx		sxo ;
+	snxxx sxo(dbuf,dlen) ;
 	sxo.s1 = s1 ;
 	sxo.mch = 0 ;
 	sxo.d2 = d2 ;
-	return sxo(dbuf,dlen) ;
+	return sxo ;
 } /* end subroutine */
 
 int snchrs(char *dp,int dl,int ch,int n) noex {
@@ -173,32 +186,42 @@ int snchrs(char *dp,int dl,int ch,int n) noex {
 
 /* local subroutines */
 
-int snxxx::operator () (char *dbuf,int dlen) noex {
-	int		rs = SR_FAULT ;
-	int		rl = 0 ;
-	if (dbuf) ylikely {
-	    storebuf	sb(dbuf,dlen) ;
-	    rs = SR_OK ;
-	    if (rs >= 0) ylikely {
-	        if (s1) {
-	            rs = sb.str(s1) ;
-	        } else {
-	            rs = sb.dec(d1) ;
-	        } /* end */
-	    } /* end if (ok) */
-	    if ((rs >= 0) && mch) ylikely {
-	        rs = sb.chr(mch) ;
-	    } /* end */
-	    if (rs >= 0) ylikely {
-	        if (s2) {
-	            rs = sb.str(s2) ;
-	        } else {
-	            rs = sb.dec(d2) ;
-	        } /* end */
-	    } /* end if (ok) */
-	    rl = sb.idx ;
-	} /* end if (non-null) */
-	return (rs >= 0) ? rl : rs ;
+snxxx::operator int () noex {
+	int rs = SR_OK ;
+	for (cauto &m : subs) {
+	    rs = (this->*m)() ;
+	    if (rs < 0) break ;
+	} /* end for */
+	if (rs >= 0) rs = sb.idx ;
+	return rs ;
 } /* end method (snxxx::operator) */
+
+int snxxx::subpre() noex {
+    	int rs = SR_OK ;
+	if (s1) {
+	    rs = sb.str(s1) ;
+	} else {
+	    rs = sb.dec(d1) ;
+	} /* end */
+	return rs ;
+} /* end method (snxxx::subpre) */
+
+int snxxx::submid() noex {
+    	int rs = SR_OK ;
+	if (mch) {
+	    rs = sb.chr(mch) ;
+	} /* end */
+	return rs ;
+} /* end method (snxxx::submid) */
+
+int snxxx::subpost() noex {
+    	int rs = SR_OK ;
+	if (s2) {
+	    rs = sb.str(s2) ;
+	} else {
+	    rs = sb.dec(d2) ;
+	} /* end */
+	return rs ;
+} /* end method (snxxx::subpost) */
 
 
