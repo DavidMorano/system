@@ -99,7 +99,7 @@ int sbuf_termconseq(sbuf *op,int name,cchar *is,int na,...) noex {
 	        if ((rs = tc(tbuf,tlen,name,is,na,ap)) >= 0) ylikely {
 	            tl = rs ;
 	            rs = sbuf_strw(op,tbuf,tl) ;
-	        }
+	        } /* end */
 		va_end(ap) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
