@@ -66,14 +66,17 @@
 #include	<ugetx.h>
 #include	<utimezone.h>
 
-#include	<atox.h>
+#include	<baops.h>
+#include	<funcodes.h>
+#include	<fnm.hh>
+#include	<intx.h>
 #include	<varnames.hh>
 #include	<syswords.hh>
 #include	<sysconfcmds.h>
 #include	<ptx.h>
 #include	<strnul.hh>
 #include	<mailvalues.hh>
-#include	<intx.h>
+#include	<mkchar.h>
 #include	<timewatch.hh>
 #include	<timecount.hh>
 #include	<timeval.hh>
@@ -83,12 +86,11 @@
 #include	<itimerspec.h>
 #include	<stdfiles.h>
 #include	<stdfnames.h>
-#include	<xxtostr.h>
-#include	<strtox.h>
-#include	<baops.h>
-#include	<mkchar.h>
-#include	<funcodes.h>
-#include	<fnm.hh>
+#include	<stringto.hh>		/* string-to-integer */
+#include	<strtox.h>		/* string-to-integer */
+#include	<atox.h>		/* string-to-integer */
+#include	<stox.hh>		/* string-to-integer */
+#include	<xxtostr.h>		/* integer-to-string */
 
 #include	<stdintx.h>
 #include	<ccfile.hh>
