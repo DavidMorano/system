@@ -47,7 +47,7 @@ OBJ3_SNX= snkeyval.o snloadavg.o
 OBJ4_SNX= snrealname.o snshellunder.o sntid.o
 OBJ5_SNX= sntmtime.o snuuid.o snxxx.o snwx.o
 OBJ6_SNX= snclean.o
-OBJ7_SNX= snabbrname.o snabbrnum.o
+OBJ7_SNX= snabbrname.o snabbrnum.o snabbr.o
 
 OBJA_SNX= obj0_snx.o obj1_snx.o
 OBJB_SNX= obj2_snx.o obj3_snx.o
@@ -173,6 +173,7 @@ sncpyx.o:		sncpyx.cc	sncpyx.h	$(INCS)
 sncpyxw.o:		sncpyxw.cc	sncpyxw.h	$(INCS)
 sncpyxc.o:		sncpyxc.cc	sncpyxc.h	$(INCS)
 
+snabbr.o:		snabbr.cc	snabbr.h	$(INCS)
 snabbrname.o:		snabbrname.cc	snabbr.h	$(INCS)
 snabbrnum.o:		snabbrnum.cc	snabbr.h	$(INCS)
 
