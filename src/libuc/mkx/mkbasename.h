@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	mkbasename(char *,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
