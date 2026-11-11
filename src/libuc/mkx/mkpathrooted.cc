@@ -104,7 +104,7 @@ int mkpathrooted(char *rbuf,cchar *fn) noex {
 	        } else {
 		    rs = mkpath(rbuf,fn) ;
 		    rl = rs ;
-	        }
+	        } /* end if */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
