@@ -37,6 +37,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 #include	<snaddw.h>
 #include	<snaddslash.h>
@@ -54,17 +55,17 @@ local inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 local inline int snadd(char *dbuf,int dlen,int dl,cchar *sp,int sl) noex {
 	return snaddw(dbuf,dlen,dl,sp,sl) ;
 } /* end subroutine */
+#endif /* __cplusplus */
 
-template<typename ... Args>
+#ifdef	__cplusplus
+template<conccharp ... Args>
 inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return snaddx(dbuf,dlen,dl,na,args ...) ;
 } /* end subroutine */
-
 #endif /* __cplusplus */
 
 
