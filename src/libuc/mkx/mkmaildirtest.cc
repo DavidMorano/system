@@ -71,9 +71,8 @@
 
 /* local variables */
 
-static bufsizevar	maxpathlen(bufsize_mp) ;
-
-constexpr char		saved[] = MAILDIR_SAVED ;
+static bufsizevar	maxpathlen	(bufsize_mp) ;
+constexpr char		saved[]		= MAILDIR_SAVED ;
 
 
 /* exported variables */
@@ -89,11 +88,11 @@ int mkmaildirtest(char *rbuf,cchar *dp,int dl) noex {
 		if (storebuf sb(rbuf,rs) ; (rs = sb.strw(dp,dl)) >= 0) ylikely {
 	            if ((rs > 0) && (rbuf[rs - 1] != '/')) {
 	                rs = sb.chr('/') ;
-		    }
+		    } /* end */
 	            if (rs >= 0) ylikely {
 	                rs = sb.strw(saved) ;
 			len = sb.idx ;
-		    }
+		    } /* end */
 	        } /* end if (storebuf) */
 	    } /* end if (maxpathlen) */
 	} /* end if (non-null) */
