@@ -92,11 +92,10 @@
 /* exported subroutines */
 
 int sntid(char *dp,int dl,pthread_t tid) noex {
-	uintptr_t	up = uintptr_t(tid) ;
+	uintptr_t	uv = cast_reinterpret<uintptr_t>(tid) ;
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
-	    uint	uv = cast_static<uint>(up & UINT_MAX) ;
-	    rs = ctdecui(dp,dl,uv) ;
+	    rs = ctdec(dp,dl,uv) ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sntid) */
