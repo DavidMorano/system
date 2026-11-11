@@ -98,7 +98,7 @@ export {
 	            rbuf[i] = getdig(di) ;
 	            val >>= nshift ;
 	        } /* end for */
-	        rbuf[ndig] = '\0' ;
+	        rbuf[ndig] = eos ;
 		rs = SR_OK ;
 	    } /* end if (no-overflow) */
 	} /* end if (valid base) */
