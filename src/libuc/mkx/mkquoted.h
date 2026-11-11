@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int mkquoted(char *,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
