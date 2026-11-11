@@ -25,13 +25,10 @@
 
 
 EXTERNC_begin
-
 extern int		mkpathrooted(char *,cchar *) noex ;
-
 local inline int	mkpathabs(char *rbuf,cchar *sp) noex {
     	return mkpathrooted(rbuf,sp) ;
 } /* end subroutine */
-
 EXTERNC_end
 
 
