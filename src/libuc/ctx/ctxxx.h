@@ -53,7 +53,6 @@ local inline int ctxxxll(char *bp,int bl,int b,longlong v)	noex {
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int ctxxx(char *bp,int bl,int b,int v)		noex {
 	return ctxxxi(bp,bl,b,v) ;
 } /* end */
@@ -63,7 +62,9 @@ inline int ctxxx(char *bp,int bl,int b,long v)		noex {
 inline int ctxxx(char *bp,int bl,int b,longlong v)	noex {
 	return ctxxxll(bp,bl,b,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int ctxxx(char *bp,int bl,int b,uint v)		noex {
 	return ctxxxui(bp,bl,b,v) ;
 } /* end */
@@ -73,7 +74,6 @@ inline int ctxxx(char *bp,int bl,int b,ulong v)		noex {
 inline int ctxxx(char *bp,int bl,int b,ulonglong v)	noex {
 	return ctxxxull(bp,bl,b,v) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
