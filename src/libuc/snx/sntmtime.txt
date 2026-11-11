@@ -1,3 +1,5 @@
+SNTMTIME
+
 
 	Format codes:
 	- A		full weekday name (not yet coded)
