@@ -25,7 +25,7 @@
 /*******************************************************************************
 
 	Name:
-	ctxxxxx
+	cvtxx
 
 	Description:
 	These subroutines convert an integer (signed or unsigned)
@@ -112,11 +112,11 @@ constexpr int		maxstack = (256 + 1) ;	/* |int256_t| in binary */
 /* local subroutine-templates */
 
 template<typename UT>
-local constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
+local constexpr int cvtx(char *dbuf,int dlen,int b,UT v) noex {
 	cuint		ub(b) ;
 	int		rl = 0 ; /* return-value */
 	char		*rp = (dbuf + dlen) ;
-	*rp = '\0' ;
+	*rp = eos ;
 	if (v != 0) {
 	    int di ;
 	    if_constexpr (szof(UT) > szof(ulong)) {
@@ -144,64 +144,63 @@ local constexpr int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	    *--rp = '0' ;
 	} /* end */
 	return rl ;
-} /* end subroutine (ctxxxx) */
+} /* end subroutine (cvtx) */
 
 template<typename UT,typename ST>
-local int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
+local int ctsx(char *dp,int dl,int b,const ST &v) noex {
 	UT		uv = (UT) v ;
 	cint		tc = typecode<ST> ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ; /* return-value */
 	if (v < 0) uv = (neg uv) ;
-	if (dp) {
+	if (dp) ylikely {
 	    rs = SR_NOTSUP ;
-	    if ((b >= 2) && (b <= digtab.maxbase)) {
+	    if ((b >= 2) && (b <= digtab.maxbase)) ylikely {
 	        cint	dlen = digbufsize.bufsize[tc][b] ;
-		int	len ;
 		if (dlen > maxstack) {
 		    if (char *dbuf ; (rs = lm_mall((dlen+1),&dbuf)) >= 0) {
-			{
-		            len = ctxxxx(dbuf,dlen,b,uv) ;
+			if ((rs = cvtx(dbuf,dlen,b,uv)) >= 0) {
+			    int len = rs ;
 		            if (v < 0) dbuf[dlen - (++len)] = '-' ;
 		            rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 			    rl = rs ;
-			}
+			} /* end if (cvtx) */
 			rs1 = lm_free(dbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (memory-acquire-deallocation) */
 		} else {
 		    char dbuf[dlen+1] ;
-		    len = ctxxxx(dbuf,dlen,b,uv) ;
-		    if (v < 0) dbuf[dlen - (++len)] = '-' ;
-		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
-		    rl = rs ;
+		    if ((rs = cvtx(dbuf,dlen,b,uv)) >= 0) {
+			int len = rs ;
+		        if (v < 0) dbuf[dlen - (++len)] = '-' ;
+		        rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
+		        rl = rs ;
+		    } /* end if (cvtx) */
 		} /* end block */
 	   } /* end if (supported base) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-} /* end subroutine-template (sctxxxx) */
+} /* end subroutine-template (ctsx) */
 
 template<typename UT>
-local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
+local int ctux(char *dp,int dl,int b,const UT &uv) noex {
 	cint		tc = typecode<UT> ;
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
-	if (dp) {
+	if (dp) ylikely {
 	    rs = SR_NOTSUP ;
-	    if ((b >= 2) && (b <= digtab.maxbase)) {
+	    if ((b >= 2) && (b <= digtab.maxbase)) ylikely {
 	        cint	dlen = digbufsize.bufsize[tc][b] ;
-		int	len ;
-		{
-		    char dbuf[dlen+1] ;
-		    len = ctxxxx(dbuf,dlen,b,uv) ;
+		if (char dbuf[dlen+1] ; (rs = cvtx(dbuf,dlen,b,uv)) >= 0) {
+		    int	len = rs ;
 		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
 		    rl = rs ;
-		} /* end block */
+		} /* end if (cvtx) */
 	    } /* end if (base supported) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
-} /* end subroutine-template (uctxxxx) */
+} /* end subroutine-template (ctux) */
 
 
 /* exported variables */
@@ -210,27 +209,27 @@ local int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 /* exported subroutines */
 
 int ctxxxsi(char *dp,int dl,int b,sint v)			noex {
-	return sctxxxx<uint>(dp,dl,b,v) ;
+	return ctsx<uint>(dp,dl,b,v) ;
 } /* end */
 
 int ctxxxsl(char *dp,int dl,int b,slong v)		noex {
-	return sctxxxx<ulong>(dp,dl,b,v) ;
+	return ctsx<ulong>(dp,dl,b,v) ;
 } /* end */
 
 int ctxxxsll(char *dp,int dl,int b,slonglong v)		noex {
-	return sctxxxx<ulonglong>(dp,dl,b,v) ;
+	return ctsx<ulonglong>(dp,dl,b,v) ;
 } /* end */
 
 int ctxxxui(char *dp,int dl,int b,uint uv)		noex {
-	return uctxxxx(dp,dl,b,uv) ;
+	return ctux(dp,dl,b,uv) ;
 } /* end */
 
 int ctxxxul(char *dp,int dl,int b,ulong uv)		noex {
-	return uctxxxx(dp,dl,b,uv) ;
+	return ctux(dp,dl,b,uv) ;
 } /* end */
 
 int ctxxxull(char *dp,int dl,int b,ulonglong uv)	noex {
-	return uctxxxx(dp,dl,b,uv) ;
+	return ctux(dp,dl,b,uv) ;
 } /* end */
 
 
