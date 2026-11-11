@@ -38,7 +38,6 @@ extern int sncpy6w(char *,int,ccp,ccp,ccp,ccp,ccp,ccp,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int sncpyw(char *dp,int dl,
 		cc *s1,int sl = -1) noex {
 	return sncpyxw(dp,dl,1,s1,sl) ;
@@ -63,7 +62,6 @@ inline int sncpyw(char *dp,int dl,
 		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl = -1) noex {
 	return sncpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
