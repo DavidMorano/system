@@ -97,7 +97,7 @@ cchar *strabbrerr(int rsv) noex {
 		s = rp ;
 	    } else {
 	        s = "*UNK*" ;
-	    }
+	    } /* end */
 	} /* end if */
 	return s ;
 } /* end subroutine (strabbrerr) */
