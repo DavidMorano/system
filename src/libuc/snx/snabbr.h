@@ -1,8 +1,8 @@
-/* snabbr HEADER */
+/* snabbr HEADER (Counted-C-String Abbreviations) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* counted c-string operations */
+/* various subroutines that create or retrive abbreviations */
 /* version %I% last-modified %G% */
 
 
