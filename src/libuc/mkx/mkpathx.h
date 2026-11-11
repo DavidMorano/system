@@ -22,30 +22,28 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
+
 #include	<mkpathxw.h>		/* LIBUC */
 #include	<mknpathx.h>		/* LIBUC */
 #include	<mknpathxw.h>		/* LIBUC */
 
 
 EXTERNC_begin
-
 extern int mkpath1(char *,cc *) noex ;
 extern int mkpath2(char *,cc *,cc *) noex ;
 extern int mkpath3(char *,cc *,cc *,cc *) noex ;
 extern int mkpath4(char *,cc *,cc *,cc *,cc *) noex ;
 extern int mkpath5(char *,cc *,cc *,cc *, cc *,cc *) noex ;
 extern int mkpath6(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-template<typename ... Args>
+template<conccharp ... Args>
 inline int mkpath(char *dp,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return mknpathx(dp,-1,na,args ...) ;
 } /* end subroutine */
-
 #endif /* __cplusplus */
 
 
