@@ -1,4 +1,4 @@
-/* fnm MODULE (primary - Vector-Regular-Extression) */
+/* fnm HEADER (File-Name-Match) */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
