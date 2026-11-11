@@ -157,7 +157,7 @@ local int ictroman(char *dbuf,int dlen,ulonglong v)	noex {
 	    if (v >= n) {
 	        cint in = intconv(v / n) ;
 	        rs = b.chrs('M',in) ;
-	        v = (v%n) ;
+	        v = (v % n) ;
 	    } /* end if */
 	    n /= 10 ;
 	    for (int r = 0 ; (rs >= 0) && (r < ntabs) ; r += 1) {
