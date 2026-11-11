@@ -84,7 +84,7 @@ int sbuf_addquoted(sbuf *sbp,cchar *sp,int µsl) noex {
 	            if ((rs = mkquoted(qbuf,qlen,sp,sl)) >= 0) ylikely {
 	                len = rs ;
 	                rs = sbuf_strw(sbp,qbuf,len) ;
-	            }
+	            } /* end */
 	            rs1 = lm_free(qbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (allocation) */
