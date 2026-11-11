@@ -1,4 +1,4 @@
-/* fsdirtree HEADER */
+/* fsdirs HEADER */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	FSDIRTREE_INCLUDE
-#define	FSDIRTREE_INCLUDE
+#ifndef	FSDIRS_INCLUDE
+#define	FSDIRS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -27,83 +27,83 @@
 #include	<hdb.h>			/* LIBUC */
 
 
-#define	FSDIRTREE		struct fsdirtree_head
-#define	FSDIRTREE_FL		struct fsdirtree_flags
-#define	FSDIRTREE_MAGIC		0x98653217
+#define	FSDIRS			struct fsdirs_head
+#define	FSDIRS_FL		struct fsdirs_flags
+#define	FSDIRS_MAGIC		0x98653217
 
 /* options */
-enum fsdirtreeos {
-    fsdirtreeo_pipe,
-    fsdirtreeo_chr,
-    fsdirtreeo_dir,
-    fsdirtreeo_name,
-    fsdirtreeo_blk,
-    fsdirtreeo_reg,
-    fsdirtreeo_lnk,
-    fsdirtreeo_sock,
-    fsdirtreeo_door,
-    fsdirtreeo_wht,
-    fsdirtreeo_follow,
-    fsdirtreeo_noent,
-    fsdirtreeo_uniqfile,
-    fsdirtreeo_uniqdir,
-    fsdirtreeo_igndotfile,
-    fsdirtreeo_igndotdir,
-    fsdirtreeo_overlast
-} ; /* end enum (fsdirtreeos) */
+enum fsdirsos {
+    fsdirso_pipe,
+    fsdirso_chr,
+    fsdirso_dir,
+    fsdirso_name,
+    fsdirso_blk,
+    fsdirso_reg,
+    fsdirso_lnk,
+    fsdirso_sock,
+    fsdirso_door,
+    fsdirso_wht,
+    fsdirso_follow,
+    fsdirso_noent,
+    fsdirso_uniqfile,
+    fsdirso_uniqdir,
+    fsdirso_igndotfile,
+    fsdirso_igndotdir,
+    fsdirso_overlast
+} ; /* end enum (fsdirsos) */
 
 /* masks */
 #ifdef	__cplusplus
-struct fsdirtreems {
-    static constexpr int	pipe		= (1 << fsdirtreeo_pipe) ;
-    static constexpr int	chr		= (1 << fsdirtreeo_chr) ;
-    static constexpr int	dir		= (1 << fsdirtreeo_dir) ;
-    static constexpr int	name		= (1 << fsdirtreeo_name) ;
-    static constexpr int	blk		= (1 << fsdirtreeo_blk) ;
-    static constexpr int	reg		= (1 << fsdirtreeo_reg) ;
-    static constexpr int	lnk		= (1 << fsdirtreeo_lnk) ;
-    static constexpr int	sock		= (1 << fsdirtreeo_sock) ;
-    static constexpr int	door		= (1 << fsdirtreeo_door) ;
-    static constexpr int	wht		= (1 << fsdirtreeo_wht) ;
-    static constexpr int	follow		= (1 << fsdirtreeo_follow) ;
-    static constexpr int	noent		= (1 << fsdirtreeo_noent) ;
-    static constexpr int	uniqfile	= (1 << fsdirtreeo_uniqfile) ;
-    static constexpr int	uniqdir		= (1 << fsdirtreeo_uniqdir) ;
-    static constexpr int	igndotfile	= (1 << fsdirtreeo_igndotfile) ;
-    static constexpr int	igndotdir	= (1 << fsdirtreeo_igndotdir) ;
-} ; /* end struct (fsdirtreems) */
+struct fsdirsms {
+    static constexpr int	pipe		= (1 << fsdirso_pipe) ;
+    static constexpr int	chr		= (1 << fsdirso_chr) ;
+    static constexpr int	dir		= (1 << fsdirso_dir) ;
+    static constexpr int	name		= (1 << fsdirso_name) ;
+    static constexpr int	blk		= (1 << fsdirso_blk) ;
+    static constexpr int	reg		= (1 << fsdirso_reg) ;
+    static constexpr int	lnk		= (1 << fsdirso_lnk) ;
+    static constexpr int	sock		= (1 << fsdirso_sock) ;
+    static constexpr int	door		= (1 << fsdirso_door) ;
+    static constexpr int	wht		= (1 << fsdirso_wht) ;
+    static constexpr int	follow		= (1 << fsdirso_follow) ;
+    static constexpr int	noent		= (1 << fsdirso_noent) ;
+    static constexpr int	uniqfile	= (1 << fsdirso_uniqfile) ;
+    static constexpr int	uniqdir		= (1 << fsdirso_uniqdir) ;
+    static constexpr int	igndotfile	= (1 << fsdirso_igndotfile) ;
+    static constexpr int	igndotdir	= (1 << fsdirso_igndotdir) ;
+} ; /* end struct (fsdirsms) */
 #endif /* __cplusplus */
 
 /* options */
-#define	FSDIRTREE_MPIPE		(1<<	    fsdirtreeo_pipe)
-#define	FSDIRTREE_MCHR		(1<<	    fsdirtreeo_chr)
-#define	FSDIRTREE_MDIR		(1<<	    fsdirtreeo_dir)
-#define	FSDIRTREE_MNAME		(1<<	    fsdirtreeo_name)
-#define	FSDIRTREE_MBLK		(1<<	    fsdirtreeo_blk)
-#define	FSDIRTREE_MREG		(1<<	    fsdirtreeo_reg)
-#define	FSDIRTREE_MLNK		(1<<	    fsdirtreeo_lnk)
-#define	FSDIRTREE_MSOCK		(1<<	    fsdirtreeo_sock)
-#define	FSDIRTREE_MDOOR		(1<<	    fsdirtreeo_door)
-#define	FSDIRTREE_MWHT		(1<<	    fsdirtreeo_wht)
-#define	FSDIRTREE_MFOLLOW	(1<<	    fsdirtreeo_follow)
-#define	FSDIRTREE_MNOENT	(1<<	    fsdirtreeo_noent)
-#define	FSDIRTREE_MUNIQFILE	(1<<	    fsdirtreeo_uniqfile)
-#define	FSDIRTREE_MUNIQDIR	(1<<	    fsdirtreeo_uniqdir)
-#define	FSDIRTREE_MIGNDOTFILE	(1<<	    fsdirtreeo_igndotfile)
-#define	FSDIRTREE_MIGNDOTDIR	(1<<	    fsdirtreeo_igndotdir)
+#define	FSDIRS_MPIPE		(1<<	    fsdirso_pipe)
+#define	FSDIRS_MCHR		(1<<	    fsdirso_chr)
+#define	FSDIRS_MDIR		(1<<	    fsdirso_dir)
+#define	FSDIRS_MNAME		(1<<	    fsdirso_name)
+#define	FSDIRS_MBLK		(1<<	    fsdirso_blk)
+#define	FSDIRS_MREG		(1<<	    fsdirso_reg)
+#define	FSDIRS_MLNK		(1<<	    fsdirso_lnk)
+#define	FSDIRS_MSOCK		(1<<	    fsdirso_sock)
+#define	FSDIRS_MDOOR		(1<<	    fsdirso_door)
+#define	FSDIRS_MWHT		(1<<	    fsdirso_wht)
+#define	FSDIRS_MFOLLOW		(1<<	    fsdirso_follow)
+#define	FSDIRS_MNOENT		(1<<	    fsdirso_noent)
+#define	FSDIRS_MUNIQFILE	(1<<	    fsdirso_uniqfile)
+#define	FSDIRS_MUNIQDIR		(1<<	    fsdirso_uniqdir)
+#define	FSDIRS_MIGNDOTFILE	(1<<	    fsdirso_igndotfile)
+#define	FSDIRS_MIGNDOTDIR	(1<<	    fsdirso_igndotdir)
 
-#define	FSDIRTREE_MFIFO		FSDIRTREE_MPIPE
-#define	FSDIRTREE_MCHAR		FSDIRTREE_MCHR
-#define	FSDIRTREE_MBLOCK	FSDIRTREE_MBLK
-#define	FSDIRTREE_MLINK		FSDIRTREE_MLNK
+#define	FSDIRS_MFIFO		FSDIRS_MPIPE
+#define	FSDIRS_MCHAR		FSDIRS_MCHR
+#define	FSDIRS_MBLOCK		FSDIRS_MBLK
+#define	FSDIRS_MLINK		FSDIRS_MLNK
 
-struct fsdirtree_flags {
+struct fsdirs_flags {
 	uint		feof:1 ;
 	uint		dir:1 ;
 	uint		dirids:1 ;	/* dir-id tracking */
-} ; /* end struct (fsdirtree_flags) */
+} ; /* end struct (fsdirs_flags) */
 
-struct fsdirtree_head {
+struct fsdirs_head {
 	cchar		**prunearr ;
 	char		*bnbuf ;
 	char		*nbuf ;		/* "name" buffer */
@@ -112,7 +112,7 @@ struct fsdirtree_head {
 	fifostr		*dqp ;		/* directory-queue-pointer */
 	fsdir		*dirp ;		/* directory-pointer */
 	hdb		*dip ;		/* directory-id-pointer */
-	FSDIRTREE_FL	fl ;
+	FSDIRS_FL	fl ;
 	uint		magval ;
 	int		opts ;
 	int		bndlen ;
@@ -121,18 +121,18 @@ struct fsdirtree_head {
 	int		nlen ;		/* "name" length */
 	int		llen ;		/* "link" length */
 	ushort		selset ;	/* selection-set of DTs */
-} ; /* end struct (fsdirtree_head) */
+} ; /* end struct (fsdirs_head) */
 
 #ifdef	__cplusplus
-enum fsdirtreemems {
-	fsdirtreemem_close,
-	fsdirtreemem_overlast
-} ; /* end enum (fsdirtreemems) */
-struct fsdirtree ;
-struct fsdirtree_co {
-	fsdirtree	*op = nullptr ;
+enum fsdirsmems {
+	fsdirsmem_close,
+	fsdirsmem_overlast
+} ; /* end enum (fsdirsmems) */
+struct fsdirs ;
+struct fsdirs_co {
+	fsdirs		*op = nullptr ;
 	int		w = -1 ;
-	void operator () (fsdirtree *p,int m) noex {
+	void operator () (fsdirs *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ; /* end */
@@ -140,43 +140,41 @@ struct fsdirtree_co {
 	int operator () () noex { 
 	    return operator int () ;
 	} ; /* end */
-} ; /* end struct (fsdirtree_co) */
-struct fsdirtree : fsdirtree_head {
-	fsdirtree_co	close ;
-	fsdirtree() noex {
-	    close	(this,fsdirtreemem_close) ;
-	    magval = 0 ;
+} ; /* end struct (fsdirs_co) */
+struct fsdirs : fsdirs_head {
+	fsdirs_co	close ;
+	fsdirs() noex {
+	    close	(this,fsdirsmem_close) ;
+	    magval	= 0 ;
 	} ; /* end ctor */
-	fsdirtree(const fsdirtree &) = delete ;
-	fsdirtree &operator = (const fsdirtree &) = delete ;
+	fsdirs(const fsdirs &) = delete ;
+	fsdirs &operator = (const fsdirs &) = delete ;
 	int open	(cchar *,int = 0) noex ;
 	int prune	(cchar **) noex ;
 	int read	(ustat *,char *,int) noex ;
 	void dtor	() noex ;
-	destruct fsdirtree() {
+	destruct fsdirs() {
 	    if (magval) dtor() ;
 	} ; /* end */
-} ; /* end struct (fsdirtree) */
+} ; /* end struct (fsdirs) */
 #else	/* __cplusplus */
-typedef FSDIRTREE	fsdirtree ;
+typedef FSDIRS		fsdirs ;
 #endif /* __cplusplus */
 
-typedef	FSDIRTREE_FL	fsdirtree_fl ;
+typedef	FSDIRS_FL	fsdirs_fl ;
 
 EXTERNC_begin
-
-extern int fsdirtree_open	(fsdirtree *,cchar *,int) noex ;
-extern int fsdirtree_prune	(fsdirtree *,cchar **) noex ;
-extern int fsdirtree_read	(fsdirtree *,ustat *,char *,int) noex ;
-extern int fsdirtree_close	(fsdirtree *) noex ;
-
+extern int fsdirs_open	(fsdirs *,cchar *,int) noex ;
+extern int fsdirs_prune	(fsdirs *,cchar **) noex ;
+extern int fsdirs_read	(fsdirs *,ustat *,char *,int) noex ;
+extern int fsdirs_close	(fsdirs *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-extern const fsdirtreems	fsdirtreem ;
+extern const fsdirsms	fsdirsm ;
 #endif /* __cplusplus */
 
 
-#endif /* FSDIRTREE_INCLUDE */
+#endif /* FSDIRS_INCLUDE */
 
 
