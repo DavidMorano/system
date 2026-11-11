@@ -22,24 +22,24 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 
 EXTERNC_begin
-
 extern int mknpathxw(char *,int,int,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int mknpath1w(char *,int,cc *,int) noex ;
 extern int mknpath2w(char *,int,cc *,cc *,int) noex ;
 extern int mknpath3w(char *,int,cc *,cc *,cc *,int) noex ;
 extern int mknpath4w(char *,int,cc *,cc *,cc *,cc *,int) noex ;
 extern int mknpath5w(char *,int,cc *,cc *,cc *,cc *,cc *,int) noex ;
 extern int mknpath6w(char *,int,cc *,cc *,cc *,cc *,cc *,cc *,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
 #ifdef	COMMENT
-
 inline int mknpathw(char *pp,int pl,
 		cc *s1,int sl) noex {
 	return mknpathxw(pp,pl,1,s1,sl) ;
@@ -65,15 +65,12 @@ inline int mknpathw(char *pp,int pl,
 		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl) noex {
 	return mknpathxw(pp,pl,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end */
-
-#else
-
-template<typename ... Args>
+#else /* COMMENT */
+template<conccharp ... Args>
 inline int mknpath(char *dp,int dl,Args ... args,int sl) noex {
 	cint	na = npack(Args) ;
 	return mknpathxw(dp,dl,na,args ...,sl) ;
 } /* end */
-
 #endif /* COMMENT */
 #endif /* __cplusplus */
 
