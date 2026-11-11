@@ -28,7 +28,6 @@
 
 
 EXTERNC_begin
-
 extern bool	ischalpha	(int) noex attrpure ;
 extern bool	ischalnum	(int) noex attrpure ;
 extern bool	ischdigit	(int) noex attrpure ;
@@ -43,7 +42,9 @@ extern bool	ischprintbad	(int) noex attrpure ;
 extern bool	ischdict	(int) noex attrpure ;
 extern bool	ischcmdstart	(int) noex attrpure ;
 extern bool	ischhdrkey	(int) noex attrpure ;
+EXTERNC_end
 
+EXTERNC_begin
 local inline bool	ischpl	(int ch) noex attrconst {
 	return (ch == '+') ;
 } /* end */
@@ -111,7 +112,6 @@ local inline bool	ischspacetab	(int ch) noex attrpure {
 local inline bool	ischAbbr	(int ch) noex attrpure {
     	return ischabbr(ch) ;
 } /* end */
-
 EXTERNC_end
 
 
