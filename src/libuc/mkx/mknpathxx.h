@@ -32,11 +32,9 @@
 
 
 EXTERNC_begin
-
 extern int	mknpathexp	(char *,int,cchar *,int) noex ;
 extern int	mknpathuser	(char *,int,cchar *,cchar *,int) noex ;
 extern int	mknpathvar	(char *,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
