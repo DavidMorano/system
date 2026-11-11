@@ -43,7 +43,7 @@ extern int sncpy6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-template<concharp ... Args>
+template<conccharp ... Args>
 inline int sncpy(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return sncpyx(dp,dl,na,args ...) ;
