@@ -26,18 +26,15 @@
 
 
 EXTERNC_begin
-
 extern int mkpath1w(char *,cc *,int) noex ;
 extern int mkpath2w(char *,cc *,cc *,int) noex ;
 extern int mkpath3w(char *,cc *,cc *,cc *,int) noex ;
 extern int mkpath4w(char *,cc *,cc *,cc *,cc *,int) noex ;
 extern int mkpath5w(char *,cc *,cc *,cc *,cc *,cc *,int) noex ;
 extern int mkpath6w(char *,cc *,cc *,cc *,cc *,cc *,cc *,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int mkpathw(char *pp,cc *s1,int sl) noex {
 	return mknpathxw(pp,-1,1,s1,sl) ;
 } /* end */
@@ -58,7 +55,6 @@ inline int mknpathw(char *pp,cc *s1,cc *s2,cc *s3,cc *s4,
 		cc *s5,cc *s6,int sl) noex {
 	return mknpathxw(pp,-1,6,s1,s2,s3,s4,s5,s6,sl) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
