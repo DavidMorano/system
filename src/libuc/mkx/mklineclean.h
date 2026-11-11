@@ -61,9 +61,7 @@
 
 
 EXTERNC_begin
-
 extern int	mklineclean(char *,int,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
