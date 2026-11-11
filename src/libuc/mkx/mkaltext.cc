@@ -79,19 +79,18 @@ static bufsizevar	maxpathlen(bufsize_mp) ;
 /* exported subroutines */
 
 int mkaltext(char *dbuf,cchar *name,cchar *ext) noex {
-    	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dbuf && name && ext) ylikely {
 	    rs = SR_INVALID ;
 	    if (name[0]) ylikely {
-	        if (cchar *tp ; (tp = strrchr(name,'.')) != np) ylikely {
+	        if (cchar *tp = strrchr(name,'.')) ylikely {
 	            if (tp[1] != '\0') ylikely {
 			if ((rs = maxpathlen) >= 0) ylikely {
 	                    cint	dlen = rs ;
 	                    if (sbuf alt ; (rs = alt.start(dbuf,dlen)) >= 0) {
+				cint nl = intconv(tp - name) ;
 		                {
-				    cint	nl = intconv(tp - name) ;
 	                            alt.strw(name,nl) ;
 	                            alt.chr('.') ;
 	                            alt.strw(ext,-1) ;
