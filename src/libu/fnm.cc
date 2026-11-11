@@ -1,4 +1,4 @@
-/* fnm SUPPORT */
+/* fnm SUPPORT (File-Name-Match) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
