@@ -73,9 +73,9 @@
 
 /* imported namespaces */
 
-using std::to_chars ;
-using std::to_chars_result ;
-using std::errc ;
+using std::errc ;			/* type? */
+using std::to_chars_result ;		/* type */
+using std::to_chars ;			/* subroutine */
 
 
 /* local typedefs */
@@ -94,25 +94,28 @@ using std::errc ;
 
 template<typename T>
 local int ctcharsx(char *dbuf,int dlen,int base,T &v) noex {
-	to_chars_result	r ;
+	using rest	= to_chars_result ;
 	constexpr errc	ec_ok = errc() ;
-	int		rs = SR_OK ;
-	char		*ep = (dbuf + dlen) ;
-	dbuf[0] = '\0' ;
-	if (r = to_chars(dbuf,ep,v,base) ; (r.ec == ec_ok)) {
-	    *r.ptr = eos ;
-	} else {
-	    using enum std::errc ;
+	int		rs = SR_FAULT ;
+	if (dbuf) ylikely {
+	    charp ep = (dbuf + dlen) ;
 	    dbuf[0] = eos ;
-	    switch (r.ec) {
-	    case value_too_large:
-		rs = SR_OVERFLOW ;
-		break ;
-	    default:
-		rs = SR_INVALID ;
-		break ;
-	    } /* end switch */
-	} /* end if (handle errors) */
+	    rs = SR_OK ;
+	    if (rest r = to_chars(dbuf,ep,v,base) ; (r.ec == ec_ok)) {
+	        *r.ptr = eos ;
+	    } else {
+	        using enum std::errc ;
+	        dbuf[0] = eos ;
+	        switch (r.ec) {
+	        case value_too_large:
+		    rs = SR_OVERFLOW ;
+		    break ;
+	        default:
+		    rs = SR_INVALID ;
+		    break ;
+	        } /* end switch */
+	    } /* end if (handle errors) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine-template (ctcharsx) */
 
