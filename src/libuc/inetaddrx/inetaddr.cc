@@ -63,7 +63,7 @@
 #include	<netinet/in.h>		/* POSIX */
 #include	<arpa/inet.h>		/* |inet_addr(3c)| + |in_addr_t| */
 #include	<netdb.h>		/* POSIX */
-#include	<cstddef>		/* CSDT |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
@@ -81,7 +81,7 @@
 #pragma		GCC dependency		"mod/ureserve.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
-import digtab ;				/* |digtab(3u)| */
+import digtab ;				/* |getdig(3u)| */
 import ureserve ;
 
 /* local defines */
