@@ -34,7 +34,6 @@ extern int	rmdot		(cchar *,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int	rmext		(cchar *sp) noex {
     	return rmext(sp,-1) ;
 } /* end */
@@ -47,7 +46,6 @@ inline int	rmslashes	(cchar *sp) noex {
 inline int	rmdot		(cchar *sp) noex {
     	return rmdot(sp,-1) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
