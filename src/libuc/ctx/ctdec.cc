@@ -25,7 +25,7 @@
 /*******************************************************************************
 
 	Name:
-	ctdecxx
+	cvtdecxx
 
 	Description:
 	These subroutines convert an integer (signed or unsigned)
@@ -114,7 +114,7 @@ local inline char getdig_hi(int) noex ;
 /* local subroutine-templates */
 
 template<typename UT>
-local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
+local constexpr int cvtdecx(char *dbuf,int dlen,UT v) noex {
 	constexpr uint	udiv100 = uint(div100) ;
 	char		*rp = (dbuf + dlen) ;
 	int		rl = 0 ; /* return-value */
@@ -152,7 +152,7 @@ local constexpr int ctdecx(char *dbuf,int dlen,UT v) noex {
 	    *--rp = '0' ;
 	} /* end if */
 	return rl ;
-} /* end subroutine-template (ctdecx) */
+} /* end subroutine-template (cvtdecx) */
 
 template<typename UT,typename ST>
 local int ctdecsx(char *dp,int dl,const ST &v) noex {
@@ -162,17 +162,13 @@ local int ctdecsx(char *dp,int dl,const ST &v) noex {
 	int		rl = 0 ; /* return-value */
 	if (v < 0) uv = (neg uv) ;
 	if (dp) ylikely {
-	    {
-	        cint	dlen = digbufsize.bufsize[tc][base] ;
-		int	len ;
-		{
-		    char dbuf[dlen+1] ;
-		    len = ctdecx(dbuf,dlen,uv) ;
-		    if (v < 0) dbuf[dlen - (++len)] = '-' ;
-		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
-		    rl = rs ;
-		} /* end block */
-	   } /* end block */
+	    cint	dlen = digbufsize.bufsize[tc][base] ;
+	    if (char dbuf[dlen+1] ; (rs = cvtdecx(dbuf,dlen,uv)) >= 0) {
+		int	len = rs ;
+		if (v < 0) dbuf[dlen - (++len)] = '-' ;
+		rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
+		rl = rs ;
+	   } /* end if (cvtdecx) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine-template (ctdecsx) */
@@ -183,16 +179,12 @@ local int ctdecux(char *dp,int dl,const UT &uv) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ; /* return-value */
 	if (dp) ylikely {
-	    {
-	        cint	dlen = digbufsize.bufsize[tc][base] ;
-		int	len ;
-		{
-		    char dbuf[dlen+1] ;
-		    len = ctdecx(dbuf,dlen,uv) ;
-		    rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
-		    rl = rs ;
-		} /* end block */
-	    } /* end block */
+	    cint	dlen = digbufsize.bufsize[tc][base] ;
+	    if (char dbuf[dlen+1] ; (rs = cvtdecx(dbuf,dlen,uv)) >= 0) {
+		int	len = rs ;
+		rs = sncpy(dp,dl,(dbuf + dlen - len)) ;
+		rl = rs ;
+	    } /* end if (cvtdecx) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 } /* end subroutine-template (ctdecux) */
