@@ -101,7 +101,7 @@ constexpr flent		fl_mode[] = {
 	{ S_ISUID, "SUID"	},
 	{ S_ISGID, "SGID"	},
 	{ S_ISVTX, "SAVETXT"	},
-	{ 0,	nullptr		}
+	{ 0,	   nullptr	}
 } ; /* end array (fl_mode) */
 
 
