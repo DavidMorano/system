@@ -38,42 +38,34 @@ extern int ctromanull	(char *,int,ulonglong)		noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 template<typename T>
 inline int ctroman(char *,int,T)			noex {
 	return SR_NOSYS ;
 } /* end */
-
 template<>
 inline int ctroman(char *dp,int dl,sint v)		noex {
 	return ctromansi(dp,dl,v) ;
 } /* end */
-
 template<>
 inline int ctroman(char *dp,int dl,slong v)		noex {
 	return ctromansl(dp,dl,v) ;
 } /* end */
-
 template<>
 inline int ctroman(char *dp,int dl,slonglong v)		noex {
 	return ctromansll(dp,dl,v) ;
 } /* end */
-
 template<>
 inline int ctroman(char *dp,int dl,uint v)		noex {
 	return ctromanui(dp,dl,v) ;
 } /* end */
-
 template<>
 inline int ctroman(char *dp,int dl,ulong v)		noex {
 	return ctromanul(dp,dl,v) ;
 } /* end */
-
 template<>
 inline int ctroman(char *dp,int dl,ulonglong v)		noex {
 	return ctromanull(dp,dl,v) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
