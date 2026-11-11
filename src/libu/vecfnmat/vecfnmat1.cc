@@ -1,8 +1,8 @@
-/* vecfnmat1 MODULE (implementation -- Vector-Regular-Expression) */
+/* vecfnmat1 MODULE (implementation -- Vector-File-Name-Match) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* vector of regular expressions */
+/* vector of file-name patterms */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* debugging */
