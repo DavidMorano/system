@@ -29,6 +29,7 @@
 
 #ifndef	CONCHARP_INCLUDE
 #define	CONCHARP_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -54,6 +55,7 @@ concept conccharp =
     std::convertible_to<T,const char *> ;
 
 
+#endif /* __cplusplus */
 #endif /* CONCHARP_INCLUDE */
 
 
