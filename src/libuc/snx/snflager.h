@@ -53,7 +53,7 @@ enum snflagermems {
 } ; /* end enum (snflagermems) */
 struct snflager ;
 struct snflager_co {
-	snflager		*op = nullptr ;
+	snflager	*op = nullptr ;
 	int		w = -1 ;
 	void operator () (snflager *p,int m) noex {
 	    op = p ;
@@ -69,17 +69,17 @@ struct snflager : snflager_head {
 	snflager_co	len ;
 	snflager_co	finish ;
 	snflager() noex {
-	    count(this,snflagermem_count) ;
-	    len(this,snflagermem_len) ;
-	    finish(this,snflagermem_finish) ;
-	    bp = nullptr ;
+	    count	(this,snflagermem_count) ;
+	    len		(this,snflagermem_len) ;
+	    finish	(this,snflagermem_finish) ;
+	    bp		= nullptr ;
 	} ; /* end ctor */
-	snflager(const snflager &) = delete ;
+	snflager	(const snflager &) = delete ;
 	snflager &operator = (const snflager &) = delete ;
-	int start(char *,int) noex ;
-	int addstr(cchar *) noex ;
-	int addstrw(cchar *,int = -1) noex ;
-	void dtor() noex ;
+	int start	(char *,int) noex ;
+	int addstr	(cchar *) noex ;
+	int addstrw	(cchar *,int = -1) noex ;
+	void dtor	() noex ;
 	destruct snflager() {
 	    if (bp) dtor() ;
 	} ; /* end destruct */
