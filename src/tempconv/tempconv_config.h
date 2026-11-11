@@ -1,4 +1,9 @@
-/* config */
+/* tempconv_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* this is a SHELL built-in version of 'temp(1)' */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
