@@ -211,7 +211,7 @@ int sbuf_reset(sbuf *op) noex {
 	    char	*bp = SBUF_RBUF ;
 	    rs = SR_OK ;
 	    SBUF_INDEX = 0 ;
-	    *bp = '\0' ;
+	    *bp = eos ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sbuf_reset) */
@@ -246,7 +246,7 @@ int sbuf_buf(sbuf *op,cchar *sp,int sl) noex {
 	            } /* end if */
 	            if (*sp && (sl > 0)) rs = SR_OVERFLOW ;
 	        } /* end if */
-	        *bp = '\0' ;
+	        *bp = eos ;
 	        len = intconv(bp - (SBUF_RBUF + SBUF_INDEX)) ;
 	        SBUF_INDEX = (rs >= 0) ? intconv(bp - SBUF_RBUF) : rs ;
 	    } /* end if (not in error-mode) */
@@ -423,7 +423,7 @@ int sbuf_chr(sbuf *op,int ch) noex {
 		rs = SR_OVERFLOW ;
 	        if (bl >= len) ylikely {
 	            *bp++ = charconv(ch) ;
-	            *bp = '\0' ;
+	            *bp = eos ;
 	            SBUF_INDEX += len ;
 	            rs = SR_OK ;
 	        } else {
@@ -450,7 +450,7 @@ int sbuf_chrs(sbuf *op,int ch,int n) noex {
 	                } /* end for */
 	                SBUF_INDEX += n ;
 	                rs = SR_OK ;
-	                *bp = '\0' ;
+	                *bp = eos ;
 	            } else {
 	                SBUF_INDEX = rs ;
 	            } /* end */
@@ -659,7 +659,7 @@ local int sbuf_addstrw(sbuf *op,cchar *sp,int sl) noex {
 	        if (*sp && (sl > 0)) rs = SR_OVERFLOW ;
 	    } /* end if */
 	} /* end if */
-	*bp = '\0' ;
+	*bp = eos ;
 	len = intconv(bp - (SBUF_RBUF + SBUF_INDEX)) ;
 	SBUF_INDEX = (rs >= 0) ? intconv(bp - SBUF_RBUF) : rs ;
 	return (rs >= 0) ? len : rs ;
@@ -674,7 +674,7 @@ int sbuf_co::operator () (int a) noex {
 		break ;
 	    case sbufmem_hexc:
 		{
-		    char	c = charconv(a) ;
+		    char c = charconv(a) ;
 		    rs = sbuf_hexc(op,c) ;
 		}
 		break ;
@@ -683,7 +683,7 @@ int sbuf_co::operator () (int a) noex {
 		break ;
 	    case sbufmem_chr:
 		{
-		    char	c = charconv(a) ;
+		    char c = charconv(a) ;
 		    rs = sbuf_chr(op,c) ;
 		}
 		break ;
