@@ -60,7 +60,6 @@ local inline int cthexll(char *bp,int bl,longlong v)	noex {
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int cthex(char *bp,int bl,int v)			noex {
 	return cthexi(bp,bl,v) ;
 } /* end */
@@ -70,7 +69,9 @@ inline int cthex(char *bp,int bl,long v)		noex {
 inline int cthex(char *bp,int bl,longlong v)		noex {
 	return cthexll(bp,bl,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int cthex(char *bp,int bl,uchar v)		noex {
 	return cthexuc	(bp,bl,v) ;
 } /* end */
@@ -86,7 +87,6 @@ inline int cthex(char *bp,int bl,ulong v)		noex {
 inline int cthex(char *bp,int bl,ulonglong v)		noex {
 	return cthexull	(bp,bl,v) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
