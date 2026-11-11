@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	mksoname(char *,cchar *,int) noex ;
-
 EXTERNC_end
 
 
