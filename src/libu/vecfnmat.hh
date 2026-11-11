@@ -1,8 +1,8 @@
-/* vecfnmat HEADER */
+/* vecfnmat HEADER (Vector-File-Name-Match) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* vector of regular expressions */
+/* vector of file-name patterns */
 /* version %I% last-modified %G% */
 
 
