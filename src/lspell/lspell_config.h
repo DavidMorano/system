@@ -19,6 +19,13 @@
 #define	LSPELLCONFIG_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+
+
 #define	VERSION		"0"
 #define	WHATINFO	"@(#)lspell "
 #define	BANNER		"Local Spell"
@@ -45,23 +52,6 @@
 #define	VARDEBUGFD1	"LSPELL_DEBUGFD"
 #define	VARDEBUGFD2	"DEBUGFD"
 
-#define	VARNODE		"NODE"
-#define	VARSYSNAME	"SYSNAME"
-#define	VARRELEASE	"RELEASE"
-#define	VARMACHINE	"MACHINE"
-#define	VARARCHITECTURE	"ARCHITECTURE"
-#define	VARCLUSTER	"CLUSTER"
-#define	VARSYSTEM	"SYSTEM"
-#define	VARNISDOMAIN	"NISDOMAIN"
-#define	VARPRINTER	"PRINTER"
-#define	VARTERM		"TERM"
-#define	VARCOLUMNS	"COLUMNS"
-
-#define	VARTMPDNAME	"TMPDIR"
-
-#define	VARPRLOCAL	"LOCAL"
-#define	VARPRPCS	"PCS"
-
 #define	TMPDNAME	"/tmp"
 #define	WORKDNAME	"/tmp"
 #define	LOGCNAME	"log"
@@ -79,10 +69,6 @@
 #define	PIDFNAME	"run/lspell"		/* mutex PID file */
 #define	LOGFNAME	"var/log/lspell"	/* activity log */
 #define	LOCKFNAME	"spool/locks/lspell"	/* lock mutex file */
-
-#ifndef	COLUMNS
-#define	COLUMNS		80			/* output columns */
-#endif
 
 #define	LOGSIZE		(80*1024)
 
