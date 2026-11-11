@@ -23,7 +23,7 @@
 
 	Description:
 	Create and copy a string repreentation of an Internet address
-	(either IP4 or IP5) into the destination.
+	(either IP4 or IP6) into the destination.
 
 	Synopsis:
 	int sninetaddr(char *dbuf,int dlen,int af,char *addr) noex
@@ -57,7 +57,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD |nullptr_t| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -103,8 +103,8 @@ local int sninet6	(char *,int,cchar *) noex ;
 
 /* local variables */
 
-constexpr int		diglen = HEXBUFLEN ;
-constexpr bool		f_cthexuc = CF_CTHEXUC ;
+constexpr int		diglen		= HEXBUFLEN ;
+constexpr bool		f_cthexuc	= CF_CTHEXUC ;
 
 
 /* exported variables */
