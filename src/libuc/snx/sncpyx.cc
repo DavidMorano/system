@@ -40,7 +40,8 @@
 	a resulting c-string).
 
 	Synopsis:
-	int sncpy{x}(charp dbuf,int dlen,cchar *sp ...) noex
+    	int sncpy	(char *dp,int dl,cchar *s1) noex
+	int sncpy{x}	(char *dp,int dl,cchar *s1, ...) noex
 
 	Arguments:
 	{x}		one of: 1, 2, 3, 4, 5, 6
