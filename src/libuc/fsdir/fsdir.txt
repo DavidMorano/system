@@ -1,0 +1,35 @@
+FSDIR
+
+= usage
+
+fsdir	d ;
+fsdir	d = fsdir() ;		/* error: disallowing this */
+
+if ((rs = fsdir_open(&d,fname)) >= 0) {
+
+	/* ... */
+	rs1 = fsdir_close(&d) ;
+}
+
+fsdir	d(dname) ;
+
+if ((rs = d.open) >= 0) {
+
+	rs1 = d.close ;
+}
+
+rs = d.close ;
+
+rs = d.close() ;
+
+rs = d.open ;
+
+rs = d.open() ;
+
+rs = d.rewind ;
+
+rs = d.seek() ;
+
+rs = d.seek(off) ;
+
+
