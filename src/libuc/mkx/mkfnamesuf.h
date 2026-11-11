@@ -22,28 +22,27 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<uconcepts.hh>		/* LIBU */
 
 
 EXTERNC_begin
-
 extern int mkfnamesufx(char *,int,cc *,...) noex ;
+EXTERNC_end
 
+EXTERNC_begin
 extern int mkfnamesuf1(char *,cc *,cc *) noex ;
 extern int mkfnamesuf2(char *,cc *,cc *,cc *) noex ;
 extern int mkfnamesuf3(char *,cc *,cc *,cc *,cc *) noex ;
 extern int mkfnamesuf4(char *,cc *,cc *,cc *,cc *,cc *) noex ;
 extern int mkfnamesuf5(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-template<typename ... Args>
+template<conccharp ... Args>
 inline int mkfnamesuf(char *dp,cc *bp,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return mkfnamesufx(dp,na,bp,args ...) ;
 } /* end subroutine-template */
-
 #endif /* __cplusplus */
 
 
