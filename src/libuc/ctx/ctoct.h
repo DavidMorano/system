@@ -50,7 +50,6 @@ local inline int ctoctll(char *bp,int bl,longlong v)	noex {
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 inline int ctoct(char *bp,int bl,int v)			noex {
 	return ctocti(bp,bl,v) ;
 } /* end */
@@ -60,7 +59,9 @@ inline int ctoct(char *bp,int bl,long v)		noex {
 inline int ctoct(char *bp,int bl,longlong v)		noex {
 	return ctoctll(bp,bl,v) ;
 } /* end */
+#endif /* __cplusplus */
 
+#ifdef	__cplusplus
 inline int ctoct(char *bp,int bl,uint v)		noex {
 	return ctoctui(bp,bl,v) ;
 } /* end */
@@ -70,7 +71,6 @@ inline int ctoct(char *bp,int bl,ulong v)		noex {
 inline int ctoct(char *bp,int bl,ulonglong v)		noex {
 	return ctoctull(bp,bl,v) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
