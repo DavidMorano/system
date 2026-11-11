@@ -19,10 +19,21 @@
 
   	Group:
 	digval
+	digval{x}
+
+	Description:
+	We examine a single character, of some number base, and
+	return either an error or the integer value of the digit.
+	For example, the hexadecimal character-digit 'b' would
+	return the decimal value '11'.  The maximum allowed
+	number base is 64.
 
 	Returns:
 	>=0	valid value
 	<0	error (SR_DOM)
+
+	Notes:
+	1. The maximum allowed number base is 64.
 
 *******************************************************************************/
 
@@ -36,14 +47,14 @@
 
 
 EXTERNC_begin
+extern int	digval(int) noex ;	/* <- base 64 */
+EXTERNC_end
 
-extern int	digval(int) noex ;
-
-extern int	digvalbin(int) noex ;
-extern int	digvaloct(int) noex ;
-extern int	digvaldec(int) noex ;
-extern int	digvalhex(int) noex ;
-
+EXTERNC_begin
+extern int	digvalbin(int) noex ;	/* <- base 2 */
+extern int	digvaloct(int) noex ;	/* <- base 8 */
+extern int	digvaldec(int) noex ;	/* <- base 10 */
+extern int	digvalhex(int) noex ;	/* <- base 16 */
 EXTERNC_end
 
 
