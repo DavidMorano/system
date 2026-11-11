@@ -69,6 +69,9 @@
 
 /* local defines */
 
+#define	RSB_HEXP(prec,value)	if (rs >= 0) rs = b.hexp((prec),(value))
+#define	RSB_CHAR(ch)		if (rs >= 0) rs = b.chr(ch)
+
 
 /* imported namespaces */
 
@@ -102,11 +105,11 @@ int snuuid(char *dbuf,int dlen,uuid_dat *up) noex {
 	if (dbuf && up) ylikely {
 	    if (sbuf b ; (rs = b.start(dbuf,dlen)) >= 0) ylikely {
 	        ulonglong v = (up->time & UINT_MAX) ;
-	        if (rs >= 0) rs = b.hexp(4,v) ;
-	        if (rs >= 0) rs = b.chr('-') ;
+		RSB_HEXP(4,v) ;
+		RSB_CHAR('-') ;
 	        v = ((up->time >> 32) & UINT_MAX) ;
-	        if (rs >= 0) rs = b.hexp(2,v) ;
-	        if (rs >= 0) rs = b.chr('-') ;
+		RSB_HEXP(2,v) ;
+		RSB_CHAR('-') ;
 	        if (rs >= 0) ylikely {
 		    ulong tv ;
 		    v = 0 ;
@@ -118,14 +121,14 @@ int snuuid(char *dbuf,int dlen,uuid_dat *up) noex {
 		    v |= (tv << (8+4)) ;
 	            rs = b.hexp(2,v) ;
 	        } /* end if (ok) */
-	        if (rs >= 0) rs = b.chr('-') ;
+		RSB_CHAR('-') ;
 	        v = (up->clk & UINT_MAX) ;
 	        v &= (compl (3 << 14)) ;
 	        v |= (2 << 14) ;		/* standardized variant */
-	        if (rs >= 0) rs = b.hexp(2,v) ;
-	        if (rs >= 0) rs = b.chr('-') ;
+		RSB_HEXP(2,v) ;
+		RSB_CHAR('-') ;
 	        v = up->node ;
-	        if (rs >= 0) rs = b.hexp(6,v) ;
+		RSB_HEXP(6,v) ;
 	        len = b.finish ;
 	        if (rs >= 0) rs = len ;
 	    } /* end if (sbuf) */
