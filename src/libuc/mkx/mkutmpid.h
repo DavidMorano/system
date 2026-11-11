@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
 extern int	mkutmpid(char *,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
