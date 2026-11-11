@@ -96,7 +96,7 @@ int snaddslash(char *rbuf,int rlen,int rl) noex {
 	        rs = SR_OK ;
 		if ((rl > 0) && (rbuf[rl - 1] != '/')) {
 		    rs = SR_OVERFLOW ;
-		    if (rl < rlen) {
+		    if (rl < rlen) ylikely {
 		        rbuf[rl++] = '/' ;
 		        rbuf[rl] = eos ;
 	                rs = 1 ; /* <- good return-value */
