@@ -17,8 +17,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-#define	UUID_VERSION	4		/* default UUID version */
 #define	UUID_DAT	struct uuid_data
+#define	UUID_VERSION	4		/* default UUID version */
 
 
 struct uuid_data {
@@ -33,17 +33,13 @@ struct uuid_data {
 typedef UUID_DAT	uuid_dat ;
 
 EXTERNC_begin
-
 extern int mkuuid(uuid_dat *,int) noex ;
-
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 local inline int mkuuid(uuid_dat *udp) noex {
     	return mkuuid(udp,0) ;
 } /* end */
-
 #endif /* __cplusplus */
 
 
