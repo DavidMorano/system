@@ -40,22 +40,22 @@ extern int sncpyfc	(char *,int,cchar *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-template<concharp ... Args>
+template<conccharp ... Args>
 inline int sncpybc(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return sncpybcx(dp,dl,na,args ...) ;
 } /* end subroutine-template (sncpy) */
-template<concharp ... Args>
+template<conccharp ... Args>
 inline int sncpylc(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return sncpylcx(dp,dl,na,args ...) ;
 } /* end subroutine-template (sncpy) */
-template<concharp ... Args>
+template<conccharp ... Args>
 inline int sncpyuc(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return sncpybux(dp,dl,na,args ...) ;
 } /* end subroutine-template (sncpy) */
-template<concharp ... Args>
+template<conccharp ... Args>
 inline int sncpyfc(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return sncpyfcx(dp,dl,na,args ...) ;
