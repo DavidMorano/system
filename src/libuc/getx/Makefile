@@ -50,7 +50,7 @@ OBJ06= getpassword.o getportnum.o getprogpath.o
 OBJ07= getproto.o getpf.o getpwd.o getprogexec.o
 OBJ08= getpwentry.o getpwlogname.o getpwx.o 
 OBJ09= getseed.o getserial.o getserv.o
-OBJ10= getsocktype.o getsyslogx.o 
+OBJ10= getsocktype.o getsyslogx.o getnoise.o
 OBJ11= getuserhome.o getuserorg.o getuserterms.o
 OBJ12= getxid.o getopendial.o getmaxpid.o
 OBJ13= getnisdomain.o getfstype.o getuserterm.o
@@ -207,6 +207,7 @@ getnfile.o:		getnfile.cc		getnfile.h		$(INCS)
 getngroups.o:		getngroups.cc		getngroups.h		$(INCS)
 getnodedomain.o:	getnodedomain.cc	getnodedomain.h		$(INCS)
 getnodeinfo.o:		getnodeinfo.cc		getnodeinfo.h		$(INCS)
+getnoise.o:		getnoise.cc		getnoise.h		$(INCS)
 getnprocessors.o:	getnprocessors.cc	getnprocessors.h	$(INCS)
 getostype.o:		getostype.cc		getostype.h		$(INCS)
 getpassword.o:		getpassword.cc		getpassword.h		$(INCS)
