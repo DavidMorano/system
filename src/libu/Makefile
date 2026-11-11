@@ -95,7 +95,7 @@ OBJ35= utmptypes.o utmpsizes.o usyscalls.o
 OBJ36= mapex.o deb.o
 OBJ37= syspredefined.o
 OBJ38= typecodes.o charnames.o
-OBJ39= strtox.o atox.o
+OBJ39= strtox.o atox.o stox.o stringto.o
 
 OBJ40= ascii.o ubufdefs.o vardefs.o
 OBJ41= memord.o fnm.o
@@ -635,6 +635,8 @@ findbit.o:		findbit.ccm					$(INCS)
 strtox.o:		strtox.cc	strtox.h bitmanip.o		$(INCS)
 strnul.o:		strnul.cc	strnul.hh			$(INCS)
 atox.o:			atox.cc		atox.h				$(INCS)
+stox.o:			stox.cc		stox.hh				$(INCS)
+stringto.o:		stringto.cc	stringto.hh			$(INCS)
 
 # MISC
 stdclib.o:		stdclib.cc	stdclib.hh			$(INCS)
