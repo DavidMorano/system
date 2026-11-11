@@ -23,9 +23,7 @@
 
 
 EXTERNC_begin
-
 extern int	mkcexsync(char *,int) noex ;
-
 EXTERNC_end
 
 
