@@ -38,9 +38,7 @@ struct linecleanoptms {
 
 
 #ifdef	__cplusplus
-
 extern const linecleanoptms	linecleanoptm ;
-
 #endif /* __cplusplus */
 
 
