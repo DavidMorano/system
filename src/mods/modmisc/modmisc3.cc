@@ -126,12 +126,9 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 /* local subroutines */
 
 local int local_pathadd(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	if ((pl > 0) && (pbuf[pl - 1] != '/')) {
-	    rs = snaddslash(pbuf,plen,pl) ;
+	int		rs ;
+	if ((rs = snaddslash(pbuf,plen,pl)) >= 0) {
 	    pl += rs ;
-	} /* end */
-	if (rs >= 0) ylikely {
 	    rs = snaddw(pbuf,plen,pl,sp,sl) ;
 	    pl += rs ;
 	} /* end */
