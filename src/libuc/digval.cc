@@ -47,7 +47,8 @@
 	We examine a single character, of some number base, and
 	return either an error or the integer value of the digit.
 	For example, the hexadecimal character-digit 'b' would
-	return the decimal value '11'.
+	return the decimal value '11'.  The maximum allowed
+	number base is 64.
 
 	Synopsis:
 	int digval(int ch) noex
@@ -71,6 +72,9 @@
 	digvaloct	base-8		(checked)
 	digvaldec	base-10		(checked)
 	digvalhex	base-16		(checked + case-insensitive)
+
+	Notes:
+	1. The maximum allowed number base is 64.
 
 *******************************************************************************/
 
