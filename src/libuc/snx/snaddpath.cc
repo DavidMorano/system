@@ -130,7 +130,7 @@ int snaddpath(char *pbuf,int plen,int pl,cchar *sp,int sl) noex {
 int adder::operator () (cchar *sp,int sl) noex {
     	int		rs ;
 	int		len = 0 ; /* return-value */
-	if ((rs = aslash()) >= 0) {
+	if ((rs = aslash()) >= 0) ylikely {
 	    len += rs ;
 	    rs = astr(sp,sl) ;
 	    len += rs ;
@@ -141,16 +141,14 @@ int adder::operator () (cchar *sp,int sl) noex {
 
 int adder::aslash() noex {
 	int		rs = SR_OK ;
-    	int		len = 0 ;
 	if ((rl > 0) && (rbuf[rl - 1] != '/')) {
 	    rs = SR_OVERFLOW ;
-	    if (rl < rlen) {
-		rs = SR_OK ;
+	    if (rl < rlen) ylikely {
 	        rbuf[rl++] = '/' ;
-	        len += 1 ;
+		rs = 1 ;		/* <- return-value */
 	    } /* end if (good) */
 	} /* end if (needed) */
-	return (rs >= 0) ? len : rs ;
+	return rs ;
 } /* end method (adder::operator) */
 
 int adder::astr(cchar *sp,int sl) noex {
