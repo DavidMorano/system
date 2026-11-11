@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int	mkunique(char *,int,cchar *,int) noex ;
-
 EXTERNC_end
 
 
