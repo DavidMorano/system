@@ -117,7 +117,7 @@ int mknpathuser(char *rbuf,int rlen,cchar *un,cchar *pp,int µpl) noex {
 	    while ((pl > 0) && (pp[0] == '/')) {
 	        pp += 1 ;
 	        pl -= 1 ;
-	    }
+	    } /* end while */
 	    if (pl > 0) ylikely {
 	        if (pp[0] == CH_TILDE) {
 	            pp += 1 ;
@@ -125,7 +125,7 @@ int mknpathuser(char *rbuf,int rlen,cchar *un,cchar *pp,int µpl) noex {
 	            rs = mknpathsquiggle(rbuf,rlen,un,pp,pl) ;
 	        } else if (pp[0] == CHX_MICRO) {
 	            rs = mknpathuserfs(rbuf,rlen,pp,pl) ;
-	        }
+	        } /* end if */
 	    } /* end if */
 	} /* end if (getlenstr) */
 	return rs ;
@@ -146,11 +146,11 @@ local int mknpathsquiggle(char *rbuf,int rlen,cc *un,cc *pp,int pl) noex {
 	} else {
 	    pp += pl ;
 	    pl = 0 ;
-	}
+	} /* end if */
 	if ((ul == 0) && un) ylikely {
 	    up = un ;
 	    ul = -1 ;
-	}
+	} /* end if */
 	rs = mknpathun(rbuf,rlen,up,ul,pp,pl) ;
 	return rs ;
 } /* end subroutine (mknpathsqiggle) */
@@ -158,14 +158,14 @@ local int mknpathsquiggle(char *rbuf,int rlen,cc *un,cc *pp,int pl) noex {
 local int mknpathuserfs(char *rbuf,int rlen,cchar *pp,int pl) noex {
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	if ((pl >= 2) && (strncmp("µ/",pp,2) == 0)) {
+	if ((pl >= 2) && (cmpstrn("µ/",pp,2) == 0)) {
 	    pp += 2 ;
 	    pl -= 2 ;
 	    if (pl > 0) ylikely {
 	        while (pl && (pp[0] == '/')) {
 	            pp += 1 ;
 	            pl -= 1 ;
-	        }
+	        } /* end while */
 	        if (pl > 0) ylikely {
 	            cchar	*up = pp ;
 	            int		ul = pl ;
@@ -176,7 +176,7 @@ local int mknpathuserfs(char *rbuf,int rlen,cchar *pp,int pl) noex {
 	            } else {
 	                pp += pl ;
 	                pl = 0 ;
-	            }
+	            } /* end if */
 	            rs = mknpathun(rbuf,rlen,up,ul,pp,pl) ;
 	        } /* end if (positive) */
 	    } /* end if (positive) */
@@ -196,7 +196,7 @@ local int mknpathun(char *rbuf,int rlen,cc *up,int ul,cc *sp,int sl) noex {
 		cint mul = min(ul,ulen) ;
 	        rs = intconv(strwcpy(ubuf,up,mul) - ubuf) ;
 	        un = ubuf ;
-	    }
+	    } /* end if */
 	    if (rs >= 0) ylikely {
 	        if (char *pwbuf ; (rs = lm_pw(&pwbuf)) >= 0) {
 	            ucentpwx	pw ;
@@ -205,7 +205,7 @@ local int mknpathun(char *rbuf,int rlen,cc *up,int ul,cc *sp,int sl) noex {
 	                rs = getpwusername(&pw,pwbuf,pwlen,-1) ;
 	            } else {
 	                rs = pw.nam(pwbuf,pwlen,un) ;
-	            }
+	            } /* end if */
 	            if (rs >= 0) ylikely {
 		        cchar	*dir = pw.pw_dir ;
 	                if (sl > 0) {
@@ -214,7 +214,7 @@ local int mknpathun(char *rbuf,int rlen,cc *up,int ul,cc *sp,int sl) noex {
 	                } else {
 	                    rs = mknpath(rbuf,rlen,dir) ;
 			    rl = rs ;
-	                }
+	                } /* end if */
 	            } /* end if (ok) */
 	            rs1 = lm_free(pwbuf) ;
 		    if (rs >= 0) rs = rs1 ;
