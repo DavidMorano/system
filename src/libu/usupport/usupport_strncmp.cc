@@ -159,10 +159,10 @@ namespace libu {
 namespace libu {
     int strncasecmpo(cchar *e1p,cchar *e2p,int n) noex {
     	return (+ strncasecmp(e1p,e2p,n)) ;
-    }
+    } /* end */
     int strncasecmpr(cchar *e1p,cchar *e2p,int n) noex {
     	return (- strncasecmp(e1p,e2p,n)) ;
-    }
+    } /* end */
 } /* end namespace (libu) */
 
 namespace libu {
