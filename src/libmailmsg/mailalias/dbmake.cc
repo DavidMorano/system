@@ -486,7 +486,7 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	                if ((ropts & DBMAKE_OSEC) && (it[hi][0] != 0)) {
 	                    while ((v = it[hi][0]) != 0) {
 	                        ki = rectab[v][0] ;
-	                        f = (strcmp(kp,(skey + ki)) == 0) ;
+	                        f = (cmpstr(kp,(skey + ki)) == 0) ;
 	                        if (! f) break ;
 	                        if (ropts & DBMAKE_ORANDLC) {
 	                            khash = randlc(khash + c) ;
