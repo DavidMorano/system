@@ -49,7 +49,6 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<clanguage.h>
 #include	<usysbase.h>
 #include	<usyscalls.h>
@@ -522,11 +521,11 @@ local int config_readers(CF *csp,char *ebuf,int el,int i) noex {
                     sip->have.lfname = true ;
                     ml = subinfo_setfname(sip,tbuf,ebuf,el,true,
                         LOGCNAME,sn,"") ;
-                    if ((lfn == np) || (strcmp(lfn,tfn) != 0)) {
+                    if ((lfn == np) || (cmpstr(lfn,tfn) != 0)) {
                         cchar   **vpp = &sip->lfname ;
                         sip->changed.lfname = true ;
                         rs = subinfo_setentry(sip,vpp,tbuf,ml) ;
-                    }
+                    } /* end if */
                 } /* end if (needed) */
                 break ;
             case cparam_spooldir:
