@@ -97,7 +97,7 @@
 	implementation consisting of |openqotd_capbegin()| and
 	|openqotd_capend()|.
 
-	Q. Why did not we just use |ptm_lockbegin()| and |ptm_lockend()|
+	Q. Why did not we just use |ptm_lockbeg()| and |ptm_lockend()|
 	as our mutual-exclusion lock around |lockfile()|?
 	A. Because:
 	a. it is not a good idea to put POSIX® mutexes around a large
@@ -114,17 +114,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<csignal>		/* |sig_atomic_t| */
+#include	<unistd.h>		/* POSIX® */
+#include	<fcntl.h>		/* POSIX® */
+#include	<csignal>		/* CSTD |sig_atomic_t| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<usyscalls.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>
 #include	<ucfork.h>
-#include	<ucatfork.h>
+#include	<ucforkat.h>
 #include	<ucatexit.h>
 #include	<ucopen.h>
 #include	<ucdesc.h>
@@ -139,11 +139,11 @@
 #include	<pathadd.h>
 #include	<sfx.h>
 #include	<getmjd.h>		/* |getmjd(3uc)| */
-#include	<prmktmpdir.h>		/* LIBPR */
 #include	<lockfile.h>
 #include	<hasx.h>
 #include	<isnot.h>		/* |isNotAccess(3uc)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<prmktmpdir.h>		/* LIBPR */
 
 #include	"prqotd.h"
 #include	"prqotd_util.hh"
@@ -257,15 +257,15 @@ int openqotd_init() noex {
 	        if ((rs = cnp->create) >= 0) {
 	    	    void_f	b = openqotd_atforkbefore ;
 	    	    void_f	a = openqotd_atforkafter ;
-	            if ((rs = uc_atforkrec(b,a,a)) >= 0) {
+	            if ((rs = uc_forkatrec(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(openqotd_exit)) >= 0) {
 	                    rs = 0 ;
 	                    uip->f_initdone = true ;
 	                } /* end if (uc_atexit) */
 	                if (rs < 0) nlikely {
-	                    uc_atforkexp(b,a,a) ;
+	                    uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
-	            } /* end if (uc_atforkrec) */
+	            } /* end if (uc_forkatrec) */
 	            if (rs < 0) nlikely {
 	                cnp->destroy() ;
 		    } /* end if (error) */
@@ -292,19 +292,19 @@ int openqotd_fini() noex {
 	    {
 	        void_f	b = openqotd_atforkbefore ;
 	        void_f	a = openqotd_atforkafter ;
-	        rs1 = uc_atforkexp(b,a,a) ;
+	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		ptc *cnp = &uip->cn ;
 	        rs1 = cnp->destroy() ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        ptm *mxp = &uip->mx ;
 	        rs1 = mxp->destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    memclear(uip) ;
 	} /* end if (was initialized) */
 	return rs ;
@@ -389,7 +389,7 @@ local int openqotd_capbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
 	ptm *mxp = &uip->mx ;
-	if ((rs = mxp->lockbegin(to)) >= 0) ylikely {
+	if ((rs = mxp->lockbeg(to)) >= 0) ylikely {
 	    {
 	        ptc *cnp = &uip->cn ;
 	        uip->waiters += 1 ;
@@ -398,7 +398,7 @@ local int openqotd_capbegin(int to) noex {
 	        } /* end while */
 	        if (rs >= 0) {
 	            uip->f_capture = true ;
-	        }
+	        } /* end */
 	        uip->waiters -= 1 ;
 	    } /* end block */
 	    rs1 = mxp->lockend ;
@@ -412,13 +412,13 @@ local int openqotd_capend() noex {
 	int		rs ;
 	int		rs1 ;
 	ptm *mxp = &uip->mx ;
-	if ((rs = mxp->lockbegin) >= 0) ylikely {
+	if ((rs = mxp->lockbeg) >= 0) ylikely {
 	    {
 		ptc *cnp = &uip->cn ;
 	        uip->f_capture = false ;
 	        if (uip->waiters > 0) {
 	            rs = cnp->signal ;
-	        }
+	        } /* end */
 	    } /* end block */
 	    rs1 = mxp->lockend ;
 	    if (rs >= 0) rs = rs1 ;
@@ -458,7 +458,7 @@ local void openqotd_atforkbefore() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	{
 	    ptm *mxp = &uip->mx ;
-	    mxp->lockbegin() ;
+	    mxp->lockbeg() ;
 	}
 } /* end subroutine (openqotd_atforkbefore) */
 
@@ -474,7 +474,7 @@ local void openqotd_exit() noex {
 	cint		rs = openqotd_fini() ;
 	if (rs < 0) {
 	    ulogerror("openqotd",rs,"exit-fini") ;
-	}
+	} /* enf */
 } /* end subroutine (openqotd_exit) */
 
 local int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
@@ -580,7 +580,7 @@ local int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	                                if ((rs = uc_rewind(fd)) >= 0) {
 	                                    rs = loadchown(pr,fd) ;
 					}
-	                            }
+	                            } /* end */
 	                            rs1 = uc_close(s) ;
 	                    	    if (rs >= 0) rs = rs1 ;
 	                        } /* end if (maintqotd) */
@@ -623,7 +623,7 @@ local int loadchown(cchar *pr,int fd) noex {
 	    uid_t	euid = geteuid() ;
 	    if (euid != sb.st_uid) {
 	        uc_fchown(fd,sb.st_uid,sb.st_gid) ;
-	    }
+	    } /* end */
 	} /* end if (uc_stat) */
 	return rs ;
 } /* end subroutine (loadchown) */
