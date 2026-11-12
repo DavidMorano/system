@@ -416,7 +416,7 @@ namespace prqotd {
 		    gid_t	g = sip->gid_pr ;
 		    if ((rs = u_fchown(fd,u,g)) == SR_PERM) {
 			rs = SR_OK ;
-		    }
+		    } /* end */
 		} /* end if */
 	    } /* end if (rewind) */
 	    if (rs < 0) u_close(fd) ;
@@ -431,7 +431,7 @@ namespace prqotd {
 	int		rs1 ;
 	if (char *tmpname ; (rs = lm_mn(&tmpname)) >= 0) ylikely {
 	    cchar	*namp ; /* used-multiple */
-	    if ((f_def && (ebuf[0] == '\0')) || (strcmp(ebuf,"+") == 0)) {
+	    if ((f_def && (ebuf[0] == '\0')) || (cmpstr(ebuf,"+") == 0)) {
 	        namp = name ;
 	        if ((suf != nullptr) && (suf[0] != '\0')) {
 	            namp = tmpname ;
@@ -443,12 +443,12 @@ namespace prqotd {
 	                    rs = mkpath3(fnamep,sip->pr,dname,namp) ;
 	                } else {
 	                    rs = mkpath2(fnamep,sip->pr,namp) ;
-		        }
+		        } /* end if */
 	            } else {
 	                rs = mkpath1(fnamep,namp) ;
-	            }
+	            } /* end if */
 		} /* end if (ok) */
-	    } else if (strcmp(ebuf,"-") == 0) {
+	    } else if (cmpstr(ebuf,"-") == 0) {
 	        fnamep[0] = '\0' ;
 	    } else if (ebuf[0] != '\0') {
 	        namp = ebuf ;
@@ -465,11 +465,11 @@ namespace prqotd {
 	                    rs = mkpath3(fnamep,sip->pr,dname,namp) ;
 	                } else {
 	                    rs = mkpath2(fnamep,sip->pr,namp) ;
-		        }
+		        } /* end if */
 	            } /* end if */
 	        } else {
 	            rs = mkpath1(fnamep,namp) ;
-	        }
+	        } /* end if */
 	    } /* end if */
 	    rs1 = lm_free(tmpname) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -489,16 +489,16 @@ namespace prqotd {
 	        int	oi = -1 ;
 	        if (*epp != nullptr) {
 	            oi = vecstr_findaddr(&lip->stores,*epp) ;
-	        }
+	        } /* end */
 	        if (vp != nullptr) {
 	            vnlen = lenstr(vp,vl) ;
 	            rs = vecstr_store(&lip->stores,vp,vnlen,epp) ;
 	        } else {
 		    *epp = nullptr ;
-	        }
+	        } /* end */
 	        if ((rs >= 0) && (oi >= 0)) {
 	            vecstr_del(&lip->stores,oi) ;
-	        }
+	        } /* end */
 	    } /* end if (ok) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? vnlen : rs ;
@@ -523,10 +523,10 @@ namespace prqotd {
 	if (! sip->open.hosts)  {
 	    rs = vecpstr_start(&sip->hosts,0,0,0) ;
 	    sip->open.hosts = (rs >= 0) ;
-	}
+	} /* end if */
 	if ((rs >= 0) && vp) {
 	    rs = vecpstr_adduniq(&sip->hosts,vp,vl) ;
-	}
+	} /* end if */
 	return rs ;
     } /* end subroutine (subinfo_hostname) */
     int subinfo_source(SUB *sip,cchar *vp,int vl) noex {
@@ -534,10 +534,10 @@ namespace prqotd {
 	if (! sip->open.sources)  {
 	    rs = vecpstr_start(&sip->sources,0,0,0) ;
 	    sip->open.sources = (rs >= 0) ;
-	}
+	} /* end if */
 	if ((rs >= 0) && (vp != nullptr)) {
 	    rs = vecpstr_adduniq(&sip->sources,vp,vl) ;
-	}
+	} /* end if */
 	return rs ;
     } /* end subroutine (subinfo_source) */
 } /* end namespace (prqotd) */
@@ -597,7 +597,7 @@ local int subinfo_envbegin(SUB *sip) noex {
 	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) ylikely {
 	            cchar	**vpp = &sip->un ;
 	            rs = subinfo_setentry(sip,vpp,ubuf,rs) ;
-	        }
+	        } /* end if */
 	        rs1 = lm_free(ubuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
@@ -610,7 +610,7 @@ local int subinfo_envend(SUB *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (subinfo_envend) */
 
@@ -625,7 +625,7 @@ local int subinfo_confbegin(SUB *sip) noex {
 	    if ((rs = config_start(csp,sip,cfname)) >= 0) ylikely {
 	        if ((rs = config_read(csp)) >= 0) ylikely {
 	            rs = 1 ;
-	        }
+	        } /* end */
 	        if (rs < 0) nlikely {
 	            config_finish(csp) ;
 		} /* end if (error) */
@@ -648,12 +648,12 @@ local int subinfo_confend(SUB *sip) noex {
 	    {
 	        rs1 = config_finish(csp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = lm_free(sip->cfp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        sip->cfp = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
@@ -723,7 +723,7 @@ local int subinfo_opensrc(SUB *sip,cchar *qf,cchar *sep) noex {
 	    fd = rs ;
 	} else {
 	    rs = SR_NOENT ;
-	}
+	} /* end if (error) */
 #if	CF_DEBUG && CF_OPENDEF
 	if (rs == SR_NOENT) {
 	    rs = opendef(sip) ;
@@ -761,7 +761,7 @@ local int subinfo_defprog(SUB *sip,cchar *qfn) noex {
 			    break ;
 		        } else if (isNotPresent(rs)) {
 			    rs = SR_OK ;
-			}
+			} /* end if */
 			if (rs < 0) break ;
 	            } /* end for */
 		    if ((rs >= 0) && (fd < 0)) rs = SR_NOENT ;
@@ -771,7 +771,7 @@ local int subinfo_defprog(SUB *sip,cchar *qfn) noex {
 	    } /* end if (vecstr) */
 	    if ((rs < 0) && (fd >= 0)) {
 		u_close(fd) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (subinfo_id) */
 	return (rs >= 0) ? fd : rs ;
 } /* end subroutine (subinfo_defprog) */
@@ -796,7 +796,7 @@ local int subinfo_defproger(SUB *sip,vecstr *plp,cc *prog,cc *qfn) noex {
 	        char	*abuf = (a + (ai++ * (maxpath + 1))) ;
 	        if (rl == 0) {
 		    rs = mkpath1(rbuf,prog) ;
-	        }
+	        } /* end */
 	        if (rs >= 0) ylikely {
 		    cchar	*cp ;
 	            if (int cl ; (cl = sfbasename(prog,-1,&cp)) > 0) ylikely {
@@ -824,7 +824,7 @@ local int subinfo_defproger(SUB *sip,vecstr *plp,cc *prog,cc *qfn) noex {
 	                } /* end if (sncpy) */
 	            } else {
 		        rs = SR_NOENT ;
-		    }
+		    } /* end if (error) */
 	        } /* end if (mkpath) */
 	    } /* end if (getprogpath) */
 	    rs1 = lm_free(a) ;
@@ -834,17 +834,17 @@ local int subinfo_defproger(SUB *sip,vecstr *plp,cc *prog,cc *qfn) noex {
 } /* end subroutine (subinfo_defproger) */
 
 local int subinfo_addourpath(SUB *sip,vecstr *plp) noex {
-	static cchar	*path = getenver(varname.path) ;
+	static cchar	*pval = getenver(varname.path) ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (path) {
-	    rs = plp->addpathclean(path,-1) ;
+	if (pval) {
+	    rs = plp->addpathclean(pval,-1) ;
 	    c += rs ;
-	}
+	} /* end */
 	if (rs >= 0) ylikely {
 	    rs = subinfo_addprbins(sip,plp) ;
 	    c += rs ;
-	}
+	} /* end */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (subinfo_addourpath) */
 
@@ -892,7 +892,7 @@ local int subinfo_id(SUB *sip) noex {
 	if (! sip->open.id) {
 	    sip->open.id = true ;
 	    rs = ids_load(&sip->id) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (subinfo_id) */
 
@@ -956,7 +956,7 @@ local int debugmode(cchar *ids,cchar *s,cchar *fname) noex {
 		}
 	    } else {
 	        debugprintf("%s: %s rs=%d\n",ids,s,rs) ;
-	    }
+	    } /* end */
 	    rs1 = lm_free(mstr) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
