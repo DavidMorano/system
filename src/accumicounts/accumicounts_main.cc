@@ -1,12 +1,12 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* part of the ACCUMICOUNTS program */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
 #define	CF_GETEXECNAME	1		/* use 'getexecname(3c)' */
-
 
 /* revision history:
 
@@ -18,26 +18,30 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Description:
+
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<baops.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
 #include	<field.h>
 #include	<paramopt.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
-#include	"defs.h"
 
 
 /* local defines */
@@ -62,17 +66,6 @@ local int usage(struct proginfo *) ;
 
 /* local variables */
 
-static cchar *argopts[] = {
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"option",
-	"set",
-	"follow",
-	NULL
-} ;
-
 enum argopts {
 	argopt_version,
 	argopt_verbose,
@@ -82,36 +75,42 @@ enum argopts {
 	argopt_set,
 	argopt_follow,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static cchar	*progopts[] = {
+constexpr cpcchar	argopts[] = {
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"option",
+	"set",
 	"follow",
-	"nofollow",
-	NULL
-} ;
+	nullptr
+} ; /* end array */
 
 enum options {
 	progopt_follow,
 	progopt_nofollow,
 	progopt_overlast
-} ;
+} ; /* end enum */
+
+constexpr cpcchar	progopts[] = {
+	"follow",
+	"nofollow",
+	nullptr
+} ; /* end array */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
-	struct proginfo	pi, *pip = &pi ;
-
+int main(int argc,con mainv argv,con mainv envv) {
+	PI		pi, *pip = &pi ;
 	paramopt	aparams ;
-
 	bfile	errfile ;
 	bfile	outfile, *ofp = &outfile ;
-
 	int	argr, argl, aol, akl, avl, kwi ;
 	int	ai, ai_max, ai_pos ;
 	int	argvalue = -1 ;
@@ -128,14 +127,14 @@ char	*envv[] ;
 	char	*argp, *aop, *akp, *avp ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
-	char	*pr = NULL ;
-	char	*pmspec = NULL ;
-	char	*searchname = NULL ;
-	char	*afname = NULL ;
+	char	*pr = nullptr ;
+	char	*pmspec = nullptr ;
+	char	*searchname = nullptr ;
+	char	*afname = nullptr ;
 	char	*cp ;
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -143,7 +142,7 @@ char	*envv[] ;
 
 	proginfo_start(pip,envv,argv[0],VERSION) ;
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
 
@@ -156,7 +155,7 @@ char	*envv[] ;
 
 	pip->ofp = ofp ;
 	pip->debuglevel = 0 ;
-	pip->tmpdname = NULL ;
+	pip->tmpdname = nullptr ;
 	pip->namelen = MAXNAMELEN ;
 
 	pip->bytes = 0 ;
@@ -208,7 +207,7 @@ char	*envv[] ;
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                akl = avp - aop ;
 	                avp += 1 ;
@@ -516,32 +515,32 @@ char	*envv[] ;
 
 /* get some program information */
 
-	if (pr == NULL) {
+	if (pr == nullptr) {
 
 	    pr = getenv(VARPROGRAMROOT1) ;
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = getenv(VARPROGRAMROOT2) ;
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = getenv(VARPROGRAMROOT3) ;
 
 /* try to see if a path was given at invocation */
 
-	    if ((pr == NULL) && (pip->progdname != NULL))
+	    if ((pr == nullptr) && (pip->progdname != nullptr))
 	        proginfo_rootprogdname(pip) ;
 
 /* do the special thing */
 
 #if	CF_GETEXECNAME && defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-	    if ((pr == NULL) && (pip->pr == NULL)) {
+	    if ((pr == nullptr) && (pip->pr == nullptr)) {
 
 	        cchar	*pp ;
 
 
 	        pp = getexecname() ;
 
-	        if (pp != NULL)
+	        if (pp != nullptr)
 	            proginfo_execname(pip,pp) ;
 
 	    }
@@ -549,9 +548,9 @@ char	*envv[] ;
 
 	} /* end if (getting a program root) */
 
-	if (pip->pr == NULL) {
+	if (pip->pr == nullptr) {
 
-	    if (pr == NULL)
+	    if (pr == nullptr)
 	        pr = PROGRAMROOT ;
 
 	    proginfo_setprogroot(pip,pr,-1) ;
@@ -579,10 +578,10 @@ char	*envv[] ;
 
 /* check a few more things */
 
-	if (pip->tmpdname == NULL)
+	if (pip->tmpdname == nullptr)
 	    pip->tmpdname = getenv("TMPDIR") ;
 
-	if (pip->tmpdname == NULL)
+	if (pip->tmpdname == nullptr)
 	    pip->tmpdname = TMPDNAME ;
 
 
@@ -599,7 +598,7 @@ char	*envv[] ;
 
 	    while (paramopt_curenumval(&aparams,PO_OPTION,&cur,&cp) >= 0) {
 
-		if (cp == NULL) continue ;
+		if (cp == nullptr) continue ;
 
 	        if ((kwi = matstr(progopts,cp,-1)) >= 0) {
 
@@ -644,7 +643,7 @@ char	*envv[] ;
 
 /* process any files in the argument filename list file */
 
-	if ((rs >= 0) && (afname != NULL) && (afname[0] != '\0')) {
+	if ((rs >= 0) && (afname != nullptr) && (afname[0] != '\0')) {
 
 	    bfile	argfile, *afp = &argfile ;
 
@@ -699,26 +698,19 @@ char	*envv[] ;
 
 	} /* end if (processing file argument file list */
 
-	if ((pan == 0) && (afname == NULL))
+	if ((pan == 0) && (afname == nullptr))
 	    goto badnodirs ;
 
 	if ((rs = bopen(ofp,BFILE_STDOUT,"dwct",0644)) >= 0) {
-
-		for (i = 0 ; i < ICOUNTS_TOTAL ; i += 1) {
-
-	    		bprintf(ofp,"%3d %16lld\n",
+	    for (i = 0 ; i < ICOUNTS_TOTAL ; i += 1) {
+	  	bprintf(ofp,"%3d %16lld\n",
 			i,pip->icounts[i]) ;
-
-		}
-
+	    } /* end for */
 	    bclose(ofp) ;
-
 	} else
 	    goto badoutopen ;
 
-
 	ex = EX_OK ;
-
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)
@@ -756,7 +748,7 @@ usage:
 
 /* help */
 help:
-	printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	goto retearly ;
 
@@ -790,19 +782,14 @@ badoutopen:
 
 	goto ret1 ;
 
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
 
-
-local int usage(pip)
-struct proginfo	*pip ;
-{
-	int	rs ;
-	int	wlen = 0 ;
-
+local int usage(PI *pip) noex {
+	int		rs ;
+	int		wlen = 0 ;
 
 	rs = bprintf(pip->efp,
 	    "%s: USAGE> %s [file(s) ...] [-Vv]\n",
@@ -815,8 +802,6 @@ struct proginfo	*pip ;
 
 	wlen += rs ;
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
-
+} /* end subroutine (usage) */
 
 
