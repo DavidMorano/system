@@ -222,39 +222,39 @@ constexpr int   chtablen	= (UCHAR_MAX + 1) ;
 namespace {
     struct llhelper {
 	ulonglong	ullmax	= 0 ;
-	longlong	llmin	= 0 ;
-	longlong	llmax	= 0 ;
-	ulonglong	cutoff	[maxbase+1] = {} ;
-	longlong	pcutoff	[maxbase+1] = {} ;
-	longlong	ncutoff	[maxbase+1] = {} ;
-	int		cutlim	[maxbase+1] = {} ;
-	int		pcutlim	[maxbase+1] = {} ;
-	int		ncutlim	[maxbase+1] = {} ;
+	longlong	sllmin	= 0 ;
+	longlong	sllmax	= 0 ;
+	ulonglong	ucutoff	[maxbase+1] = {} ;	/* unsigned */
+	longlong	pcutoff	[maxbase+1] = {} ;	/* positive */
+	longlong	ncutoff	[maxbase+1] = {} ;	/* negative */
+	int		ucutlim	[maxbase+1] = {} ;	/* unsigned */
+	int		pcutlim	[maxbase+1] = {} ;	/* positive */
+	int		ncutlim	[maxbase+1] = {} ;	/* negative */
 	consteval void mklims() noex {
 	    clonglong	one = 1 ;
 	    cint	nb = nbits<longlong> ;
 	    ullmax = (compl ullmax) ;
-	    llmin = (one << (nb - 1)) ;
-	    llmax = longlong(ullmax >> 1) ;
+	    sllmin = (one << (nb - 1)) ;
+	    sllmax = longlong(ullmax >> 1) ;
 	} ; /* end method (mklims) */
-	consteval void mkcuts() noex {
+	consteval void mkuns() noex {
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
-		cutoff[b] = (ullmax / b) ;
-		cutlim[b] = conv<int>(ullmax % b) ;
+		ucutoff[b] = (ullmax / b) ;
+		ucutlim[b] = conv<int>(ullmax % b) ;
 	    } /* end for */
-	} ; /* end method (mkcuts) */
+	} ; /* end method (mkuns) */
 	consteval void mkpos() noex {
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
-                pcutoff[b] = (llmax / b) ;
-                pcutlim[b] = conv<int>(llmax % b) ;
+                pcutoff[b] = (sllmax / b) ;
+                pcutlim[b] = conv<int>(sllmax % b) ;
 	    } /* end for */
 	} ; /* end method (mkpos) */
 	consteval void mkneg() noex {
 	    longlong	nco ;
 	    int		ncl ;
 	    for (uint b = 2 ; b <= uint(maxbase) ; b += 1) {
-                nco = (llmin / b) ;
-                ncl = conv<int>(llmin % b) ;
+                nco = (sllmin / b) ;
+                ncl = conv<int>(sllmin % b) ;
                 if (ncl > 0) {
                     ncl -= b ;
                     nco += 1 ;
@@ -266,7 +266,7 @@ namespace {
 	} ; /* end method (mkneg) */
 	consteval llhelper() noex {
 	    mklims() ;
-	    mkcuts() ;
+	    mkuns() ;
 	    mkpos() ;
 	    mkneg() ;
 	} ; /* end ctor */
@@ -654,7 +654,7 @@ void strer_sll::cvtpos(int val) noex {
 
 void strer_sll::reterr() noex {
     	if (verr < 0) {
-	    res = (fneg) ? llhelp.llmin : llhelp.llmax ;
+	    res = (fneg) ? llhelp.sllmin : llhelp.sllmax ;
 	    errno = ERANGE ;
 	} /* end if (error) */
 } /* end method (strer_sll::reterr) */
@@ -665,8 +665,8 @@ strer_ull::operator ulonglong () noex {
 } /* end method */
 
 void strer_ull::cookprep() noex {
-	cutoff = llhelp.cutoff[base] ;
-	cutlim = llhelp.cutlim[base] ;
+	cutoff = llhelp.ucutoff[base] ;
+	cutlim = llhelp.ucutlim[base] ;
 } /* end method */
 
 void strer_ull::cvt(int val) noex {
