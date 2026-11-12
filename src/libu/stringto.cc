@@ -5,7 +5,7 @@
 /* convert a C++ string of digits to an integer (of various sizes) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -81,7 +81,7 @@ int stringtosl	(con string &s,int b,slong *rp)		noex {
     	return stringtox(stosl,s,b,rp) ;
 } /* end subroutine (stringtosl) */
 
-int stringtosll	(con string &s,int b,slonglong *rp)		noex {
+int stringtosll	(con string &s,int b,slonglong *rp)	noex {
     	return stringtox(stosll,s,b,rp) ;
 } /* end subroutine (stringtosll) */
 
@@ -93,7 +93,7 @@ int stringtoul	(con string &s,int b,ulong *rp)		noex {
     	return stringtox(stoul,s,b,rp) ;
 } /* end subroutine (stringtoul) */
 
-int stringtoull	(con string &s,int b,ulonglong *rp)		noex {
+int stringtoull	(con string &s,int b,ulonglong *rp)	noex {
     	return stringtox(stoull,s,b,rp) ;
 } /* end subroutine (stringtoull) */
 
