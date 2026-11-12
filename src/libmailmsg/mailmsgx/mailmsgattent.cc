@@ -34,7 +34,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -329,8 +328,8 @@ int mailmsgattent_isplaintext(MME *op) noex {
 	    if ((op->type != nullptr) && (op->subtype != nullptr)) {
 	        cchar	*str_text	= contypenames[contypeval_text] ;
 	        cchar	*str_plain	= contypenames[contypeval_plain] ;
-	        f = (strcmp(op->type,str_text) == 0) ;
-	        f = f && (strcmp(op->subtype,str_plain) == 0) ;
+	        f = (cmpstr(op->type,str_text) == 0) ;
+	        f = f && (cmpstr(op->subtype,str_plain) == 0) ;
 	    }
 	    op->f_plaintext = f ;
 	} /* end if (magic) */
@@ -528,7 +527,7 @@ local int mailmsgattent_checkatt(MME *op) noex {
         int             rs = SR_OK ;
         cchar           *fn = op->attfname ;
         if (fn) {
-            if (strcmp(fn,"-") != 0) {
+            if (cmpstr(fn,"-") != 0) {
                 rs = perm(fn,-1,-1,nullptr,R_OK) ;
             }
         } /* end if */
