@@ -20,8 +20,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* POSIX® */
-#include	<stdlib.h>		/* POSIX® */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
