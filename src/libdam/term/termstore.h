@@ -22,8 +22,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* system types */
 #include	<termios.h>		/* POSIX® */
-#include	<stddef.h>		/* POSIX® */
-#include	<stdlib.h>		/* POSIX® */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
@@ -40,10 +40,8 @@ struct termstore {
 typedef TERMSTORE	termstore ;
 
 EXTERNC_begin
-
 extern int termstore_save	(termstore *,int) noex ;
 extern int termstore_restore	(termstore *) noex ;
-
 EXTERNC_end
 
 
