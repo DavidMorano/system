@@ -22,13 +22,16 @@
 
 	Description:
 	This subroutine creates (makes) a Shared-Object Name from
-	various components.
+	various components.  Given a prefix ('pre'), a base ('base'),
+	and an extension ('ext'), this subroutine creates the
+	string:
+		<pre>_<base>.<ext)
 
 	Synopsis:
 	int mkshlibname(char *rbuf,cchar *pre,cchar *base,cchar *ext) noex
 
 	Arguments:
-	rbuf		result buffer
+	rbuf		result buffer pointer
 	pre		optional filename prefix
 	base		base-part of final filename
 	ext		optional extension resulting filename
@@ -47,7 +50,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -81,7 +84,6 @@ import libutil ;			/* |memclear(3u)| */
 
 
 /* forward references */
-
 
 
 /* local variables */
