@@ -70,19 +70,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |strncmp(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<tmstrs.h>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<tmstrs.h>		/* LIBUC */
 #include	<strn.h>
 #include	<sfx.h>			/* |sfnext(3uc)| */
 #include	<six.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<isch.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* LIBU */
 
 #include	"mailmsgmatenv.h"
 
@@ -146,7 +145,7 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 	    } /* end if */
 	    if ((sl > 5) && (sp[0] == 'F')) {
 	        int	si = 5 ;
-	        if (strncmp("From ",sp,si) == 0) {
+	        if (cmpstrn("From ",sp,si) == 0) {
 	            mep->rt = -1 ;
 	            sp += si ;
 	            sl -= si ;
@@ -162,7 +161,7 @@ int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 			    }
 		        }
 		    }
-	        }
+	        } /* end if (cmpstrn) */
 	    } /* end if (hit) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -178,7 +177,7 @@ local int mmenvdat_ema(mmenvdat *mep,cchar *sp,int sl) noex {
 	    mep->a.ep = cp ;
 	    mep->a.el = cl ;
 	    skip = intconv((cp + cl) - sp) ;
-	}
+	} /* end if */
 	return skip ;
 } /* end subroutine (mmenvdat_ema) */
 
@@ -220,7 +219,7 @@ local int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
 			} /* end if (sfnext) */
 		    }
 		} /* end if (sfnext) */
-	    }
+	    } /* end if */
 	} /* end if (sfnext) */
 	return skip ;
 } /* end subroutine (mmenvdat_date) */
@@ -233,7 +232,7 @@ local int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
 	} /* end for */
 	if (si >= 0) {
 	    mep->rt = i ;
-	}
+	} /* end if */
 	return si ;
 } /* end subroutine (mmenvdat_datefin) */
 
@@ -249,8 +248,8 @@ local int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
 		mep->r.ep = cp ;
 		mep->r.el = cl ;
 		skip = intconv((cp + cl) - sp) ;
-	    }
-	}
+	    } /* end if */
+	} /* end if */
 	return skip ;
 } /* end subroutine (mmenvdat_remote) */
 
