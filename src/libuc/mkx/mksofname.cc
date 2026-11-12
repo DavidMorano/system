@@ -24,13 +24,15 @@
 
 	Description:
 	This subroutine constructs a full-path filename from various
-	specified components.
+	specified components.  Given a directory name 'dn' and a
+	name 'name' and an extension 'ext', this subroutine forms:
+		{dn}/{name}.{ext}
 
 	Synopsis:
 	int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex
 
 	Arguements:
-	rbuf		result buffer
+	rbuf		result buffer pointer
 	dn		directory name
 	name		base-name
 	ext		extension
