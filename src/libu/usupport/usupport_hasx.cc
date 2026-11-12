@@ -40,7 +40,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* CSTD |strcmp(3c)| */
+#include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -89,7 +89,7 @@ namespace libu {
     bool hasext(cchar *sp,int sl,cchar *ext) noex {
     	bool		f = false ;
 	if (cint si = siext(sp,sl) ; si >= 0) {
-	    f = (strcmp((sp + si),ext) == 0) ;
+	    f = (cmpstr((sp + si),ext) == 0) ;
 	} /* end if (siext) */
     	return f ;
     } /* end subroutine (hasext) */
