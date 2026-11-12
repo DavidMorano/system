@@ -21,9 +21,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* POSIX® system types */
-#include	<stddef.h>		/* POSIX® */
-#include	<stdlib.h>		/* POSIX® */
-#include	<stdarg.h>		/* POSIX® */
+#include	<stddef.h>		/* CSTD */
+#include	<stdlib.h>		/* CSTD */
+#include	<stdarg.h>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
