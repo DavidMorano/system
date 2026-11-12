@@ -96,7 +96,7 @@ struct locinfo {
 	vecstr		stores ;
 	PI		*pip ;
 	cchar		*searchline ;
-	LI_FL		have, f, changed, finval ;
+	LI_FL		have, fl, changed, finval ;
 	LI_FL		open ;
 } ; /* end struct */
 
