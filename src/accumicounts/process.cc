@@ -1,52 +1,51 @@
-/* process */
+/* process SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* process a name */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-
 	The was newly written for the present purpose.
-
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************
+/*******************************************************************************
 
+  	Description:
 	This subroutine reads, parses, and adds up 'icounts'
 	file a specified file.
 
-
-******************************************************************************/
-
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<termios.h>
-#include	<csignal>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
-
-#include	<usystem.h>
-#include	<bfile.h>
-#include	<baops.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<baops.h>		/* LIBU */
+#include	<sfx.h>
+#include	<cfdec.h>
 #include	<field.h>
-#include	<localmisc.h>
+#include	<paramopt.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	"paramopt.h"
 #include	"config.h"
-#include	"defs.h"
 
 
 /* local defines */
@@ -58,9 +57,6 @@
 
 /* external subroutines */
 
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-
 
 /* external variables */
 
@@ -71,36 +67,24 @@ extern int	cfdeci(cchar *,int,int *) ;
 /* forward references */
 
 
-/* external variables */
-
-
 /* local variables */
 
 
+/* exported variables */
 
 
+/* exported subroutines */
 
-
-
-int process(pip,name,pp)
-struct proginfo	*pip ;
-char		name[] ;
-PARAMOPT	*pp ;
-{
+int process(PI *pip,cchar *name,PARAMOPT *pp) noex {
 	ustat	sb ;
-
 	bfile	ifile ;
-
 	int	rs ;
 	int	len ;
 	int	sl, cl ;
-
 	cchar	*sp, *cp ;
-
 	char	linebuf[LINEBUFLEN + 1] ;
 
-
-	if (name == NULL)
+	if (name == nullptr)
 	    return BAD ;
 
 #if	CF_DEBUG
@@ -153,16 +137,10 @@ PARAMOPT	*pp ;
 	            ii = ICOUNTS_TOTAL ;
 
 	        pip->icounts[ii] += n ;
-
 	    } /* end while */
-
 	    bclose(&ifile) ;
-
 	} /* end if */
-
 	return rs ;
-}
-/* end subroutine (process) */
-
+} /* end subroutine (process) */
 
 
