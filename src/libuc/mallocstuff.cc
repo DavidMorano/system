@@ -16,7 +16,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/*****************************************************************************
+/*******************************************************************************
 
   	Group:
 	mallocstuff
@@ -25,7 +25,7 @@
 	These subroutines allocate a suitable amount of memory and
 	then copy the user supplied thing into it.
 
-****************************************************************************/
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
