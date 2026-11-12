@@ -1,13 +1,12 @@
-/* main */
+/* main SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* update the machine status for the current machine */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_GETEXECNAME	1		/* get the 'exec(2)' name */
-
 
 /* revision history:
 
@@ -15,33 +14,38 @@
 	This code was originally written.  
 
 	= 1998-06-01, David A­D­ Morano
-	I enhanced the program a little to print out some other information.
+	I enhanced the program a little to print out some other
+	information.
 
 	= 1999-03-01, David A­D­ Morano
-	I enhanced the program a little to to do something (I forget what).
+	I enhanced the program a little to to do something (I forget
+	what).
 
 	= 2004-01-10, David A­D­ Morano
-	This code was originally written.  
-        The KSH program switched to using a fakey "large file" (64-bit fake-out
-        mode) compilation mode on Solaris. This required some checking to see if
-        any references to 'u_stat()' had to be updated to work with the new KSH.
-        Although we call 'u_stat()' here, its structure is not passed to other
-        subroutines expecting the regular 32-bit structure.
+	This code was originally written.  The KSH program switched
+	to using a fakey "large file" (64-bit fake-out mode)
+	compilation mode on Solaris. This required some checking
+	to see if any references to 'u_stat()' had to be updated
+	to work with the new KSH.  Although we call 'u_stat()' here,
+	its structure is not passed to other subroutines expecting
+	the regular 32-bit structure.
 
 	= 2005-04-20, David A­D­ Morano
-        I changed the program so that the configuration file is consulted even
-        if the program is not run in daemon-mode. Previously, the configuration
-        file was only consulted when run in daemon-mode. The thinking was that
-        running the program in regular (non-daemon) mode should be quick. The
-        problem is that the MS file had to be guessed without the aid of
-        consulting the configuration file. Although not a problem in most
-        practice, it was not aesthetically appealing. It meant that if the
-        administrator changed the MS file in the configuration file, it also had
-        to be changed by specifying it explicitly at invocation in
-        non-daemon-mode of the program. This is the source of some confusion
-        (which the world really doesn't need). So now the configuration is
-        always consulted. The single one-time invocation is still fast enough
-        for the non-smoker aged under 40! :-) :-)
+	I changed the program so that the configuration file is
+	consulted even if the program is not run in daemon-mode.
+	Previously, the configuration file was only consulted when
+	run in daemon-mode. The thinking was that running the program
+	in regular (non-daemon) mode should be quick. The problem
+	is that the MS file had to be guessed without the aid of
+	consulting the configuration file. Although not a problem
+	in most practice, it was not aesthetically appealing. It
+	meant that if the administrator changed the MS file in the
+	configuration file, it also had to be changed by specifying
+	it explicitly at invocation in non-daemon-mode of the
+	program. This is the source of some confusion (which the
+	world really doesn't need). So now the configuration is
+	always consulted. The single one-time invocation is still
+	fast enough for the non-smoker aged under 40! :-) :-)
 
 */
 
@@ -49,27 +53,26 @@
 
 /**************************************************************************
 
+  	Description:
 	This is a built-in command to the KSH shell.  It should also
 	be able to be made into a stand-alone program without much
 	(if almost any) difficulty, but I have not done that yet (we
 	already have a MSU program out there).
 
-	Note that special care needed to be taken with the child processes
-	because we cannot let them ever return normally !  They cannot
-	return since they would be returning to a KSH program that thinks
-	it is alive (!) and that geneally causes some sort of problem or
-	another.  That is just some weird thing asking for trouble.  So we
-	have to take care to force child processes to exit explicitly.
-	Child processes are only created when run in "daemon" mode.
+	Note that special care needed to be taken with the child
+	processes because we cannot let them ever return normally
+	!  They cannot return since they would be returning to a
+	KSH program that thinks it is alive (!) and that geneally
+	causes some sort of problem or another.  That is just some
+	weird thing asking for trouble.  So we have to take care
+	to force child processes to exit explicitly.  Child processes
+	are only created when run in "daemon" mode.
 
 	Synopsis:
-
 	$ msu [-speed[=<name>]] [-zerospeed] [-msfile <file>]
 
-
 	Implementation note:
-
-	It is difficult to close files when run as a SHELL builtin !
+	It is difficult to close files when run as a SHELL builtin!
 	We want to close files when we run in the background, but when
 	running as a SHELL builtin, we cannot close file descriptors
 	untill after we fork (else we corrupt the enclosing SHELL).
@@ -77,9 +80,7 @@
 	objects open across the fork.  This problem is under review.
 	Currently, there is not an adequate self-contained solution.
 
-
 *****************************************************************************/
-
 
 #include	<envstandards.h>	/* ordered first to configure */
 
