@@ -838,7 +838,7 @@ local int mailalias_keymatch(MA *op,int ri,cchar *aname) noex {
 	cchar		*ks = (op->skey + ki) ;
 	bool		f = true ;
 	f = f && (ks[0] == aname[0]) ;
-	f = f && (strcmp(ks,aname) == 0) ;
+	f = f && (cmpstr(ks,aname) == 0) ;
 	return f ;
 } /* end subroutine (mailalias_keymatch) */
 
