@@ -23,9 +23,8 @@
 	mkshmname
 
 	Description:
-	This subroutine constructs a shared-memory (SHM) name 
-	from various specified
-	components.
+	This subroutine constructs a shared-memory (SHM) name from
+	various specified components.
 
 	Synopsis:
 	int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl) noex
