@@ -1,23 +1,25 @@
-/* checkname */
+/* checkname SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* check a file name */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUG 	0
-
+#define	CF_DEBUG 	0		/* debugging */
 
 /* revision history:
 
-	= 96/03/01, David A­D­ Morano
-
+	= 1996-03-01, David A­D­ Morano
 	This code was originally written.
-
 
 */
 
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
-/***********************************************************************
+/*******************************************************************************
 
+  	Description:
 	This module first checks to see if the file meets the specified
 	requirements to be considered in the file size sum.  If a file
 	is supposed to be included, the size of the file is added to
@@ -34,29 +36,25 @@
 	0		continue with directory walk as usual
 	>0		skip this directory entry in directory walk
 
-
-***********************************************************************/
-
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<dirent.h>
-#include	<climits>
-#include	<ctype.h>
-
-#include	<bfile.h>
-#include	<usystem.h>
-#include	<paramopt.h>
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<paramopt.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
-#include	"defs.h"
 
 
 /* local defines */
@@ -74,33 +72,32 @@ extern int	sfbasename(cchar *,int,cchar **) ;
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
 
 local int	addsize() ;
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int checkname(name,sbp,ckp)
-char		name[] ;
-ustat	*sbp ;
-struct checkparams	*ckp ;
-{
-	ustat	sb2 ;
-
-	struct proginfo	*pip = ckp->pip ;
-
+int checkname(cchar *name,ustat *sbp,checkparams *ckp) noex {
+	PI		*pip = ckp->pip ;
 	PARAMOPT	*pp = ckp->pp ;
-
+	ustat		sb2 ;
 	int	rs ;
 	int	dirlen, len, nnlen ;
-	int	f_changed = FALSE ;
-
+	int	f_changed = false ;
 	char	newname[MAXPATHLEN + 1] ;
 	char	*nnp ;
 	char	*bnp ;
-
 
 #if	CF_DEBUG
 	if (pip->debuglevel > 1)
@@ -179,10 +176,10 @@ struct checkparams	*ckp ;
 	    debugprintf("checkname: suffix requested\n") ;
 #endif
 
-		if ((cp = strrchr(name,'.')) == NULL)
+		if ((cp = strrchr(name,'.')) == nullptr)
 			return 0 ;
 
-		if (paramopt_findvalue(pp,SUFFIX,(cp + 1),-1,NULL) < 0)
+		if (paramopt_findvalue(pp,SUFFIX,(cp + 1),-1,nullptr) < 0)
 			return 0 ;
 
 	} /* end if (restricting to specified suffixes) */
@@ -197,17 +194,11 @@ struct checkparams	*ckp ;
 
 
 	return 0 ;
-}
-/* end subroutine (checkname) */
-
+} /* end subroutine (checkname) */
 
 /* add up the size of this file to the total */
-local int addsize(pip,size)
-struct proginfo	*pip ;
-size_t		size ;
-{
+local int addsize(PI *pip,size_t size) noex {
 	long	bytes ;
-
 
 	bytes = pip->bytes ;
 	bytes += (size % MEGABYTE) ;
@@ -217,8 +208,6 @@ size_t		size ;
 	pip->megabytes += (size / MEGABYTE) ;
 
 	return size ;
-}
-/* end subroutine (addsize) */
-
+} /* end subroutine (addsize) */
 
 
