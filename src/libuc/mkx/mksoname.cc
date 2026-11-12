@@ -23,15 +23,18 @@
 
 	Description:
 	This subroutine formulates (makes) the file-name for a
-	shared library (shared object).
+	shared library (shared object).  Given the counted c-string
+	'pn' this subroutine formulates in the result buffer
+	(assumed to be of MAXNAMELEN length) the file name:
+		lib{pn}.so
 
 	Synopsis:
 	int mksoname(char *rbuf,cchar *pnp,int pnl) noex
 
 	Arguments:
-	rbuf		result buffer
-	pnp		source pointer
-	pnl		source length
+	rbuf		result buffer pointer
+	pnp		source string pointer
+	pnl		source string length
 
 	Returns:
 	>=0		result buffer length
@@ -40,7 +43,6 @@
 	See-also:
 	mksofname
 	mksoname
-	mkshlibname
 
 *******************************************************************************/
 
@@ -93,15 +95,15 @@ cint			libl		= clenstr(liba) ;
 
 /* exported subroutines */
 
-int mksoname(char *shlibname,cchar *pnp,int µpnl) noex {
+int mksoname(char *rbuf,cchar *pnp,int µpnl) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
-	if (shlibname && pnp) ylikely {
+	if (rbuf && pnp) ylikely {
 	    rs = SR_INVALID ;
 	    if (pnp[0]) ylikely {
 		if (int pnl ; (pnl = getlenstr(pnp,µpnl)) > 0) ylikely {
 		    if ((rs = maxnamelen) >= 0) ylikely {
-		        storebuf sb(shlibname,rs) ;
+		        storebuf sb(rbuf,rs) ;
 	                bool f = (pnl >= 3) ;
 	                f = f && (strncmp(pnp,liba,libl) == 0) ;
 	                if (! f) {
