@@ -47,7 +47,6 @@
 #include	<unistd.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| + |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -154,14 +153,14 @@ int mker::procdir(uids *idp,cchar *dn) noex {
 	    if (S_ISDIR(sb.st_mode)) {
 	        if ((rs = idp->perm(&sb,X_OK)) == 0) {
 		    rs = uperm(dn,X_OK) ;
-		}
+		} /* end */
 	    } else {
 	        rs = SR_NOTDIR ;
-	    }
+	    } /* end if (error) */
 	} else if (rs == SR_NOENT) {
 	    if ((rs = u_mkdir(dn,dm)) >= 0) {
 	        c = 1 ;
-	    }
+	    } /* end */
 	} /* end if */
 	return (rs >= 0) ? c : rs ;
 } /* end method (mker::procdir) */
@@ -175,11 +174,11 @@ int mker::mkdirer(uids *idp,cchar *dn) noex {
 	if (char *dbuf ; (rs = umem.mall(dsz,&dbuf)) >= 0) ylikely {
             if ((rs = mknpath(dbuf,maxpath,dn)) >= 0) ylikely {
                 cchar       *dp = dbuf ;
-                for (char *bp ; (bp = strchr(dp,'/')) != np ; ) {
+                for (char *bp ; (bp = strochr(dp,'/')) != np ; ) {
                     bool    f = true ;
-                    *bp = '\0' ;	/* <- set temporary termination */
+                    *bp = eos ;	/* <- set temporary termination */
                     f = f && ((bp - dp) > 0) ;
-                    f = f && (strcmp(dp,".") != 0) ;
+                    f = f && (cmpstr(dp,".") != 0) ;
                     if (f) {
                         rs = procdir(idp,dbuf) ;
                         c += rs ;
