@@ -1,4 +1,4 @@
-/* termtime_main (termtime) */
+/* termtime_main SUPPORT (termtime) */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -17,7 +17,7 @@
 
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
-/**************************************************************************
+/*******************************************************************************
 
 	Name:
 	termtime
@@ -29,7 +29,7 @@
 	Synopsis:
 	$ termtime
 
-*****************************************************************************/
+*******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<ctime>			/* CSTD */
@@ -109,6 +109,7 @@ enum terms {
     	term_vt540,
 	term_xterm,
 	term_xtermcolor,
+	term_screen,
     	term_overlast
 } ; /* end enum (terms) */
 
@@ -125,6 +126,7 @@ constexpr cpcchar	terms[] = {
 	[term_vt540]		= "vt540",
 	[term_xterm]		= "xterm",
 	[term_xtermcolor]	= "xterm-color",
+	[term_screen]		= "screen",
 	[term_overlast] 	= nullptr
 } ; /* end array (terms) */
 
@@ -190,20 +192,20 @@ int main(int,mainv,mainv) {
 
 local int mktermstr(strmgr *smp) noex {
 	static cchar	*valp = getenv(varname.term) ;
-	cint		slen = TIMEBUFLEN ;
+	cint		tlen = TIMEBUFLEN ;
 	int		rs = SR_NOTFOUND ;
 	int		rs1 ;
 	int		len = 0 ; /* return-value */
 	if (valp) ylikely {
-	    if (char sbuf[slen + 1] ; (rs = mktimestr(sbuf,slen)) >= 0) {
-		cint	sl = rs ;
+	    if (char tbuf[tlen + 1] ; (rs = mktimestr(tbuf,tlen)) >= 0) {
+		cint	tl = rs ;
 	        if (static cint rst = gettermtype(valp) ; (rs = rst) >= 0) {
 		    cint tt = rs ;
 		    if ((rs = mkcurstr(smp,tt,0)) >= 0) ylikely {
 			len += rs ;
-			if ((rs = mkcurpos(smp,sl)) >= 0) ylikely {
+			if ((rs = mkcurpos(smp,tl)) >= 0) ylikely {
 			    len += rs ;
-	                    rs = smp->str(sbuf,sl) ;
+	                    rs = smp->str(tbuf,tl) ;
 			    len += rs ;
 			} /* end if (mkcurpos) */
 			rs1 = mkcurstr(smp,tt,1) ;
