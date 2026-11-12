@@ -719,7 +719,7 @@ local int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
 	    rs = SR_OK ;
 	    f = (hnp->namelen == hl) ;
 	    f = f && (hnp->name[0] == hp[0]) ;
-	    f = f && (strncmp(hnp->name,hp,hl) == 0) ;
+	    f = f && (cmpstrn(hnp->name,hp,hl) == 0) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (msghdrname_match) */
@@ -736,8 +736,8 @@ local int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
 		f = true ;
 	    } else {
 		ilp->del(i) ;
-	    }
-	}
+	    } /* end if */
+	} /* end if */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (msghdrname_addnew) */
 
@@ -755,7 +755,7 @@ local int msghdrname_addcont(MMHNAME *hnp,cchar *valp,int vall) noex {
 	    		    rs = msghdrinst_add(hip,cp,cl) ;
 			}
 		    }
-		}
+		} /* end if */
 	    } /* end if (positive) */
 	} /* end if (positive) */
 	return rs ;
@@ -771,7 +771,7 @@ local int msghdrname_iline(MMHNAME *hnp,int hi,int li,cchar **rpp) noex {
 	        rs = msghdrinst_ival(hip,li,rpp) ;
 	        len = rs ;
 	    }
-	}
+	} /* end if */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (msghdrname_iline) */
 
@@ -784,7 +784,7 @@ local int msghdrname_ival(MMHNAME *hnp,int hi,cchar **rpp) noex {
 	        rs = msghdrinst_val(hip,rpp) ;
 	        vl = rs ;
 	    }
-	}
+	} /* end if */
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (msghdrname_ival) */
 
@@ -837,7 +837,7 @@ local int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	} /* end if (needed) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? hnp->vp : nullptr ;
-	}
+	} /* end */
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (msghdrname_val) */
 
@@ -871,7 +871,7 @@ local int msghdrinst_add(MMHINST *hip,cchar *vp,int vl) noex {
 		valp->vp = vp ;
 		valp->vl = vl ;
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (msghdrinst_add) */
 
@@ -883,10 +883,10 @@ local int msghdrinst_ival(MMHINST *hip,int li,cchar **rpp) noex {
 	    MMHVAL *valp = (MMHVAL *) vp ;
 	    vl = valp->vl ;
 	    rp = valp->vp ;
-	}
+	} /* end if */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? rp : nullptr ;
-	}
+	} /* end */
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (msghdrinst_ival) */
 
@@ -929,7 +929,7 @@ local int msghdrinst_val(MMHINST *hip,cchar **rpp) noex {
 	} /* end if (needed) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? hip->vp : nullptr ;
-	}
+	} /* end */
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (msghdrinst_val) */
 
