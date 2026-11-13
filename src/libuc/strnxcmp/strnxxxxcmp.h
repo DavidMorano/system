@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
-/* find a character in a counted c-string */
+/* counted c-string comparisons */
 /* version %I% last-modified %G% */
 
 
