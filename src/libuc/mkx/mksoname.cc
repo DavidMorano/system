@@ -49,7 +49,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<bufsizevar.hh>		/* LLIBUC */
@@ -105,7 +104,7 @@ int mksoname(char *rbuf,cchar *pnp,int µpnl) noex {
 		    if ((rs = maxnamelen) >= 0) ylikely {
 		        storebuf sb(rbuf,rs) ;
 	                bool f = (pnl >= 3) ;
-	                f = f && (strncmp(pnp,liba,libl) == 0) ;
+	                f = f && (cmpstrn(pnp,liba,libl) == 0) ;
 	                if (! f) {
 			    rs = sb.strw(liba,libl) ;
 	                }
