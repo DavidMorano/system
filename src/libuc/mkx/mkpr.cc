@@ -59,7 +59,6 @@
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -589,7 +588,7 @@ local int dirsearch(cchar *basedname,cchar *username) noex {
 	        while ((rs = fsdir_read(&dir,&ds,nbuf,nlen)) > 0) {
 		    cchar	*fnp = ds.name ;
 		    if (fnp[0] != '.') {
-		        f_found = (strcmp(fnp,username) == 0) ;
+		        f_found = (cmpstr(fnp,username) == 0) ;
 		        if (f_found) break ;
 		    }
 	        } /* end while */
