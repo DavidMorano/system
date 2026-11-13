@@ -30,8 +30,6 @@
 #include	<stdintx.h>		/* LIBU */
 #include	<intx.h>		/* LIBU */
 
-#include	<vstrorders.h>		/* LIBU */
-
 #include	<usupport_cfdec.hh>
 #include	<usupport_cfdect.hh>
 #include	<usupport_cfhex.hh>
