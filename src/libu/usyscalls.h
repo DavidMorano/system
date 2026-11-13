@@ -65,6 +65,7 @@
 #include	<ucodenames.h>
 #include	<ugetx.h>
 #include	<utimezone.h>
+#include	<ucmpx.h>
 
 #include	<baops.h>
 #include	<funcodes.h>
