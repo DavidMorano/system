@@ -40,19 +40,21 @@ MODS +=
 LIBS +=
 
 
-OBJ0= cmpitimer.o
-OBJ1= cmptimeval.o cmptimespec.o
-OBJ2= cmpval.o
-OBJ3=
-OBJ4=
-OBJ5=
-OBJ6=
+DEPS= cmporders.h
+
+OBJ0= cmporders.o vstrorders.o
+OBJ1= cmptimeval.o cmptimespec.o 
+OBJ2= cmpitimer.o
+OBJ3= cmpstr.o 
+OBJ4= cmpstrnx.o cmpstrx.o
+OBJ5= cmpstrk.o cmpstrkn.o
+OBJ6= cmpval.o
 OBJ7=
 
-OBJA= obj0.o obj1.o obj2.o
-OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o obj5.o obj6.o
 
-OBJ= obja.o
+OBJ= obja.o objb.o
 
 
 INCDIRS +=
@@ -157,12 +159,22 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-cmpitimer.o:		cmpitimer.cc	cmpitimer.h			$(INCS)
-cmptimeval.o:		cmptimeval.cc	cmptimeval.h			$(INCS)
-cmptimespec.o:		cmptimespec.cc	cmptimespec.h			$(INCS)
+cmporders.o:		cmporders.cc	cmporders.h			$(INCS)
 
-cmpval.o:		cmpval.dir	cmpval.hh			$(INCS)
+cmpitimer.o:		cmpitimer.cc	cmpitimer.h		$(DEPS)	$(INCS)
+cmpstrk.o:		cmpstrk.cc	cmpstrk.h		$(DEPS)	$(INCS)
+cmpstrkn.o:		cmpstrkn.cc	cmpstrkn.h		$(DEPS)	$(INCS)
+cmpstrnx.o:		cmpstrnx.cc	cmpstrnx.h		$(DEPS)	$(INCS)
+cmpstrx.o:		cmpstrx.cc	cmpstrx.h		$(DEPS)	$(INCS)
+cmptimeval.o:		cmptimeval.cc	cmptimeval.h		$(DEPS)	$(INCS)
+cmptimespec.o:		cmptimespec.cc	cmptimespec.h		$(DEPS)	$(INCS)
+
+cmpval.o:		cmpval.dir	cmpval.hh		$(DEPS)	$(INCS)
 cmpval.dir:
 	makesubdir $@
+
+cmpstr.o:		cmpstr.cc	cmpstr.h		$(DEPS)	$(INCS)
+
+vstrorders.o:		vstrorders.cc	vstrorders.h			$(INCS)
 
 
