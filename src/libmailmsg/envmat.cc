@@ -48,7 +48,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -94,7 +93,7 @@ int envmat(cchar *sp,int µsl) noex {
 	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	    rs = SR_OK ;
 	    if ((sl > 5) && (sp[0] == 'F') && (sp[1] == 'r')) {
-		f = (strncmp((sp+2),"om ",3) == 0) ;
+		f = (cmpstrn((sp+2),"om ",3) == 0) ;
 	    } /* end if (possible match) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
