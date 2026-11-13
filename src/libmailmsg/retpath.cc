@@ -37,7 +37,6 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<estrings.h>		/* LIBUC */
@@ -155,7 +154,7 @@ int retpath_search(retpath *plp,cchar *name,cchar **rpp) noex {
 	if (plp) {
 	    for (i = 0 ; (rs = plp->get(i,rpp)) >= 0 ; i += 1) {
 	        if ((*rpp) != nullptr) {
-	            if (strcmp(name,(*rpp)) == 0) break ;
+	            if (cmpstr(name,(*rpp)) == 0) break ;
 	        }
 	    } /* end for */
 	} /* end if (non-null) */
