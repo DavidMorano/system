@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* string comparison w/ folded case */
+/* counted c-string comparisons */
 /* version %I% last-modified %G% */
 
 
