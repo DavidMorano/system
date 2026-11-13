@@ -88,7 +88,7 @@ OBJ30= binchunk.o conintx.o udiv.o stdintx.o
 OBJ31= ccfile.o readln.o dprint.o
 
 OBJ32= muldigs.o varithmetic.o xxtostr.o
-OBJ33= intext.o cmporders.o localmisc.o
+OBJ33= intext.o localmisc.o
 OBJ34= exitcodes.o stacktypes.o sysconfcmds.o
 OBJ35= utmptypes.o utmpsizes.o usyscalls.o
 
@@ -98,7 +98,7 @@ OBJ38= typecodes.o charnames.o
 OBJ39= strtox.o atox.o stox.o stringto.o
 
 OBJ40= ascii.o ubufdefs.o vardefs.o
-OBJ41= memord.o fnm.o
+OBJ41= memord.o fnm.o 
 OBJ42=
 OBJ43=
 
@@ -668,7 +668,6 @@ getbyte.o:		getbyte.ccm		getbyte.hh		$(INCS)
 # various types
 utmptypes.o:		utmptypes.cc		utmptypes.hh		$(INCS)
 utmpsizes.o:		utmpsizes.cc		utmpsizes.hh		$(INCS)
-cmporders.o:		cmporders.cc		cmporders.h		$(INCS)
 localmisc.o:		localmisc.cc		localmisc.h		$(INCS)
 mapex.o:		mapex.cc		mapex.h			$(INCS)
 sysconfcmds.o:		sysconfcmds.cc		sysconfcmds.h		$(INCS)
