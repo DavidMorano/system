@@ -30,8 +30,8 @@
 	int strpcmp(cchar *s1,cchar *s2) noex
 
 	Arguments:
-	s1	one string
-	s2	second string
+	s1	c-string pointer #1
+	s2	c-string pointer #2
 
 	Returns:
 	>0	the first string is bigger than the second
@@ -58,7 +58,7 @@
 #include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| */
+#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
