@@ -78,7 +78,6 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<new>			/* C++STD |nothrow(3c++)| */
 #include	<utility>		/* C++STD |unreachable(3c++)| */
 #include	<clanguage.h>		/* LIBU */
@@ -307,7 +306,7 @@ local sysret_t usys_uname(utsname *utsp) noex {
 local sysret_t uname_machine(utsname *up) noex {
 	cint		mlen = (szof(up->machine) - 1) ;
 	int		rs = SR_OK ;
-	if (char *mbuf = up->machine ; strcmp(mbuf,"x86_64") == 0) {
+	if (char *mbuf = up->machine ; cmpstr(mbuf,"x86_64") == 0) {
 	    if_constexpr (f_darwin) {
 		cint	req = SAI_MACHINE ;
 	        rs = ugetauxinfo(mbuf,mlen,req) ;
@@ -322,7 +321,7 @@ local sysret_t uname_nodename(utsname *up) noex {
 	int		rs = SR_OK ;
 	if (char *nn = up->nodename) {
 	    if (char *cp = strchr(nn,'.')) {
-	        *cp = '\0' ;
+	        *cp = eos ;
 	    } /* end */
 	} /* end */
 	return rs ;
