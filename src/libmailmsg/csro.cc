@@ -98,7 +98,7 @@ local int csro_ctor(csro *op,Args ... args) noex {
 		if (rs < 0) {
 		    delete op->nlp ;
 		    op->nlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-vecstr) */
 	} /* end if (non-null) */
 	return rs ;
@@ -111,11 +111,11 @@ local int csro_dtor(csro *op) noex {
 	    if (op->elp) ylikely {
 		delete op->elp ;
 		op->elp = nullptr ;
-	    }
+	    } /* end if (delete) */
 	    if (op->nlp) ylikely {
 		delete op->nlp ;
 		op->nlp = nullptr ;
-	    }
+	    } /* end if (delete) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (csro_dtor) */
@@ -125,7 +125,7 @@ local inline int csro_magic(csro *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == CSRO_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (csro_magic) */
 
@@ -159,11 +159,11 @@ int csro_start(csro *op,int n) noex {
 	        } /* end if (vecobj_start) */
 	        if (rs < 0) {
 	           vecstr_finish(op->nlp) ;
-		}
+		} /* end if (error) */
 	    } /* end if (vecstr_start) */
 	    if (rs < 0) {
 		csro_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (csro_ctor) */
 	return rs ;
 } /* end subroutine (csro_start) */
@@ -184,15 +184,15 @@ int csro_finish(csro *op) noex {
 	    {
 	        rs1 = vecobj_finish(elp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    if (op->nlp) ylikely {
 	        rs1 = vecstr_finish(op->nlp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = csro_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -212,7 +212,7 @@ int csro_add(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	        if ((rs = vecstr_findn(nlp,mailname,nlen)) >= 0) {
 	            if ((rs = vecobj_search(vlp,&ve,vcmpentry,np)) >= 0) {
 		         f_release = true ;
-		    }
+		    } /* end */
 	        } else if (rs == SR_NOENT) {
 	            if ((rs = vecstr_add(nlp,mailname,nlen)) >= 0) {
 	                int		ni = rs ;
@@ -220,12 +220,12 @@ int csro_add(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	                if ((rs = vecstr_get(nlp,ni,&sp)) >= 0) {
 			    rs = vecobj_add(vlp,&ve) ;
 		        }
-		    }
+		    } /* end */
 	        } /* end if (getting existing name) */
 	        if (f_release) {
 		    rs1 = value_finish(&ve) ;
 		    if (rs >= 0) rs = rs1 ;
-	        }
+	        } /* end */
 	    } /* end if (value) */
 	} /* end if (magic) */
 	return rs ;
@@ -245,7 +245,7 @@ int csro_already(csro *op,cchar *mailname,cchar *fname,off_t moff) noex {
 	            f = true ;
 	        } else if (rs == rsn) {
 	            rs = SR_OK ;
-	        }
+	        } /* end */
 	        rs1 = value_finish(&ve) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (value) */
@@ -337,14 +337,14 @@ int csro_getvalue(csro *op,cc *mailname,csro_vcur *vcp,csro_val **vepp) noex {
 	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
 	        bool	f = (vp != nullptr) ;
 		valp = (csro_val *) vp ;
-	        f = f && (strcmp(valp->mailname,mailname) == 0) ;
+	        f = f && (cmpstr(valp->mailname,mailname) == 0) ;
 	        if (f) break ;
 	        i += 1 ;
 	    } /* end while */
 	    if ((rs >= 0) && valp) {
 		*vepp = valp ;
 	        *vcp = i ;
-	    }
+	    } /* end if */
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (csro_getvalue) */
@@ -360,7 +360,7 @@ local int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 	sz += (lenstr(mailname)+1) ;
 	if (fname != nullptr) {
 	   sz += (lenstr(fname)+1) ;
-	}
+	} /* end */
 	if (char *bp ; (rs = libmem.mall(sz,&bp)) >= 0) ylikely {
 	    ep->mailname = bp ;
 	    bp = (strwcpy(bp,fname,-1)+1) ;
@@ -368,8 +368,8 @@ local int value_start(VALUE *ep,cchar *mailname,cchar *fname,off_t moff) noex {
 	    if (fname != nullptr) {
 	        bp = (strwcpy(bp,fname,-1)+1) ;
 	    } else {
-		*bp = '\0' ;
-	    }
+		*bp = eos ;
+	    } /* end if */
 	} /* end if (memory-allocation) */
 	return rs ;
 } /* end subroutine (value_start) */
@@ -381,10 +381,12 @@ local int value_finish(VALUE *ep) noex {
 	    rs = SR_OK ;
 	    if (ep->mailname) ylikely {
 		void *vp = voidp(ep->mailname) ;
+		{
 		rs1 = libmem.free(vp) ;
 		if (rs >= 0) rs = rs1 ;
 	        ep->mailname = nullptr ;
-	    }
+		}
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (value_finish) */
@@ -401,7 +403,7 @@ local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	            if (e2p) {
 		        cchar	*s1 = e1p->mailname ;
 		        cchar	*s2 = e2p->mailname ;
-	                if ((rc = strcmp(s1,s2)) == 0) {
+	                if ((rc = cmpstr(s1,s2)) == 0) {
 	                    rc = intconv(e1p->moff - e2p->moff) ;
 	                }
 	            } else {
@@ -427,14 +429,14 @@ local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 	            if (e2p) {
 		        cchar	*s1 = e1p->mailname ;
 		        cchar	*s2 = e2p->mailname ;
-	                if ((rc = strcmp(s1,s2)) == 0) {
+	                if ((rc = cmpstr(s1,s2)) == 0) {
 	                    if ((rc = intconv(e1p->moff - e2p->moff)) == 0) {
 	                        if (e1p->fname == nullptr) {
 	                            rc = 1 ;
 	                        } else if (e1p->fname == nullptr) {
 	                            rc = -1 ;
 	                        } else {
-	                            rc = strcmp(e1p->fname,e2p->fname) ;
+	                            rc = cmpstr(e1p->fname,e2p->fname) ;
 		                }
 		            }
 	                } /* end if */
