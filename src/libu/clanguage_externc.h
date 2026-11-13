@@ -25,9 +25,11 @@
 #ifndef	EXTERNC_begin
 #ifdef	__cplusplus
 #define	EXTERNC_begin		extern "C" {
+#define	EXTERNC_beg		extern "C" {
 #define	EXTERNC_end		}
 #else
 #define	EXTERNC_begin		/* externc_begin */
+#define	EXTERNC_beg		/* externc_beg */
 #define	EXTERNC_end		/* externc_end */
 #endif /* __cplusplus */
 #endif /* EXTERNC_begin */
