@@ -43,9 +43,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstrings>		/* C++STD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstrings>		/* C++STD |strcasecmp(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<new>			/* C++STD |nothrow(3c++)| */
 #include	<clanguage.h>		/* LIBU */
@@ -262,7 +262,7 @@ int splitaddr_prematch(splitaddr *op,splitaddr *sap) noex {
 	    if ((rs >= 0) && f && (op->lpart != nullptr)) {
 	        f = false ;
 	        if (sap->lpart != nullptr) {
-	            f = (strcmp(op->lpart,sap->lpart) == 0) ;
+	            f = (cmpstr(op->lpart,sap->lpart) == 0) ;
 	        }
 	    } /* end if */
 	} /* end if (magic) */
