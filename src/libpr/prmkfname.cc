@@ -81,7 +81,6 @@
 #include	<sys/param.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -131,12 +130,12 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	    if (char *tbuf ; (rs = lm_mp(&tbuf)) >= 0) ylikely {
 		cint	tlen = rs ;
 	        cchar	*sp ; /* used-multiple */
-	        if ((f_def && (ebuf[0] == '\0')) || (strcmp(ebuf,"+") == 0)) {
+	        if ((f_def && (ebuf[0] == '\0')) || (cmpstr(ebuf,"+") == 0)) {
 	            sp = name ;
 	            if ((suf != nullptr) && (suf[0] != '\0')) {
 	                sp = tbuf ;
 	                mkfnamesuf1(tbuf,name,suf) ;
-	            }
+	            } /* end if */
 	            if (sp[0] != '/') {
 	                if ((dname != nullptr) && (dname[0] != '\0')) {
 	                    rs = mkpath3(fname,pr,dname,sp) ;
@@ -144,12 +143,12 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	                } else {
 	                    rs = mkpath2(fname,pr,sp) ;
 			    len = rs ;
-		        }
+		        } /* end if */
 	            } else {
 	                rs = mkpath1(fname,sp) ;
 			len = rs ;
-	            }
-	        } else if (strcmp(ebuf,"-") == 0) {
+	            } /* end if */
+	        } else if (cmpstr(ebuf,"-") == 0) {
 	            fname[0] = '\0' ;
 	        } else if (ebuf[0] != '\0') {
 	            sp = ebuf ;
@@ -169,7 +168,7 @@ int prmkfname(cc *pr,char *fname,cc *ebuf,int el,int f_def,cc *dname,
 	                    } else {
 	                        rs = mkpath2(fname,pr,sp) ;
 			        len = rs ;
-		            }
+		            } /* end if */
 	                } /* end if */
 	            } else {
 	                rs = mkpath1(fname,sp) ;
