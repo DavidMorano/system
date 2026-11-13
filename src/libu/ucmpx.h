@@ -23,9 +23,14 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
+#include	<cmporders.h>
 #include	<cmpitimer.h>
 #include	<cmptimeval.h>
 #include	<cmptimespec.h>
+#include	<cmpstrnk.h>
+#include	<cmpstrnkn.h>
+#include	<cmpstrnx.h>
+#include	<cmpstrx.h>
 #include	<cmpval.hh>
 
 
