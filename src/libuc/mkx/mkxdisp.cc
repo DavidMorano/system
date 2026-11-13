@@ -28,29 +28,37 @@
 	  in another domain!
 
 	Synopsis:
-	int mkxsdisp(char *rbuf,int rlen,cc *disp,cc *node,cc *domain) noex
+	int mkxsdisp(char *rbuf,int rlen,cc *disp,cc *node,cc *dom) noex
 
 	Arguments:
 	rbuf		result buffer pointer
 	rlenf		result buffer length
 	disp		current display string
 	node		current nodename
-	domain		current domainname
+	dom		current domainname
 
 	Returns:
 	>=0	length of the created DISPLAY string specification
 	<0	error (system-return)
+
+	Notes:
+	1. A valid X-Window display looks like:
+		[hostname]:[:]num[:screen]
+	where:
+		hostname	- a hostname
+		num		- a number
+		screen		- a screen number
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<strwcpy.h>		/* LIBUC */
+#include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"mkxdisp.h"
@@ -60,8 +68,6 @@
 import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
-
-#define	LENLRFT		intconv(rlen + rbuf - bp) /* historical */
 
 
 /* imported namespaces */
@@ -83,22 +89,22 @@ using std::max ;			/* type */
 
 namespace {
     struct suber {
-	char	*rbuf ;
-	cchar	*disp ;
-	cchar	*node ;
-	cchar	*domain ;
-	int	rlen ;
+	char		*rbuf ;
+	cchar		*disp ;
+	cchar		*node ;
+	cchar		*dom ;
+	int		rlen ;
 	suber(char *rb,int rl,cc *ad,cc *an,cc *ao) noex : rbuf(rb), rlen(rl) {
-	    disp = ad ;
-	    node = an ;
-	    domain = ao ;
+	    disp	= ad ;
+	    node	= an ;
+	    dom		= ao ;
 	} ; /* end ctor */
-	operator int () noex ;
-	int tryone() noex ;
-	int trytwo() noex ;
-	int trythree() noex ;
+	operator int	() noex ;
+	int tryone	() noex ;
+	int trytwo	() noex ;
+	int trythree	() noex ;
     private:
-	int lenr(cc *) noex ;
+	int lenr	(cc *) noex ;
     } ; /* end struct (suber) */
     typedef int (suber::*suber_m)() noex ;
 } /* end namespace */
@@ -106,6 +112,7 @@ namespace {
 
 /* forward references */
 
+local bool isvalid(cchar *) noex ;
 local bool havevar(cchar *v) noex {
     	return (v && v[0]) ;
 } /* end subroutine */
@@ -125,17 +132,17 @@ constexpr suber_m	tries[] = {
 
 /* exported subroutines */
 
-int mkxsdisp(char *rbuf,int rlen,cc *disp,cc *node,cc *domain) noex {
+int mkxsdisp(char *rbuf,int rlen,cc *disp,cc *node,cc *dom) noex {
     	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
 	if (rbuf && disp) ylikely {
 	    rs = SR_INVALID ;
-	    rbuf[0] = '\0' ;
-	    if ((rlen > 0) && disp[0]) ylikely {
-		if (suber so(rbuf,rlen,disp,node,domain) ; (rs = so) >= 0) {
+	    rbuf[0] = eos ;
+	    if ((rlen > 0) && isvalid(disp)) ylikely {
+		if (suber so(rbuf,rlen,disp,node,dom) ; (rs = so) >= 0) {
 		    len = rs ;
 		}
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mkxdisp) */
@@ -157,9 +164,9 @@ int suber::tryone() noex {
 	if (disp[0] == ':') {
 	    char	*bp = rbuf ;
 	    bp = strwcpy(bp,node,lenr(bp)) ;
-	    if (havevar(domain)) {
+	    if (havevar(dom)) {
 	        if (lenr(bp) > 0) *bp++ = '.' ;
-	        bp = strwcpy(bp,domain,lenr(bp)) ;
+	        bp = strwcpy(bp,dom,lenr(bp)) ;
 	    } /* end if */
 	    bp = strwcpy(bp,disp,lenr(bp)) ;
 	    rs = intconv(bp - rbuf) ;
@@ -169,10 +176,10 @@ int suber::tryone() noex {
 
 int suber::trytwo() noex {
     	int		rs = SR_OK ;
-	bool		f_remote = havevar(domain) ;
-	cchar		*cp = strchr(disp,':') ;
+	bool		f_remote = havevar(dom) ;
+	cchar		*cp = strochr(disp,':') ;
 	cchar		*tp = nullptr ;
-	if (f_remote) tp = strchr(disp,'.') ;
+	if (f_remote) tp = strochr(disp,'.') ;
 	if (cp && ((! f_remote) || (tp && (cp > tp)))) {
 	    cint	len = lenstr(disp) ;
 	    char	*bp = rbuf ;
@@ -184,13 +191,13 @@ int suber::trytwo() noex {
 
 int suber::trythree() noex {
     	int		rs = SR_OK ;
-	if (havevar(domain)) ylikely {
-	    cchar	*cp = strchr(disp,':') ;
+	if (havevar(dom)) ylikely {
+	    cchar	*cp = strochr(disp,':') ;
 	    char	*bp = rbuf ;
 	    cint ol = intconv(cp - disp) ;
 	    bp = strwcpy(bp,disp,min(ol,lenr(bp))) ;
 	    if (lenr(bp) > 0) *bp++ = '.' ;
-	    bp = strwcpy(bp,domain,lenr(bp)) ;
+	    bp = strwcpy(bp,dom,lenr(bp)) ;
 	    bp = strwcpy(bp,cp,lenr(bp)) ;
 	    rs = intconv(bp - rbuf) ;
 	} /* end if */
@@ -200,5 +207,20 @@ int suber::trythree() noex {
 int suber::lenr(cc *bp) noex {
 	return intconv(rlen + rbuf - bp) ;
 } /* end method (suber::lenr) */
+
+local bool isvalid(cchar *disp) noex {
+    	cnullptr np{} ;
+    	bool f = false ;
+	if (cc *tp = strochr(disp,':')) {
+	    tp += 1 ;
+	    if (*tp == ':') {
+		tp += 1 ;
+		f = ischdig(tp[0]) ;
+	    } else {
+		f = ischdig(tp[0]) ;
+	    }
+	} /* end if */
+	return f ;
+} /* end subroutine (isvalid) */
 
 
