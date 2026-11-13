@@ -40,7 +40,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"stdclib.hh"
 
