@@ -2,7 +2,7 @@
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* string key comparison */
+/* c-string key comparisons */
 /* version %I% last-modified %G% */
 
 
