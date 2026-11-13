@@ -29,15 +29,16 @@
 	valid IDs that follow historic UNIX conventions, so we are
 	trying to help out with this subroutine!
 
-	Special note: This subroutine will not NUL terminate the
-	ID buffer if the created ID is the maximum length of the
-	supplied buffer.  This is fine when the buffer is the exact
-	buffer of the ID field in a UTMP record (for example) but
-	this is not good if you want to try to print the buffer out
-	as a normal string.  Supply a buffer one character larger
-	than needed and NUL terminate it at the end if you want to
-	treat the resulting buffer as a normal C-language string
-	(NUL terminated).
+	Special note: 
+	This subroutine will not NUL terminate the ID buffer if the
+	created ID is the maximum length of the supplied buffer.
+	This is fine when the buffer is the exact buffer of the ID
+	field in a UTMP record (for example) but this is not good
+	if you want to try to print the buffer out as a normal
+	string.  Supply a buffer one character larger than needed
+	and NUL terminate it at the end if you want to treat the
+	resulting buffer as a normal C-language string (NUL
+	terminated).
 
 	Note on IDs:
 
@@ -143,14 +144,14 @@ namespace {
     struct prefix {
 	cchar		*name ;
 	cchar		*prefix ;
-    } ;
+    } ; /* end struct */
     struct tmper ;
     typedef int (tmper::*tmp_m)(cchar *,int) noex ;
     struct tmper {
-	cchar	*sbuf ;
-	char	*rbuf ;
-	int	rlen ;
-	int	slen ;
+	cchar		*sbuf ;
+	char		*rbuf ;
+	int		rlen ;
+	int		slen ;
 	tmper(char *rp,int rl,cchar *dp,int dl) noex {
 	    sbuf = dp ;
 	    rbuf = rp ;
@@ -158,11 +159,11 @@ namespace {
 	    rlen = rl ;
 	} ; /* end ctor */
 	operator int () noex ;
-	int extdev(cchar **) noex ;
-	int subdirs(cchar *,int) noex ;
-	int basename(cchar *,int) noex ;
-	int special(cchar *,int) noex ;
-	int something(cchar *,int) noex ;
+	int extdev	(cchar **) noex ;
+	int subdirs	(cchar *,int) noex ;
+	int basename	(cchar *,int) noex ;
+	int special	(cchar *,int) noex ;
+	int something	(cchar *,int) noex ;
     } ; /* end struct (tmper) */
 } /* end namespace */
 
@@ -175,29 +176,28 @@ local int	idcpy(char *,int,cchar *,int,cchar *,int) noex ;
 /* local variables */
 
 constexpr prefix	prefixes[] = {
-	{ "pts", "P" },
-	{ "term", "" },
-	{ "tty", "" },
-	{ "rx", "R" },
-	{ "xt", "X" },
-	{ nullptr, nullptr }
+	{ "pts",	"P"	},
+	{ "term",	""	},
+	{ "tty",	""	},
+	{ "rx",		"R"	},
+	{ "xt",		"X"	},
+	{ nullptr,	nullptr }
 } ; /* end array (prefixes) */
 
 constexpr prefix	specials[] = {
-	{ "console", "co" },
-	{ "syscon", "cs" },
-	{ nullptr, nullptr }
+	{ "console",	"co"	},
+	{ "syscon",	"cs"	},
+	{ nullptr,	nullptr	}
 } ; /* end array (specials) */
 
-static tmp_m	tmpcalls[] {
+constexpr tmp_m	tmpcalls[] {
 	&tmper::subdirs,
 	&tmper::basename,
 	&tmper::special,
-	&tmper::something,
-	nullptr
+	&tmper::something
 } ; /* end array (tmpcalls) */
 
-constexpr cchar		dpre[] = "/dev/" ;	/* device prefix */
+constexpr char		dpre[] = "/dev/" ;	/* device prefix */
 
 
 /* exported variables */
@@ -224,10 +224,10 @@ tmper::operator int () noex {
 		if (slen > 0) ylikely {
 		    if (cchar *lp ; (rs = extdev(&lp)) >= 0) ylikely {
 		        cint	ll = rs ;
-		        rs = 0 ;
-		        for (int i = 0 ; (rs == 0) && tmpcalls[i] ; i += 1) {
-		            tmp_m	m = tmpcalls[i] ;
+		        rs = SR_OK ;
+			for (cauto &m : tmpcalls) {
 		            rs = (this->*m)(lp,ll) ;
+			    if (rs) break ;
 		        } /* end for */
 		    } /* end if (extdev) */
 		} /* end if (domain) */
@@ -237,15 +237,15 @@ tmper::operator int () noex {
 } /* end method (tmper::operator) */
 
 int tmper::extdev(cchar **rpp) noex {
-	static constexpr int	dl = lenstr(dpre) ;
+	statcexpr int	dl = lenstr(dpre) ;
 	int		rs = SR_OK ;
 	int		ll = slen ;
 	cchar		*lp = sbuf ;
 	if (ll >= dl) {
-	    if (strncmp(lp,dpre,dl) == 0) {
+	    if (cmpstrn(lp,dpre,dl) == 0) {
 	        lp += dl ;
 	        ll -= dl ;
-	    }
+	    } /* end */
 	} /* end if (possible) */
 	if (ll < 1) rs = SR_INVALID ;
 	*rpp = lp ;
@@ -255,7 +255,7 @@ int tmper::extdev(cchar **rpp) noex {
 int tmper::subdirs(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	if ((ll > 0) && (rbuf[0] == '\0')) ylikely {
-	    if (cchar *tp ; (tp = strnchr(lp,ll,'/')) != nullptr) ylikely {
+	    if (cchar *tp = strnchr(lp,ll,'/')) ylikely {
 	        cint	sl = intconv(tp - lp) ;
 	        cint	cl = (ll - intconv((tp + 1) - lp)) ;
 	        int	pl = 0 ;
@@ -266,7 +266,7 @@ int tmper::subdirs(cchar *lp,int ll) noex {
 	        for (i = 0 ; prefixes[i].name ; i += 1) {
 	            pp = prefixes[i].name ;
 	            pl = lenstr(pp) ;
-	            if ((pl == sl) && (strncmp(pp,sp,pl) == 0)) break ;
+	            if ((pl == sl) && (cmpstrn(pp,sp,pl) == 0)) break ;
 	        } /* end for */
 	        if (prefixes[i].name && pp && pl) ylikely {
 	            rs = idcpy(rbuf,rlen,pp,pl,cp,cl) ;
@@ -287,7 +287,7 @@ int tmper::basename(cchar *lp,int ll) noex {
 	    for (i = 0 ; prefixes[i].name ; i += 1) {
 	        pp = prefixes[i].name ;
 	        pl = lenstr(pp) ;
-	        if ((pl <= cl) && (strncmp(pp,lp,pl) == 0)) break ;
+	        if ((pl <= cl) && (cmpstrn(pp,lp,pl) == 0)) break ;
 	    } /* end for */
 	    if (prefixes[i].name && pp && pl) ylikely {
 	        rs = idcpy(rbuf,rlen,pp,pl,cp,cl) ;
@@ -299,13 +299,13 @@ int tmper::basename(cchar *lp,int ll) noex {
 int tmper::special(cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	if ((ll > 0) && (rbuf[0] == '\0')) ylikely {
-	    int		i = 0 ;
+	    int		i = 0 ; /* used-afterwards */
 	    int		pl = 0 ;
 	    cchar	*pp{} ;
 	    for (i = 0 ; specials[i].name ; i += 1) {
 	        pp = specials[i].name ;
 		pl = lenstr(pp) ;
-	        if (strcmp(pp,lp) == 0) break ;
+	        if (cmpstr(pp,lp) == 0) break ;
 	    } /* end for */
 	    if (prefixes[i].name && pp && pl) ylikely {
 	        rs = idcpy(rbuf,rlen,pp,pl,nullptr,0) ;
@@ -315,11 +315,12 @@ int tmper::special(cchar *lp,int ll) noex {
 } /* end method (tmper::special) */
 
 int tmper::something(cchar *lp,int ll) noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	if ((ll > 0) && (rbuf[0] == '\0')) ylikely {
-	    int		cl = 0 ;
-	    cchar	*cp ;
-	    if ((cp = strnchr(lp,ll,'/')) != nullptr) {
+	    int		cl = 0 ;	/* used-multiple */
+	    cchar	*cp ;		/* used-multiple */
+	    if ((cp = strnchr(lp,ll,'/')) != np) {
 	        cp += 1 ;
 	        cl = intconv(ll - (cp - lp)) ;
 	    } else {
@@ -327,27 +328,27 @@ int tmper::something(cchar *lp,int ll) noex {
 	        cl = ll ;
 	    } /* end if */
 	    if (cl > rlen) {
-	        rs = idcpy(rbuf,rlen,nullptr,0,(cp+(cl-rlen)),rlen) ;
+	        rs = idcpy(rbuf,rlen,np,0,(cp + (cl - rlen)),rlen) ;
 	    } else if (cp) {
-	        rs = idcpy(rbuf,rlen,nullptr,0,cp,cl) ;
-	    }
+	        rs = idcpy(rbuf,rlen,np,0,cp,cl) ;
+	    } /* end if */
 	} /* end if (needed) */
 	return rs ;
 } /* end method (tmper::something) */
 
 local int idcpy(char *idbuf,int idlen,cchar *pp,int pl,cchar *cp,int cl) noex {
 	int		rs ;
-	int		j = 0 ;
+	int		j = 0 ; /* used-multiple */
 	for (int k = 0 ; (j < idlen) && (k < pl) ; j += 1) {
 	    idbuf[j] = pp[k++] ;
-	}
+	} /* end for */
 	for (int k = 0 ; (j < idlen) && (k < cl) ; j += 1) {
 	    idbuf[j] = cp[k++] ;
-	}
+	} /* end for */
 	rs = j ; /* <- return value */
 	while (j < idlen) {
-	    idbuf[j++] = '\0' ;
-	}
+	    idbuf[j++] = eos ;
+	} /* end while */
 	return rs ;
 } /* end subroutine (idcpy) */
 
