@@ -45,7 +45,6 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<six.h>			/* LIBUC |sichr(3uc)| */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC |ischeol(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
