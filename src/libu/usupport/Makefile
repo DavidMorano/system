@@ -67,14 +67,14 @@ OBJ19= usupport_hasx.o usupport_hasnot.o
 OBJ20= usupport_strdcpyx.o usupport_strdcpyxw.o
 OBJ21= usupport_vstrcmp.o usupport_vstrkeycmp.o
 OBJ22= usupport_strxxxxcmp.o usupport_strnwcpy.o
-OBJ23=
+OBJ23= vstrorders.o
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
-OBJF= obj20.o obj21.o obj22.o 
+OBJF= obj20.o obj21.o obj22.o obj20.o
 
 OBJ= obja.o objb.o objc.o objd.o obje.o objf.o
 
@@ -289,5 +289,7 @@ usupport_toxc.o:	usupport_toxc.cc	usupport_toxc.hh	$(INCS)
 usupport_ustrftime.o:	usupport_ustrftime.cc	usupport_ustrftime.hh	$(INCS)
 usupport_vstrcmp.o:	usupport_vstrcmp.cc	usupport_vstrcmp.hh	$(INCS)
 usupport_vstrkeycmp.o:	usupport_vstrkeycmp.cc	usupport_vstrkeycmp.hh	$(INCS)
+
+vstrorders.o:		vstrorders.cc		vstrorders.h
 
 
