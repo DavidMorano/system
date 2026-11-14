@@ -97,7 +97,6 @@ using std::error_code ;			/* type */
 using std::ios ;			/* type (|basic_ios<char>|) */
 using std::string ;			/* type */
 using std::string_view ;		/* type */
-using libu::matstr ;			/* subroutine */
 
 
 /* local typedefs */
