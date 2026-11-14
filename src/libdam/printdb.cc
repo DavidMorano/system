@@ -279,7 +279,7 @@ local int printdb_fetcher(printdb *op,char *vbuf,int vlen,cchar *printer,
 	                        if (rs < 0) break ;
 	                        rs = SR_NOTFOUND ;
 	                        for (int i = 0 ; ste.keyvals[i][0] ; i += 1) {
-	                            if (strcmp(key,ste.keyvals[i][0]) == 0) {
+	                            if (cmpstr(key,ste.keyvals[i][0]) == 0) {
 				        cchar	*valp = ste.keyvals[i][1] ;
 	                                rs = sncpy1(vbuf,vlen,valp) ;
 	                                if ((rs >= 0) || (rs == rso)) break ;
