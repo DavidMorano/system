@@ -42,7 +42,6 @@
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<strx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -211,7 +210,7 @@ local int isRealName(cchar *fname,int fl) noex {
 		if (strncmp((tp + 1),suf,suflen) == 0) {
 		    cint	tl = intconv(tp - cp) ;
 		    cchar	*rn = sysname[w] ;
-		    if (strwcmp(rn,cp,tl) == 0) {
+		    if (cmpstrw(rn,cp,tl) == 0) {
 			len = intconv(tp - fname) ;
 		    }
 		}
