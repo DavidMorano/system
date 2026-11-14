@@ -185,7 +185,7 @@ int rcmdr(cchar *rhost,cchar *ruser,cchar *cmd,int *fd2p) noex {
 	    if (getehostname(ehostname,rhost) < 0) {
 	        rs = SR_HOSTUNREACH ;
 	    }
-	    if ((rs >= 0) && (strcmp(rhost,ehostname) != 0)) {
+	    if ((rs >= 0) && (cmpstr(rhost,ehostname) != 0)) {
 	        rhost = ehostname ;
 	    }
 	} /* end if (needed name service) */
