@@ -777,7 +777,7 @@ local int key_mat(KEY *kep,cchar *kp,int kl) noex {
 	 	f = (strncmp(kep->kp,kp,kl) == 0) ;
 	    }
 	} else {
-	 	f = (strcmp(kep->kp,kp) == 0) ;
+	 	f = (cmpstr(kep->kp,kp) == 0) ;
 	} /* end if */
 	return f ;
 } /* end subroutine (key_mat) */
@@ -853,7 +853,7 @@ local int cmpkeye(const KEY *k1p,const KEY *k2p) noex {
 	cchar		*c1p = k1p->kp ;
 	cchar		*c2p = k2p->kp ;
 	if ((rc = (c1p[0] - c2p[0])) == 0) {
-	    rc = strcmp(c1p,c2p) ;
+	    rc = cmpstr(c1p,c2p) ;
 	}
 	return rc ;
 } /* end subroutine (cmpkeye) */
@@ -883,8 +883,8 @@ local int cmpente(const ENT *e1p,const ENT *e2p,int) noex {
 	if (rc == 0) {
 	    const KEY	*k1p = e1p->kep ;
 	    const KEY	*k2p = e2p->kep ;
-	    if ((rc = strcmp(k1p->kp,k2p->kp)) == 0) {
-	        rc = strcmp(e1p->vname,e2p->vname) ;
+	    if ((rc = cmpstr(k1p->kp,k2p->kp)) == 0) {
+	        rc = cmpstr(e1p->vname,e2p->vname) ;
 	    }
 	}
 	return rc ;
