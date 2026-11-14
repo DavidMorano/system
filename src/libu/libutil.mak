@@ -49,19 +49,19 @@ OBJPART03= libutil-loadstrs.o libutil-memclear.o
 OBJPART04= libutil-memcopy.o libutil-memcpy.o
 OBJPART05= libutil-resumelife.o libutil-stpcpy.o
 OBJPART06= libutil-strcopy.o libutil-strcpy.o
-OBJPART07= libutil-memload.o libutil-strcmp.o
+OBJPART07= libutil-memload.o 
 
 OBJPART08= libutil-getbyte.o
 OBJPART09= libutil-memb.o
 OBJPART10= libutil-operators.o
-OBJPART11=
+OBJPART11= libutil-cmpx.o libutil-strcmp.o
 
 OBJPARTA= objpart00.o objpart01.o 
 OBJPARTB= objpart02.o objpart03.o 
 OBJPARTC= objpart04.o objpart05.o 
 OBJPARTD= objpart06.o objpart07.o
 OBJPARTE= objpart08.o objpart09.o
-OBJPARTF= objpart10.o
+OBJPARTF= objpart10.o objpart11.o
 
 OBJPART+= objparta.o objpartb.o objpartc.o objpartd.o
 OBJPART+= objparte.o objpartf.o
@@ -285,8 +285,9 @@ libutil-strxspn.o:	libutil-strxspn.ccm		$(DEPS)	$(INCS)
 libutil-stpcpy.o:	libutil-stpcpy.ccm		$(DEPS)	$(INCS)
 libutil-strcpy.o:	libutil-strcpy.ccm		$(DEPS)	$(INCS)
 libutil-strcopy.o:	libutil-strcopy.ccm		$(DEPS)	$(INCS)
-libutil-strcmp.o:	libutil-strcmp.ccm		$(DEPS)	$(INCS)
 libutil-operators.o:	libutil-operators.ccm		$(DEPS)	$(INCS)
+libutil-cmpx.o:		libutil-cmpx.ccm		$(DEPS)	$(INCS)
+libutil-strcmp.o:	libutil-strcmp.ccm		$(DEPS)	$(INCS)
 
 libutil%memb.o:		libutil%memb.cc libutil0.o		$(INCS)
 	$(COMPILE.cc) $<
