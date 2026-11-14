@@ -78,7 +78,6 @@ import usysconf ;			/* |usysconfval(3u)| */
 /* imported namespaces */
 
 using libu::strdcpy1w ;			/* subroutine */
-using libu::vstrkeycmp ;		/* subroutine */
 using libu::umem ;			/* variable */
 
 
@@ -262,7 +261,7 @@ int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 	        int	fl ; /* used-afterwards */
 	 	rs = SR_OK ;
 	        *ep++ = '=' ;
-	        *ep = '\0' ;
+	        *ep = eos ;
 	        el = intconv(ep - ebuf) ;
 	        while ((fl = fsp->sharg(ft,ep,(elen - el))) >= 0) {
 	            if (fl > 0) {
@@ -272,7 +271,7 @@ int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 	            if (fsp->term == '#') break ;
 	        } /* end while */
 		if (fl != rsn) rs = fl ;
-	        *ep = '\0' ;
+	        *ep = eos ;
 	        if (rs >= 0) {
 	            c += 1 ;
 	            rs = vsp->add(ebuf,el) ;
