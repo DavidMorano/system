@@ -42,10 +42,10 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<umatx.h>		/* LIBU */
 #include	<ucmem.h>		/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -629,7 +629,7 @@ local int biblebook_matcher(BB *op,cchar *mbuf,int mlen) noex {
 	    {
 	        bl = intconv(strwcpynon(bbuf,mbuf,ml) - bbuf) ;
 	    }
-	    i = matostr(op->names,1,bbuf,bl) ;
+	    i = matstro(op->names,1,bbuf,bl) ;
 	    if (i < 0) rs = SR_NOTFOUND ;
 	} /* end if (ok) */
 	return (rs >= 0) ? i : rs ;
