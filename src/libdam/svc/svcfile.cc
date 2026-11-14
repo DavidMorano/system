@@ -1347,7 +1347,7 @@ local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
 	    if (e1p) {
 		rc = -1 ;
 	        if (e2p) {
-	            rc = strcmp(e1p->fname,e2p->fname) ;
+	            rc = cmpstr(e1p->fname,e2p->fname) ;
 	        }
 	    }
 	}
@@ -1371,7 +1371,7 @@ local int vcmpsvcname(cvoid **v1pp, cvoid **v2pp) noex {
 	    	        }
 		    }
 		    if ((rc == 0) && (! f1) && (! f2)) {
-	    	        rc = strcmp(e1p->svcname,e2p->svcname) ;
+	    	        rc = cmpstr(e1p->svcname,e2p->svcname) ;
 	            }
 	        }
 	    }
