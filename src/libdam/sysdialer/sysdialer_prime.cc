@@ -35,7 +35,7 @@
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<cstring>		/* CSTD |cmpstr(3c)| */
 #include	<new>			/* C++STD placement-new */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -302,7 +302,7 @@ local int sysdialer_startprs(SD *op,mainv prs) noex {
                 op->fl.vsprs = true ;
                 for (int i = 0 ; prs[i] != nullptr ; i += 1) {
 		    cchar *pr = prs[i] ;
-                    if (strcmp(pr,op->pr) != 0) {
+                    if (cmpstr(pr,op->pr) != 0) {
                         rs = plp->add(pr,-1) ;
                     }
                     if (rs < 0) break ;
@@ -709,7 +709,7 @@ local int sysdialer_sotest(SD *op,cc *soname) noex {
 	cnullptr	np{} ;
 	int		rs = SR_NOTFOUND ;
 	if ((mip = (SD_INFO *) dlsym(op->sop,soname)) != np) ylikely {
-	    if (strcmp(mip->name,soname) == 0) {
+	    if (cmpstr(mip->name,soname) == 0) {
 	        ep->osz = dip->osz ;
 	        ep->flags = dip->flags ;
 	        ep->mp->dhp = dhp ;
@@ -736,7 +736,7 @@ local int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 			cint ch1 = mkchar(e1p->name[0]) ;
 			cint ch2 = mkchar(e2p->name[0]) ;
 			if ((rc = (ch1 - ch2)) == 0) {
-		            rc = strcmp(e1p->name,e2p->name) ;
+		            rc = cmpstr(e1p->name,e2p->name) ;
 			}
 		    }
 	        }
