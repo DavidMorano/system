@@ -45,7 +45,7 @@
 #include	<fcntl.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<cstring>		/* CSTD |cmpstr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<aflag.hh>		/* LIBU */
@@ -244,7 +244,7 @@ local int localgetorg_var(SI *sip) noex {
 	if (! f) {
 	    static cchar	*vun = getenv(vnun) ;
 	    if (vun && (vun[0] != '\0'))
-	        f = (strcmp(vun,un) == 0) ;
+	        f = (cmpstr(vun,un) == 0) ;
 	}
 	if (f) {
 	    static cchar	*vorg = getenv(vnorg) ;
