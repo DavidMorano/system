@@ -24,6 +24,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<cmpstrkn.h>		/* LIBU */
 
 
 EXTERNC_begin
