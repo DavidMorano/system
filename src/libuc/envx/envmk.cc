@@ -89,8 +89,6 @@
 #include	<strdcpy.h>		/* LIBUC */
 #include	<ctdec.h>		/* LIBUC */
 #include	<matxstr.h>		/* LIBUC */
-#include	<strkeycmp.h>		/* |strkeycmp(3uc)| */
-#include	<vstrkeycmp.h>		/* |vstrkeycmp(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -365,7 +363,7 @@ int envmk_envset(envmk *op,cchar *kp,cchar *valp,int vall) noex {
 	        if (cchar *ep{} ; (rs = spp->store(ebuf,el,&ep)) >= 0) ylikely {
 	    	    vechand	*elp = op->envp ;
 		    {
-		        auto	vcf = vechand_f(vstrkeycmp) ;
+		        auto	vcf = vechand_f(cmpvstrk) ;
 	                if ((rs = elp->search(ep,vcf,np)) >= 0) {
 	                    rs = elp->del(rs) ;
 			} else if (rs == rsn) {
@@ -446,12 +444,12 @@ local int envmk_mkenv(envmk *op) noex {
 	            cchar	*kp = op->envv[i] ;
 	            if (matkeystr(envbad,kp,-1) < 0) {
 	                if ((! f_path) && (kp[0] == 'P')) {
-	                    f_path = (strkeycmp(kp,varpath) == 0) ;
-	                }
+	                    f_path = (cmpstrk(kp,varpath) == 0) ;
+	                } /* end */
 	                n += 1 ;
 	                if ((rs = elp->add(kp)) >= 0) {
 	                    rs = et.add(kp,-1) ;
-	                }
+	                } /* end */
 	            } /* end if (good ENV variable) */
 	        } /* end for */
 	    } /* end if (ENV was specified) */
@@ -463,7 +461,7 @@ local int envmk_mkenv(envmk *op) noex {
 	    if ((rs >= 0) && (op->envv == nullptr)) {
 	        rs = envmk_mkenvdef(op,&et,envdef) ;
 	        n += rs ;
-	    }
+	    } /* end */
 	    /* system environment variables */
 	    if (rs >= 0) ylikely {
 	        if ((rs = envmk_mkenvdef(op,&et,envsys)) >= 0) ylikely {
@@ -522,7 +520,7 @@ local int mktz(char *vbuf,int vlen,cchar *un) noex {
 		len = rs ;
 	    } else if (isNotPresent(rs)) {
 		rs = SR_OK ;
-	    }
+	    } /* end */
 	    rs1 = ua.close ;
 	    if (rs1 >= 0) rs = rs1 ;
 	} /* end if (userattr) */
@@ -669,7 +667,7 @@ local int envmk_envadd(envmk *op,EL *etp,cc *kp,cc *vp,int vl) noex {
 	bl += (kl + 1) ;
 	if (vp) {
 	    bl += ((vl >= 0) ? vl : int(lenstr(vp))) ;
-	}
+	} /* end */
 	if (char *bp ; (rs = lm_mall((bl+1),&bp)) >= 0) ylikely {
 	    strpack	*spp = op->storep ;
 	    strdcpy3w(bp,bl,kp,"=",vp,vl) ;
