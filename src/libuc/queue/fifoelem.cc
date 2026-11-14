@@ -30,9 +30,9 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -254,7 +254,7 @@ int fifoelem_present(FE *op,cv *vsp,int vsl,fifoelem_cmp scmp) noex {
 	    if (vsl < 0) {
 		sl = lenstr(sp) ;
 	    }
-	    if (scmp == nullptr) scmp = fifoelem_cmp(strcmp) ;
+	    if (scmp == nullptr) scmp = fifoelem_cmp(cmpstr) ;
 	    cauto entcmp = [&sp,&sl,scmp] (FE_ENT *ep) {
 		bool f = true ;
 		f = f && (sl == ep->dl) ;
