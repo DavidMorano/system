@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int cmptimespec(CTIMESPEC *,CTIMESPEC *) noex ;
-
 EXTERNC_end
 
 
