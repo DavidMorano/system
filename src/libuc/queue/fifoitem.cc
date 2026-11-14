@@ -29,12 +29,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"fifoitem.h"
@@ -230,7 +229,7 @@ int fifoitem_present(fifoitem *op,cv *sp,int sl,fifoitem_cmp scmp) noex {
 		cchar	*cp = charp(sp) ;
 		sl = lenstr(cp) ;
 	    }
-	    if (scmp == nullptr) scmp = fifoitem_cmp(strcmp) ;
+	    if (scmp == nullptr) scmp = fifoitem_cmp(cmpstr) ;
 	    cauto entcmp = [&sp,&sl,scmp] (FI_ENT *ep) {
 		bool f = true ;
 		f = f && (sl == ep->dl) ;
