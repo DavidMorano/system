@@ -277,7 +277,7 @@ int pingstatdb_fes(PSD *op) noex {
 } /* end subroutine (pingstatdb_fes) */
 
 local bool ishostmat(cc *h1,cc *h2) noex {
-    	return (strcmp(h1,h2) == 0) ;
+    	return (cmpstr(h1,h2) == 0) ;
 } /* end subroutine (ishostmat) */
 
 int pingstatdb_recget(PSD *op,cchar *hn,PSD_REC **rpp) noex {
