@@ -45,7 +45,6 @@
 #include	<climits>		/* CSTD |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -1072,7 +1071,7 @@ local int cmpfne(ND_F *e1p,ND_F *e2p) noex {
 	    cint	ch1 = mkchar(*s1) ;
 	    cint	ch2 = mkchar(*s2) ;
 	    if ((rc = (ch1 - ch2)) == 0) {
-		rc = strcmp(s1,s2) ;
+		rc = cmpstr(s1,s2) ;
 	    }
 	}
 	return rc ;
