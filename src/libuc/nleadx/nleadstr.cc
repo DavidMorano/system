@@ -26,9 +26,9 @@
 	nleadfoldstr
 
 	Description:
-	Calculate the number of characters that two string have in
+	Calculate the number of characters that two strings have in
 	common from their leading edges.  If we get a match at all
-	we return the number of characters matched. If we do not
+	we return the number of characters matched.  If we do not
 	get a match, we return a negative number.  The second given
 	string is allowed to have an optional length supplied.
 
