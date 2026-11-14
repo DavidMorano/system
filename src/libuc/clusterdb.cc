@@ -34,7 +34,6 @@
 #include	<ctime>			/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -364,7 +363,7 @@ fetcher::operator int () noex {
 	                if (rs1 == nrs) break ;
 	                rs = rs1 ;
 	                if (rs >= 0) {
-	                    f_match = (strcmp(nn,nbuf) == 0) ;
+	                    f_match = (cmpstr(nn,nbuf) == 0) ;
 	                }
 	                if (f_match) break ;
 	            } /* end while (fetching) */
@@ -378,7 +377,7 @@ fetcher::operator int () noex {
 	    if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
 	        while (rs >= 0) {
 	            rs = kvsfile_curenum(kop,&vcur,kbuf,klen,nbuf,nlen) ;
-	            if ((rs >= 0) && (strcmp(nn,nbuf) == 0)) break ;
+	            if ((rs >= 0) && (cmpstr(nn,nbuf) == 0)) break ;
 	        } /* end while (enumerating) */
 	        rs1 = kvsfile_curend(kop,&vcur) ;
 		if (rs >= 0) rs = rs1 ;
