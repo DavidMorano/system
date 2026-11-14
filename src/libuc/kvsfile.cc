@@ -47,7 +47,6 @@
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -722,7 +721,7 @@ local int kvsfile_already(kvsfile *op,KF_ENT *nep) noex {
 	    hdb_curbegin(op->elp,&cur) ;
 	    while (hdb_fetch(op->elp,key,&cur,&val) >= 0) {
 	        KF_ENT	*ep = cast_static<entp>(val.buf) ;
-	        f = (strcmp(nep->vname,ep->vname) == 0) ;
+	        f = (cmpstr(nep->vname,ep->vname) == 0) ;
 	        if (f) break ;
 	    } /* end while */
 	    hdb_curend(op->elp,&cur) ;
@@ -952,14 +951,14 @@ local int vcmpfname(cvoid **v1pp,cvoid **v2pp) noex {
 	if (e1p || e2p) {
 	    if (e1p) {
 	        if (e2p) {
-	            rc = strcmp(e1p->fname,e2p->fname) ;
+	            rc = cmpstr(e1p->fname,e2p->fname) ;
 	        } else {
 	            rc = -1 ;
 		}
 	    } else {
 	       rc = +1 ;
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (vcmpfname) */
 
@@ -970,14 +969,14 @@ local int vcmpkey(cvoid **v1pp,cvoid **v2pp) noex {
 	if (e1p || e2p) {
 	    if (e1p) {
 	        if (e2p) {
-	            rc = strcmp(e1p->kname,e2p->kname) ;
+	            rc = cmpstr(e1p->kname,e2p->kname) ;
 	        } else {
 	            rc = -1 ;
 		}
 	    } else {
 	        rc = +1 ;
 	    }
-	}
+	} /* end if */
 	return rc ;
 } /* end subroutine (vcmpkey) */
 
@@ -985,8 +984,8 @@ local int cmpkeyval(cvoid *v1p,cvoid *v2p,int) noex {
 	KF_ENT		*e1p = (KF_ENT *) v1p ;
 	KF_ENT		*e2p = (KF_ENT *) v2p ;
 	int		rc ;
-	if ((rc = strcmp(e1p->kep->kname,e2p->kep->kname)) == 0) {
-	    rc = strcmp(e1p->vname,e2p->vname) ;
+	if ((rc = cmpstr(e1p->kep->kname,e2p->kep->kname)) == 0) {
+	    rc = cmpstr(e1p->vname,e2p->vname) ;
 	}
 	return rc ;
 } /* end subroutine (cmpkeyval) */
