@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTMATOSTR_INCLUDE
 #define	USUPPORTMATOSTR_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -27,15 +28,19 @@
 
 
 namespace libu {
-    extern int matobasestr(con mainv,int,cchar *,int) noex ;
-    extern int matocasestr(con mainv,int,cchar *,int) noex ;
-    extern int matofoldstr(con mainv,int,cchar *,int) noex ;
+    extern int matobasestr(con mainv,int,cchar *,int = -1) noex ;
+    extern int matocasestr(con mainv,int,cchar *,int = -1) noex ;
+    extern int matofoldstr(con mainv,int,cchar *,int = -1) noex ;
+} /* end subroutine (libu) */
+
+namespace libu {
     inline int matostr(con mainv bs,int n,cchar *sp,int sl = -1) noex {
 	return libu::matobasestr(bs,n,sp,sl) ;
     } /* end subroutine (matostr) */
 } /* end subroutine (libu) */
 
 
+#endif /* __cplusplus */
 #endif /* USUPPORTMATOSTR_INCLUDE */
 
 
