@@ -33,7 +33,6 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<usysrets.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usys_cmp.h"
