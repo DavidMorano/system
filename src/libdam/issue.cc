@@ -1139,7 +1139,7 @@ local int mapdir_procerv(MD *ep,cc **ev,cc *dn,mv strs,int fd,cc *na) noex {
                         cchar       *den = nbuf ;
                         if (den[0] != '.') {
                             if (cc *tp ; (tp = strchr(den,'.')) != np) {
-                                if (strcmp((tp + 1),na) == 0) {
+                                if (cmpstr((tp + 1),na) == 0) {
                                     cchar       *digp ;
                                     int tl = intconv(tp - den) ;
                                     bool        f = true ;
@@ -1159,7 +1159,7 @@ local int mapdir_procerv(MD *ep,cc **ev,cc *dn,mv strs,int fd,cc *na) noex {
 					tl = intconv(tp - den) ;
                                         rs = nums.add(den,tl) ;
                                     }
-                                } /* end if (strcmp) */
+                                } /* end if (cmpstr) */
                             } /* end if (have an IS file) */
                         } /* end if */
                         if (rs < 0) break ;
