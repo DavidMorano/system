@@ -341,7 +341,7 @@ int rexer::mainsub() noex {
 	        if (getehostname(buf,hostname) < 0) 
 		    goto badunreach ;
 
-	        if (strcmp(hostname,buf) != 0) {
+	        if (cmpstr(hostname,buf) != 0) {
 	            strcpy(hostname,buf) ;
 		}
 
@@ -387,7 +387,7 @@ int rexer::mainsub() noex {
 	            (mp->password == nullptr)) continue ;
 
 	        if ((hostequiv(hostname,mp->machine,u.domainname)) &&
-	            (strcmp(mp->login,username) == 0)) {
+	            (cmpstr(mp->login,username) == 0)) {
 
 	            ahost = ahostname ;
 	            strcpy(ahostname,hostname) ;
@@ -506,7 +506,7 @@ int rexer::mainsub() noex {
 /* finally we try to connect using RCMDU with our own username */
 
 	if ((! (ro & rexopt_keepalive)) && 
-	    (strcmp(username,u.username) != 0)) {
+	    (cmpstr(username,u.username) != 0)) {
 
 	    rs = rcmdu(hostname,u.username,
 	        cmdbuf,fd2p) ;
