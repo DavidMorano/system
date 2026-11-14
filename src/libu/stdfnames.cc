@@ -41,7 +41,8 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<usupport.h>		/* LIBU |matstr(3u)| */
+#include	<umatx.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 #include	<stdfiles.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -52,8 +53,6 @@
 
 
 /* imported namespaces */
-
-using libu::matstr ;			/* subroutine */
 
 
 /* local typedefs */
