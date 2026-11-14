@@ -76,7 +76,6 @@
 #include	<snwcpy.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC |sfweirdo(3uc)| */
 #include	<strn.h>		/* LIBUC */
-#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<char.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
@@ -449,7 +448,7 @@ int subinfo::deps(cchar *sp,int sl) noex {
 	    cchar	*fp{} ;
 	    for (int fl ; (fl = fsb.get(dterms,&fp)) >= 0 ; ) {
 	        if (fl > 0) {
-		    auto	vs = vstrkeycmp ;
+		    auto	vs = cmpvstrk ;
 	            if ((rs = vecstr_searchl(dlp,fp,fl,vs,np)) >= 0) {
 			f = true ;
 		    } else if (rs == rsn) {
@@ -536,7 +535,7 @@ int subinfo::def(buffer *bp,cchar *kp,int kl) noex {
 	    {
 		int	cl{} ;
 		cchar	*cp{} ;
-	        auto	vs = vstrkeycmp ;
+	        auto	vs = cmpvstrk ;
 		bool	f_found = false ;
 	        if ((rs = vecstr_searchl(dlp,kp,kl,vs,&cp)) >= 0) {
 		    f_found = true ;
