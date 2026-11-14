@@ -462,7 +462,7 @@ int acctab_find(acctab *op,cc *netgroup,acctab_ent **sepp) noex {
 		*sepp = entp(vp) ;
 	        if (*sepp == nullptr) continue ;
 	        sp = (*sepp)->netgroup ;
-	        f = (strcmp(netgroup,sp) == 0) ;
+	        f = (cmpstr(netgroup,sp) == 0) ;
 	        if (f) break ;
 	    } /* end for (looping through entries) */
 	    if (f) idx = i ;
@@ -1130,7 +1130,7 @@ local int part_match(PARTTYPE *pp,cchar *s) noex {
 	    f = false ;
 	    if (s) {
 	        if (pp->patrgx == nullptr) {
-	            f = (strcmp(pp->patstd,s) == 0) ;
+	            f = (cmpstr(pp->patstd,s) == 0) ;
 	            if (! f) {
 	                f = ismatstar(pp->patstd,s) ;
 	            }
@@ -1147,7 +1147,7 @@ local int part_match(PARTTYPE *pp,cchar *s) noex {
 	                        f = (strncmp(s + sl1 - tsz,tp,tsz) == 0) ;
 	                    } /* end if */
 	                } else {
-	                    f = (strcmp(pp->patstd,s) == 0) ;
+	                    f = (cmpstr(pp->patstd,s) == 0) ;
 	                }
 	            } else {
 		        if_constexpr (f_regex) {
@@ -1207,7 +1207,7 @@ local int vcmpent(cvoid **v1pp,cvoid **v2pp) noex {
 	        if (e2p) {
 		    cchar	*s1 = e1p->netgroup.patstd ;
 		    cchar	*s2 = e2p->netgroup.patstd ;
-	    	    rc = strcmp(s1,s2) ;
+	    	    rc = cmpstr(s1,s2) ;
 		}
 	    }
 	}
