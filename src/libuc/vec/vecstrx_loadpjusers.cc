@@ -43,7 +43,6 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucenumua.h>		/* LIBUC */
 #include	<uckvamatch.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -117,13 +116,13 @@ local int vecstrx_loadpjnent(vecstrx *vsp,ent *uap,cchar *pjn) noex {
 	int		c = 0 ;
 	cchar		*k = "project" ;
 	if (cchar *vp{} ; (rs = uc_kvamatch(uap->attr,k,&vp)) >= 0) {
-	    if (strwcmp(pjn,vp,rs) == 0) {
+	    if (cmpstrw(pjn,vp,rs) == 0) {
 	        rs = vsp->adduniq(uap->name) ;
 	        if (rs < INT_MAX) c += 1 ;
 	    }
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (vecstrx_loadpjnent) */
 
