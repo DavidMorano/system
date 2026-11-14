@@ -32,11 +32,11 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<storebuf.h>		/* LIBUC */
 #include	<utf8decoder.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<endian.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -352,7 +352,7 @@ local int chartrans_sethave(CT *op,cchar *sp,int sl) noex {
 	for (i = 0 ; i < op->nmax ; i += 1) {
 	    setp = (op->sets + i) ;
 	    if (setp->name != nullptr) {
-	        f = (strwcmp(setp->name,sp,sl) == 0) ;
+	        f = (cmpstrw(setp->name,sp,sl) == 0) ;
 	        if (f) break ;
 	    }
 	} /* end for */
