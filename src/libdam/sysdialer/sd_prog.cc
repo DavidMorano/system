@@ -61,7 +61,6 @@
 #include	<paramfile.h>		/* LIBUC */
 #include	<logfile.h>		/* LIBUC */
 #include	<strx.h>		/* LIBUC */
-#include	<vstrcmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<envs.h>		/* LIBUC */
 #include	<sysvar.h>		/* LIBUC */
 #include	<sysdialer.h>		/* LIBUC */
@@ -593,7 +592,7 @@ int prog_open(PROG *op,SD_ARGS *ap,cc *hostname,cc *svcname,mainv av) noex {
 	if (rs < 0)
 	    goto baddefsload ;
 
-	vecstr_sort(&sip->defs,vstrkeycmp) ;
+	vecstr_sort(&sip->defs,cmpvstrk) ;
 
 	rs = envs_start(&sip->xenvs,DEFNXENVS) ;
 	if (rs < 0)
@@ -2314,7 +2313,7 @@ SUBINFO		*sip ;
 	for (i = 0 ; envsys[i] != nullptr ; i += 1) {
 
 	    ename = envsys[i] ;
-	    if (vecstr_search(elp,ename,vstrkeycmp,nullptr) == SR_NOTFOUND) {
+	    if (vecstr_search(elp,ename,cmpvstrk,nullptr) == SR_NOTFOUND) {
 	        tp = nullptr ;
 	        switch ((int) ename[0]) {
 	        case 'S':
@@ -2474,17 +2473,13 @@ vecstr		*elp ;
 	int		rs = SR_OK ;
 	cchar		*varpath = VARPATH ;
 	cchar		*pp ;
-
-	if ((rs = vecstr_search(elp,varpath,vstrkeycmp,&pp)) >= 0) {
-	    cchar	*tp ;
-
+	if ((rs = vecstr_search(elp,varpath,cmpvstrk,&pp)) >= 0) {
 	    rs = SR_NOENT ;
+	    cchar *tp ;
 	    if ((tp = strchr(pp,'=')) != nullptr) {
 	        rs = loadpathcomp(sip,plp,(tp + 1)) ;
 	    }
-
 	} /* end if */
-
 	return rs ;
 } /* end subroutine (loadpathlist) */
 
