@@ -486,7 +486,7 @@ local int filecounts_update(FC *op,WKR *wp) noex {
 	                    }
 	                } else {
 	                    c += 1 ;
-	                    if (strcmp(wep->name,"TOTAL") == 0) {
+	                    if (cmpstr(wep->name,"TOTAL") == 0) {
 	                        cint	ni = wep->ni ;
 	                        wep->action = WKR_CMDSET ;
 	                        nlp[ni].value += wp->vall ;
@@ -699,7 +699,7 @@ local int worker_start(WKR *wp,FC_N *nlp) noex  {
 	    cchar	*tnp = total ;
 	    for (i = 0 ; nlp[i].name != nullptr ; i += 1) {
 	        cchar	*sp = nlp[i].name ;
-	        if ((sp[0] != 'T') || (strcmp(sp,tnp) != 0)) {
+	        if ((sp[0] != 'T') || (cmpstr(sp,tnp) != 0)) {
 	            cint	nv = nlp[i].value ;
 	            na = actioncmd(nv) ;
 	            if (na == WKR_CMDINC) vadding += nv ;
