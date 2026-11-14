@@ -64,7 +64,6 @@
 #include	<mkx.h>			/* LIBUC |mkshmname(3uc)| */
 #include	<sfx.h>			/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<cvtdater.h>		/* LIBUC */
 #include	<shmalloc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -1169,7 +1168,7 @@ local int votdc_bookslotfind(votdc *op,cchar *lang) noex {
 	for (int i = 0 ; i < n ; i += 1) {
 	    cchar	*elang = blp[i].lang ;
 	    if (elang[0] != '\0') {
-		f_same = (strcmp(elang,lang) == 0) ;
+		f_same = (cmpstr(elang,lang) == 0) ;
 		idx = i ;
 	    } else {
 		i_empty = i ;
@@ -1225,7 +1224,7 @@ local int votdc_booklanghave(votdc *op,cchar *lang) noex {
 	int		rs = SR_NOTFOUND ;
 	int		i ; /* used-afterwards return-value */
 	for (i = 0 ; i < n ; i += 1) {
-	    if (strcmp(bap[i].lang,lang) == 0) {
+	    if (cmpstr(bap[i].lang,lang) == 0) {
 		rs = SR_OK ;
 		break ;
 	    }
@@ -1366,7 +1365,7 @@ local int votdc_titlematcher(votdc *op,int ac,int ci,cc *cbuf,int cl) noex {
 	int		rs = SR_NOTFOUND ;
 	if (tcp->titles) {
 	    tcp->amark = ac ;
-	    if ((rs = matostr(tcp->titles,2,cbuf,cl)) < 0) {
+	    if ((rs = matstro(tcp->titles,2,cbuf,cl)) < 0) {
 		rs = SR_NOTFOUND ;
 	    }
 	} /* end if (non-null) */
@@ -1407,7 +1406,7 @@ local int votdc_titlevalid(votdc *op,int bi) noex {
 	    bool	f = false ;
 	    for (i = 0 ; i < n ; i += 1) {
 		if ((tcp[i].lang[0] != '\0') && (tcp[i].wmark == wm)) {
-		    f = (strcmp(tcp[i].lang,blang) == 0) ;
+		    f = (cmpstr(tcp[i].lang,blang) == 0) ;
 		    if (f) break ;
 		}
 	    } /* end for */
