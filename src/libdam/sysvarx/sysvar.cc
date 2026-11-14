@@ -42,8 +42,7 @@
 #include	<snwcpy.h>		/* LIBUC */
 #include	<strxcmp.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<strxcmp.h>		/* LIBUC |strkeycmp(3uc)| */
-#include	<vstrcmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<strxcmp.h>		/* LIBUC |cmpstrk(3uc)| */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -577,7 +576,7 @@ local int sysvar_defaults(SV *op) noex {
 	        if ((rs < 0) && (! f)) break ;
 	    } /* end for */
 	    if (rs >= 0) ylikely {
-	        vecstr_sort(op->dlp,vstrkeycmp) ;
+	        vecstr_sort(op->dlp,cmpvstrk) ;
 	    }
 	    if (rs < 0) {
 		op->fl.defaults = false ;
@@ -661,7 +660,7 @@ local int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 	    int		i = (dcp->i >= 0) ? (dcp->i + 1) : 0 ;
 	    cchar	*cp ; /* multiple-use */
 	    while ((rs = vecstr_get(op->dlp,i,&cp)) >= 0) {
-	        if (strkeycmp(key,cp) == 0) break ;
+	        if (cmpstrk(key,cp) == 0) break ;
 	        i += 1 ;
 	    } /* end while */
 	    if (rs >= 0) ylikely {
