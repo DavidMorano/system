@@ -30,6 +30,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"vecstrx.hh"
@@ -53,7 +54,7 @@ int vecstrx::foilcmp(vecstrx *rnp) noex {
 	            cchar	*sp{} ;
 	            for (int j = 0 ; rnp->get(j,&sp) >= 0 ; j += 1) {
 		        if (sp) {
-	        	    f_match = (cp[0] == sp[0]) && (strcmp(cp,sp) == 0) ;
+	        	    f_match = (cp[0] == sp[0]) && (cmpstr(cp,sp) == 0) ;
 	        	    if (f_match) break ;
 		        }
 	            } /* end for */
