@@ -108,7 +108,6 @@
 #include	<mknpathx.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |DECBUFLEN| */
