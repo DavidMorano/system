@@ -80,13 +80,13 @@
 #include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
 #include	<sbuf.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
 #include	<vecstr.h>		/* LIBUC */
 #include	<permx.h>		/* LIBUC |permids(3uc)| */
-#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"permsched.h"
@@ -163,7 +163,7 @@ local int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
 	rbuf[0] = '\0' ;
 	if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	    cauto	vf = vecstr_finder ;
-	    cauto	vs = vstrkeycmp ;
+	    cauto	vs = cmpvstrk ;
 	    char	kb[2] = {} ;
 	    for (cchar *fp = fmt ; *fp && (rs >= 0) ; fp += 1) {
 	        if (*fp == '%') {
