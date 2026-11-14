@@ -47,7 +47,6 @@
 #include	<unistd.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| + |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
@@ -136,11 +135,11 @@ local int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 	if (char *dirbuf ; (rs = lm_mp(&dirbuf)) >= 0) ylikely {
             if ((rs = mkpath(dirbuf,dname)) >= 0) ylikely {
                 cchar       *dp = dirbuf ;
-                for (char *bp ; (bp = strchr(dp,'/')) != np ; ) {
+                for (char *bp ; (bp = strochr(dp,'/')) != np ; ) {
                     bool    f = true ;
                     *bp = '\0' ;	/* <- set temporary termination */
                     f = f && ((bp - dp) > 0) ;
-                    f = f && (strcmp(dp,".") != 0) ;
+                    f = f && (cmpstr(dp,".") != 0) ;
                     if (f) {
                         rs = procdir(idp,dirbuf,dm) ;
                         c += rs ;
