@@ -1131,7 +1131,7 @@ local int termdisp_erase(TD *op,int w,int item,int type) noex {
 local int termmatch(const TERMTYPE *tlist,cchar *term) noex {
 	int	i ; /* used-afterwards */
 	for (i = 0 ; tlist[i].term != nullptr ; i += 1) {
-	    if (strcmp(term,tlist[i].term) == 0) break ;
+	    if (cmpstr(term,tlist[i].term) == 0) break ;
 	} /* end for */
 	return (tlist[i].term != nullptr) ? i : -1 ;
 } /* end subroutine (termmatch) */
