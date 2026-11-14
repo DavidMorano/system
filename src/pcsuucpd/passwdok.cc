@@ -37,7 +37,7 @@
 #include	<des.h>			/* ?? */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<cstring>		/* CSTD |cmpstr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -112,7 +112,7 @@ int passwdok(cchar *password,cchar *pw_stored) noex {
 	DEBUGPRINTF("pw_given=>%s<\n",pw_given) ;
 #endif
 
-	f_cmp = (strcmp(pw_stored,pw_given) == 0) ;
+	f_cmp = (cmpstr(pw_stored,pw_given) == 0) ;
 
 /* if both the supplied and the stored passwords are zero length, allow it */
 
