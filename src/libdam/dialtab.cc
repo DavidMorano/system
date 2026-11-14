@@ -46,7 +46,6 @@
 #include	<vecobj.h>		/* LIBUC */
 #include	<mkpathx.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<bfile.h>		/* LIBB */
 
@@ -378,7 +377,7 @@ int adder::procln(int fi,cchar *lp,int ll) noex {
                         flg.ent = (rs >= 0) ;
 		    } /* end if (ok) */
                 } else {
-                    if (int ki ; (ki = matostr(dialnames,2,fp,fl)) >= 0) {
+                    if (int ki ; (ki = matstro(dialnames,2,fp,fl)) >= 0) {
                         if ((fl = fsb.get(ft.terms,&fp)) > 0) {
 			    cchar **rpp = nullptr ;
                             switch (ki) {
@@ -476,7 +475,7 @@ int dialtab_search(DT *op,cchar *name,DT_ENT **depp) noex {
 			        break ;
 		            }
 	                } /* end (strncmp) */
-	            } else if (strcmp(name,sp) == 0) {
+	            } else if (cmpstr(name,sp) == 0) {
 	                idx = i ;
 		        break ;
 	            }
