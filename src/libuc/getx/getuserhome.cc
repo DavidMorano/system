@@ -70,6 +70,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<aflag.hh>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucopen.h>		/* LIBUC */
@@ -85,7 +86,6 @@
 #include	<mkpathx.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<strlibval.hh>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -268,7 +268,7 @@ local int subinfo_getvar(subinfo *sip,char *rbuf,int rlen) noex {
 	    if ((hd != nullptr) && (hd[0] != '\0')) {
 	        int	bl ;
 	        if (cchar *bp{} ; (bl = sfbasename(hd,-1,&bp)) > 0) {
-	            if (strwcmp(un,bp,bl) == 0) {
+	            if (cmpstrw(un,bp,bl) == 0) {
 	                rs = mknpath1(rbuf,rlen,hd) ;
 	                len = rs ;
 	            }
@@ -333,7 +333,7 @@ local int dirsearch(cchar *basedname,cchar *un) noex {
 	        while ((rs = fsdir_read(&dir,&ds,nbuf,nlen)) > 0) {
 	            cchar	*fnp = ds.name ;
 	            if (fnp[0] != '.') {
-	                f_found = (fnp[0] == un[0]) && (strcmp(fnp,un) == 0) ;
+	                f_found = (fnp[0] == un[0]) && (cmpstr(fnp,un) == 0) ;
 	                if (f_found) break ;
 	            }
 	        } /* end while */
