@@ -290,7 +290,7 @@ int jobdb_search(jobdb *op,cchar *fname,jobdb_ent **jepp) noex {
 	        for (i = 0 ; (rs = dbp->get(i,&vp)) >= 0 ; i += 1) {
 		    jobdb_ent *jap = resumelife<jobdb_ent>(vp) ;
 	            if (vp) {
-	                if (strcmp(jap->efname,fname) == 0) {
+	                if (cmpstr(jap->efname,fname) == 0) {
 			    *jepp = jap ;
 			    break ;
 			}
