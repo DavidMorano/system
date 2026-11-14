@@ -285,7 +285,7 @@ local int opencfile(int w,int of,int ttl) noex {
 	            } /* end if (alternate test) */
 #ifdef	COMMENT
 	            if (rs >= 0) ylikely {
-	                if (strcmp(dbfnames[w],STDFNNULL) != 0) {
+	                if (cmpstr(dbfnames[w],STDFNNULL) != 0) {
 	                    if ((rs = u_stat(dbfnames[w],&sb)) >= 0) {
 	                        if (dt == 0) dt = time(nullptr) ;
 	                        if (sb.st_mtime > mt) rs = SR_STALE ;
