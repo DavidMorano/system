@@ -46,7 +46,7 @@
 #include	<fcntl.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| + |strcmp(3c)| */
+#include	<cstring>		/* CSTD |strchr(3c)| + |cmpstr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -112,7 +112,7 @@ int chmods(cchar *dname,mode_t dm) noex {
 	                cp = dbuf ;
 	                while ((cp2 = strchr(cp,'/')) != nullptr) {
 	                    *cp2 = '\0' ;
-	                    if (((cp2 - cp) > 0) && (strcmp(cp,".") != 0)) {
+	                    if (((cp2 - cp) > 0) && (cmpstr(cp,".") != 0)) {
 	                        rs = checkinfo_dir(&ci,dbuf) ;
 			        c += rs ;
 	                    } /* end if */
