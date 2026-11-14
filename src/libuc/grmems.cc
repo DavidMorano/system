@@ -72,7 +72,6 @@
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strdcpy.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -522,7 +521,7 @@ local int grmems_fetch(grmems *op,grmems_rec **epp,cchar *gnp,int gnl) noex {
 	for (i = 0 ; (rs = recarr_get(rlp,i,&ep)) >= 0 ; i += 1) {
 	    if (ep) {
 	        if (gnp[0] == ep->gn[0]) {
-	            if (strwcmp(ep->gn,gnp,gnl) == 0) break ;
+	            if (cmpstrw(ep->gn,gnp,gnl) == 0) break ;
 		}
 	    }
 	} /* end for */
