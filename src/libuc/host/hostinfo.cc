@@ -51,6 +51,7 @@
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucinet.h>		/* LIBUC */
 #include	<ucgetx.h>		/* LIBUC |uc_getipnode{x}(3uc)| */
@@ -1240,7 +1241,7 @@ local int vmatname(cvoid **v1pp,cvoid **v2pp) noex {
 	bool		f = true ;
 	f = f && (ne1p->name[0] == ne2p->name[0]) ;
 	f = f && (ne1p->namelen == ne2p->namelen) ;
-	f = f && (strcmp(ne1p->name,ne2p->name) == 0) ;
+	f = f && (cmpstr(ne1p->name,ne2p->name) == 0) ;
 	return (f) ? 0 : 1 ;	/* <- reversed sense */
 } /* end subroutine (vmatname) */
 
