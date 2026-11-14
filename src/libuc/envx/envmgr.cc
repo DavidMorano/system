@@ -28,11 +28,11 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
+#include	<new>			/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<sfx.h>			/* LIBUC */
-#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"envmgr.h"
@@ -42,8 +42,6 @@
 
 
 /* imported namespaces */
-
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -63,11 +61,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 local int envmgr_ctor(envmgr *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
-	    if ((op->listp = new(nothrow) vechand) != np) ylikely {
-	        if ((op->strp = new(nothrow) vecstr) != np) ylikely {
+	    if ((op->listp = new(nt) vechand) != np) ylikely {
+	        if ((op->strp = new(nt) vecstr) != np) ylikely {
 		    rs = SR_OK ;
 		}
 		if (rs < 0) {
@@ -174,7 +173,7 @@ int envmgr_set(envmgr *op,cchar *kp,cchar *vp,int vl) noex {
 	        vechand		*elp = op->listp ;
 	        cint		i = rs ;
 	        if (cchar *ep ; (rs = vecstr_get(esp,i,&ep)) >= 0) ylikely {
-		    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+		    vechand_vcmp	vcf = vechand_vcmp(cmpvstrk) ;
 	            if ((rs = vechand_search(elp,kp,vcf,np)) >= 0) {
 	                vechand_del(elp,rs) ;
 	            } else if (rs == nrs) {
