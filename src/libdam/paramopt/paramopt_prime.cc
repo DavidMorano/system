@@ -491,7 +491,7 @@ local int paramopt_findkey(PO *op,cc *name,PO_NAME **rpp) noex {
 	if ((rs = paramopt_magic(op,name)) >= 0) ylikely {
 	    PO_NAME	*pp ;
 	    for (pp = op->head ; pp != nullptr ; pp = pp->next) {
-	        if (strcmp(pp->name,name) == 0) break ;
+	        if (cmpstr(pp->name,name) == 0) break ;
 	    } /* end for */
 	    if (pp) c = pp->c ;
 	    if (rpp) *rpp = pp ;
