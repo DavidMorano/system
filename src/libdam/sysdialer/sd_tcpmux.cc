@@ -442,7 +442,7 @@ cchar	*av[] ;
 		if ((afspec != nullptr) && (afspec[0] != '\0')) {
 
 			for (i = 0 ; afs[i].name != nullptr ; i += 1) {
-				if (strcmp(afs[i].name,afspec) == 0)
+				if (cmpstr(afs[i].name,afspec) == 0)
 					break ;
 			}
 
