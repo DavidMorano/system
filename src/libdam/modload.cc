@@ -49,7 +49,7 @@
 #include	<dlfcn.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<cstring>		/* CSTD |cmpstr(3c)| */
 #include	<new>			/* C++STD placement-new */
 #include	<memory>		/* C++STD |destroy_at(3c++)| */
 #include	<clanguage.h>		/* LIBU */
@@ -722,7 +722,7 @@ int subinfo::sotest(char *tbuf,int tlen) noex {
 	        if (void *vp ; (vp = dlsym(mlp->sop,tbuf)) != np) {
 	            modload_mi	*mip = (modload_mi *) vp ;
 	            mlp->midp = mip ;
-	            if (strcmp(mip->name,mlp->modname) == 0) {
+	            if (cmpstr(mip->name,mlp->modname) == 0) {
 		        rs = SR_OK ;
 	            }
 	        } /* end if (dlsym) */
