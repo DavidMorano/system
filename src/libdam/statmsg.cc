@@ -1285,7 +1285,7 @@ local int mapdir_procerv(MD *mdp,cc **ev,cc *dn,mv strs,int fd,cc *kn) noex {
                         cchar       *den = nbuf ;
                         if (den[0] != '.') {
                             cchar   *tp = strchr(den,'.') ;
-                            if (tp && (strcmp((tp+1),suf) == 0)) {
+                            if (tp && (cmpstr((tp+1),suf) == 0)) {
                                 int         tl ;
                                 bool        f = true ;
                                 cchar       *digp ;
