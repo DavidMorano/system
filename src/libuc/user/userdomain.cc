@@ -62,7 +62,6 @@
 #include	<fcntl.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -153,7 +152,7 @@ int userdomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 	    if (username[0]) ylikely {
 	        uargs	a(dbuf,dlen,username,MAXFILESIZE) ;
 	        cchar	*fname = UDOMASTDFNIN ;
-	        if (pr && (pr[0] != '\0') && (strcmp(pr,"/") != 0)) {
+	        if (pr && (pr[0] != '\0') && (cmpstr(pr,"/") != 0)) {
 		     if (char *fbuf ; (rs = lm_mp(&fbuf)) >= 0) {
 	    	         if ((rs = mkpath(fbuf,pr,fname)) >= 0) {
 	             	    rs = a.userdomainer(fbuf) ;
