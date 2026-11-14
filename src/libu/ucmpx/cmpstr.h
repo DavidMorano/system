@@ -25,8 +25,10 @@
 
 #include	<cmpstrk.h>
 #include	<cmpstrkn.h>
-#include	<cmpstrnx.h>
+#include	<cmpstrn.h>
+#include	<cmpstrw.h>
 #include	<cmpstrx.h>
+#include	<cmpvstrx.h>
 
 
 #endif /* CMPSTR_INCLUDE */
