@@ -141,7 +141,7 @@ int listentcp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 	        if (hp != nullptr) {
 	            bool	f = false ;
 	            f = f || (hp[0] == '\0') ;
-	            f = f || (strcmp(hp,"*") == 0) ;
+	            f = f || (cmpstr(hp,"*") == 0) ;
 	            if (f) {
 	                hp = ANYHOST ;
 	            }
