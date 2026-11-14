@@ -1118,7 +1118,7 @@ time_t		daytime ;
 		op->h.nentries) ;
 #endif
 
-	        f = (strcmp(fm.magic,SRVREG_FILEMAGIC) == 0) ;
+	        f = (cmpstr(fm.magic,SRVREG_FILEMAGIC) == 0) ;
 
 #if	CF_DEBUG
 	        DEBUGPRINTF("srvreg_fileinit: fm.magic=%s\n",fm.magic) ;
