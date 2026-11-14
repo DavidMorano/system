@@ -51,7 +51,6 @@
 #include	<getsysname.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"getostype.h"
@@ -243,10 +242,10 @@ int typer::trysysname() noex {
 int typer::matguess(cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	for (cauto &g : guesses) {
-	    if (strwcasecmp(g.name,sp,sl) == 0) {
+	    if (cmpstrwic(g.name,sp,sl) == 0) {
 		rs = g.type ;
 		fgot = true ;
-	    }
+	    } /* end if (cmpstrwic) */
 	    if (fgot) break ;
 	} /* end for */
 	return rs ;
@@ -261,10 +260,10 @@ int typer::other() noex {
 namespace libdam {
     ostyper::operator int () noex {
 	return getostype() ;
-    }
+    } /* end */
     int ostyper::operator () () noex {
 	return getostype() ;
-    }
+    } /* end */
 } /* end namespace (libdam) */
 
 
