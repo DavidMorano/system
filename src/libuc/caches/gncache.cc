@@ -30,7 +30,6 @@
 #include	<ctime>			/* CSTD |time(2)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU |geustime(3u)| */
@@ -556,7 +555,7 @@ local int record_update(rec *rp,time_t dt,cchar *gn) noex {
 	if (rp) ylikely {
 	    rp->ti_create = dt ;
 	    rp->ti_access = dt ;
-	    f_changed = (strcmp(rp->gn,gn) != 0) ;
+	    f_changed = (cmpstr(rp->gn,gn) != 0) ;
 	    if (f_changed) {
 		cint	gnl = var.groupnamelen ;
 	        strwcpy(rp->gn,gn,gnl) ;
