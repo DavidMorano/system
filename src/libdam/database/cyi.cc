@@ -815,7 +815,7 @@ local int vcmpte(cvoid *v1p,cvoid *v2p) noex {
 local bool isOurSuffix(cchar *name,cchar *fsuf) noex {
 	bool		f = false ;
 	if (cchar *tp = strchr(name,'.') ; tp) {
-	    f = (strcmp((tp + 1),fsuf) == 0) ;
+	    f = (cmpstr((tp + 1),fsuf) == 0) ;
 	}
 	return f ;
 } /* end subroutine (isOurSuffix) */
