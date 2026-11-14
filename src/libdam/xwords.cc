@@ -114,7 +114,7 @@ int xwords_start(xwords *op,cchar *wbuf,int wlen) noex {
 	            i += 1 ;
 	        }
 	    } else if ((wlen == 7) && (wbuf[0] == 'c')) {
-		if (strcmp(wbuf,"cieling") == 0) {
+		if (cmpstr(wbuf,"cieling") == 0) {
 	            op->words[i].wp = "ceiling" ;
 	            op->words[i].wl = 7 ;
 	            i += 1 ;
