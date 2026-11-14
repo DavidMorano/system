@@ -79,12 +79,11 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<nulstr.h>		/* LIBU */
+#include	<intceil.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<vechand.h>		/* LIBUC */
-#include	<vstrcmp.h>		/* LIBUC */
 #include	<nleadstr.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<intceil.h>		/* LIBUC */
 #include	<nextpowtwo.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -464,7 +463,7 @@ int vecpstr_sort(vecpstr *op,vecpstr_vcmp vcf) noex {
 	int		c = 0 ;
 	if ((rs = vecpstr_magic(op)) >= 0) ylikely {
 	    if (op->va) ylikely {
-		if (vcf == nullptr) vcf = vstrcmp ;
+		if (vcf == nullptr) vcf = cmpvstr ;
 	        if ((! op->fl.issorted) && (op->cnt > 1)) {
 		    c = op->cnt ;
 		    vecpstr_arrsort(op,vcf) ;
@@ -482,7 +481,7 @@ int vecpstr_search(vecpstr *op,cchar *sp,vecpstr_vcmp vcf,cchar **rpp) noex {
 	    rs = SR_NOTFOUND ;
 	    if (op->va) ylikely {
 		cchar	**rpp2 ;
-		if (vcf == nullptr) vcf = vstrcmp ;
+		if (vcf == nullptr) vcf = cmpvstr ;
 	        if (op->fl.issorted) {
 		    csize	alen = size_t(op->idx) ;
 	            csize	esize = sizeof(char *) ;
@@ -539,7 +538,7 @@ int vecpstr_finder(vecpstr *op,cc *sp,vecpstr_vcmp vcf,cc **rpp) noex {
             rs = SR_NOTFOUND ;
             if (op->va) ylikely {
                int          i ; /* <- used-afterwards */
-               if (vcf == nullptr) vcf = vstrcmp ;
+               if (vcf == nullptr) vcf = cmpvstr ;
                for (i = 0 ; i < op->idx ; i += 1) {
                     if (op->va[i]) {
                        if ((*vcf)(&sp,(op->va+i)) == 0) break ;
@@ -548,7 +547,7 @@ int vecpstr_finder(vecpstr *op,cc *sp,vecpstr_vcmp vcf,cc **rpp) noex {
                if (i < op->idx) rs = i ;
                if (rpp) {
                    *rpp = (rs >= 0) ? op->va[i] : nullptr ;
-               }
+               } /* end */
             } /* end if (populated) */
 	} /* end if (magic) */
 	return rs ;
@@ -564,7 +563,7 @@ int vecpstr_find(vecpstr *op,cchar *sp) noex {
                 for (i = 0 ; i < op->idx ; i += 1) {
                     cchar   *ep = op->va[i] ;
                     if (ep) {
-                        if ((sch == ep[0]) && (strcmp(sp,ep) == 0)) break ;
+                        if ((sch == ep[0]) && (cmpstr(sp,ep) == 0)) break ;
                     }
                 } /* end for */
                 if (i < op->idx) rs = i ;
@@ -585,7 +584,7 @@ int vecpstr_findn(vecpstr *op,cchar *sp,int sl) noex {
 	        if (ep && (sch == ep[0])) {
 		    cint	m = nleadstr(ep,sp,sl) ;
 		    if ((m == sl) && (ep[m] == '\0')) break ;
-	        }
+	        } /* end */
 	    } /* end for */
 	    if (i < op->idx) rs = i ;
 	} /* end if (magic) */
@@ -662,7 +661,7 @@ int vecpstr_strmk(vecpstr *op,char *tab,int tabsize) noex {
                 } /* end for */
                 while (bp < (tab + tabsize)) {
                     *bp++ = '\0' ;
-                }
+                } /* end while */
             } /* end if (not overflow) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
@@ -765,8 +764,8 @@ int vecpstr_avmkstr(vecpstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 		            }
 	                } /* end for */
 	                av[c] = nullptr ;
-	            }
-	        }
+	            } /* end if */
+	        } /* end if */
 	    } /* end if (vecpstr_cksize) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
@@ -809,7 +808,7 @@ int vecpstr_add(vecpstr *op,string *strp) noex {
 	    cchar	*sp = strp->c_str() ;
 	    cint	sl = intconv(strp->size()) ;
 	    rs = vecpstr_add(op,sp,sl) ;
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (vecpstr_add) */
 
@@ -918,7 +917,7 @@ local int vecpstr_finchunks(vecpstr *op) noex {
 	            rs1 = libmem.free(chkp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
-	    }
+	    } /* end if */
 	} /* end for */
 	op->chp = nullptr ;
 	return (rs >= 0) ? c : rs ;
@@ -988,7 +987,7 @@ local int vecpstr_record(vecpstr *op,cchar *sp) noex {
 	int		i = 0 ;
 	if ((op->idx + 1) > op->ext) {
 	    rs = vecpstr_extvec(op,-1) ;
-	}
+	} /* end if */
 	if (rs >= 0) {
 	    i = op->idx ;
 	    op->va[(op->idx)++] = sp ;
@@ -1065,7 +1064,7 @@ local int chunk_add(VPS_CH *chkp,cchar *sp,int sl,cchar **rpp) noex {
 	    } /* end block */
 	} else {
 	    rs = SR_BUGCHECK ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end subroutine (chunk_add) */
 
@@ -1089,7 +1088,7 @@ local int chunk_addkeyval(VPS_CH *chkp,cc *kp,int kl,cc *vp,int vl,
 	    *rpp = bp ;
 	} else {
 	    rs = SR_BUGCHECK ;
-	}
+	} /* end if (error) */
 	return rs ;
 } /* end subroutine (chunk_addkeyval) */
 
@@ -1179,7 +1178,7 @@ int vecpstr::finder(cchar *s,vecpstr_f vcmp,cchar **rpp) noex {
 } /* end method */
 
 int vecpstr::findkey(cchar *kp,int kl,cchar **rpp) noex {
-	return searchl(kp,kl,vstrkeycmp,rpp) ;
+	return searchl(kp,kl,cmpvstrk,rpp) ;
 } /* end method (vecpstr::findkey) */
 
 int vecpstr::del(int ai) noex {
@@ -1190,14 +1189,14 @@ int vecpstr::del(int ai) noex {
 void vecpstr::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("vecpstr",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (vecpstr::dtor) */
 
 vecpstr::operator int () noex {
     	int		rs = SR_NOTOPEN ;
 	if (magval == VECPSTR_MAGIC) ylikely {
 	    rs = cnt ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (vecpstr::operator) */
 
