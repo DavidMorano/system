@@ -34,7 +34,7 @@
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>		/* |strcmp(3c)| */
+#include	<cstring>		/* |cmpstr(3c)| */
 #include	<new>			/* |nothrow(3c++)| */
 #include	<clanguage.h>
 #include	<usysbase.h>
