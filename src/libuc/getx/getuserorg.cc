@@ -226,7 +226,7 @@ local int getuserorg_var(SI *sip) noex {
 	if (! f) {
 	    static cchar	*vun = getenver(vusername) ;
 	    if (vun && vun[0]) {
-	        f = (strcmp(vun,un) == 0) ;
+	        f = (cmpstr(vun,un) == 0) ;
 	    }
 	}
 	if (f) {
