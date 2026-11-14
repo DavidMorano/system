@@ -198,7 +198,7 @@ int rcmdu(cchar *rhost,cchar *ruser,cchar *cmd,int *fd2p) noex {
 
 	if ((rs >= 0) && (inet_addr(rhost) == NOADDR)) {
 	    rs = getehostname(ehostname,rhost) ;
-	    if ((rs >= 0) && (strcmp(rhost,ehostname) != 0)) {
+	    if ((rs >= 0) && (cmpstr(rhost,ehostname) != 0)) {
 	        rhost = ehostname ;
 	    }
 	} /* end if */
