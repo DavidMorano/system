@@ -232,7 +232,7 @@ local int subinfo_sofind(SI *sip) noex {
 	    for (int i = 0 ; dnames[i] ; i += 1) {
 	        cchar	*dname = dnames[i] ;
 	        if (dname[0] != '\0') {
-		    if (strcmp(dname,DNAME_SELF) == 0) {
+		    if (cmpstr(dname,DNAME_SELF) == 0) {
 			sip->sop = RTLD_SELF ;
 			rs = subinfo_checksyms(sip) ;
 		    } else {
@@ -253,7 +253,7 @@ local int subinfo_sofind(SI *sip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_open) {
 		subinfo_modclose(sip) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (IDs) */
 	return rs ;
 } /* end subroutine (subinfo_sofind) */
@@ -273,7 +273,7 @@ local int subinfo_socheck(SI *sip,ids *idp,cc *dname) noex {
 	            rs1 = u_stat(sofname,&sb) ;
 	            if ((rs1 >= 0) && (! S_ISREG(sb.st_mode))) {
 	                rs1 = SR_ISDIR ;
-		    }
+		    } /* end if (error) */
 	            if (rs1 >= 0) {
 	                rs1 = permids(idp,&sb,soperm) ;
 		    }
