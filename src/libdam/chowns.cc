@@ -118,7 +118,7 @@ int chowns(cchar *dname,uid_t uid,gid_t gid) noex {
 	                cchar	*cp = dbuf ;
 	                for (char *bp ; (bp = strchr(cp,'/')) != np ; ) {
 	                    *bp = '\0' ;
-	                    if (((bp - cp) > 0) && (strcmp(cp,".") != 0)) {
+	                    if (((bp - cp) > 0) && (cmpstr(cp,".") != 0)) {
 	                        rs = checkdir(&ci,dbuf) ;
 			        c += 1 ;
 	                    } /* end if */
