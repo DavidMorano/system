@@ -31,7 +31,7 @@
 #include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<cstring>		/* CSTD |cmpstr(3c)| */
 #include	<new>			/* C++STD placement-new */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
@@ -333,8 +333,8 @@ local int filewatch_checkrest(FW *op,time_t dt) noex {
     	int		rs ;
 	if (op->fl.open && ((dt - op->opentime) > to)) {
 	    bool	f = false ;
-	    f = f || (strcmp(op->fname,"-") == 0) ;
-	    f = f || (strcmp(op->fname,STDFNIN) == 0) ;
+	    f = f || (cmpstr(op->fname,"-") == 0) ;
+	    f = f || (cmpstr(op->fname,STDFNIN) == 0) ;
 	    if (! f) {
 	        if (ustat sb ; (rs = u_stat(op->fname,&sb)) >= 0) {
 	            f = f || (sb.st_ino != op->ino) ;
@@ -596,7 +596,7 @@ filewatch_co::operator int () noex {
 } /* end method (filewatch_co::operator) */
 
 local int bopenx(bfile *wfp,cchar *fn) noex {
-	if (strcmp(fn,"-") == 0) fn = STDFNIN ;
+	if (cmpstr(fn,"-") == 0) fn = STDFNIN ;
 	return bopen(wfp,fn,"r",0) ;
 } /* end subroutine (bopenx) */
 
