@@ -34,7 +34,7 @@
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<cstring>		/* CSTD |cmpstr(3c)| */
 #include	<new>			/* C++STD placement-new */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -322,7 +322,7 @@ int checkdirer::looper(vecstr *elp) noex {
 	        	fl = rs ;
 	        	if (void *dhp ; (dhp = dlopen(dlfname,dlm)) != np) {
 			    SD_INFO	*dip = (SD_INFO *) dlsym(dhp,name) ;
-	                    if (dip && (strcmp(dip->name,name) == 0)) {
+	                    if (dip && (cmpstr(dip->name,name) == 0)) {
 	                        ep->osz = dip->osz ;
 	                        ep->flags = dip->flags ;
 	                        ep->mp->dhp = dhp ;
@@ -413,7 +413,7 @@ namespace sysdialer_util {
     int entry_hasname(ent *ep,void *dhp,cc *name) noex {
 	SD_INFO		*dip = (SD_INFO *) dlsym(dhp,name) ;
 	int		rs = SR_NOTFOUND ;
-	if ((dip != nullptr) && (strcmp(dip->name,name) == 0)) {
+	if ((dip != nullptr) && (cmpstr(dip->name,name) == 0)) {
 	    ep->osz = dip->osz ;
 	    rs = SR_OK ;
 	} /* end */
