@@ -43,6 +43,7 @@ module ;
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
+#include	<cmpstr.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<baops.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |eol| */
@@ -58,7 +59,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using libu::strwcmp ;			/* subroutine */
 using libu::siochr ;			/* subroutine */
 using libu::sirchr ;			/* subroutine */
 
@@ -292,11 +292,11 @@ int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex {
 	    if (int cl ; (cl = sfcontent(sp,sl,&cp)) > 0) {
 		cchar	*kp{} ;
 		if (int kl ; (kl = sfnext(cp,cl,&kp)) > 0) {
-		    if (strwcmp(key,kp,kl) == 0) {
+		    if (cmpstrw(key,kp,kl) == 0) {
 			cint	xl = intconv((cp + cl) - (kp + kl)) ;
 			cchar	*xp = (kp + kl) ;
 			vl = sfnext(xp,xl,&vp) ;
-		    } /* end if (strwcmp) */
+		    } /* end if (cmpstrw) */
 		} /* end if (sfnext) */
 	    } /* end if (sfcontent) */
 	} /* end if (non-null) */
