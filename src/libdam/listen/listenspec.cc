@@ -699,19 +699,19 @@ local int listenspec_tcpsame(LS *op,LISTENSPEC *otherp) noex {
 	{
 	f = f && LEQUIV((ip->af != nullptr),(oip->af != nullptr)) ;
 	if (f && (ip->af != nullptr)) {
-	    f = (strcmp(ip->af,oip->af) == 0) ;
+	    f = (cmpstr(ip->af,oip->af) == 0) ;
 	}
 	}
 	{
 	f = f && LEQUIV((ip->host != nullptr),(oip->host != nullptr)) ;
 	if (f && (ip->host != nullptr)) {
-	    f = (strcmp(ip->host,oip->host) == 0) ;
+	    f = (cmpstr(ip->host,oip->host) == 0) ;
 	}
 	}
 	{
 	f = f && LEQUIV((ip->port != nullptr),(oip->port != nullptr)) ;
 	if (f && (ip->port != nullptr)) {
-	    f = (strcmp(ip->port,oip->port) == 0) ;
+	    f = (cmpstr(ip->port,oip->port) == 0) ;
 	}
 	}
 	return (rs >= 0) ? f : rs ;
@@ -867,7 +867,7 @@ local int listenspec_usssame(LS *op,LISTENSPEC *otherp) noex {
 	{
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
 	if (f && (ip->fname != nullptr)) {
-	    f = (strcmp(ip->fname,oip->fname) == 0) ;
+	    f = (cmpstr(ip->fname,oip->fname) == 0) ;
 	}
 	}
 	return (rs >= 0) ? f : rs ;
@@ -980,7 +980,7 @@ local int listenspec_passsame(LS *op,LISTENSPEC *otherp) noex {
 	{
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
 	if (f && (ip->fname != nullptr)) {
-	    f = (strcmp(ip->fname,oip->fname) == 0) ;
+	    f = (cmpstr(ip->fname,oip->fname) == 0) ;
 	}
 	}
 	return (rs >= 0) ? f : rs ;
@@ -1106,7 +1106,7 @@ local int listenspec_connsame(LS *op,LISTENSPEC *otherp) noex {
 	{
 	f = f && LEQUIV((ip->fname != nullptr),(oip->fname != nullptr)) ;
 	if (f && (ip->fname != nullptr)) {
-	    f = (strcmp(ip->fname,oip->fname) == 0) ;
+	    f = (cmpstr(ip->fname,oip->fname) == 0) ;
 	}
 	}
 	return (rs >= 0) ? f : rs ;
@@ -1285,7 +1285,7 @@ local int listenspec_openport(LS *op,int af,cc *hostspec,cc *portspec,
 		         bool	f = false ;
 		         f = f || (hp == nullptr) ;
 		         f = f || (hp[0] == '\0') ;
-		         f = f || (strcmp(hp,"*") == 0) ;
+		         f = f || (cmpstr(hp,"*") == 0) ;
 		         if (f) hp = ANYHOST ;
 		         rs = listenspec_openporter(op,pr,af,hp,port,opts) ;
 		         fd = rs ;
