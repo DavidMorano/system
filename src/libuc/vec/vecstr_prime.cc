@@ -102,7 +102,6 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<nleadstr.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<vstrcmp.h>		/* LIBUC */
 #include	<intceil.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -488,7 +487,7 @@ int vecstr_sort(vecstr *op,vecstr_vcmp vcf) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->va) ylikely {
-	        if (vcf == nullptr) vcf = vstrcmp ;
+	        if (vcf == nullptr) vcf = cmpvstr ;
 	        if ((! op->vfl.issorted) && (op->vcnt > 1)) {
 		    c = op->vcnt ;
 		    vecstr_arrsort(op,vcf) ;
@@ -507,7 +506,7 @@ int vecstr_search(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	    if (op->va) ylikely {
 		int	i = 0 ;
 	        cchar	**spp{} ;
-	        if (vcf == nullptr) vcf = vstrcmp ;
+	        if (vcf == nullptr) vcf = cmpvstr ;
 	        if (op->vfl.osorted && (! op->vfl.issorted)) {
 	            op->vfl.issorted = true ;
 	            if (op->vcnt > 1) {
@@ -569,7 +568,7 @@ int vecstr_finder(vecstr *op,cchar *sp,vecstr_vcmp vcf,cchar **rpp) noex {
 	assert(op) ;
 	if (op) ylikely {
 	    rs = SR_NOTFOUND ;
-	    if (vcf == nullptr) vcf = vstrcmp ;
+	    if (vcf == nullptr) vcf = cmpvstr ;
 	    if (op->va) ylikely {
 		int	i ; /* used-afterwards */
 	        for (i = 0 ; i < op->vidx ; i += 1) {
@@ -597,7 +596,7 @@ int vecstr_find(vecstr *op,cchar *sp) noex {
 	        for (i = 0 ; i < op->vidx ; i += 1) {
 	            cchar	*ep = op->va[i] ;
 	            if (ep) {
-	                if ((sch == ep[0]) && (strcmp(sp,ep) == 0)) break ;
+	                if ((sch == ep[0]) && (cmpstr(sp,ep) == 0)) break ;
 		    }
 	        } /* end for */
 	        if (i < op->vidx) rs = i ;
@@ -1052,7 +1051,7 @@ int vecstr::finder(cchar *s,vecstr_f vcmp,cchar **rpp) noex {
 } /* end method */
 
 int vecstr::findkey(cchar *kp,int kl,cchar **rpp) noex {
-	return searchl(kp,kl,vstrkeycmp,rpp) ;
+	return searchl(kp,kl,cmpvstrk,rpp) ;
 } /* end method (vecstr::findkey) */
 
 int vecstr::findaddr(cchar *addr) noex {
