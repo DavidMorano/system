@@ -32,10 +32,10 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<vecitem.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"recip.h"
@@ -50,7 +50,6 @@ import libutil ;			/* |getlenstr(3u)| */
 /* external namespaces */
 
 using libuc::libmem ;			/* variable */
-using std::nothrow ;			/* constant */
 
 
 /* external typedefs */
@@ -70,11 +69,12 @@ using std::nothrow ;			/* constant */
 template<typename ... Args>
 local inline int recip_ctor(recip *op,Args ... args) noex {
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
-	    if ((op->mdp = new(nothrow) vecitem) != np) ylikely {
+	    if ((op->mdp = new(nt) vecitem) != np) ylikely {
 		rs = SR_OK ;
 	    } /* end if (new-vecitem) */
 	} /* end if (non-null) */
@@ -274,7 +274,7 @@ int recip_match(recip *op,cchar *sp,int sl) noex {
 		rs = SR_OK ;
 	        if (sl < 0) sl = lenstr(sp) ;
 	        if (op->recipient) {
-	            f = (strwcmp(op->recipient,sp,sl) == 0) ;
+	            f = (cmpstrw(op->recipient,sp,sl) == 0) ;
 	        }
 	    } /* end if (valid) */
 	} /* end if (magic) */
