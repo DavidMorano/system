@@ -226,7 +226,7 @@ int opendialer_finger(cc *pr,cc *prn,cc *svc,
 
 	    if (ai.to >= 0) to = ai.to ;
 	    if (ai.af >= 0) af = ai.af ;
-	    if ((ai.s1 != nullptr) && (strcmp(svc,argz) != 0)) {
+	    if ((ai.s1 != nullptr) && (cmpstr(svc,argz) != 0)) {
 	        if (ai.s2 != nullptr) {
 	            if (ai.s3 != nullptr) {
 			hostname = ai.s1 ;
