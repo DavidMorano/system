@@ -64,7 +64,6 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -170,7 +169,7 @@ int suber::operator () (cchar *fname) noex {
 
 int suber::fileopen(cchar *fname) noex {
 	int		rs = SR_OK ;
-	if (strcmp(fname,"-") != 0) {
+	if (cmpstr(fname,"-") != 0) {
 	    cint	of = O_RDONLY ;
 	    cmode	om = 0666 ;
 	    if ((rs = uc_open(fname,of,om)) >= 0) {
