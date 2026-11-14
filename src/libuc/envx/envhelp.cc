@@ -52,7 +52,6 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<matkeystr.h>		/* LIBUC */
-#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -218,7 +217,7 @@ int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
 	if (op && kp) ylikely {
 	    cchar	*cp{} ;
 	    if (nulstr ks ; (rs = ks.start(kp,kl,&cp)) >= 0) ylikely {
-	        vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	        vechand_vcmp	vcf = vechand_vcmp(cmpvstrk) ;
 	        vechand		*elp = op->elp ;
 	        void		*vp{} ;
 	        if ((rs = vechand_search(elp,cp,vcf,&vp)) >= 0) ylikely {
@@ -237,7 +236,7 @@ int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
 int envhelp_sort(envhelp *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	    vechand_vcmp	vcf = vechand_vcmp(cmpvstrk) ;
 	    rs = vechand_sort(op->elp,vcf) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -254,7 +253,7 @@ int envhelp_count(envhelp *op) noex {
 int envhelp_getvec(envhelp *op,mainv *listp) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
-	    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	    vechand_vcmp	vcf = vechand_vcmp(cmpvstrk) ;
 	    vechand		*elp = op->elp ;
 	    if ((rs = vechand_sort(elp,vcf)) >= 0) ylikely {
 	        if (listp) {
@@ -308,7 +307,7 @@ local int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
 } /* end subroutine (envhelp_copy) */
 
 local int vechand_addover(vechand *elp,cchar *ep) noex {
-	vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	vechand_vcmp	vcf = vechand_vcmp(cmpvstrk) ;
 	cnullptr	np{} ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
