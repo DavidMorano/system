@@ -225,7 +225,7 @@ local int pushmod(int fd,cchar *mods) noex {
 	    rs = SR_NOTOPEN ;
 	    if (fd >= 0) {
 	        cchar	timod[] = "timod" ;
-	        if (strcmp(mods,timod) == 0) {
+	        if (cmpstr(mods,timod) == 0) {
 	            if ((rs = u_ioctl(fd,I_LOOK,timod)) == SR_INVALID) {
 	                rs = u_ioctl(fd,I_PUSH,timod) ;
 	            }
@@ -233,7 +233,7 @@ local int pushmod(int fd,cchar *mods) noex {
 	            if (char *mbuf{} ; (rs = lm_mp(&mbuf)) >= 0) {
 		        cint	mlen = rs ;
 	                if ((rs = u_ioctl(fd,I_LOOK,mbuf)) >= 0) {
-	                    if (strcmp(mbuf,timod) == 0) {
+	                    if (cmpstr(mbuf,timod) == 0) {
 	                        rs = u_ioctl(fd,I_POP,0) ;
 	                    }
 	                } else if (rs == SR_INVALID) {
