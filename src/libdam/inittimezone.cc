@@ -46,7 +46,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<vecstr.h>		/* LIBUC */
-#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<cmpvstrk.h>		/* LIBUC |cmpvstrk(3uc)| */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -100,7 +100,7 @@ int inittimezone(char *rbuf,int rlen,cchar *fname) noex {
 	            if ((rs = defs.envfile(fname)) >= 0) ylikely {
 			cchar	*var = varname.tz ;
 			cchar	*sp ;
-	        	if ((rs = defs.finder(var,vstrkeycmp,&sp)) >= 0) {
+	        	if ((rs = defs.finder(var,cmpvstrk,&sp)) >= 0) {
 	                    if (sp && sp[0]) {
 			        if (cchar *tp = strchr(sp,'=') ; tp) {
 	                           rs = sncpy(rbuf,rlen,(tp+1)) ;
