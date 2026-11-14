@@ -79,17 +79,19 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<ctime>
-#include	<csignal>
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>		/* |lenstr(3c)| */
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<ucmpx.h>		/* LIBU */
+#include	<umatx.h>		/* LIBU */
 #include	<estrings.h>
-#include	<ascii.h>
-#include	<stdorder.h>
+#include	<ascii.h>		/* LIBU */
+#include	<stdorder.h>		/* LIBU */
 #include	<vecstr.h>
 #include	<msfile.h>
 #include	<hostinfo.h>
@@ -106,10 +108,8 @@
 #include	<nodedb.h>
 #include	<clusterdb.h>
 #include	<mkcexsync.h>
-#include	<strxcmp.h>		/* |strkeycmp(3uc)| */
-#include	<vstrcmp.h>		/* |vstrkeycmp(3uc)| */
-#include	<localmisc.h>
-#include	<debug.h>
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBEBUG */
 
 #include	"dialopts.h"
 #include	"dialprog.h"
@@ -865,7 +865,7 @@ int dialcprog(cchar *pr,cchar *node,cchar *fname,mainv av,mainv ev,
 	            int	f ;
 	            for (i = 0 ; ev[i] != NULL ; i += 1) {
 	                f = (ev[i][0] != varnode[0]) ;
-	                f = f || (strkeycmp(ev[i],varnode) != 0) ;
+	                f = f || (cmpstrk(ev[i],varnode) != 0) ;
 	                if (f)
 	                    nev[j++] = ev[i] ;
 	            } /* end for */
@@ -1590,7 +1590,7 @@ local int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	        if (rs1 == SR_NOTFOUND) {
 	            int	f = TRUE ;
 	            f = f && (ev[i][0] != '-') ;
-	            f = f && (matkeystr(envbads,ev[i],-1) < 0) ;
+	            f = f && (matstrk(envbads,ev[i],-1) < 0) ;
 	            if (f) {
 
 #if	CF_DEBUGS
@@ -1605,7 +1605,7 @@ local int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	                    rs = filer_sendrecord(&wr,rtype,ev[i],-1) ;
 	                }
 
-	            } else if (strkeycmp(VARDISPLAY,ev[i]) == 0) {
+	            } else if (cmpstrk(VARDISPLAY,ev[i]) == 0) {
 
 #if	CF_DEBUGS
 	                debugprintf("dialcprog/sendvars: display=>%s<\n",
