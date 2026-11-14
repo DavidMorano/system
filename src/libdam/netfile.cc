@@ -67,7 +67,6 @@
 #include	<fieldterminit.hh>	/* LIBUC */
 #include	<field.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strwcmp.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
