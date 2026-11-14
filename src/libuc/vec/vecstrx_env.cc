@@ -55,10 +55,10 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<strn.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
-#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"vecstrx.hh"
@@ -102,7 +102,7 @@ int vecstrx::envadd(cchar *kp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
 	int		i = INT_MAX ;
 	if (kp) ylikely {
-	    cauto	vcmp = vstrkeycmp ;
+	    cauto	vcmp = cmpvstrk ;
 	    if ((rs = finder(kp,vcmp,np)) == rsn) {
 	        rs = addkeyval(kp,-1,vp,vl) ;
 	        i = rs ;
@@ -138,7 +138,7 @@ int vecstrx::envset(cchar *kp,cchar *vp,int vl) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	if (kp) ylikely {
-	    cauto	vcmp = vstrkeycmp ;
+	    cauto	vcmp = cmpvstrk ;
 	    if ((rs = finder(kp,vcmp,np)) >= 0) {
 	        del(rs) ;
 	    } else if (rs == SR_NOTFOUND) {
@@ -157,7 +157,7 @@ int vecstrx::envget(cchar *kp,cchar **rpp) noex {
 	if (kp) ylikely {
 	    cchar	*rp = nullptr ;
 	    if (rpp) *rpp = nullptr ;
-	    if (cchar *ep ; (rs = finder(kp,vstrkeycmp,&ep)) >= 0) {
+	    if (cchar *ep ; (rs = finder(kp,cmpvstrk,&ep)) >= 0) {
 	        if (cchar *tp ; (tp = strchr(ep,'=')) != nullptr) {
 	            rp = (tp + 1) ;
 	            rl = lenstr(tp + 1) ;
@@ -220,7 +220,7 @@ local int vecstrx_addwithin(vecstrx *op,cchar *sp,int sl) noex {
 			}
 	            } /* end if */
 	            if (rs >= 0) {
-			auto	vs = vstrkeycmp ;
+			cauto	vs = cmpvstrk ;
 	                if ((rs = op->finder(kp,vs,np)) == rsn) {
 	                    f_added = true ;
 	                    if (f_separated) {
