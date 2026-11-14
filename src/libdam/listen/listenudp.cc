@@ -154,8 +154,8 @@ int listenudp(int af,cchar *hostname,cchar *portspec,int opts) noex {
 		}
 	    } else {
 		bool	f = false ;
-		f = (strcmp(hostname,ANYHOST) == 0) ;
-		f = f || (strcmp(hostname,"*") == 0) ;
+		f = (cmpstr(hostname,ANYHOST) == 0) ;
+		f = f || (cmpstr(hostname,"*") == 0) ;
 	        if (! f) {
 		    rs = getaddr(addr,af,hostname) ;
 		    af = rs ;
