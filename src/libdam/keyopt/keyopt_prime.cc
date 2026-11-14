@@ -41,7 +41,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<strn.h>		/* LIBUC */
-#include	<strkeycmp.h>		/* LIBUC */
+#include	<cmpstrk.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -402,7 +402,7 @@ local int keyopt_findkey(keyopt *op,cchar *keyp,int keyl,NAM **rpp) noex {
 	    cchar *namp = pp->name ;
 	    bool f ; /* used-afterwards */
 	    if (keyl < 0) {
-	        f = (strkeycmp(namp,keyp) == 0) ;
+	        f = (cmpstrk(namp,keyp) == 0) ;
 	    } else {
 		f = true ;
 	        f = f && (strncmp(namp,keyp,keyl) == 0) ;
