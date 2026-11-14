@@ -1,0 +1,50 @@
+/* libutil-cmpx MODULE (primary-partition) */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* UNIX® kernel support subroutines */
+/* version %I% last-modified %G% */
+
+
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
+
+module ;
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |INT_MAX| + |UCHAR_MAX| */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstdarg>		/* CSTD */
+#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
+#include	<algorithm>		/* C++STD |min(C++)| */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+
+export module libutil:cmpx ;
+
+export {
+    constexpr int ccmpstr(cchar *s1,cchar *s2) noex {
+	int rc = 0 ;
+	while (*s1 && *s2 && (rc == 0)) {
+	    rc = (int(*s1 & UCHAR_MAX) - int(*s2 & UCHAR_MAX)) ;
+	    s1++ ;
+	    s2++ ;
+	} /* end while */
+	return rc ;
+    } /* end subroutine (ccmpstr) */
+    constexpr int ccmpstrn(cchar *s1,cchar *s2,int n) noex {
+	int rc = 0 ;
+	while (n && *s1 && *s2 && (rc == 0)) {
+	    rc = (int(*s1 & UCHAR_MAX) - int(*s2 & UCHAR_MAX)) ;
+	    n-- ;
+	    s1++ ;
+	    s2++ ;
+	} /* end while */
+	return rc ;
+    } /* end subroutine (ccmpstrn) */
+} /* end export */
+
+
