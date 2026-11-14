@@ -35,8 +35,9 @@ export import :strcopy ;
 export import :strcpy ;
 export import :strlen ;
 export import :strxspn ;
-export import :strcmp ;
 export import :getbyte ;
 export import :operators ;
+export import :cmpx ;
+export import :strcmp ;
 
 
