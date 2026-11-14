@@ -33,7 +33,6 @@
 #include	<ctime>			/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<new>			/* C++STD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<string>		/* C++STD |string(3c++)| */
@@ -438,7 +437,7 @@ local int grcache_searchname(grcache *op,rec **rpp,cchar *gn) noex {
 	    if (vp) {
 		rp = recp(vp) ;
 	        if (rp->gn[0] == gn[0]) {
-		    f = (strcmp(rp->gn,gn) == 0) ;
+		    f = (cmpstr(rp->gn,gn) == 0) ;
 	        }
 	    }
 	    if (f) break ;
