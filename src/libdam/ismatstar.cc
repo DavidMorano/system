@@ -99,7 +99,7 @@ bool ismatstar(cchar *se,cchar *s) noex {
 	        f = (strncmp((s + sl1 - sl),tp,sl) == 0) ;
 	    } /* end if */
 	} else {
-	    f = (strcmp(se,s) == 0) ;
+	    f = (cmpstr(se,s) == 0) ;
 	}
 	return f ;
 } /* end subroutine (ismatstar) */
