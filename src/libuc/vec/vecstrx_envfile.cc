@@ -62,7 +62,6 @@
 #include	<sfx.h>			/* LIBUC */
 #include	<strcpyx.h>		/* LIBUC */
 #include	<strdcpyxw.h>		/* LIBUC */
-#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU |DPRINTF(3u)| */
 
@@ -284,7 +283,7 @@ int subinfo::parse(field *fsp,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (kl <= (elen - 1)) ylikely {
-	    vs_f	vs = vstrkeycmp ;
+	    vs_f	vs = cmpvstrk ;
 	    int		el = 0 ;
 	    char	*ep = strdcpy1w(ebuf,elen,kp,kl) ;
 	    if ((rs = vsp->finder(ebuf,vs,nullptr)) == rsn) {
