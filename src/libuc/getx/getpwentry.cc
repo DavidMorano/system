@@ -35,6 +35,7 @@
 #include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucpwcache.h>		/* LIBUC */
 #include	<ucentpw.h>		/* LIBUC */
@@ -287,16 +288,16 @@ local int getpwentry_shadow(pwentry *uep,SI *sip,ucentpw *pep) noex {
 	            if (pep->pw_passwd) {
 			bool f = false ;
 			cc *pp = pep->pw_passwd ;
-	                f = f || (strcmp(pp,"*NP*") == 0) ;
-			f = f || (strcmp(pp,"x") == 0) ;
+	                f = f || (cmpstr(pp,"*NP*") == 0) ;
+			f = f || (cmpstr(pp,"x") == 0) ;
 			if (f) {
 	                    sip->strw(sd.sp_pwdp,-1,vpp) ;
 	                } else {
 	                    sip->strw(pp,-1,vpp) ;
-	                }
+	                } /* end */
 	            } else {
 	                sip->strw(sd.sp_pwdp,-1,vpp) ;
-	            }
+	            } /* end */
 	        } else if (rs == SR_ACCESS) {
 	            rs = SR_OK ;
 	            if (pep->pw_passwd) {
