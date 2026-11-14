@@ -45,17 +45,15 @@
 #include	<cstdlib>		/* CSTD */
 #include	<algorithm>		/* C++STD |sort(3c++)| */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
-#include	<strwcmp.h>		/* LIBUC */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"matlocalfs.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |lenstr(3u)| + |cstrcmp(3u)| */
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -144,7 +142,7 @@ namespace {
 		    cuchar uch_a = uchar(an[0]) ;
 		    cuchar uch_s = uchar(sp[0]) ;
 		    if ((f = (uch_a < uch_s)) == false) {
-			f = ((uch_a == uch_s) && (strwcmp(an,sp,sl) < 0)) ;
+			f = ((uch_a == uch_s) && (cmpstrw(an,sp,sl) < 0)) ;
 		    }
 		}
                 return f ;
@@ -154,7 +152,7 @@ namespace {
             if (cauto it = partition_point(itf,itl,pred_mat) ; it != itl) {
                 cauto mat = [this,sp,sl] (int c) noex -> bool {
                     cchar *an = name[c] ;
-                    return (strwcmp(an,sp,sl) == 0) ;
+                    return (cmpstrw(an,sp,sl) == 0) ;
                 } ; /* end lambda (mat) */
                 if (cint ii = *it ; mat(ii)) {
 		    ei = ii ;
