@@ -687,7 +687,7 @@ local int entmat(cvoid *v1p,cvoid *v2p,int) noex {
 		    cchar	*s1 = e1p->name ;
 		    cchar	*s2 = e2p->name ;
 		    if ((rc = (*s1 - *s2)) == 0) {
-	    	        rc = (strcmp(s1,s2) == 0) ;
+	    	        rc = (cmpstr(s1,s2) == 0) ;
 		    }
 		}
 	    }
