@@ -38,7 +38,6 @@
 #include	<field.h>		/* LIBUC */
 #include	<fieldterms.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<toxc.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
