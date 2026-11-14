@@ -81,7 +81,6 @@
 #include	<ucsysconf.h>		/* LIBU */
 #include	<timewatch.hh>		/* LIBU */
 #include	<strnul.hh>		/* LIBU */
-#include	<matostr.h>		/* LIBUC */
 #include	<cfdecmf.h>		/* LIBUC */
 #include	<bufsizes.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
@@ -462,14 +461,14 @@ int ubufmgr::filelook(cchar *kp,int kl,cchar *vp,int vl) noex {
 	    DPRINTF("key=%s\n",ccp(ks)) ;
 	    DPRINTF("val=%s\n",ccp(vs)) ;
 	} /* end if_constexpr (f_debug) */
-	if (int w ; (w = matocasestr(names,2,kp,kl)) >= 0) {
+	if (int w ; (w = matstroic(names,2,kp,kl)) >= 0) {
 	    if (int v ; (rs = cfdecmf(vp,vl,&v)) >= 0) {
 		DPRINTF("load v=%d\n",v) ;
 		bs[w] = v ;
 	    } else if (isNotValid(rs)) {
 		rs = SR_OK ;
-	    }
-	} /* end if (matocasestr) */
+	    } /* end */
+	} /* end if (matstroic) */
 	DPRINTF("ret rs=%d c=%d\n",rs,c) ;
 	return (rs >= 0) ? c : rs ;
 } /* end method (ubufmgr::filelook) */
