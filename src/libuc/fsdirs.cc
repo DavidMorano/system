@@ -287,7 +287,7 @@ local int fsdirs_opener(fsdirs *op,cchar *dname) noex {
     	cint		maxpath = var.maxpathlen ;
 	int             rs = SR_OK ;
         cchar		*bdp = dname ;
-        if ((bdp == nullptr) || (strcmp(bdp,".") == 0)) {
+        if ((bdp == nullptr) || (cmpstr(bdp,".") == 0)) {
 	    bdp = "" ;
 	} /* end if */
         if (bdp[0] != '/') {
