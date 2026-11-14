@@ -748,7 +748,7 @@ local int msgid_fileinit(msgid *op,time_t dt) noex {
 		    	bl += rs ;
 			if ((rs = filehead(&op->h,fc,(fbuf + bl))) >= 0) {
 		   	    bl += rs ;
-	                    f = (strcmp(fm.magval,MSGID_FMB) == 0) ;
+	                    f = (cmpstr(fm.magval,MSGID_FMB) == 0) ;
 	                    {
 	                        cint	v = MSGID_FILEVERSION ;
 	                        f = f && (fm.vetu[0] <= v) ;
@@ -1245,8 +1245,8 @@ local uint keyhash(msgid_key *kp) noex {
 
 local bool keymat(msgid_key *kp,msgide *ep) noex {
     	bool		f = true ;
-	f = f && (strcmp(kp->msgid,ep->messageid) == 0) ;
-	f = f && (strcmp(kp->recip,ep->recipient) == 0) ;
+	f = f && (cmpstr(kp->msgid,ep->messageid) == 0) ;
+	f = f && (cmpstr(kp->recip,ep->recipient) == 0) ;
 	return f ;
 } /* end subroutine (keymat) */
 
