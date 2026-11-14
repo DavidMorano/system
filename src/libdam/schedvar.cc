@@ -44,7 +44,7 @@
 #include	<snx.h>			/* LIBUC |snkeyval(3uc)| */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
-#include	<vstrkeycmp.h>		/* LIBUC |vstrkeycmp(3uc)| */
+#include	<cmpvstrk.h>		/* LIBUC |cmpvstrk(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"schedvar.h"
@@ -211,9 +211,9 @@ int schedvar_findkey(SV *op,cc *key,cc **rpp) noex {
 	if ((rs = schedvar_magic(op,key)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
 	    if_constexpr (f_search) {
-		rs = slp->search(key,vstrkeycmp,rpp) ;
+		rs = slp->search(key,cmpvstrk,rpp) ;
 	    } else {
-		rs = slp->finder(key,vstrkeycmp,rpp) ;
+		rs = slp->finder(key,cmpvstrk,rpp) ;
 	    }
 	} /* end if (magic) */
 	return rs ;
@@ -223,7 +223,7 @@ int schedvar_del(SV *op,cc *key) noex {
 	int		rs ;
 	if ((rs = schedvar_magic(op,key)) >= 0) ylikely {
 	    vecstr	*slp = op->slp ;
-	    if ((rs = slp->finder(key,vstrkeycmp)) >= 0) {
+	    if ((rs = slp->finder(key,cmpvstrk)) >= 0) {
 	        rs = slp->del(rs) ;
 	    }
 	}
@@ -263,7 +263,7 @@ local int schedvar_exper(SV *op,char *dbuf,int dlen,cc *sp,int sl) noex {
                     if (*fp == '%') {
                         rs = b.chr('%') ;
                     } else {
-			auto	vcf = vstrkeycmp ;
+			auto	vcf = cmpvstrk ;
 			cchar	*cp ;
 			if_constexpr (f_search) {
                             rs = slp->search(KEYBUF(*fp),vcf,&cp) ;
