@@ -26,21 +26,21 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-
+EXTERNC_beg
 extern int nleadbasestr(cchar *,cchar *,int) noex ;
 extern int nleadcasestr(cchar *,cchar *,int) noex ;
 extern int nleadfoldstr(cchar *,cchar *,int) noex ;
+EXTERNC_end
 
+EXTERNC_beg
+local inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
+	return nleadbasestr(bs,sp,sl) ;
+} /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
-	return nleadbasestr(bs,sp,sl) ;
-} /* end */
-#else
-local inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
-	return nleadbasestr(bs,sp,sl) ;
+inline int nleadstr(cchar *bs,cchar *sp) noex {
+	return nleadbasestr(bs,sp,-1) ;
 } /* end */
 #endif /* __cplusplus */
 
