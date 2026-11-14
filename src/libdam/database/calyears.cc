@@ -1456,7 +1456,7 @@ int loadnamer::procdir(cchar *dirname) noex {
 	    for (fsdir_ent ds ; (rs = dir.read(&ds,nbuf,nlen)) > 0 ; ) {
 	        if (ds.name[0] != '.') {
 	            if (cchar *tp = strrchr(ds.name,'.') ; tp) {
-		        if (strcmp((tp + 1),calsuf) == 0) {
+		        if (cmpstr((tp + 1),calsuf) == 0) {
 	                    if ((rs = mkpath(tbuf,dirname,ds.name)) >= 0) {
 	    			if (ustat sb ; (rs = u_stat(tbuf,&sb)) >= 0) {
 	            	            if (S_ISREG(sb.st_mode)) {
