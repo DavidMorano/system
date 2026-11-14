@@ -303,7 +303,7 @@ int recipient_already(RC *op,cchar *host,cchar *locvap,int type) noex {
 		            RC_VAL	*valp = (RC_VAL *) val.buf ;
 	                    bool	f = true ;
 	                    f = f && (type == valp->type) ;
-	                    f = f && (strcmp(locvap,valp->localpart) == 0) ;
+	                    f = f && (cmpstr(locvap,valp->localpart) == 0) ;
 	                    if (f) break ;
 	                } /* end while */
 	                rs1 = hdb_curend(op->hlp,&cur) ;
