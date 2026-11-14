@@ -410,7 +410,7 @@ int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 	                pep = entp(vp) ;
 		        if (vp) {
 	                    if (pep->key) {
-	                        if (strcmp(ks,pep->key) == 0) break ;
+	                        if (cmpstr(ks,pep->key) == 0) break ;
 		            }
 		        }
 	            } /* end for (looping through entries) */
@@ -1072,7 +1072,7 @@ local int vcmpentry(cvoid **v1pp,cvoid **v2pp) noex {
 		    cint	ch1 = mkchar(e1p->key[0]) ;
 		    cint	ch2 = mkchar(e2p->key[0]) ;
 	            if ((rc = (ch1 - ch2)) == 0) {
-	                rc = strcmp(e1p->key,e2p->key) ;
+	                rc = cmpstr(e1p->key,e2p->key) ;
 	            }
 	        }
 	    }
