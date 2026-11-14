@@ -1191,7 +1191,7 @@ local int vcmpkey(cchar **s1pp,cchar **s2pp) noex {
 	            cint	l1 = lenstr(s1) ;
 	            cint 	l2 = lenstr(s2) ;
 	            if ((rc = (l2 - l1)) == 0) {
-	                rc = strcmp(s2,s1) ;
+	                rc = cmpstr(s2,s1) ;
 		    }
 	        } else {
 	            rc = -1 ;
