@@ -429,7 +429,7 @@ local int subinfo_cacheget(SI *sip,CN *uip) noex {
 	    if ((rs = mxp->lockbeg) >= 0) ylikely {
 	        if (uip->a != nullptr) {
 	            if ((uip->et > 0) && ((sip->dt-uip->et) < uip->ttl)) {
-	                if (strcmp(sip->nn,uip->nn) == 0) {
+	                if (cmpstr(sip->nn,uip->nn) == 0) {
 	                    rs = sncpy1(sip->rbuf,sip->rlen,uip->cn) ;
 	                    len = rs ;
 	                }
