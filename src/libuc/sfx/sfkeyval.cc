@@ -46,8 +46,8 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<six.h>			/* LIBUC |sichr(3uc)| */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC |ischeol(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
@@ -90,11 +90,11 @@ int sfkeyval(cchar *sp,int sl,cchar *key,cchar **rpp) noex {
 	    if (int cl = sfcontent(sp,sl,&cp) ; cl > 0) {
 		cchar *kp{} ;
 		if (int kl = sfnext(cp,cl,&kp) ; kl > 0) {
-		    if (strwcmp(key,kp,kl) == 0) {
+		    if (cmpstrw(key,kp,kl) == 0) {
 			cint	xl = intconv((cp + cl) - (kp + kl)) ;
 			cchar	*xp = (kp + kl) ;
 			vl = sfnext(xp,xl,&vp) ;
-		    } /* end if (strwcmp) */
+		    } /* end if (cmpstrw) */
 		} /* end if (sfnext) */
 	    } /* end if (sfcontent) */
 	} /* end if (non-null) */
