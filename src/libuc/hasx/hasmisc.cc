@@ -69,7 +69,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -182,7 +181,7 @@ bool hasmacro(cchar *lp,int ll) noex {
 	if (lp) ylikely {
 	    if ((ll > 1) && (lp[0] == '.')) {
 	        if (char tbuf[3] ; twochars(tbuf,(lp+1),(ll-1)) > 1) {
-	            f = (strcmp(tbuf,"\\\"") != 0) ;
+	            f = (cmpstr(tbuf,"\\\"") != 0) ;
 	        }
 	    } /* end if */
 	} /* end if (non-null) */
@@ -194,7 +193,7 @@ bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 	if (tbuf && ms) ylikely {
 	    if (cint ml = lenstr(ms) ; tlen >= (ml + 1)) {
 	        f = true ;
-	        f = f && (strncmp(tbuf,ms,ml) == 0) ;
+	        f = f && (cmpstrn(tbuf,ms,ml) == 0) ;
 	        f = f && (tbuf[ml] == '\n') ;
 	    } /* end if */
 	} /* end if (non-null) */
