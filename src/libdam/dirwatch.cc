@@ -449,7 +449,7 @@ int dirwatch_find(DW *op,cchar *name,DW_ENT *dep,char *rbuf,int rlen) noex {
 	            for (i = 0 ; (rs = elp->get(i,&vp)) >= 0 ; i += 1) {
 	                if (vp) {
 		            iep = (IENT *) vp ;
-	                    if (strcmp(name,iep->name) == 0) break ;
+	                    if (cmpstr(name,iep->name) == 0) break ;
 	                }
 	            } /* end for (looping through entries) */
 		} /* end if_constexpr (f_fnamecmp) */
@@ -834,7 +834,7 @@ local int vcmpfn(cvoid **v1pp,cvoid **v2pp) noex {
 	    if (e1p || e2p) ylikely {
 	        if (e1p) {
 	            if (e2p) {
-	                rc = strcmp(e1p->name,e2p->name) ;
+	                rc = cmpstr(e1p->name,e2p->name) ;
 	            } else {
 	                rc = -1 ;
 		    }
