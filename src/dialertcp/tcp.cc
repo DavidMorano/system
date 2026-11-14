@@ -405,7 +405,7 @@ int tcp_open(TCP *op,SYSDIALER_ARGS *ap,cchar *hn,cchar *svc,mainv) noex {
 
 	        for (i = 0 ; afs[i].name != nullptr ; i += 1) {
 
-	            if (strcmp(afs[i].name,afspec) == 0)
+	            if (cmpstr(afs[i].name,afspec) == 0)
 	                break ;
 
 	        }
