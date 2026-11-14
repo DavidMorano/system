@@ -155,7 +155,6 @@
 #include	<mapstrint.h>		/* LIBUC */
 #include	<stdorder.h>		/* LIBUC */
 #include	<mkx.h>			/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<lockfile.h>		/* LIBUC */
 #include	<entbuf.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
