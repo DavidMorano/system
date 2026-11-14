@@ -45,12 +45,10 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
-#include	<utypedefs.h>		/* LIBU */
-#include	<utypealiases.h>	/* LIBU */
-#include	<usysdefs.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC |ischalpha(3u)| */
 #include	<localmisc.h>		/* LIBU |UC(3u)| */
 
@@ -98,7 +96,7 @@ bool hasbasename(cchar *sp,int µsl,cchar *bname) noex {
 	if (int sl ; bname && ((sl = getlenstr(sp,µsl)) > 0)) {
 	    if (cchar *cp ; bname[0]) {
 		if (int cl ; (cl = sfbasename(sp,sl,&cp)) > 0) {
-		    f = (strwcmp(bname,cp,cl) == 0) ;
+		    f = (cmpstrw(bname,cp,cl) == 0) ;
                 } /* end if (sfbasename) */
 	    } /* end if (valid) */
 	} /* end if (getlenstr) */
@@ -112,7 +110,7 @@ bool hasbasestem(cchar *sp,int µsl,cchar *sname) noex {
 		if (int cl ; (cl = sfbasename(sp,sl,&cp)) > 0) {
 		    if (cchar *tp = strnrchr(cp,cl,'.') ; tp) {
 			cint tl = intconv(tp - cp) ;
-		        f = (strwcmp(sname,cp,tl) == 0) ;
+		        f = (cmpstrw(sname,cp,tl) == 0) ;
 		    }
                 } /* end if (sfbasename) */
 	    } /* end if (valid) */
