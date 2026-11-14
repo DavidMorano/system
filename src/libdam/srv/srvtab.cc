@@ -292,7 +292,7 @@ int srvtab_match(srvtab *op,cchar *service,srvtab_ent **sepp) noex {
 
 	        } /* end if */
 
-	    } else if (strcmp(service,sp) == 0) {
+	    } else if (cmpstr(service,sp) == 0) {
 	        rs = SR_OK ;
 	    }
 	    if (rs >= 0) break ;
@@ -313,7 +313,7 @@ int srvtab_find(srvtab *op,cchar *service,srvtab_ent **sepp) noex {
 	        for (int i = 0 ; slp->get(i,&vp) >= 0 ; i += 1) {
 	            if (ST_ENT *ep = resumelife<SRVTAB_ENT>(vp)) {
 	                charp sp = (*sepp)->service ;
-	                if (strcmp(service,sp) == 0) idx = i ;
+	                if (cmpstr(service,sp) == 0) idx = i ;
 	            }
 		    if (idx >= 0) break ;
 	        } /* end for (looping through entries) */
