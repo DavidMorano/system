@@ -46,7 +46,6 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"svckey.h"
@@ -109,7 +108,7 @@ int svckey_load(svckey *skp,svcfile_ent *sep) noex {
 	    for (int i = 0 ; sep->keyvals[i][0] != nullptr ; i += 1) {
 	        cchar	*kp = sep->keyvals[i][0] ;
 	        cchar	*vp = sep->keyvals[i][1] ;
-	        if (int ki ; (ki = matostr(svcname.n,1,kp,-1)) >= 0) {
+	        if (int ki ; (ki = matstro(svcname.n,1,kp,-1)) >= 0) {
 	            switch (ki) {
 	            case svckey_file:
 	                skp->file = vp ;
@@ -149,7 +148,7 @@ int svckey_load(svckey *skp,svcfile_ent *sep) noex {
 	                break ;
 	            } /* end switch */
 	            if (ki >= 0) c += 1 ;
-	        } /* end if (matostr) */
+	        } /* end if (matstro) */
 	    } /* end for */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
