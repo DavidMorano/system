@@ -39,9 +39,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<matstr.h>		/* LIBUC */
 #include	<opendials.h>		/* LIBUC |opendialer(3uc)| */
 #include	<localmisc.h>		/* LIBU */
@@ -92,7 +92,7 @@ int getopendial(cchar *name) noex {
 		if ((v = matstr(names,name,-1)) >= 0) {
 		    rs = SR_OK ;
 		} else {
-	            if (strcmp(name,"unix") == 0) {
+	            if (cmpstr(name,"unix") == 0) {
 			rs = SR_OK ;
 		        v = opendial_uss ;
 	            }
