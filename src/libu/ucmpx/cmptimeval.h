@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
 extern int cmptimeval(CTIMEVAL *,CTIMEVAL *) noex ;
-
 EXTERNC_end
 
 
