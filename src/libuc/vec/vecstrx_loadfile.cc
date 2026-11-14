@@ -63,7 +63,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
+#include	<cstring>		/* CSTD |cmpstr(3c)| */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -155,7 +155,7 @@ local int vecstrx_loadfiler(vecstrx *op,int fu,cchar *fname) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-        if (strcmp(fname,"-") != 0) {
+        if (cmpstr(fname,"-") != 0) {
             cint    of = O_RDONLY ;
             cmode   om = 0666 ;
             if ((rs = u_open(fname,of,om)) >= 0) {
