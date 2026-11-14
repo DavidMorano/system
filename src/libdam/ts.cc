@@ -145,7 +145,6 @@
 #include	<hash.h>		/* LIBUC |hash_elf(3dam)| */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strdcpyx.h>		/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<lockfile.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC |sncpy(3uc)| */
 #include	<mkx.h>			/* LIBUC |mkmagic(3uc)| */
