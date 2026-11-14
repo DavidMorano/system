@@ -40,7 +40,7 @@
 #include	<uclibmem.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
 #include	<strn.h>		/* LIBUC */
-#include	<strkeycmp.h>		/* LIBUC */
+#include	<cmpstrk.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
