@@ -32,6 +32,7 @@
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<getgroupname.h>	/* LIBUC */
 #include	<bufsizevar.hh>		/* LIBUC */
@@ -516,7 +517,7 @@ local int record_update(FG_REC *rp,time_t dt,cc *gn) noex {
 	    rs = SR_OK ;
 	    rp->ti_create = dt ;
 	    rp->ti_access = dt ;
-	    f_changed = (strcmp(rp->gn,gn) != 0) ;
+	    f_changed = (cmpstr(rp->gn,gn) != 0) ;
 	    if (f_changed) {
 	        strwcpy(rp->gn,gn,gnl) ;
 	    }
