@@ -64,7 +64,6 @@
 #include	<netdb.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
@@ -259,7 +258,7 @@ local int try_straight(SI *mip) noex {
 	cchar		*hn = aip->hostname ;
 	if (hn != nullptr) {
 	    bool	f = false ;
-	    f = f || ((hn[0] == 'a') && (strcmp(hn,ANYHOST) == 0)) ;
+	    f = f || ((hn[0] == 'a') && (cmpstr(hn,ANYHOST) == 0)) ;
 	    f = f || (hn[0] == '*') ;
 	    f = f || (hn[0] == '\0') ;
 	    if (f) {
