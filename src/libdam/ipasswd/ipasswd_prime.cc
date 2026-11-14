@@ -90,7 +90,6 @@
 #include	<sfx.h>			/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<randlc.h>		/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<mkx.h>			/* LIBUC */
 #include	<isfd.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
@@ -1057,7 +1056,7 @@ local int ipasswd_keymatchall(ipasswd *op,int opts,int ri,realname *rp) noex {
 	if (f) {
 	    if (opts & IPASSWD_FOLASTFULL) {
 	        si = op->rectab[ri].last ;
-	        f = (strcmp((s + si),rp->last) == 0) ;
+	        f = (cmpstr((s + si),rp->last) == 0) ;
 	    } else {
 	        si = op->rectab[ri].last ;
 	        f = (strncmp((s + si),rp->last,rp->len.last) == 0) ;
