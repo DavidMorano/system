@@ -58,7 +58,6 @@
 #include	<field.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<sfx.h>			/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<cfdecmf.h>		/* LIBUC */
 #include	<baops.h>		/* LIBU |baset(3u)| */
 #include	<localmisc.h>		/* LIBU |UC(3u)| */
