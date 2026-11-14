@@ -27,11 +27,13 @@
 #include	<cmpitimer.h>
 #include	<cmptimeval.h>
 #include	<cmptimespec.h>
-#include	<cmpstrnk.h>
-#include	<cmpstrnkn.h>
-#include	<cmpstrnx.h>
+#include	<cmpstrk.h>
+#include	<cmpstrkn.h>
+#include	<cmpstrn.h>
+#include	<cmpstrw.h>
 #include	<cmpstrx.h>
 #include	<cmpval.hh>
+#include	<cmpvstrx.h>
 
 
 #endif /* UCMPX_INCLUDE */
