@@ -77,11 +77,11 @@
 #include	<algorithm>		/* CSTD |sort(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |libu::cfdec(3u)| */
 #include	<uinet.h>		/* LIBU */
 #include	<bufsizevar.hh>		/* LIBUC */
 #include	<strdcpy.h>		/* LIBUC */
-#include	<strwcmp.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC |hasalldig(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 #include	<dprint.hh>		/* LIBU debugging */
@@ -90,7 +90,7 @@
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
-import libutil ;			/* |lenstr(3u)| + |cstrcmp(3u)| */
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -143,7 +143,7 @@ namespace {
 		    {
 			cint d = (ch_a - ch_s) ;
 		        f = f || (d < 0) ;
-                        f = f || ((d == 0) && (strwcmp(an,sp,sl) < 0)) ;
+                        f = f || ((d == 0) && (cmpstrw(an,sp,sl) < 0)) ;
 		    }
 		}
                 return f ;
@@ -153,7 +153,7 @@ namespace {
             if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
                 cauto mat = [this,sp,sl] (int c) noex -> bool {
                     cchar *an = ns[c].name ;
-                    return (strwcmp(an,sp,sl) == 0) ;
+                    return (cmpstrw(an,sp,sl) == 0) ;
                 } ; /* end lambda (mat) */
                 if (cint ii = *it ; mat(ii)) {
                     if ((af = ns[ii].af) >= 0) rs = SR_OK ;
@@ -306,9 +306,7 @@ namespace {
 } /* end namespace */
 
 constexpr namemgr	nametab ;
-
 static bufsizevar	maxpathlen(bufsize_mp) ;
-
 cbool			f_debug = CF_DEBUG ;
 
 
