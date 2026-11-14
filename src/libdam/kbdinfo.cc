@@ -50,7 +50,6 @@
 #include	<sfx.h>			/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<matxstr.h>		/* LIBUC */
 #include	<cfnum.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC */
