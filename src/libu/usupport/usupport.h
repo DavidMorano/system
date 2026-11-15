@@ -51,6 +51,7 @@
 #include	<usupport_sichar.hh>
 #include	<usupport_siext.hh>
 #include	<usupport_sispan.hh>
+#include	<usupport_sisubx.hh>
 #include	<usupport_siwhtx.hh>
 #include	<usupport_sixchr.hh>
 #include	<usupport_snadd.hh>
