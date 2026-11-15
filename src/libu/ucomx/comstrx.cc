@@ -33,10 +33,10 @@
 	string is allowed to have an optional length supplied.
 
 	Synopsis:
-	int nlead{x}str(cchar **bs,cchar *sp,int sl) noex
+	int comstr{x}c(cchar **bs,cchar *sp,int sl) noex
 
 	Arguments:
-	{x}		'base', 'case', 'fold'
+	{x}		one of: b, i, f
 	bs		base string to compare against
 	sp		test-string to test against the base string
 	sl		length of test-string
@@ -44,18 +44,6 @@
 	Returns:
 	>=0		length of matched string (0=no-match)
 	<0		error (-1 only due to NULL argument)
-
-	Notes:
-	1. Rationale for using templates rather than passing a 
-	function-pointer:
-	The thinking is that I want the template instantiation to
-	"see" any inlined subroutine and optimize it all out rather
-	than being forced to actually call a subroutine (if only a
-	pointer was supplied).  Anywat, that was the thinking, even
-	if misguided.  Also note that this goes against one of the
-	major coding standard rules which is: to optimize for space
-	rather than time (without the compiler doing that operation
-	itself).
 
 *******************************************************************************/
 
