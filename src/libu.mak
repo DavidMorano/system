@@ -79,8 +79,8 @@ OBJ23= syscontain.o
 
 OBJ24= posixdir.o nulstr.o vecbool.o
 OBJ25= fonce.o filerec.o vecfnmat.o
-OBJ26= ustd.o ugetx.o
-OBJ27= ucomposite.o upt.o ucmpx.o umatx.o
+OBJ26= ustd.o ugetx.o upt.o ucomposite.o 
+OBJ27= ucmpx.o umatx.o ucomx.o
 
 OBJ28= bitmanip.o findbit.o baops.o
 OBJ29= clockids.o filetypes.o funcodes.o 
@@ -542,6 +542,11 @@ ucmpx.dir:
 # UMATX
 umatx.o:		umatx.dir
 umatx.dir:
+	makesubdir $@
+
+# UCOMX
+ucomx.o:		ucomx.dir
+ucomx.dir:
 	makesubdir $@
 
 # POSIX® synchronization mechanisms
