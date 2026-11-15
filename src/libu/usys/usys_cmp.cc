@@ -28,7 +28,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* |getprogname(3c)| |execname(3c) */
+#include	<cstdlib>		/* |getprogname(3c)| + |execname(3c) */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
