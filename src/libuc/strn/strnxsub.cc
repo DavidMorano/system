@@ -69,6 +69,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<usys.h>		/* LIBU |strsubn(3u)| */
 #include	<nleadstr.h>		/* LIBUC */
 #include	<toxc.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
@@ -84,6 +85,8 @@ import libutil ;			/* |lenstr(3u)| */
 
 
 /* imported namespaces */
+
+using usys::strsubn ;			/* subroutine */
 
 
 /* local typedefs */
@@ -128,8 +131,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 	if (sp && ss) ylikely {
 	    if (sl >= 0) {
 		if (syshas.strnstr) {
-		    csize n = size_t(sl) ;
-		    rp = strnstr(sp,ss,n) ;
+		    rp = strsubn(sp,ss,sl) ;
 		} else {
 		    if (cint sslen = lenstr(ss) ; sslen > 0) {
 		        strner	so(tobc,nleadbasestr) ;
@@ -179,12 +181,12 @@ char *strner::strnxsub(cchar *sp,int µsl,cchar *ss,int sslen) noex {
 	if (cint sl = getlenstr(sp,µsl) ; sl >= sslen) ylikely {
 	    int ch = mkchar(ss[0]) ;
 	    {
-                cint        sslead = toxc(ch) ;
+                cint        chx_ss = toxc(ch) ;
                 int         i ; /* used-afterwards */
                 bool        f = false ;
                 for (i = 0 ; i <= (sl - sslen) ; i += 1) {
 		    ch = mkchar(sp[i]) ;
-                    if (toxc(ch) == sslead) {
+                    if (toxc(ch) == chx_ss) {
                         cint        m = nleadxstr((sp + i),ss,sslen) ;
                         f = (m == sslen) ;
                         if (f) break ;
