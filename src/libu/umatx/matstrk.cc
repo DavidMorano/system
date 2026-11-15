@@ -47,10 +47,10 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<ucomx.h>		/* LIBU */
 #include	<cmpstrk.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"usupport_nleadkeystr.hh"
 #include	"matstrk.h"
 
 
@@ -58,8 +58,6 @@
 
 
 /* imported namespaces */
-
-using libu::nleadkeystr ;		/* subroutine */
 
 
 /* local typedefs */
@@ -98,7 +96,7 @@ constexpr bool keyend(cint ch) noex {
 	    if (sl >= 0) {
 	        for (int m ; a[i] ; i += 1) {
 		    if ((m = (sch == a[i][0])) > 0) {
-		        m = nleadkeystr(a[i],sp,sl) ;
+		        m = comstrk(a[i],sp,sl) ;
 		    }
 		    f = (((m == sl) || keyend(sp[m])) && keyend(a[i][m])) ;
 		    if (f) break ;
