@@ -1,4 +1,5 @@
 # MAKEFILE (usys)
+#
 
 T= usys
 
@@ -65,7 +66,7 @@ OBJ17_USYS= usys_snwcpy.o usys_snx.o
 OBJ18_USYS= usys_strw.o usys_in4in6addr.o
 OBJ19_USYS= usys_execname.o usys_termios.o
 
-OBJ20_USYS= usys_strxbrk.o 
+OBJ20_USYS= usys_strxbrk.o usys_strsub.o
 OBJ21_USYS= usys_stpcpy.o usys_stpncpy.o
 OBJ22_USYS= usys_strbcpy.o
 OBJ23_USYS= usys_lenstr.o usys_hasx.o
@@ -304,7 +305,7 @@ usys_plock.o:		usys_plock.cc		usys_plock.h		$(INCS)
 usys_execname.o:	usys_execname.cc	usys_execname.hh	$(INCS)
 usys_snwcpy.o:		usys_snwcpy.cc		usys_snwcpy.hh		$(INCS)
 usys_snx.o:		usys_snx.cc		usys_snx.hh		$(INCS)
-usys_strw.o:		usys_strbcpy.cc		usys_strbcpy.hh		$(INCS)
+usys_strbcpy.o:		usys_strbcpy.cc		usys_strbcpy.hh		$(INCS)
 usys_strw.o:		usys_strw.cc		usys_strw.hh		$(INCS)
 
 # missing operating system calls or facilities
@@ -328,6 +329,7 @@ usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
 usys_stpcpy.o:		usys_stpcpy.cc		usys_stpcpy.h		$(INCS)
 usys_stpncpy.o:		usys_stpncpy.cc		usys_stpncpy.h		$(INCS)
 usys_streams.o:		usys_streams.cc		usys_streams.h		$(INCS)
+usys_strsub.o:		usys_strsub.cc		usys_strsub.hh		$(INCS)
 usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
 usys_strxbrk.o:		usys_strxbrk.cc		usys_strxbrk.h		$(INCS)
 usys_strxchr.o:		usys_strxchr.cc		usys_strxchr.h		$(INCS)
