@@ -51,7 +51,7 @@
 	The thinking is that I want the template instantiation to
 	"see" any inlined subroutine and optimize it all out rather
 	than being forced to actually call a subroutine (if only a
-	pointer was supplied).  Anywat, that was the thinking, even
+	pointer was supplied).  Anyway, that was the thinking, even
 	if misguided.  Also note that this goes against one of the
 	major coding standard rules which is: to optimize for space
 	rather than time (without the compiler doing that operation
