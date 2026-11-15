@@ -48,6 +48,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
+#include	<ucomx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"matstrx.h"		/* <- needed for default case */
@@ -66,9 +67,6 @@ using libu::tobc ;			/* subroutine */
 using libu::tolc ;			/* subroutine */
 using libu::touc ;			/* subroutine */
 using libu::tofc ;			/* subroutine */
-using libu::nleadbasestr ;		/* subroutine */
-using libu::nleadcasestr ;		/* subroutine */
-using libu::nleadfoldstr ;		/* subroutine */
 
 
 /* local typedefs */
@@ -115,15 +113,15 @@ namespace {
 /* exported subroutines */
 
     int matstrobc(con mainv a,int n,cchar *sp,int sl) noex {
-	mater	mo(tobc,nleadbasestr,matstrbc) ;
+	mater	mo(tobc,comstrbc,matstrbc) ;
 	return mo.matstrox(a,n,sp,sl) ;
     } /* end subroutine (matstrobc) */
     int matstroic(con mainv a,int n,cchar *sp,int sl) noex {
-	mater	mo(tolc,nleadcasestr,matstric) ;
+	mater	mo(tolc,comstric,matstric) ;
 	return mo.matstrox(a,n,sp,sl) ;
     } /* end subroutine (matstroic) */
     int matstrofc(con mainv a,int n,cchar *sp,int sl) noex {
-	mater	mo(tofc,nleadfoldstr,matstrfc) ;
+	mater	mo(tofc,comstrfc,matstrfc) ;
 	return mo.matstrox(a,n,sp,sl) ;
     } /* end subroutine (matstrofc) */
 
