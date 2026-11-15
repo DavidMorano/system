@@ -79,10 +79,10 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
+#include	<ucomx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_toxc.hh"
-#include	"usupport_nleadstr.hh"
 #include	"matstrx.h"
 
 
@@ -91,9 +91,6 @@
 
 /* imported namespaces */
 
-using libu::nleadbasestr ;	/* subroutine */
-using libu::nleadcasestr ;	/* subroutine */
-using libu::nleadfoldstr ;	/* subroutine */
 using libu::tobc ;		/* subroutine */
 using libu::touc ;		/* subroutine */
 using libu::tofc ;		/* subroutine */
@@ -160,15 +157,15 @@ namespace {
 /* exported subroutines */
 
     int matstrbc(con mainv a,cchar *sp,int sl) noex {
-	matstrx mo(tobc,nleadbasestr) ;
+	matstrx mo(tobc,comstrbc) ;
 	return mo(a,sp,sl) ;
     } /* end subroutine (matstrbc) */
     int matstric(con mainv a,cchar *sp,int sl) noex {
-	matstrx mo(touc,nleadcasestr) ;
+	matstrx mo(touc,comstric) ;
 	return mo(a,sp,sl) ;
     } /* end subroutine (matstric) */
     int matstrfc(con mainv a,cchar *sp,int sl) noex {
-	matstrx mo(tofc,nleadfoldstr) ;
+	matstrx mo(tofc,comstrfc) ;
 	return mo(a,sp,sl) ;
     } /* end subroutine (matstrfc) */
 
