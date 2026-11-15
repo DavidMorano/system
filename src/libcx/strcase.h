@@ -1,4 +1,4 @@
-/* libcx HEADER */
+/* strcase HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 (conformance reviewed) */
 
@@ -17,6 +17,7 @@
 
 #ifndef STRCASE_INCLUDE
 #define	STRCASE_INCLUDE
+
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<clanguage.h>		/* LIBU */
