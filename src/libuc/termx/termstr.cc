@@ -44,11 +44,11 @@
 #include	<cstdarg>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucomx.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU */
 #include	<ansigr.h>		/* LIBUC */
 #include	<buffer.h>		/* LIBUC */
 #include	<termconseq.h>		/* LIBUC */
-#include	<nleadstr.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"termstr.h"
@@ -496,7 +496,7 @@ local int termstr_findterm(termstr *op,cchar *termtype) noex {
 	int		si = -1 ;
 	for (int i = 0 ; terms[i].name ; i += 1) {
 	    cchar	*sp = terms[i].name ;
-	    m = nleadstr(sp,termtype,-1) ;
+	    m = comstr(sp,termtype,-1) ;
 	    if (((m >= n) && (m == tlen)) || (sp[m] == '\0')) {
 	        if (m > m_max) {
 	            m_max = m ;
