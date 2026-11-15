@@ -51,7 +51,7 @@
 
 #include	"usys_resolvepath.h"
 
-import libutil ;
+import libutil ;			/* |clenstr(3u)| */
 
 unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	cnullptr	np{} ;
@@ -61,7 +61,7 @@ unixret_t resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	if (rbuf) ylikely {
 	    if (fname[0] && (rlen >= 0)) ylikely {
 		 if (char *rp = realpath(fname,np)) ylikely {
-		    if ((rl = cstrlen(rp)) <= rlen) {
+		    if ((rl = clenstr(rp)) <= rlen) {
 			strcpy(rbuf,rp) ;
 		    } else {
 			ru = unixretbad ;
