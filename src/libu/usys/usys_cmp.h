@@ -35,7 +35,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<stddef.h>		/* CSTD */
 #include	<stdlib.h>		/* CSTD */
-#include	<string.h>		/* CSTD */
+#include	<string.h>		/* CSTD |strcmp(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
