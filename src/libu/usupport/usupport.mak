@@ -45,7 +45,7 @@ OBJ01= usupport_itimer.o usupport_snadd.o
 OBJ02= usupport_cfdec.o usupport_cfdect.o
 OBJ03= usupport_cfhex.o usupport_cfinet.o
 OBJ04= usupport_toxc.o usupport_snwcpy.o 
-OBJ05= usupport_rmx.o
+OBJ05= usupport_rmx.o usupport_sisubx.o
 OBJ06= usupport_ustrftime.o usupport_mkhex.o
 OBJ07= usupport_ctdec.o usupport_cthex.o
 
@@ -265,6 +265,7 @@ usupport_rmx.o:		usupport_rmx.cc		usupport_rmx.hh		$(INCS)
 usupport_sichar.o:	usupport_sichar.cc	usupport_sichar.hh	$(INCS)
 usupport_siext.o:	usupport_siext.cc	usupport_siext.hh	$(INCS)
 usupport_sispan.o:	usupport_sispan.cc	usupport_sispan.hh	$(INCS)
+usupport_sisubx.o:	usupport_sisubx.cc	usupport_sisubx.hh	$(INCS)
 usupport_siwhtx.o:	usupport_siwhtx.cc	usupport_siwhtx.hh	$(INCS)
 usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.hh	$(INCS)
 usupport_snadd.o:	usupport_snadd.cc	usupport_snadd.hh	$(INCS)
