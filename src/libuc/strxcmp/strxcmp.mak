@@ -43,7 +43,7 @@ LIBS +=
 OBJ0= strxxxxcmp.o strkeycmp.o 
 OBJ1= strkeydictcmp.o 
 OBJ2= stremacmp.o strvalcmp.o strleadcmp.o
-OBJ3= strpcmp.o dictdiff.o
+OBJ3= strpcmp.o
 
 OBJA= obj0.o obj1.o
 OBJB= obj2.o obj3.o
@@ -144,6 +144,5 @@ strkeydictcmp.o:	strkeydictcmp.cc	strkeydictcmp.h	$(INCS)
 strleadcmp.o:		strleadcmp.cc		strleadcmp.h	$(INCS)
 strpcmp.o:		strpcmp.cc		strpcmp.h	$(INCS)
 strxxxxcmp.o:		strxxxxcmp.cc		strxxxxcmp.h	$(INCS)
-dictdiff.o:		dictdiff.cc		dictdiff.h	$(INCS)
 
 
