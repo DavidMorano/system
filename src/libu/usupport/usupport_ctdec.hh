@@ -38,6 +38,9 @@ namespace libu {
     extern int ctdecul	(char *,int,ulong)		noex ;
     extern int ctdecull	(char *,int,ulonglong)		noex ;
     extern int ctdec_unknown	(char *,int)		noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     template<typename T> inline int ctdec(char *rp,int rl,T uv) noex {
 	(void) uv ;
 	return libu::ctdec_unknown(rp,rl) ;
