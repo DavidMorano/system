@@ -33,8 +33,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* CSTD */
-#include	<stdlib.h>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -42,9 +40,7 @@
 
 
 EXTERNC_begin
-local inline char *strochr(cchar *sp,int sch) noex {
-    	return strchr(sp,sch) ;
-} /* end */
+extern char *strochr(cchar *,int) noex ;
 EXTERNC_end
 
 
