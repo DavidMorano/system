@@ -18,7 +18,7 @@
 /*******************************************************************************
 
   	System:
-	usys_linux
+	usys_streams
 
 	General:
 	This file contains the UNIX® system types that the brain-damaged
