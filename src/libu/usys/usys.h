@@ -86,9 +86,12 @@
 #include	<usys_stpcpy.h>
 #include	<usys_stpncpy.h>
 #include	<usys_streams.h>
+#include	<usys_strnstr.h>
 #include	<usys_strsub.hh>
 #include	<usys_strtox.h>
+#include	<usys_strx.h>
 #include	<usys_strxbrk.h>
+#include	<usys_strxchr.h>
 #include	<usys_sysctl.h>
 #include	<usys_task.h>
 #include	<usys_termios.h>
