@@ -53,16 +53,17 @@ OBJPART= objparta.o objpartb.o
 OBJPRIME= ureserve0.o
 
 OBJ00= ureserve1.o ureserve2.o 
-OBJ01= ureserve3.o ureserve4.o
-OBJ02= ureserve5.o ureserve6.o
-OBJ03= ureserve7a.o ureserve7b.o 
-OBJ04= ureserve8a.o ureserve8b.o ureserve8c.o
+OBJ01= ureserve3.o 
+OBJ02= ureserve4a.o ureserve4b.o
+OBJ03= ureserve5.o ureserve6.o
+OBJ04= ureserve7a.o ureserve7b.o 
+OBJ05= ureserve8a.o ureserve8b.o ureserve8c.o
 OBJ06=
 OBJ07=
 
 OBJA= objimpl00.o objimpl01.o 
 OBJB= objimpl02.o objimpl03.o 
-OBJC= objimpl04.o
+OBJC= objimpl04.o objimpl05.o
 OBJD=
 
 OBJIMPL= obja.o objb.o objc.o
