@@ -67,16 +67,22 @@ OBJ19= usupport_hasx.o usupport_hasnot.o
 OBJ20= usupport_strdcpyx.o usupport_strdcpyxw.o
 OBJ21= usupport_vstrcmp.o usupport_vstrkeycmp.o
 OBJ22= usupport_strxxxxcmp.o usupport_strnwcpy.o
-OBJ23= vstrorders.o
+OBJ23= usupport_sixbrk.o
+
+OBJ24= vstrorders.o
+OBJ25=
+OBJ26=
+OBJ27= 
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
 OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
-OBJF= obj20.o obj21.o obj22.o obj20.o
+OBJF= obj20.o obj21.o obj22.o obj23.o
+OBJG= obj24.o 
 
-OBJ= obja.o objb.o objc.o objd.o obje.o objf.o
+OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
 
 
 INCDIRS +=
@@ -219,6 +225,19 @@ obj23.o:		$(OBJ23)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj24.o:		$(OBJ24)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj25.o:		$(OBJ25)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj26.o:		$(OBJ26)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj27.o:		$(OBJ27)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -235,6 +254,9 @@ obje.o:			$(OBJE)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objf.o:			$(OBJF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objg.o:			$(OBJG)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -267,6 +289,7 @@ usupport_siext.o:	usupport_siext.cc	usupport_siext.hh	$(INCS)
 usupport_sispan.o:	usupport_sispan.cc	usupport_sispan.hh	$(INCS)
 usupport_sisubx.o:	usupport_sisubx.cc	usupport_sisubx.hh	$(INCS)
 usupport_siwhtx.o:	usupport_siwhtx.cc	usupport_siwhtx.hh	$(INCS)
+usupport_sixbrk.o:	usupport_sixbrk.cc	usupport_sixbrk.hh	$(INCS)
 usupport_sixchr.o:	usupport_sixchr.cc	usupport_sixchr.hh	$(INCS)
 usupport_snadd.o:	usupport_snadd.cc	usupport_snadd.hh	$(INCS)
 usupport_sncpyx.o:	usupport_sncpyx.cc	usupport_sncpyx.hh	$(INCS)
