@@ -28,6 +28,9 @@
 namespace libu {
     extern char *strnochr(cchar *,int,int) noex ;
     extern char *strnrchr(cchar *,int,int) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline char *strnchr(cchar *sp,int sl,int sch) noex {
 	return libu::strnochr(sp,sl,sch) ;
     } /* end subroutine */
