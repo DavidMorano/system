@@ -93,15 +93,13 @@ typedef struct userattr_s {
 
 #ifndef	DECLARATION_USERATTR
 #define	DECLARATION_USERATTR
-EXTERNC_begin
-
+EXTERNC_beg
 extern void setuserattr() noex ;
 extern void enduserattr() noex ;
 extern void free_userattr(userattr *) noex ;
 extern userattr *getuserattr() noex ;
 extern userattr *getusernam(cchar *) noex ;
 extern userattr *getuseruid(uid_t) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_USERATTR */
 
@@ -121,13 +119,9 @@ typedef int	projid_t ;
 
 #ifndef	DECLARATION_GETPROJID
 #define	DECLARATION_GETPROJID
-#ifdef	__cplusplus
-extern "C" {
+EXTERNC_beg
     extern projid_t getprojid() noex ;
-} /* end */
-#else
-    extern projid_t getprojid() noex ;
-#endif /* __cplusplus */
+EXTERNC_end
 #endif /* DECLARATION_GETPROJID */
 
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
@@ -155,10 +149,8 @@ typedef long		sysvmsgtype ;
 
 #ifndef	DECLARATION_MEMCNTL
 #define	DECLARATION_MEMCNTL
-EXTERNC_begin
-
+EXTERNC_beg
 extern unixret_t memcntl(void *,size_t,int,void *,int,int) noex ;
-
 EXTERNC_end
 #endif /* DECLARATION_MEMCNTL */
 
@@ -172,7 +164,7 @@ EXTERNC_end
 
 #ifndef	DECLARATION_MEMINHERIT
 #define	DECLARATION_MEMINHERIT
-EXTERNC_begin
+EXTERNC_beg
 extern unixret_t minherit(void *,size_t,int) noex ;
 EXTERNC_end
 #endif /* DECLARATION_MEMINHERIT */
@@ -211,7 +203,7 @@ enum syshasmemplock {
 
 #ifndef	DECLARATION_MEMPLOCK
 #define	DECLARATION_MEMPLOCK
-EXTERNC_begin
+EXTERNC_beg
 extern unixret_t plock(int) noex ;
 EXTERNC_end
 #endif /* DECLARATION_MEMPLOCK */
@@ -240,7 +232,7 @@ namespace usys {
 /* all operating systems */
 #ifndef	SUBROUTINE_STATFILE
 #define	SUBROUTINE_STATFILE
-EXTERNC_begin
+EXTERNC_beg
 local inline unixret_t statfile(cchar *fn,USTAT *sbp) noex {
     	return stat(fn,sbp) ;
 } /* end */
@@ -261,31 +253,12 @@ EXTERNC_end
 
 #ifndef	SUBROUTINE_DUPOVER
 #define	SUBROUTINE_DUPOVER
-EXTERNC_begin
+EXTERNC_beg
 local inline unixret_t dupover(int sfd,int dfd) noex {
     	return dup2(sfd,dfd) ;
 } /* end */
 EXTERNC_end
 #endif /* SUBROUTINE_DUPOVER */
-
-#ifndef	SUBROUTINE_STRBRK
-#define	SUBROUTINE_STRBRK
-EXTERNC_begin
-local inline char *strbrk(cchar *sp,cchar *sc) noex {
-    	return strpbrk(sp,sc) ;
-} /* end */
-EXTERNC_end
-#endif /* SUBROUTINE_STRBRK */
-
-/* this ( |strochr(3c)| ) is the companion subroutine of |strrchr(3c)| */
-#ifndef	SUBROUTINE_STROCHR
-#define	SUBROUTINE_STROCHR
-EXTERNC_begin
-local inline char *strochr(cchar *sp,int sch) noex {
-    	return strchr(sp,sch) ;
-} /* end */
-EXTERNC_end
-#endif /* SUBROUTINE_STROCHR */
 
 
 #endif /* USYSXXX_INCLUDE */
