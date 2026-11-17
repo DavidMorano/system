@@ -28,7 +28,7 @@
 	The string comparisons are case insensitive.
 
 	Synopsis:
-	char *strnstr(cchar *sp,cchar *ss,int n) noex
+	char *strnstr(cchar *sp,cchar *ss,size_t n) noex
 
 	Arguments:
 	sp		test c-string pointer
@@ -56,7 +56,21 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+extern "C" {
+    extern size_t strlen(ccharp) noex ;
+} /* end extern (C) */
+
+extern "C" {
+    extern int	strncmp(ccharp,ccharp,size_t) noex ;
+} /* end extern (C) */
 
 
 /* external variables */
@@ -76,27 +90,19 @@
 
 /* exported subroutines */
 
-char *strnstr(cchar *sp,cchar *s2) noex {
+char *strnstr(cchar *sp,cchar *ss,size_t n) {
     	char		*rp = nullptr ;
-	if (sp && s2) ylikely {
-	    cint	s2len = lenstr(s2) ;
-	    rp = charp(sp) ;
-	    if (s2len > 0) {
-	        cint	sl = lenstr(sp) ;
-	        if (s2len <= sl) {
-	            cint	s2lead = CHAR_TOLC(s2[0]) ;
-		    int	m ;
-		    int	i ; /* used-afterwards */
-		    bool	f = false ;
-	            for (i = 0 ; i <= (sl-s2len) ; i += 1) {
-		        int	ch = CHAR_TOLC(sp[i]) ;
-	                if (ch == s2lead) {
-	                    m = nleadcasestr((sp+i),s2,s2len) ;
-	                    f = (m == s2len) ;
-			    if (f) break ;
-	                } /* end if */
-	            } /* end for */
-	            rp = (char *) ((f) ? (sp+i) : nullptr) ;
+	if (sp && ss) ylikely {
+	    rp = cast_const<charp>(sp) ;
+	    if (csize s2len = strlen(ss) ; s2len > 0) {
+	        if (csize sl = strlen(sp) ; sl >= s2len) {
+		    char *ep = rp + (sl - s2len) ;
+		    bool f = false ;
+		    for ( ; rp < ep ; rp += 1) {
+			f = (strncmp(rp,ss,n) == 0) ;
+			if (f) break ;
+		    } /* end for */
+		    if (! f) rp = nullptr ;
 	        } else {
 	            rp = nullptr ;
 	        } /* end */
