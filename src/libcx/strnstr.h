@@ -27,7 +27,7 @@
 
 
 EXTERNC_begin
-extern charp	strnstr(cchar *,cchar *size_t) noex ;
+extern charp	strnstr(cchar *,cchar *,size_t) noex ;
 EXTERNC_end
 
 
