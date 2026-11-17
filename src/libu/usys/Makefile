@@ -66,13 +66,13 @@ OBJ17_USYS= usys_snwcpy.o usys_snx.o
 OBJ18_USYS= usys_strw.o usys_in4in6addr.o
 OBJ19_USYS= usys_execname.o usys_termios.o
 
-OBJ20_USYS= usys_strxbrk.o usys_strsub.o
+OBJ20_USYS= usys_strx.o usys_strxbrk.o usys_strxchr.o
 OBJ21_USYS= usys_stpcpy.o usys_stpncpy.o
-OBJ22_USYS= usys_strbcpy.o
+OBJ22_USYS= usys_strbcpy.o usys_strsub.o
 OBJ23_USYS= usys_lenstr.o usys_hasx.o
 
 OBJ24_USYS= usys_cmp.o
-OBJ25_USYS=
+OBJ25_USYS= usys_strnstr.o
 OBJ26_USYS=
 OBJ27_USYS=
 
@@ -84,7 +84,7 @@ OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
 OBJG= obj18_usys.o obj19_usys.o obj20_usys.o
 OBJH= obj21_usys.o obj22_usys.o obj23_usys.o
-OBJI= obj24_usys.o 
+OBJI= obj24_usys.o obj25_usys.o
 
 OBJ_J0= obja.o objb.o objc.o objd.o 
 OBJ_J1= obje.o objf.o objg.o objh.o
@@ -329,8 +329,10 @@ usys_stime.o:		usys_stime.cc		usys_stime.h		$(INCS)
 usys_stpcpy.o:		usys_stpcpy.cc		usys_stpcpy.h		$(INCS)
 usys_stpncpy.o:		usys_stpncpy.cc		usys_stpncpy.h		$(INCS)
 usys_streams.o:		usys_streams.cc		usys_streams.h		$(INCS)
+usys_strnstr.o:		usys_strnstr.cc		usys_strnstr.h		$(INCS)
 usys_strsub.o:		usys_strsub.cc		usys_strsub.hh		$(INCS)
 usys_strtox.o:		usys_strtox.cc		usys_strtox.h		$(INCS)
+usys_strx.o:		usys_strx.cc		usys_strx.h		$(INCS)
 usys_strxbrk.o:		usys_strxbrk.cc		usys_strxbrk.h		$(INCS)
 usys_strxchr.o:		usys_strxchr.cc		usys_strxchr.h		$(INCS)
 usys_isaexec.o:		usys_isaexec.cc		usys_isaexec.h		$(INCS)
