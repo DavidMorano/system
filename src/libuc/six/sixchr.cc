@@ -98,7 +98,6 @@ cbool		f_strchr = CF_STRCHR ;
 /* exported subroutines */
 
 int siochr(cchar *sp,int sl,int sch) noex {
-    	cnullptr	np{} ;
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
@@ -106,18 +105,18 @@ int siochr(cchar *sp,int sl,int sch) noex {
 	    if_constexpr (f_strchr) {
 	        if (sl > 0) {
 	            for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	                cint	ch = mkchar(sp[i]) ;
+	                cint ch = mkchar(sp[i]) ;
 	                if ((f = (ch == sch))) break ;
 	            } /* end for */
 	        } else {
-		    if (cchar *tp ; (tp = strchr(sp,sch)) != np) {
+		    if (cchar *tp = strchr(sp,sch)) {
 			f = true ;
 			i = intconv(tp - sp) ;
 		    } /* end */
 	        } /* end if */
 	    } else {
 	        for (i = 0 ; sl-- && sp[i] ; i += 1) {
-	            cint	ch = mkchar(sp[i]) ;
+	            cint ch = mkchar(sp[i]) ;
 	            if ((f = (ch == sch))) break ;
 	        } /* end for */
 	    } /* end if_constexpr (f_strchr) */
@@ -131,7 +130,7 @@ int sirchr(cchar *sp,int µsl,int sch) noex {
 	sch &= UCHAR_MAX ;
 	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) {
 	    for (i = (sl - 1) ; i >= 0 ; i -= 1) {
-	        cint	ch = mkchar(sp[i]) ;
+	        cint ch = mkchar(sp[i]) ;
 	        if ((f = (ch == sch))) break ;
 	    } /* end for */
 	} /* end if (getlenstr) */
