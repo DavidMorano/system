@@ -31,6 +31,9 @@ namespace libu {
     extern int strwbasecmp(cchar *,cchar *,int) noex ;
     extern int strwcasecmp(cchar *,cchar *,int) noex ;
     extern int strwfoldcmp(cchar *,cchar *,int) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int strwcmp(cchar *bs,cchar *sp,int sl) noex {
 	return libu::strwbasecmp(bs,sp,sl) ;
     } /* end subroutine (strwcmp) */
