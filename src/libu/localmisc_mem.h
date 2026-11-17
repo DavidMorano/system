@@ -23,7 +23,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stddef.h>		/* CSTD |size_t| */
-#include	<string.h>		/* CSTD |memset(3c)| */
 
 
 #ifdef	__cplusplus
@@ -31,7 +30,8 @@
 #ifndef	SUBROUTINE_MEMCLEAR
 #define	SUBROUTINE_MEMCLEAR
 local inline int memclear(void *objp,int sz) noex {
-    	csize	objs = (size_t) sz ;
+        extern voidp memset(voidp,int,size_t) noex ;
+    	csize	objs = size_t(sz) ;
     	memset(objp,0,objs) ;
 	return sz ;
 } /* end subroutine */
