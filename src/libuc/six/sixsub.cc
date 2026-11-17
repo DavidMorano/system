@@ -58,10 +58,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strnstr(3c)| + |strstr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<nleadstr.h>		/* LIBUC */
+#include	<usys.h>		/* LIBU |strsub(3u)| + |strsubn(3u)| */
+#include	<ucmpx.h>		/* LIBU */
 #include	<toxc.h>		/* LIBUC |toxc(3u)| */
 #include	<localmisc.h>		/* LIBU */
 
@@ -76,12 +76,15 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
+using usys::strsub ;			/* subroutine */
+using usys::strsubn ;			/* subroutine */
+
 
 /* local typedefs */
 
 extern "C" {
-    typedef int (*toxc_f)(int) noex ;
-    typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
+    typedef int (*toxc_f)	(int) noex ;
+    typedef int (*cmpn_f)	(cchar *,cchar *,int) noex ;
 } /* end extern (C) */
 
 
@@ -96,20 +99,17 @@ extern "C" {
 
 /* forward references */
 
-template<toxc_f toxc,nleadxstr_f nleadxstr>
+template<toxc_f toxc,cmpn_f cmpn>
 local int sixsub(cchar *sp,int µsl,cchar *ss) noex {
 	int		i{} ; /* used-afterwards */
 	bool		f = false ;
 	if (int sl ; ss && ((sl = getlenstr(sp,µsl)) > 0)) {
 	    cint	sslen = lenstr(ss) ;
 	    if (sslen <= sl) ylikely {
-	        cint	sslead = toxc(ss[0]) ;
-	        int	m ;
+	        cint	chx_ss = toxc(ss[0]) ;
 	        for (i = 0 ; i < (sl - sslen) ; i += 1) {
-		    f = ((sslen == 0) || (toxc(sp[i]) == sslead)) ;
-		    if (f) {
-	                m = nleadxstr((sp + i),ss,sslen) ;
-	                f = (m == sslen) ;
+		    if (toxc(sp[i]) == chx_ss) {
+	                f = (cmpn((sp + i),ss,sslen) == 0) ;
 		    }
 	            if (f) break ;
 	        } /* end for */
@@ -132,15 +132,14 @@ int sibasesub(cchar *sp,int sl,cchar *ss) noex {
 	if (sp && ss) ylikely {
 	    if (sl >= 0) {
 	        if (syshas.strnstr) {
-	            csize	slsize = size_t(sl) ;
-	            if (cc *tp ; (tp = strnstr(sp,ss,slsize)) != nullptr) {
+	            if (cc *tp = strsubn(sp,ss,sl)) {
 		        si = intconv(tp - sp) ;
 	            }
 	        } else {
-	            si = sixsub<tobc,nleadbasestr>(sp,sl,ss) ;
+	            si = sixsub<tobc,cmpstrnbc>(sp,sl,ss) ;
 	        } /* end if_constexpr (f_strnstr) */
 	    } else {
-	        if (cc *tp ; (tp = strstr(sp,ss)) != nullptr) {
+	        if (cc *tp = strsub(sp,ss)) {
 		    si = intconv(tp - sp) ;
 	        }
 	    } /* end if (length given or not) */
@@ -151,7 +150,7 @@ int sibasesub(cchar *sp,int sl,cchar *ss) noex {
 int sicasesub(cchar *sp,int sl,cchar *ss) noex {
     	int		si = -1 ;
 	if (sp && ss) ylikely {
-	    si = sixsub<touc,nleadcasestr>(sp,sl,ss) ;
+	    si = sixsub<touc,cmpstrnic>(sp,sl,ss) ;
 	} /* end if (non-null) */
 	return si ;
 } /* end subroutine (sicasesub) */
@@ -159,7 +158,7 @@ int sicasesub(cchar *sp,int sl,cchar *ss) noex {
 int sifoldsub(cchar *sp,int sl,cchar *ss) noex {
     	int		si = -1 ;
 	if (sp && ss) ylikely {
-	    si = sixsub<tofc,nleadfoldstr>(sp,sl,ss) ;
+	    si = sixsub<tofc,cmpstrnfc>(sp,sl,ss) ;
 	} /* end if (non-null) */
 	return si ;
 } /* end subroutine (sifoldsub) */
