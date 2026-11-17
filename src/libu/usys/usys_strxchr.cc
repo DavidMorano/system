@@ -28,6 +28,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -65,5 +66,9 @@
 
 
 /* exported subroutines */
+
+char *strochr(cchar *sp,int sch) noex {
+    	return strchr(sp,sch) ;
+} /* end */
 
 
