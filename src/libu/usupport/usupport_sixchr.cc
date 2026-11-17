@@ -100,7 +100,6 @@ cbool		f_strchr = CF_STRCHR ;
 
 namespace libu {
     int siochr(cchar *sp,int sl,int sch) noex {
-    	cnullptr	np{} ;
 	int		i = 0 ; /* return-value */
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
@@ -111,7 +110,7 @@ namespace libu {
 	                if ((f = (ch == sch))) break ;
 	            } /* end for */
 	        } else {
-		    if (cchar *tp ; (tp = strchr(sp,sch)) != np) {
+		    if (cchar *tp = strchr(sp,sch)) {
 			f = true ;
 			i = intconv(tp - sp) ;
 		    } /* end */
