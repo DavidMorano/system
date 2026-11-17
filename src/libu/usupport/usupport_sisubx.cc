@@ -64,7 +64,6 @@
 #include	<usys.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<ucmpx.h>		/* LIBU */
-#include	<ucomx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_toxc.hh"
@@ -123,6 +122,26 @@ local int sisubxco(cchar *sp,int 탎l,cchar *ss) noex {
 	return (f) ? i : -1 ;
 } /* end subroutine-template (sisubxco) */
 
+template<toxc_f toxc,cmpn_f cmpn>
+local int sisubxcr(cchar *sp,int 탎l,cchar *ss) noex {
+	int		i{} ; /* used-afterwards */
+	bool		f = false ;
+	if (int sl ; ss && ((sl = getlenstr(sp,탎l)) > 0)) {
+	    if (cint sslen = lenstr(ss) ; sslen <= sl) ylikely {
+		if (cint n = (sl - sslen) ; n > 0) {
+	            cint chx_ss = toxc(ss[n - 1]) ;
+	            for (i = (n - 1) ; i >= 0 ; i -= 1) {
+		        if (toxc(sp[i]) == chx_ss) {
+	                    f = (cmpn((sp + i),ss,sslen) == 0) ;
+		        }
+	                if (f) break ;
+	            } /* end for */
+		} /* end block */
+	    } /* end if (possible) */
+	} /* end if (getlenstr) */
+	return (f) ? i : -1 ;
+} /* end subroutine-template (sisubxcr) */
+
 
 /* local variables */
 
@@ -132,7 +151,8 @@ local int sisubxco(cchar *sp,int 탎l,cchar *ss) noex {
 
 /* exported subroutines */
 
-int sisubbco(cchar *sp,int sl,cchar *ss) noex {
+namespace libu {
+    int sisubbco(cchar *sp,int sl,cchar *ss) noex {
     	int		si = -1 ;
 	if (sp && ss) ylikely {
 	    if (sl >= 0) {
@@ -141,7 +161,7 @@ int sisubbco(cchar *sp,int sl,cchar *ss) noex {
 		        si = intconv(tp - sp) ;
 	            } /* end */
 	        } else {
-	            si = sisubxco<tobc,cmpstrnbco>(sp,sl,ss) ;
+	            si = sisubxco<tobc,cmpstrnbc>(sp,sl,ss) ;
 	        } /* end if_constexpr (f_strnstr) */
 	    } else {
 	        if (cc *tp = strsub(sp,ss)) {
@@ -150,14 +170,25 @@ int sisubbco(cchar *sp,int sl,cchar *ss) noex {
 	    } /* end if (length given or not) */
 	} /* end if (non-null) */
 	return si ;
-} /* end subroutine (sisubbco) */
+    } /* end subroutine (sisubbco) */
+    int sisubico(cchar *sp,int sl,cchar *ss) noex {
+    	return sisubxco<touc,cmpstrnic>(sp,sl,ss) ;
+    } /* end subroutine (sisubico) */
+    int sisubfco(cchar *sp,int sl,cchar *ss) noex {
+    	return sisubxco<tofc,cmpstrnfc>(sp,sl,ss) ;
+    } /* end subroutine (sisubfco) */
+} /* end nmaespace (libu) */
 
-int sisubico(cchar *sp,int sl,cchar *ss) noex {
-    	return sisubxco<touc,cmpstrnico>(sp,sl,ss) ;
-} /* end subroutine (sisubico) */
-
-int sisubfco(cchar *sp,int sl,cchar *ss) noex {
-    	return sisubxco<tofc,cmpstrnfco>(sp,sl,ss) ;
-} /* end subroutine (sisubfco) */
+namespace libu {
+    int sisubbcr(cchar *sp,int sl,cchar *ss) noex {
+    	return sisubxcr<touc,cmpstrnic>(sp,sl,ss) ;
+    } /* end subroutine (sisubbcr) */
+    int sisubicr(cchar *sp,int sl,cchar *ss) noex {
+    	return sisubxcr<touc,cmpstrnic>(sp,sl,ss) ;
+    } /* end subroutine (sisubicr) */
+    int sisubfcr(cchar *sp,int sl,cchar *ss) noex {
+    	return sisubxcr<tofc,cmpstrnfc>(sp,sl,ss) ;
+    } /* end subroutine (sisubfcr) */
+} /* end nmaespace (libu) */
 
 
