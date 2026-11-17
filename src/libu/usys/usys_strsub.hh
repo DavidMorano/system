@@ -34,33 +34,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* CSTD */
-#include	<stdlib.h>		/* CSTD */
-#include	<string.h>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 
 
-#ifndef	DECLARATION_STRSUB
-#define	DECLARATION_STRSUB
 namespace usys {
-    local inline char *strsub(cchar *sp,cchar *ss) noex {
-    	return strstr(sp,ss) ;
-    } /* end */
+    extern char *strsub		(ccharp,ccharp)		noex ;
+    extern char *strsubn	(ccharp,ccharp,int)	noex ;
 } /* end namespace (usys) */
-#endif /* DECLARATION_STRSUB */
-
-#ifndef	DECLARATION_STRSUBN
-#define	DECLARATION_STRSUBN
-namespace usys {
-    local inline char *strsubn(cchar *sp,cchar *ss,int n) noex {
-    	csize nsize = size_t(n) ;
-    	return strnstr(sp,ss,nsize) ;
-    } /* end */
-} /* end namespace (usys) */
-#endif /* DECLARATION_STRSUBN */
 
 
 #endif /* __cplusplus */
