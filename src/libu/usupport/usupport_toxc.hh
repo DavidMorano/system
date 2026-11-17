@@ -32,9 +32,15 @@ namespace libu {
     inline int tobc	(int ch) noex {
 	return (ch & UCHAR_MAX) ;
     } /* end subroutine */
+} /* end namespace (libu) */
+
+namespace libu {
     extern int tolc	(int ch) noex ;
     extern int touc	(int ch) noex ;
     extern int tofc	(int ch) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline char chtobc	(int ch) noex {
 	return char(libu::tobc(ch)) ;
     } /* end subroutine */
