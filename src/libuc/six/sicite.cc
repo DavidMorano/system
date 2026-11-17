@@ -51,9 +51,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<ucmpx.h>		/* LIBU */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
 #include	<localmisc.h>		/* LIBU */
 
@@ -84,15 +84,16 @@
 /* exported subroutines */
 
 int sicite(cchar *sp,int sl,cchar *ep,int el) noex {
+    	cnullptr	np{} ;
 	int		si = -1 ; /* return-value */
 	if (sp && ep) {
 	    int		cl = sl ;
 	    cchar	*cp = sp ;
-	    for (cchar *tp ; (tp = strnchr(cp,cl,'\\')) != nullptr ; ) {
-	        if (strncmp((tp + 1),ep,el) == 0) {
+	    for (cchar *tp ; (tp = strnchr(cp,cl,'\\')) != np ; ) {
+	        if (cmpstrn((tp + 1),ep,el) == 0) {
 	            si = intconv(tp - sp) ;
 	            break ;
-	        }
+	        } /* end */
 	        cl -= intconv((tp + 1) - cp) ;
 	        cp = (tp + 1) ;
 	    } /* end for */
