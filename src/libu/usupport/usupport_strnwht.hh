@@ -51,6 +51,9 @@ namespace libu {
     extern char *strnwht	(cchar *,int) noex ;
     extern char *strnwhtchr	(cchar *,int,int) noex ;
     extern char *strnwhtbrk	(cchar *,int,cchar *) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline char *strnwhite	(cchar *sp,int sl) noex {
 	return libu::strnwht(sp,sl) ;
     } /* end subroutine */
