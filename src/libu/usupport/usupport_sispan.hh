@@ -34,6 +34,9 @@ namespace libu {
     extern int	sispanoctal	(cchar *,int) noex ;
     extern int	sispanwhite	(cchar *,int) noex ;
     extern int	sispanblank	(cchar *,int) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int	sispandig	(cchar *sp,int sl) noex {
     	return libu::sispandigit(sp,sl) ;
     } /* end subroutine */
