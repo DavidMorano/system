@@ -37,6 +37,9 @@ namespace libu {
     extern int cthexui	(char *,int,uint)		noex ;
     extern int cthexul	(char *,int,ulong)		noex ;
     extern int cthexull	(char *,int,ulonglong)		noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     extern int cthex_unknown	(char *,int)		noex ;
     template<typename T> inline int cthex(char *rp,int rl,T uv) noex {
 	(void) uv ;
