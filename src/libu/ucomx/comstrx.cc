@@ -59,7 +59,7 @@
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"nleadstr.h"
+#include	"comstrx.h"
 
 
 /* local defines */
