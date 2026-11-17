@@ -31,6 +31,9 @@ namespace libu {
     extern int nleadbasestr(cchar *,cchar *,int) noex ;
     extern int nleadcasestr(cchar *,cchar *,int) noex ;
     extern int nleadfoldstr(cchar *,cchar *,int) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int nleadstr(cchar *bs,cchar *sp,int sl) noex {
 	return libu::nleadbasestr(bs,sp,sl) ;
     } /* end subroutine */
