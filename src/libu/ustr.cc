@@ -127,7 +127,7 @@ int u_fattach(int fd,cchar *fname) noex {
 		    rs = (neg errno) ;
 		}
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (u_fattach) */
 
@@ -140,7 +140,7 @@ int u_detach(cchar *fname) noex {
 		    rs = (neg errno) ;
 		}
 	    }
-	}
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (u_fdetach) */
 
@@ -251,7 +251,7 @@ int ustr::msgget(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
 	if ((rs = getmsg(fd,cmp,dmp,fp)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (ustr::msgget) */
 
@@ -259,7 +259,7 @@ int ustr::msggetp(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
 	if ((rs = getpmsg(fd,cmp,dmp,bp,fp)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (ustr::msggetp) */
 
@@ -267,7 +267,7 @@ int ustr::msgput(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
 	if ((rs = putmsg(fd,cmp,dmp,flags)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (ustr::msgput) */
 
@@ -275,7 +275,7 @@ int ustr::msgputp(int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		rs ;
 	if ((rs = putpmsg(fd,cmp,dmp,band,flags)) < 0) {
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (ustr::msgputp) */
 
