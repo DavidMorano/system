@@ -34,6 +34,9 @@ namespace libu {
     extern int	sioctal(cchar *,int) noex ;
     extern int	siwhite(cchar *,int) noex ;
     extern int	siblank(cchar *,int) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int	sidig(cchar *sp,int sl) noex {
 	return libu::sidigit(sp,sl) ;
     } /* end subroutine */
