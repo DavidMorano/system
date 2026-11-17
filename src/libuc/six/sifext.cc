@@ -81,7 +81,7 @@ import libutil ;			/* |lenstr(3u)| */
 int sifext(cchar *fp,int µfl,mainv exts) noex {
 	int		si = -1 ;
 	if (int fl ; exts && ((fl = getlenstr(fp,µfl)) >= 0)) {
-	    if (cchar *tp ; (tp = strnrchr(fp,fl,'.')) != nullptr) {
+	    if (cchar *tp = strnrchr(fp,fl,'.')) {
 	        cint	el = intconv((fp + fl) - (tp + 1)) ;
 	        cchar	*ep = (tp + 1) ;
 	        if ((el > 0) && (matstr(exts,ep,el) >= 0)) {
