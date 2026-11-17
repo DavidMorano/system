@@ -33,28 +33,16 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* CSTD */
-#include	<stdlib.h>		/* CSTD */
-#include	<string.h>		/* CSTD |strcmp(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 
 
-#ifndef	DECLARATION_CMPSTR
-#define	DECLARATION_CMPSTR
-local inline int cmpstr(ccharp s1,ccharp s2) noex {
-	return strcmp(s1,s2) ;
-} /* end if (cmpstr) */
-#endif /* DECLARATION_CMPSTR */
-
-#ifndef	DECLARATION_CMPSTRN
-#define	DECLARATION_CMPSTRN
-local inline int cmpstrn(ccharp s1,ccharp s2,int n) noex {
-	return strncmp(s1,s2,size_t(n)) ;
-} /* end if (cmpstr) */
-#endif /* DECLARATION_CMPSTRN */
+EXTERNC_beg
+extern int cmpstr	(ccharp,ccharp)		noex ;
+extern int cmpstrn	(ccharp,ccharp,int)	noex ;
+EXTERNC_end
 
 
 #endif /* USYSCMP_INCLUDE */
