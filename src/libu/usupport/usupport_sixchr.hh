@@ -29,6 +29,9 @@
 namespace libu {
     extern int	siochr(cchar *,int,int) noex ;
     extern int	sirchr(cchar *,int,int) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline int	sichr(cchar *sp,int sl,int sch) noex {
 	return libu::siochr(sp,sl,sch) ;
     } /* end subroutine */
