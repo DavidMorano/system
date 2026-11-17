@@ -33,6 +33,9 @@ namespace libu {
     extern char *strnwcpylc(char *,int,cchar *,int = -1) noex ;
     extern char *strnwcpyuc(char *,int,cchar *,int = -1) noex ;
     extern char *strnwcpyfc(char *,int,cchar *,int = -1) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline char *strnwcpy(char *dp,int dl,cchar *sp,int sl = -1) noex {
 	return strnwcpybc(dp,dl,sp,sl) ;
     } /* end subroutine */
