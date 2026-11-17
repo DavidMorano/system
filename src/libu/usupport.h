@@ -53,6 +53,7 @@
 #include	<usupport_sispan.hh>
 #include	<usupport_sisubx.hh>
 #include	<usupport_siwhtx.hh>
+#include	<usupport_sixbrk.hh>
 #include	<usupport_sixchr.hh>
 #include	<usupport_snadd.hh>
 #include	<usupport_sncpyx.hh>
