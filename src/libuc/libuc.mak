@@ -1093,6 +1093,16 @@ find.o:			find.dir
 find.dir:
 	makesubdir $@
 
+# CMPXX
+cmpxx.o:		cmpxx.dir
+cmpxx.dir:
+	makesubdir $@
+
+# DICTX
+dictx.o:		dictx.dir
+dictx.dir:
+	makesubdir $@
+
 # string-constants
 sysdbfiles.o:		sysdbfiles.cc	sysdbfiles.h
 sysdbfn.o:		sysdbfn.cc	sysdbfn.h
