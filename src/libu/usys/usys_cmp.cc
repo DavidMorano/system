@@ -28,7 +28,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* |getprogname(3c)| + |execname(3c) */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strcmp(3c)| + |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -66,5 +67,13 @@
 
 
 /* exported subroutines */
+
+int cmpstr(ccharp s1,ccharp s2) noex {
+	return strcmp(s1,s2) ;
+} /* end if (cmpstr) */
+
+int cmpstrn(ccharp s1,ccharp s2,int n) noex {
+	return strncmp(s1,s2,size_t(n)) ;
+} /* end if (cmpstrn) */
 
 
