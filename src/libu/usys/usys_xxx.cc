@@ -20,7 +20,6 @@
   	Name:
 	usys_xxx
 
-    	Description:
   	Description:
 	I provide some missing system facilities in this module.
 
@@ -43,8 +42,6 @@
 /* USERATTR begin */
 #if	(! defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
 /*----------------------------------------------------------------------------*/
-
-EXTERNC_begin
 
 void setuserattr() noex { 
 	errno = ENOSYS ;
@@ -77,8 +74,6 @@ userattr *getuseruid(uid_t) noex {
 	return nullptr ;
 } /* end */
 
-EXTERNC_end
-
 /*----------------------------------------------------------------------------*/
 #endif /* (! defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
 /* USERATTR end */
@@ -87,8 +82,6 @@ EXTERNC_end
 /* MEMCNTL begin */
 #if	(! defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
 /*----------------------------------------------------------------------------*/
-
-EXTERNC_begin
 
 unixret_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
     	unixret_t	ru = unixretbad ;
@@ -103,8 +96,6 @@ unixret_t memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 	return ru ;
 } /* end subroutine (memcntl) */
 
-EXTERNC_end
-
 /*----------------------------------------------------------------------------*/
 #endif /* (! defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
@@ -112,8 +103,6 @@ EXTERNC_end
 /* MEMINHERIT begin */
 #if	(! defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0)
 /*----------------------------------------------------------------------------*/
-
-EXTERNC_begin
 
 unixret_t minherit(void *ma,size_t ms,int cmd) noex {
     	unixret_t	ru = unixretbad ;
@@ -128,8 +117,6 @@ unixret_t minherit(void *ma,size_t ms,int cmd) noex {
 	return ru ;
 } /* end subroutine (memcntl) */
 
-EXTERNC_end
-
 /*----------------------------------------------------------------------------*/
 #endif /* (! defined(SYSHAS_MEMINHERIT)) || (SYSHAS_MEMINHERIT == 0) */
 /* MEMINHERIT end */
@@ -137,8 +124,6 @@ EXTERNC_end
 /* MEMPLOCK begin */
 #if	(! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0)
 /*----------------------------------------------------------------------------*/
-
-EXTERNC_begin
 
 unixret_t plock(int cmd) noex {
     	unixret_t	ru = unixretbad ;
@@ -149,8 +134,6 @@ unixret_t plock(int cmd) noex {
 	if (ec) errno = ec ;
 	return ru ;
 } /* end subroutine (plock) */
-
-EXTERNC_end
 
 /*----------------------------------------------------------------------------*/
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */
