@@ -32,6 +32,9 @@ namespace libu {
     extern char *strndigex(cchar *,int) noex ;
     extern char *strnoctal(cchar *,int) noex ;
     extern char *strnblank(cchar *,int) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
     inline char *strndig(cchar *sp,int sl) noex {
 	return libu::strndigit(sp,sl) ;
     } /* end subroutine */
