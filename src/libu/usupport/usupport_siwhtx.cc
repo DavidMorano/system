@@ -107,7 +107,7 @@ namespace libu {
     int siwhtchr(cchar *sp,int sl,int sch) noex {
     	int		si = -1 ;
 	if (sp) ylikely {
-	    if (cchar *tp = strnwhtchr(sp,sl,sch) ; tp) {
+	    if (cchar *tp = strnwhtchr(sp,sl,sch)) {
 	        si = intconv(tp - sp) ;
 	    } /* end */
 	} /* end if (non-null) */
@@ -119,7 +119,7 @@ namespace libu {
     int siwhtbrk(cchar *sp,int sl,cchar *ss) noex {
     	int		si = -1 ;
 	if (sp) ylikely {
-	    if (cchar *tp = strnwhtbrk(sp,sl,ss) ; tp) {
+	    if (cchar *tp = strnwhtbrk(sp,sl,ss)) {
 	        si = intconv(tp - sp) ;
 	    } /* end */
 	} /* end if (non-null) */
@@ -128,7 +128,7 @@ namespace libu {
     int siwhtbrk(cchar *sp,int sl,con chrset *setp) noex {
     	int		si = -1 ;
 	if (sp) ylikely {
-	    if (cchar *tp = libu::strnwhtbrk(sp,sl,setp) ; tp) {
+	    if (cchar *tp = libu::strnwhtbrk(sp,sl,setp)) {
 	        si = intconv(tp - sp) ;
 	    } /* end */
 	} /* end if (non-null) */
