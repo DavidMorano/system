@@ -62,7 +62,7 @@
 #include	<hash.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<msgsub.hh>		/* LIBUC */
-#include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
+#include	<cmpxx.h>		/* LIBUC */
 #include	<isfd.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -904,7 +904,7 @@ local int msgid_searchid(msgid *op,cchar *midp,int midl,char **bepp) noex {
 	            bep = bp + (i * op->entsz) ;
 		    if ((rs = ma.wr(bep)) >= 0) {
 	                cchar	*cp = ma.messageid ;
-	                f = strnncmp(midp,midl,cp,var.lmsgid) ;
+	                f = cmpstrnn(midp,midl,cp,var.lmsgid) ;
 		    } /* end if (msgide_wr) */
 	            if (f) break ;
 	            ei += 1 ;
