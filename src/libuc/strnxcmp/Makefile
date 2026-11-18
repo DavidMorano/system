@@ -42,11 +42,11 @@ LIBS +=
 
 OBJ0= strnxxxxcmp.o
 OBJ1= strnkeycmp.o strnvalcmp.o
-OBJ2= strnleadcmp.o strnncmp.o 
-OBJ3= strnndictcmp.o
+OBJ2= strnndictcmp.o
+OBJ3= 
 
 OBJA= obj0.o obj1.o
-OBJB= obj2.o obj3.o
+OBJB= obj2.o
 
 OBJ_STRNXCMP= obja.o objb.o
 
@@ -137,8 +137,6 @@ objb.o:			$(OBJB)
 
 strnkeycmp.o:		strnkeycmp.cc		strnkeycmp.h	$(INCS)
 strnvalcmp.o:		strnvalcmp.cc				$(INCS)
-strnleadcmp.o:		strnleadcmp.cc				$(INCS)
-strnncmp.o:		strnncmp.cc				$(INCS)
 strnndictcmp.o:		strnndictcmp.cc 			$(INCS)
 strnxxxxcmp.o:		strnxxxxcmp.cc		strnxxxxcmp.h	$(INCS)
 
