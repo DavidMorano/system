@@ -48,7 +48,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<ucomx.h>		/* LIBU */
-#include	<cmpstrk.h>		/* LIBU */
+#include	<ucmpx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"matstrk.h"
@@ -75,7 +75,7 @@
 /* forward references */
 
 constexpr bool keyend(cint ch) noex {
-	return (((ch) == '\0') || ((ch) == '=')) ;
+	return ((ch == '\0') || (ch == '=')) ;
 } /* end subroutine */
 
 
@@ -89,7 +89,7 @@ constexpr bool keyend(cint ch) noex {
 
     int matstrk(con mainv a,cchar *sp,int sl) noex {
     	int		rc = -1 ;
-	if (a && sp) {
+	if (a && sp) ylikely {
 	    cint	sch = sp[0] ; /* ok: everything promotes the same */
 	    int		i = 0 ; /* used-afterwards */
 	    bool 	f = false ;
@@ -97,17 +97,17 @@ constexpr bool keyend(cint ch) noex {
 	        for (int m ; a[i] ; i += 1) {
 		    if ((m = (sch == a[i][0])) > 0) {
 		        m = comstrk(a[i],sp,sl) ;
-		    }
+		    } /* end */
 		    f = (((m == sl) || keyend(sp[m])) && keyend(a[i][m])) ;
 		    if (f) break ;
 	        } /* end for */
 	    } else {
 	        for ( ; a[i] ; i += 1) {
 	            if (sch == a[i][0]) {
-		        f = (cmpstrk(a[i],sp) == 0) ;
+		        f = (cmpstrkey(a[i],sp) == 0) ;
 		    } else {
 		        f = (keyend(sp[0]) && keyend(a[i][0])) ;
-		    }
+		    } /* end */
 		    if (f) break ;
 	        } /* end for */
 	    } /* end if */
