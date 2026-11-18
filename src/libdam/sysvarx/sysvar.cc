@@ -42,7 +42,7 @@
 #include	<snwcpy.h>		/* LIBUC */
 #include	<strxcmp.h>		/* LIBUC */
 #include	<matstr.h>		/* LIBUC */
-#include	<strxcmp.h>		/* LIBUC |cmpstrk(3uc)| */
+#include	<cmpxx.h>		/* LIBUC |cmpstrkey(3uc)| */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
@@ -660,12 +660,12 @@ local int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 	    int		i = (dcp->i >= 0) ? (dcp->i + 1) : 0 ;
 	    cchar	*cp ; /* multiple-use */
 	    while ((rs = vecstr_get(op->dlp,i,&cp)) >= 0) {
-	        if (cmpstrk(key,cp) == 0) break ;
+	        if (cmpstrkey(key,cp) == 0) break ;
 	        i += 1 ;
 	    } /* end while */
 	    if (rs >= 0) ylikely {
 	        cchar	*valp = nullptr ;
-	        if (cchar *tp{} ; (tp = strchr(cp,'=')) != nullptr) {
+	        if (cchar *tp = strchr(cp,'=')) {
 		    valp = (tp + 1) ;
 		} /* end if */
 	        if (valp) {
@@ -674,8 +674,8 @@ local int sysvar_deffetch(SV *op,cc *kp,int kl,SV_DC *dcp,
 		        vl = rs ;
 	            } else {
 		        vl = lenstr(valp) ;
-		    }
-	        }
+		    } /* end */
+	        } /* end */
 	        if (rs >= 0) {
 	            dcp->i = i ;
 		} /* end if (ok) */
