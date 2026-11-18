@@ -55,19 +55,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<ucmpx.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<cmporders.h>		/* LIBU */
 
-#include	"strxcmp.h"
+#include	"cmpstrpre.h"
 
 
 /* local defines */
@@ -77,8 +75,6 @@
 
 
 /* local typedefs */
-
-typedef cmporders	co ;
 
 
 /* external subroutines */
@@ -104,26 +100,12 @@ typedef cmporders	co ;
 int cmpstrpre(cchar *s1,cchar *s2) noex {
 	int		rc = 0 ;
 	if (s1 && s2) ylikely {
-	    while (*s1 && *s2) {
-	        if (*s1 != *s2) break ;
-	        s1 += 1 ;
-	        s2 += 1 ;
+	    while (*s2) {
+		cint ch1 = mkchar(*s1++) ;
+		cint ch2 = mkchar(*s2++) ;
+	        rc = ch1 - ch2 ;
+		if (rc) break ;
 	    } /* end while */
-	    /* exact match */
-	    if ((*s1 | *s2) != 0) {
-	        rc = +1 ;
-	        /* no match */
-	        if (*s1 != '\0') {
-		    /* prefix match */
-		    rc = +0 ;		/* <- note */
-		    if (*s2 != '\0') {
-		        /* no match */
-		        cint ch1 = mkchar(*s1) ;
-		        cint ch2 = mkchar(*s2) ;
-		        rc = (ch1 - ch2) ;
-		    } /* end if */
-	        } /* end if */
-	    } /* end if */
 	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (cmpstrpre) */
