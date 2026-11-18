@@ -94,7 +94,6 @@
 
 extern int	expander() ;
 extern int	procfileenv(char *,char *,VECSTR *) ;
-extern int	procfilepaths(char *,char *,VECSTR *) ;
 
 
 /* external variables */
@@ -1109,56 +1108,46 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    } /* end if (removal multiplier) */
 
-
 /* what about an 'environ' file ? */
 
 	    if (cf.envfname != NULL) {
-
 #if	CF_DEBUG
 	if (DEBUG_DEBUG)
 	            debugprintf("main: 1 envfile=%s\n",cf.envfname) ;
 #endif
-
 	        procfileenv(pip->pr,cf.envfname,&exports) ;
-
-	    } else
+	    } else {
 	        procfile(procfileenv,pip->pr,&svars,
 	            ENVFNAME,&exports) ;
-
+	    }
 	    f_procfileenv = TRUE ;
-
 
 /* "do" any 'paths' file before we process the environment variables */
 
-	    if (cf.pathfname != NULL)
-	        procfilepaths(pip->pr,cf.pathfname,&exports) ;
-
-	    else
+	    if (cf.pathfname != NULL) {
+	        vecstr_filepaths(&exports,pip->pr,cf.pathfname) ;
+	    } else {
 	    	procfile(procfilepaths,pip->pr,&svars,
 	            PATHSFNAME,&exports) ;
-
+	    }
 	    f_procfilepaths = TRUE ;
-
 
 #if	CF_DEBUG
 	if (DEBUG_DEBUG)
 	        debugprintf("main: processing CF loglen\n") ;
 #endif
 
-	    if ((cf.loglen >= 0) && (loglen < 0))
+	    if ((cf.loglen >= 0) && (loglen < 0)) {
 	        loglen = cf.loglen ;
+	    }
 
 /* loop through the UNSETs in the configuration file */
 
 	    for (i = 0 ; vecstr_get(&cf.unsets,i,&cp) >= 0 ; i += 1) {
-
 	        rs = vecstr_finder(&exports,cp,vstrkeycmp,NULL) ;
-
 	        if (rs >= 0)
 	            vecstr_del(&exports,rs) ;
-
 	    } /* end for */
-
 
 /* loop through the EXPORTed variables in the configuration file */
 
