@@ -1,8 +1,8 @@
-/* usupport_matostr SUPPORT */
+/* usupport_matstro SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
-/* USUPPORT Match-Option-String */
+/* USUPPORT Match-String-Option */
 /* version %I% last-modified %G% */
 
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	mato{x}str
+	matstro{x}c
 
 	Description:
 	Check that the given string matches a MINIMUM number of
@@ -27,10 +27,10 @@
 	we do not match, we return "less-than-zero".
 
 	Synopsis:
-	int mato{x}str(cchar *const *a,int n,cchar *sp,int sl) noex
+	int matstro{x}c(cchar *const *a,int n,cchar *sp,int sl) noex
 
 	Arguments:
-	{x}		base, case, fold
+	{x}		b, i, f
 	a		array of string to match against
 	n		minimum number of characters that must match
 	sp		string to test against array
@@ -52,8 +52,8 @@
 
 #include	"usupport_toxc.hh"
 #include	"usupport_nleadstr.hh"
-#include	"usupport_matstr.hh"	/* <- needed for default case */
-#include	"usupport_matostr.hh"
+#include	"usupport_matstrx.hh"	/* <- needed for default case */
+#include	"usupport_matstro.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
