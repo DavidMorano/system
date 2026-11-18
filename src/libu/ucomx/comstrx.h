@@ -39,8 +39,20 @@ local inline int comstr(cchar *bs,cchar *sp,int sl) noex {
 EXTERNC_end
 
 #ifdef	__cplusplus
+inline int comstrbc(cchar *bs,cchar *sp) noex {
+    	return comstrbc(bs,sp,-1) ;
+} /* end */
+inline int comstric(cchar *bs,cchar *sp) noex {
+    	return comstric(bs,sp,-1) ;
+} /* end */
+inline int comstrfc(cchar *bs,cchar *sp) noex {
+    	return comstrfc(bs,sp,-1) ;
+} /* end */
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
 inline int comstr(cchar *bs,cchar *sp) noex {
-	return comstrbc(bs,sp,-1) ;
+    	return comstrbc(bs,sp,-1) ;
 } /* end */
 #endif /* __cplusplus */
 
