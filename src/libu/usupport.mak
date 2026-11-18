@@ -44,24 +44,24 @@ OBJ00= usupport_prime.o usupport_sncpyx.o
 OBJ01= usupport_itimer.o usupport_snadd.o
 OBJ02= usupport_cfdec.o usupport_cfdect.o
 OBJ03= usupport_cfhex.o usupport_cfinet.o
-OBJ04= usupport_toxc.o usupport_snwcpy.o 
+OBJ04= usupport_toxc.o 
 OBJ05= usupport_rmx.o usupport_sisubx.o
 OBJ06= usupport_ustrftime.o usupport_mkhex.o
 OBJ07= usupport_ctdec.o usupport_cthex.o
 
-OBJ08= usupport_getsign.o usupport_siext.o
+OBJ08= usupport_getsign.o 
 OBJ09= usupport_strnxchr.o usupport_strnxbrk.o
 OBJ10= usupport_strnchar.o usupport_strnwht.o
-OBJ11= usupport_strkeycmp.o usupport_strwcmp.o
+OBJ11= usupport_strkeycmp.o 
 
 OBJ12= usupport_strncmp.o usupport_strnkeycmp.o
 OBJ13= usupport_strncpyxc.o usupport_strnset.o
 OBJ14= usupport_sichar.o usupport_sispan.o
 OBJ15= usupport_sixchr.o usupport_siwhtx.o
 
-OBJ16= usupport_matstr.o usupport_matostr.o 
-OBJ17= usupport_matkeystr.o usupport_strwcpy.o
-OBJ18= usupport_nleadkeystr.o usupport_nleadstr.o
+OBJ16= usupport_siext.o
+OBJ17= usupport_strwcpy.o
+OBJ18= usupport_snwcpy.o 
 OBJ19= usupport_hasx.o usupport_hasnot.o 
 
 OBJ20= usupport_strdcpyx.o usupport_strdcpyxw.o
@@ -69,10 +69,15 @@ OBJ21= usupport_vstrcmp.o usupport_vstrkeycmp.o
 OBJ22= usupport_strxxxxcmp.o usupport_strnwcpy.o
 OBJ23= usupport_sixbrk.o
 
-OBJ24= vstrorders.o
-OBJ25=
-OBJ26=
-OBJ27= 
+OBJ24= usupport_cmpstrx.o usupport_cmpstrk.o
+OBJ25= usupport_comstrx.o usupport_comstrk.o
+OBJ26= usupport_matstrx.o usupport_matstrk.o 
+OBJ27= usupport_matstro.o 
+
+OBJ28= usupport_cmpstrw.o
+OBJ29= vstrorders.o
+OBJ30=
+OBJ32= 
 
 OBJA= obj00.o obj01.o obj02.o obj03.o
 OBJB= obj04.o obj05.o obj06.o obj07.o
@@ -80,9 +85,11 @@ OBJC= obj08.o obj09.o obj10.o obj11.o
 OBJD= obj12.o obj13.o obj14.o obj15.o
 OBJE= obj16.o obj17.o obj18.o obj19.o
 OBJF= obj20.o obj21.o obj22.o obj23.o
-OBJG= obj24.o 
+OBJG= obj24.o obj25.o obj26.o obj27.o
+OBJH= obj28.o obj29.o
 
-OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
+OBJ += obja.o objb.o objc.o objd.o
+OBJ += obje.o objf.o objg.o objh.o
 
 
 INCDIRS +=
@@ -238,6 +245,19 @@ obj27.o:		$(OBJ27)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+obj28.o:		$(OBJ28)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj29.o:		$(OBJ29)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj30.o:		$(OBJ30)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj31.o:		$(OBJ31)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
@@ -259,6 +279,9 @@ objf.o:			$(OBJF)
 objg.o:			$(OBJG)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+objh.o:			$(OBJH)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -276,12 +299,7 @@ usupport_hasnot.o:	usupport_hasnot.cc	usupport_hasnot.hh	$(INCS)
 usupport_hasx.o:	usupport_hasx.cc	usupport_hasx.hh	$(INCS)
 usupport_ctdec.o:	usupport_ctdec.cc	usupport_ctdec.hh	$(INCS)
 usupport_cthex.o:	usupport_cthex.cc	usupport_cthex.hh	$(INCS)
-usupport_matkeystr.o:	usupport_matkeystr.cc	usupport_matkeystr.hh	$(INCS)
-usupport_matostr.o:	usupport_matostr.cc	usupport_matostr.hh	$(INCS)
-usupport_matstr.o:	usupport_matstr.cc	usupport_matstr.hh	$(INCS)
 usupport_mkhex.o:	usupport_mkhex.cc	usupport_mkhex.hh	$(INCS)
-usupport_nleadkeystr.o:	usupport_nleadkeystr.cc	usupport_nleadkeystr.hh	$(INCS)
-usupport_nleadstr.o:	usupport_nleadstr.cc	usupport_nleadstr.hh	$(INCS)
 usupport_prime.o:	usupport_prime.cc	usupport_prime.h	$(INCS)
 usupport_rmx.o:		usupport_rmx.cc		usupport_rmx.hh		$(INCS)
 usupport_sichar.o:	usupport_sichar.cc	usupport_sichar.hh	$(INCS)
@@ -306,13 +324,22 @@ usupport_strnxbrk.o:	usupport_strnxbrk.cc	usupport_strnxbrk.hh	$(INCS)
 usupport_strnkeycmp.o:	usupport_strnkeycmp.cc	usupport_strnkeycmp.hh	$(INCS)
 usupport_strnwcpy.o:	usupport_strnwcpy.cc	usupport_strnwcpy.hh	$(INCS)
 usupport_strnwht.o:	usupport_strnwht.cc	usupport_strnwht.hh	$(INCS)
-usupport_strwcmp.o:	usupport_strwcmp.cc	usupport_strwcmp.hh	$(INCS)
 usupport_strwcpy.o:	usupport_strwcpy.cc	usupport_strwcpy.hh	$(INCS)
 usupport_strxxxxcpy.o:	usupport_strxxxxcpy.cc	usupport_strxxxxcpy.hh	$(INCS)
 usupport_toxc.o:	usupport_toxc.cc	usupport_toxc.hh	$(INCS)
 usupport_ustrftime.o:	usupport_ustrftime.cc	usupport_ustrftime.hh	$(INCS)
 usupport_vstrcmp.o:	usupport_vstrcmp.cc	usupport_vstrcmp.hh	$(INCS)
 usupport_vstrkeycmp.o:	usupport_vstrkeycmp.cc	usupport_vstrkeycmp.hh	$(INCS)
+
+usupport_cmpstrk.o:	usupport_cmpstrk.cc	usupport_cmpstrk.hh	$(INCS)
+usupport_cmpstrx.o:	usupport_cmpstrx.cc	usupport_cmpstrx.hh	$(INCS)
+usupport_comstrk.o:	usupport_comstrk.cc	usupport_comstrk.hh	$(INCS)
+usupport_comstrx.o:	usupport_comstrx.cc	usupport_comstrx.hh	$(INCS)
+usupport_matstrk.o:	usupport_matstrk.cc	usupport_matstrk.hh	$(INCS)
+usupport_matstro.o:	usupport_matstro.cc	usupport_matstro.hh	$(INCS)
+usupport_matstrx.o:	usupport_matstrx.cc	usupport_matstrx.hh	$(INCS)
+
+usupport_cmpstrw.o:	usupport_cmpstrw.cc	usupport_cmpstrw.hh	$(INCS)
 
 vstrorders.o:		vstrorders.cc		vstrorders.h
 
