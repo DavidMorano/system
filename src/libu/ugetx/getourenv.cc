@@ -45,7 +45,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
@@ -59,7 +58,7 @@
 
 /* imported namespaces */
 
-using libu::matkeystr ;			/* subroutine */
+using libu::matstrk ;			/* subroutine */
 
 
 /* local typedefs */
@@ -88,8 +87,8 @@ using libu::matkeystr ;			/* subroutine */
 cchar *getourenv(con mainv envv,cchar *key) noex {
 	cchar		*vp = nullptr ; /* return-value */
 	if (envv && key && key[0]) {
-	    if (int ei ; (ei = matkeystr(envv,key,-1)) >= 0) {
-		if ((vp = strchr(envv[ei],'=')) != nullptr) {
+	    if (int ei ; (ei = matstrk(envv,key,-1)) >= 0) {
+		if ((vp = strochr(envv[ei],'=')) != nullptr) {
 		    vp += 1 ;
 		}
 	    }
