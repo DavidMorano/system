@@ -27,8 +27,7 @@
 #include	<cmpitimer.h>
 #include	<cmptimeval.h>
 #include	<cmptimespec.h>
-#include	<cmpstrk.h>
-#include	<cmpstrkn.h>
+#include	<cmpstrkeyval.h>
 #include	<cmpstrn.h>
 #include	<cmpstrw.h>
 #include	<cmpstrx.h>
