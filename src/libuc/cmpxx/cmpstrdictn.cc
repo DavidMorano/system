@@ -71,14 +71,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
+#include	<ucmpx.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<char.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<cmporders.h>		/* LIBU */
 
 #include	"cmpstrdictn.h"
 
@@ -95,8 +97,6 @@ import libutil ;			/* lenstr(3u)| */
 
 
 /* local typedefs */
-
-typedef cmporders	co ;
 
 
 /* external subroutines */
@@ -115,9 +115,9 @@ struct dictchar {
 
 /* forward references */
 
-local int	dch_start(DCH *,cchar *,int) noex ;
-local int	dch_finish(DCH *) noex ;
-local int	dch_get(DCH *) noex ;
+local int	dch_start	(DCH *,cchar *,int) noex ;
+local int	dch_finish	(DCH *) noex ;
+local int	dch_get		(DCH *) noex ;
 
 local int	cmpstrdo(cchar *,cchar *,int) noex ;
 
@@ -160,14 +160,14 @@ int cmpstrdictn(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	            if (rc == 0) {
 	                while (s1len && (! ischdict(s1[s1len-1]))) {
 			    s1len -= 1 ;
-		        }
+		        } /* end while */
 	                while (s2len && (! ischdict(s2[s2len-1]))) {
 			    s2len -= 1 ;
-		        }
+		        } /* end while */
 	                rc = (s1len - s2len) ; /* more determinism */
 	            } /* end if */
 	            if (rc == 0) {
-	                rc = strncmp(s1,s2,s2len) ; /* determinism? */
+	                rc = cmpstrn(s1,s2,s2len) ; /* determinism? */
 		    } /* end */
 	            rs1 = dch_finish(&dc2) ;
 	            if (rs >= 0) rs = rs1 ;
