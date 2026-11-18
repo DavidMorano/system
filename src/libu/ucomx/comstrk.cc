@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	nleadkeystr
+	comstrk
 
 	Description:
 	Check that the given string matches (case independently)
