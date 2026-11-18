@@ -56,6 +56,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_strnxchr.hh"
@@ -109,7 +110,7 @@ namespace {
 	} ; /* end */
 	bool iscond(int ch) const noex override final {
 	    ch &= UCHAR_MAX ;
-    	    return (strchr(ss,ch) != nullptr) ;
+    	    return (strochr(ss,ch) != nullptr) ;
 	} ; /* end */
     } ; /* end struct (rmtrailer_class) */
     struct rmtrailer_chr : rmtrailer {
