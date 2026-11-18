@@ -36,16 +36,16 @@
 module ;
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<stdexcept>
-#include	<clanguage.h>
-#include	<usysbase.h>
-#include	<hdb.h>
-#include	<hash.h>		/* |hash_elf(3uc)| */
-#include	<strnxcmp.h>		/* |strnncmp(3uc)| */
-#include	<localmisc.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<stdexcept>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<hdb.h>			/* LIBUC */
+#include	<hash.h>		/* LIBUC |hash_elf(3uc)| */
+#include	<cmpxx.h>		/* LIBUC */
+#include	<localmisc.h>		/* LIBU */
 
 #define	SETHAND_DEFENTS	10
 
@@ -65,16 +65,16 @@ export {
 	virtual int	getkey(cvoid **rpp) const {
 	    if (rpp != nullptr) *rpp = cvoidp(kp) ;
 	    return kl ;
-	} ;
+	} ; /* end */
 	virtual int	getval(cvoid **rpp) const {
 	    if (rpp != nullptr) *rpp = cvoidp(vp) ;
 	    return vl ;
-	} ;
+	} ; /* end */
 	virtual uint	hash() {
 	   int		hv = 0 ;
 	   if (kp != nullptr) hv = hash_elf(kp,kl) ;
 	   return hv ;
-	} ;
+	} ; /* end */
 	virtual int	cmp(sethandent *e1p,sethandent *e2p) {
 	    int		rc = 0 ;
 	    cvoid	*v1p ;
@@ -83,34 +83,34 @@ export {
 	        if (int k2l ; (k2l = e2p->getkey(&v2p)) >= 0) {
 	    	    cchar	*c1p = charp(v1p) ;
 	    	    cchar	*c2p = charp(v2p) ;
-		    rc = strnncmp(c1p,k1l,c2p,k2l) ;
+		    rc = cmpstrnn(c1p,k1l,c2p,k2l) ;
 		}
 	    }
 	    return rc ;
-	} ;
+	} ; /* end */
 	virtual int	setosize(int aosize) {
 	    osize = aosize ;
 	    return SR_OK ;
 	} ;
 	virtual int	getosize() const {
 	    return osize ;
-	} ;
+	} ; /* end */
 	sethandent() { } ;
 	sethandent(cvoid *akp,int akl,cvoid *avp,int avl) :
 	    kl(akl), vl(avl), kp(akp), vp(avp) {
-	} ;
+	} ; /* end */
 	destruct sethandent() {
 	    kp = nullptr ;
 	    vp = nullptr ;
 	    kl = 0 ;
 	    vl = 0 ;
-	} ;
+	} ; /* end */
     } ; /* end class (sethandent) */
     class sethand ;
     class sethand_it {
 	hdb_cur		cur ;
 	friend		sethand ;
-    } ;
+    } ; /* end */
     class sethand {
 	hdb		dlp ;
 	int		n = 0 ;
@@ -133,14 +133,14 @@ export {
 		f_started = true ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end */
 	int begin() {
 	    int		rs ;
 	    if ((rs = hdb_start(&dlp,n,at,nullptr,nullptr)) >= 0) {
 		f_started = true ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end */
 	int end() {
 	    int		rs = SR_OK ;
 	    if (f_started) {
@@ -148,13 +148,13 @@ export {
 		rs = hdb_finish(&dlp) ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end */
 	int itbegin(sethand_it *itp) {
 	    return hdb_curbegin(&dlp,&itp->cur) ;
-	} ;
+	} ; /* end */
 	int itend(sethand_it *itp) {
 	    return hdb_curend(&dlp,&itp->cur) ;
-	} ;
+	} ; /* end */
 	int itfetch(sethand_it *itp,sethandent **rpp,cchar *kp,int kl) {
 	    hdb_dat	key, val ;
 	    hdb_cur	*curp = &itp->cur ;
@@ -166,7 +166,7 @@ export {
 		rs = val.len ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end */
 	int itenum(sethand_it *itp,sethandent **rpp) {
 	    hdb_dat	key, val ;
 	    hdb_cur	*curp = &itp->cur ;
@@ -176,7 +176,7 @@ export {
 		rs = val.len ;
 	    }
 	    return rs ;
-	} ;
+	} ; /* end */
 	int add(const sethandent *ep) {
 	    cint	os = ep->getosize() ;
 	    int		rs = SR_OK ;
@@ -197,7 +197,7 @@ export {
 		}
 	    }
 	    return rs ;
-	} ;
+	} ; /* end */
 	sethand& operator += (const sethandent *ep) {
 	    int	rs = add(ep) ;
 	    if (rs < 0) {
@@ -205,7 +205,7 @@ export {
 		throw a ;
 	    }
 	    return (*this) ;
-	} ;
+	} ; /* end */
     } ; /* end class (sethand) */
 } /* end export */
 
