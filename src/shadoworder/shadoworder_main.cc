@@ -32,23 +32,22 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bits.h>
 #include	<paramopt.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
-#include	<strnxcmp.h>		/* strnncmp(3uc)| */
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<cmpxx.h>		/* LIBUC */
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"shadoworker_config.h"
 
 
 /* local defines */
@@ -886,12 +885,10 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (main) */
+} /* end subroutine (main) */
 
 
 /* local subroutines */
-
 
 local int usage(PROGINFO *pip)
 {
@@ -913,9 +910,7 @@ local int usage(PROGINFO *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
-
+} /* end subroutine (usage) */
 
 local int process(PROGINFO *pip,paramopt *app,bfile *ofp,cchar ddname[])
 {
@@ -960,9 +955,7 @@ local int process(PROGINFO *pip,paramopt *app,bfile *ofp,cchar ddname[])
 	} /* end if (ok) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (process) */
-
+} /* end subroutine (process) */
 
 local int procfile(PROGINFO *pip,paramopt *app,VECOBJ *pfp,cchar *fname)
 {
@@ -1016,9 +1009,7 @@ local int procfile(PROGINFO *pip,paramopt *app,VECOBJ *pfp,cchar *fname)
 #endif
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procfile) */
-
+} /* end subroutine (procfile) */
 
 local int procpwverify(PROGINFO *pip,paramopt *app,bfile *ofp,VECOBJ *pfp)
 {
@@ -1081,9 +1072,7 @@ local int procpwverify(PROGINFO *pip,paramopt *app,bfile *ofp,VECOBJ *pfp)
 #endif
 
 	return rs ;
-}
-/* end subroutine (procpwverify) */
-
+} /* end subroutine (procpwverify) */
 
 local int procpwverifier(PROGINFO *pip,bfile *ofp,USERWORD *fa,int fn)
 {
@@ -1154,9 +1143,7 @@ local int procpwverifier(PROGINFO *pip,bfile *ofp,USERWORD *fa,int fn)
 #endif
 
 	return rs ;
-}
-/* end subroutine (procpwverifier) */
-
+} /* end subroutine (procpwverifier) */
 
 local int processmore(pip,app,ofp,pfp,shfname)
 PROGINFO	*pip ;
@@ -1226,9 +1213,7 @@ cchar	shfname[] ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (processmore) */
-
+} /* end subroutine (processmore) */
 
 local int procshverify(PROGINFO *pip,paramopt *app,VECOBJ *sfp)
 {
@@ -1296,9 +1281,7 @@ local int procshverify(PROGINFO *pip,paramopt *app,VECOBJ *sfp)
 #endif
 
 	return rs ;
-}
-/* end subroutine (procpwverify) */
-
+} /* end subroutine (procpwverify) */
 
 local int procshverifier(PROGINFO *pip,USERWORD *fa,int fn)
 {
@@ -1342,9 +1325,7 @@ local int procshverifier(PROGINFO *pip,USERWORD *fa,int fn)
 #endif
 
 	return rs ;
-}
-/* end subroutine (procshverifier) */
-
+} /* end subroutine (procshverifier) */
 
 local int procprintout(pip,app,ofp,pfp,sfp)
 PROGINFO	*pip ;
@@ -1382,8 +1363,6 @@ VECOBJ		*sfp ;
 	}
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procprintout) */
 
 
 #ifdef	COMMENT
@@ -1492,11 +1471,9 @@ ret1:
 
 ret0:
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (procpf) */
+} /* end subroutine (procpf) */
 
 #endif /* COMMENT */
-
 
 local int userword_start(USERWORD *wp,uint lo,int line,cchar *sp,int sl)
 {
@@ -1516,9 +1493,7 @@ local int userword_start(USERWORD *wp,uint lo,int line,cchar *sp,int sl)
 	}
 
 	return rs ;
-}
-/* end subroutine (userword_start) */
-
+} /* end subroutine (userword_start) */
 
 local int userword_finish(USERWORD *wp)
 {
@@ -1533,8 +1508,7 @@ local int userword_finish(USERWORD *wp)
 	wp->ul = 0 ;
 
 	return rs ;
-}
-/* end subroutine (userword_finish) */
+} /* end subroutine (userword_finish) */
 
 
 local int getnumfields(PROGINFO *pip,USERWORD *fa,int nf,cchar *lp,int ll)
@@ -1573,8 +1547,7 @@ local int getnumfields(PROGINFO *pip,USERWORD *fa,int nf,cchar *lp,int ll)
 	fa[n].up = nullptr ;
 	fa[n].ul = 0 ;
 	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (getnumfields) */
+} /* end subroutine (getnumfields) */
 
 local int userwordcmp(cvoid *v1p,cvoid *v2p) noex {
 	USERWORD	*e1p, **e1pp = (USERWORD **) v1p ;
@@ -1584,7 +1557,7 @@ local int userwordcmp(cvoid *v1p,cvoid *v2p) noex {
 	    if (*e2pp != nullptr) {
 	        e1p = *e1pp ;
 	        e2p = *e2pp ;
-	        rc = strnncmp(e1p->up,e1p->ul,e2p->up,e2p->ul) ;
+	        rc = cmpstrnn(e1p->up,e1p->ul,e2p->up,e2p->ul) ;
 	    } else {
 	        rc = -1 ;
 	    }
@@ -1592,7 +1565,6 @@ local int userwordcmp(cvoid *v1p,cvoid *v2p) noex {
 	    rc = +1 ;
 	}
 	return rc ;
-}
-/* end subroutine (userwordcmp) */
+} /* end subroutine (userwordcmp) */
 
 
