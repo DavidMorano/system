@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	UMATX_INCLUDE
-#define	UMATX_INCLUDE
+#ifndef	UCOMX_INCLUDE
+#define	UCOMX_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -27,6 +27,6 @@
 #include	<comstrx.h>
 
 
-#endif /* UMATX_INCLUDE */
+#endif /* UCOMX_INCLUDE */
 
 
