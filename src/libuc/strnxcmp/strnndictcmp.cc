@@ -80,7 +80,7 @@
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
 
-#include	"strnxcmp.h"
+#include	"cmpxx.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -88,7 +88,7 @@ import libutil ;			/* lenstr(3u)| */
 
 /* local defines */
 
-#define	DCH	struct dictchar
+#define	DCH	dictchar
 
 
 /* imported namespaces */
