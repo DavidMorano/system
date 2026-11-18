@@ -62,7 +62,6 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usys.h>		/* LIBU */
-#include	<usupport.h>		/* LIBU */
 #include	<ucmpx.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
