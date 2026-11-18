@@ -21,7 +21,7 @@
 	strnvalcmp
 
 	Description:
-	This subroutines are used to compare fields of a c-string
+	This subroutine is used to compare fields of a c-string
 	(like an environment variables type of string 'HOME=/here').
 	Fields that can be compared are:
 		key
@@ -56,7 +56,7 @@
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
 
-#include	"strnxcmp.h"
+#include	"cmpxx.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -98,7 +98,7 @@ int strnvalcmp(cchar *sp,cchar *valp,int µvall) noex {
 	int		rc = 0 ;
 	if (sp) ylikely {
 	    if (int vall ; (vall = getlenstr(valp,µvall)) >= 0) ylikely {
-	        if (cchar *tp = strchr(sp,'=') ; tp) {
+	        if (cchar *tp = strchr(sp,'=')) {
 	            sp = (tp + 1) ;
 	            while (*sp) {
 			if (strncmp(sp,valp,vall) == 0) {
@@ -106,7 +106,7 @@ int strnvalcmp(cchar *sp,cchar *valp,int µvall) noex {
 			    if ((ch_end == '\0') || (ch_end == ':')) {
 		               rc = 0 ;
 		            }
-			}
+			} /* end */
 	                if ((tp = strchr(sp,':')) == np) break ;
 	                sp = (tp + 1) ;
 		        if (rc) break ;
@@ -123,7 +123,7 @@ int strnvalcmp(cchar *sp,cchar *vp,int µvl) noex {
 	int		rc = 0 ;
 	if (sp && vp) {
 	    if (cint vl = getlenstr(vp,µvl) ; vl >= 0) {
-	        if (cchar *tp ; (tp = strchr(sp,'=')) != nullptr) {
+	        if (cchar *tp = strchr(sp,'=')) {
 	            sp = (tp + 1) ;
 		    rc = strncmp(sp,vp,vl) ;
 	        } /* end if */
