@@ -96,7 +96,6 @@
 /* external subroutines */
 
 extern int	procfileenv(char *,char *,vecstr *) ;
-extern int	procfilepaths(char *,char *,vecstr *) ;
 extern int	process_input(PROGINFO *,int) ;
 
 
@@ -1289,7 +1288,7 @@ int main(int argc,mainv argv,mainv envv) {
 /* "do" any 'paths' file before we process the environment variables */
 
 	    if (cf.pathfname != nullptr) {
-	        procfilepaths(pip->pr,cf.pathfname,&exports) ;
+	        vecstr_filepaths(&exports,pip->pr,cf.pathsfile) ;
 	    } else {
 	        procfile(pip,procfilepaths,pip->pr,&svars,
 	            PATHSFNAME,&exports) ;
