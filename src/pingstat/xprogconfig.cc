@@ -376,13 +376,12 @@ int progconfig(proginfo *pip) noex {
 
 /* "do" any 'paths' file before we process the environment variables */
 
-	    if (cf.pathfname != NULL)
-	        procfilepaths(pip->pr,cf.pathfname,&exports) ;
-
-	    else
+	    if (cf.pathfname != NULL) {
+	        vecstr_filepaths(&exports,pip->pr,cf.pathsfile) ;
+	    } else {
 	        procfile(pip,procfilepaths,pip->pr,&svars,
 	            PATHSFNAME,&exports) ;
-
+	    }
 	    f_procfilepaths = TRUE ;
 
 #if	CF_DEBUG
