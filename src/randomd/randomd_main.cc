@@ -96,7 +96,6 @@
 
 extern int	expander() ;
 extern int	procfileenv(char *,char *,VECSTR *) ;
-extern int	procfilepaths(char *,char *,VECSTR *) ;
 extern int	watch(struct proginfo *,struct serverinfo *,
 			varsub *,vecstr *,SRVTAB *,ACCTAB *,BUILTIN *) ;
 
@@ -1351,32 +1350,29 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    } /* end if (sendmail) */
 
-
 /* what about an 'environ' file ? */
 
 	    if (cf.envfname != nullptr) {
-
 #if	CF_DEBUG
 	        if (pip->debuglevel > 1)
 	            debugprintf("main: 1 envfile=%s\n",cf.envfname) ;
 #endif
-
 	        procfileenv(pip->programroot,cf.envfname,&exports) ;
-
-	    } else
+	    } else {
 	        procfile(pip,procfileenv,pip->programroot,&svars,
 	            ENVFNAME,&exports) ;
+	    }
 
 	    f_procfileenv = TRUE ;
 
 /* "do" any 'paths' file before we process the environment variables */
 
 	    if (cf.pathfname != nullptr) {
-	        procfilepaths(pip->programroot,cf.pathfname,&exports) ;
-	    } else
+	        vecstr_filepaths(&exports,pip->programroot,cf.pathsfile) ;
+	    } else {
 	        procfile(pip,procfilepaths,pip->programroot,&svars,
 	            PATHSFNAME,&exports) ;
-
+	    }
 	    f_procfilepaths = TRUE ;
 
 #if	CF_DEBUG
