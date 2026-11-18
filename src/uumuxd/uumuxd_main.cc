@@ -1259,32 +1259,28 @@ int main(int argc,mainv argv,mainv envv) {
 
 	    } /* end if (sendmail) */
 
-
 /* what about an 'environ' file ? */
 
 	    if (cf.envfile != NULL) {
-
 #if	CF_DEBUG
 	        if (g.debuglevel > 1)
 	            debugprintf("main: 1 envfile=%s\n",cf.envfile) ;
 #endif
-
 	        procfileenv(g.programroot,cf.envfile,&exports) ;
-
-	    } else
+	    } else {
 	        procfile(gp,procfileenv,g.programroot,&svars,
 	            ENVFILE,&exports) ;
-
+	    }
 	    f_procfileenv = TRUE ;
 
 /* "do" any 'paths' file before we process the environment variables */
 
 	    if (cf.pathsfile != NULL) {
-	        procfilepaths(g.programroot,cf.pathsfile,&exports) ;
-	    } else
+	        vecstr_filepaths(&exports,g.programroot,cf.pathsfile) ;
+	    } else {
 	        procfile(gp,procfilepaths,g.programroot,&svars,
 	            PATHSFILE,&exports) ;
-
+	    }
 	    f_procfilepaths = TRUE ;
 
 #if	CF_DEBUG
