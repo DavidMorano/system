@@ -43,10 +43,10 @@ LIBS +=
 DEPS=
 DEPSV=
 
-OBJ0= cmpstrdictn.o
-OBJ1= cmpstrpre.o
-OBJ2=
-OBJ3=
+OBJ0= cmpstrdictk.o cmpstrdictn.o
+OBJ1= cmpstrnn.o 
+OBJ2= cmpstrpre.o cmpstrpren.o
+OBJ3= cmpema.o
 OBJ4=
 OBJ5=
 OBJ6=
@@ -55,11 +55,11 @@ OBJ7=
 OBJ8=
 OBJ9=
 
-OBJA= obj0.o obj1.o
-OBJB= obj4.o obj5.o obj6.o obj7.o
+OBJA= obj0.o obj1.o obj2.o obj3.o
+OBJB= obj4.o
 OBJC= obj8.o obj9.o
 
-OBJ= obja.o
+OBJ= obja.o objb.o
 
 
 INCDIRS +=
@@ -171,7 +171,12 @@ obj.o:			$(OBJ)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
+cmpstrdictk.o:		cmpstrdictk.cc	cmpstrdictk.h			$(INCS)
 cmpstrdictn.o:		cmpstrdictn.cc	cmpstrdictn.h			$(INCS)
+cmpstrnn.o:		cmpstrnn.cc	cmpstrnn.h			$(INCS)
 cmpstrpre.o:		cmpstrpre.cc	cmpstrpre.h			$(INCS)
+cmpstrpren.o:		cmpstrpren.cc	cmpstrpren.h			$(INCS)
+
+cmpema.o:		cmpema.cc	cmpema.h			$(INCS)
 
 
