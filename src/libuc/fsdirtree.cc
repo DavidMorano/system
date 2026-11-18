@@ -61,6 +61,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
+#include	<umatx.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucfileop.h>		/* LIBUC */
 #include	<ucgetx.h>		/* LIBUC */
@@ -68,7 +69,6 @@
 #include	<fsdir.h>		/* LIBUC */
 #include	<fifostr.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
-#include	<matstr.h>		/* LIBUC */
 #include	<filetypes.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC */
@@ -509,11 +509,11 @@ reader::operator int () noex {
 	return (rs >= 0) ? len : rs ;
 } /* end method (reader::operator) */
 
-int fsdirtree_prune(fsdirtree *op,cchar **prune) noex {
+int fsdirtree_prune(fsdirtree *op,con mainv prune) noex {
     	int		rs ;
 	if ((rs = fsdirtree_magic(op,prune)) >= 0) ylikely {
 	    op->prunearr = prune ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (fsdirtree_prune) */
 
@@ -678,7 +678,7 @@ int fsdirtree::open(cchar *dname,int fo) noex {
 	return fsdirtree_open(this,dname,fo) ;
 } /* end method */
 
-int fsdirtree::prune(cchar **parr) noex {
+int fsdirtree::prune(con mainv parr) noex {
 	return fsdirtree_prune(this,parr) ;
 } /* end method */
 
