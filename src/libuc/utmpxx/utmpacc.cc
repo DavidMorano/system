@@ -89,7 +89,7 @@
 #include	<filemap.h>		/* LIBUC */
 #include	<filer.h>		/* LIBUC */
 #include	<snx.h>			/* LIBUC */
-#include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
+#include	<cmpxx.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<isoneof.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
@@ -170,14 +170,14 @@ namespace {
 	void operator () (utmpacc *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	int callout(int v) noex ;
 	int operator () (int v = -1) noex {
 	    return callout(v) ;
-	} ;
+	} ; /* end */
 	operator int () noex {
 	    return callout(-1) ;
-	} ;
+	} ; /* end */
     } ; /* end struct (utmpacc_co) */
     struct utmpacc_arg {
 	ENT		*uep ;
@@ -442,7 +442,7 @@ int icur::openbegin() noex {
     	int		rs ;
 	if ((rs = opentmp(nullptr,of,om)) >= 0) {
 	    fd = rs ;
-	}
+	} /* end */
 	return rs ;
 } /* end method (icur::openvegin) */
 
@@ -490,10 +490,10 @@ int icur::bufend() noex {
 	    {
 		rs1 = fbp->finish ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		destroy_at(fbp) ;
-	    }
+	    } /* end */
 	    {
 		rs1 = libmem.free(fbp) ;
 		if (rs >= 0) rs = rs1 ;
@@ -1191,7 +1191,7 @@ int utmpacc::getentline(ARG *ap,cchar *lp,int ll) noex {
 	            if (up->ut_user[0] != '\0') {
 		        if (ap->uep->line == nullptr) {
 			    cint sline = utmpsize.line ;
-	                    if (strnncmp(up->ut_line,sline,lp,ll) == 0)  {
+	                    if (cmpstrnn(up->ut_line,sline,lp,ll) == 0)  {
 			        ffound = true ;
 			        rs = utmpaccent_loada(ap,up) ;
 		            } /* end if (matched) */
