@@ -74,31 +74,30 @@
 #include	<netdb.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<ctime>
-#include	<csignal>
-#include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>		/* |getenv(3c)| */
-#include	<cstring>
-#include	<clanguage.h>
-#include	<usysbase.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<getfiledirs.h>
 #include	<getusername.h>
 #include	<getchostname.h>
-#include	<bfile.h>
-#include	<baops.h>
+#include	<baops.h>		/* LIBU */
 #include	<vecstr.h>
 #include	<userinfo.h>
 #include	<logfile.h>
 #include	<bufstr.h>
 #include	<mallocstuff.h>
-#include	<strx.h>		/* |strnncmp(3uc)| */
-#include	<prognamevar.hh>
+#include	<strx.h>		/* LIBUC */
 #include	<strtime.h>		/* LIBUC */
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<bfile.h>		/* LIBB */
+#include	<prognamevar.hh>	/* LIBDAM */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"rshe_config.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -1379,7 +1378,7 @@ local int proc_rxenv(proginfo *pip,jobinfo *jip,char *key,int klen) noex {
 		continue ;
 
 	    elen = cp - (*ep) ;
-	    if ((elen == klen) && (strnncmp(*ep,elen,key,klen) == 0))
+	    if ((elen == klen) && (cmpstrnn(*ep,elen,key,klen) == 0))
 	        return proc_env(pip,jip,key,klen,cp + 1) ;
 
 	} /* end for */
@@ -1458,7 +1457,7 @@ local int proc_env(proginfo *pip,jobinfo *jip,cc *kp,int klen,cc *vp) noex {
 
 /* perform some preprocessing on specific variables */
 
-	if (strnncmp(kp,klen,"DISPLAY",-1) == 0) {
+	if (cmpstrnn(kp,klen,"DISPLAY",-1) == 0) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 2)
@@ -1480,15 +1479,15 @@ local int proc_env(proginfo *pip,jobinfo *jip,cc *kp,int klen,cc *vp) noex {
 		vp) ;
 #endif
 
-	} else if ((strnncmp(kp,klen,"HOME",-1) == 0) ||
-	    (strnncmp(kp,klen,"PWD",-1) == 0) ||
-	    (strnncmp(kp,klen,"LOGNAME",-1) == 0) ||
-	    (strnncmp(kp,klen,"HZ",-1) == 0) ||
-	    (strnncmp(kp,klen,"TERM",-1) == 0)) {
+	} else if ((cmpstrnn(kp,klen,"HOME",-1) == 0) ||
+	    (cmpstrnn(kp,klen,"PWD",-1) == 0) ||
+	    (cmpstrnn(kp,klen,"LOGNAME",-1) == 0) ||
+	    (cmpstrnn(kp,klen,"HZ",-1) == 0) ||
+	    (cmpstrnn(kp,klen,"TERM",-1) == 0)) {
 
 	    return OK ;
 
-	} else if (strnncmp(kp,klen,"LOCALDOMAIN",-1) == 0) {
+	} else if (cmpstrnn(kp,klen,"LOCALDOMAIN",-1) == 0) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 2)
