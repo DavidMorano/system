@@ -54,7 +54,7 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<stdclib.hh>		/* LIBU |std_strncasecmp(3u)| */
 #include	<nleadstr.h>		/* LIBUC */
-#include	<strnxcmp.h>		/* LIBUC |strnfoldcmp(3uc)| */
+#include	<cmpxx.h>		/* LIBUC |strnfoldcmp(3uc)| */
 #include	<toxc.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
