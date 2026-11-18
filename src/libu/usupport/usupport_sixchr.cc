@@ -5,7 +5,7 @@
 /* UNIX® kernel support subroutines */
 /* version %I% last-modified %G% */
 
-#define	CF_STRCHR	1		/* used |strchr(3c)| */
+#define	CF_STRCHR	1		/* used |strochr(3c)| */
 
 /* revision history:
 
@@ -48,9 +48,9 @@
 #include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -63,7 +63,7 @@ import libutil ;			/* |lenstr(3u)| */
 /* local defines */
 
 #ifndef	CF_STRCHR
-#define	CF_STRCHR	1		/* used |strchr(3c)| */
+#define	CF_STRCHR	1		/* used |strochr(3c)| */
 #endif
 
 
@@ -90,7 +90,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* local variables */
 
-cbool		f_strchr = CF_STRCHR ;
+cbool		f_strochr = CF_STRCHR ;
 
 
 /* exported variables */
@@ -104,13 +104,13 @@ namespace libu {
 	bool		f = false ;
 	sch &= UCHAR_MAX ;
 	if (sp) ylikely {
-	    if_constexpr (f_strchr) {
+	    if_constexpr (f_strochr) {
 	        if (sl > 0) {
 	            for (int ch ; sl-- && ((ch = mkchar(sp[i]))) ; i += 1) {
 	                if ((f = (ch == sch))) break ;
 	            } /* end for */
 	        } else {
-		    if (cchar *tp = strchr(sp,sch)) {
+		    if (cchar *tp = strochr(sp,sch)) {
 			f = true ;
 			i = intconv(tp - sp) ;
 		    } /* end */
@@ -119,7 +119,7 @@ namespace libu {
 	        for (int ch ; sl-- && ((ch = mkchar(sp[i]))) ; i += 1) {
 	            if ((f = (ch == sch))) break ;
 	        } /* end for */
-	    } /* end if_constexpr (f_strchr) */
+	    } /* end if_constexpr (f_strochr) */
 	} /* end if (non-null) */
 	return (f) ? i : -1 ;
     } /* end subroutine (siochr) */
