@@ -75,9 +75,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -135,7 +135,7 @@ namespace libu {
 	if (sp && strclass) {
 	    for (i = 0 ; sl-- && sp[i] ; i += 1) {
 	        cint	ch = mkchar(sp[i]) ;
-	        if (strchr(strclass,ch) == nullptr) break ;
+	        if (strochr(strclass,ch) == nullptr) break ;
 	    } /* end for */
 	} /* end if (non-null) */
 	return i ;
