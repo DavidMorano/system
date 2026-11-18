@@ -46,14 +46,16 @@ DEPSV= cmpstr.o
 OBJ0= cmporders.o
 OBJ1= cmptimeval.o cmptimespec.o 
 OBJ2= cmpitimer.o
-OBJ3= cmpstr.o 
+OBJ3= cmpstr.o cmpstrw.o
 OBJ4= cmpstrn.o cmpstrx.o
-OBJ5= cmpstrk.o cmpstrkn.o
-OBJ6= cmpstrw.o
+OBJ5= cmpstrkey.o cmpstrkeyn.o
+OBJ6= cmpstrval.o cmpstrvaln.o
 OBJ7= cmpval.o
 
 OBJ8= cmpvstrx.o
 OBJ9= cmpvstr.o cmpvstrk.o
+OBJ10=
+OBJ11=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
@@ -183,8 +185,6 @@ cmpval.dir:
 
 cmpstr.o:		cmpstr.cc	cmpstr.h		$(DEPS)	$(INCS)
 
-cmpstrk.o:		cmpstrk.cc	cmpstrk.h		$(DEPS)	$(INCS)
-cmpstrkn.o:		cmpstrkn.cc	cmpstrkn.h		$(DEPS)	$(INCS)
 cmpstrn.o:		cmpstrn.cc	cmpstrn.h		$(DEPS)	$(INCS)
 cmpstrw.o:		cmpstrw.cc	cmpstrw.h		$(DEPS)	$(INCS)
 cmpstrx.o:		cmpstrx.cc	cmpstrx.h		$(DEPS)	$(INCS)
@@ -192,5 +192,10 @@ cmpstrx.o:		cmpstrx.cc	cmpstrx.h		$(DEPS)	$(INCS)
 cmpvstrx.o:		cmpvstrx.cc	cmpvstrx.h	$(DEPSV)	$(INCS)
 cmpvstr.o:		cmpvstr.cc	cmpvstr.h	$(DEPSV)	$(INCS)
 cmpvstrk.o:		cmpvstrk.cc	cmpvstrk.h	$(DEPSV)	$(INCS)
+
+cmpstrkey.o:		cmpstrkey.cc	cmpstrkey.h		$(DEPS)	$(INCS)
+cmpstrkeyn.o:		cmpstrkeyn.cc	cmpstrkeyn.h		$(DEPS)	$(INCS)
+cmpstrval.o:		cmpstrval.cc	cmpstrval.h		$(DEPS)	$(INCS)
+cmpstrvaln.o:		cmpstrvaln.cc	cmpstrvaln.h		$(DEPS)	$(INCS)
 
 
