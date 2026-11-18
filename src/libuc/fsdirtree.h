@@ -104,7 +104,7 @@ struct fsdirtree_flags {
 } ; /* end struct (fsdirtree_flags) */
 
 struct fsdirtree_head {
-	cchar		**prunearr ;
+	mainv		prunearr ;
 	char		*bnbuf ;
 	char		*nbuf ;		/* "name" buffer */
 	char		*lbuf ;		/* "link" buffer */
@@ -150,7 +150,7 @@ struct fsdirtree : fsdirtree_head {
 	fsdirtree(const fsdirtree &) = delete ;
 	fsdirtree &operator = (const fsdirtree &) = delete ;
 	int open	(cchar *,int = 0) noex ;
-	int prune	(cchar **) noex ;
+	int prune	(con mainv) noex ;
 	int read	(ustat *,char *,int) noex ;
 	void dtor	() noex ;
 	destruct fsdirtree() {
@@ -166,7 +166,7 @@ typedef	FSDIRTREE_FL	fsdirtree_fl ;
 EXTERNC_begin
 
 extern int fsdirtree_open	(fsdirtree *,cchar *,int) noex ;
-extern int fsdirtree_prune	(fsdirtree *,cchar **) noex ;
+extern int fsdirtree_prune	(fsdirtree *,con mainv) noex ;
 extern int fsdirtree_read	(fsdirtree *,ustat *,char *,int) noex ;
 extern int fsdirtree_close	(fsdirtree *) noex ;
 
