@@ -23,6 +23,12 @@ EXTERNC_beg
 extern int cmpstrdictn(cchar *,int,cchar *,int) noex ;
 EXTERNC_end
 
+#ifdef	__cplusplus
+inline int	cmpstrdictn	(cchar *s1,int s1l,cchar *s2) noex {
+    	return cmpstrdictn(s1,s1l,s2,-1) ;
+} /* end */
+#endif /* __cplusplus */
+
 
 #endif /* CMPSTRDICTX_INCLUDE */
 
