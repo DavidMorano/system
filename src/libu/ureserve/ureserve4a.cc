@@ -36,7 +36,6 @@ module ;
 #include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
@@ -84,7 +83,7 @@ namespace {
 	    bool	f = false ;
 	    ch &= UCHAR_MAX ;
 	    f = f || (ch == '\n') ;
-	    f = f || char_iswhite(ch) ;
+	    f = f || ischwht(ch) ;
 	    f = f || termx(ch) ;
 	    return f ;
 	} ; /* end method (isterm) */
@@ -106,18 +105,18 @@ namespace {
 int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
     	if (sp) ylikely {
 	    if (sl >= 0) {
-	        while ((sl > 0) && char_iswht(*sp)) {
+	        while ((sl > 0) && ischwht(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        } /* end while */
 	        if (sp[0] == '\0') sl = 0 ;
 	    } else {
-	        while (char_iswht(*sp)) {
+	        while (ischwht(*sp)) {
 	            sp += 1 ;
 	        } /* end while */
 	        sl = lenstr(sp) ;
 	    } /* end if */
-	    while ((sl > 0) && char_iswht(sp[sl - 1])) {
+	    while ((sl > 0) && ischwht(sp[sl - 1])) {
 	        sl -= 1 ;
 	    } /* end while */
 	} else {
@@ -228,7 +227,7 @@ int sfnextbrk(cchar *sp,int sl,cchar *bstr,cchar **rpp) noex {
 	    cchar	*bstr ;		/* <- initialized separately */
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
 	    bool termx(int ch) const noex override final {
-		return (strchr(bstr,ch) != nullptr) ;
+		return (strochr(bstr,ch) != nullptr) ;
 	    } ;
 	} ; /* end struct */
 	if (bstr) ylikely {
@@ -310,7 +309,7 @@ sfnextx::operator int () noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
 	if (sp && rpp) ylikely {
-	    while (sl && char_iswhite(*sp)) {
+	    while (sl && ischwht(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
