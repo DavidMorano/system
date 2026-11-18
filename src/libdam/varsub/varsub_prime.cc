@@ -50,7 +50,7 @@
 #include	<strwcmp.h>		/* LIBUC */
 #include	<strwcpy.h>		/* LIBUC */
 #include	<strnxchr.h>		/* LIBUC */
-#include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
+#include	<cmpxx.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -690,7 +690,7 @@ local int entry_finish(ent *ep) noex {
 } /* end subroutine (entry_finish) */
 
 local int entry_keycmp(ent *ep,ent *eap) noex {
-	return strnncmp(ep->kp,ep->kl,eap->kp,eap->kl) ;
+	return cmpstrnn(ep->kp,ep->kl,eap->kp,eap->kl) ;
 } /* end subroutine (entry_keycmp) */
 
 local int entry_tmp(ent *ep,cchar *kp,int kl,cchar *vp,int vl) noex {
