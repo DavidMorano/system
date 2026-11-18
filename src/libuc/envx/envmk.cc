@@ -71,6 +71,7 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU |u_getenviron(3u)| */
+#include	<ucmpx.h>		/* LIBU |cmpstrkey(3u)| */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucsysconf.h>		/* LIBUC */
 #include	<ucinfo.h>		/* LIBUC */
@@ -444,7 +445,7 @@ local int envmk_mkenv(envmk *op) noex {
 	            cchar	*kp = op->envv[i] ;
 	            if (matkeystr(envbad,kp,-1) < 0) {
 	                if ((! f_path) && (kp[0] == 'P')) {
-	                    f_path = (cmpstrk(kp,varpath) == 0) ;
+	                    f_path = (cmpstrkey(kp,varpath) == 0) ;
 	                } /* end */
 	                n += 1 ;
 	                if ((rs = elp->add(kp)) >= 0) {
