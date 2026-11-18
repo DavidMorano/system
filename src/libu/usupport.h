@@ -40,12 +40,7 @@
 #include	<usupport_hasnot.hh>
 #include	<usupport_hasx.hh>
 #include	<usupport_itimer.hh>
-#include	<usupport_matkeystr.hh>
-#include	<usupport_matostr.hh>
-#include	<usupport_matstr.hh>
 #include	<usupport_mkhex.hh>
-#include	<usupport_nleadkeystr.hh>
-#include	<usupport_nleadstr.hh>
 #include	<usupport_prime.h>
 #include	<usupport_rmx.hh>
 #include	<usupport_sichar.hh>
@@ -77,6 +72,11 @@
 #include	<usupport_ustrftime.hh>
 #include	<usupport_vstrcmp.hh>
 #include	<usupport_vstrkeycmp.hh>
+
+#include	<usupport_comstrx.hh>
+#include	<usupport_matstrk.hh>
+#include	<usupport_matstro.hh>
+#include	<usupport_matstrx.hh>
 
 
 #endif /* USUPPORT_INCLUDE */
