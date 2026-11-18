@@ -5,7 +5,7 @@
 /* subroutine to find a character in a given string */
 /* version %I% last-modified %G% */
 
-#define	CF_STRCHR	0		/* use |strchr(3c)| */
+#define	CF_STRCHR	0		/* use |strochr(3c)| */
 
 /* revision history:
 
@@ -54,7 +54,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| + |strcspn(3n)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
@@ -71,7 +70,7 @@ import chrset ;
 /* local defines */
 
 #ifndef	CF_STRCHR
-#define	CF_STRCHR	1		/* use |strchr(3c)| */
+#define	CF_STRCHR	1		/* use |strochr(3c)| */
 #endif
 
 
@@ -92,7 +91,7 @@ import chrset ;
 
 /* local variables */
 
-constexpr bool		f_strchr = CF_STRCHR ;
+constexpr bool		f_strochr = CF_STRCHR ;
 
 
 /* exported variables */
@@ -119,10 +118,10 @@ namespace libu {
 	bool		f = false ;
 	if (sp && ss) ylikely {
 	    if (sl >= 0) {
-	        if_constexpr (f_strchr) {
+	        if_constexpr (f_strochr) {
 	            for (i = 0 ; sl && sp[i] ; i += 1) {
 		        cint	ch = mkchar(sp[i]) ;
-		        f = (strchr(ss,ch) != np) ;
+		        f = (strochr(ss,ch) != np) ;
 	                if (f) break ;
 	                sl -= 1 ;
 	            } /* end for */
@@ -133,7 +132,7 @@ namespace libu {
 		    	if ((f = sset.tst(ch))) break ;
 	                sl -= 1 ;
 	            } /* end for */
-	        } /* end if_constexpr (f_strchr) */
+	        } /* end if_constexpr (f_strochr) */
 	    } else {
 	        f = ((i = xstrcspn(sp,ss)) , (sp[i] != '\0')) ;
 	    }
