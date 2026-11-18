@@ -54,7 +54,7 @@
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
 
-#include	"cmpstrk.h"
+#include	"cmpstrkey.h"
 #include	"cmpvstrk.h"
 
 
@@ -69,7 +69,7 @@
 typedef cmporders	vo ;
 
 extern "C" {
-    typedef int (*cmpstrkx_f)(cchar *,cchar *) noex ;
+    typedef int (*cmpstrkeyx_f)(cchar *,cchar *) noex ;
 } /* end extern */
 
 
@@ -84,7 +84,7 @@ extern "C" {
 
 /* forward references */
 
-local int cmpvstrkx(cmpstrkx_f fun,cchar **s1pp,cchar **s2pp) noex {
+local int cmpvstrkx(cmpstrkeyx_f fun,cchar **s1pp,cchar **s2pp) noex {
 	int		rc = 0 ;
 	if (s1pp && s2pp) {
 	    cchar	*s1 = *s1pp ;
@@ -112,25 +112,25 @@ local int cmpvstrkx(cmpstrkx_f fun,cchar **s1pp,cchar **s2pp) noex {
 /* exported subroutines */
 
 int cmpvstrkbc(cchar **s1pp,cchar **s2pp) noex {
-	return cmpvstrkx(cmpstrkbc,s1pp,s2pp) ;
+	return cmpvstrkx(cmpstrkeybc,s1pp,s2pp) ;
 } /* end */
 int cmpvstrkic(cchar **s1pp,cchar **s2pp) noex {
-	return cmpvstrkx(cmpstrkic,s1pp,s2pp) ;
+	return cmpvstrkx(cmpstrkeyic,s1pp,s2pp) ;
 } /* end */
 int cmpvstrkfc(cchar **s1pp,cchar **s2pp) noex {
-	return cmpvstrkx(cmpstrkfc,s1pp,s2pp) ;
+	return cmpvstrkx(cmpstrkeyfc,s1pp,s2pp) ;
 } /* end */
 
 int cmpvstrkbcx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* base */
-	cmpstrkx_f cmpfun = (fo) ? cmpstrkbcr : cmpstrkbco ;
+	cmpstrkeyx_f cmpfun = (fo) ? cmpstrkeybcr : cmpstrkeybco ;
 	return cmpvstrkx(cmpfun,e1pp,e2pp) ;
 } /* end subroutine (cmpvstrkbcx) */
 int cmpvstrkicx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* case */
-	cmpstrkx_f cmpfun = (fo) ? cmpstrkicr : cmpstrkico ;
+	cmpstrkeyx_f cmpfun = (fo) ? cmpstrkeyicr : cmpstrkeyico ;
 	return cmpvstrkx(cmpfun,e1pp,e2pp) ;
 } /* end subroutine (cmpvstrkicx) */
 int cmpvstrkfcx(cchar **e1pp,cchar **e2pp,vo fo) noex { /* fold */
-	cmpstrkx_f cmpfun = (fo) ? cmpstrkfcr : cmpstrkfco ;
+	cmpstrkeyx_f cmpfun = (fo) ? cmpstrkeyfcr : cmpstrkeyfco ;
 	return cmpvstrkx(cmpfun,e1pp,e2pp) ;
 } /* end subroutine (cmpvstrkfcx) */
 
