@@ -102,7 +102,6 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 
 extern int	expander(struct proginfo *,char *,int,char *,int) ;
 extern int	procfileenv(char *,char *,VECSTR *) ;
-extern int	procfilepaths(char *,char *,VECSTR *) ;
 extern int	watch(struct proginfo *, BUILTIN *) ;
 
 
@@ -1336,35 +1335,29 @@ int main(int argc,mainv argv,mainv envv) {
 
 /* organization code */
 
-	if (orgcode[0] == '\0')
+	if (orgcode[0] == '\0') {
 	    strwcpy(orgcode,ORGCODE,NISTINFO_ORGSIZE) ;
-
+	}
 	pip->orgcode = orgcode ;
 
 /* load up some environment and execution paths if we have not already */
 
 	if (! f_procfileenv) {
-
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
 	        debugprintf("main: 2 procfileenv() \n") ;
 #endif
-
 	    procfile(pip,procfileenv,pip->pr,&svars,
 	        XENVFNAME,&pip->exports) ;
-
 	}
 
 	if (! f_procfilepaths) {
-
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
 	        debugprintf("main: 2 procfilepaths() \n") ;
 #endif
-
 	    procfile(pip,procfilepaths,pip->pr,&svars,
 	        XPATHFNAME,&pip->exports) ;
-
 	}
 
 /* if we are a daemon program, try to bind our INET port */
@@ -1375,7 +1368,6 @@ int main(int argc,mainv argv,mainv envv) {
 #endif
 
 	if (pip->fl.daemon) {
-
 	    in_addr_t	addr ;
 
 
