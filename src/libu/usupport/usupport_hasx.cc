@@ -45,6 +45,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |UC(3u)| */
 
 #include	"usupport_siext.hh"
