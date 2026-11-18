@@ -44,7 +44,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
@@ -61,7 +60,7 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using libu::matkeystr ;			/* subroutine */
+using libu::matstrk ;			/* subroutine */
 
 
 /* local typedefs */
@@ -95,19 +94,19 @@ int getev(con mainv envv,cchar *kp,int kl,cchar **rpp) noex {
 	    rs = SR_INVALID ;
 	    if (kp[0]) ylikely {
 		rs = SR_OK ;
-	        if (int ei ; (ei = matkeystr(envv,kp,kl)) >= 0) {
-	            if ((vp = strchr(envv[ei],'=')) != nullptr) {
+	        if (int ei ; (ei = matstrk(envv,kp,kl)) >= 0) {
+	            if ((vp = strochr(envv[ei],'=')) != nullptr) {
 	                vp += 1 ;
 	                vl = lenstr(vp) ;
-	            }
+	            } /* end */
 	        } else {
 	            rs = SR_NOTFOUND ;
-	        }
+	        } /* end if (error) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? vp : nullptr ;
-	}
+	} /* end */
 	return (rs >= 0) ? vl : rs ;
 } /* end subroutine (getev) */
 
