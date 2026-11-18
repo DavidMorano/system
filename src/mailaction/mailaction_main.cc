@@ -102,7 +102,6 @@ extern int	proginfo_setpiv(struct proginfo *,cchar *,
 
 extern int	expander(struct proginfo *,char *,int,char *,int) ;
 extern int	procfileenv(char *,char *,VECSTR *) ;
-extern int	procfilepaths(char *,char *,VECSTR *) ;
 extern int	watch(struct proginfo *, BUILTIN *) ;
 
 
@@ -2338,9 +2337,7 @@ VECSTR		*elp ;
 {
 	int	rs ;
 	int	sl ;
-
 	char	tmpfname[MAXPATHLEN + 1] ;
-
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
