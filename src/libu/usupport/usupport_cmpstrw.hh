@@ -1,8 +1,8 @@
-/* usupport_nleadkeystr HEADER */
+/* usupport_cmpstrw HEADER */
 /* charset=ISO8859-1 */
-/* lang=C++20 (conformance reviewed) */
+/* lang=C++20 */
 
-/* match on the leading part of a string */
+/* string-comparison variant */
 /* version %I% last-modified %G% */
 
 
@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	USUPPORTNLEADKEYSTR_INCLUDE
-#define	USUPPORTNLEADKEYSTR_INCLUDE
+#ifndef	USUPPORTCMPSTRW_INCLUDE
+#define	USUPPORTCMPSTRW_INCLUDE
 #ifdef	__cplusplus
 
 
@@ -28,11 +28,19 @@
 
 
 namespace libu {
-    extern int nleadkeystr(cchar *,cchar *,int) noex ;
+    extern int cmpstrwbc(cchar *,cchar *,int) noex ;
+    extern int cmpstrwic(cchar *,cchar *,int) noex ;
+    extern int cmpstrwfc(cchar *,cchar *,int) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
+    inline int cmpstrw(cchar *bs,cchar *sp,int sl) noex {
+	return cmpstrwbc(bs,sp,sl) ;
+    } /* end subroutine (cmpstrw) */
 } /* end namespace (libu) */
 
 
 #endif /* __cplusplus */
-#endif /* USUPPORTNLEADKEYSTR_INCLUDE */
+#endif /* USUPPORTCMPSTRW_INCLUDE */
 
 

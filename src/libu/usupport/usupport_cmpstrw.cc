@@ -1,4 +1,4 @@
-/* usupport_strwcmp SUPPORT */
+/* usupport_cmpstrw SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	strwcmp
+	cmpstrw
 	strw{x}cmp
 
 	Description: 
@@ -26,7 +26,7 @@
 	is allowed to be counted instead of NUL terminated.
 
 	Synopsis:
-	int strwcmp(cchar *s1,cchar *s2,int s2len) noex
+	int cmpstrw(cchar *s1,cchar *s2,int s2len) noex
 	int strw{x}cmp(cchar *s1,cchar *s2,int s2len) noex
 
 	Arguments:
@@ -55,7 +55,8 @@
 #include	<localmisc.h>		/* LIBU */
 
 #include	"usupport_strncmp.hh"
-#include	"usupport_strwcmp.hh"
+#include	"usupport_comstrx.hh"
+#include	"usupport_cmpstrw.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -69,9 +70,9 @@ import libutil ;			/* |lenstr(3u)| */
 using libu::strnbasecmp ;		/* subroutine */
 using libu::strncasecmp ;		/* subroutine */
 using libu::strnfoldcmp ;		/* subroutine */
-using libu::nleadbasestr ;		/* subroutine */
-using libu::nleadcasestr ;		/* subroutine */
-using libu::nleadfoldstr ;		/* subroutine */
+using libu::comstrbc ;			/* subroutine */
+using libu::comstric ;			/* subroutine */
+using libu::comstrfc ;			/* subroutine */
 using libu::tobc ;			/* subroutine */
 using libu::touc ;			/* subroutine */
 using libu::tofc ;			/* subroutine */
@@ -93,7 +94,7 @@ namespace {
 	int x(cc *,cc *,int)			const noex ;
 	virtual int tox(int ch) 		const noex = 0 ;
 	virtual int strnxcmp(cc *,cc *,int) 	const noex = 0 ;
-	virtual int nleadxstr(cc *,cc *,int)	const noex = 0 ;
+	virtual int comx(cc *,cc *,int)		const noex = 0 ;
    } ; /* end struct (cmpx) */
    struct basecmpx : cmpx {
 	int tox(int ch)				const noex override final {
@@ -102,8 +103,8 @@ namespace {
 	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strnbasecmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
-	    return nleadbasestr(s1,s2,sl) ;
+	int comx(cc *s1,cc *s2,int sl)		const noex override final {
+	    return comstrbc(s1,s2,sl) ;
 	} ;
    } ; /* end struct */
    struct casecmpx : cmpx {
@@ -113,8 +114,8 @@ namespace {
 	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strncasecmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
-	    return nleadcasestr(s1,s2,sl) ;
+	int comx(cc *s1,cc *s2,int sl)		const noex override final {
+	    return comstric(s1,s2,sl) ;
 	} ;
    } ; /* end struct */
    struct foldcmpx : cmpx {
@@ -124,8 +125,8 @@ namespace {
 	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
 	    return strnfoldcmp(bs,sp,sl) ;
 	} ;
-	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
-	    return nleadfoldstr(s1,s2,sl) ;
+	int comx(cc *s1,cc *s2,int sl)		const noex override final {
+	    return comstrfc(s1,s2,sl) ;
 	} ;
    } ; /* end struct */
 } /* end namespace */
@@ -169,7 +170,7 @@ int cmpx::x(cchar *s1,cchar *s2,int µs2len) const noex {
 	        cint	ch2 = tox(*s2) ;
 	        if ((rc = (ch1 - ch2)) == 0) {
 	            if ((rc = strnxcmp(s1,s2,s2len)) == 0) {
-	                if (cint m = nleadxstr(s1,s2,s2len) ; m < s2len) {
+	                if (cint m = comx(s1,s2,s2len) ; m < s2len) {
 	    	            cint	m1 = tox(s1[m]) ;
 	    	            cint	m2 = tox(s2[m]) ;
 		            rc = (m1 - m2) ;
