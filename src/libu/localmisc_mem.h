@@ -25,18 +25,22 @@
 #include	<stddef.h>		/* CSTD |size_t| */
 
 
+#ifdef	COMMENT
+
 #ifdef	__cplusplus
 #else /* __splusplus */
 #ifndef	SUBROUTINE_MEMCLEAR
 #define	SUBROUTINE_MEMCLEAR
 local inline int memclear(void *objp,int sz) noex {
         extern voidp memset(voidp,int,size_t) noex ;
-    	csize	objs = size_t(sz) ;
+    	const size_t	objs = (size_t) sz ;
     	memset(objp,0,objs) ;
 	return sz ;
 } /* end subroutine */
 #endif /* SUBROUTINE_MEMCLEAR */
 #endif /* __splusplus */
+
+#endif /* COMMENT */
 
 
 #endif /* LOCALMISCMEM_INCLUDE */
