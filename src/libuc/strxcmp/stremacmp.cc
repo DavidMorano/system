@@ -46,7 +46,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<strnxcmp.h>		/* LIBUC |strnncmp(3uc)| */
+#include	<cmpxx.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
 
@@ -97,7 +97,7 @@ int stremacmp(cchar *e1p,cchar *e2p) noex {
 	        if ((rc = strcasecmp((t1p+1),(t2p+1))) == 0) {
 	            cint t1l = intconv(t1p - e1p) ;
 	            cint t2l = intconv(t2p - e2p) ;
-	            rc = strnncmp(e1p,t1l,e2p,t2l) ;
+	            rc = cmpstrnn(e1p,t1l,e2p,t2l) ;
 	        } /* end if (strcasecmp) */
 	    } else {
 	        rc = strcmp(e1p,e2p) ;
