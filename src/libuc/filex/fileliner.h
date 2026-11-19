@@ -25,15 +25,13 @@
 
 
 EXTERNC_begin
-
-extern int	fileliner(cchar *,int) noex ;
-
+    extern int	fileliner(cchar *,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int fileliner(cchar *fn) noex {
-    	return fileliner(fn,0) ;
-} /* end subroutine */
+    inline int fileliner(cchar *fn) noex {
+	return fileliner(fn,0) ;
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 
