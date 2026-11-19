@@ -1,4 +1,4 @@
-/* cmpstrval SUPPORT */
+/* usupport_cmpstrv SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 (conformance reviewed) */
 
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	cmpstrval
+	cmpstrv
 
 	Description:
 	These subroutines are used to compare fields of a string
@@ -28,7 +28,7 @@
 		value
 
 	Synopses:
-	int cmpstrval(cchar *sp,cchar *vp,int vl) noex
+	int cmpstrv(cchar *sp,cchar *vp,int vl) noex
 
 	Arguments:
 	sp		c-string pointer
@@ -43,18 +43,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<ucmpx.h>		/* LIBU */
+#include	<usys.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
 
-#include	"cmpstrval.h"
+#include	"usupport_cmpstrv.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -91,7 +90,8 @@ typedef cmporders	co ;
 
 /* exported subroutines */
 
-int cmpstrval(cchar *sp,cchar *vp) noex {
+namespace libu {
+    int cmpstrv(cchar *sp,cchar *vp) noex {
 	int		rc = 0 ;
 	if (sp && vp) ylikely {
 	    if (cchar *tp = strochr(sp,'=')) {
@@ -100,20 +100,23 @@ int cmpstrval(cchar *sp,cchar *vp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	return rc ;
-} /* end subroutine (cmpstrval) */
+    } /* end subroutine (cmpstrv) */
+} /* end namespace (libu) */
 
-int cmpstrvalø(cchar *sp,cchar *vp) noex {
+namespace libu {
+    int cmpstrvø(cchar *sp,cchar *vp) noex {
     	int		rc = 0 ;
 	if (sp || vp) ylikely {
 	    rc = +1 ;
 	    if (sp) {
 		rc = -1 ;
 		if (vp) {
-		    rc = cmpstrval(sp,vp) ;
+		    rc = cmpstrv(sp,vp) ;
 		} /* end */
 	    }
 	} /* end if */
 	return rc ;
-} /* end subroutine (cmpstrvalø) */
+    } /* end subroutine (cmpstrvø) */
+} /* end namespace (libu) */
 
 
