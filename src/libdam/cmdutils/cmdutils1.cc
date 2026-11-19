@@ -47,7 +47,6 @@ import ureserve ;			/* is{x}(2u)| */
 /* imported namespaces */
 
 using libu::cfdec ;			/* |cfdec(3u)| */
-using libu::matocasestr ;		/* |matocasestr(3u)| */
 
 
 /* local typedefs */
@@ -91,14 +90,13 @@ int optval(cchar *sp,int µsl) noex {
 	if (int sl ; (sl = getlenstr(sp,µsl)) >= 0) ylikely {
 	    rs = SR_OK ;
 	    if (sl > 0) ylikely {
-		if (int hi ; (hi = matocasestr(hits,1,sp,sl)) >= 0) {
+		if (int hi ; (hi = matstroic(hits,1,sp,sl)) >= 0) {
 	            v = (hi & 1) ;
 	        } else {
-	            cint	ch = mkchar(sp[0]) ;
 		    rs = SR_INVALID ;
-	            if (ischnum(ch)) {
+	            if (cint ch = mkchar(sp[0]) ; ischnum(ch)) {
 	                rs = cfdec(sp,sl,&v) ; /* <- swapped out */
-		    }
+		    } /* end */
 	        } /* end if */
 	    } /* end if (non-zero positive) */
 	} /* end if (getlenstr) */
