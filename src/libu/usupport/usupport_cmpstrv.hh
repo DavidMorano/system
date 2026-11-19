@@ -1,4 +1,4 @@
-/* cmpstrval HEADER */
+/* usupport_cmpstrv HEADER */
 /* charset=ISO8859-1 */
 /* lang=C20 */
 
@@ -8,8 +8,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CMPSTRVAL_INCLUDE
-#define	CMPSTRVAL_INCLUDE
+#ifndef	USUPPORTCMPSTRV_INCLUDE
+#define	USUPPORTCMPSTRV_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -19,12 +19,12 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+namespace libu {
 extern int	cmpstrval	(cchar *,cchar *) noex ;
 extern int	cmpstrvalø	(cchar *,cchar *) noex ;
-EXTERNC_end
+} /* end namespace (libu) */
 
 
-#endif /* CMPSTRVAL_INCLUDE */
+#endif /* USUPPORTCMPSTRV_INCLUDE */
 
 
