@@ -104,16 +104,14 @@ typedef FILEMAP		filemap ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern int	filemap_open	(filemap *,cchar *,size_t) noex ;
-extern int	filemap_stat	(filemap *,ustat *) noex ;
-extern int	filemap_read	(filemap *,int,void *) noex ;
-extern int	filemap_getln	(filemap *,cchar **) noex ;
-extern int	filemap_seek	(filemap *,off_t,int) noex ;
-extern int	filemap_tell	(filemap *,off_t *) noex ;
-extern int	filemap_rewind	(filemap *) noex ;
-extern int	filemap_close	(filemap *) noex ;
-
+    extern int	filemap_open	(filemap *,cchar *,size_t) noex ;
+    extern int	filemap_stat	(filemap *,ustat *) noex ;
+    extern int	filemap_read	(filemap *,int,void *) noex ;
+    extern int	filemap_getln	(filemap *,cchar **) noex ;
+    extern int	filemap_seek	(filemap *,off_t,int) noex ;
+    extern int	filemap_tell	(filemap *,off_t *) noex ;
+    extern int	filemap_rewind	(filemap *) noex ;
+    extern int	filemap_close	(filemap *) noex ;
 EXTERNC_end
 
 
