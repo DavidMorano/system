@@ -46,7 +46,6 @@
 #include	<climits>		/* CSTD |UCHAR_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strchr(3c)| */
 #include	<algorithm>		/* C++STD |sort(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -75,8 +74,6 @@ import libutil ;			/* |lenstr(3u)| */
 using std::sort ;			/* subroutine-template */
 using std::partition_point ;		/* subroutine-template */
 using libu::strnchr ;			/* subroutine */
-using libu::strkeycmp ;			/* subroutine */
-using libu::strnkeycmp ;		/* subroutine */
 using libu::umem ;			/* variable */
 
 
@@ -110,7 +107,7 @@ namespace {
 		    cuchar uch1 = uchar(*s1) ;
 		    cuchar uch2 = uchar(*s2) ;
 		    if ((f = (uch1 < uch2)) == false) {
-			f = ((uch1 == uch2) && (strkeycmp(s1,s2) < 0)) ;
+			f = ((uch1 == uch2) && (cmpstrkey(s1,s2) < 0)) ;
 		    }
 		} /* end block */
 		return f ;
@@ -169,7 +166,7 @@ cchar *getenver(cchar *kp,int ªkl) noex {
 	    if ((rs = rsv) >= 0) {
 		if ((kl = rmeq(kp,kl)) > 0) {
 		    if (cint ei = nametab(kp,kl) ; ei >= 0) {
-	                if ((valp = strchr(sub.envv[ei],'=')) != np) {
+	                if ((valp = strochr(sub.envv[ei],'=')) != np) {
 	                    valp += 1 ;
 		        }
 	            } /* end if (getter) */
@@ -227,7 +224,7 @@ int namemgr::operator () (cchar *sp,int sl) const noex {
 		cuchar uch_a = uchar(an[0]) ;
 		cuchar uch_s = uchar(sp[0]) ;
 		if ((f = (uch_a < uch_s)) == false) {
-		    f = ((uch_a == uch_s) && (strnkeycmp(an,sp,sl) < 0)) ;
+		    f = ((uch_a == uch_s) && (cmpstrkeyn(an,sp,sl) < 0)) ;
 		}
 	    } /* end block */
             return f ;
@@ -237,7 +234,7 @@ int namemgr::operator () (cchar *sp,int sl) const noex {
         if (cauto it = partition_point(itf,itl,predf) ; it != itl) {
             cauto mat = [this,sp,sl] (int c) noex -> bool {
                 cchar *an = envv[c] ;
-                return (strnkeycmp(an,sp,sl) == 0) ;
+                return (cmpstrkeyn(an,sp,sl) == 0) ;
             } ; /* end lambda (mat) */
             if (cint ii = *it ; mat(ii)) {
                 ei = ii ;
