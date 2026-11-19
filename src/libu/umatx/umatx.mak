@@ -43,8 +43,8 @@ LIBS +=
 DEPS=
 DEPSV=
 
-OBJ0= matstrx.o matstrk.o matstro.o
-OBJ1=
+OBJ0= matstrk.o matstrm.o matstro.o
+OBJ1= matstrx.o 
 OBJ2=
 OBJ3=
 OBJ4=
@@ -52,7 +52,7 @@ OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o
+OBJA= obj0.o obj1.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o
@@ -159,8 +159,9 @@ obj.o:			$(OBJ)
 
 matstr.o:		matstr.cc	matstr.h			$(INCS)
 
-matstrx.o:		matstrx.cc	matstrx.h		$(DEPS)	$(INCS)
 matstrk.o:		matstrk.cc	matstrk.h		$(DEPS)	$(INCS)
+matstrm.o:		matstrm.cc	matstrm.h		$(DEPS)	$(INCS)
 matstro.o:		matstro.cc	matstro.h		$(DEPS)	$(INCS)
+matstrx.o:		matstrx.cc	matstrx.h		$(DEPS)	$(INCS)
 
 
