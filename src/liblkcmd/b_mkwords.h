@@ -1,4 +1,9 @@
-/* config */
+/* mkwords_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* MKWORDS program */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,9 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	MKWORDSCONFIG_INCLUDE
+#define	MKWORDSCONFIG_INCLUDE
 
 
 #define	VERSION		"0"
@@ -86,5 +94,8 @@
 #define	LOGSIZE		(80*1024)
 
 #define	DEFTABSIZE	(1 * 1024 * 1024)	/* default table size */
+
+
+#endif /* MKWORDSCONFIG_INCLUDE */
 
 
