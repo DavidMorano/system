@@ -50,11 +50,11 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<usupport.h>		/* LIBU */
-#include	<stdclib.hh>		/* LIBU |std_strncasecmp(3u)| */
+#include	<stdclib.hh>		/* LIBU |std_cmpstrnic(3u)| */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"usupport_strncmp.hh"
+#include	"usupport_toxc.hh"
+#include	"usupport_cmpstrn.hh"
 #include	"usupport_comstrx.hh"
 #include	"usupport_cmpstrw.hh"
 
@@ -67,9 +67,9 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using libu::strnbasecmp ;		/* subroutine */
-using libu::strncasecmp ;		/* subroutine */
-using libu::strnfoldcmp ;		/* subroutine */
+using libu::cmpstrnbc ;			/* subroutine */
+using libu::cmpstrnic ;			/* subroutine */
+using libu::cmpstrnfc ;			/* subroutine */
 using libu::comstrbc ;			/* subroutine */
 using libu::comstric ;			/* subroutine */
 using libu::comstrfc ;			/* subroutine */
@@ -90,44 +90,44 @@ using libu::tofc ;			/* subroutine */
 /* local structures */
 
 namespace {
-   struct cmpx {
+   struct cmper {
 	int x(cc *,cc *,int)			const noex ;
 	virtual int tox(int ch) 		const noex = 0 ;
-	virtual int strnxcmp(cc *,cc *,int) 	const noex = 0 ;
+	virtual int cmpx(cc *,cc *,int) 	const noex = 0 ;
 	virtual int comx(cc *,cc *,int)		const noex = 0 ;
    } ; /* end struct (cmpx) */
-   struct basecmpx : cmpx {
+   struct cmperbc : cmper {
 	int tox(int ch)				const noex override final {
 	    return tobc(ch) ;
-	} ;
-	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
-	    return strnbasecmp(bs,sp,sl) ;
-	} ;
+	} ; /* end */
+	int cmpx(cc *bs,cc *sp,int sl)	const noex override final {
+	    return cmpstrnbc(bs,sp,sl) ;
+	} ; /* end */
 	int comx(cc *s1,cc *s2,int sl)		const noex override final {
 	    return comstrbc(s1,s2,sl) ;
-	} ;
+	} ; /* end */
    } ; /* end struct */
-   struct casecmpx : cmpx {
+   struct cmperic : cmper {
 	int tox(int ch)				const noex override final {
 	    return touc(ch & UCHAR_MAX) ;
-	} ;
-	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
-	    return strncasecmp(bs,sp,sl) ;
-	} ;
+	} ; /* end */
+	int cmpx(cc *bs,cc *sp,int sl)	const noex override final {
+	    return cmpstrnic(bs,sp,sl) ;
+	} ; /* end */
 	int comx(cc *s1,cc *s2,int sl)		const noex override final {
 	    return comstric(s1,s2,sl) ;
-	} ;
+	} ; /* end */
    } ; /* end struct */
-   struct foldcmpx : cmpx {
+   struct cmperfc : cmper {
 	int tox(int ch)				const noex override final {
 	    return tofc(ch & UCHAR_MAX) ;
-	} ;
-	int strnxcmp(cc *bs,cc *sp,int sl)	const noex override final {
-	    return strnfoldcmp(bs,sp,sl) ;
-	} ;
+	} ; /* end */
+	int cmpx(cc *bs,cc *sp,int sl)	const noex override final {
+	    return cmpstrnfc(bs,sp,sl) ;
+	} ; /* end */
 	int comx(cc *s1,cc *s2,int sl)		const noex override final {
 	    return comstrfc(s1,s2,sl) ;
-	} ;
+	} ; /* end */
    } ; /* end struct */
 } /* end namespace */
 
@@ -144,24 +144,24 @@ namespace {
 /* exported subroutines */
 
 namespace libu {
-    int strwbasecmp(cchar *s1,cchar *s2,int s2len) noex {
-	basecmpx co ;
+    int cmpstrwbc(cchar *s1,cchar *s2,int s2len) noex {
+	cmperbc co ;
 	return co.x(s1,s2,s2len) ;
-    } /* end subroutine (strwbasecmp) */
-    int strwcasecmp(cchar *s1,cchar *s2,int s2len) noex {
-	casecmpx co ;
+    } /* end subroutine (cmpstrwbc) */
+    int cmpstrwic(cchar *s1,cchar *s2,int s2len) noex {
+	cmperic co ;
 	return co.x(s1,s2,s2len) ;
-    } /* end subroutine (strwcasecmp) */
-    int strwfoldcmp(cchar *s1,cchar *s2,int s2len) noex {
-	foldcmpx co ;
+    } /* end subroutine (cmpstrwic) */
+    int cmpstrwfc(cchar *s1,cchar *s2,int s2len) noex {
+	cmperfc co ;
 	return co.x(s1,s2,s2len) ;
-    } /* end subroutine (strwfoldcmp) */
+    } /* end subroutine (cmpstrfc) */
 } /* end namespace (libu) */
 
 
 /* local subroutines */
 
-int cmpx::x(cchar *s1,cchar *s2,int µs2len) const noex {
+int cmper::x(cchar *s1,cchar *s2,int µs2len) const noex {
 	int		rc = 0 ;
 	if (s1 && s2) {
 	    rc = tox(s1[0]) ;
@@ -169,15 +169,15 @@ int cmpx::x(cchar *s1,cchar *s2,int µs2len) const noex {
 	        cint	ch1 = tox(*s1) ;
 	        cint	ch2 = tox(*s2) ;
 	        if ((rc = (ch1 - ch2)) == 0) {
-	            if ((rc = strnxcmp(s1,s2,s2len)) == 0) {
+	            if ((rc = cmpx(s1,s2,s2len)) == 0) {
 	                if (cint m = comx(s1,s2,s2len) ; m < s2len) {
-	    	            cint	m1 = tox(s1[m]) ;
-	    	            cint	m2 = tox(s2[m]) ;
+	    	            cint m1 = tox(s1[m]) ;
+	    	            cint m2 = tox(s2[m]) ;
 		            rc = (m1 - m2) ;
 		        } else {
 		            rc = tox(s1[m]) ;
-		        }
-		    } /* end if (strnxcmp) */
+		        } /* end */
+		    } /* end if (cmpx) */
 	        } /* end if (first characters were equal) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
