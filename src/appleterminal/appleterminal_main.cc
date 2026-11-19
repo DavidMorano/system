@@ -48,7 +48,6 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdio>		/* CSTD |snprintf(3c)| */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<iostream>		/* C++STD unused */
 #include	<string>		/* C++STD */
 #include	<clanguage.h>		/* LIBU */
@@ -72,7 +71,6 @@ import ureserve ;			/* |is{x}(3u)| */
 /* imported namespaces */
 
 using std::string ;			/* type */
-using libu::matstr ;			/* subroutine */
 using libu::rmtrailchr ;		/* subroutine */
 using libu::rmchr ;			/* subroutine */
 using std::cout ;			/* variable */
@@ -196,7 +194,7 @@ int proginfo::termout() noex {
 	cchar		*vn = varname.termprogram ;
 	int		rs = SR_OK ;
 	if (cchar *tn ; (tn = getourenv(envv,vn)) != nullptr) ylikely {
-            if ((strcmp(tn,appleterminal) == 0) && (argc >= 2)) {
+            if ((cmpstr(tn,appleterminal) == 0) && (argc >= 2)) {
                 string	s ;
                 cint	fd = FD_STDIN ;
 		cint	ps = getps(pm) ;
@@ -210,7 +208,7 @@ int proginfo::termout() noex {
                         rs = SR_OVERFLOW ;
                     } else {
                         s += ibuf ;
-                    }
+                    } /* end */
                 } /* end if (ok) */
                 if (rs >= 0) ylikely {
                     cchar   prefix[] = "file://" ;
@@ -222,7 +220,7 @@ int proginfo::termout() noex {
                         if (hn[0]) {
                             s += hn ;
                             vl = lenstr(hn) ;
-                        }
+                        } /* end */
                     } /* end if (possible hostname) */
                     if (fn[0]) ylikely {
                         cint        elen = ENCBUFLEN ;
