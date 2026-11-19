@@ -18,9 +18,7 @@
 
 
 EXTERNC_begin
-
-extern int	fileprintable(cchar *) noex ;
-
+    extern int	fileprintable(cchar *) noex ;
 EXTERNC_end
 
 
