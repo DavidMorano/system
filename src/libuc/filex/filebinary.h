@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	filebinary(cchar *) noex ;
-
+    extern int	filebinary(cchar *) noex ;
 EXTERNC_end
 
 
