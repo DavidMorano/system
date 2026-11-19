@@ -43,17 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* BSD |strncasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strcmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<stdclib.hh>		/* LIBU |std_strncasecmp(3u)| */
+#include	<usupport.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
-#include	<char.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
 
@@ -62,13 +59,13 @@
 
 /* local defines */
 
-#define	TOFC(ch)	CHAR_TOFC(ch)
-#define	strncasecmp	std_strncasecmp
-
 
 /* imported namespaces */
 
-using stdclib::std_strncasecmp ;	/* subroutine */
+using libu::tobc ;			/* subroutine */
+using libu::touc ;			/* subroutine */
+using libu::tofc ;			/* subroutine */
+using libu::cmpstrnbc ;
 
 
 /* local typedefs */
@@ -76,7 +73,7 @@ using stdclib::std_strncasecmp ;	/* subroutine */
 typedef cmporders	co ;
 
 extern "C" {
-    typedef int (*strncmp_f)(cchar *,cchar *,int) noex ;
+    typedef int (*cmpstrn_f)(cchar *,cchar *,int) noex ;
 } /* end extern (C) */
 
 
@@ -91,7 +88,7 @@ extern "C" {
 
 /* forward references */
 
-local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
+local int strnxcmp(cmpstrn_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
     	int		rc = 0 ;
 	if (s1 || s2) ylikely {
 	    rc = +1 ;
@@ -102,10 +99,10 @@ local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
 		        rc = (- fun(s1,s2,n)) ;
 		    } else {
 		        rc = (+ fun(s1,s2,n)) ;
-		    }
+		    } /* end */
 		}
 	    }
-	}
+	} /* end */
 	return rc ;
 } /* end subroutine (strxcmp) */
 
@@ -127,7 +124,7 @@ local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
 int strnbasecmp(cchar *s1,cchar *s2,int slen) noex {
     	int		rc = 0 ;
 	if (s1 && s2) ylikely {
-	    rc = strncmp(s1,s2,slen) ;
+	    rc = cmpstrn(s1,s2,slen) ;
 	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (strnnasecmp) */
@@ -136,8 +133,8 @@ int strnfoldcmp(cchar *e1p,cchar *e2p,int n) noex {
 	int		rc = 0 ;
 	if (e1p && e2p) ylikely {
 	    for (int i = 0 ; (i < n) ; i += 1) {
-	        cint ch1 = TOFC(*e1p++) ;
-	        cint ch2 = TOFC(*e2p++) ;
+	        cint ch1 = tofc(*e1p++) ;
+	        cint ch2 = tofc(*e2p++) ;
 	        rc = ch1 - ch2 ;
 	        if (rc || !ch1 || !ch2) break ;
 	    } /* end for */
@@ -153,12 +150,12 @@ int strnbasecmpr(cchar *e1p,cchar *e2p,int n) noex {
     	return (- strnbasecmp(e1p,e2p,n)) ;
 } /* end subroutine */
 
-int strncasecmpo(cchar *e1p,cchar *e2p,int n) noex {
-    	return (+ strncasecmp(e1p,e2p,n)) ;
+int cmpstrnbco(cchar *e1p,cchar *e2p,int n) noex {
+    	return (+ cmpstrnbc(e1p,e2p,n)) ;
 } /* end subroutine */
 
-int strncasecmpr(cchar *e1p,cchar *e2p,int n) noex {
-    	return (- strncasecmp(e1p,e2p,n)) ;
+int cmpstrnbcr(cchar *e1p,cchar *e2p,int n) noex {
+    	return (- cmpstrnbc(e1p,e2p,n)) ;
 } /* end subroutine */
 
 int strnfoldcmpo(cchar *e1p,cchar *e2p,int n) noex {
@@ -178,11 +175,11 @@ int strnxbasecmpr(cchar *s1,cchar *s2,int n) noex {
 } /* end subroutine */
 
 int strnxcasecmpo(cchar *s1,cchar *s2,int n) noex {
-    	return strnxcmp(strncasecmp,s1,s2,n,cmporder_obverse) ;
+    	return strnxcmp(cmpstrnbc,s1,s2,n,cmporder_obverse) ;
 } /* end subroutine */
 
 int strnxcasecmpr(cchar *s1,cchar *s2,int n) noex {
-    	return strnxcmp(strncasecmp,s1,s2,n,cmporder_reverse) ;
+    	return strnxcmp(cmpstrnbc,s1,s2,n,cmporder_reverse) ;
 } /* end subroutine */
 
 int strnxfoldcmpo(cchar *s1,cchar *s2,int n) noex {
