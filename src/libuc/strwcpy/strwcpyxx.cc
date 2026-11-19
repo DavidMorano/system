@@ -133,7 +133,6 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<sfx.h>			/* LIBUC |sfnext(3cu)| */
 #include	<char.h>		/* LIBUC |CHAR_ISWHITE(3uc)| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
@@ -141,8 +140,10 @@
 #include	"strwcpyxx.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ureserve.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import ureserve ;			/* |sfnext(3u)| */
 
 /* local defines */
 
