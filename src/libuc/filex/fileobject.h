@@ -36,9 +36,7 @@
 
 
 EXTERNC_begin
-
-extern int	fileobject(cchar *) noex ;
-
+    extern int	fileobject(cchar *) noex ;
 EXTERNC_end
 
 
