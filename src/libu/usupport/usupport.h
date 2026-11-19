@@ -55,8 +55,6 @@
 #include	<usupport_snwcpy.hh>
 #include	<usupport_strdcpyx.hh>
 #include	<usupport_strdcpyxw.hh>
-#include	<usupport_strkeycmp.hh>
-#include	<usupport_strncmp.hh>
 #include	<usupport_strncpyxc.hh>
 #include	<usupport_strnkeycmp.hh>
 #include	<usupport_strnchar.hh>
@@ -71,9 +69,17 @@
 #include	<usupport_toxc.hh>
 #include	<usupport_ustrftime.hh>
 #include	<usupport_vstrcmp.hh>
-#include	<usupport_vstrkeycmp.hh>
 
+#include	<usupport_cmpstrk.hh>
+#include	<usupport_cmpstrkn.hh>
+#include	<usupport_cmpstrn.hh>
+#include	<usupport_cmpstrv.hh>
+#include	<usupport_cmpstrw.hh>
+#include	<usupport_cmpstrx.hh>
+
+#include	<usupport_comstrk.hh>
 #include	<usupport_comstrx.hh>
+
 #include	<usupport_matstrk.hh>
 #include	<usupport_matstro.hh>
 #include	<usupport_matstrx.hh>
