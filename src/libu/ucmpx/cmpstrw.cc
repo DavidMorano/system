@@ -49,9 +49,10 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
-#include	<cmpstr.h>		/* LIBU */
+#include	<comstr.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"cmpstrn.h"
 #include	"cmpstrw.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
@@ -63,9 +64,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 /* imported namespaces */
 
-using libu::nleadbasestr ;		/* subroutine */
-using libu::nleadcasestr ;		/* subroutine */
-using libu::nleadfoldstr ;		/* subroutine */
 using libu::tobc ;			/* subroutine */
 using libu::touc ;			/* subroutine */
 using libu::tofc ;			/* subroutine */
@@ -83,43 +81,43 @@ using libu::tofc ;			/* subroutine */
 /* local structures */
 
 namespace {
-   struct cmpx {
+   struct cmper {
 	int x(cc *,cc *,int)			const noex ;
 	virtual int tox(int ch) 		const noex = 0 ;
-	virtual int cmpstrnx(cc *,cc *,int) 	const noex = 0 ;
-	virtual int nleadxstr(cc *,cc *,int)	const noex = 0 ;
+	virtual int cmpx(cc *,cc *,int) 	const noex = 0 ;
+	virtual int comx(cc *,cc *,int)		const noex = 0 ;
    } ; /* end struct (cmpx) */
-   struct cmpxb : cmpx {
+   struct cmpxb : cmper {
 	int tox(int ch)				const noex override final {
 	    return (ch & UCHAR_MAX) ;
 	} ; /* end */
-	int cmpstrnx(cc *bs,cc *sp,int sl)	const noex override final {
+	int cmpx(cc *bs,cc *sp,int sl)		const noex override final {
 	    return cmpstrnbc(bs,sp,sl) ;
 	} ; /* end */
-	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
-	    return nleadbasestr(s1,s2,sl) ;
+	int comx(cc *s1,cc *s2,int sl)		const noex override final {
+	    return comstrbc(s1,s2,sl) ;
 	} ; /* end */
    } ; /* end struct */
-   struct cmpxi : cmpx {
+   struct cmpxi : cmper {
 	int tox(int ch)				const noex override final {
 	    return touc(ch & UCHAR_MAX) ;
 	} ; /* end */
-	int cmpstrnx(cc *bs,cc *sp,int sl)	const noex override final {
+	int cmpx(cc *bs,cc *sp,int sl)		const noex override final {
 	    return cmpstrnic(bs,sp,sl) ;
 	} ; /* end */
-	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
-	    return nleadcasestr(s1,s2,sl) ;
+	int comx(cc *s1,cc *s2,int sl)		const noex override final {
+	    return comstric(s1,s2,sl) ;
 	} ; /* end */
    } ; /* end struct */
-   struct cmpxf : cmpx {
+   struct cmpxf : cmper {
 	int tox(int ch)				const noex override final {
 	    return tofc(ch & UCHAR_MAX) ;
 	} ; /* end */
-	int cmpstrnx(cc *bs,cc *sp,int sl)	const noex override final {
+	int cmpx(cc *bs,cc *sp,int sl)		const noex override final {
 	    return cmpstrnfc(bs,sp,sl) ;
 	} ; /* end */
-	int nleadxstr(cc *s1,cc *s2,int sl)	const noex override final {
-	    return nleadfoldstr(s1,s2,sl) ;
+	int comx(cc *s1,cc *s2,int sl)		const noex override final {
+	    return comstrfc(s1,s2,sl) ;
 	} ; /* end */
    } ; /* end struct */
 } /* end namespace */
@@ -154,7 +152,7 @@ int cmpstrwfc(cchar *s1,cchar *s2,int s2len) noex {
 
 /* local subroutines */
 
-int cmpx::x(cchar *s1,cchar *s2,int µs2len) const noex {
+int cmper::x(cchar *s1,cchar *s2,int µs2len) const noex {
 	int		rc = 0 ;
 	if (s1 && s2) ylikely {
 	    rc = tox(s1[0]) ;
@@ -162,19 +160,19 @@ int cmpx::x(cchar *s1,cchar *s2,int µs2len) const noex {
 	        cint	ch1 = tox(*s1) ;
 	        cint	ch2 = tox(*s2) ;
 	        if ((rc = (ch1 - ch2)) == 0) {
-	            if ((rc = cmpstrnx(s1,s2,s2len)) == 0) {
-	                if (cint m = nleadxstr(s1,s2,s2len) ; m < s2len) {
+	            if ((rc = cmpx(s1,s2,s2len)) == 0) {
+	                if (cint m = comx(s1,s2,s2len) ; m < s2len) {
 	    	            cint m1 = tox(s1[m]) ;
 	    	            cint m2 = tox(s2[m]) ;
 		            rc = (m1 - m2) ;
 		        } else {
 		            rc = tox(s1[m]) ;
 		        } /* end */
-		    } /* end if (cmpstrnx) */
+		    } /* end if (cmpx) */
 	        } /* end if (first characters were equal) */
 	    } /* end if (getlenstr) */
 	} /* end if (non-null) */
 	return rc ;
-} /* end method (cmpx::x) */
+} /* end method (cmper::x) */
 
 
