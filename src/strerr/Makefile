@@ -60,7 +60,7 @@ OBJ7= strxcmp.o strcpyx.o nleadx.o
 
 OBJ8= char.o
 OBJ9= strw.o strwcpy.o
-OBJ10= sif.o strnxcmp.o
+OBJ10= sif.o
 OBJ11= sfx.o strfilter.o
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
