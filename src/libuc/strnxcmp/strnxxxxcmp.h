@@ -28,50 +28,50 @@
 
 
 EXTERNC_begin
-extern int	strnbasecmp	(cchar *,cchar *,int) noex ;
-extern int	strnfoldcmp	(cchar *,cchar *,int) noex ;
+    extern int	strnbasecmp	(cchar *,cchar *,int) noex ;
+    extern int	strnfoldcmp	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int	strnbasecmpo	(cchar *,cchar *,int) noex ;
-extern int	strnbasecmpr	(cchar *,cchar *,int) noex ;
+    extern int	strnbasecmpo	(cchar *,cchar *,int) noex ;
+    extern int	strnbasecmpr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int	strncasecmpo	(cchar *,cchar *,int) noex ;
-extern int	strncasecmpr	(cchar *,cchar *,int) noex ;
+    extern int	strncasecmpo	(cchar *,cchar *,int) noex ;
+    extern int	strncasecmpr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int	strnfoldcmpo	(cchar *,cchar *,int) noex ;
-extern int	strnfoldcmpr	(cchar *,cchar *,int) noex ;
+    extern int	strnfoldcmpo	(cchar *,cchar *,int) noex ;
+    extern int	strnfoldcmpr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int	strnxbasecmpo	(cchar *,cchar *,int) noex ;
-extern int	strnxbasecmpr	(cchar *,cchar *,int) noex ;
+    extern int	strnxbasecmpo	(cchar *,cchar *,int) noex ;
+    extern int	strnxbasecmpr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int	strnxcasecmpo	(cchar *,cchar *,int) noex ;
-extern int	strnxcasecmpr	(cchar *,cchar *,int) noex ;
+    extern int	strnxcasecmpo	(cchar *,cchar *,int) noex ;
+    extern int	strnxcasecmpr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int	strnxfoldcmpo	(cchar *,cchar *,int) noex ;
-extern int	strnxfoldcmpr	(cchar *,cchar *,int) noex ;
+    extern int	strnxfoldcmpo	(cchar *,cchar *,int) noex ;
+    extern int	strnxfoldcmpr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-local inline int strnxbasecmp	(cchar *s1,cchar *s2,int n) noex {
+    local inline int strnxbasecmp	(cchar *s1,cchar *s2,int n) noex {
     	return strnxbasecmpo(s1,s2,n) ;
-} /* end */
-local inline int strnxcasecmp	(cchar *s1,cchar *s2,int n) noex {
+    } /* end */
+    local inline int strnxcasecmp	(cchar *s1,cchar *s2,int n) noex {
     	return strnxcasecmpo(s1,s2,n) ;
-} /* end */
-local inline int strnxfoldcmp	(cchar *s1,cchar *s2,int n) noex {
+    } /* end */
+    local inline int strnxfoldcmp	(cchar *s1,cchar *s2,int n) noex {
     	return strnxfoldcmpo(s1,s2,n) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 
