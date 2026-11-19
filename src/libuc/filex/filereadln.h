@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	filereadln(cchar *,char *,int) noex ;
-
+    extern int	filereadln(cchar *,char *,int) noex ;
 EXTERNC_end
 
 
