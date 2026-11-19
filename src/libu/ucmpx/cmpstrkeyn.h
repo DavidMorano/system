@@ -15,8 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CMPSTRKN_INCLUDE
-#define	CMPSTRKN_INCLUDE
+#ifndef	CMPSTRKEYN_INCLUDE
+#define	CMPSTRKEYN_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -87,6 +87,6 @@ inline int	cmpstrkeyn	(cchar *s1,cchar *s2) noex {
 #endif /* __cplusplus */
 
 
-#endif /* CMPSTRKN_INCLUDE */
+#endif /* CMPSTRKEYN_INCLUDE */
 
 
