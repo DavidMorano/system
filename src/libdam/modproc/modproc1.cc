@@ -51,20 +51,20 @@ module ;
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>		/* |O_{xx}| */
-#include	<climits>		/* |INT_MAX| */
-#include	<cstddef>		/* |nullptr_t| */
+#include	<climits>		/* CSTD |INT_MAX| */
+#include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
 #include	<strnul.hh>		/* LIBU */
-#include	<langparse.h>
 #include	<ascii.h>		/* LIBU */
 #include	<ascii.h>		/* LIBU |CH_NL| */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
-#include	<deb.hh>		/* |DEBPRINTF(3u)| */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
+#include	<langparse.h>		/* ** ?? ** */
 
 #include	"strmgr.h"		/* locally supplied */
 #include	"haslead.h"		/* locally suuplied */
@@ -92,7 +92,6 @@ import deb ;				/* LIBU |debprintf(3u)| */
 /* imported namespaces */
 
 using libu::strnchr ;			/* subroutine */
-using libu::strwcmp ;			/* subroutine */
 using libu::umem ;			/* variable */
 
 
@@ -379,7 +378,7 @@ int modmgr::procln(int ln,cchar *lp,int ll) noex {
 	    	    strnul st(ip,il) ;
 	    	    CDEBPR("piece=>%s<\n",ccp(st)) ;
 		}
-		if (strwcmp(istr,ip,il) == 0) {
+		if (cmpstrw(istr,ip,il) == 0) {
 		    cint	ch_s = CH_SEMI ;
 		    cchar	*mp ;
 		    CDEBPR("cmp\n") ;
