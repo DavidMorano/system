@@ -70,8 +70,7 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usys.h>		/* LIBU |strsubn(3u)| */
-#include	<nleadstr.h>		/* LIBUC */
-#include	<toxc.h>		/* LIBUC */
+#include	<usupport.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
@@ -87,13 +86,19 @@ import libutil ;			/* |lenstr(3u)| */
 /* imported namespaces */
 
 using usys::strsubn ;			/* subroutine */
+using libu::tobc ;			/* subroutine */
+using libu::touc ;			/* subroutine */
+using libu::tofc ;			/* subroutine */
+using libu::comstrbc ;			/* subroutine */
+using libu::comstric ;			/* subroutine */
+using libu::comstrfc ;			/* subroutine */
 
 
 /* local typedefs */
 
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
-    typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
+    typedef int (*comx_f)(cchar *,cchar *,int) noex ;
 } /* end extern (C) */
 
 
@@ -108,8 +113,8 @@ extern "C" {
 namespace {
     struct strner {
 	toxc_f		toxc ;
-    	nleadxstr_f	nleadxstr ;
-	strner(toxc_f t,nleadxstr_f n) noex : toxc(t), nleadxstr(n) { } ;
+    	comx_f	nleadxstr ;
+	strner(toxc_f t,comx_f n) noex : toxc(t), nleadxstr(n) { } ;
 	char *strnxsub(cchar *,int,cchar *,int) noex ;
     } ; /* end struct (strner) */
 } /* end namespace */
@@ -134,7 +139,7 @@ char *strnbasesub(cchar *sp,int sl,cchar *ss) noex {
 		    rp = strsubn(sp,ss,sl) ;
 		} else {
 		    if (cint sslen = lenstr(ss) ; sslen > 0) {
-		        strner	so(tobc,nleadbasestr) ;
+		        strner	so(tobc,comstrbc) ;
 	                rp = so.strnxsub(sp,sl,ss,sslen) ;
 		    } else {
 	    	        rp = charp(sp) ;
@@ -151,7 +156,7 @@ char *strncasesub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
 	if (sp && ss) ylikely {
 	    if (cint sslen = lenstr(ss) ; sslen > 0) {
-		strner	so(tolc,nleadcasestr) ;
+		strner	so(touc,comstric) ;
 		rp = so.strnxsub(sp,sl,ss,sslen) ;
 	    } else {
 		rp = charp(sp) ;
@@ -164,7 +169,7 @@ char *strnfoldsub(cchar *sp,int sl,cchar *ss) noex {
 	char		*rp = nullptr ;
 	if (sp && ss) ylikely {
 	    if (cint sslen = lenstr(ss) ; sslen > 0) {
-	        strner	so(tofc,nleadfoldstr) ;
+	        strner	so(tofc,comstrfc) ;
 	        rp = so.strnxsub(sp,sl,ss,sslen) ;
 	    } else {
 		rp = charp(sp) ;
