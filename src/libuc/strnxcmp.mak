@@ -65,7 +65,6 @@ ARFLAGS		?= $(MAKEARFLAGS)
 LDFLAGS		?= $(MAKELDFLAGS)
 
 
-
 .SUFFIXES:		.hh .ii .iim .ccm
 
 
@@ -136,7 +135,7 @@ objb.o:			$(OBJB)
 
 
 strnkeycmp.o:		strnkeycmp.cc		strnkeycmp.h	$(INCS)
-strnvalcmp.o:		strnvalcmp.cc				$(INCS)
+strnvalcmp.o:		strnvalcmp.cc		strnvalcmp.h	$(INCS)
 strnndictcmp.o:		strnndictcmp.cc 			$(INCS)
 strnxxxxcmp.o:		strnxxxxcmp.cc		strnxxxxcmp.h	$(INCS)
 
