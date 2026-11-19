@@ -5,7 +5,7 @@
 /* short-word queue */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
