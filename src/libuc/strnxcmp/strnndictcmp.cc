@@ -71,8 +71,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstring>		/* CSTD |strncmp(3c)| */
 #include	<clanguage.h>		/* LIBU */
+#include	<usupport.h>		/* LIBU */
 #include	<ulogerror.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<char.h>		/* LIBUC */
@@ -153,22 +153,22 @@ int strnndictcmp(cchar *s1,int s1len,cchar *s2,int s2len) noex {
 	            } /* end for */
 	            if (rc == 0) {
 	                rc = (s1len - s2len) ; /* more determinism */
-		    }
+		    } /* end */
 	            if (rc == 0) {
 	                rc = strdocmp(s1,s2,i) ; /* break ties so far */
-		    }
+		    } /* end */
 	            if (rc == 0) {
 	                while (s1len && (! ischdict(s1[s1len-1]))) {
 			    s1len -= 1 ;
-		        }
+		        } /* end while */
 	                while (s2len && (! ischdict(s2[s2len-1]))) {
 			    s2len -= 1 ;
-		        }
+		        } /* end while */
 	                rc = (s1len - s2len) ; /* more determinism */
 	            } /* end if */
 	            if (rc == 0) {
-	                rc = strncmp(s1,s2,s2len) ; /* determinism? */
-		    }
+	                rc = cmpstrn(s1,s2,s2len) ; /* determinism? */
+		    } /* end */
 	            rs1 = dch_finish(&dc2) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (dc2) */
