@@ -100,7 +100,7 @@ using libu::tofc ;		/* subroutine */
 
 extern "C" {
     typedef int (*toxc_f)	(int) noex ;
-    typedef int (*nleadxstr_f)	(cchar *,cchar *,int) noex ;
+    typedef int (*comx_f)	(cchar *,cchar *,int) noex ;
 } /* end extern */
 
 
@@ -115,8 +115,8 @@ extern "C" {
 namespace {
     struct matstrx {
 	toxc_f		toxc ;
-	nleadxstr_f	nleadxstr ;
-	matstrx(toxc_f f1,nleadxstr_f f2) noex : toxc(f1), nleadxstr(f2) { } ;
+	comx_f		comx ;
+	matstrx(toxc_f f1,comx_f f2) noex : toxc(f1), comx(f2) { } ;
 	int operator () (con mainv a,cchar *sp,int sl) noex {
     	    int		rc = -1 ;
 	    if (a && sp) {
@@ -125,15 +125,15 @@ namespace {
 	        if (int m ; sl >= 0) {
 	            for (i = 0 ; a[i] ; i += 1) {
 		        if ((m = ((sl > 0) && (lch == toxc(a[i][0])))) > 0) {
-			    m = nleadxstr(a[i],sp,sl) ;
-		        }
+			    m = comx(a[i],sp,sl) ;
+		        } /* end */
 		        if ((m == sl) && (a[i][m] == '\0')) break ;
 	            } /* end for */
 	        } else {
 	            for (i = 0 ; a[i] ; i += 1) {
 		        if ((m = (lch == toxc(a[i][0]))) > 0) {
-			    m = nleadxstr(a[i],sp,-1) ;
-		        }
+			    m = comx(a[i],sp,-1) ;
+		        } /* end */
 		        if ((a[i][m] == '\0') && (sp[m] == '\0')) break ;
 	            } /* end for */
 	        } /* end if */
@@ -156,17 +156,17 @@ namespace {
 
 /* exported subroutines */
 
-    int matstrbc(con mainv a,cchar *sp,int sl) noex {
+int matstrbc(con mainv a,cchar *sp,int sl) noex {
 	matstrx mo(tobc,comstrbc) ;
 	return mo(a,sp,sl) ;
-    } /* end subroutine (matstrbc) */
-    int matstric(con mainv a,cchar *sp,int sl) noex {
+} /* end subroutine (matstrbc) */
+int matstric(con mainv a,cchar *sp,int sl) noex {
 	matstrx mo(touc,comstric) ;
 	return mo(a,sp,sl) ;
-    } /* end subroutine (matstric) */
-    int matstrfc(con mainv a,cchar *sp,int sl) noex {
+} /* end subroutine (matstric) */
+int matstrfc(con mainv a,cchar *sp,int sl) noex {
 	matstrx mo(tofc,comstrfc) ;
 	return mo(a,sp,sl) ;
-    } /* end subroutine (matstrfc) */
+} /* end subroutine (matstrfc) */
 
 
