@@ -64,7 +64,6 @@ import libutil ;			/* |lenstr(3u)| */
 /* imported namespaces */
 
 using libu::tobc ;			/* subroutine */
-using libu::tolc ;			/* subroutine */
 using libu::touc ;			/* subroutine */
 using libu::tofc ;			/* subroutine */
 
@@ -73,8 +72,8 @@ using libu::tofc ;			/* subroutine */
 
 extern "C" {
     typedef int (*toxc_f)	(int) noex ;
-    typedef int (*nleadxstr_f)	(cchar *,cchar *,int) noex ;
-    typedef int (*matxstr_f)	(con mainv,cchar *,int) noex ;
+    typedef int (*comx_f)	(cchar *,cchar *,int) noex ;
+    typedef int (*matx_f)	(con mainv,cchar *,int) noex ;
 } /* end extern */
 
 
@@ -89,13 +88,13 @@ extern "C" {
 namespace {
     struct mater {
 	toxc_f		toxc ;
-	nleadxstr_f	nleadx ;
-	matxstr_f	matxstr ;
+	comx_f		comx ;
+	matx_f		matx ;
 	int matstrox(con mainv,int,cchar *,int) noex ;
-	mater(toxc_f t,nleadxstr_f n,matxstr_f m) noex { 
+	mater(toxc_f t,comx_f n,matx_f m) noex { 
 	    toxc = t ;
-	    nleadx = n ;
-	    matxstr = m ;
+	    comx = n ;
+	    matx = m ;
 	} ; /* end ctor */
     } ; /* end struct (mater) */
 } /* end namespace */
@@ -112,18 +111,18 @@ namespace {
 
 /* exported subroutines */
 
-    int matstrobc(con mainv a,int n,cchar *sp,int sl) noex {
+int matstrobc(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tobc,comstrbc,matstrbc) ;
 	return mo.matstrox(a,n,sp,sl) ;
-    } /* end subroutine (matstrobc) */
-    int matstroic(con mainv a,int n,cchar *sp,int sl) noex {
-	mater	mo(tolc,comstric,matstric) ;
+} /* end subroutine (matstrobc) */
+int matstroic(con mainv a,int n,cchar *sp,int sl) noex {
+	mater	mo(touc,comstric,matstric) ;
 	return mo.matstrox(a,n,sp,sl) ;
-    } /* end subroutine (matstroic) */
-    int matstrofc(con mainv a,int n,cchar *sp,int sl) noex {
+} /* end subroutine (matstroic) */
+int matstrofc(con mainv a,int n,cchar *sp,int sl) noex {
 	mater	mo(tofc,comstrfc,matstrfc) ;
 	return mo.matstrox(a,n,sp,sl) ;
-    } /* end subroutine (matstrofc) */
+} /* end subroutine (matstrofc) */
 
 
 /* local subroutines */
@@ -136,7 +135,7 @@ int mater::matstrox(con mainv a,int n,cchar *sp,int µsl) noex {
 	        for (int m, i = 0 ; a[i] ; i += 1) {
 	            cchar	*ap = a[i] ;
 	            if ((m = (lch == toxc(ap[0]))) > 0) {
-	                m = nleadx(ap,sp,sl) ;
+	                m = comx(ap,sp,sl) ;
 	            } /* end */
 	            if ((m == sl) && ((m >= n) || (ap[m] == '\0'))) {
 		        si = i ;
@@ -144,7 +143,7 @@ int mater::matstrox(con mainv a,int n,cchar *sp,int µsl) noex {
 	            } /* end */
 	        } /* end for */
 	    } else {
-	        si = matxstr(a,sp,sl) ;
+	        si = matx(a,sp,sl) ;
 	    } /* end */
 	} /* end if (getlenstr) */
 	return si ;
