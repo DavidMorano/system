@@ -558,11 +558,11 @@ int proginfo::args(argmgr *amp) noex {
     	int		rs ;
 	while ((rs = amp->arg) > 0) {
 	    if (cc *sp ; (rs = amp->argopt(&sp)) > 1) {
-		if (int wi ; (wi = matostr(argopts,2,sp,rs)) >= 0) {
+		if (int wi ; (wi = matstro(argopts,2,sp,rs)) >= 0) {
 		    rs = argoptstr(amp,wi) ;
 		} else {
 		    rs = argoptchr(amp,sp,rs) ;
-		} /* end if (matostr) */
+		} /* end if (matstro) */
 	    } else if (rs == 1) {
 		rs = argoptchr(amp,sp,rs) ;
 	    } else if ((rs >= 0) && ((rs = amp->argoptlong(&sp)) > 0)) {
@@ -613,7 +613,7 @@ int proginfo::argoptstr(argmgr *amp,int wi) noex {
 int proginfo::argoptlong(argmgr *amp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	(void) amp ;
-	if (int wi ; (wi = matostr(argoptlongs,2,sp,sl)) >= 0) {
+	if (int wi ; (wi = matstro(argoptlongs,2,sp,sl)) >= 0) {
 	    switch (wi) {
 	    case argoptlong_version:
 		fl.version = true ;
@@ -622,7 +622,7 @@ int proginfo::argoptlong(argmgr *amp,cchar *sp,int sl) noex {
 	} else {
 	    cerr << pname << ": " << "invalid option" << eol ;
 	    rs = SR_INVALID ;
-	} /* end if (matostr) */
+	} /* end if (matstro) */
 	return rs ;
 } /* end method (proginfo::argoptlong) */
 
@@ -1055,11 +1055,11 @@ int proginfo::tardiradd(cchar *dp,int dl) noex {
 int proginfo::modtypeout(cchar *cp,int cl)  noex {
     	constexpr uint	nouts = modout_overlast ;
     	int		rs = SR_INVALID ;
-	if (cint mi = matostr(modoutnames,1,cp,cl) ; mi >= 0) {
+	if (cint mi = matstro(modoutnames,1,cp,cl) ; mi >= 0) {
 	    cint tmask = (bit_ceil(nouts) - 1) ;
 	    rs = SR_OK ;
 	    fl.ot = uchar(mi & tmask) ;	/* avoiding GCC complaint */
-	} /* end if (matostr) */
+	} /* end if (matstro) */
 	return rs ;
 } /* end method (proginfo::modtypeout) */
 
