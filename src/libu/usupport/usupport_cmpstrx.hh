@@ -17,6 +17,7 @@
 
 #ifndef	USUPPORTCMPSTRX_INCLUDE
 #define	USUPPORTCMPSTRX_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -83,6 +84,7 @@ namespace libu {
 } /* end namespace (libu) */
 
 
+#endif /* __cplusplus */
 #endif /* USUPPORTCMPSTRX_INCLUDE */
 
 
