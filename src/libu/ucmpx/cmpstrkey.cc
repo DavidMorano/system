@@ -118,7 +118,7 @@ local int cmpstrkeyx(toxc_f tox,cchar *e1p,cchar *e2p) noex {
 	    } /* end if (resolution) */
 	} /* end if (non-null) */
 	return rc ;
-} /* end subroutine (strkeycmp) */
+} /* end subroutine (cmpstrkeyx) */
 
 local int cmpstrx(strcmp_f fun,cchar *s1,cchar *s2,co fo) noex {
     	int		rc = 0 ;
