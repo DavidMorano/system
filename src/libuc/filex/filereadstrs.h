@@ -36,9 +36,7 @@
 
 
 EXTERNC_begin
-
-extern int	filereadstrs(char *,int,cchar *) noex ;
-
+    extern int	filereadstrs(char *,int,cchar *) noex ;
 EXTERNC_end
 
 
