@@ -87,14 +87,13 @@ using libu::matstrk ;			/* subroutine */
 cchar *getourenv(con mainv envv,cchar *key) noex {
 	cchar		*vp = nullptr ; /* return-value */
 	if (envv && key && key[0]) {
-	    if (int ei ; (ei = matstrk(envv,key,-1)) >= 0) {
+	    if (int ei ; (ei = matstrk(envv,key)) >= 0) {
 		if ((vp = strochr(envv[ei],'=')) != nullptr) {
 		    vp += 1 ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	} /* end if */
 	return vp ;
-} 
-/* end subroutine (getourenv) */
+} /* end subroutine (getourenv) */
 
 
