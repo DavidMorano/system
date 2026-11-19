@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	comstrk
+	comstrk{x}c
 
 	Description:
 	Check that the given string matches (case independently)
@@ -27,9 +27,10 @@
 	matched.  If we do not match, we return a negative number.
 
 	Synopsis:
-	int nleadkeystr(cchar *bs,cchar *sp,int sl) noex
+	int comstrk{x}c(cchar *bs,cchar *sp,int sl) noex
 
 	Arguments:
+	{x}		one of: b, i, f
 	bs		base string to compare against
 	sp		test-string to test against the base string
 	sl		length of test-string
