@@ -51,7 +51,8 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
-#include	<toxc.h>		/* LIBUC */
+#include	<usupport.h>		/* LIBU */
+#include	<ucmpx.h>		/* LIBU */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 #include	<cmporders.h>		/* LIBU */
@@ -69,13 +70,16 @@ import libutil ;			/* |lenstr(3u)| */
 
 using std::min ;			/* subroutine */
 using std::max ;			/* subroutine */
+using libu::tobc ;			/* subroutine */
+using libu::touc ;			/* subroutine */
+using libu::tofc ;			/* subroutine */
 
 
 /* local typedefs */
 
 extern "C" {
     typedef int (*toxc_f)(int) noex ;
-    typedef int (*strncmp_f)(cchar *,cchar *,int) noex ;
+    typedef int (*cmpx_f)(cchar *,cchar *,int) noex ;
 } /* end extern (C) */
 
 typedef cmporders	co ;
@@ -126,14 +130,14 @@ local int strnkeyxcmp(toxc_f tox,cchar *e1p,cchar *e2p,int n) noex {
                         rc = (+ ch1) ;
                     } else {
                         rc = tox(ch1) - tox(ch2) ;
-                    }
+                    } /* end */
                 } /* end if (resolution) */
 	    } /* end block */
 	} /* end if (non-null) */
 	return rc ;
 } /* end subroutine (strnkeyxcmp) */
 
-local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
+local int strnxcmp(cmpx_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
     	int		rc = 0 ;
 	if (s1 || s2) ylikely {
 	    rc = +1 ;
@@ -144,7 +148,7 @@ local int strnxcmp(strncmp_f fun,cchar *s1,cchar *s2,int n,co fo) noex {
 		        rc = (- fun(s1,s2,n)) ;
 		    } else {
 		        rc = (+ fun(s1,s2,n)) ;
-		    }
+		    } /* end */
 		}
 	    }
 	} /* end if */
