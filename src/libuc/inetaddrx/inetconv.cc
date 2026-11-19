@@ -80,13 +80,17 @@
 #include	<usyscalls.h>		/* LIBU |strwcpy(3u)| */
 #include	<ucinet.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC |strnchr(3uc)| */
-#include	<sfx.h>			/* LIBUC |sfshrink(3uc)| */
 #include	<uinet.h>		/* LIBU */
 #include	<inaddrbad.hh>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"inetconv.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/ureserve.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
+import ureserve ;			/* |sfshrink(3u)| */
 
 /* local defines */
 
