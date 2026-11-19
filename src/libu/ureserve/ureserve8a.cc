@@ -63,7 +63,7 @@ using std::string ;			/* type */
 using std::string_view ;		/* type */
 using std::ranges::sort ;		/* niebloid */
 using std::ranges::binary_search ;	/* niebloid */
-using libu::strnkeycmp ;		/* subroutine */
+using libu::cmpstrkn ;			/* subroutine */
 
 
 /* local typedefs */
@@ -222,14 +222,14 @@ int vecstr::findkey(cchar *sp,int sl,cchar **rpp) noex {
 	if (sp) ylikely {
 	    if (vecstr_cur cur ; (rs = curbegin(&cur)) >= 0) {
 		for (cc *ep ; (rs = curenum(&cur,&ep)) >= 0 ; ) {
-		    if (strnkeycmp(ep,sp,sl) == 0) {
+		    if (cmpstrkn(ep,sp,sl) == 0) {
 			if (cc *tp = strochr(ep,'=') ; tp) {
 			    rl = lenstr(tp + 1) ;
 			    if (rpp) {
 			       *rpp = (tp + 1) ;
 			    }
 			} /* end if (strxchr) */
-		    } /* end if (strnkeycmp) */
+		    } /* end if (cmpstrkn) */
 		    if ((rs < 0) || (rl >= 0)) break ;
 		} /* end for */
 		rs1 = curend(&cur) ;
