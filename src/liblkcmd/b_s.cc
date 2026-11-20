@@ -1178,7 +1178,7 @@ badprogstart:
 	        while (ucmallreg_curenum(&cur,&reg) >= 0) {
 	            debugprintf("main: MIreg.addr=%p\n",reg.addr) ;
 	            debugprintf("main: MIreg.size=%u\n",reg.size) ;
-	            debugprinthexblock(ids,80,reg.addr,reg.size) ;
+	            debugprinthexb(ids,80,reg.addr,reg.size) ;
 	        } /* end while */
 	        ucmallreg_curend(&cur) ;
 	    } /* end if (positive) */
@@ -2320,7 +2320,7 @@ int		sl ;
 	    cchar	*bp ;
 	    if ((rs = sbuf_getbuf(bufp,&bp)) >= 0) {
 	        debugprintf("b_s/bufsd: buf bl=%u\n",rs) ;
-	        debugprinthexblock("bufsd",cols,bp,rs) ;
+	        debugprinthexb("bufsd",cols,bp,rs) ;
 	    }
 	}
 #endif /* CF_DEBUG */
