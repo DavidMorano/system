@@ -143,7 +143,7 @@ extern int	progcmdname(PI *,int,cchar **) ;
 
 #if	CF_DEBUGS || CF_DEBUG 
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,...) ;
+extern int	debugprinthexb(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	progexports(PI *,cchar *) ;
 #endif /* CF_DEBUGS */
@@ -2200,7 +2200,7 @@ local int procwatchpolling(PI *pip,SUBINFO *wip,int fd,int re)
 			rs1 = sockaddress_getaf(&cip->sa) ;
 			debugprintf("progwatch/procwatchpolling: af=%u\n",rs1) ;
 			al = sockaddress_getaddr(&cip->sa,abuf,alen) ;
-			rs1 = debugprinthexblock("progwatch/procwatchpolling",
+			rs1 = debugprinthexb("progwatch/procwatchpolling",
 				80,abuf,al) ;
 			debugprintf("progwatch/procwatchpolling: drs=%d\n",
 				rs1) ;
