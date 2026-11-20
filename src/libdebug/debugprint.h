@@ -25,7 +25,12 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-#define DEBUGOPEN(fn)	debugopen(fn)
+#define DEBUGOPEN(fn)	({					\
+	int rsdebug = 0 ;					\
+        if_constexpr (f_debug) {				\
+	    rsdebug = debugopen(fn) ;				\
+	} ; rsdebug ; \
+    }) /* end macro (DEBUGOPEN) */
 
 #ifdef	__cplusplus
 #define DEBUGPRINTF(FMT, ...)	({ 				\
@@ -42,36 +47,39 @@
 #define DEBUGCLOSE	debugclose()
 
 EXTERNC_begin
-extern int debugopen		(cchar *) noex ;
-extern int debugclose		(void) noex ;
-extern int debugwrite		(cchar *,int) noex ;
-extern int debugprint		(cchar *,int) noex ;
-extern int debugprintf		(cchar *,...) noex ;
-extern int debugprintx		(cchar *,cchar *,...) noex ; /* special */
-extern int debugvprintf		(cchar *,va_list) noex ;
-extern int debugprintfsize	(cchar *,int) noex ;
+    extern int debugopen	(cchar *) noex ;
+    extern int debugclose	(void) noex ;
+    extern int debugprintx	(cchar *,cchar *,...) noex ; /* special */
 EXTERNC_end
 
 EXTERNC_begin
-extern int debugsetfd		(int) noex ;
-extern int debuggetfd		(void) noex ;
+    extern int debugwrite	(cchar *,int) noex ;
+    extern int debugprint	(cchar *,int) noex ;
+    extern int debugprintf	(cchar *,...) noex ;
+    extern int debugvprintf	(cchar *,va_list) noex ;
+    extern int debugprintfsize	(cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int debugprinthexblock	(cchar *,int,cvoid *,int) noex ;
-extern int debugprinthexs	(cchar *,int,cvoid *,int) noex ;
-extern int debugprintdeci	(cchar *,int) noex ;
-extern int debugprinthexi	(cchar *,int) noex ;
-extern int debugprintnum	(cchar *,int) noex ;
+    extern int debugsetfd	(int) noex ;
+    extern int debuggetfd	(void) noex ;
+EXTERNC_end
+
+EXTERNC_begin
+    extern int debugprinthexb	(cchar *,int,cvoid *,int) noex ;
+    extern int debugprinthexs	(cchar *,int,cvoid *,int) noex ;
+    extern int debugprintdeci	(cchar *,int) noex ;
+    extern int debugprinthexi	(cchar *,int) noex ;
+    extern int debugprintnum	(cchar *,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int debugwrite(cchar *sp) noex {
+    inline int debugwrite(cchar *sp) noex {
     	return debugwrite(sp,-1) ;
-} /* end */
-inline int debugprint(cchar *sp) noex {
-    	return debugprint(sp,-1) ;
-} /* end */
+    } /* end */
+    inline int debugprint(cchar *sp) noex {
+	return debugprint(sp,-1) ;
+    } /* end */
 #endif /* __cplusplus */
 
 
