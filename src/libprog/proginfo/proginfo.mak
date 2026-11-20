@@ -54,7 +54,7 @@ PA_BASE=
 PI_BASE0= proginfo_base1.o
 PI_BASE1= proginfo_base2.o
 PI_BASE2= proginfo_base3.o proginfo_base4.o
-PI_BASE3= proginfo_base5.o
+PI_BASE3= proginfo_base5.o proginfo_base6.o
 
 PI_BASE= pi_base0.o pi_base1.o pi_base2.o pi_base3.o
 
@@ -229,6 +229,7 @@ proginfo_base2.o:	proginfo_base2.cc		$(PR_BASE)	$(INCS)
 proginfo_base3.o:	proginfo_base3.cc		$(PR_BASE)	$(INCS)
 proginfo_base4.o:	proginfo_base4.cc		$(PR_BASE)	$(INCS)
 proginfo_base5.o:	proginfo_base5.cc		$(PR_BASE)	$(INCS)
+proginfo_base6.o:	proginfo_base6.cc		$(PR_BASE)	$(INCS)
 
 # sub-module-primary
 proginfo_rand.o:	$(PA_RAND) $(PR_RAND) $(PI_RAND)
