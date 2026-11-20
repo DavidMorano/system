@@ -1017,7 +1017,7 @@ badprogstart:
 	        while (ucmallreg_curenum(&cur,&reg) >= 0) {
 	            debugprintf("main: MIreg.addr=%p\n",reg.addr) ;
 	            debugprintf("main: MIreg.size=%u\n",reg.size) ;
-	            debugprinthexblock(ids,80,reg.addr,reg.size) ;
+	            debugprinthexb(ids,80,reg.addr,reg.size) ;
 	        } /* end while */
 	        ucmallreg_curend(&cur) ;
 	    } /* end if (positive) */
