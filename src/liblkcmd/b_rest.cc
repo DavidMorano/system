@@ -104,7 +104,7 @@ extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
+extern int	debugprinthexb(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
@@ -903,7 +903,7 @@ badprogstart:
 	        while (ucmallreg_curenum(&cur,&reg) >= 0) {
 	            debugprintf("b_rest: MIreg.addr=%p\n",reg.addr) ;
 	            debugprintf("b_rest: MIreg.size=%u\n",reg.size) ;
-	            debugprinthexblock(ids,80,reg.addr,reg.size) ;
+	            debugprinthexb(ids,80,reg.addr,reg.size) ;
 	        }
 	        ucmallreg_curend(&cur) ;
 	    }
