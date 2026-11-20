@@ -98,7 +98,7 @@ extern int	proguserlist_end(PROGINFO *) ;
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
+extern int	debugprinthexb(cchar *,int,cvoid *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
@@ -915,7 +915,7 @@ badprogstart:
 		while (ucmallreg_curenum(&cur,&reg) >= 0) {
 	            debugprintf("main: MIreg.addr=%p\n",reg.addr) ;
 	            debugprintf("main: MIreg.size=%u\n",reg.size) ;
-		    debugprinthexblock(ids,80,reg.addr,reg.size) ;
+		    debugprinthexb(ids,80,reg.addr,reg.size) ;
 		}
 		ucmallreg_curend(&cur) ;
 	    }
