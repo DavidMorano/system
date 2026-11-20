@@ -22,12 +22,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
-#include	<localmisc.h>		/* LIBU |MAXHOSTNAMELEN| */
 
 
 #define	USERINFO		struct userinfo_head
 #define	USERINFO_MAGIC		0x33216271
-#define	USERINFO_LEN		((3 * 2048) + MAXHOSTNAMELEN)
 #define	USERINFO_LOGIDLEN	15
 
 
@@ -54,14 +52,14 @@ struct userinfo_head {
 	cchar		*realname ;	/* processed GECOS-name */
 	cchar		*mailname ;	/* best compacted mail-name */
 	cchar		*fullname ;	/* best fullname */
-	cchar		*name ;		/* best compacted name */
+	cchar		*name ;		/* best compacted real-name */
 	cchar		*groupname ;	/* login groupname */
 	cchar		*projname ;	/* user project name */
 	cchar		*tz ;		/* user time-zone */
 	cchar		*md ;		/* mail-spool directory */
 	cchar		*wstation ;	/* user weather-station */
 	cchar		*logid ;	/* suggested ID for logging */
-	char		*a ;		/* memory allocation */
+	char		*allocinfo ;	/* memory allocation */
 	pid_t		pid ;
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
@@ -79,21 +77,21 @@ struct userinfo_cos {
 	userinfo	*op = nullptr ;
 	void operator () (userinfo *p) noex {
 	    op = p ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () (ccharp = nullptr) noex ;
-} ;
+} ; /* end struct (userinfo_cos) */
 struct userinfo_co {
 	userinfo	*op = nullptr ;
 	int		w = -1 ;
 	void operator () (userinfo *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (userinfo_co) */
 struct userinfo : userinfo_head {
 	userinfo_cos	start ;
@@ -101,25 +99,23 @@ struct userinfo : userinfo_head {
 	userinfo() noex {
 	    start	(this) ;
 	    finish	(this,userinfomem_finish) ;
-	    magval = 0 ;
+	    magval	= 0 ;
 	} ; /* end ctor */
 	userinfo(const userinfo &) = delete ;
 	userinfo &operator = (const userinfo &) = delete ;
 	void dtor() noex ;
 	destruct userinfo() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (userinfo) */
 #else	/* __cplusplus */
 typedef USERINFO	userinfo ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern int userinfo_start	(userinfo *,cchar *) noex ;
-extern int userinfo_finish	(userinfo *) noex ;
-extern int userinfo_data	(userinfo *,char *,int,cchar *) noex ;
-
+    extern int userinfo_start	(userinfo *,cchar *) noex ;
+    extern int userinfo_finish	(userinfo *) noex ;
+    extern int userinfo_data	(userinfo *,char *,int,cchar *) noex ;
 EXTERNC_end
 
 
