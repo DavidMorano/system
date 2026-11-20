@@ -1,3 +1,7 @@
+	} /* end if (syshas.userattr) */
+	return rs ;
+} /* end subroutine (submgr_usready) */
+
 /* userinfo SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
@@ -5,6 +9,7 @@
 /* get user information from various databases */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 #define	CF_OLDUSERINFO	0		/* compile-in old |userinfo(3dam)| */
 #define	CF_UCPWCACHE	0		/* use |ucpwcache(3uc)| */
 
@@ -38,14 +43,15 @@
 
 /*******************************************************************************
 
-	Name:
+	Object:
 	userinfo
 
 	Description:
 	Get user information from PASSWD database.
 
 	Synopsis:
-	int userinfo_start(UI *uip,cchar *username) noex
+	int userinfo_start	(UI *uip,cchar *username) noex
+	int userinfo_finish	(UI *uip) noex
 
 	Arguments:
 	uip		address of 'userinfo' structure
@@ -66,9 +72,9 @@
 #include	<netdb.h>		/* POSIX */
 #include	<pwd.h>			/* POSIX */
 #include	<grp.h>			/* POSIX */
-#include	<strings.h>		/* BSD |strcasecmp(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
@@ -102,6 +108,7 @@
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |DIGBUFLEN| + |REALNAMELEN| */
+#include	<dprint.hh>		/* LIBU */
 
 #include	"userinfo.h"
 
@@ -113,11 +120,21 @@ import uconstants ;			/* |sysword(3u)| */
 
 /* local defines */
 
-#define	PCI		procinfo
-#define	PCI_FL		procinfo_flags
-#define	PCI_TMPS	procinfo_tmps
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
+
+#define	UI		userinfo
+
+#define	SMGR		submgr
+#define	SMGR_FL		submgr_flags
+#define	SMGR_TMPS	submgr_tmps
 
 #define	PRNAME		"LOCAL"		/* program-root for USERATTR */
+
+#ifndef	USERINFO_LEN
+#define	USERINFO_LEN	((3 * 2048) + MAXHOSTNAMELEN)
+#endif
 
 #ifndef	LOGIDLEN
 #define	LOGIDLEN	15		/* log ID length */
@@ -165,8 +182,6 @@ import uconstants ;			/* |sysword(3u)| */
 #ifndef	UA_WS
 #define	UA_WS		"ws"		/* weather station */
 #endif
-
-#define	UI		userinfo
 
 
 /* imported namespaces */
@@ -219,7 +234,7 @@ enum uits {
 	uit_overlast
 } ; /* end enum (uits) */
 
-struct procinfo_flags {
+struct submgr_flags {
 	uint		altuser:1 ;
 	uint		pw:1 ;
 	uint		ua:1 ;
@@ -227,13 +242,13 @@ struct procinfo_flags {
 	uint		allocua:1 ;
 } ; /* end struct */
 
-struct procinfo_tmps {
+struct submgr_tmps {
 	cchar		*gecosname ;
 	cchar		*realname ;
 } ; /* end struct */
 
-struct procinfo {
-	PCI_TMPS	tstrs ;
+struct submgr {
+	SMGR_TMPS	tstrs ;
 	PASSWD		pw ;
 	bits		have ;
 	ucinfo_names	unixinfo ;
@@ -248,7 +263,7 @@ struct procinfo {
 	char		*domainname ;	/* allocated */
 	char		*pr ;		/* allocated */
 	char		*tbuf ;
-	PCI_FL	fl ;
+	SMGR_FL		fl ;
 	int		pwlen ;
 	int		tlen ;
 } ; /* end struct */
@@ -273,9 +288,14 @@ template<typename ... Args>
 local int userinfo_ctor(userinfo *op,Args ... args) noex {
     	USERINFO	*hop = op ;
 	int		rs = SR_FAULT ;
+	cbool		f_debug = true ;
+	DPRINTF("ent\n") ;
 	if (op && (args && ...)) ylikely {
+	DPRINTF("non-null\n") ;
 	    rs = memclear(hop) ;
+	DPRINTF("memclear() rs=%d\n",rs) ;
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (userinfo_ctor) */
 
@@ -292,7 +312,7 @@ local inline int userinfo_magic(userinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == USERINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (userinfo_magic) */
 
@@ -304,68 +324,71 @@ local int	userinfo_load(UI *,strstore *,int *) noex ;
 local int	userinfo_setnuls(UI *,cchar *) noex ;
 #endif
 
-local int	procinfo_start(PCI *,UI *,strstore *,int *) noex ;
-local int	procinfo_finish(PCI *) noex ;
-local int 	procinfo_find(PCI *,cchar *) noex ;
-local int	procinfo_pwentry(PCI *,cchar *) noex ;
-local int	procinfo_getpwuser(PCI *,ucentpw *,char *,int,
-			cchar *) noex ;
-local int	procinfo_store(PCI *,int,cchar *,int,cchar **) noex ;
-local int	procinfo_uabegin(PCI *) noex ;
-local int	procinfo_uaend(PCI *) noex ;
-local int	procinfo_ualookup(PCI *,char *,int,cchar *) noex ;
+local int	submgr_start	(SMGR *,UI *,strstore *,int *) noex ;
+local int	submgr_finish	(SMGR *) noex ;
+local int 	submgr_find	(SMGR *,cchar *) noex ;
+local int	submgr_pwentry	(SMGR *,cchar *) noex ;
+local int	submgr_getpwu	(SMGR *,ucentpw *,char *,int,ccp) noex ;
+local int	submgr_store	(SMGR *,int,cchar *,int,cchar **) noex ;
+local int	submgr_ualookup	(SMGR *,char *,int,cchar *) noex ;
+local int	submgr_uaready	(SMGR *) noex ;
+local int	submgr_uaobjbeg	(SMGR *) noex ;
+local int	submgr_uaobjend	(SMGR *) noex ;
+local int	submgr_uabeg	(SMGR *) noex ;
+local int	submgr_uaend	(SMGR *) noex ;
 
 /* components */
-local int	procinfo_homedname(PCI *) noex ;
-local int	procinfo_shell(PCI *) noex ;
-local int	procinfo_org(PCI *) noex ;
-local int	procinfo_prbin(PCI *) noex ;
-local int	procinfo_office(PCI *) noex ;
-local int	procinfo_printer(PCI *) noex ;
-local int	procinfo_gecos(PCI *) noex ;
-local int	procinfo_gecosname(PCI *) noex ;
-local int	procinfo_realname(PCI *) noex ;
-local int	procinfo_mailname(PCI *) noex ;
-local int	procinfo_name(PCI *) noex ;
-local int	procinfo_fullname(PCI *) noex ;
-local int	procinfo_uinfo(PCI *) noex ;
-local int	procinfo_nodename(PCI *) noex ;
-local int	procinfo_domainname(PCI *) noex ;
-local int	procinfo_project(PCI *) noex ;
-local int	procinfo_tz(PCI *) noex ;
-local int	procinfo_md(PCI *) noex ;
-local int	procinfo_wstation(PCI *) noex ;
-local int	procinfo_logid(PCI *) noex ;
+local int	submgr_homedname(SMGR *) noex ;
+local int	submgr_shell(SMGR *) noex ;
+local int	submgr_org(SMGR *) noex ;
+local int	submgr_prbin(SMGR *) noex ;
+local int	submgr_office(SMGR *) noex ;
+local int	submgr_printer(SMGR *) noex ;
+local int	submgr_gecos(SMGR *) noex ;
+local int	submgr_gecosname(SMGR *) noex ;
+local int	submgr_realname(SMGR *) noex ;
+local int	submgr_mailname(SMGR *) noex ;
+local int	submgr_name(SMGR *) noex ;
+local int	submgr_fullname(SMGR *) noex ;
+local int	submgr_uinfo(SMGR *) noex ;
+local int	submgr_nodename(SMGR *) noex ;
+local int	submgr_domainname(SMGR *) noex ;
+local int	submgr_project(SMGR *) noex ;
+local int	submgr_tz(SMGR *) noex ;
+local int	submgr_md(SMGR *) noex ;
+local int	submgr_wstation(SMGR *) noex ;
+local int	submgr_logid(SMGR *) noex ;
 
 
 /* local variables */
 
 /* order here is generally (quite) important */
-constexpr int		(*components[])(PCI *) = {
-	procinfo_homedname,
-	procinfo_shell,
-	procinfo_org,
-	procinfo_prbin,
-	procinfo_office,
-	procinfo_printer,
-	procinfo_gecos,
-	procinfo_gecosname,
-	procinfo_realname,
-	procinfo_mailname,
-	procinfo_name,
-	procinfo_fullname,
-	procinfo_uinfo,
-	procinfo_nodename,
-	procinfo_domainname,
-	procinfo_project,
-	procinfo_tz,
-	procinfo_md,
-	procinfo_wstation,
-	procinfo_logid,
+constexpr int		(*components[])(SMGR *) = {
+	submgr_homedname,
+	submgr_shell,
+	submgr_org,
+	submgr_prbin,
+	submgr_office,
+	submgr_printer,
+	submgr_gecos,
+	submgr_gecosname,
+	submgr_realname,
+	submgr_mailname,
+	submgr_name,
+	submgr_fullname,
+	submgr_uinfo,
+	submgr_nodename,
+	submgr_domainname,
+	submgr_project,
+	submgr_tz,
+	submgr_md,
+	submgr_wstation,
+	submgr_logid,
 	nullptr
 } ; /* end array */
 
 static vars		var ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -378,33 +401,56 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
+	DPRINTF("ent\n") ;
+	printf("userinfo_start: ent\n") ;
 	if ((rs = userinfo_ctor(uip)) >= 0) ylikely {
 	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		static cchar	*nn = getenver(varname.node) ;
 	        uip->nodename = nn ;
+	printf("userinfo_start: 1\n") ;
+	DPRINTF("1\n") ;
 	        if ((rs = userinfo_id(uip)) >= 0) ylikely {
 	            cint	sz = (uit_overlast * szof(cchar *)) ;
+	printf("userinfo_start: 2\n") ;
+	DPRINTF("2\n") ;
 	            if (void *vp ; (rs = lm_call(1,sz,&vp)) >= 0) ylikely {
 	                strstore	st ;
+			cint		sn = 10 ;
 	                int		*sis = cast_static<int *>(vp) ;
-	                if ((rs = strstore_start(&st,10,startsize)) >= 0) {
+	printf("userinfo_start: 3\n") ;
+	DPRINTF("3\n") ;
+	                if ((rs = strstore_start(&st,sn,startsize)) >= 0) {
+	printf("userinfo_start: 4\n") ;
+	DPRINTF("4\n") ;
 	                    if ((rs = userinfo_process(uip,&st,sis,un)) >= 0) {
+	printf("userinfo_start: 5\n") ;
+	DPRINTF("5\n") ;
 	                        rs = userinfo_load(uip,&st,sis) ;
 	                        len = rs ;
+	printf("userinfo_start: 6 rs=%d\n",rs) ;
+	DPRINTF("6 rs=%d\n",rs) ;
 	                    } /* end if */
 	                    rs1 = strstore_finish(&st) ;
 	                    if (rs >= 0) rs = rs1 ;
+	printf("userinfo_start: 7 rs=%d\n",rs) ;
+	DPRINTF("7 rs=%d\n",rs) ;
 	                } /* end if (strstore) */
 	                rs1 = lm_free(vp) ;
 	                if (rs >= 0) rs = rs1 ;
+	printf("userinfo_start: 8 rs=%d\n",rs) ;
+	DPRINTF("8 rs=%d\n",rs) ;
 	            } /* end if (memory_allocation) */
-	            if (rs >= 0) uip->magval = USERINFO_MAGIC ;
+	            if (rs >= 0) {
+			uip->magval = USERINFO_MAGIC ;
+		    } /* end if (ok) */
 	        } /* end if (userinfo_id) */
 	    } /* end if (vars::operator) */
 	    if (rs < 0) {
 		userinfo_dtor(uip) ;
 	    } /* end if (error) */
 	} /* end if (userinfo_ctor) */
+	printf("userinfo_start: ret rs=%d\n",rs) ;
+	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (userinfo_start) */
 
@@ -412,15 +458,15 @@ int userinfo_finish(UI *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = userinfo_magic(op)) >= 0) ylikely {
-	    if (op->a) ylikely {
-	        rs1 = lm_free(op->a) ;
+	    if (op->allocinfo) ylikely {
+	        rs1 = lm_free(op->allocinfo) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->a = nullptr ;
+	        op->allocinfo = nullptr ;
 	    } /* end if (memory-release) */
 	    {
 	        rs1 = userinfo_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -433,25 +479,29 @@ local int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	if (PCI pi ; (rs = procinfo_start(&pi,uip,stp,sis)) >= 0) ylikely {
+	DPRINTF("ent\n") ;
+	if (SMGR pi ; (rs = submgr_start(&pi,uip,stp,sis)) >= 0) ylikely {
 	    {
-	        rs = procinfo_find(&pi,un) ;
+		DPRINTF("-> find\n") ;
+	        rs = submgr_find(&pi,un) ;
 		rv = rs ;
+		DPRINTF("find() rs=%d\n",rs) ;
 	    }
-	    rs1 = procinfo_finish(&pi) ;
+	    rs1 = submgr_finish(&pi) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (procinfo) */
+	} /* end if (submgr) */
+	DPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (userinfo_process) */
 
 local int userinfo_id(UI *uip) noex {
 	int		rs ;
 	if ((rs = ucpid) >= 0) {
-	    uip->pid = rs ;
-	    uip->uid = getuid() ;
-	    uip->euid = geteuid() ;
-	    uip->gid = getgid() ;
-	    uip->egid = getegid() ;
+	    uip->pid	= rs ;
+	    uip->uid	= getuid() ;
+	    uip->euid	= geteuid() ;
+	    uip->gid	= getgid() ;
+	    uip->egid	= getegid() ;
 	    if ((rs = ostype) >= 0) {
 	        uip->ostype = rs ;
 	    }
@@ -562,20 +612,20 @@ local int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	                } /* end switch */
 	                if ((rs >= 0) && (*vpp == nullptr)) {
 			    *vpp = (a + sis[i]) ;
-			}
+			} /* end */
 	            } /* end for */
 	        } /* end if */
 	        if (rs >= 0) {
-	            uip->a = a ;
+	            uip->allocinfo = a ;
 	        } else {
 	            lm_free(a) ;
-		}
+		} /* end */
 	    } /* end if (memory-acquire) */
 	} /* end if */
 	return (rs >= 0) ? sz : rs ;
 } /* end subroutine (userinfo_load) */
 
-local int procinfo_start(PCI *pip,UI *uip,strstore *stp,int *sis) noex {
+local int submgr_start(SMGR *pip,UI *uip,strstore *stp,int *sis) noex {
 	cint		pwlen = var.pwlen ;
 	int		rs ;
 	int		sz = 0 ;
@@ -612,16 +662,16 @@ local int procinfo_start(PCI *pip,UI *uip,strstore *stp,int *sis) noex {
 	    } else {
 	        lm_free(bp) ;
 	        pip->a = nullptr ;
-	    }
+	    } /* end */
 	} /* end if */
 	return rs ;
-} /* end subroutine (procinfo_start) */
+} /* end subroutine (submgr_start) */
 
-local int procinfo_finish(PCI *pip) noex {
+local int submgr_finish(SMGR *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	{
-	    rs1 = procinfo_uaend(pip) ;
+	    rs1 = submgr_uaend(pip) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	if (pip->pwbuf) ylikely {
@@ -640,9 +690,9 @@ local int procinfo_finish(PCI *pip) noex {
 	    pip->a = nullptr ;
 	} /* end if (memory-release) */
 	return rs ;
-} /* end subroutine (procinfo_finish) */
+} /* end subroutine (submgr_finish) */
 
-local int procinfo_store(PCI *pip,int uit,cc *vp,int vl,cc **rpp) noex {
+local int submgr_store(SMGR *pip,int uit,cc *vp,int vl,cc **rpp) noex {
 	strstore	*stp = pip->stp ;
 	int		rs = SR_OK ;
 	if (uit >= 0) {
@@ -655,17 +705,49 @@ local int procinfo_store(PCI *pip,int uit,cc *vp,int vl,cc **rpp) noex {
 	    }
 	} else {
 	    rs = SR_BUGCHECK ;
-	}
+	} /* end if (error) */
 	if (rpp && (rs < 0)) {
 	    *rpp = nullptr ;
 	} /* end if (error) */
 	return rs ;
-} /* end subroutine (procinfo_store) */
+} /* end subroutine (submgr_store) */
 
-local int procinfo_uabegin(PCI *pip) noex {
+local int submgr_uaready(SMGR *pip) noex {
+    	int		rs = SR_OK ;
+	if (syshas.userattr) {
+	    rs = submgr_usbeg(pip) ;
+	} /* end if (syshas.userattr) */
+	return rs ;
+} /* end subroutine (submgr_usready) */
+
+local int submgr_uaobjbeg(SMGR *pip) noex {
+    	int		rs = SR_OK ;
+	if (pip->uap == nullptr) {
+	    cint	sz = szof(userattrdb) ;
+	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
+	        pip->uap = (userattrdb *) vp ;
+	    } /* end if (memory-acquire) */
+	} /* end if (needed) */
+	return rs ;
+} /* end subroutine (submgr_uaobjbeg) */
+
+local int submgr_uaobjend(SMGR *pip) noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (pip->uap) {
+	    rs1 = lm_free(pip->uap) ;
+	    if (rs >= 0) rs = rs1 ;
+	    pip->uap = nullptr ;
+	} /* end if (had) */
+	return rs ;
+} /* end subroutine (submgr_uaobjend) */
+
+local int submgr_uabeg(SMGR *pip) noex {
 	int		rs = SR_OK ;
+	DPRINTF("ent\n") ;
 	if ((! pip->fl.ua) && pip->fl.pw && (! pip->fl.uainit)) {
 	    pip->fl.uainit = true ;
+
 	    if (pip->uap == nullptr) {
 	        cint	sz = szof(userattrdb) ;
 	        if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
@@ -687,10 +769,11 @@ local int procinfo_uabegin(PCI *pip) noex {
 		} /* end if */
 	    } /* end if (ok) */
 	} /* end if (f.ua) */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (procinfo_uabegin) */
+} /* end subroutine (submgr_uabeg) */
 
-local int procinfo_uaend(PCI *pip) noex {
+local int submgr_uaend(SMGR *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pip->fl.ua) ylikely {
@@ -705,80 +788,94 @@ local int procinfo_uaend(PCI *pip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-release) */
 	return rs ;
-} /* end subroutine (procinfo_uaend) */
+} /* end subroutine (submgr_uaend) */
 
-local int procinfo_ualookup(PCI *pip,char *rbuf,int rlen,cc *kn) noex {
+local int submgr_ualookup(SMGR *pip,char *rbuf,int rlen,cc *kn) noex {
 	int		rs = SR_FAULT ;
 	if (pip && rbuf && kn) ylikely {
-	    rbuf[0] = '\0' ;
+	    rbuf[0] = eos ;
 	    rs = SR_OK ;
-	    if (pip->fl.pw) {
-	        if (! pip->fl.ua) {
-		    rs = procinfo_uabegin(pip) ;
-		}
-	        if (rs >= 0) ylikely {
-	            rs = userattrdb_lookup(pip->uap,rbuf,rlen,kn) ;
-	        }
-	    }
+	    if (syshas.userattr) {
+	        if (pip->fl.pw) {
+	            if (! pip->fl.ua) {
+		        rs = submgr_uabeg(pip) ;
+		    }
+	            if (rs >= 0) ylikely {
+	                rs = userattrdb_lookup(pip->uap,rbuf,rlen,kn) ;
+	            }
+	        } /* end if (has-pw) */
+	    } /* end if (syshas.userattr) */
 	} /* end if (non-null) */
 	return rs ;
-} /* end subroutine (procinfo_ualookup) */
+} /* end subroutine (submgr_ualookup) */
 
-local int procinfo_find(PCI *pip,cchar *un) noex {
+local int submgr_find(SMGR *pip,cchar *un) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs ;
-	if ((rs = procinfo_pwentry(pip,un)) >= 0) ylikely {
+	DPRINTF("ent\n") ;
+	if ((rs = submgr_pwentry(pip,un)) >= 0) ylikely {
 	    cint	dlen = DIGBUFLEN ;
 	    int		cl = -1 ;
 	    int		uit ;
 	    cchar	*cp{} ;
 	    char	dbuf[DIGBUFLEN+1] ;
+	DPRINTF("1 rs=%d\n",rs) ;
 	    if (rs > 0) {
 	        cchar	*vp{} ;
 	        uip->gid = pip->pw.pw_gid ;
 	        cp = pip->pw.pw_name ;
 	        if (rs >= 0) {
+	DPRINTF("2 rs=%d\n",rs) ;
 	            uit = uit_password ;
 	            vp = pip->pw.pw_passwd ;
-	            rs = procinfo_store(pip,uit,vp,-1,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,-1,nullptr) ;
 	        }
+	DPRINTF("3 rs=%d\n",rs) ;
 	        if (rs >= 0) {
 	            uit = uit_gecos ;
 	            vp = pip->pw.pw_gecos ;
-	            rs = procinfo_store(pip,uit,vp,-1,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,-1,nullptr) ;
 	        }
+	DPRINTF("4 rs=%d\n",rs) ;
 	        if (rs >= 0) {
 	            uit = uit_homedname ;
 	            vp = pip->pw.pw_dir ;
-	            rs = procinfo_store(pip,uit,vp,-1,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,-1,nullptr) ;
 	        }
+	DPRINTF("5 rs=%d\n",rs) ;
 	    } else {
 	        uint	uv = (uint) uip->uid ;
 	        cp = dbuf ;
 	        dbuf[0] = 'U' ;
 	        cl = ctdecui((dbuf+1),(dlen-1),uv) + 1 ;
+	DPRINTF("6 rs=%d\n",rs) ;
 	    } /* end if */
+	DPRINTF("7 rs=%d\n",rs) ;
 	    if (rs >= 0) {
 	        uit = uit_username ;
-	        rs = procinfo_store(pip,uit,cp,cl,nullptr) ;
+	        rs = submgr_store(pip,uit,cp,cl,nullptr) ;
 	    }
+	DPRINTF("8 rs=%d\n",rs) ;
 	    if (rs >= 0) {
 	        for (int i = 0 ; components[i] ; i += 1) {
+	DPRINTF("loop i=%d rs=%d\n",i,rs) ;
 	            rs = (*components[i])(pip) ;
 	            if (rs < 0) break ;
-	        } /* end if */
+	        } /* end for */
+	DPRINTF("loop-out rs=%d\n",rs) ;
 	    } /* end if */
 	} /* end if */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (procinfo_find) */
+} /* end subroutine (submgr_find) */
 
-local int procinfo_pwentry(PCI *pip,cchar *un) noex {
+local int submgr_pwentry(SMGR *pip,cchar *un) noex {
 	ucentpw		pw ;
 	int		rs ;
 	int		pwlen = pip->tlen ;
 	int		f = false ;
 	char		*pwbuf = pip->tbuf ;
-	if ((rs = procinfo_getpwuser(pip,&pw,pwbuf,pwlen,un)) >= 0) {
+	if ((rs = submgr_getpwu(pip,&pw,pwbuf,pwlen,un)) >= 0) {
 	    ucentpw	*pwp = cast_static<ucentpw *>(&pw) ;
 	    pip->fl.pw = true ;
 	    if ((rs = pwp->size()) >= 0) {
@@ -795,11 +892,11 @@ local int procinfo_pwentry(PCI *pip,cchar *un) noex {
 		    } /* end if (error) */
 	        } /* end if (memory-acquire) */
 	    } /* end if (passwdent_size) */
-	} /* end if (procinfo_getpwuser) */
+	} /* end if (submgr_getpwu) */
 	return (rs >= 0) ? f : rs ;
-} /* end subroutine (procinfo_pwentry) */
+} /* end subroutine (submgr_pwentry) */
 
-local int procinfo_getpwuser(PCI *pip,ucentpw *pwp,
+local int submgr_getpwu(SMGR *pip,ucentpw *pwp,
 		char *pwbuf,int pwlen,cchar *un) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs ;
@@ -813,11 +910,11 @@ local int procinfo_getpwuser(PCI *pip,ucentpw *pwp,
 	    } /* end if (getpwx_name) */
 	} else {
 	    rs = getpwusername(pwp,pwbuf,pwlen,uip->uid) ;
-	}
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_getpwuser) */
+} /* end subroutine (submgr_getpwu) */
 
-local int procinfo_homedname(PCI *pip) noex {
+local int submgr_homedname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_homedname ;
@@ -835,11 +932,11 @@ local int procinfo_homedname(PCI *pip) noex {
 	        vp = sysword.w_tmpdir ;
 	    }
 	    uip->homedname = vp ;
-	}
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_homedname) */
+} /* end subroutine (submgr_homedname) */
 
-local int procinfo_shell(PCI *pip) noex {
+local int submgr_shell(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_shell ;
@@ -855,9 +952,9 @@ local int procinfo_shell(PCI *pip) noex {
 	    }
 	} /* end if */
 	return rs ;
-} /* end subroutine (procinfo_shell) */
+} /* end subroutine (submgr_shell) */
 
-local int procinfo_org(PCI *pip) noex {
+local int submgr_org(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	cint		orglen = var.maxnamelen ;
 	int		rs = SR_OK ;
@@ -895,7 +992,7 @@ local int procinfo_org(PCI *pip) noex {
 	        } /* end if */
 	        if (rs >= 0) ylikely {
 	            if ((vp != nullptr) && (vp[0] != '\0')) {
-	                rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
+	                rs = submgr_store(pip,uit,vp,vl,nullptr) ;
 		    }
 	        } /* end if (ok) */
 		rs1 = lm_free(orgfname) ;
@@ -903,9 +1000,9 @@ local int procinfo_org(PCI *pip) noex {
 	    } /* end if (m-a-f) */
 	} /* end if */
 	return rs ;
-} /* end subroutine (procinfo_org) */
+} /* end subroutine (submgr_org) */
 
-local int procinfo_prbin(PCI *pip) noex {
+local int submgr_prbin(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_prbin ;
@@ -918,12 +1015,12 @@ local int procinfo_prbin(PCI *pip) noex {
 	    }
 	    if ((vp != nullptr) && (vp[0] != '\0')) {
 	        uip->prbin = vp ;
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_prbin) */
+} /* end subroutine (submgr_prbin) */
 
-local int procinfo_office(PCI *pip) noex {
+local int submgr_office(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_office ;
@@ -937,11 +1034,11 @@ local int procinfo_office(PCI *pip) noex {
 	    if ((vp != nullptr) && (vp[0] != '\0')) {
 	        uip->office = vp ;
 	    }
-	}
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_office) */
+} /* end subroutine (submgr_office) */
 
-local int procinfo_printer(PCI *pip) noex {
+local int submgr_printer(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_printer ;
@@ -957,10 +1054,10 @@ local int procinfo_printer(PCI *pip) noex {
 	    }
 	}
 	return rs ;
-} /* end subroutine (procinfo_printer) */
+} /* end subroutine (submgr_printer) */
 
 /* parse out the GECOS field */
-local int procinfo_gecos(PCI *pip) noex {
+local int submgr_gecos(SMGR *pip) noex {
     	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1056,7 +1153,7 @@ local int procinfo_gecos(PCI *pip) noex {
 	                    break ;
 	                } /* end switch */
 	                if ((rs >= 0) && (vp != np)) {
-	                    rs = procinfo_store(pip,uit,vp,vl,np) ;
+	                    rs = submgr_store(pip,uit,vp,vl,np) ;
 	                }
 	            } /* end if */
 	            if (rs < 0) break ;
@@ -1066,9 +1163,9 @@ local int procinfo_gecos(PCI *pip) noex {
 	    } /* end if (gecos) */
 	} /* end if (non-empty) */
 	return rs ;
-} /* end subroutine (procinfo_gecos) */
+} /* end subroutine (submgr_gecos) */
 
-local int procinfo_gecosname(PCI *pip) noex {
+local int submgr_gecosname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_gecosname ;
@@ -1081,14 +1178,14 @@ local int procinfo_gecosname(PCI *pip) noex {
 	        char	nbuf[REALNAMELEN+1] ;
 	        if ((vl = mkgecosname(nbuf,nlen,gstr)) > 0) {
 	            vp = nbuf ;
-	            rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,vl,nullptr) ;
 	        }
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_gecosname) */
+} /* end subroutine (submgr_gecosname) */
 
-local int procinfo_realname(PCI *pip) noex {
+local int submgr_realname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_realname ;
@@ -1100,7 +1197,7 @@ local int procinfo_realname(PCI *pip) noex {
 	        if (! pip->fl.altuser) {
 	            sp = getenver(varname.name) ;
 	        }
-	    }
+	    } /* end */
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        int	vl ;
 	        cchar	*vp = nbuf ;
@@ -1111,12 +1208,12 @@ local int procinfo_realname(PCI *pip) noex {
 	            pip->sis[uit] = rs ;
 	            pip->tstrs.realname = cp ;
 	        }
-	    }
+	    } /* end */
 	} /* end if (needed) */
 	return rs ;
-} /* end subroutine (procinfo_realname) */
+} /* end subroutine (submgr_realname) */
 
-local int procinfo_mailname(PCI *pip) noex {
+local int submgr_mailname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_mailname ;
@@ -1159,14 +1256,14 @@ local int procinfo_mailname(PCI *pip) noex {
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        vp = mbuf ;
 	        if ((vl = mkmailname(mbuf,mlen,sp,sl)) > 0) {
-	            rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,vl,nullptr) ;
 		}
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_mailname) */
+} /* end subroutine (submgr_mailname) */
 
-local int procinfo_name(PCI *pip) noex {
+local int submgr_name(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_name ;
@@ -1181,7 +1278,7 @@ local int procinfo_name(PCI *pip) noex {
 	        if (! pip->fl.altuser) {
 	            sp = getenver(varname.name) ;
 	        }
-	    }
+	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        sp = pip->tstrs.realname ;
 	        if (sp == nullptr) {
@@ -1195,21 +1292,21 @@ local int procinfo_name(PCI *pip) noex {
 	            sp = rbuf ;
 	            sl = mkrealname(rbuf,rlen,gp,gl) ;
 	        }
-	    }
+	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (pip->fl.pw) {
 		    sp = pip->pw.pw_name ;
 		    sl = -1 ;
 		}
-	    }
+	    } /* end */
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
-	        rs = procinfo_store(pip,uit,sp,sl,nullptr) ;
-	    }
-	}
+	        rs = submgr_store(pip,uit,sp,sl,nullptr) ;
+	    } /* end */
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_name) */
+} /* end subroutine (submgr_name) */
 
-local int procinfo_fullname(PCI *pip) noex {
+local int submgr_fullname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_fullname ;
@@ -1223,9 +1320,9 @@ local int procinfo_fullname(PCI *pip) noex {
 	    }
 	}
 	return rs ;
-} /* end subroutine (procinfo_fullname) */
+} /* end subroutine (submgr_fullname) */
 
-local int procinfo_nodename(PCI *pip) noex {
+local int submgr_nodename(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_nodename ;
@@ -1236,18 +1333,19 @@ local int procinfo_nodename(PCI *pip) noex {
 	    if (nbuf[0] == '\0') {
 	        rs = getnodename(nbuf,nlen) ;
 	        nl = rs ;
-	    }
+	    } /* end */
 	    if (rs >= 0) {
-	        rs = procinfo_store(pip,uit,nbuf,nl,nullptr) ;
-	    }
-	}
+	        rs = submgr_store(pip,uit,nbuf,nl,nullptr) ;
+	    } /* end */
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_nodename) */
+} /* end subroutine (submgr_nodename) */
 
-local int procinfo_domainname(PCI *pip) noex {
+local int submgr_domainname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_domainname ;
+	DPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->domainname == nullptr)) {
 	    uip->domainname = nullptr ;
 	    if (uip->domainname == nullptr) {
@@ -1259,21 +1357,28 @@ local int procinfo_domainname(PCI *pip) noex {
 		    }
 	            uip->domainname = valp ;
 	        } /* end if (getting env-domain) */
-	    }
+	    } /* end */
+	DPRINTF("mid1 rs=%d\n",rs) ;
 	    if (uip->domainname == nullptr) {
 	        cint	dlen = var.hostnamelen ;
 	        int	dl = -1 ;
 	        char	*dbuf = pip->domainname ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
+	DPRINTF("pw1 rs=%d\n",rs) ;
 	            if (pip->fl.pw) {
 	                cchar	*kn = UA_DN ;
-	                rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
+	DPRINTF("pw2 rs=%d\n",rs) ;
+	                rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
+	DPRINTF("pw3 rs=%d\n",rs) ;
 	                if (isNotPresent(rs)) {
-	                    dbuf[0] = '\0' ;
+	DPRINTF("pw4 rs=%d\n",rs) ;
+	                    dbuf[0] = eos ;
 	                    rs = SR_OK ;
 	                }
-	            }
-	        }
+	DPRINTF("pw5 rs=%d\n",rs) ;
+	            } /* end */
+	        } /* end */
+	DPRINTF("mid2 rs=%d\n",rs) ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
 	            rs = getinetdomain(dbuf,dlen) ;
 	            dl = rs ;
@@ -1281,16 +1386,18 @@ local int procinfo_domainname(PCI *pip) noex {
 	                dbuf[0] = '\0' ;
 	                rs = SR_OK ;
 	            }
-	        }
+	        } /* end */
+	DPRINTF("mid3 rs=%d\n",rs) ;
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
-	            rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
-	        }
-	    }
-	}
+	            rs = submgr_store(pip,uit,dbuf,dl,nullptr) ;
+	        } /* end */
+	    } /* end */
+	} /* end */
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
-} /* end subroutine (procinfo_domainename) */
+} /* end subroutine (submgr_domainename) */
 
-local int procinfo_project(PCI *pip) noex {
+local int submgr_project(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	cint		dlen = var.projnamelen ;
 	int		rs = SR_OK ;
@@ -1301,14 +1408,14 @@ local int procinfo_project(PCI *pip) noex {
 	    if ((rs >= 0) && (dbuf[0] == '\0')) {
 	        if (pip->fl.pw) {
 	            cchar	*kn = UA_PROJECT ;
-	            rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
+	            rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
 	            dl = rs ;
 	            if (isNotPresent(rs)) {
 	                dbuf[0] = '\0' ;
 	                rs = SR_OK ;
 	            }
 	        }
-	    }
+	    } /* end */
 	    if ((rs >= 0) && (dbuf[0] == '\0')) {
 	        if (pip->fl.pw) {
 	            cchar	*un = pip->pw.pw_name ;
@@ -1319,15 +1426,15 @@ local int procinfo_project(PCI *pip) noex {
 	                rs = SR_OK ;
 	            }
 	        }
-	    }
+	    } /* end */
 	    if ((rs >= 0) && (dbuf[0] != '\0')) {
-	        rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
-	    }
+	        rs = submgr_store(pip,uit,dbuf,dl,nullptr) ;
+	    } /* end */
 	} /* end if (project) */
 	return rs ;
-} /* end subroutine (procinfo_project) */
+} /* end subroutine (submgr_project) */
 
-local int procinfo_tz(PCI *pip) noex {
+local int submgr_tz(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
@@ -1345,7 +1452,7 @@ local int procinfo_tz(PCI *pip) noex {
 	        char	dbuf[var.tznamelen +1] ;
 	        if (pip->fl.pw) {
 	            cchar	*kn = UA_TZ ;
-	            rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
+	            rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
 	            dl = rs ;
 	            if (isNotPresent(rs)) {
 	                dbuf[0] = '\0' ;
@@ -1353,14 +1460,14 @@ local int procinfo_tz(PCI *pip) noex {
 	            }
 	        } /* end if */
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
-	            rs = procinfo_store(pip,uit,dbuf,dl,np) ;
+	            rs = submgr_store(pip,uit,dbuf,dl,np) ;
 	        } /* end if */
 	    } /* end if */
 	} /* end if (tz) */
 	return rs ;
-} /* end subroutine (procinfo_tz) */
+} /* end subroutine (submgr_tz) */
 
-local int procinfo_md(PCI *pip) noex {
+local int submgr_md(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1371,7 +1478,7 @@ local int procinfo_md(PCI *pip) noex {
 	        if (! pip->fl.altuser) {
 	            uip->md = getenver(varname.maildir) ;
 	        }
-	    }
+	    } /* end */
 	    if (uip->md == nullptr) {
 	        int	dl = -1 ;
 	        if (char *dbuf ; (rs = lm_hostname(&dbuf)) >= 0) {
@@ -1379,7 +1486,7 @@ local int procinfo_md(PCI *pip) noex {
 	            if ((rs >= 0) && (dbuf[0] == '\0')) {
 	                if (pip->fl.pw) {
 	                    cchar	*kn = UA_MD ;
-	                    rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
+	                    rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
 	                    dl = rs ;
 	                    if (isNotPresent(rs)) {
 	                        dbuf[0] = '\0' ;
@@ -1388,17 +1495,17 @@ local int procinfo_md(PCI *pip) noex {
 	                }
 	            } /* end if */
 	            if ((rs >= 0) && (dbuf[0] != '\0')) {
-	                rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
+	                rs = submgr_store(pip,uit,dbuf,dl,nullptr) ;
 	            }
 		    rs1 = lm_free(dbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
-	    }
+	    } /* end */
 	} /* end if (md) */
 	return rs ;
-} /* end subroutine (procinfo_md) */
+} /* end subroutine (submgr_md) */
 
-local int procinfo_wstation(PCI *pip) noex {
+local int submgr_wstation(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_wstation ;
@@ -1408,7 +1515,7 @@ local int procinfo_wstation(PCI *pip) noex {
 	        if (! pip->fl.altuser) {
 	            uip->wstation = getenver(VARWSTATION) ;
 	        }
-	    }
+	    } /* end */
 	    if (uip->wstation == nullptr) {
 	        cint	dlen = WSLEN ;
 	        int	dl = -1 ;
@@ -1416,23 +1523,23 @@ local int procinfo_wstation(PCI *pip) noex {
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
 	            if (pip->fl.pw) {
 	                cchar	*kn = UA_WS ;
-	                rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
+	                rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
 	                dl = rs ;
 	                if (isNotPresent(rs)) {
 	                    dbuf[0] = '\0' ;
 	                    rs = SR_OK ;
 	                }
 	            }
-	        }
+	        } /* end */
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
-	            rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
-	        }
-	    }
-	}
+	            rs = submgr_store(pip,uit,dbuf,dl,nullptr) ;
+	        } /* end */
+	    } /* end */
+	} /* end */
 	return rs ;
-} /* end subroutine (procinfo_wstation) */
+} /* end subroutine (submgr_wstation) */
 
-local int procinfo_logid(PCI *pip) noex {
+local int submgr_logid(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
@@ -1447,14 +1554,14 @@ local int procinfo_logid(PCI *pip) noex {
 	        cint	llen = LOGIDLEN ;
 	        char	lbuf[LOGIDLEN+1] ;
 	        if ((rs = mklogid(lbuf,llen,nn,-1,v)) >= 0) {
-	            rs = procinfo_store(pip,uit,lbuf,rs,np) ;
+	            rs = submgr_store(pip,uit,lbuf,rs,np) ;
 	        }
 	    }
 	}
 	return rs ;
-} /* end subroutine (procinfo_logid) */
+} /* end subroutine (submgr_logid) */
 
-local int procinfo_uinfo(PCI *pip) noex {
+local int submgr_uinfo(SMGR *pip) noex {
 	int		rs ;
 	if ((rs = ucinfo_name(&pip->unixinfo)) >= 0) {
 	    userinfo	*uip = pip->uip ;
@@ -1467,27 +1574,41 @@ local int procinfo_uinfo(PCI *pip) noex {
 	    if ((pip->sis[uit] == 0) && (uip->nodename == nullptr)) {
 	        uip->nodename = xip->nodename ;
 	    }
-	}
+	} /* end subroutine */
 	return rs ;
-} /* end subroutine (procinfo_uinfo) */
+} /* end subroutine (submgr_uinfo) */
 
 void userinfo::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("userinfo",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (useirnfo::dtor) */
 
 userinfo_cos::operator int () noex {
-	return userinfo_start(op,nullptr) ;
+    	int		rs = SR_BUGCHECK ;
+	DPRINTF("ent op-int\n") ;
+	printf("userinfo_cos::op1: ent\n") ;
+	if (op) ylikely {
+	printf("userinfo_cos::op1: non\n") ;
+	    rs = userinfo_start(op,nullptr) ;
+	} /* end if (non-null) */
+	printf("userinfo_cos::op1: ret rs=%d\n",rs) ;
+	return rs ;
 } /* end method */
 
 int userinfo_cos::operator () (cchar *un) noex {
-	return userinfo_start(op,un) ;
+    	int		rs = SR_BUGCHECK ;
+	DPRINTF("ent op-call\n") ;
+	printf("userinfo_cos::op2: ent\n") ;
+	if (op) ylikely {
+	    rs = userinfo_start(op,un) ;
+	} /* end if (non-null) */
+	return rs ;
 } /* end method */
 
 userinfo_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case userinfomem_finish:
 	        rs = userinfo_finish(op) ;
@@ -1638,12 +1759,12 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	                    } /* end switch */
 	                    if (sp) {
 			        rs = si.strw(sp,-1,rpp) ;
-		            }
+		            } /* end */
 	                    if (rs < 0) break ;
 	                } /* end for */
 	                if (rs >= 0) {
 		            oup->magval = USERINFO_MAGIC ;
-		        }
+		        } /* end */
 	                sz = si.finish ;
 	                if (rs >= 0) rs = sz ;
 	            } /* end if (storeitem) */
@@ -1683,7 +1804,7 @@ vars::operator int () noex {
 		    }
 		}
 	    }
-	}
+	} /* end */
 	return rs ;
 } /* end method (vars::operator) */
 
