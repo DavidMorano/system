@@ -5,7 +5,7 @@
 /* special debug printing */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* debugging */
+#define	CF_DEBUG	1		/* debugging */
 #define	CF_LINELEN	0		/* use |strlinelen(3dam)| */
 
 /* revision history:
@@ -30,7 +30,7 @@
 	debugprintfsize		
 	debugsetfd		
 	debuggetfd		
-	debugprinthexblock	
+	debugprinthexb	
 	debugprinthexs		
 	debugprintdeci		
 	debugprinthexi		
@@ -54,7 +54,7 @@
 	debugprintfsize		(cchar *,int) noex
 	debugsetfd		(int) noex
 	debuggetfd		(void) noex
-	debugprinthexblock	(cchar *,int,cvoid *,int) noex
+	debugprinthexb	(cchar *,int,cvoid *,int) noex
 	debugprinthexs		(cchar *,int,cvoid *,int) noex
 	debugprintdeci		(cchar *,int) noex
 	debugprinthexi		(cchar *,int) noex
@@ -460,7 +460,7 @@ int debugprinthexs(cchar *ids,int maxcols,cchar *sp,int sl) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (debugprinthex) */
 
-int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
+int debugprinthexb(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ; /* return-value */
 	if (vp) ylikely {
@@ -501,7 +501,7 @@ int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
 	    } /* end while */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-} /* end subroutine (debugprinthexblock) */
+} /* end subroutine (debugprinthexb) */
 
 int debugsetfd(int fd) noex {
 	int		rs = SR_NOTOPEN ;
@@ -574,12 +574,15 @@ int debuggetfd() noex {
 /* low level debug-print function */
 int debugprint(cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
-	if (sbuf) {
+	DPRINTF("ent slen=%d\n",µslen) ;
+	if (sbuf) ylikely {
 	    rs = SR_NOTOPEN ; 
 	    if (ef.fd >= 0) {
+		DPRINTF("-> printer\n") ;
 	        rs = debugprinter(sbuf,slen) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DPRINTF("ret rs=%d wlen=%d\n",rs,wlen) ;
 	return rs ;
 } /* end subroutine (debugprint) */
 
@@ -656,7 +659,7 @@ local int debugprinter(cchar *sbuf,int µslen) noex {
 	                    f_needeol = true ;
 			} else {
 			    kl -= 1 ;
-			}
+			} /* end */
 		    } else {
 	                f_needeol = true ;
 		    } /* end if */
