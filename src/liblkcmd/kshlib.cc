@@ -8,7 +8,7 @@
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_DEBUGENV	0		/* debug environment */
-#define	CF_DEBUGHEXB	0		/* debug w/ |debugprinthexblock()| */
+#define	CF_DEBUGHEXB	0		/* debug w/ |debugprinthexb()| */
 #define	CF_PLUGIN	1		/* define 'plugin_version()' */
 #define	CF_LOCKMEMALLOC	1		/* call |lockmemalloc(3uc)| */
 #define	CF_KSHRUN	1		/* run background under KSH */
@@ -1619,7 +1619,7 @@ local int kshlib_workgen(KSHLIB *uip,MSGDATA *mip)
 	debugprintf("kshlib_workgen: ent\n") ;
 #endif
 #if	CF_DEBUGS && CF_DEBUGHEXB
-	debugprinthexblock("kshlib_workgen: ",80,mip->mbuf,mip->ml) ;
+	debugprinthexb("kshlib_workgen: ",80,mip->mbuf,mip->ml) ;
 #endif
 	if ((rs = kshlib_capbegin(uip,-1)) >= 0) {
 	    if ((rs = kshlib_notesactive(uip)) > 0) {
