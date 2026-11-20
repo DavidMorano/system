@@ -59,7 +59,7 @@
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
+extern int	debugprinthexb(cchar *,int,cvoid *,int) ;
 #endif
 
 
