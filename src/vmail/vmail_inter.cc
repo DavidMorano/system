@@ -3595,7 +3595,7 @@ local int inter_cmdsubject(INTER *iap,int argnum)
 		cint	n = COLUMNS ;
 		debugprintf("inter/cmdsubject: dl=%d d=>%r<\n",
 			dl,disbuf,strlinelen(disbuf,dl,40)) ;
-		debugprinthexblock("inter_cmdsubject:",n,disbuf,dl) ;
+		debugprinthexb("inter_cmdsubject:",n,disbuf,dl) ;
 	}
 #endif
 	    } /* end if (non-null) */
