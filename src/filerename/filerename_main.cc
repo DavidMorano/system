@@ -21,38 +21,37 @@
 
 /*******************************************************************************
 
+  	Description:
 	This is a fairly generic front-end subroutine for a program.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* ordered first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<ctime>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
+#include	<ctime>			/* CSTD */
+#include	<csignal>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<bfile.h>
 #include	<field.h>
 #include	<nulstr.h>
 #include	<ascii.h>
 #include	<wdt.h>
 #include	<char.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<bfile.h>		/* LIBB */
 
 #include	"config.h"
-#include	"defs.h"
 
 
 /* local defines */
@@ -68,14 +67,6 @@
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* local structures */
