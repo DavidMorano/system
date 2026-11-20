@@ -217,6 +217,10 @@ int proginfo::pfinish() noex {
 	    if (rs >= 0) rs = rs1 ;
 	    pf.logfile = false ;
 	} /* end */
+	if (pf.uinfo) {
+	    rs1 = puiend() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end */
 	DEBUGPRINTF("1 rs=%d\n",rs) ;
 	if (idp) {
 	    rs1 = idp->release ;
@@ -707,6 +711,7 @@ proginfo::proginfo(int ac,con mainv av,con mainv ev) noex {
 	hwserial	(this) ;
 	retpid		(this,proginfomem_retpid) ;
 	ncpu		(this,proginfomem_ncpu) ;
+	uinfo		(this,proginfomem_uinfo) ;
 	finish		(this,proginfomem_finish) ;
 	progname	(this,proginfomem_progname) ;
 	progename	(this,proginfomem_progename) ;
@@ -769,6 +774,9 @@ int proginfo_co::operator () (int) noex {
 		break ;
 	    case proginfomem_ncpu:
 		rs = op->pncpu() ;
+		break ;
+	    case proginfomem_uinfo:
+		rs = op->puinfo() ;
 		break ;
 	    case proginfomem_finish:
 		rs = op->pfinish() ;
