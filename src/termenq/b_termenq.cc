@@ -1410,7 +1410,7 @@ local int procenq(PI *pip,SHIO *ofp) noex {
 		    cchar	*ids = "termenq/procenq" ;
 	            debugprintf("termenq/procenq: rs=%d\n",rs) ;
 	            debugprintf("termenq/procenq: ab=>%r<\n",cbuf,cl) ;
-		    debugprinthexblock(ids,max,cbuf,cl) ;
+		    debugprinthexb(ids,max,cbuf,cl) ;
 	            debugprintf("termenq/procenq: type=%u\n",
 				cmdp->type) ;
 	            debugprintf("termenq/procenq: name=%04x\n",
