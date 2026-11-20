@@ -64,7 +64,7 @@ extern int	isNotPresent(int) ;
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	debugprinthex(cchar *,int,cchar *,int) ;
-extern int	debugprinthexblock(cchar *,int,cvoid *,int) ;
+extern int	debugprinthexb(cchar *,int,cvoid *,int) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif /* CF_DEBUGS */
 
