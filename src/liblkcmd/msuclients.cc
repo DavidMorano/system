@@ -577,7 +577,7 @@ local int msuclients_connect(MSUCLIENTS *op)
 		int	mc = COLUMNS ;
 		cchar	*s = (cchar *) &op->srv ;
 	        debugprintf("msuclients_connect: srvlen=%d\n",rs) ;
-	        debugprinthexblock("msuclients_connect:",mc,s,op->srvlen) ;
+	        debugprinthexb("msuclients_connect:",mc,s,op->srvlen) ;
 	    }
 #endif
 
