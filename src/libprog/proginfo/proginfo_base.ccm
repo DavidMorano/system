@@ -36,7 +36,8 @@ module ;
 #include	<usysbase.h>		/* LIBU */
 #include	<vecstr.h>		/* LIBUC */
 #include	<ids.h>			/* LIBUC */
-#include	<logfile.h>		/* LIBUC */
+#include	<userinfo.h>		/* LIBDAM */
+#include	<logfile.h>		/* LIBDAM */
 
 export module proginfo.base ;
 
@@ -48,6 +49,7 @@ export module proginfo.base ;
 enum proginfomems {
 	proginfomem_retpid,
 	proginfomem_ncpu,
+	proginfomem_uinfo,
 	proginfomem_finish,
 	proginfomem_progname,		/* program name */
 	proginfomem_progename,		/* execution file-name */
@@ -67,6 +69,7 @@ export {
 	uint		ignore:1 ;
 	uint		errfile:1 ;
 	uint		outfile:1 ;
+	uint		uinfo:1 ;	/* USERINFO clled */
 	uint		pcsconf:1 ;
 	uint		hfname:1 ;
 	uint		cfname:1 ;
@@ -160,33 +163,15 @@ export {
 	cchar		*searchname ;
 	cchar		*pr ;		/* program root */
 	cchar		*rootname ;	/* distribution name */
-	cchar		*version ;
 	cchar		*banner ;
-	cchar		*umachine ;	/* UNAME machine name */
-	cchar		*usysname ;	/* UNAME OS system-name */
-	cchar		*urelease ;	/* UNAME OS release */
-	cchar		*uversion ;	/* UNAME OS version */
 	cchar		*architecture ;	/* UAUX machine architecture */
 	cchar		*platform ;	/* UAUX machine platform */
 	cchar		*provider ;	/* UAUX machine provider */
 	cchar		*nisdomain ;	/* UAUX machine nisdomain */
 	cchar		*hz ;		/* OS HZ */
-	cchar		*nodename ;	/* USERINFO */
-	cchar		*domainname ;	/* USERINFO */
-	cchar		*username ;	/* USERINFO */
-	cchar		*homedname ;	/* USERINFO */
-	cchar		*shell ;	/* USERINFO */
 	cchar		*org ;		/* USERINFO */
-	cchar		*gecosname ;	/* USERINFO */
-	cchar		*realname ;	/* USERINFO */
-	cchar		*name ;		/* USERINFO */
-	cchar		*fullname ;	/* USERINFO full-name */
-	cchar		*mailname ;	/* USERINFO mail-abbreviated-name */
-	cchar		*tz ;		/* USERINFO */
 	cchar		*maildname ;	/* USERINFO */
-	cchar		*logid ;	/* USERINFO ID for logging purposes */
 	cchar		*orgcode ;
-	cchar		*groupname ;
 	cchar		*hostname ;
 	cchar		*tmpdname ;
 	cchar		*random ;	/* SHELL */
@@ -203,7 +188,6 @@ export {
 	void		*buffer ;	/* general buffer */
 	void		*contextp ;	/* SHELL context */
 	void		*lip ;		/* local information */
-	void		*uip ;		/* USERINFO object */
 	void		*userlist ;	/* user-list state */
 	void		*config ;	/* configuration */
 	void		*watch ;	/* watch */
@@ -227,7 +211,7 @@ export {
 	int		pwdlen ;
 	proginfo_vals() noex ;
     } ; /* end struct (proginfo_vals) */
-    struct proginfo : proginfo_vals {
+    struct proginfo : userinfo, proginfo_vals {
 	friend		proginfo_start ;
 	friend		proginfo_co ;
     	statcexpr auto	np = nullptr ;
@@ -236,6 +220,7 @@ export {
 	proginfo_co	retpid ;
 	proginfo_co	ncpu ;
 	proginfo_co	finish ;
+	proginfo_co	uinfo ;
 	proginfo_eprint	eprint ;
 	proginfo_ccharp	progname ;	/* program name */
 	proginfo_ccharp	progename ;	/* execution file-name */
@@ -253,10 +238,10 @@ export {
 	pid_t		pid ;
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
-	PI_FL		pfhave{} ;
-	PI_FL		pf{} ;
-	PI_FL		pfchanged{} ;
-	PI_FL		pfopen{} ;
+	PI_FL		pfhave{} ;	/* flags */
+	PI_FL		pf{} ;		/* flags */
+	PI_FL		pfchanged{} ;	/* flags */
+	PI_FL		pfopen{} ;	/* flags */
 	int		prs ;		/* previous-return-status */
 	int		argc ;
 	int		pm ;		/* program-mode */
@@ -279,6 +264,11 @@ export {
 	int pfinish	() noex ;
 	int pretpid	() noex ;
 	int pncpu	() noex ;
+	int puinfo	() noex ;
+	int puibeg	() noex ;
+	int puiend	() noex ;
+	int puiloadbeg	() noex ;
+	int puiloadend	() noex ;
     } ; /* end struct (proginfo) */
 } /* end export */
 
