@@ -234,8 +234,6 @@ objg.o:			$(OBJG)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
-proginfo.o:		proginfo.cc	proginfo.hh			$(INCS)
-proglog.o:		proglog.cc	proglog.hh			$(INCS)
 
 progmsgid.o:		progmsgid.cc	progmsgid.h			$(INCS)
 proguserlist.o:		proguserlist.cc	proguserlist.h			$(INCS)
