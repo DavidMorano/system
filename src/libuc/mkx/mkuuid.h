@@ -33,13 +33,13 @@ struct uuid_data {
 typedef UUID_DAT	uuid_dat ;
 
 EXTERNC_begin
-extern int mkuuid(uuid_dat *,int) noex ;
+    extern int mkuuid(uuid_dat *,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-local inline int mkuuid(uuid_dat *udp) noex {
+    local inline int mkuuid(uuid_dat *udp) noex {
     	return mkuuid(udp,0) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
