@@ -25,7 +25,7 @@
 
 
 EXTERNC_begin
-extern int	mkufname(char *,cchar *,cchar *) noex ;
+    extern int	mkufname(char *,cchar *,cchar *) noex ;
 EXTERNC_end
 
 
