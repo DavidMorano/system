@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	getehostname(char *,cchar *) noex ;
-
+    extern int	getehostname(char *,cchar *) noex ;
 EXTERNC_end
 
 
