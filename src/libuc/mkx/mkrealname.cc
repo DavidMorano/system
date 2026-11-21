@@ -5,6 +5,7 @@
 /* make a realname */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -46,11 +47,16 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<realname.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"mkmisc.h"
 
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -73,6 +79,8 @@
 
 /* local variables */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -83,7 +91,9 @@ int mkrealname(char *rbuf,int rlen,cchar *gnp,int gnl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
+	DEBUGPRINTF("ent\n") ;
 	if (rbuf && gnp) ylikely {
+	    DEBUGPRINTF("-> realname_start\n") ;
 	    if (realname rn ; (rs = rn.start(gnp,gnl)) >= 0) ylikely {
 	        {
 	            rs = rn.name(rbuf,rlen) ;
@@ -93,6 +103,7 @@ int mkrealname(char *rbuf,int rlen,cchar *gnp,int gnl) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (realname) */
 	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mkrealname) */
 
