@@ -25,17 +25,13 @@
 
 
 EXTERNC_begin
-
-extern int	getclustername(char *,int,cchar *) noex ;
-
+    extern int	getclustername(char *,int,cchar *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
 namespace libuc {
     extern int	prgetclustername(cchar *,char *,int,cchar *) noex ;
 }
-
 #endif /* __cplusplus */
 
 
