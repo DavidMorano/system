@@ -46,7 +46,7 @@
 #include	<toxc.h>		/* LIBUC */
 #include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
-#include	<localmisc.h>		/* |REALNAME| */
+#include	<localmisc.h>		/* LIBU |REALNAMELEN| */
 
 #include	"realname.h"
 
@@ -98,7 +98,7 @@ int realname::mailname(char *rbuf,int rlen) noex {
 void realname::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("realname",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (realname::dtor) */
 
 int realname_esther::operator () () noex {
@@ -109,7 +109,7 @@ int realname_esther::operator () () noex {
 	        rs = realname_start(op,nullptr,0) ;
 	        break ;
 	    } /* end switch */
-	}
+	} /* end */
 	return rs ;
 } /* end method */
     
@@ -121,7 +121,7 @@ int realname_esther::operator () (cchar *sp,int sl) noex {
 	        rs = realname_start(op,sp,sl) ;
 	        break ;
 	    } /* end switch */
-	}
+	} /* end */
 	return rs ;
 } /* end method */
 
@@ -138,13 +138,13 @@ int realname_esther::operator () (cchar **sa,int sn) noex {
 		            rs = realname_loadpieces(op,sa,sn) ;
 			    if (rs < 0) {
 			        realname_finish(op) ;
-			    }
+			    } /* end if (error) */
 		        } /* end if (realname_start) */
 		    } /* end if (valid) */
 		} /* end if (non-null) */
 	        break ;
 	    } /* end switch */
-	}
+	} /* end */
 	return rs ;
 } /* end method */
 
@@ -159,12 +159,12 @@ int realname_esther::operator () (dstr *dsp) noex {
 		        rs = realname_loadparts(op,dsp) ;
 			if (rs < 0) {
 			    realname_finish(op) ;
-			}
+			} /* end if (error) */
 		    } /* end if (realname_start) */
 		} /* end if (non-null) */
 	        break ;
 	    } /* end switch */
-	}
+	} /* end */
 	return rs ;
 } /* end method */
 
