@@ -30,20 +30,20 @@
 
 
 EXTERNC_begin
-extern int mkpath1(char *,cc *) noex ;
-extern int mkpath2(char *,cc *,cc *) noex ;
-extern int mkpath3(char *,cc *,cc *,cc *) noex ;
-extern int mkpath4(char *,cc *,cc *,cc *,cc *) noex ;
-extern int mkpath5(char *,cc *,cc *,cc *, cc *,cc *) noex ;
-extern int mkpath6(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
+    extern int mkpath1(char *,cc *) noex ;
+    extern int mkpath2(char *,cc *,cc *) noex ;
+    extern int mkpath3(char *,cc *,cc *,cc *) noex ;
+    extern int mkpath4(char *,cc *,cc *,cc *,cc *) noex ;
+    extern int mkpath5(char *,cc *,cc *,cc *, cc *,cc *) noex ;
+    extern int mkpath6(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-template<conccharp ... Args>
-inline int mkpath(char *dp,Args ... args) noex {
+    template<conccharp ... Args>
+    inline int mkpath(char *dp,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return mknpathx(dp,-1,na,args ...) ;
-} /* end subroutine */
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 
