@@ -25,13 +25,13 @@
 
 
 EXTERNC_begin
+    extern int getchostname(char *,cchar *) noex ;
+EXTERNC_end
 
-extern int getchostname(char *,cchar *) noex ;
-
-local inline int getcname(char *cbuf,cchar *name) noex {
+EXTERNC_begin
+    local inline int getcname(char *cbuf,cchar *name) noex {
 	return getchostname(cbuf,name) ;
-}
-
+    } /* end */
 EXTERNC_end
 
 
