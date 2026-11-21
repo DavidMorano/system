@@ -25,7 +25,7 @@
 
 
 EXTERNC_begin
-extern int	mkshlibname(char *,cchar *,cchar *,cchar *) noex ;
+    extern int	mkshlibname(char *,cchar *,cchar *,cchar *) noex ;
 EXTERNC_end
 
 
