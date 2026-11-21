@@ -66,11 +66,11 @@ struct userattrdb_co {
 	void operator () (userattrdb *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
-	operator int () noex ;
+	} ; /* end */
+	operator int	() noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (userattrdb_co) */
 struct userattrdb : userattrdb_head {
 	userattrdb_co	count ;
@@ -78,30 +78,28 @@ struct userattrdb : userattrdb_head {
 	userattrdb() noex {
 	    count	(this,userattrdbmem_count) ;
 	    close	(this,userattrdbmem_close) ;
-	    magval = 0 ;
+	    magval	= 0 ;
 	} ; /* end ctor */
 	userattrdb(const userattrdb &) = delete ;
 	userattrdb &operator = (const userattrdb &) = delete ;
-	int open(cchar *) noex ;
-	int lookup(char *,int,cchar *) noex ;
-	void dtor() noex ;
+	int open	(cchar *) noex ;
+	int look	(char *,int,cchar *) noex ;
+	void dtor	() noex ;
 	destruct userattrdb() {
 	    if (magval) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (userattrdb) */
-typedef	USERATTRDB_FL	userattrdb_fl ;
 #else	/* __cplusplus */
 typedef USERATTRDB	userattrdb ;
-typedef	USERATTRDB_FL	userattrdb_fl ;
 #endif /* __cplusplus */
 
+typedef	USERATTRDB_FL	userattrdb_fl ;
+
 EXTERNC_begin
-
-extern int userattrdb_open	(userattrdb *,cchar *) noex ;
-extern int userattrdb_lookup	(userattrdb *,char *,int,cchar *) noex ;
-extern int userattrdb_count	(userattrdb *) noex ;
-extern int userattrdb_close	(userattrdb *) noex ;
-
+    extern int userattrdb_open	(userattrdb *,cchar *) noex ;
+    extern int userattrdb_look	(userattrdb *,char *,int,cchar *) noex ;
+    extern int userattrdb_count	(userattrdb *) noex ;
+    extern int userattrdb_close	(userattrdb *) noex ;
 EXTERNC_end
 
 
