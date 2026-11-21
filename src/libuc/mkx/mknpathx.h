@@ -28,24 +28,24 @@
 
 
 EXTERNC_begin
-extern int mknpathx(char *,int,int,...) noex ;
+    extern int mknpathx(char *,int,int,...) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int mknpath1(char *,int,cc *) noex ;
-extern int mknpath2(char *,int,cc *,cc *) noex ;
-extern int mknpath3(char *,int,cc *,cc *,cc *) noex ;
-extern int mknpath4(char *,int,cc *,cc *,cc *,cc *) noex ;
-extern int mknpath5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
-extern int mknpath6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
+    extern int mknpath1(char *,int,cc *) noex ;
+    extern int mknpath2(char *,int,cc *,cc *) noex ;
+    extern int mknpath3(char *,int,cc *,cc *,cc *) noex ;
+    extern int mknpath4(char *,int,cc *,cc *,cc *,cc *) noex ;
+    extern int mknpath5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
+    extern int mknpath6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-template<conccharp ... Args>
-inline int mknpath(char *dp,int dl,Args ... args) noex {
+    template<conccharp ... Args>
+    inline int mknpath(char *dp,int dl,Args ... args) noex {
 	cint	na = npack(Args) ;
 	return mknpathx(dp,dl,na,args ...) ;
-} /* end subroutine */
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 
