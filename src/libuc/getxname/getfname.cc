@@ -181,9 +181,10 @@ int subinfo::round() noex {
 } /* end method (subinfo::round) */
 
 int subinfo::loc() noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = perm(fname,-1,-1,nullptr,am)) >= 0) {
+	if ((rs = perm(fname,-1,-1,np,am)) >= 0) {
 	    if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 		if (! S_ISDIR(sb.st_mode)) {
 		    rs = mkpath(rbuf,fname) ;
@@ -191,20 +192,21 @@ int subinfo::loc() noex {
 		}
 	    } else if (isNotAccess(rs)) {
 	        rs = SR_OK ;
-	    }
+	    } /* end */
 	} else if (isNotAccess(rs)) {
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return (rs >= 0) ? len : rs ;
 } /* end method (subinfo::loc) */
 
 int subinfo::rem() noex {
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (pr) ylikely {
 	    if ((rs = mkpath(rbuf,pr,fname)) >= 0) ylikely {
 		len = rs ;
-	        if ((rs = perm(rbuf,-1,-1,nullptr,am)) >= 0) {
+	        if ((rs = perm(rbuf,-1,-1,np,am)) >= 0) {
 	            if (ustat sb ; (rs = uc_stat(fname,&sb)) >= 0) {
 		        if (S_ISDIR(sb.st_mode)) {
 		            len = 0 ;
@@ -212,11 +214,11 @@ int subinfo::rem() noex {
 		    } else if (isNotAccess(rs)) {
 			len = 0 ;
 			rs = SR_OK ;
-		    }
+		    } /* end */
 	        } else if (isNotAccess(rs)) {
 		    len = 0 ;
 	            rs = SR_OK ;
-	        }
+	        } /* end */
 	    } /* end if (mkpath) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
