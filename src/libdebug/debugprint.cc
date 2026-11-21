@@ -25,9 +25,10 @@
 	debugwrite		
 	debugprint		
 	debugprintf		
-	debugprintx		
+	debugprintxf
+	debugprintxs
 	debugvprintf		
-	debugprintfsize		
+	debugprintfsz		
 	debugsetfd		
 	debuggetfd		
 	debugprinthexb	
@@ -49,12 +50,13 @@
 	debugwrite		(cchar *,int) noex
 	debugprint		(cchar *,int) noex
 	debugprintf		(cchar *,...) noex
-	debugprintx		(cchar *fun,cchar *fmt,...) noex 
+	debugprintxf		(cchar *fun,cchar *fmt,...) noex 
+	debugprintxs		(ccp,ccp,ccp,int = -1) noex 
 	debugvprintf		(cchar *,va_list) noex
-	debugprintfsize		(cchar *,int) noex
+	debugprintfsz		(cchar *,int) noex
 	debugsetfd		(int) noex
 	debuggetfd		(void) noex
-	debugprinthexb	(cchar *,int,cvoid *,int) noex
+	debugprinthexb		(cchar *,int,cvoid *,int) noex
 	debugprinthexs		(cchar *,int,cvoid *,int) noex
 	debugprintdeci		(cchar *,int) noex
 	debugprinthexi		(cchar *,int) noex
@@ -137,6 +139,7 @@
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucproc.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
+#include	<sncpy.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<fmtstr.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC |hasprintbad(3uc)| */
@@ -182,7 +185,6 @@ import ureserve ;			/* |is{x}(3u)| */
 
 /* imported namespaces */
 
-using libu::sncpy ;			/* subroutine-template */
 using libu::snprintf ;			/* subroutine */
 using libu::snvprintf ;			/* subroutine */
 using libu::strwcpy ;			/* subroutine */
@@ -356,7 +358,7 @@ int debugprintf(cchar *fmt,...) noex {
 } /* end subroutine (debugprintf) */
 
 /* special for |DEBUGPRINTF(3debug)| */
-int debugprintx(cchar *fun,cchar *fmt,...) noex {
+int debugprintxf(cchar *fun,cchar *fmt,...) noex {
 	va_list		ap ;
     	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
@@ -379,6 +381,34 @@ int debugprintx(cchar *fun,cchar *fmt,...) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (debugprintx) */
+
+/* special for |DEBUGPRINTS(3debug)| */
+int debugprintxs(ccp fun,ccp str,ccp sp,int 탎l = -1) noex {
+    	cnothrow	nt{} ;
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ; /* return-value */
+	DPRINTF("ent\n") ;
+	if (fun && str && sp) ylikely {
+	    rs = SR_NOTOPEN ;
+	    if (ef.fd > 0) {
+		if (int sl ; (sl = getlenstr(sp,탎l)) >= 0) ylikely {
+		    cint flen = (lenstr(fun) + 2 + lenstr(str) + sl + 100) ;
+		    rs = SR_NOMEM ;
+		    if (char *fbuf = new(nt) char [flen + 1]) ylikely {
+		        if ((rs = sncpyw(fbuf,flen,fun,": ",str,sp,sl)) >= 0) {
+	                    rs = debugprinter(fbuf,rs) ;
+		DPRINTF("debugprinter() rs=%d\n",rs) ;
+	                    wlen += rs ;
+	                } /* end if (sncpy) */
+		DPRINTF("sncpyw-out rs=%d\n",rs) ;
+		        delete [] fbuf ;
+	            } /* end if (new-char) */
+		} /* end if (getlenstr) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	DPRINTF("ret rs=%d wlen=%d\n",rs,wlen) ;
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (debugprintxs) */
 
 int debugvprintf(cchar *fmt,va_list ap) noex {
     	cnothrow	nt{} ;
@@ -606,7 +636,7 @@ int debugwrite(cchar *sbuf,int 탎len) noex {
 	int		wlen = 0 ;
 	DPRINTF("ent slen=%d\n",탎len) ;
 	if (int slen ; sbuf && ((slen = getlenstr(sbuf,탎len)) >= 0)) {
-	    DPRINTF("getlen() slen=%d\n",slen) ;
+	    DPRINTF("getlenstr() slen=%d\n",slen) ;
 	    rs = SR_NOTOPEN ;
 	    if (ef.fd > 0) {
 	        if (((rs = debugmgr_init()) >= 0) && (slen > 0)) {
@@ -648,7 +678,7 @@ local int debugprinter(cchar *sbuf,int 탎len) noex {
 	int		wlen = 0 ; /* return-value */
 	DPRINTF("ent slen=%d\n",탎len) ;
 	if (int slen ; sbuf && ((slen = getlen(sbuf,탎len)) >= 0)) ylikely {
-	    cint clen = slen ;
+	    cint clen = (slen + 1) ; /* <- room for possible EOL */
 	    rs = SR_NOMEM ;
 	    DPRINTF("getlen() slen=%d\n",slen) ;
 	    if (char *cbuf = new(nt) char[clen + 1]) ylikely {
