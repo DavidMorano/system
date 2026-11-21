@@ -5,7 +5,7 @@
 /* manipulate real names */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -90,7 +90,7 @@ struct names {
 	cchar		*a[REALNAME_NNAMES] ;
 	int		li ;
 	int		i ;
-	int		count ;
+	int		cnt ;
 	uchar		l[REALNAME_NNAMES] ;
 	uchar		f_abv[REALNAME_NNAMES] ;
 } ; /* end struct (name) */
@@ -109,7 +109,6 @@ local int realname_ctor(realname *op,Args ... args) noex {
 	    if (void *vp ; (rs = lm_mall(ssz,&vp)) >= 0) ylikely {
 		op->stbuf = charp(vp) ;
 		op->stlen = ssz ;
-		rs = SR_OK ;
 	    } /* end if (memory-acquire) */
 	} /* end if (non-null) */
 	return rs ;
@@ -150,7 +149,7 @@ local int	names_finish	(names *) noex ;
 /* local variables */
 
 constexpr int		nnames		= REALNAME_NNAMES ;
-cbool			f_debug		= CF_EBUG ;
+cbool			f_debug		= CF_DEBUG ;
 
 
 /* exported variables */
@@ -163,6 +162,9 @@ int realname_start(realname *op,cchar *sp,int sl) noex {
 	DEBUGPRINTF("ent\n") ;
 	if ((rs = realname_ctor(op)) >= 0) ylikely {
 	    if (sp) {
+		DEBUGPRINTF("-> ss\n") ;
+		int rs1 = DEBUGPRINTS("ss=",sp,sl) ;
+		DEBUGPRINTF("debprints() rs=%d\n",rs1) ;
 	        rs = realname_parse(op,sp,sl) ;
 	    } /* end */
 	    if (rs >= 0) ylikely {
@@ -179,6 +181,7 @@ int realname_start(realname *op,cchar *sp,int sl) noex {
 int realname_finish(realname *op) noex {
 	int		rs ;
 	int		rs1 ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = realname_magic(op)) >= 0) ylikely {
 	    {
 		rs1 = realname_dtor(op) ;
@@ -186,12 +189,14 @@ int realname_finish(realname *op) noex {
 	    }
 	    op->magval = 0 ;
 	} /* end if (magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (realname_finish) */
 
 int realname_loadparts(realname *op,dstr *stp) noex {
 	int		rs ;
 	int		rs1 ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = realname_magic(op,stp)) >= 0) ylikely {
 	    if ((rs = realname_avail(op)) >= 0) ylikely {
 	        cint	slen = REALNAME_STORELEN ;
@@ -235,11 +240,13 @@ int realname_loadparts(realname *op,dstr *stp) noex {
 	        op->len.store = uchar(rs) ;
 	    } /* end if (storeitem_avail) */
 	} /* end if (magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (realname_loadparts) */
 
 int realname_loadpieces(realname *op,cchar **sa,int sn) noex {
 	int		rs ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = realname_magic(op,sa)) >= 0) ylikely {
 	    if ((rs = realname_avail(op)) >= 0) ylikely {
 	        int		c = 0 ;
@@ -316,6 +323,7 @@ int realname_loadpieces(realname *op,cchar **sa,int sn) noex {
 	        } /* end if (valid) */
 	    } /* end if (storeitem_avail) */
 	} /* end if (magic) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (realname_loadpieces) */
 
@@ -367,6 +375,7 @@ int realname_getlast(realname *op,cchar **rpp) noex {
 int realname_getpieces(realname *op,cchar **parts) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
+	DEBUGPRINTF("ent\n") ;
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (parts) ylikely {
@@ -396,6 +405,7 @@ int realname_getpieces(realname *op,cchar **parts) noex {
 	        parts[c] = nullptr ;
 	    } /* end if */
 	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? c : rs ;
 } /* end subroutine (realname_getpieces) */
 
@@ -403,6 +413,7 @@ int realname_name(realname *op,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
+	DEBUGPRINTF("ent\n") ;
 	if (op) ylikely {
 	    if (sbuf s ; (rs = s.start(rbuf,rlen)) >= 0) ylikely {
 	        cint	nlen = REALNAME_STORELEN ;
@@ -470,6 +481,7 @@ int realname_name(realname *op,char *rbuf,int rlen) noex {
 	        if (rs >= 0) rs = len ;
 	    } /* end if (buffer) */
 	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (realname_name) */
 
@@ -565,29 +577,36 @@ local int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
+	DEBUGPRINTF("ent\n") ;
 	if (op && sbuf) ylikely {
-	    memclear(op) ;
+	DEBUGPRINTF("1 stbuf¥%p\n",op->stbuf) ;
 	    if (names n ; (rs = names_start(&n,op->stbuf)) >= 0) ylikely {
 	        int	fabv{} ;
 	        int	flast{} ;
+	DEBUGPRINTF("2\n") ;
 	        if (namestr ns ; (rs = ns.start(sbuf,slen)) >= 0) ylikely {
 		    int		sl ;
 	            cchar	*sp{} ;
+	DEBUGPRINTF("3\n") ;
 	            while ((sl = ns.next(&sp,&fabv,&flast)) >= 0) {
+	DEBUGPRINTF("4\n") ;
 	                if (sl > 0) {
 	                    rs = names_add(&n,sp,sl,fabv,flast) ;
 	                    if (rs < 0) break ;
 	                }
 			if (rs < 0) break ;
 	            } /* end while */
+	DEBUGPRINTF("5 rs=%d\n",rs) ;
 	            rs1 = ns.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (namestr) */
+	DEBUGPRINTF("6 rs=%d\n",rs) ;
 	        if (rs >= 0) ylikely {
 		    int		i ; /* used-multiple */
 		    /* load up the information on the name parts */
+	DEBUGPRINTF("7 rs=%d\n",rs) ;
 	            if (n.li < 0) {
-	                if (n.count >= nnames) {
+	                if (n.cnt >= nnames) {
 	                    i = n.i ;
 	                } else {
 	                    i = ((n.i + nnames - 1) % REALNAME_NNAMES) ;
@@ -595,13 +614,14 @@ local int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 	            } else {
 	                i = n.li ;
 		    } /* end */
+	DEBUGPRINTF("8 rs=%d\n",rs) ;
 	            op->last = n.a[i] ;
 	            op->len.last = n.l[i] ;
 	            op->abv.last = !!n.f_abv[i] ;
 	            n.a[i] = nullptr ;
 	            i = (i + 1) % nnames ;
 		    /* get the rest of the parts of this realname */
-	            for (int j = 0 ; j < (n.count - 1) ; ) {
+	            for (int j = 0 ; j < (n.cnt - 1) ; ) {
 	                if (n.a[i] != nullptr) {
 	                    switch (j) {
 	                    case 0:
@@ -630,54 +650,60 @@ local int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 	                i = (i + 1) % nnames ;
 	            } /* end for */
 	        } /* end if (we had enough storage) */
+	DEBUGPRINTF("9 rs=%d\n",rs) ;
 	        rs1 = names_finish(&n) ;
 	        if (rs >= 0) rs = rs1 ;
+	DEBUGPRINTF("10 rs=%d\n",rs) ;
 	        len = rs1 ;
 	        op->len.store = uchar(len) ;
 	    } /* end if (names) */
 	} /* end if (non-null) */
+	DEBUGPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (realname_parse) */
 
 local int names_start(names *op,char *rbuf) noex {
 	cint		rlen = REALNAME_STORELEN ;
 	int		rs ;
+	DEBUGPRINTF("ent rlen=%d rbuf¥%p\n",rlen,rbuf) ;
 	if ((rs = op->s.start(rbuf,rlen)) >= 0) ylikely {
+	DEBUGPRINTF("1\n") ;
 	    op->li = -1 ;
-	    op->i = op->count = 0 ;
+	    op->i = op->cnt = 0 ;
 	    for (int i = 0 ; i < nnames ; i += 1) {
 	        op->a[i] = nullptr ;
 	        op->f_abv[i] = 0 ;
 	    } /* end for */
 	} /* end if */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (names_start) */
 
 local int names_add(names *op,cchar *nbuf,int nlen,int f_abv,int f_last) noex {
 	int		rs = SR_INVALID ;
-	int		count = 0 ;
+	int		c = 0 ;
 	if ((nlen > 0) && ((op->li < 0) || (op->i != op->li))) {
 	    /* load this new one in */
 	    if (op->a[op->i] != nullptr) {
-	        op->count -= 1 ;
+	        op->cnt -= 1 ;
 	    } /* end */
 	    if (cchar *cp{} ; (rs = op->s.strw(nbuf,nlen,&cp)) >= 0) ylikely {
 	        cint	cl = rs ;
 	        op->a[op->i] = cp ;
 	        op->l[op->i] = uchar(cl) ;
 	        op->f_abv[op->i] = (f_abv)?1:0 ;
-	        op->count += 1 ;
+	        op->cnt += 1 ;
 	        if (f_last) {
 	            op->li = op->i ;
 	        }
 		/* saturate if we have not yet seen a last name */
-	        if ((op->count < nnames) || (op->li >= 0)) {
+	        if ((op->cnt < nnames) || (op->li >= 0)) {
 	            op->i = (op->i + 1) % nnames ;
 	        } /* end if */
-	        count = op->count ;
+	        c = op->cnt ;
 	    } /* end if (storeitem) */
 	} /* end if (valid) */
-	return (rs >= 0) ? count : rs ;
+	return (rs >= 0) ? c : rs ;
 } /* end subroutine (names_add) */
 
 local int names_finish(names *op) noex {
