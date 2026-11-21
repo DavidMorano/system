@@ -47,7 +47,7 @@
 #include	<realname.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
-#include	"mkx.h"
+#include	"mkmisc.h"
 
 
 /* local defines */
