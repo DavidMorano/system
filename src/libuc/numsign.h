@@ -15,6 +15,16 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/******************************************************************************* 
+  	Group:
+	numsign
+
+	Description:
+	Retrieve the numeric sign of an integer variable (of various
+	sizes).
+
+*******************************************************************************/
+
 #ifndef	NUMSIGN_INCLUDE
 #define	NUMSIGN_INCLUDE
 
@@ -40,14 +50,12 @@ constexpr bool numsign(T v) noex {
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern bool numsigni	(int) noex ;
-extern bool numsignl	(long) noex ;
-extern bool numsignll	(longlong) noex ;
-extern bool numsignui	(uint) noex ;
-extern bool numsignul	(ulong) noex ;
-extern bool numsignull	(ulonglong) noex ;
-
+    extern bool numsigni	(int) noex ;
+    extern bool numsignl	(long) noex ;
+    extern bool numsignll	(longlong) noex ;
+    extern bool numsignui	(uint) noex ;
+    extern bool numsignul	(ulong) noex ;
+    extern bool numsignull	(ulonglong) noex ;
 EXTERNC_end
 
 
