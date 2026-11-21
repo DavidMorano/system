@@ -26,9 +26,7 @@
 
 
 EXTERNC_begin
-
-extern int	getgroupname(char *,int,gid_t) noex ;
-
+    extern int	getgroupname(char *,int,gid_t) noex ;
 EXTERNC_end
 
 
