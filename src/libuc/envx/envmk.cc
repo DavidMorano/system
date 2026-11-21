@@ -186,6 +186,8 @@ local int envmk_envadd		(envmk *,EL *,cchar *,cchar *,int) noex ;
 local int envmk_userinfo	(envmk *) noex ;
 local int envmk_cspath		(envmk *,EL *) noex ;
 
+local bool isNoEnt		(int) noex ;
+
 
 /* local variables */
 
@@ -517,9 +519,9 @@ local int mktz(char *vbuf,int vlen,cchar *un) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (userattrdb ua ; (rs = ua.open(un)) >= 0) ylikely {
-	    if ((rs = ua.lookup(vbuf,vlen,"tz")) >= 0) {
+	    if ((rs = ua.look(vbuf,vlen,"tz")) >= 0) {
 		len = rs ;
-	    } else if (isNotPresent(rs)) {
+	    } else if (isNoEnt(rs)) {
 		rs = SR_OK ;
 	    } /* end */
 	    rs1 = ua.close ;
@@ -583,7 +585,7 @@ local int envmk_mkenvsys(envmk *op,EL *etp,mainv envs) noex {
                                     vp = vbuf ;
                                 } else if (isNotPresent(rs)) {
                                     rs = SR_OK ;
-                                }
+                                } /* end */
                                 break ;
                             case 'H':
                                 if ((rs = gethz(0)) >= 0) {
@@ -734,5 +736,9 @@ local int envmk_userinfo(envmk *op) noex {
 	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (envmk_userinfo) */
+
+local bool isNoEnt(int rs) noex {
+    	return isNotPresent(rs) || (rs == SR_NOSYS) ;
+} /* end subroutine */
 
 
