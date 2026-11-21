@@ -420,8 +420,6 @@ int userinfo_start(UI *uip,cchar *un) noex {
 		userinfo_dtor(uip) ;
 	    } /* end if (error) */
 	} /* end if (userinfo_ctor) */
-	debugprintx(__func__,"UI_STARTx: ret rs=%d\n",rs) ;
-	debugprintf("UI_START: ret rs=%d\n",rs) ;
 	DEBUGPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (userinfo_start) */
@@ -429,7 +427,6 @@ int userinfo_start(UI *uip,cchar *un) noex {
 int userinfo_finish(UI *op) noex {
 	int		rs ;
 	int		rs1 ;
-	debugprintf("UI_FIN: ent\n") ;
 	if ((rs = userinfo_magic(op)) >= 0) ylikely {
 	    if (op->allocinfo) ylikely {
 	        rs1 = lm_free(op->allocinfo) ;
@@ -442,7 +439,6 @@ int userinfo_finish(UI *op) noex {
 	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
-	debugprintf("UI_FIN: ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (userinfo_finish) */
 
@@ -1208,9 +1204,13 @@ local int submgr_mailname(SMGR *pip) noex {
 	        if (pip->fl.pw) {
 	            cchar	*gn = pip->pw.pw_gecos ;
 	            sp = nbuf ;
-	            sl = mkgecosname(nbuf,nlen,gn) ;
+	            rs = mkgecosname(nbuf,nlen,gn) ;
+		    sl = rs ;
+	DEBUGPRINTF("mkgecosname() rs=%d\n",rs) ;
 	        } /* end if (has-pw) */
 	    } /* end */
+	DEBUGPRINTF("mid2() rs=%d\n",rs) ;
+	    if (rs >= 0) {
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
 	            sp = getenver(varname.name) ;
@@ -1227,7 +1227,9 @@ local int submgr_mailname(SMGR *pip) noex {
 	        if ((rs = mkmailname(mbuf,mlen,sp,sl)) > 0) {
 	            rs = submgr_store(pip,uit,mbuf,rs) ;
 		} /* end if (mkmailname) */
+	DEBUGPRINTF("mkmailname-out rs=%d\n",rs) ;
 	    } /* end */
+	    } /* end if (ok) */
 	} /* end */
 	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
