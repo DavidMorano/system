@@ -2586,7 +2586,7 @@ local int loadtz(PROGINFO *pip)
 	    char	abuf[TZNAMELEN+1] = { 0 } ;
 
 	    if ((rs = userattrdb_open(&ua,pip->username)) >= 0) {
-	        if ((rs = userattrdb_lookup(&ua,abuf,alen,UA_TZ)) >= 0) {
+	        if ((rs = userattrdb_look(&ua,abuf,alen,UA_TZ)) >= 0) {
 	            al = rs ;
 	        } else if (isNotPresent(rs))
 	            rs = SR_OK ;
