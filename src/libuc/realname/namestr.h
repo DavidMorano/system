@@ -45,11 +45,11 @@ struct namestr_co {
 	void operator () (namestr *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (namestr_co) */
 struct namestr : namestr_head {
 	namestr_co	skipwhite ;
@@ -57,7 +57,7 @@ struct namestr : namestr_head {
 	namestr() noex {
 	    skipwhite	(this,namestrmem_skipwhite) ;
 	    finish	(this,namestrmem_finish) ;
-	    strp = nullptr ;
+	    strp	= nullptr ;
 	} ; /* end ctor */
 	namestr(const namestr &) = delete ;
 	namestr &operator = (const namestr &) = delete ;
@@ -67,20 +67,18 @@ struct namestr : namestr_head {
 	void dtor	() noex ;
 	destruct namestr() {
 	    if (strp) dtor() ;
-	} ;
+	} ; /* end */
 } ; /* end struct (namestr) */
 #else	/* __cplusplus */
 typedef NAMESTR		namestr ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern int	namestr_start		(namestr *,cchar *,int) noex ;
-extern int	namestr_next		(namestr *,cchar **,int *,int *) noex ;
-extern int	namestr_skipwhite	(namestr *) noex ;
-extern int	namestr_brk		(namestr *,cchar *,cchar **) noex ;
-extern int	namestr_finish		(namestr *) noex ;
-
+    extern int	namestr_start		(namestr *,cchar *,int) noex ;
+    extern int	namestr_next		(namestr *,cchar **,int *,int *) noex ;
+    extern int	namestr_skipwhite	(namestr *) noex ;
+    extern int	namestr_brk		(namestr *,cchar *,cchar **) noex ;
+    extern int	namestr_finish		(namestr *) noex ;
 EXTERNC_end
 
 
