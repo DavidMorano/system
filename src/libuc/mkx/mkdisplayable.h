@@ -18,7 +18,7 @@
 
 
 EXTERNC_begin
-extern int mkdisplayable(char *,int,cchar *,int) noex ;
+    extern int mkdisplayable(char *,int,cchar *,int) noex ;
 EXTERNC_end
 
 
