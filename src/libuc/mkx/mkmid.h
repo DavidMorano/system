@@ -50,7 +50,7 @@
 
 
 EXTERNC_begin
-extern int	mkmid(char *,int,cchar *,cchar *,pid_t,int) noex ;
+    extern int	mkmid(char *,int,cchar *,cchar *,pid_t,int) noex ;
 EXTERNC_end
 
 
