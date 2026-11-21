@@ -25,7 +25,7 @@
 
 
 EXTERNC_begin
-extern int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex ;
+    extern int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex ;
 EXTERNC_end
 
 
