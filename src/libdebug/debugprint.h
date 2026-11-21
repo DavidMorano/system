@@ -36,12 +36,18 @@
 #define DEBUGPRINTF(FMT, ...)	({ 				\
 	int rsdebug = 0 ;					\
         if_constexpr (f_debug) {				\
-            rsdebug = debugprintx(__func__, FMT __VA_OPT__(,) __VA_ARGS__) ; \
+            rsdebug = debugprintxf(__func__, FMT __VA_OPT__(,) __VA_ARGS__) ; \
         } ; rsdebug ; \
     }) /* end macro (DEBUGPRINTF) */
-#else /* __cplusplus */
-#define DEBUGPRINTF(FMT, ...)					\
-    debugprintx(__func__,FMT __VA_OPT__(,) __VA_ARGS__)
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#define DEBUGPRINTS(str,sbuf,slen) ({					\
+	int rsdebug = 0 ;						\
+        if_constexpr (f_debug) {					\
+            rsdebug = debugprintxs(__func__,(str),(sbuf),(slen)) ;	\
+        } ; rsdebug ;							\
+    }) /* end macro (DEBUGPRINTS) */
 #endif /* __cplusplus */
 
 #define DEBUGCLOSE	debugclose()
@@ -49,7 +55,8 @@
 EXTERNC_begin
     extern int debugopen	(cchar *) noex ;
     extern int debugclose	(void) noex ;
-    extern int debugprintx	(cchar *,cchar *,...) noex ; /* special */
+    extern int debugprintxf	(cchar *,cchar *,...) noex ; /* special */
+    extern int debugprintxs	(ccp,ccp,ccp,int) noex ; /* special */
 EXTERNC_end
 
 EXTERNC_begin
@@ -57,7 +64,7 @@ EXTERNC_begin
     extern int debugprint	(cchar *,int) noex ;
     extern int debugprintf	(cchar *,...) noex ;
     extern int debugvprintf	(cchar *,va_list) noex ;
-    extern int debugprintfsize	(cchar *,int) noex ;
+    extern int debugprintfsz	(cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_begin
@@ -79,6 +86,9 @@ EXTERNC_end
     } /* end */
     inline int debugprint(cchar *sp) noex {
 	return debugprint(sp,-1) ;
+    } /* end */
+    inline int debugprintxs	(ccp fun,ccp str,ccp sp) noex {
+	return debugprintxs(fun,str,sp,-1) ;
     } /* end */
 #endif /* __cplusplus */
 
