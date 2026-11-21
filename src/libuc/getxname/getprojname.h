@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	getprojname(char *,int,cchar *) noex ;
-
+    extern int	getprojname(char *,int,cchar *) noex ;
 EXTERNC_end
 
 
