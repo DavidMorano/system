@@ -5,6 +5,7 @@
 /* manipulate real names */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -36,6 +37,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstdio>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
@@ -49,6 +51,7 @@
 #include	<isch.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |REALNAMELEN| */
+#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
 
 #include	"realname.h"
 #include	"namestr.h"
@@ -59,9 +62,13 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	NAMES			struct names
+#define	NAMES			names
 
 #define	REALNAME_STORELEN	REALNAMELEN
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	1		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -118,7 +125,7 @@ local int realname_dtor(realname *op) noex {
 		if (rs >= 0) rs = rs1 ;
 		op->stbuf = nullptr ;
 		op->stlen = 0 ;
-	    }
+	    } /* end if (memory-release) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (realname_dtor) */
@@ -128,21 +135,22 @@ local inline int realname_magic(realname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == REALNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (realname_magic) */
 
-local int	realname_avail(realname *) noex ;
-local int	realname_parse(realname *,cchar *,int) noex ;
+local int	realname_avail	(realname *) noex ;
+local int	realname_parse	(realname *,cchar *,int) noex ;
 
-local int	names_start(names *,char *) noex ;
-local int	names_add(names *,cchar *,int,int,int) noex ;
-local int	names_finish(names *) noex ;
+local int	names_start	(names *,char *) noex ;
+local int	names_add	(names *,cchar *,int,int,int) noex ;
+local int	names_finish	(names *) noex ;
 
 
 /* local variables */
 
-constexpr int		nnames = REALNAME_NNAMES ;
+constexpr int		nnames		= REALNAME_NNAMES ;
+cbool			f_debug		= CF_EBUG ;
 
 
 /* exported variables */
@@ -152,17 +160,19 @@ constexpr int		nnames = REALNAME_NNAMES ;
 
 int realname_start(realname *op,cchar *sp,int sl) noex {
 	int		rs ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = realname_ctor(op)) >= 0) ylikely {
 	    if (sp) {
 	        rs = realname_parse(op,sp,sl) ;
-	    }
+	    } /* end */
 	    if (rs >= 0) ylikely {
 		op->magval = REALNAME_MAGIC ;
-	    }
+	    } /* end */
 	    if (rs < 0) {
 		realname_dtor(op) ;
 	    } /* end if (error) */
 	} /* end if (realname_ctor) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (realname_start) */
 
@@ -193,13 +203,13 @@ int realname_loadparts(realname *op,dstr *stp) noex {
 	                cl = s.strw(stp[0].sbuf,stp[0].slen,&cp) ;
 	                op->first = cp ;
 	                op->len.first = uchar(cl) ;
-	            }
+	            } /* end */
 		    /* middle-1 */
 	            if (stp[1].sbuf != nullptr) {
 	                cl = s.strw(stp[1].sbuf,stp[1].slen,&cp) ;
 	                op->m1 = cp ;
 	                op->len.m1 = uchar(cl) ;
-	            }
+	            } /* end */
 		    /* middle-2 */
 	            if (stp[2].sbuf != nullptr) {
 	                cl = s.strw(stp[2].sbuf,stp[2].slen,&cp) ;
@@ -211,13 +221,13 @@ int realname_loadparts(realname *op,dstr *stp) noex {
 	                cl = s.strw(stp[3].sbuf,stp[3].slen,&cp) ;
 	                op->m3 = cp ;
 	                op->len.m3 = uchar(cl) ;
-	            }
+	            } /* end */
 		    /* last */
 	            if (stp[4].sbuf != nullptr) {
 	                cl = s.strw(stp[4].sbuf,stp[4].slen,&cp) ;
 	                op->last = cp ;
 	                op->len.last = uchar(cl) ;
-	            }
+	            } /* end */
 		    /* done */
 	            rs1 = s.finish ;
 	            if (rs >= 0) rs = rs1 ;
@@ -302,7 +312,7 @@ int realname_loadpieces(realname *op,cchar **sa,int sn) noex {
 	            } /* end if (storeitem) */
 	            if (rs >= 0) {
 	                op->len.store = uchar(rs) ;
-	            }
+	            } /* end if (ok) */
 	        } /* end if (valid) */
 	    } /* end if (storeitem_avail) */
 	} /* end if (magic) */
@@ -314,7 +324,7 @@ int realname_getfirst(realname *op,cchar **rpp) noex {
 	if (op) ylikely {
 	    if (rpp) *rpp = op->first ;
 	    rs = op->len.first ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (realname_getfirst) */
 
@@ -323,7 +333,7 @@ int realname_getm1(realname *op,cchar **rpp) noex {
 	if (op) ylikely {
 	    if (rpp) *rpp = op->m1 ;
 	    rs = op->len.m1 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (realname_getm1) */
 
@@ -332,7 +342,7 @@ int realname_getm2(realname *op,cchar **rpp) noex {
 	if (op) ylikely {
 	    if (rpp) *rpp = op->m2 ;
 	    rs = op->len.m2 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (realname_getm2) */
 
@@ -341,7 +351,7 @@ int realname_getm3(realname *op,cchar **rpp) noex {
 	if (op) ylikely {
 	    if (rpp) *rpp = op->m3 ;
 	    rs = op->len.m3 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (realname_getm3) */
 
@@ -350,7 +360,7 @@ int realname_getlast(realname *op,cchar **rpp) noex {
 	if (op) ylikely {
 	    if (rpp) *rpp = op->last ;
 	    rs = op->len.last ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (realname_getlast) */
 
@@ -547,7 +557,7 @@ local int realname_avail(realname *op) noex {
     	int		rs = SR_OK ;
 	if (op->abv.last) {
 	    rs = SR_ALREADY ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (realname_avail) */
 
@@ -568,6 +578,7 @@ local int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 	                    rs = names_add(&n,sp,sl,fabv,flast) ;
 	                    if (rs < 0) break ;
 	                }
+			if (rs < 0) break ;
 	            } /* end while */
 	            rs1 = ns.finish ;
 		    if (rs >= 0) rs = rs1 ;
@@ -580,10 +591,10 @@ local int realname_parse(realname *op,cchar *sbuf,int slen) noex {
 	                    i = n.i ;
 	                } else {
 	                    i = ((n.i + nnames - 1) % REALNAME_NNAMES) ;
-		        }
+		        } /* end */
 	            } else {
 	                i = n.li ;
-		    }
+		    } /* end */
 	            op->last = n.a[i] ;
 	            op->len.last = n.l[i] ;
 	            op->abv.last = !!n.f_abv[i] ;
@@ -649,7 +660,7 @@ local int names_add(names *op,cchar *nbuf,int nlen,int f_abv,int f_last) noex {
 	    /* load this new one in */
 	    if (op->a[op->i] != nullptr) {
 	        op->count -= 1 ;
-	    }
+	    } /* end */
 	    if (cchar *cp{} ; (rs = op->s.strw(nbuf,nlen,&cp)) >= 0) ylikely {
 	        cint	cl = rs ;
 	        op->a[op->i] = cp ;
