@@ -34,18 +34,16 @@ enum getfnames {
 #define	GETFNAME_TYPEUNKNOWN	-1
 #define	GETFNAME_TYPELOCAL	getfname_local
 #define	GETFNAME_TYPEROOT	getfname_root
-#endif
+#endif /* GETFNAME_TYPELOCAL */
+
+EXTERNC_beg
+    extern int getfname(cc *,char *,getfnames,cc *,int) noex ;
+EXTERNC_end
 
 #ifdef	__cplusplus
-
-extern "C" {
-    extern int getfname(cc *,char *,getfnames,cc *,int = 0) noex ;
-}
-
-#else /* __cplusplus */
-
-extern int getfname(cchar *,char *,int,cchar *,int) noex ;
-
+    inline int getfname(cc *pr,char *rbuf,getfnames ft,cc *fn) noex {
+	return getfname(pr,rbuf,ft,fn,0) ;
+    } /* end */
 #endif /* __cplusplus */
 
 
