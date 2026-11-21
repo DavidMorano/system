@@ -34,12 +34,10 @@ enum ucprogdatas {
 #define	UCPROGDATA_DSYSTAT	ucprogdata_systat
 
 EXTERNC_begin
-
-extern int ucprogdata_init	() noex ;
-extern int ucprogdata_set	(int,cchar *,int,int) noex ;
-extern int ucprogdata_get	(int,char *,int) noex ;
-extern int ucprogdata_fini	() noex ;
-
+    extern int ucprogdata_init	() noex ;
+    extern int ucprogdata_set	(int,cchar *,int,int) noex ;
+    extern int ucprogdata_get	(int,char *,int) noex ;
+    extern int ucprogdata_fini	() noex ;
 EXTERNC_end
 
 
