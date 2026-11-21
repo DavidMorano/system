@@ -25,7 +25,7 @@
 
 
 EXTERNC_begin
-extern int	mkxdisp(char *,int,cc *,cc *,cc *) noex ;
+    extern int	mkxdisp(char *,int,cc *,cc *,cc *) noex ;
 EXTERNC_end
 
 
