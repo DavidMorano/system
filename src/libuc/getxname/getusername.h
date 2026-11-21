@@ -47,11 +47,9 @@ struct getxuser_head {
 typedef GETXUSER	getxuser ;
 
 EXTERNC_begin
-
-extern int getxusername		(getxuser *) noex ;
-extern int getusername		(char *,int,uid_t) noex ;
-extern int getpwusername	(ucentpw *,char *,int,uid_t) noex ;
-
+     extern int getxusername	(getxuser *) noex ;
+     extern int getusername	(char *,int,uid_t) noex ;
+     extern int getpwusername	(ucentpw *,char *,int,uid_t) noex ;
 EXTERNC_end
 
 
