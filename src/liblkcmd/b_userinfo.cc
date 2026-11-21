@@ -3209,7 +3209,7 @@ local int datauser_ua(DATAUSER *dup) noex {
 	        char		vbuf[VBUFLEN + 1] ;
 	        for (i = 0 ; uakeys[i] != nullptr ; i += 1) {
 		    cchar *uk = uakeys[i] ;
-	            if ((rs = userattrdb_lookup(&ua,vbuf,vlen,uk)) >= 0) {
+	            if ((rs = userattrdb_look(&ua,vbuf,vlen,uk)) >= 0) {
 			vl = rs ;
 	                switch (i) {
 	                case uakey_tz:
@@ -3223,7 +3223,7 @@ local int datauser_ua(DATAUSER *dup) noex {
 	                } /* end switch */
 		    } else if (rs == SR_NOTFOUND) {
 			rs = SR_OK ;
-	            } /* end if (userattrdb_lookup) */
+	            } /* end if (userattrdb_look) */
 	            if (rs < 0) break ;
 	        } /* end for */
 	        rs1 = userattrdb_close(&ua) ;
