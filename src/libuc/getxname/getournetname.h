@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	getournetname(char *,int,cchar *) noex ;
-
+    extern int	getournetname(char *,int,cchar *) noex ;
 EXTERNC_end
 
 
