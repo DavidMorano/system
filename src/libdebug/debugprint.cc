@@ -5,7 +5,7 @@
 /* special debug printing */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #define	CF_LINELEN	0		/* use |strlinelen(3dam)| */
 
 /* revision history:
@@ -136,6 +136,7 @@
 #include	<ucopen.h>		/* LIBUC */
 #include	<ucdesc.h>		/* LIBUC */
 #include	<ucproc.h>		/* LIBUC */
+#include	<snwcpy.h>		/* LIBUC */
 #include	<cfdec.h>		/* LIBUC */
 #include	<fmtstr.h>		/* LIBUC */
 #include	<hasx.h>		/* LIBUC |hasprintbad(3uc)| */
@@ -244,7 +245,7 @@ local int	cthexi(char *,int) noex ;
 local char	*convdeci(long,char *) noex ;
 #endif /* COMMENT */
 
-#ifdef	COMMENT
+#ifdef	COMMENT /* get form the library instead */
 local bool	hasprintbad(cchar *,int) noex ;
 #endif /* COMMENT */
 
@@ -339,9 +340,9 @@ int debugprintf(cchar *fmt,...) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	DPRINTF("ent fd=%d fmt=>%s<\n",ef.fd,fmt) ;
-	if (fmt) {
+	if (fmt) ylikely {
 	    rs = SR_NOTOPEN ;
-	    if (ef.fd > 0) {
+	    if (ef.fd > 0) ylikely {
 	        va_begin(ap,fmt) ;
 		{
 		    rs = debugvprintf(fmt,ap) ;
@@ -360,13 +361,13 @@ int debugprintx(cchar *fun,cchar *fmt,...) noex {
     	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
-	if (fmt) {
+	if (fun && fmt) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (ef.fd > 0) {
-		cint flen = (lenstr(__func__) + 2 + lenstr(fmt)) ;
+		cint flen = (lenstr(fun) + 2 + lenstr(fmt)) ;
 		rs = SR_NOMEM ;
-		if (char *fbuf = new(nt) char [flen + 1]) {
-		    if ((rs = sncpy(fbuf,flen,fun,": ",fmt)) >= 0) {
+		if (char *fbuf = new(nt) char [flen + 1]) ylikely {
+		    if ((rs = sncpy(fbuf,flen,fun,": ",fmt)) >= 0) ylikely {
 	                va_begin(ap,fmt) ;
 	                rs = debugvprintf(fbuf,ap) ;
 	                wlen += rs ;
@@ -377,19 +378,19 @@ int debugprintx(cchar *fun,cchar *fmt,...) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
-} /* end subroutine (debugvprintx) */
+} /* end subroutine (debugprintx) */
 
 int debugvprintf(cchar *fmt,va_list ap) noex {
     	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
-	if (fmt) {
+	if (fmt) ylikely {
 	    DPRINTF("fmt=>%s<\n",fmt) ;
 	    rs = SR_NOTOPEN ;
-	    if (ef.fd > 0) {
+	    if (ef.fd > 0) ylikely {
 		rs = SR_NOMEM ;
-		if (char *lbuf = new(nt) char [llen + 1]) {
-	            if ((rs = snvprintf(lbuf,llen,fmt,ap)) >= 0) {
+		if (char *lbuf = new(nt) char [llen + 1]) ylikely {
+	            if ((rs = snvprintf(lbuf,llen,fmt,ap)) >= 0) ylikely {
 			DPRINTF("fmtstr() rs=%d\n",rs) ;
 	        	rs = debugprinter(lbuf,rs) ;
 	                wlen += rs ;
@@ -411,10 +412,10 @@ int debugprintnum(cchar *s,int v) noex {
 int debugprintdeci(cchar *s,int v) noex {
     	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (s) {
+	if (s) ylikely {
 	    rs = SR_NOMEM ;
-	    if (char *lbuf = new(nt) char [llen + 1]) {
-		if ((rs = snprintf(lbuf,llen,"%s %d\n",s,v)) >= 0) {
+	    if (char *lbuf = new(nt) char [llen + 1]) ylikely {
+		if ((rs = snprintf(lbuf,llen,"%s %d\n",s,v)) >= 0) ylikely {
 	            rs = debugwrite(lbuf,rs) ;
 	        } /* end if (snprintf) */
 		delete [] lbuf ;
@@ -426,10 +427,11 @@ int debugprintdeci(cchar *s,int v) noex {
 int debugprinthexi(cchar *s,int v) noex {
     	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (s) {
+	if (s) ylikely {
 	    rs = SR_NOMEM ;
-	    if (char *lbuf = new(nt) char [llen + 1]) {
-		if ((rs = snprintf(lbuf,llen,"%s %08x\n",s,v)) >= 0) {
+	    if (char *lbuf = new(nt) char [llen + 1]) ylikely {
+		char fmt[] = "%s %08x\n" ;
+		if ((rs = snprintf(lbuf,llen,fmt,s,v)) >= 0) ylikely {
 	            rs = debugwrite(lbuf,rs) ;
 	        } /* end if (snprintf) */
 		delete [] lbuf ;
@@ -448,7 +450,7 @@ int debugprinthexs(cchar *ids,int maxcols,cchar *sp,int sl) noex {
 	    if (ids) idlen = lenstr(ids) ;
 	    if (maxcols < 0) maxcols = COLUMNS ;
 	    if (idlen > 0) maxcols -= (idlen + 1) ;
-	    if ((rs = mkhexnstr(pbuf,plen,maxcols,sp,sl)) >= 0) {
+	    if ((rs = mkhexnstr(pbuf,plen,maxcols,sp,sl)) >= 0) ylikely {
 	        if (idlen > 0) {
 	            rs = debugprintf("%r %s\n",ids,idlen,pbuf) ;
 	        } else {
@@ -506,7 +508,7 @@ int debugprinthexb(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
 int debugsetfd(int fd) noex {
 	int		rs = SR_NOTOPEN ;
 	ef.fd = 0 ; /* special case (use zero) */
-	if (fd >= 0) {
+	if (fd >= 0) ylikely {
 	    if (ustat sb ; (fd < FD_MAX) && ((rs = uc_fstat(fd,&sb)) >= 0)) {
 	        ef.fd = fd ;
 	        ef.sz = intconv(sb.st_size) ;
@@ -536,7 +538,7 @@ int debugopen(cchar *fname) noex {
 	                    fd = rs ;
 	                } else {
 	                    u_close(fd) ;
-	                }
+	                } /* end */
 	            } /* end if (u_open) */
 	        } /* end if */
 	        if (rs >= 0) ylikely {
@@ -548,7 +550,7 @@ int debugopen(cchar *fname) noex {
 			ef.fl.seekable = true ;
 		    } else if (rs == SR_NOTSEEK) {
 			rs = SR_OK ;
-	            }
+	            } /* end */
 	        } /* end if (ok) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -558,7 +560,7 @@ int debugopen(cchar *fname) noex {
 int debugclose() noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ef.fd > 0) {
+	if (ef.fd > 0) ylikely {
 	    rs1 = u_close(ef.fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    ef.fd = 0 ; /* special case (use zero) */
@@ -574,15 +576,15 @@ int debuggetfd() noex {
 /* low level debug-print function */
 int debugprint(cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
-	DPRINTF("ent slen=%d\n",탎len) ;
+	DPRINTF("ent slen=%d\n",slen) ;
 	if (sbuf) ylikely {
 	    rs = SR_NOTOPEN ; 
-	    if (ef.fd >= 0) {
+	    if (ef.fd >= 0) ylikely {
 		DPRINTF("-> printer\n") ;
 	        rs = debugprinter(sbuf,slen) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	DPRINTF("ret rs=%d wlen=%d\n",rs,wlen) ;
+	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (debugprint) */
 
@@ -593,7 +595,7 @@ local int getlen(cchar *sp,int sl) noex {
 	} else {
 	    if (al = lenstr(sp,sl) ; al > llen) {
 		al = llen ;
-	    }
+	    } /* end */
 	} /* end if_constexpr (f_linelen) */
     	return al ;
 } /* end subroutine (getlen) */
@@ -645,49 +647,54 @@ local int debugprinter(cchar *sbuf,int 탎len) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ; /* return-value */
 	DPRINTF("ent slen=%d\n",탎len) ;
-	if (int slen ; sbuf && ((slen = getlen(sbuf,탎len)) >= 0)) {
+	if (int slen ; sbuf && ((slen = getlen(sbuf,탎len)) >= 0)) ylikely {
 	    cint clen = slen ;
 	    rs = SR_NOMEM ;
 	    DPRINTF("getlen() slen=%d\n",slen) ;
-	    if (char *cbuf = new(nt) char[clen + 1]) {
-		    int		kl = slen ; /* check-length */
+	    if (char *cbuf = new(nt) char[clen + 1]) ylikely {
+		    int		ckl = slen ; /* check-length */
 	            bool	f_needeol = false ;
-	            bool	f_cleaned = false ;
+		    bool	f_hasbad = false ;
 		    rs = SR_OK ;
 		    if (slen > 0) {
 	                if (sbuf[slen - 1] != '\n') {
 	                    f_needeol = true ;
 			} else {
-			    kl -= 1 ;
+			    ckl -= 1 ;
 			} /* end */
 		    } else {
 	                f_needeol = true ;
 		    } /* end if */
+	    	    DPRINTF("f_needeol=%u\n",uint(f_needeol)) ;
 	            /* scan for bad characters */
-	            if ((kl > 0) && hasprintbad(sbuf,kl)) {
-			cauto sncl = snwcpyprintclean ;
-			DPRINTF("-> sncl kl=%d\n",kl) ;
-	                if ((rs = sncl(cbuf,(clen - 1),sbuf,kl)) >= 0) {
-			    f_cleaned = true ;
+	            if ((ckl > 0) && hasprintbad(sbuf,ckl)) {
+			f_hasbad = true ;
+		    } /* end if ("bad-bad" determination) */
+		    if (f_needeol || f_hasbad) {
+			int idx = 0 ;
+			if (f_hasbad) {
+			    cauto sncl = snwcpyprintclean ;
+			    DPRINTF("-> sncl ckl=%d\n",ckl) ;
+	                    rs = sncl(cbuf,(clen - 1),sbuf,ckl) ;
+			    idx += rs ;
 			    DPRINTF("sncl() rs=%d\n",rs) ;
-		            sbuf = cbuf ;
-		            slen = rs ;
-	                } /* end if */
-		    } /* end if (switched buffer) */
-		    if ((rs >= 0) && f_needeol) {
-			if (! f_cleaned) {
-			    strwcpy(cbuf,sbuf,slen) ;
-			}
-			cbuf[slen++] = '\n' ;
-		        cbuf[slen] = '\0' ;
+			} else {
+	                    rs = snwcpy(cbuf,(clen - 1),sbuf,ckl) ;
+			    idx += rs ;
+			} /* end if */
+		        if ((rs >= 0) && ((ckl < slen) || f_needeol)) {
+			    cbuf[idx++] = eol ;
+		            cbuf[idx] = eos ;
+			} /* end if (needed EOL) */
 			sbuf = cbuf ;
+			slen = idx ;
 		    } /* end if (switched buffer) */
 	            /* write the line-buffer out */
 	            if (rs >= 0) {
 			DPRINTF("-> dwr slen=%d\n",slen) ;
 			if_constexpr (f_debug) {
 			    strnul ps(sbuf,slen) ;
-			    DPRINTF("s=>%s<",ccp(ps)) ;
+			    DPRINTF("sbuf=>%s<",ccp(ps)) ;
 			}
 	                rs = debugwrite(sbuf,slen) ;
 	                wlen = rs ;
@@ -729,7 +736,7 @@ int debugmgr_head::advend() noex {
 	return rs ;
 } /* end if (debugmgr_head::advend) */
 
-#ifdef	COMMENT
+#ifdef	COMMENT /* unused */
 local char *convdeci(long num,char *endptr) noex {
 	ulong		unum = ulong(num) ;
 	char		*bp ;
@@ -740,14 +747,14 @@ local char *convdeci(long num,char *endptr) noex {
 } /* end subroutine (convdeci) */
 #endif /* COMMENT */
 
-#ifdef	COMMENT
+#ifdef	COMMENT /* unused */
 local int cthexi(char *buf,int val) noex {
 	cint		n = (2 * szof(int)) ;
 	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
 	    buf[i] = cthextable[val & 0x0F] ;
 	    val >>= 4 ;
 	} /* end for */
-	buf[n] = '\0' ;
+	buf[n] = eos ;
 	return n ;
 } /* end subroutine (cthexi) */
 #endif /* COMMENT */
@@ -761,7 +768,7 @@ local int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 		    ch = '�' ;
 	        } else {
 		    ch = '�' ;
-		}
+		} /* end */
 	    } /* end if (was print-bad) */
 	    dbuf[dl++] = char(ch) ;
 	    sl -= 1 ;
@@ -769,7 +776,7 @@ local int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	if ((sl != 0) && *sp) {
 	    rs = SR_OVERFLOW ;
 	} /* end if */
-	dbuf[dl] = '\0' ;
+	dbuf[dl] = eos ;
 	return (rs >= 0) ? dl : rs ;
 } /* end subroutine (snwcpyprintclean) */
 
