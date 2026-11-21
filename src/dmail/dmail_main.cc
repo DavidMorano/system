@@ -3170,7 +3170,7 @@ local int procrecip_mailspool(PI *pip,RECIP *rp)
 	        int		vl ;
 	        cchar		*ak = "md" ;
 	        char		vbuf[MAXPATHLEN+1] ;
-	        if ((vl = userattrdb_lookup(&ua,vbuf,vlen,ak)) >= 0) {
+	        if ((vl = userattrdb_look(&ua,vbuf,vlen,ak)) >= 0) {
 	            rs = recip_setmailspool(rp,vbuf,vl) ;
 	            pl = rs ;
 	        }
