@@ -25,7 +25,7 @@
 
 
 EXTERNC_begin
-extern int	mkpathmulti(char *,cchar *,int) noex ;
+    extern int	mkpathmulti(char *,cchar *,int) noex ;
 EXTERNC_end
 
 
