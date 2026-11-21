@@ -117,7 +117,7 @@ local int getprojnamer(char *rbuf,int rlen,cchar *un) noex {
                     if (ucentpj pj ; (rs = pj.getdef(pjbuf,pjlen,un)) >= 0) {
                         rs = sncpy(rbuf,rlen,pj.pj_name) ;
                         rl = rs ;
-                    }
+                    } /* end if (getdef) */
                     rs1 = lm_free(pjbuf) ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (m-a-f) */
