@@ -1,7 +1,3 @@
-	} /* end if (syshas.userattr) */
-	return rs ;
-} /* end subroutine (submgr_usready) */
-
 /* userinfo SUPPORT */
 /* charset=ISO8859-1 */
 /* lang=C++20 */
@@ -11,7 +7,6 @@
 
 #define	CF_DEBUG	1		/* debugging */
 #define	CF_OLDUSERINFO	0		/* compile-in old |userinfo(3dam)| */
-#define	CF_UCPWCACHE	0		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -74,14 +69,12 @@
 #include	<grp.h>			/* POSIX */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdio>		/* CSTD */
 #include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucgetpid.h>		/* LIBUC */
-#include	<ucpwcache.h>		/* LIBUC |ucpwcache_name(3uc)| */
 #include	<ucinfo.h>		/* LIBUC */
 #include	<getnodedomain.h>	/* LIBUC */
 #include	<getnodename.h>		/* LIBUC */
@@ -107,8 +100,9 @@
 #include	<ctdec.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
+#include	<vardefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |DIGBUFLEN| + |REALNAMELEN| */
-#include	<dprint.hh>		/* LIBU */
+#include	<libdebug.h>		/* LIBEBUG |DEBUGPRINTF(3u)| */
 
 #include	"userinfo.h"
 
@@ -129,6 +123,8 @@ import uconstants ;			/* |sysword(3u)| */
 #define	SMGR		submgr
 #define	SMGR_FL		submgr_flags
 #define	SMGR_TMPS	submgr_tmps
+
+#define	UAD		userattrdb
 
 #define	PRNAME		"LOCAL"		/* program-root for USERATTR */
 
@@ -237,9 +233,8 @@ enum uits {
 struct submgr_flags {
 	uint		altuser:1 ;
 	uint		pw:1 ;
-	uint		ua:1 ;
-	uint		uainit:1 ;
-	uint		allocua:1 ;
+	uint		uaopen:1 ;
+	uint		uamall:1 ;
 } ; /* end struct */
 
 struct submgr_tmps {
@@ -288,14 +283,9 @@ template<typename ... Args>
 local int userinfo_ctor(userinfo *op,Args ... args) noex {
     	USERINFO	*hop = op ;
 	int		rs = SR_FAULT ;
-	cbool		f_debug = true ;
-	DPRINTF("ent\n") ;
 	if (op && (args && ...)) ylikely {
-	DPRINTF("non-null\n") ;
 	    rs = memclear(hop) ;
-	DPRINTF("memclear() rs=%d\n",rs) ;
 	} /* end if (non-null) */
-	DPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (userinfo_ctor) */
 
@@ -316,48 +306,46 @@ local inline int userinfo_magic(userinfo *op,Args ... args) noex {
 	return rs ;
 } /* end subroutine (userinfo_magic) */
 
-local int	userinfo_process(UI *,strstore *,int *,cchar *) noex ;
-local int	userinfo_id(UI *uip) noex ;
-local int	userinfo_load(UI *,strstore *,int *) noex ;
+local int userinfo_proc		(UI *,strstore *,int *,cchar *) noex ;
+local int userinfo_id		(UI *uip) noex ;
+local int userinfo_load		(UI *,strstore *,int *) noex ;
 
-#ifdef	COMMENT
-local int	userinfo_setnuls(UI *,cchar *) noex ;
-#endif
-
-local int	submgr_start	(SMGR *,UI *,strstore *,int *) noex ;
-local int	submgr_finish	(SMGR *) noex ;
-local int 	submgr_find	(SMGR *,cchar *) noex ;
-local int	submgr_pwentry	(SMGR *,cchar *) noex ;
-local int	submgr_getpwu	(SMGR *,ucentpw *,char *,int,ccp) noex ;
-local int	submgr_store	(SMGR *,int,cchar *,int,cchar **) noex ;
-local int	submgr_ualookup	(SMGR *,char *,int,cchar *) noex ;
-local int	submgr_uaready	(SMGR *) noex ;
-local int	submgr_uaobjbeg	(SMGR *) noex ;
-local int	submgr_uaobjend	(SMGR *) noex ;
-local int	submgr_uabeg	(SMGR *) noex ;
-local int	submgr_uaend	(SMGR *) noex ;
+local int submgr_start		(SMGR *,UI *,strstore *,int *) noex ;
+local int submgr_finish		(SMGR *) noex ;
+local int submgr_find		(SMGR *,cchar *) noex ;
+local int submgr_pwentry	(SMGR *,cchar *) noex ;
+local int submgr_getpwu		(SMGR *,ucentpw *,char *,int,ccp) noex ;
+local int submgr_store		(SMGR *,int,ccp,int,ccpp = nullptr) noex ;
+local int submgr_ualookup	(SMGR *,char *,int,cchar *) noex ;
+local int submgr_uaready	(SMGR *) noex ;
+local int submgr_uaobjbeg	(SMGR *) noex ;
+local int submgr_uaobjend	(SMGR *) noex ;
+local int submgr_uabeg		(SMGR *) noex ;
+local int submgr_uaend		(SMGR *) noex ;
 
 /* components */
-local int	submgr_homedname(SMGR *) noex ;
-local int	submgr_shell(SMGR *) noex ;
-local int	submgr_org(SMGR *) noex ;
-local int	submgr_prbin(SMGR *) noex ;
-local int	submgr_office(SMGR *) noex ;
-local int	submgr_printer(SMGR *) noex ;
-local int	submgr_gecos(SMGR *) noex ;
-local int	submgr_gecosname(SMGR *) noex ;
-local int	submgr_realname(SMGR *) noex ;
-local int	submgr_mailname(SMGR *) noex ;
-local int	submgr_name(SMGR *) noex ;
-local int	submgr_fullname(SMGR *) noex ;
-local int	submgr_uinfo(SMGR *) noex ;
-local int	submgr_nodename(SMGR *) noex ;
-local int	submgr_domainname(SMGR *) noex ;
-local int	submgr_project(SMGR *) noex ;
-local int	submgr_tz(SMGR *) noex ;
-local int	submgr_md(SMGR *) noex ;
-local int	submgr_wstation(SMGR *) noex ;
-local int	submgr_logid(SMGR *) noex ;
+local int submgr_homedname	(SMGR *) noex ;
+local int submgr_shell		(SMGR *) noex ;
+local int submgr_org		(SMGR *) noex ;
+local int submgr_prbin		(SMGR *) noex ;
+local int submgr_office		(SMGR *) noex ;
+local int submgr_printer	(SMGR *) noex ;
+local int submgr_gecos		(SMGR *) noex ;
+local int submgr_gecosname	(SMGR *) noex ;
+local int submgr_realname	(SMGR *) noex ;
+local int submgr_mailname	(SMGR *) noex ;
+local int submgr_name		(SMGR *) noex ;
+local int submgr_fullname	(SMGR *) noex ;
+local int submgr_uinfo		(SMGR *) noex ;
+local int submgr_nodename	(SMGR *) noex ;
+local int submgr_domain		(SMGR *) noex ;
+local int submgr_project	(SMGR *) noex ;
+local int submgr_tz		(SMGR *) noex ;
+local int submgr_md		(SMGR *) noex ;
+local int submgr_wstation	(SMGR *) noex ;
+local int submgr_logid		(SMGR *) noex ;
+
+local bool isNoEnt		(int) noex ;
 
 
 /* local variables */
@@ -378,7 +366,7 @@ constexpr int		(*components[])(SMGR *) = {
 	submgr_fullname,
 	submgr_uinfo,
 	submgr_nodename,
-	submgr_domainname,
+	submgr_domain,
 	submgr_project,
 	submgr_tz,
 	submgr_md,
@@ -397,48 +385,31 @@ cbool			f_debug		= CF_DEBUG ;
 /* exported subroutines */
 
 int userinfo_start(UI *uip,cchar *un) noex {
-	cint		startsize = (USERINFO_LEN/4) ;
+	cint		startsz = (USERINFO_LEN/4) ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	DPRINTF("ent\n") ;
-	printf("userinfo_start: ent\n") ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = userinfo_ctor(uip)) >= 0) ylikely {
 	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
 		static cchar	*nn = getenver(varname.node) ;
 	        uip->nodename = nn ;
-	printf("userinfo_start: 1\n") ;
-	DPRINTF("1\n") ;
 	        if ((rs = userinfo_id(uip)) >= 0) ylikely {
 	            cint	sz = (uit_overlast * szof(cchar *)) ;
-	printf("userinfo_start: 2\n") ;
-	DPRINTF("2\n") ;
 	            if (void *vp ; (rs = lm_call(1,sz,&vp)) >= 0) ylikely {
-	                strstore	st ;
-			cint		sn = 10 ;
-	                int		*sis = cast_static<int *>(vp) ;
-	printf("userinfo_start: 3\n") ;
-	DPRINTF("3\n") ;
-	                if ((rs = strstore_start(&st,sn,startsize)) >= 0) {
-	printf("userinfo_start: 4\n") ;
-	DPRINTF("4\n") ;
-	                    if ((rs = userinfo_process(uip,&st,sis,un)) >= 0) {
-	printf("userinfo_start: 5\n") ;
-	DPRINTF("5\n") ;
+			cint	sn = 10 ;
+	                int	*sis = cast_static<int *>(vp) ;
+	                strstore st ;
+	                if ((rs = strstore_start(&st,sn,startsz)) >= 0) {
+	                    if ((rs = userinfo_proc(uip,&st,sis,un)) >= 0) {
 	                        rs = userinfo_load(uip,&st,sis) ;
 	                        len = rs ;
-	printf("userinfo_start: 6 rs=%d\n",rs) ;
-	DPRINTF("6 rs=%d\n",rs) ;
 	                    } /* end if */
 	                    rs1 = strstore_finish(&st) ;
 	                    if (rs >= 0) rs = rs1 ;
-	printf("userinfo_start: 7 rs=%d\n",rs) ;
-	DPRINTF("7 rs=%d\n",rs) ;
 	                } /* end if (strstore) */
 	                rs1 = lm_free(vp) ;
 	                if (rs >= 0) rs = rs1 ;
-	printf("userinfo_start: 8 rs=%d\n",rs) ;
-	DPRINTF("8 rs=%d\n",rs) ;
 	            } /* end if (memory_allocation) */
 	            if (rs >= 0) {
 			uip->magval = USERINFO_MAGIC ;
@@ -449,14 +420,16 @@ int userinfo_start(UI *uip,cchar *un) noex {
 		userinfo_dtor(uip) ;
 	    } /* end if (error) */
 	} /* end if (userinfo_ctor) */
-	printf("userinfo_start: ret rs=%d\n",rs) ;
-	DPRINTF("ret rs=%d len=%d\n",rs,len) ;
+	debugprintx(__func__,"UI_STARTx: ret rs=%d\n",rs) ;
+	debugprintf("UI_START: ret rs=%d\n",rs) ;
+	DEBUGPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (userinfo_start) */
 
 int userinfo_finish(UI *op) noex {
 	int		rs ;
 	int		rs1 ;
+	debugprintf("UI_FIN: ent\n") ;
 	if ((rs = userinfo_magic(op)) >= 0) ylikely {
 	    if (op->allocinfo) ylikely {
 	        rs1 = lm_free(op->allocinfo) ;
@@ -469,30 +442,31 @@ int userinfo_finish(UI *op) noex {
 	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
+	debugprintf("UI_FIN: ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (userinfo_finish) */
 
 
 /* local subroutines */
 
-local int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
+local int userinfo_proc(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	DPRINTF("ent\n") ;
+	DEBUGPRINTF("ent\n") ;
 	if (SMGR pi ; (rs = submgr_start(&pi,uip,stp,sis)) >= 0) ylikely {
 	    {
-		DPRINTF("-> find\n") ;
+		DEBUGPRINTF("-> find\n") ;
 	        rs = submgr_find(&pi,un) ;
 		rv = rs ;
-		DPRINTF("find() rs=%d\n",rs) ;
+		DEBUGPRINTF("find() rs=%d\n",rs) ;
 	    }
 	    rs1 = submgr_finish(&pi) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (submgr) */
-	DPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
+	DEBUGPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
-} /* end subroutine (userinfo_process) */
+} /* end subroutine (userinfo_proc) */
 
 local int userinfo_id(UI *uip) noex {
 	int		rs ;
@@ -511,7 +485,7 @@ local int userinfo_id(UI *uip) noex {
 
 local int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	int		rs ;
-	int		sz = 0 ;
+	int		sz = 0 ; /* return-value */
 	if ((rs = strstore_strsize(stp)) >= 0) ylikely {
 	    sz = rs ;
 	    if (char *a ; (rs = lm_mall(sz,&a)) >= 0) ylikely {
@@ -610,7 +584,7 @@ local int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	                    rs = SR_BADFMT ;
 	                    break ;
 	                } /* end switch */
-	                if ((rs >= 0) && (*vpp == nullptr)) {
+	                if ((rs >= 0) && vpp && (*vpp == nullptr)) {
 			    *vpp = (a + sis[i]) ;
 			} /* end */
 	            } /* end for */
@@ -644,21 +618,21 @@ local int submgr_start(SMGR *pip,UI *uip,strstore *stp,int *sis) noex {
 	if (char *bp ; (rs = lm_mall(sz,&bp)) >= 0) ylikely {
 	    int		bl = 0 ;
 	    pip->a = bp ;
-	    pip->uap = (userattrdb *) (bp+bl) ;
+	    pip->uap = (userattrdb *) (bp + bl) ;
 	    bl += szof(userattrdb) ;
-	    pip->nodename = (bp+bl) ;
+	    pip->nodename = (bp + bl) ;
 	    bl += var.nodenamelen ;
-	    pip->domainname = (bp+bl) ;
+	    pip->domainname = (bp + bl) ;
 	    bl += var.hostnamelen ;
-	    pip->pr = (bp+bl) ;
+	    pip->pr = (bp + bl) ;
 	    bl += var.maxpathlen ;
-	    pip->tbuf = (bp+bl) ;
+	    pip->tbuf = (bp + bl) ;
 	    bl += pip->tlen ;
 	    if ((rs = bits_start(&pip->have,uit_overlast)) >= 0) ylikely {
-	        pip->nodename[0] = '\0' ;
-	        pip->domainname[0] = '\0' ;
-	        pip->pr[0] = '\0' ;
-	        pip->tbuf[0] = '\0' ;
+	        pip->nodename[0]	= eos ;
+	        pip->domainname[0]	= eos ;
+	        pip->pr[0]		= eos ;
+	        pip->tbuf[0]		= eos ;
 	    } else {
 	        lm_free(bp) ;
 	        pip->a = nullptr ;
@@ -715,17 +689,53 @@ local int submgr_store(SMGR *pip,int uit,cc *vp,int vl,cc **rpp) noex {
 local int submgr_uaready(SMGR *pip) noex {
     	int		rs = SR_OK ;
 	if (syshas.userattr) {
-	    rs = submgr_usbeg(pip) ;
+	    rs = submgr_uabeg(pip) ;
 	} /* end if (syshas.userattr) */
 	return rs ;
-} /* end subroutine (submgr_usready) */
+} /* end subroutine (submgr_uaready) */
+
+local int submgr_uabeg(SMGR *pip) noex {
+	int		rs = SR_OK ;
+	int		f = false ; /* return-value */
+	DEBUGPRINTF("ent\n") ;
+	if ((! pip->fl.uaopen) && pip->fl.pw) {
+	    if ((rs = submgr_uaobjbeg(pip)) >= 0) {
+	        cchar	*un = pip->pw.pw_name ;
+	        if ((rs = userattrdb_open(pip->uap,un)) >= 0) {
+	            pip->fl.uaopen = true ;
+		    f = true ;
+		} /* end if (open) */
+		if (rs < 0) {
+		    submgr_uaobjend(pip) ;
+		} /* end if (error) */
+	    } /* end if (submgr_uaobjbeg) */
+	} /* end if (fl.uaopen) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	return (rs >= 0) ? f : rs ;
+} /* end subroutine (submgr_uabeg) */
+
+local int submgr_uaend(SMGR *pip) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (pip->fl.uaopen) ylikely {
+	    pip->fl.uaopen = false ;
+	    rs1 = userattrdb_close(pip->uap) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if */
+	if (pip->uap) {
+	    rs1 = submgr_uaobjend(pip) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if */
+	return rs ;
+} /* end subroutine (submgr_uaend) */
 
 local int submgr_uaobjbeg(SMGR *pip) noex {
     	int		rs = SR_OK ;
-	if (pip->uap == nullptr) {
+	if ((pip->uap == nullptr) && (! pip->fl.uamall)) {
 	    cint	sz = szof(userattrdb) ;
 	    if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
 	        pip->uap = (userattrdb *) vp ;
+		pip->fl.uamall = true ;
 	    } /* end if (memory-acquire) */
 	} /* end if (needed) */
 	return rs ;
@@ -734,138 +744,95 @@ local int submgr_uaobjbeg(SMGR *pip) noex {
 local int submgr_uaobjend(SMGR *pip) noex {
     	int		rs = SR_OK ;
 	int		rs1 ;
-	if (pip->uap) {
+	if (pip->uap && pip->fl.uamall) {
 	    rs1 = lm_free(pip->uap) ;
 	    if (rs >= 0) rs = rs1 ;
 	    pip->uap = nullptr ;
+	    pip->fl.uamall = false ;
 	} /* end if (had) */
 	return rs ;
 } /* end subroutine (submgr_uaobjend) */
 
-local int submgr_uabeg(SMGR *pip) noex {
-	int		rs = SR_OK ;
-	DPRINTF("ent\n") ;
-	if ((! pip->fl.ua) && pip->fl.pw && (! pip->fl.uainit)) {
-	    pip->fl.uainit = true ;
-
-	    if (pip->uap == nullptr) {
-	        cint	sz = szof(userattrdb) ;
-	        if (void *vp ; (rs = lm_mall(sz,&vp)) >= 0) {
-	            pip->uap = (userattrdb *) vp ;
-	            pip->fl.allocua = true ;
-	        }
-	    } /* end if */
-	    if (rs >= 0) ylikely {
-	        cchar	*un = pip->pw.pw_name ;
-	        if ((rs = userattrdb_open(pip->uap,un)) >= 0) {
-	            pip->fl.ua = true ;
-		} else {
-		    {
-	                lm_free(pip->uap) ;
-	                pip->uap = nullptr ;
-	                pip->fl.allocua = false ;
-		    } /* end if (memory-release) */
-		    if (isNotPresent(rs)) rs = SR_OK ;
-		} /* end if */
-	    } /* end if (ok) */
-	} /* end if (f.ua) */
-	DPRINTF("ret rs=%d\n",rs) ;
-	return rs ;
-} /* end subroutine (submgr_uabeg) */
-
-local int submgr_uaend(SMGR *pip) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	if (pip->fl.ua) ylikely {
-	    pip->fl.ua = false ;
-	    rs1 = userattrdb_close(pip->uap) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-	if (pip->fl.allocua && (pip->uap != nullptr)) {
-	    rs1 = lm_free(pip->uap) ;
-	    pip->uap = nullptr ;
-	    pip->fl.allocua = false ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (memory-release) */
-	return rs ;
-} /* end subroutine (submgr_uaend) */
-
 local int submgr_ualookup(SMGR *pip,char *rbuf,int rlen,cc *kn) noex {
 	int		rs = SR_FAULT ;
+	int		len = 0 ;
 	if (pip && rbuf && kn) ylikely {
 	    rbuf[0] = eos ;
 	    rs = SR_OK ;
 	    if (syshas.userattr) {
 	        if (pip->fl.pw) {
-	            if (! pip->fl.ua) {
-		        rs = submgr_uabeg(pip) ;
-		    }
-	            if (rs >= 0) ylikely {
-	                rs = userattrdb_lookup(pip->uap,rbuf,rlen,kn) ;
-	            }
+		    if ((rs = submgr_uaready(pip)) > 0) ylikely {
+		        if (UAD *uap = resumelife<UAD>(pip->uap)) {
+	                    if ((rs = userattrdb_look(uap,rbuf,rlen,kn)) >= 0) {
+			        len = rs ;
+			    } else if (isNoEnt(rs)) {
+				rs = SR_OK ;
+			    } /* end if */
+			} /* end if (uap) */
+	            } /* end if (uaready) */
 	        } /* end if (has-pw) */
 	    } /* end if (syshas.userattr) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 } /* end subroutine (submgr_ualookup) */
 
 local int submgr_find(SMGR *pip,cchar *un) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs ;
-	DPRINTF("ent\n") ;
+	DEBUGPRINTF("ent\n") ;
 	if ((rs = submgr_pwentry(pip,un)) >= 0) ylikely {
 	    cint	dlen = DIGBUFLEN ;
 	    int		cl = -1 ;
 	    int		uit ;
 	    cchar	*cp{} ;
 	    char	dbuf[DIGBUFLEN+1] ;
-	DPRINTF("1 rs=%d\n",rs) ;
+	DEBUGPRINTF("1 rs=%d\n",rs) ;
 	    if (rs > 0) {
 	        cchar	*vp{} ;
 	        uip->gid = pip->pw.pw_gid ;
 	        cp = pip->pw.pw_name ;
 	        if (rs >= 0) {
-	DPRINTF("2 rs=%d\n",rs) ;
+	DEBUGPRINTF("2 rs=%d\n",rs) ;
 	            uit = uit_password ;
 	            vp = pip->pw.pw_passwd ;
-	            rs = submgr_store(pip,uit,vp,-1,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,-1) ;
 	        }
-	DPRINTF("3 rs=%d\n",rs) ;
+	DEBUGPRINTF("3 rs=%d\n",rs) ;
 	        if (rs >= 0) {
 	            uit = uit_gecos ;
 	            vp = pip->pw.pw_gecos ;
-	            rs = submgr_store(pip,uit,vp,-1,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,-1) ;
 	        }
-	DPRINTF("4 rs=%d\n",rs) ;
+	DEBUGPRINTF("4 rs=%d\n",rs) ;
 	        if (rs >= 0) {
 	            uit = uit_homedname ;
 	            vp = pip->pw.pw_dir ;
-	            rs = submgr_store(pip,uit,vp,-1,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,-1) ;
 	        }
-	DPRINTF("5 rs=%d\n",rs) ;
+	DEBUGPRINTF("5 rs=%d\n",rs) ;
 	    } else {
 	        uint	uv = (uint) uip->uid ;
 	        cp = dbuf ;
 	        dbuf[0] = 'U' ;
 	        cl = ctdecui((dbuf+1),(dlen-1),uv) + 1 ;
-	DPRINTF("6 rs=%d\n",rs) ;
+	DEBUGPRINTF("6 rs=%d\n",rs) ;
 	    } /* end if */
-	DPRINTF("7 rs=%d\n",rs) ;
+	DEBUGPRINTF("7 rs=%d\n",rs) ;
 	    if (rs >= 0) {
 	        uit = uit_username ;
-	        rs = submgr_store(pip,uit,cp,cl,nullptr) ;
+	        rs = submgr_store(pip,uit,cp,cl) ;
 	    }
-	DPRINTF("8 rs=%d\n",rs) ;
+	DEBUGPRINTF("8 rs=%d\n",rs) ;
 	    if (rs >= 0) {
 	        for (int i = 0 ; components[i] ; i += 1) {
-	DPRINTF("loop i=%d rs=%d\n",i,rs) ;
+	DEBUGPRINTF("loop i=%d rs=%d\n",i,rs) ;
 	            rs = (*components[i])(pip) ;
 	            if (rs < 0) break ;
 	        } /* end for */
-	DPRINTF("loop-out rs=%d\n",rs) ;
+	DEBUGPRINTF("loop-out rs=%d\n",rs) ;
 	    } /* end if */
 	} /* end if */
-	DPRINTF("ret rs=%d\n",rs) ;
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_find) */
 
@@ -876,17 +843,17 @@ local int submgr_pwentry(SMGR *pip,cchar *un) noex {
 	int		f = false ;
 	char		*pwbuf = pip->tbuf ;
 	if ((rs = submgr_getpwu(pip,&pw,pwbuf,pwlen,un)) >= 0) {
-	    ucentpw	*pwp = cast_static<ucentpw *>(&pw) ;
+	    ucentpw *pwp = resumelife<ucentpw>(&pw) ;
 	    pip->fl.pw = true ;
 	    if ((rs = pwp->size()) >= 0) {
-	        int	pwsz = rs ;
+	        cint	pwsz = rs ;
 	        if (char *p ; (rs = lm_mall((pwsz+1),&p)) >= 0) {
-	            ucentpw	*tpwp = cast_static<ucentpw *>(&pip->pw) ;
+	            ucentpw *tpwp = resumelife<ucentpw>(&pip->pw) ;
 	            if ((rs = tpwp->load(p,pwsz,pwp)) >= 0) {
 	                pip->pwbuf = p ;
 	                pip->pwlen = pwsz ;
 	                f = true ;
-	            }
+	            } /* end */
 	            if (rs < 0) {
 	                lm_free(p) ;
 		    } /* end if (error) */
@@ -984,15 +951,17 @@ local int submgr_org(SMGR *pip) noex {
 	                rs = mkpath2(orgfname,hd,cname) ;
 	            } /* end if (ok) */
 	            if (rs >= 0) ylikely {
-	                rs = filereadln(orgfname,rbuf,rlen) ;
-	                vl = rs ;
-	                if (rs > 0) vp = rbuf ;
-	                if (isNotPresent(rs)) rs = SR_OK ;
+	                if ((rs = filereadln(orgfname,rbuf,rlen)) > 0) {
+	                    vl = rs ;
+	                    vp = rbuf ;
+			} else if (isNotPresent(rs)) {
+			    rs = SR_OK ;
+			}
 	            } /* end if (ok) */
 	        } /* end if */
 	        if (rs >= 0) ylikely {
 	            if ((vp != nullptr) && (vp[0] != '\0')) {
-	                rs = submgr_store(pip,uit,vp,vl,nullptr) ;
+	                rs = submgr_store(pip,uit,vp,vl) ;
 		    }
 	        } /* end if (ok) */
 		rs1 = lm_free(orgfname) ;
@@ -1153,7 +1122,7 @@ local int submgr_gecos(SMGR *pip) noex {
 	                    break ;
 	                } /* end switch */
 	                if ((rs >= 0) && (vp != np)) {
-	                    rs = submgr_store(pip,uit,vp,vl,np) ;
+	                    rs = submgr_store(pip,uit,vp,vl) ;
 	                }
 	            } /* end if */
 	            if (rs < 0) break ;
@@ -1178,7 +1147,7 @@ local int submgr_gecosname(SMGR *pip) noex {
 	        char	nbuf[REALNAMELEN+1] ;
 	        if ((vl = mkgecosname(nbuf,nlen,gstr)) > 0) {
 	            vp = nbuf ;
-	            rs = submgr_store(pip,uit,vp,vl,nullptr) ;
+	            rs = submgr_store(pip,uit,vp,vl) ;
 	        }
 	    } /* end */
 	} /* end */
@@ -1189,6 +1158,7 @@ local int submgr_realname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_realname ;
+	DEBUGPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->realname == nullptr)) {
 	    cint	nlen = REALNAMELEN ;
 	    cchar	*sp = pip->tstrs.gecosname ;
@@ -1199,17 +1169,18 @@ local int submgr_realname(SMGR *pip) noex {
 	        }
 	    } /* end */
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
-	        int	vl ;
-	        cchar	*vp = nbuf ;
-	        if ((vl = mkrealname(nbuf,nlen,sp,-1)) > 0) {
+	        if ((rs = mkrealname(nbuf,nlen,sp,-1)) > 0) {
 	            strstore	*stp = pip->stp ;
 	            cchar	*cp ;
-	            rs = strstore_store(stp,vp,vl,&cp) ;
+	DEBUGPRINTF("mkrealname() rs=%d\n",rs) ;
+	            rs = strstore_store(stp,nbuf,rs,&cp) ;
 	            pip->sis[uit] = rs ;
 	            pip->tstrs.realname = cp ;
-	        }
+	        } /* end */
+	DEBUGPRINTF("mkrealname-out rs=%d\n",rs) ;
 	    } /* end */
 	} /* end if (needed) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_realname) */
 
@@ -1217,12 +1188,11 @@ local int submgr_mailname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_mailname ;
+	DEBUGPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->mailname == nullptr)) {
 	    cint	nlen = REALNAMELEN ;
 	    cint	mlen = REALNAMELEN ;
-	    int		vl ;
 	    int		sl = -1 ;
-	    cchar	*vp ;
 	    cchar	*sp = nullptr ;
 	    char	nbuf[REALNAMELEN+1] ;
 	    char	mbuf[REALNAMELEN+1] ;
@@ -1230,36 +1200,36 @@ local int submgr_mailname(SMGR *pip) noex {
 	        if (! pip->fl.altuser) {
 	            sp = getenver(varname.mailname) ;
 	        }
-	    }
+	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        sp = pip->tstrs.gecosname ;
-	    }
+	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (pip->fl.pw) {
 	            cchar	*gn = pip->pw.pw_gecos ;
 	            sp = nbuf ;
 	            sl = mkgecosname(nbuf,nlen,gn) ;
-	        }
-	    }
+	        } /* end if (has-pw) */
+	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
 	            sp = getenver(varname.name) ;
 		    sl = -1 ;
 	        }
-	    }
+	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (pip->fl.pw) {
 		    sp = pip->pw.pw_name ;
 		    sl = -1 ;
-		}
-	    }
+		} /* end if (has-pw) */
+	    } /* end */
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
-	        vp = mbuf ;
-	        if ((vl = mkmailname(mbuf,mlen,sp,sl)) > 0) {
-	            rs = submgr_store(pip,uit,vp,vl,nullptr) ;
-		}
+	        if ((rs = mkmailname(mbuf,mlen,sp,sl)) > 0) {
+	            rs = submgr_store(pip,uit,mbuf,rs) ;
+		} /* end if (mkmailname) */
 	    } /* end */
 	} /* end */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_mailname) */
 
@@ -1267,6 +1237,7 @@ local int submgr_name(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_name ;
+	DEBUGPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->name == nullptr)) {
 	    cint	glen = REALNAMELEN ;
 	    cint	rlen = REALNAMELEN ;
@@ -1286,23 +1257,35 @@ local int submgr_name(SMGR *pip) noex {
 	            int		gl = -1 ;
 	            if (gp == nullptr) {
 	                cchar	*gn = pip->pw.pw_gecos ;
+	DEBUGPRINTF("1 gn=%s\n",gn) ;
 	                gp = gbuf ;
-	                gl = mkgecosname(gbuf,glen,gn) ;
-	            }
-	            sp = rbuf ;
-	            sl = mkrealname(rbuf,rlen,gp,gl) ;
-	        }
+	                rs = mkgecosname(gbuf,glen,gn) ;
+			gl = rs ;
+	DEBUGPRINTF("mkgecosname() rs=%d\n",rs) ;
+		    } /* end */
+		    if (rs >= 0) {
+	DEBUGPRINTF("2 gp=%s\n",gp) ;
+	                sp = rbuf ;
+	                rs = mkrealname(rbuf,rlen,gp,gl) ;
+		        sl = rs ;
+	DEBUGPRINTF("mkrealname() rs=%d\n",rs) ;
+		    } /* end */
+	        } /* end */
 	    } /* end */
-	    if ((sp == nullptr) || (sp[0] == '\0')) {
-	        if (pip->fl.pw) {
-		    sp = pip->pw.pw_name ;
-		    sl = -1 ;
-		}
-	    } /* end */
-	    if ((sp != nullptr) && (sp[0] != '\0')) {
-	        rs = submgr_store(pip,uit,sp,sl,nullptr) ;
-	    } /* end */
+	DEBUGPRINTF("mid3 rs=%d\n",rs) ;
+	    if (rs >= 0) {
+	        if ((sp == nullptr) || (sp[0] == '\0')) {
+	            if (pip->fl.pw) {
+		        sp = pip->pw.pw_name ;
+		        sl = -1 ;
+		    } /* end if (has-pw) */
+	        } /* end */
+	        if ((sp != nullptr) && (sp[0] != '\0')) {
+	            rs = submgr_store(pip,uit,sp,sl) ;
+	        } /* end */
+	    } /* end if */
 	} /* end */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_name) */
 
@@ -1312,13 +1295,13 @@ local int submgr_fullname(SMGR *pip) noex {
 	int		uit = uit_fullname ;
 	if ((pip->sis[uit] == 0) && (uip->fullname == nullptr)) {
 	    cchar	*sp = nullptr ;
-	        if (! pip->fl.altuser) {
-	            sp = getenver(varname.fullname) ;
-	        }
+	    if (! pip->fl.altuser) {
+	        sp = getenver(varname.fullname) ;
+	    } /* end */
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        uip->fullname = sp ;
-	    }
-	}
+	    } /* end */
+	} /* end */
 	return rs ;
 } /* end subroutine (submgr_fullname) */
 
@@ -1335,17 +1318,17 @@ local int submgr_nodename(SMGR *pip) noex {
 	        nl = rs ;
 	    } /* end */
 	    if (rs >= 0) {
-	        rs = submgr_store(pip,uit,nbuf,nl,nullptr) ;
+	        rs = submgr_store(pip,uit,nbuf,nl) ;
 	    } /* end */
 	} /* end */
 	return rs ;
 } /* end subroutine (submgr_nodename) */
 
-local int submgr_domainname(SMGR *pip) noex {
+local int submgr_domain(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_domainname ;
-	DPRINTF("ent\n") ;
+	DEBUGPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->domainname == nullptr)) {
 	    uip->domainname = nullptr ;
 	    if (uip->domainname == nullptr) {
@@ -1354,83 +1337,78 @@ local int submgr_domainname(SMGR *pip) noex {
 		    cchar	*valp ; 
 		    if ((valp = getenver(varname.localdomain)) != np) {
 			valp = getenver(varname.domain) ;
-		    }
+		    } /* end */
 	            uip->domainname = valp ;
 	        } /* end if (getting env-domain) */
 	    } /* end */
-	DPRINTF("mid1 rs=%d\n",rs) ;
+	DEBUGPRINTF("mid1 rs=%d\n",rs) ;
 	    if (uip->domainname == nullptr) {
 	        cint	dlen = var.hostnamelen ;
 	        int	dl = -1 ;
 	        char	*dbuf = pip->domainname ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	DPRINTF("pw1 rs=%d\n",rs) ;
+	DEBUGPRINTF("pw1 rs=%d\n",rs) ;
 	            if (pip->fl.pw) {
 	                cchar	*kn = UA_DN ;
-	DPRINTF("pw2 rs=%d\n",rs) ;
+	DEBUGPRINTF("pw2 rs=%d\n",rs) ;
 	                rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
-	DPRINTF("pw3 rs=%d\n",rs) ;
-	                if (isNotPresent(rs)) {
-	DPRINTF("pw4 rs=%d\n",rs) ;
-	                    dbuf[0] = eos ;
-	                    rs = SR_OK ;
-	                }
-	DPRINTF("pw5 rs=%d\n",rs) ;
-	            } /* end */
+	DEBUGPRINTF("pw5 rs=%d\n",rs) ;
+	            } /* end if (has-pw) */
 	        } /* end */
-	DPRINTF("mid2 rs=%d\n",rs) ;
+	DEBUGPRINTF("mid2 rs=%d\n",rs) ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	            rs = getinetdomain(dbuf,dlen) ;
-	            dl = rs ;
-	            if (isNotPresent(rs)) {
+	            if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
+	                dl = rs ;
+		    } else if (isNotPresent(rs)) {
 	                dbuf[0] = '\0' ;
 	                rs = SR_OK ;
-	            }
+	            } /* end */
 	        } /* end */
-	DPRINTF("mid3 rs=%d\n",rs) ;
+	DEBUGPRINTF("mid3 rs=%d\n",rs) ;
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
-	            rs = submgr_store(pip,uit,dbuf,dl,nullptr) ;
+	            rs = submgr_store(pip,uit,dbuf,dl) ;
 	        } /* end */
 	    } /* end */
 	} /* end */
-	DPRINTF("ret rs=%d\n",rs) ;
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_domainename) */
 
 local int submgr_project(SMGR *pip) noex {
-	userinfo	*uip = pip->uip ;
-	cint		dlen = var.projnamelen ;
+    	cnullptr	np{} ;
 	int		rs = SR_OK ;
-	int		uit = uit_project ;
-	if ((pip->sis[uit] == 0) && (uip->projname == nullptr)) {
-	    int		dl = -1 ;
-	    char	dbuf[dlen+1] = { 0 } ;
-	    if ((rs >= 0) && (dbuf[0] == '\0')) {
-	        if (pip->fl.pw) {
-	            cchar	*kn = UA_PROJECT ;
-	            rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
-	            dl = rs ;
-	            if (isNotPresent(rs)) {
-	                dbuf[0] = '\0' ;
-	                rs = SR_OK ;
-	            }
-	        }
-	    } /* end */
-	    if ((rs >= 0) && (dbuf[0] == '\0')) {
-	        if (pip->fl.pw) {
-	            cchar	*un = pip->pw.pw_name ;
-	            rs = getprojname(dbuf,dlen,un) ;
-	            dl = rs ;
-	            if (isNotPresent(rs) || (rs == SR_NOSYS)) {
-	                dbuf[0] = '\0' ;
-	                rs = SR_OK ;
-	            }
-	        }
-	    } /* end */
-	    if ((rs >= 0) && (dbuf[0] != '\0')) {
-	        rs = submgr_store(pip,uit,dbuf,dl,nullptr) ;
-	    } /* end */
-	} /* end if (project) */
+	DEBUGPRINTF("ent\n") ;
+	if (syshas.project) {
+	    userinfo	*uip = pip->uip ;
+	    cint	dlen = var.projnamelen ;
+	    int		uit = uit_project ;
+	    if ((pip->sis[uit] == 0) && (uip->projname == np)) {
+	        int	dl = 0 ;
+	        char	dbuf[dlen+1] = { 0 } ;
+	        if ((rs >= 0) && (dbuf[0] == '\0')) {
+	            if (pip->fl.pw) {
+	                cchar	*kn = UA_PROJECT ;
+	                rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
+	                dl = rs ;
+	            } /* end if (fl.pw) */
+	        } /* end */
+	        if ((rs >= 0) && (dl == 0) && (dbuf[0] == '\0')) {
+	            if (pip->fl.pw) {
+	                cchar	*un = pip->pw.pw_name ;
+	                if ((rs = getprojname(dbuf,dlen,un)) >= 0) {
+	                    dl = rs ;
+			} else if (isNoEnt(rs)) {
+	                    dbuf[0] = eos ;
+	                    rs = SR_OK ;
+	                } /* end */
+	            } /* end */
+	        } /* end */
+	        if ((rs >= 0) && (dl > 0) && dbuf[0]) {
+	            rs = submgr_store(pip,uit,dbuf,dl) ;
+	        } /* end */
+	    } /* end if (project) */
+	} /* end if (syshas.project) */
+	DEBUGPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_project) */
 
@@ -1439,28 +1417,28 @@ local int submgr_tz(SMGR *pip) noex {
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		uit = uit_tz ;
-	if ((pip->sis[uit] == 0) && (uip->tz == nullptr)) {
+	if ((pip->sis[uit] == 0) && (uip->tz == np)) {
 	    uip->tz = nullptr ;
 	    if (uip->tz == nullptr) {
 	        if (! pip->fl.altuser) {
 	            uip->tz = getenver(varname.tz) ;
 	        }
 	    } /* end if */
-	    if ((rs >= 0) && (uip->tz == nullptr)) {
+	    if ((rs >= 0) && (uip->tz == np)) {
 	        cint	dlen = var.tznamelen ;
 	        int	dl = -1 ;
 	        char	dbuf[var.tznamelen +1] ;
 	        if (pip->fl.pw) {
 	            cchar	*kn = UA_TZ ;
-	            rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
-	            dl = rs ;
-	            if (isNotPresent(rs)) {
+	            if ((rs = submgr_ualookup(pip,dbuf,dlen,kn)) >= 0) {
+	                dl = rs ;
+		    } else if (isNotPresent(rs)) {
 	                dbuf[0] = '\0' ;
 	                rs = SR_OK ;
-	            }
-	        } /* end if */
+	            } /* end */
+	        } /* end if (has-pw) */
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
-	            rs = submgr_store(pip,uit,dbuf,dl,np) ;
+	            rs = submgr_store(pip,uit,dbuf,dl) ;
 	        } /* end if */
 	    } /* end if */
 	} /* end if (tz) */
@@ -1477,7 +1455,7 @@ local int submgr_md(SMGR *pip) noex {
 	    if (uip->md == nullptr) {
 	        if (! pip->fl.altuser) {
 	            uip->md = getenver(varname.maildir) ;
-	        }
+	        } /* end */
 	    } /* end */
 	    if (uip->md == nullptr) {
 	        int	dl = -1 ;
@@ -1486,17 +1464,17 @@ local int submgr_md(SMGR *pip) noex {
 	            if ((rs >= 0) && (dbuf[0] == '\0')) {
 	                if (pip->fl.pw) {
 	                    cchar	*kn = UA_MD ;
-	                    rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
-	                    dl = rs ;
-	                    if (isNotPresent(rs)) {
+	                    if ((rs = submgr_ualookup(pip,dbuf,dlen,kn)) >= 0) {
+	                        dl = rs ;
+			    } else if (isNotPresent(rs)) {
 	                        dbuf[0] = '\0' ;
 	                        rs = SR_OK ;
-	                    }
-	                }
+	                    } /* end */
+	                } /* end if (has-pw) */
 	            } /* end if */
 	            if ((rs >= 0) && (dbuf[0] != '\0')) {
-	                rs = submgr_store(pip,uit,dbuf,dl,nullptr) ;
-	            }
+	                rs = submgr_store(pip,uit,dbuf,dl) ;
+	            } /* end */
 		    rs1 = lm_free(dbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (m-a-f) */
@@ -1523,16 +1501,16 @@ local int submgr_wstation(SMGR *pip) noex {
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
 	            if (pip->fl.pw) {
 	                cchar	*kn = UA_WS ;
-	                rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
-	                dl = rs ;
-	                if (isNotPresent(rs)) {
+	                if ((rs = submgr_ualookup(pip,dbuf,dlen,kn)) >= 0) {
+	                    dl = rs ;
+			} else if (isNotPresent(rs)) {
 	                    dbuf[0] = '\0' ;
 	                    rs = SR_OK ;
-	                }
-	            }
+	                } /* end */
+	            } /* end if (has-pw) */
 	        } /* end */
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
-	            rs = submgr_store(pip,uit,dbuf,dl,nullptr) ;
+	            rs = submgr_store(pip,uit,dbuf,dl) ;
 	        } /* end */
 	    } /* end */
 	} /* end */
@@ -1544,7 +1522,7 @@ local int submgr_logid(SMGR *pip) noex {
 	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		uit = uit_logid ;
-	if ((pip->sis[uit] == 0) && (uip->logid == nullptr)) {
+	if ((pip->sis[uit] == 0) && (uip->logid == np)) {
 	    int		v = uip->pid ;
 	    cchar	*nn = uip->nodename ;
 	    if ((nn == nullptr) || (nn[0] == '\0')) {
@@ -1554,10 +1532,10 @@ local int submgr_logid(SMGR *pip) noex {
 	        cint	llen = LOGIDLEN ;
 	        char	lbuf[LOGIDLEN+1] ;
 	        if ((rs = mklogid(lbuf,llen,nn,-1,v)) >= 0) {
-	            rs = submgr_store(pip,uit,lbuf,rs,np) ;
+	            rs = submgr_store(pip,uit,lbuf,rs) ;
 	        }
 	    }
-	}
+	} /* end if */
 	return rs ;
 } /* end subroutine (submgr_logid) */
 
@@ -1586,20 +1564,16 @@ void userinfo::dtor() noex {
 
 userinfo_cos::operator int () noex {
     	int		rs = SR_BUGCHECK ;
-	DPRINTF("ent op-int\n") ;
-	printf("userinfo_cos::op1: ent\n") ;
+	DEBUGPRINTF("ent op-int\n") ;
 	if (op) ylikely {
-	printf("userinfo_cos::op1: non\n") ;
 	    rs = userinfo_start(op,nullptr) ;
 	} /* end if (non-null) */
-	printf("userinfo_cos::op1: ret rs=%d\n",rs) ;
 	return rs ;
 } /* end method */
 
 int userinfo_cos::operator () (cchar *un) noex {
     	int		rs = SR_BUGCHECK ;
-	DPRINTF("ent op-call\n") ;
-	printf("userinfo_cos::op2: ent\n") ;
+	DEBUGPRINTF("ent op-call\n") ;
 	if (op) ylikely {
 	    rs = userinfo_start(op,un) ;
 	} /* end if (non-null) */
@@ -1630,7 +1604,7 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	        if (userinfo u ; (rs = userinfo_start(&u,un)) >= 0) ylikely {
 	            if (storeitem si ; (rs = si.start(ubuf,ulen)) >= 0) {
 	                cchar	*sp ;
-	                cchar	**rpp ;
+	                cchar	**rpp = nullptr ;
 	                oup->ostype = u.ostype ;
 	                oup->pid = u.pid ;
 	                oup->uid = u.uid ;
@@ -1757,7 +1731,7 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	                        sp = u.logid ;
 	                        break ;
 	                    } /* end switch */
-	                    if (sp) {
+	                    if (sp && rpp) {
 			        rs = si.strw(sp,-1,rpp) ;
 		            } /* end */
 	                    if (rs < 0) break ;
@@ -1807,5 +1781,9 @@ vars::operator int () noex {
 	} /* end */
 	return rs ;
 } /* end method (vars::operator) */
+
+local bool isNoEnt(int rs) noex {
+	return isNotPresent(rs) || (rs == SR_NOSYS) ;
+} /* end subroutine */
 
 
