@@ -655,10 +655,9 @@ local int proginfo_setdefdn(PI *pip) noex {
 local int proginfo_setdefpn(PI *pip) noex {
 	int		rs = SR_OK ;
 	if (pip->progname == nullptr) {
-	    if (pip->progename) {
-	        int	cl ;
+	    if (ccp progename = pip->progename) {
 	        cchar	*cp ;
-	        if ((cl = sfbasename(pip->progename,-1,&cp)) > 0) {
+	        if (int cl ; (cl = sfbasename(progename,-1,&cp)) > 0) {
 	            cl = rmext(cp,cl) ;
 	            if (cl == 0) {
 	                cp = NOPROGNAME ;
