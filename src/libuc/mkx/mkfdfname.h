@@ -25,7 +25,7 @@
 
 
 EXTERNC_begin
-extern int mkfdfname(char *,int,int) noex ;
+    extern int mkfdfname(char *,int,int) noex ;
 EXTERNC_end
 
 
