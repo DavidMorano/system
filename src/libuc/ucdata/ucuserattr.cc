@@ -24,7 +24,7 @@
 	This module supplies the following subroutines for accessing
 	the system user-attribute database:
 
-		uc_userattrbegin()
+		uc_userattrbeg()
 		uc_userattrend()
 		uc_userattrent()
 		uc_userattrnam()
@@ -32,16 +32,15 @@
 
 	These subroutines were grouped together into a single module
 	(not at all typical) because they have to be used together,
-	since using them apart makes little sense.
+	since using them apart makes little sense.  Note that these
+	stupid subroutines are thread-safe but are not reentrant!
+	Yes, that is what you get to when you have extreme brain
+	damaged system developers.
 
-	Note that these stupid subroutines are thread-safe but are
-	not reentrant!  Yes, that is what you get to when you have
-	extreme brain damaged system developers.
-
-	Implementation-note: These function, except for the first
-	two below, do not use or set the ERRNO variable. They just
-	return a NULL pointer or a non-NULL pointer, indicating
-	failure or success.
+	Implementation-note:
+	These function, except for the first two below, do not use
+	or set the ERRNO variable.  They just return a NULL pointer
+	or a non-NULL pointer, indicating failure or success.
 
 *******************************************************************************/
 
@@ -60,6 +59,9 @@
 
 #include	"ucuserattr.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
@@ -98,15 +100,15 @@ constexpr bool		f_userattr = F_USERATTR ;
 
 /* exported subroutines */
 
-int uc_userattrbegin() noex {
+int uc_userattrbeg() noex {
 	int		rs = SR_NOSYS ;
 	if_constexpr (f_userattr) {
 	    errno = 0 ;
 	    setuserattr() ;
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
-} /* end subroutine (uc_userattrbegin) */
+} /* end subroutine (uc_userattrbeg) */
 
 int uc_userattrend() noex {
 	int		rs = SR_NOSYS ;
@@ -114,7 +116,7 @@ int uc_userattrend() noex {
 	    errno = 0 ;
 	    enduserattr() ;
 	    rs = (neg errno) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (uc_userattrend) */
 
@@ -126,9 +128,9 @@ int uc_userattrent(userattr **rpp) noex {
 		rs = SR_OK ;
 	        uap = getuserattr() ;
 	        if (uap) {
-		    ucentua	*ep = cast_static<ucentua *>(uap) ;
+		    ucentua *ep = resumelife<ucentua>(uap) ;
 		    rs = ep->size() ;
-	        }
+	        } /* end */
 	    } else {
 	        rs = SR_NOSYS ;
 	    } /* end if_constexpr (f_userattr) */
@@ -147,9 +149,9 @@ int uc_userattrnam(userattr **rpp,cchar *un) noex {
 		    rs = SR_NOTFOUND ;
 	            uap = getusernam(un) ;
 	            if (uap) {
-		    	ucentua	*ep = cast_static<ucentua *>(uap) ;
+		    	ucentua	*ep = resumelife<ucentua>(uap) ;
 		        rs = ep->size() ;
-	            }
+	            } /* end */
 		} else {
 		    rs = SR_NOSYS ;
 	 	} /* end if_constexpr (f_userattr) */
@@ -169,9 +171,9 @@ int uc_userattruid(userattr **rpp,uid_t uid) noex {
 		    rs = SR_NOTFOUND ;
 	    	    uap = getuseruid(uid) ;
 	            if (uap) {
-		        ucentua	*ep = cast_static<ucentua *>(uap) ;
+		        ucentua	*ep = resumelife<ucentua>(uap) ;
 		        rs = ep->size() ;
-	            }
+	            } /* end */
 		} else {
 		    rs = SR_NOSYS ;
 		} /* end if_constexpr (f_userattr) */
