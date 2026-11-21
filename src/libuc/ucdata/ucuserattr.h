@@ -26,14 +26,12 @@
 
 
 EXTERNC_begin
-
-extern int	uc_userattrbegin	() noex ;
-extern int	uc_userattrent		(userattr **) noex ;
-extern int	uc_userattrnam		(userattr **,cchar *) noex ;
-extern int	uc_userattruid		(userattr **,uid_t) noex ;
-extern int	uc_userattrfree		(userattr *) noex ;
-extern int	uc_userattrend		() noex ;
-
+    extern int uc_userattrbeg	() noex ;
+    extern int uc_userattrent	(userattr **) noex ;
+    extern int uc_userattrnam	(userattr **,cchar *) noex ;
+    extern int uc_userattruid	(userattr **,uid_t) noex ;
+    extern int uc_userattrfree	(userattr *) noex ;
+    extern int uc_userattrend	() noex ;
 EXTERNC_end
 
 
