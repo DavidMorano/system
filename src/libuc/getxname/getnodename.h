@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	getnodename(char *,int) noex ;
-
+    extern int	getnodename(char *,int) noex ;
 EXTERNC_end
 
 
