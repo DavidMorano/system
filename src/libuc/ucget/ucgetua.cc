@@ -91,7 +91,7 @@
 /* exported subroutines */
 
 int uc_getuabegin() noex {
-	return uc_userattrbegin() ;
+	return uc_userattrbeg() ;
 } /* end subroutine (uc_getuabegin) */
 
 int uc_getuaend() noex {
