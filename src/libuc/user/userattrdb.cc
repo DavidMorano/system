@@ -49,7 +49,6 @@
 	UDOMAIN database for a query of an InterNet domain (query
 	keyname 'dn') that fail with Solaris®.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -66,7 +65,7 @@
 #include	<ucuserattr.h>		/* LIBUC |uc_userattr{x})(3uc)| */
 #include	<matstr.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
-#include	<userattr.h>		/* <- money shot */
+#include	<userattr.h>		/* LIBUC <- money shot */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"userattrdb.h"
@@ -113,9 +112,9 @@ local inline int userattrdb_ctor(userattrdb *op,Args ... args) noex {
 	    op->magval = 0 ;
 	    op->init = {} ;
 	    op->have = {} ;
-	    op->username = nullptr ;
-	    op->domain = nullptr ;
-	    op->uap = nullptr ;
+	    op->username	= nullptr ;
+	    op->domain		= nullptr ;
+	    op->uap		= nullptr ;
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (userattrdb_ctor) */
@@ -124,7 +123,7 @@ local inline int userattrdb_dtor(userattrdb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) ylikely {
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (userattrdb_dtor) */
 
@@ -133,22 +132,21 @@ local int userattrdb_magic(userattrdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == USERATTRDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (userattrdb_magic) */
 
-local int	userattrdb_opensysdb(uad *) noex ;
-local int	userattrdb_sysdb(uad *,char *,int,cchar *) noex ;
-
-local int	userattrdb_openudomain(uad *) noex ;
+local int	userattrdb_opensysdb	(uad *) noex ;
+local int	userattrdb_sysdb	(uad *,char *,int,cchar *) noex ;
+local int	userattrdb_openudomain	(uad *) noex ;
 
 
 /* local variables */
 
-static cpcchar	specials[] = {
+constexpr cpcchar	specials[] = {
 	UA_DN,
 	nullptr
-} ;
+} ; /* end array */
 
 
 /* exported variables */
@@ -167,7 +165,7 @@ int userattrdb_open(uad *op,cchar *username) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		userattrdb_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (userattrdb_ctor) */
 	return rs ;
 } /* end subroutine (userattrdb_open) */
@@ -181,38 +179,38 @@ int userattrdb_close(uad *op) noex {
 	        rs1 = lm_free(vp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->domain = nullptr ;
-	    }
+	    } /* end if (memory-release) */
 	    if (op->uap) ylikely {
 	        rs1 = uc_userattrfree(op->uap) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->uap = nullptr ;
-	    }
+	    } /* end if (userattr-free) */
 	    {
 		rs1 = userattrdb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (userattrdb_close) */
 
-int userattrdb_lookup(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
+int userattrdb_look(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
 	int		rs ;
 	if ((rs = userattrdb_magic(op,keyname)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (keyname[0]) ylikely {
-	        rbuf[0] = '\0' ;
+	        rbuf[0] = eos ;
 	        rs = userattrdb_sysdb(op,rbuf,rlen,keyname) ;
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (userattrdb_lookup) */
+} /* end subroutine (userattrdb_look) */
 
 int userattrdb_count(uad *op) noex {
     	int		rs ;
 	if ((rs = userattrdb_magic(op)) >= 0) ylikely {
 	    rs = SR_OK ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (userattrdb_count) */
 
@@ -221,24 +219,24 @@ int userattrdb_count(uad *op) noex {
 
 local int userattrdb_opensysdb(uad *op) noex {
 	int		rs = SR_OK ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if (! op->init.sysdb) {
 	    op->init.sysdb = true ;
 	    rs = uc_userattrnam(&op->uap,op->username) ;
 	    op->have.sysdb = (rs >= 0) ;
 	    f = op->have.sysdb ;
-	}
+	} /* end */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (userattrdb_opensysdb) */
 
 [[maybe_unused]] static int userattrdb_openudomain(uad *op) noex {
 	int		rs = SR_OK ;
-	int		f = false ;
+	int		f = false ; /* return-value */
 	if (! op->init.udomain) {
 	    op->init.udomain = true ;
 	    op->have.udomain = true ;	/* assumption, might change */
 	    f = op->have.udomain ;
-	}
+	} /* end */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (userattrdb_openudomain) */
 
@@ -246,7 +244,7 @@ local int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 	int		rs = SR_OK ;
 	if (! op->init.sysdb) {
 	    rs = userattrdb_opensysdb(op) ;
-	}
+	} /* end */
 	if (rs >= 0) ylikely {
 	    if (op->have.sysdb) {
 	        cchar	*cp{} ;
@@ -255,8 +253,8 @@ local int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 		        rs = sncpy1(rbuf,rlen,cp) ;
 		    } else {
 		        rs = lenstr(cp) ;
-		    }
-	        } /* end if (successful lookup) */
+		    } /* end */
+	        } /* end if (successful look) */
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    } /* end if (searching the system DB) */
@@ -268,14 +266,14 @@ int userattrdb::open(cchar *un) noex {
 	return userattrdb_open(this,un) ;
 } /* end meþhod */
 
-int userattrdb::lookup(char *rbuf,int rlen,cchar *k) noex {
-	return userattrdb_lookup(this,rbuf,rlen,k) ;
+int userattrdb::look(char *rbuf,int rlen,cchar *k) noex {
+	return userattrdb_look(this,rbuf,rlen,k) ;
 } /* end method */
 
 void userattrdb::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("userattrdb",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method */
 
 userattrdb_co::operator int () noex {
