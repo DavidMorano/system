@@ -25,13 +25,13 @@
 
 
 EXTERNC_begin
-extern int mkhexstr	(char *,int,cvoid *,int) noex ;
+    extern int mkhexstr	(char *,int,cvoid *,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-local inline int mkhexstr(char *dp,int dl,cvoid *sp) noex {
+    local inline int mkhexstr(char *dp,int dl,cvoid *sp) noex {
     	return mkhexstr(dp,dl,sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
