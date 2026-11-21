@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	getrealname(char *,int,cchar *) noex ;
-
+    extern int	getrealname(char *,int,cchar *) noex ;
 EXTERNC_end
 
 
