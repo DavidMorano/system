@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	getsysname(char *,int) noex ;
-
+    extern int	getsysname(char *,int) noex ;
 EXTERNC_end
 
 
