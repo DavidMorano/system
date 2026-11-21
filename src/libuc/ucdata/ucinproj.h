@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
-
+    extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
 EXTERNC_end
 
 
