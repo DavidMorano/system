@@ -78,31 +78,31 @@ struct project {
 #ifndef	SUBROUTINE_GETPROJID
 #define	SUBROUTINE_GETPROJID
 EXTERNC_begin
-extern projid_t getprojid() noex ;
+    extern projid_t getprojid() noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_GETPROJID */
 
 #ifndef	SUBROUTINE_GETPJ
 #define	SUBROUTINE_GETPJ
 EXTERNC_begin
-extern void	setprojent() noex ;
-extern void	endprojent() noex ;
-extern CPROJECT *getprojent(PROJECT *,void *,size_t) noex ;
-extern CPROJECT *getprojbyname(cchar *,PROJECT *,void *,size_t) noex ;
-extern CPROJECT *getprojbyid(projid_t,PROJECT *,void *,size_t) noex ;
-extern CPROJECT *getdefaultproj(cchar *,PROJECT *,void *,size_t) noex ;
-extern int inproj(cchar *,cchar *,void *,size_t) noex ;
-extern projid_t getprojidbyname(cchar *) noex ;
+    extern void	setprojent() noex ;
+    extern void	endprojent() noex ;
+    extern CPROJECT *getprojent(PROJECT *,void *,size_t) noex ;
+    extern CPROJECT *getprojbyname(cchar *,PROJECT *,void *,size_t) noex ;
+    extern CPROJECT *getprojbyid(projid_t,PROJECT *,void *,size_t) noex ;
+    extern CPROJECT *getdefaultproj(cchar *,PROJECT *,void *,size_t) noex ;
+    extern int inproj(cchar *,cchar *,void *,size_t) noex ;
+    extern projid_t getprojidbyname(cchar *) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_GETPJ */
 
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
 EXTERNC_begin
-extern unixret_t	getpjent_rp(PROJECT *,char *,int) noex ;
-extern unixret_t	getpjnam_rp(PROJECT *,char *,int,cchar *) noex ;
-extern unixret_t	getpjpid_rp(PROJECT *,char *,int,projid_t) noex ;
-extern unixret_t	getpjdef_rp(PROJECT *,char *,int,cchar *) noex ;
+    extern unixret_t	getpjent_rp(PROJECT *,char *,int) noex ;
+    extern unixret_t	getpjnam_rp(PROJECT *,char *,int,cchar *) noex ;
+    extern unixret_t	getpjpid_rp(PROJECT *,char *,int,projid_t) noex ;
+    extern unixret_t	getpjdef_rp(PROJECT *,char *,int,cchar *) noex ;
 EXTERNC_end
 
 
