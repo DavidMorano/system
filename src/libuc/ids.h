@@ -30,8 +30,8 @@
 
 struct ids_head {
 	gid_t		*gids ;
-	uid_t		uid, euid ;
-	gid_t		gid, egid ;
+	uid_t		ruid, euid ;
+	gid_t		rgid, egid ;
 } ; /* end struct (ids_head) */
 
 #ifdef	__cplusplus
@@ -49,11 +49,11 @@ struct ids_co {
 	void operator () (ids *p,int m) noex {
 	    op = p ;
 	    w = m ;
-	} ;
+	} ; /* end */
 	operator int () noex ;
 	int operator () () noex { 
 	    return operator int () ;
-	} ;
+	} ; /* end */
 } ; /* end struct (ids_co) */
 struct ids : ids_head {
 	ids_co		load ;
@@ -61,16 +61,16 @@ struct ids : ids_head {
 	ids_co		release ;
 	ids_co		refresh ;
 	ids() noex {
-	    load(this,idsmem_load) ;
-	    ngroups(this,idsmem_ngroups) ;
-	    release(this,idsmem_release) ;
-	    refresh(this,idsmem_refresh) ;
-	    gids = nullptr ;
+	    load	(this,idsmem_load) ;
+	    ngroups	(this,idsmem_ngroups) ;
+	    release	(this,idsmem_release) ;
+	    refresh	(this,idsmem_refresh) ;
+	    gids	= nullptr ;
 	} ; /* end ctor */
 	ids(const ids &) = delete ;
 	ids &operator = (const ids &) = delete ;
-	int copy(const ids *) noex ;
-	void dtor() noex ;
+	int copy	(const ids *) noex ;
+	void dtor	() noex ;
 	destruct ids() {
 	    if (gids) dtor() ;
 	} ; /* end destruct */
@@ -80,13 +80,11 @@ typedef IDS		ids ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern int	ids_load	(ids *) noex ;
-extern int	ids_ngroups	(ids *) noex ;
-extern int	ids_release	(ids *) noex ;
-extern int	ids_refresh	(ids *) noex ;
-extern int	ids_copy	(ids *,const ids *) noex ;
-
+    extern int	ids_load	(ids *) noex ;
+    extern int	ids_ngroups	(ids *) noex ;
+    extern int	ids_release	(ids *) noex ;
+    extern int	ids_refresh	(ids *) noex ;
+    extern int	ids_copy	(ids *,const ids *) noex ;
 EXTERNC_end
 
 
