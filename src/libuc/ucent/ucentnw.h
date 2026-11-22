@@ -41,10 +41,6 @@ struct ucentnw : netent {
 	} ; /* end */
 } ; /* end struct (ucentnw) */
 
-#else /* __cplusplus */
-
-typedef NETENT		ucentnw ;
-
 #endif /* __cplusplus */
 
 
