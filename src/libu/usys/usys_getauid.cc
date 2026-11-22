@@ -22,7 +22,7 @@
 
 	Description:
 	This is part of the famous "Basic-Security-Module" (BSM) that
-	was first created by Sub Mircosystems and then ported to 
+	was first created by Sun Mircosystems and then ported to 
 	Apple-Darwin by McAffe (yes the anti-virus company).
 
 *******************************************************************************/
@@ -36,12 +36,12 @@
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysflag.h>		/* LIBU */
-#include	<localmisc.h>		/* |DECBUFLEN| */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_getauid.h"
 
 
-/* GETRANDOM start */
+/* GETAUID start */
 #if	(!defined(SYSHAS_AUDIT)) || (SYSHAS_AUDIT == 0)
 
 
@@ -59,6 +59,6 @@ unixret_t getauid(au_id_t *rp) noex {
 
 
 #endif /* (!defined(SYSHAS_AUDIT)) || (SYSHAS_AUDIT == 0) */
-/* GETRANDOM end */
+/* GETAUID end */
 
 
