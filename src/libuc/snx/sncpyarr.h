@@ -18,7 +18,7 @@
 
 
 EXTERNC_begin
-extern int sncpyarr(char *,int,con mainv,int) noex ;
+    extern int sncpyarr(char *,int,con mainv,int) noex ;
 EXTERNC_end
 
 
