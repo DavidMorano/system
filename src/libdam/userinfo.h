@@ -61,8 +61,8 @@ struct userinfo_head {
 	cchar		*logid ;	/* suggested ID for logging */
 	char		*allocinfo ;	/* memory allocation */
 	pid_t		pid ;
-	uid_t		uid, euid ;
-	gid_t		gid, egid ;
+	uid_t		pwuid, ruid, euid ;
+	gid_t		pwgid, rgid, egid ;
 	uint		magval ;
 	int		ostype ;
 } ; /* end struct (userinfo_head) */
