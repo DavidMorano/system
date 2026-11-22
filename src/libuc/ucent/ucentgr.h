@@ -40,10 +40,6 @@ struct ucentgr : group {
 	} ; /* end */
 } ; /* end struct (ucentgr) */
 
-#else /* __cplusplus */
-
-typedef GROUP		ucentgr ;
-
 #endif /* __cplusplus */
 
 
