@@ -99,12 +99,10 @@ typedef UCENUMXX	ucenumgr ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern int ucenumgr_open	(ucenumgr *,cchar *) noex ;
-extern int ucenumgr_close	(ucenumgr *) noex ;
-extern int ucenumgr_readent	(ucenumgr *,ucenumgr_ent *,char *,int) noex ;
-extern int ucenumgr_reset	(ucenumgr *) noex ;
-
+    extern int ucenumgr_open	(ucenumgr *,cchar *) noex ;
+    extern int ucenumgr_close	(ucenumgr *) noex ;
+    extern int ucenumgr_readent	(ucenumgr *,ucenumgr_ent *,char *,int) noex ;
+    extern int ucenumgr_reset	(ucenumgr *) noex ;
 EXTERNC_end
 
 
