@@ -91,7 +91,6 @@ local int	ids_ngids(const ids *) noex ;
 /* local variables */
 
 static vars		var ;
-
 constexpr gid_t		gidend = gid_t(-1) ;
 
 
@@ -176,9 +175,9 @@ int ids_refresh(ids *op) noex {
 int ids_copy(ids *op,const ids *otherp) noex {
 	int		rs = SR_FAULT ;
 	if (op && otherp) ylikely {
-	    op->uid = otherp->uid ;
+	    op->ruid = otherp->ruid ;
 	    op->euid = otherp->euid ;
-	    op->gid = otherp->gid ;
+	    op->rgid = otherp->rgid ;
 	    op->egid = otherp->egid ;
 	    if ((rs = ids_ngids(otherp)) >= 0) ylikely {
 	        cint	n = rs ;
@@ -205,9 +204,9 @@ local int ids_ctor(ids *op) noex {
 	if (op) ylikely {
 	    rs = SR_OK ;
 	    op->gids = nullptr ;
-	    op->uid = getuid() ;
+	    op->ruid = getruid() ;
 	    op->euid = geteuid() ;
-	    op->gid = getgid() ;
+	    op->rgid = getrgid() ;
 	    op->egid = getegid() ;
 	} /* end if (non-null) */
 	return rs ;
@@ -226,7 +225,7 @@ local int ids_ngids(const ids *op) noex {
 	int		n = 0 ;
 	if (op->gids) ylikely {
 	    for (n = 0 ; op->gids[n] != gidend ; n += 1) ;
-	}
+	} /* end */
 	return n ;
 } /* end subroutine (ids_ngids) */
 
@@ -258,7 +257,7 @@ int ids::copy(const ids *oip) noex {
 void ids::dtor() noex {
 	if (cint rs = release ; rs < 0) {
 	    ulogerror("ids",rs,"fini-release") ;
-	}
+	} /* end */
 } /* end method (vars::dtor) */
 
 vars::operator int () noex {
