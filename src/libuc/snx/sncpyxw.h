@@ -25,43 +25,43 @@
 
 
 EXTERNC_begin
-extern int sncpyxw(char *,int,int,...) noex ;
+    extern int sncpyxw(char *,int,int,...) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int sncpy1w(char *,int,ccp,int) noex ;
-extern int sncpy2w(char *,int,ccp,ccp,int) noex ;
-extern int sncpy3w(char *,int,ccp,ccp,ccp,int) noex ;
-extern int sncpy4w(char *,int,ccp,ccp,ccp,ccp,int) noex ;
-extern int sncpy5w(char *,int,ccp,ccp,ccp,ccp,ccp,int) noex ;
-extern int sncpy6w(char *,int,ccp,ccp,ccp,ccp,ccp,ccp,int) noex ;
+    extern int sncpy1w(char *,int,ccp,int) noex ;
+    extern int sncpy2w(char *,int,ccp,ccp,int) noex ;
+    extern int sncpy3w(char *,int,ccp,ccp,ccp,int) noex ;
+    extern int sncpy4w(char *,int,ccp,ccp,ccp,ccp,int) noex ;
+    extern int sncpy5w(char *,int,ccp,ccp,ccp,ccp,ccp,int) noex ;
+    extern int sncpy6w(char *,int,ccp,ccp,ccp,ccp,ccp,ccp,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int sncpyw(char *dp,int dl,
+    inline int sncpyw(char *dp,int dl,
 		cc *s1,int sl = -1) noex {
 	return sncpyxw(dp,dl,1,s1,sl) ;
-} /* end */
-inline int sncpyw(char *dp,int dl,
+    } /* end */
+    inline int sncpyw(char *dp,int dl,
 		cc *s1,cc *s2,int sl = -1) noex {
 	return sncpyxw(dp,dl,2,s1,s2,sl) ;
-} /* end */
-inline int sncpyw(char *dp,int dl,
+    } /* end */
+    inline int sncpyw(char *dp,int dl,
 		cc *s1,cc *s2,cc *s3,int sl = -1) noex {
 	return sncpyxw(dp,dl,3,s1,s2,s3,sl) ;
-} /* end */
-inline int sncpyw(char *dp,int dl,
+    } /* end */
+    inline int sncpyw(char *dp,int dl,
 		cc *s1,cc *s2,cc *s3,cc *s4,int sl = -1) noex {
 	return sncpyxw(dp,dl,4,s1,s2,s3,s4,sl) ;
-} /* end */
-inline int sncpyw(char *dp,int dl,
+    } /* end */
+    inline int sncpyw(char *dp,int dl,
 		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,int sl = -1) noex {
 	return sncpyxw(dp,dl,5,s1,s2,s3,s4,s5,sl) ;
-} /* end */
-inline int sncpyw(char *dp,int dl,
+    } /* end */
+    inline int sncpyw(char *dp,int dl,
 		cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6,int sl = -1) noex {
 	return sncpyxw(dp,dl,6,s1,s2,s3,s4,s5,s6,sl) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
