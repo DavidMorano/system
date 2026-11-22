@@ -42,10 +42,6 @@ struct ucentpj : project {
 	} ; /* end */
 } ; /* end struct (ucentpj) */
 
-#else /* __cplusplus */
-
-typedef PROJECT		ucentpj ;
-
 #endif /* __cplusplus */
 
 
