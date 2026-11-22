@@ -644,13 +644,13 @@ local int motd_envadds(motd *op,strpack *spp,ccharpp ev,userid *idp) noex {
 	        ebuf[0] = '\0' ;
 	        switch (i) {
 	        case envstr_uid:
-	            if ((uv = idp->uid) != uidend) {
+	            if ((uv = idp->ruid) != uidend) {
 		        rs = mkdigenv(ebuf,elen,pre,es,uv) ;
 		        el = rs ;
 	            }
 	            break ;
 	        case envstr_gid:
-	            if ((uv = idp->gid) != gidend) {
+	            if ((uv = idp->rgid) != gidend) {
 		        rs = mkdigenv(ebuf,elen,pre,es,uv) ;
 		        el = rs ;
 	            }
