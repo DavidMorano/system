@@ -40,7 +40,7 @@
 
 
 EXTERNC_begin
-extern int snaddslash(char *,int,int) noex ;
+    extern int snaddslash(char *,int,int) noex ;
 EXTERNC_end
 
 
