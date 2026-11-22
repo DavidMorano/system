@@ -48,7 +48,7 @@
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<cstdint>		/* CSTD |uintptr_t| */
-#include	<bit>			/* |has_single_bit(3c++)| */
+#include	<bit>			/* C++STD |has_single_bit(3c++)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
@@ -141,8 +141,8 @@ int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 		        char	*dp = dbuf ;
 			while (sl-- && *sp && dlen--) {
 	    		    *dp++ = *sp++ ;
-			}
-			*dp = '\0' ;
+			} /* end while */
+			*dp = eos ;
 			if (dlen >= 0) {
 	    		    wlen = intconv(dp - dbuf) ;
 	    		    op->index += (wlen + 1) ;
@@ -151,7 +151,7 @@ int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 	    		    op->f_overflow = true ;
 	    		    rs = SR_OVERFLOW ;
 			    op->index = rs ;
-			}
+			} /* end */
 		    } /* end block */
 		} /* end if (no-errors) */
 	    } /* end if (open) */
@@ -176,8 +176,8 @@ int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 			char	*dp = dbuf ;
 			while (sl-- && dlen--) {
 	    		    *dp++ = *sp++ ;
-			}
-			*dp = '\0' ;
+			} /* end while */
+			*dp = eos ;
 			if (dlen >= 0) {
 	    		    wlen = intconv(dp - dbuf) ;
 	    		    op->index += (wlen + 1) ;
@@ -186,7 +186,7 @@ int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 	    		    op->f_overflow = true ;
 	    		    rs = SR_OVERFLOW ;
 	    		    op->index = rs ;
-			}
+			} /* end */
 		    } /* end block */
 		} /* end if (no-errors) */
 	    } /* end if (open) */
@@ -218,7 +218,7 @@ int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
 		            } else {
 	                        op->f_overflow = true ;
 	                        rs = SR_OVERFLOW ;
-		            }
+		            } /* end */
 		        } /* end if */
 		    } /* end if (alternatives) */
 	            if (rs >= 0) ylikely {
@@ -226,7 +226,7 @@ int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
 	                if (rpp) *rpp = dbuf ;
 	            } else {
 			op->index = rs ;
-		    }
+		    } /* end */
 		} /* end if (no-errors) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -254,7 +254,7 @@ int storeitem_chr(storeitem *op,int ch,cchar **rpp) noex {
 	    	        op->f_overflow = true ;
 	    	        rs = SR_OVERFLOW ;
 	    	        op->index = rs ;
-		    }
+		    } /* end */
 		} /* end if (no-errors) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -294,7 +294,7 @@ int storeitem_block(storeitem *op,int bsize,int align,void **vpp) noex {
 	    	        	op->f_overflow = true ;
 	    			rs = SR_OVERFLOW ;
 	    			op->index = rs ;
-			    }
+			    } /* end */
 			} /* end block */
 		    } /* end if (valid arguments) */
 		} /* end if (no-errors) */
@@ -313,7 +313,7 @@ int storeitem_ptab(storeitem *op,int n,void ***vppp) noex {
 	        cint	bs = ((n + 1) * align) ;
 	        if ((rs = storeitem_block(op,bs,align,vpp)) >= 0) ylikely {
 		    (*vppp)[n] = nullptr ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -370,7 +370,7 @@ int storeitem::block(int bsz,int bal,void **vpp) noex {
 void storeitem::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("storeitem",rs,"fini-finish") ;
-	}
+	} /* end */
 } /* end method (storeitem::dtor) */
 
 storeitem_co::operator int () noex {
