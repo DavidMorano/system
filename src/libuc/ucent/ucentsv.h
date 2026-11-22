@@ -40,10 +40,6 @@ struct ucentsv : servent {
 	} ; /* end */
 } ; /* end struct (ucentsv) */
 
-#else /* __cplusplus */
-
-typedef SERVENT		ucentsv ;
-
 #endif /* __cplusplus */
 
 
