@@ -41,11 +41,11 @@
 
 
 EXTERNC_begin
-extern int snaddpath(char *,int,int,cchar *) noex ;
+    extern int snaddpath(char *,int,int,cchar *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-extern int snaddpath(char *,int,int,cchar *,int) noex ;
+    extern int snaddpath(char *,int,int,cchar *,int) noex ;
 #endif /* __cplusplus */
 
 
