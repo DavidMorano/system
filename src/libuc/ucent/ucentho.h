@@ -40,10 +40,6 @@ struct ucentho : hostent {
 	} ; /* end */
 } ; /* end struct (ucentho) */
 
-#else /* __cplusplus */
-
-typedef HOSTENT		ucentho ;
-
 #endif /* __cplusplus */
 
 
