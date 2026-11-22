@@ -46,15 +46,15 @@
 #endif
 
 EXTERNC_begin
+   extern SERVENT	*getsvent() noex ;
+   extern SERVENT	*getsvnam(cchar *,cchar *) noex ;
+   extern SERVENT	*getsvpor(int,cchar *) noex ;
+EXTERNC_end
 
-extern SERVENT	*getsvent() noex ;
-extern SERVENT	*getsvnam(cchar *,cchar *) noex ;
-extern SERVENT	*getsvpor(int,cchar *) noex ;
-
-extern unixret_t	getsvent_rp(SERVENT *,char *,int) noex ;
-extern unixret_t	getsvnam_rp(SERVENT *,char *,int,cchar *,cchar *) noex ;
-extern unixret_t	getsvpor_rp(SERVENT *,char *,int,int,cchar *) noex ;
-
+EXTERNC_begin
+   extern unixret_t	getsvent_rp(SERVENT *,char *,int) noex ;
+   extern unixret_t	getsvnam_rp(SERVENT *,char *,int,cchar *,cchar *) noex ;
+   extern unixret_t	getsvpor_rp(SERVENT *,char *,int,int,cchar *) noex ;
 EXTERNC_end
 
 
