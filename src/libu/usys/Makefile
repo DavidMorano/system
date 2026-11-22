@@ -73,7 +73,7 @@ OBJ23_USYS= usys_lenstr.o usys_hasx.o
 
 OBJ24_USYS= usys_cmp.o
 OBJ25_USYS= usys_strnstr.o
-OBJ26_USYS=
+OBJ26_USYS= usys_getxid.o
 OBJ27_USYS=
 
 OBJA= obj00_usys.o obj01_usys.o obj02_usys.o 
@@ -84,7 +84,7 @@ OBJE= obj12_usys.o obj13_usys.o obj14_usys.o
 OBJF= obj15_usys.o obj16_usys.o obj17_usys.o
 OBJG= obj18_usys.o obj19_usys.o obj20_usys.o
 OBJH= obj21_usys.o obj22_usys.o obj23_usys.o
-OBJI= obj24_usys.o obj25_usys.o
+OBJI= obj24_usys.o obj25_usys.o obj26_usys.o
 
 OBJ_J0= obja.o objb.o objc.o objd.o 
 OBJ_J1= obje.o objf.o objg.o objh.o
@@ -316,6 +316,7 @@ usys_mqueue.o:		usys_mqueue.cc		usys_mqueue.h		$(INCS)
 usys_gethrtime.o:	usys_gethrtime.cc	usys_gethrtime.h	$(INCS)
 usys_getprocuid.o:	usys_getprocuid.cc	usys_getprocuid.h	$(INCS)
 usys_getrandom.o:	usys_getrandom.cc	usys_getrandom.h	$(INCS)
+usys_getxid.o:		usys_getxid.cc		usys_getxid.h		$(INCS)
 usys_ttynamerp.o:	usys_ttynamerp.cc	usys_ttynamerp.h	$(INCS)
 usys_resolvepath.o:	usys_resolvepath.cc	usys_resolvepath.h	$(INCS)
 usys_waitid.o:		usys_waitid.cc		usys_waitid.h		$(INCS)
