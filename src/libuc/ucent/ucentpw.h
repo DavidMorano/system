@@ -40,10 +40,6 @@ struct ucentpw : passwd {
 	} ; /* end */
 } ; /* end struct (ucentpw) */
 
-#else /* __cplusplus */
-
-typedef PASSWD		ucentpw ;
-
 #endif /* __cplusplus */
 
 
