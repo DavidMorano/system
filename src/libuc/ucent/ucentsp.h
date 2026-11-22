@@ -40,10 +40,6 @@ struct ucentsp : spwd {
 	int getnam(char *,int,cchar *) noex ;
 } ; /* end struct (ucentsp) */
 
-#else /* __cplusplus */
-
-typedef SPWD		ucentsp ;
-
 #endif /* __cplusplus */
 
 
