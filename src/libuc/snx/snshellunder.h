@@ -26,7 +26,7 @@
 
 
 EXTERNC_begin
-extern int snshellunder(char *,int,pid_t,cchar *) noex ;
+    extern int snshellunder(char *,int,pid_t,cchar *) noex ;
 EXTERNC_end
 
 
