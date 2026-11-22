@@ -99,12 +99,10 @@ typedef UCENUMXX	ucenumho ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern int ucenumho_open	(ucenumho *,cchar *) noex ;
-extern int ucenumho_close	(ucenumho *) noex ;
-extern int ucenumho_readent	(ucenumho *,ucenumho_ent *,char *,int) noex ;
-extern int ucenumho_reset	(ucenumho *) noex ;
-
+    extern int ucenumho_open	(ucenumho *,cchar *) noex ;
+    extern int ucenumho_close	(ucenumho *) noex ;
+    extern int ucenumho_readent	(ucenumho *,ucenumho_ent *,char *,int) noex ;
+    extern int ucenumho_reset	(ucenumho *) noex ;
 EXTERNC_end
 
 
