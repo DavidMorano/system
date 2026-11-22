@@ -45,27 +45,27 @@
 
 
 EXTERNC_begin
-extern int snaddx(char *,int,int,int,...) noex ;
+    extern int snaddx(char *,int,int,int,...) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-local inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
+    local inline int snadd(char *dbuf,int dlen,int dl,cchar *sp) noex {
 	return snaddw(dbuf,dlen,dl,sp,-1) ;
-} /* end subroutine */
+    } /* end subroutine */
 EXTERNC_end
 
 #ifdef	__cplusplus
-local inline int snadd(char *dbuf,int dlen,int dl,cchar *sp,int sl) noex {
+    local inline int snadd(char *dbuf,int dlen,int dl,cc *sp,int sl) noex {
 	return snaddw(dbuf,dlen,dl,sp,sl) ;
-} /* end subroutine */
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
-template<conccharp ... Args>
-inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
+    template<conccharp ... Args>
+    inline int snadd(char *dbuf,int dlen,int dl,Args ... args) noex {
 	cint		na = npack(Args) ;
 	return snaddx(dbuf,dlen,dl,na,args ...) ;
-} /* end subroutine */
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 
