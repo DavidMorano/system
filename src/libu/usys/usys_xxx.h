@@ -46,7 +46,6 @@
 #include	<unistd.h>		/* POSIX |dup2(2)| + |pipe2(2)| */
 #include	<signal.h>		/* POSIX <- |SIGEVENT| */
 #include	<pthread.h>		/* POSIX */
-#include	<string.h>		/* CSTD |strpbrk(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
