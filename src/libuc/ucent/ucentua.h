@@ -40,10 +40,6 @@ struct ucentua : userattr {
 	} ; /* end */
 } ; /* end struct (ucentua) */
 
-#else /* __cplusplus */
-
-typedef USERATTR	ucentua ;
-
 #endif /* __cplusplus */
 
 
