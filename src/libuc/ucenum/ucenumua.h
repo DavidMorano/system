@@ -100,12 +100,10 @@ typedef UCENUMXX	ucenumua ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-
-extern int ucenumua_open	(ucenumua *,cchar *) noex ;
-extern int ucenumua_close	(ucenumua *) noex ;
-extern int ucenumua_readent	(ucenumua *,ucenumua_ent *,char *,int) noex ;
-extern int ucenumua_reset	(ucenumua *) noex ;
-
+    extern int ucenumua_open	(ucenumua *,cchar *) noex ;
+    extern int ucenumua_close	(ucenumua *) noex ;
+    extern int ucenumua_readent	(ucenumua *,ucenumua_ent *,char *,int) noex ;
+    extern int ucenumua_reset	(ucenumua *) noex ;
 EXTERNC_end
 
 
