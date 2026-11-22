@@ -40,10 +40,6 @@ struct ucentpr : protoent {
 	} ; /* end */
 } ; /* end struct (ucentpr) */
 
-#else /* __cplusplus */
-
-typedef PROTOENT	ucentpr ;
-
 #endif /* __cplusplus */
 
 
