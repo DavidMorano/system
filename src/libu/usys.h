@@ -74,6 +74,7 @@
 #include	<usys_getprocuid.h>
 #include	<usys_getnetname.h>
 #include	<usys_getrandom.h>
+#include	<usys_getxid.h>
 #include	<usys_libstr.h>
 #include	<usys_mqueue.h>
 #include	<usys_pipes.h>
