@@ -255,7 +255,7 @@ int dirdb_clean(dirdb *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dirdb_magic(op)) >= 0) ylikely {
-	    if (hdb_cur cur ; (rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
+	    if (hdb_cur cur ; (rs = hdb_curbeg(op->dbp,&cur)) >= 0) {
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
 	        while ((rs1 = hdb_curenum(op->dbp,&cur,&key,&val)) >= 0) {
