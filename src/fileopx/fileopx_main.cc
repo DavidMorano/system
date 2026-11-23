@@ -3947,7 +3947,7 @@ local int procdir_end(PI *pip) noex {
 	int		rs1 ;
 	if (pip->open.dirs) {
 	    pip->open.dirs = false ;
-	    if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
+	    if ((rs1 = hdb_curbeg(dbp,&cur)) >= 0) {
 	        DIRID	*dip ;
 	        while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
 	            dip = (DIRID *) val.buf ;
@@ -4075,7 +4075,7 @@ local int procuniq_end(PI *pip) noex {
 	    FILEID	*dip ;
 	    pip->open.files = false ;
 
-	    if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
+	    if ((rs1 = hdb_curbeg(dbp,&cur)) >= 0) {
 
 	        while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
 	            dip = (FILEID *) val.buf ;
@@ -4305,7 +4305,7 @@ local int proclink_fins(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pip == nullptr) return SR_FAULT ;
-	if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
+	if ((rs1 = hdb_curbeg(dbp,&cur)) >= 0) {
 	    LINKINFO	*lip ;
 	    while ((rs1 = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
 	        lip = (LI *) val.buf ;
