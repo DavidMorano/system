@@ -1460,7 +1460,7 @@ local int procuniq_end(PROGINFO *pip)
 	    HDB_DATUM	key, val ;
 
 	    pip->fl.f_uniq = FALSE ;
-	    if ((rs = hdb_curbegin(&pip->udb,&cur)) >= 0) {
+	    if ((rs = hdb_curbeg(&pip->udb,&cur)) >= 0) {
 	        struct fileuniq	*up ;
 	        while (hdb_curenum(&pip->udb,&cur,&key,&val) >= 0) {
 	            up = (struct fileuniq *) key.buf ;
