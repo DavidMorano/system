@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	getoflags(cchar *) noex ;
-
+    extern int	getoflags(cchar *) noex ;
 EXTERNC_end
 
 
