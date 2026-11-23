@@ -276,7 +276,7 @@ int bibdb_finish(bibdb *op) noex {
 	        op->qkp = nullptr ;
 	    } /* end if (memory-release) */
 	    /* free up all key entries */
-	    if (hdb_cur cur ; (rs1 = hdb_curbegin(op->klp,&cur)) >= 0) {
+	    if (hdb_cur cur ; (rs1 = hdb_curbeg(op->klp,&cur)) >= 0) {
 	        hdb_dat	key{} ;
 	        hdb_dat	val{} ;
 	        while ((rs1 = hdb_curenum(op->klp,&cur,&key,&val)) >= 0) {
@@ -492,7 +492,7 @@ local void dumpkeylist(hdb *klp) noex {
     hdb_cur     cur ;
     hdb_dat     val ;
     DEBUGPRINTF("search loop rs=%d\n",rs) ;
-    hdb_curbegin(klp,&cur) ;
+    hdb_curbeg(klp,&cur) ;
     while (hdb_curenum(klp,&cur,&key,&val) >= 0) {
         BDB_KEY *bkp = resumelife<BDB_KEY>(val.buf) ;
         DEBUGPRINTF("qbuf=%r fi=%u\n",key.buf,key.len,bkp->fi) ;
