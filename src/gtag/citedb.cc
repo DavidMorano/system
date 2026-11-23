@@ -193,7 +193,7 @@ int citedb_finish(CD *op) noex {
 	DEBUGPRINTF("ent \n") ;
 	if ((rs = citedb_magic(op)) >= 0) {
 	    /* clean out the "store" DB */
-	    if (hdb_cur kcur ; (rs = hdb_curbegin(op->slp,&kcur)) >= 0) {
+	    if (hdb_cur kcur ; (rs = hdb_curbeg(op->slp,&kcur)) >= 0) {
 	        hdb_dat	key ;
 	        hdb_dat	value ;
 	        while (hdb_curenum(op->slp,&kcur,&key,&value) >= 0) {
