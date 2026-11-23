@@ -88,13 +88,13 @@ namespace {
     struct typer {
 	bool		fgot = false ;
 	operator int () noex ;
-	int envostype() noex ;
-	int envosname() noex ;
-	int envsysname() noex ;
-	int env(cchar *) noex ;
-	int trysysname() noex ;
-	int other() noex ;
-	int matguess(cchar *,int) noex ;
+	int envostype	() noex ;
+	int envosname	() noex ;
+	int envsysname	() noex ;
+	int env		(cchar *) noex ;
+	int trysysname	() noex ;
+	int other	() noex ;
+	int matguess	(cchar *,int) noex ;
     } ; /* end struct (typer) */
 } /* end namespace */
 
@@ -191,16 +191,16 @@ typer::operator int () noex {
 } /* end method (typer::operator) */
 
 int typer::envostype() noex {
-	cchar		*eot = getenver(varname.ostype) ;
+	static cchar	*eot = getenver(varname.ostype) ;
 	int		rs = SR_OK ;
 	if (eot) {
 	    cchar	*cp ;
 	    if (int cl ; (cl = sfshrink(eot,-1,&cp)) > 0) {
-		if (cint idx = matcasestr(ostypenames,cp,cl) ; idx >= 0) {
+		if (cint idx = matstric(ostypenames,cp,cl) ; idx >= 0) {
 		    rs = idx ;
 		    fgot = true ;
-		}
-	    }
+		} /* end */
+	    } /* end */
 	} /* end if */
 	return rs ;
 } /* end method (typer::envostype) */
@@ -215,11 +215,11 @@ int typer::envsysname() noex {
 
 int typer::env(cchar *vn) noex {
 	int		rs = SR_OK ;
-	if (cchar *eot ; (eot = getenver(vn)) != nullptr) {
+	if (cchar *eot = getenver(vn)) {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfshrink(eot,-1,&cp)) > 0) {
 		rs = matguess(cp,cl) ;
-	    }
+	    } /* end */
 	} /* end if */
 	return rs ;
 } /* end method (typer::env) */
