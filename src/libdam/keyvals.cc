@@ -311,7 +311,7 @@ int keyvals_curbegin(keyvals *op,keyvals_cur *curp) noex {
 	    curp->i = -1 ;
 	    if (void *vp{} ; (rs = mem.mall(osz,&vp)) >= 0) {
 		curp->ecp = (hdb_cur *) vp ;
-	        rs = hdb_curbegin(op->bykeyp,curp->ecp) ;
+	        rs = hdb_curbeg(op->bykeyp,curp->ecp) ;
 		if (rs < 0) {
 		    mem.free(curp->ecp) ;
 		    curp->ecp = nullptr ;
@@ -435,7 +435,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 	    hdb_dat	key ; /* used multiple blocks */
 	    hdb_dat	val ; /* used multiple blocks */
 	    ENT		*ep ; /* used multiple blocks */
-	    if ((rs = hdb_curbegin(op->bykeyp,&cur)) >= 0) {
+	    if ((rs = hdb_curbeg(op->bykeyp,&cur)) >= 0) {
 	        while (hdb_curenum(op->bykeyp,&cur,&key,&val) >= 0) {
 	            ep = entp(val.buf) ;
 	            if ((ep->fi == fi) || (fi < 0)) {
@@ -447,7 +447,7 @@ int keyvals_delset(keyvals *op,int fi) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
 	    if (rs >= 0) {
-	        if ((rs = hdb_curbegin(op->bykeyvalp,&cur)) >= 0) {
+	        if ((rs = hdb_curbeg(op->bykeyvalp,&cur)) >= 0) {
 	            while (hdb_curenum(op->bykeyvalp,&cur,&key,&val) >= 0) {
 	                ep = entp(val.buf) ;
 	                if ((ep->fi == fi) || (fi < 0)) {
@@ -478,7 +478,7 @@ int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
 	        hdb_dat		val ; /* used multiple blocks */
 	        cint		ki = rs ;
 	        /* delete all keyvals w/ this key */
-	        if ((rs = hdb_curbegin(bykeyp,&cur)) >= 0) {
+	        if ((rs = hdb_curbeg(bykeyp,&cur)) >= 0) {
 	            key.buf = kp ;
 	            key.len = lenstr(kp) ;
 	            while ((rs1 = hdb_fetch(bykeyp,key,&cur,&val)) >= 0) {
@@ -491,7 +491,7 @@ int keyvals_delkey(keyvals *op,cchar *kp,int kl) noex {
 	        } /* end if (cursor) */
 	        if (rs >= 0) {
 	            hdb	*kvp = op->bykeyvalp ;
-	            if ((rs = hdb_curbegin(kvp,&cur)) >= 0) {
+	            if ((rs = hdb_curbeg(kvp,&cur)) >= 0) {
 	                while ((rs1 = hdb_curenum(kvp,&cur,&key,&val)) >= 0) {
 	                    KEYVALS_ENT	*ep = entp(val.buf) ;
 	                    if ((rs = entry_matkey(ep,kp,kl)) >= 0) {
@@ -630,7 +630,7 @@ local int keyvals_entadd(keyvals *op,ENT *nep) noex {
 	        rs = hdb_store(op->bykeyvalp,key,val) ;
 		if (rs < 0) {
 	    	    hdb_cur	cur ;
-	    	    hdb_curbegin(op->bykeyp,&cur) ;
+	    	    hdb_curbeg(op->bykeyp,&cur) ;
 	    	    {
 	        	if (hdb_fetch(op->bykeyp,key,&cur,&val) >= 0) {
 	            	    hdb_curdel(op->bykeyp,&cur,0) ;
@@ -652,7 +652,7 @@ local int keyvals_finents(keyvals *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rs2 ;
-	if (hdb_cur cur ; (rs = hdb_curbegin(elp,&cur)) >= 0) {
+	if (hdb_cur cur ; (rs = hdb_curbeg(elp,&cur)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
 	    while ((rs2 = hdb_curenum(elp,&cur,&key,&val)) >= 0) {
