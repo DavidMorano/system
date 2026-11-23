@@ -292,7 +292,7 @@ int eigendb_curbegin(eigendb *op,eigendb_cur *curp) noex {
 	if ((rs = eigendb_magic(op,curp)) >= 0) ylikely {
 	    rs = SR_NOMEM ;
 	    if ((curp->hcp = new(nt) hdb_cur) != np) ylikely {
-		rs = hdb_curbegin(op->dbp,curp->hcp) ;
+		rs = hdb_curbeg(op->dbp,curp->hcp) ;
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
 	return rs ;
