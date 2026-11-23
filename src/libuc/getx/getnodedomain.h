@@ -25,22 +25,20 @@
 
 
 EXTERNC_begin
+    extern int	getnodedomain	(char *,char *) noex ;
+    extern int	getsysdomain	(char *,int) noex ;
+EXTERNC_end
 
-extern int	getnodedomain(char *,char *) noex ;
-
-extern int	getuserdomain(char *,int) noex ;
-extern int	getsysdomain(char *,int) noex ;
-
-local inline int getinetdomain(char *rbuf,int rlen) noex {
+EXTERNC_begin
+    local inline int getinetdomain	(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
-}
-local inline int getnetdomain(char *rbuf,int rlen) noex {
+    } /* end */
+    local inline int getnetdomain	(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
-}
-local inline int getdomainnamex(char *rbuf,int rlen) noex {
+    } /* end */
+    local inline int getdomainnamex	(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
-}
-
+    } /* end */
 EXTERNC_end
 
 
