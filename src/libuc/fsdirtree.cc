@@ -595,7 +595,7 @@ local int fsdirtree_dirend(fsdirtree *op) noex {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
 	    op->fl.dirids = false ;
-	    if (hdb_cur	cur ; (rs1 = hdb_curbegin(dbp,&cur)) >= 0) ylikely {
+	    if (hdb_cur	cur ; (rs1 = hdb_curbeg(dbp,&cur)) >= 0) ylikely {
 	        dirid	*dip ;
 	        while (hdb_curenum(dbp,&cur,&key,&val) >= 0) {
 	            if (dip = (dirid *) val.buf ; dip) {
