@@ -122,7 +122,7 @@ local int reader(char *lbuf,int llen,char *rbuf,int rlen,cchar *fname) noex {
                     if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
                         rs = sncpy1w(rbuf,rlen,cp,cl) ;
                         len = rs ;
-                    }
+                    } /* end if (sfcontent) */
                     if (len > 0) break ;
                     if (rs < 0) break ;
                 } /* end while (reading lines) */
