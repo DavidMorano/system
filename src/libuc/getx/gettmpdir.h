@@ -24,24 +24,20 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
+    extern cchar	*gettmpdirx(con mainv) noex ;
+EXTERNC_end
 
-extern cchar	*gettmpdirx(con mainv) noex ;
-
+EXTERNC_beg
+    local inline cchar *gettmpdir(con mainv envv) noex {
+	return gettmpdirx(envv) ;
+    } /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-local inline cchar *gettmpdir(con mainv envv = nullptr) noex {
-	return gettmpdirx(envv) ;
-}
-
-#else /* __cplusplus */
-
-local inline cchar *gettmpdir(con mainv envv) noex {
-	return gettmpdirx(envv) ;
-}
-
+    local inline cchar *gettmpdir() noex {
+	return gettmpdirx(nullptr) ;
+    } /* end */
 #endif /* __cplusplus */
 
 
