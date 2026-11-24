@@ -109,12 +109,12 @@ int ucenumgr::readent(ucenumgr_ent *uap,char *uabuf,int ualen) noex {
 void ucenumgr::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumgr",rs,"fini-close") ;
-	}
+	} /* end */
 } /* end method (ucenumgr::dtor) */
 
 int ucenumgr_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumgrmem_open:
 	        rs = ucenumgr_open(op,fn) ;
@@ -126,7 +126,7 @@ int ucenumgr_op::operator () (cchar *fn) noex {
 
 ucenumgr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumgrmem_reset:
 	        rs = ucenumgr_reset(op) ;
