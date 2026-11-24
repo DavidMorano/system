@@ -47,9 +47,9 @@
 #include	<inetconv.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetnw.h"		/* |uc_getnw{x}(3uc)| */
 #include	"ucentnw.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -179,7 +179,7 @@ int ucentnw::load(char *rbuf,int rlen,const ucentnw *cnwp) noex {
 int ucentnw::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if ( rbuf) ylikely {
+	if (rbuf) ylikely {
 	    rs = SR_AFNOSUPPORT ;
 	    if (n_addrtype == AF_INET4) {
 	        if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
@@ -213,18 +213,18 @@ int ucentnw::format(char *rbuf,int rlen) noex {
 
 int ucentnw::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    if (n_name) {
-	        sz += (lenstr(n_name) + 1) ;
-	    }
-	    if (n_aliases) {
-	        int	i ; /* used-afterwards */
-	        for (i = 0 ; n_aliases[i] ; i += 1) {
-	            sz += (lenstr(n_aliases[i]) + 1) ;
-	        } /* end for */
-	        sz += ((i+1)*szof(cchar *)) ;
-	    } /* end if (name-list aliases) */
-	    rs = iceil(sz,szof(cchar *)) ;
+	int		sz = 1 ;
+	if (n_name) {
+	    sz += (lenstr(n_name) + 1) ;
+	}
+	if (n_aliases) {
+	    int	i ; /* used-afterwards */
+	    for (i = 0 ; n_aliases[i] ; i += 1) {
+	        sz += (lenstr(n_aliases[i]) + 1) ;
+	    } /* end for */
+	    sz += ((i+1)*szof(cchar *)) ;
+	} /* end if (name-list aliases) */
+	rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
 } /* end subroutine (ucentnw::size) */
 
