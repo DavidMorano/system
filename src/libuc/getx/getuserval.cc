@@ -46,15 +46,8 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
-#include	<ucpwcache.h>		/* LIBUC */
-#include	<getax.h>		/* LIBUC */
-#include	<getpwx.h>		/* LIBUC */
 #include	<getusername.h>		/* LIBUC */
-#include	<filereadln.h>		/* LIBUC */
-#include	<sncpyx.h>		/* LIBUC */
-#include	<mkpathx.h>		/* LIBUC */
-#include	<char.h>		/* LIBUC */
-#include	<isnot.h>		/* LIBUC */
+#include	<userattrdb.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"getuserval.h"
@@ -70,14 +63,39 @@ import uconstants ;			/* |varname(3u)| */
 
 /* external subroutines */
 
+using libuc::libmem ;			/* variable */
+
 
 /* external variables */
 
 
 /* local structures */
 
+namespace {
+    struct submgr {
+	ccharp		attr ;
+	charp		ubuf ;
+	charp		rbuf ;
+	int		rlen ;
+	int		ulen ;
+	bool		falloc ;
+	submgr(char *rb,int rl,ccp ap) noex : rbuf(rb), rlen(rl) {
+	    attr = ap ;
+	    ubuf = nullptr ;
+	    ulen = 0 ;
+	    falloc = false ;
+	} ; /* end ctor */
+	int operator ()	(ccharp) noex ;
+	int userbeg	(ccharp) noex ;
+	int userend	() noex ;
+	int getdb	() noex ;
+    } ; /* end struct (submgr) */
+} /* end namespace */
+
 
 /* forward references */
+
+local bool	isempty(char) noex ;
 
 
 /* local variables */
@@ -90,21 +108,85 @@ import uconstants ;			/* |varname(3u)| */
 
 int getuserval(char *rbuf,int rlen,cchar *atp,cchar *un) noex {
 	int		rs = SR_FAULT ;
-	int		len = 0 ; /* return-value */
 	if (rbuf && atp) ylikely {
 	    rs = SR_INVALID ;
 	    rbuf[0] = eos ;
-	    if ((rlen > 0) && un) {
-		rs = SR_INVALID ;
-		if (un[0] && atp[0]) {
-		    rs = SR_OK ;
-		} /* end if */
+	    if ((rlen > 0) && atp[0]) {
+		submgr so(rbuf,rlen,atp) ;
+		rs = so(un) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? len : rs ;
+	return rs ;
 } /* end subroutine (getuserval) */
 
 
 /* local subroutines */
+
+int submgr::operator () (ccharp un) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if ((rs = userbeg(un)) >= 0) {
+	    {
+		rs = getdb() ;
+		len = rs ;
+	    }
+	    rs1 = userend() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (ckuser) */
+    	return (rs >= 0) ? len : rs ;
+} /* end method (submgr::operator) */
+
+int submgr::userbeg(ccharp un) noex {
+    	cnullptr	np{} ;
+    	int		rs = SR_OK ;
+	if ((un == np) || isempty(un[0])) {
+	    if ((rs = libmem.un(&ubuf)) >= 0) {
+		falloc = true ;
+		ulen = rs ;
+		rs = getusername(ubuf,ulen,-1) ;
+		if (rs < 0) {
+		    libmem.free(ubuf) ;
+		    ubuf = nullptr ;
+		    falloc = false ;
+		} /* end if (error) */
+	    } /* end if (memory-acquire) */
+	} else {
+	    ubuf = cast_const<charp>(un) ;
+	} /* end if (allocation needed) */
+	return rs ;
+} /* end method (submgr::userbeg) */
+
+int submgr::userend() noex {
+    	int		rs = SR_OK ;
+	int		rs1 ;
+	if (falloc && ubuf) {
+	    rs1 = libmem.free(ubuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    ubuf = nullptr ;
+	    ulen = 0 ;
+	    falloc = false ;
+	} /* end if (allocation) */;
+	return rs ;
+} /* end method (submgr::userend) */
+
+int submgr::getdb() noex {
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (userattrdb db ; (rs = db.open(ubuf)) >= 0) {
+	    {
+		rs = db.look(rbuf,rlen,attr) ;
+		len = rs ;
+	    }
+	    rs1 = db.close ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (userattrdb) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (submgr::getdb) */
+
+local bool isempty(char c) noex {
+    	return ((c == '\0') || (c == '-')) ;
+} /* end subroutine (isempty) */
 
 
