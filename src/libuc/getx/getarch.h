@@ -24,10 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getarch(char *,int) noex ;
-
+EXTERNC_beg
+    extern int	getarch(char *,int) noex ;
 EXTERNC_end
 
 
