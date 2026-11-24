@@ -28,10 +28,10 @@
 #include	<matxstr.h>
 
 
-EXTERNC_begin
-extern int matbasestr(con mainv,cchar *,int) noex ;
-extern int matcasestr(con mainv,cchar *,int) noex ;
-extern int matfoldstr(con mainv,cchar *,int) noex ;
+EXTERNC_beg
+    extern int matbasestr(con mainv,cchar *,int) noex ;
+    extern int matcasestr(con mainv,cchar *,int) noex ;
+    extern int matfoldstr(con mainv,cchar *,int) noex ;
 EXTERNC_end
 
 
