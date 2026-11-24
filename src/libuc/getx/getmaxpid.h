@@ -50,10 +50,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getmaxpid(int) noex ;
-
+EXTERNC_beg
+    extern int	getmaxpid(int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -62,10 +60,10 @@ namespace libuc {
     struct maxpider {
     	operator int () noex {
     	    return getmaxpid(0) ;
-	} ;
+	} ; /* end */
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (maxpider) */
 } /* end namespace */
 
