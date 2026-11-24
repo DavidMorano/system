@@ -338,7 +338,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
         int             rs1 ;
         int             f = false ;
 	if ((rs = pwcache_magic(op)) >= 0) ylikely {
-            if (hdb_cur cur ; (rs = hdb_curbegin(op->dbp,&cur)) >= 0) ylikely {
+            if (hdb_cur cur ; (rs = hdb_curbeg(op->dbp,&cur)) >= 0) ylikely {
                 hdb_dat       key{} ;
                 hdb_dat       val{} ;
                 if (dt == 0) dt = getustime ;
@@ -523,7 +523,7 @@ local int pwcache_recdel(pwcache *op,rec *ep) noex {
 local int pwcache_recfins(pwcache *op) noex {
         int             rs = SR_OK ;
         int             rs1 ;
-        if (hdb_cur cur{} ; (rs1 = hdb_curbegin(op->dbp,&cur)) >= 0) ylikely {
+        if (hdb_cur cur{} ; (rs1 = hdb_curbeg(op->dbp,&cur)) >= 0) ylikely {
             hdb_dat	key{} ;
             hdb_dat	val{} ;
             while (hdb_curenum(op->dbp,&cur,&key,&val) >= 0) {
@@ -561,7 +561,7 @@ local int pwcache_finduid(pwcache *op,rec **rpp,uid_t uid) noex {
 	int		rs1 ;
 	int		ffound = false ;
         rec         	*ep = nullptr ;
-	if (hdb_cur cur{} ; (rs = hdb_curbegin(dbp,&cur)) >= 0) ylikely {
+	if (hdb_cur cur{} ; (rs = hdb_curbeg(dbp,&cur)) >= 0) ylikely {
 	    hdb_dat   key{} ;
 	    hdb_dat   val{} ;
             while ((rs = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
