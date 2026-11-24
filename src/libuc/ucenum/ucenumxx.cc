@@ -60,7 +60,7 @@ template<typename ... Args>
 local inline int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
     	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
+	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    op->magval = 0 ;
 	    if ((op->fmp = new(nt) filemap) != nullptr) {
@@ -72,7 +72,7 @@ local inline int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
 
 local inline int ucenumxx_dtor(ucenumxx *op) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op) ylikely {
 	    rs = SR_OK ;
 	    if (op->fmp) {
 		delete op->fmp ;
@@ -93,14 +93,14 @@ local inline int ucenumxx_dtor(ucenumxx *op) noex {
 
 int ucenumxxbase::open(cchar *efname) noex {
 	int		rs ;
-	if ((rs = ucenumxx_ctor(op,efname)) >= 0) {
+	if ((rs = ucenumxx_ctor(op,efname)) >= 0) ylikely {
 	    csize	nmax = INT_MAX ;
 	    if ((rs = filemap_open(fmp,efname,nmax)) >= 0) {
 	        magval = mxx ;
-	    }
+	    } /* end */
 	    if (rs < 0) {
 		ucenumxx_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (ucenumxx_ctor) */
 	return rs ;
 } /* end if (ucenumxxbase::open) */
@@ -108,16 +108,16 @@ int ucenumxxbase::open(cchar *efname) noex {
 int ucenumxxbase::close() noex {
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
-	if (op->magval == mxx) {
+	if (op->magval == mxx) ylikely {
 	    rs = SR_OK ;
 	    if (op->fmp) {
 		rs1 = filemap_close(op->fmp) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 		rs1 = ucenumxx_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -125,7 +125,7 @@ int ucenumxxbase::close() noex {
 
 int ucenumxxbase::reset() noex {
 	int		rs = SR_NOTOPEN ;
-	if (op->magval == mxx) {
+	if (op->magval == mxx) ylikely {
 	    rs = filemap_rewind(op->fmp) ;
 	} /* end if (open) */
 	return rs ;
