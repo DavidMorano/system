@@ -25,7 +25,7 @@
 #include	<ucentpr.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	uc_getprbegin	(int) noex ;
     extern int	uc_getprent	(ucentpr *,char *,int) noex ;
     extern int	uc_getprnam	(ucentpr *,char *,int,cchar *) noex ;
