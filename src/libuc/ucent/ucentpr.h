@@ -28,14 +28,14 @@
 #ifdef	__cplusplus
 
 struct ucentpr : protoent {
-	int parse(char *,int,cchar *,int) noex ;
-	int load(char *,int,const ucentpr *) noex ;
-	int format(char *,int) noex ;
-	int size() noex ;
-	int getent(char *,int) noex ;
-	int getnam(char *,int,cchar *) noex ;
-	int getnum(char *,int,int) noex ;
-	operator int () noex {
+	int parse	(char *,int,cchar *,int) noex ;
+	int load	(char *,int,const ucentpr *) noex ;
+	int format	(char *,int) noex ;
+	int size	() noex ;
+	int getent	(char *,int) noex ;
+	int getnam	(char *,int,cchar *) noex ;
+	int getnum	(char *,int,int) noex ;
+	operator int 	() noex {
 	    return size() ;
 	} ; /* end */
 } ; /* end struct (ucentpr) */
