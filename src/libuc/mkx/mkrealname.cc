@@ -5,7 +5,7 @@
 /* make a realname */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -47,15 +47,18 @@
 #include	<usysbase.h>		/* LIBU */
 #include	<realname.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
-#include	<libdebug.h>		/* LIBDEBUG |DEBUGPRINTF(3debug)| */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
 
 #include	"mkmisc.h"
 
+#pragma		GCC dependency		"mod/deb.ccm"
+
+import deb ;				/* debugging */
 
 /* local defines */
 
 #ifndef	CF_DEBUG
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 #endif
 
 
@@ -91,9 +94,9 @@ int mkrealname(char *rbuf,int rlen,cchar *gnp,int gnl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	DEBUGPRINTF("ent\n") ;
+	DEBPRINTF("ent\n") ;
 	if (rbuf && gnp) ylikely {
-	    DEBUGPRINTF("-> realname_start\n") ;
+	    DEBPRINTF("-> realname_start\n") ;
 	    if (realname rn ; (rs = rn.start(gnp,gnl)) >= 0) ylikely {
 	        {
 	            rs = rn.name(rbuf,rlen) ;
@@ -103,7 +106,7 @@ int mkrealname(char *rbuf,int rlen,cchar *gnp,int gnl) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (realname) */
 	} /* end if (non-null) */
-	DEBUGPRINTF("ret rs=%d len=%d\n",rs,len) ;
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (mkrealname) */
 
