@@ -192,7 +192,7 @@ int setstr_count(setstr *op) noex {
 } /* end subroutine (setstr_count) */
 
 int setstr_curbegin(setstr *op,setstr_cur *curp) noex {
-	return hdb_curbegin(op,curp) ;
+	return hdb_curbeg(op,curp) ;
 } /* end subroutine (setstr_curbegin) */
 
 int setstr_curend(setstr *op,setstr_cur *curp) noex {
@@ -283,7 +283,7 @@ local int setstr_finents(setstr *op) noex {
 	int		rs1 ;
 	int		rs2 ;
 	int		c = 0 ; /* return-value */
-	if (hdb_cur cur ; (rs1 = hdb_curbegin(op,&cur)) >= 0) ylikely {
+	if (hdb_cur cur ; (rs1 = hdb_curbeg(op,&cur)) >= 0) ylikely {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    while ((rs2 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
