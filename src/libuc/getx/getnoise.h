@@ -24,8 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int	getnoise(uint *,int) noex ;
+EXTERNC_beg
+    extern int	getnoise(uint *,int) noex ;
 EXTERNC_end
 
 
