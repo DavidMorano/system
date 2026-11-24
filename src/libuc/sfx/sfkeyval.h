@@ -27,7 +27,7 @@
 
 
 EXTERNC_begin
-extern int	sfkeyval	(cchar *,int,cchar *,cchar **) noex ;
+    extern int	sfkeyval	(cchar *,int,cchar *,cchar **) noex ;
 EXTERNC_end
 
 
