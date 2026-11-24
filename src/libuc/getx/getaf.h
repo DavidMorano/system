@@ -35,20 +35,16 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getaf		(cchar *,int) noex ;
-extern int	getaflen	(int) noex ;
-extern cchar	*strafname(int) noex ;
-
+EXTERNC_beg
+    extern int	getaf		(cchar *,int) noex ;
+    extern int	getaflen	(int) noex ;
+    extern cchar	*strafname(int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-inline int getaf(cchar *sp) noex {
+    inline int getaf(cchar *sp) noex {
 	return getaf(sp,-1) ;
-} /* end subroutine */
-
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 
