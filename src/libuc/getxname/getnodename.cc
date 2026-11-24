@@ -84,12 +84,12 @@ namespace {
     struct nodeinfo ;
     typedef int (nodeinfo::*nodeinfo_m)() noex ;
     struct nodeinfo {
-	char		*nbuf ;		/* user argument */
+	charp		nbuf ;		/* user argument */
 	int		nlen ;		/* user argument */
-	nodeinfo(char *b,int l) noex : nbuf(b), nlen(l) { } ;
-	operator int () noex ;
-	int env() noex ;
-	int uinfo() noex ;
+	nodeinfo(charp bp,int bl) noex : nbuf(bp), nlen(bl) { } ;
+	operator int 	() noex ;
+	int env		() noex ;
+	int uinfo	() noex ;
     } ; /* end struct (nodeinfo) */
 } /* end namespace */
 
@@ -113,7 +113,7 @@ constexpr nodeinfo_m	tries[] = {
 int getnodename(char *nbuf,int nlen) noex {
 	int		rs = SR_FAULT ;
 	if (nbuf) ylikely {
-	    nodeinfo	ni(nbuf,nlen) ;
+	    nodeinfo ni(nbuf,nlen) ;
 	    rs = ni ;
 	} /* end if (non-null) */
 	return rs ;
@@ -132,17 +132,12 @@ nodeinfo::operator int () noex {
 } /* end method (nodeinfo::operator) */
 
 int nodeinfo::env() noex {
+	static ccharp	v_node = getenver(varname.node) ;
 	int		rs = SR_OK ;
-	cchar		*vn = varname.node ;
-	if (vn) ylikely {
-	    if (vn[0]) ylikely {
-		static cchar	*vp = getenver(vn) ;
-	 	if (vp) {
-		    if (vp[0]) {
-			rs = sncpy1(nbuf,nlen,vp) ;
-		    } /* end if (non-empty) */
-		} /* env if (have) */
-	    } /* end if (valid) */
+	if (v_node) {
+	    if (v_node[0]) {
+	        rs = sncpy(nbuf,nlen,v_node) ;
+	    } /* end if (non-empty) */
 	} /* end if (non-null) */
 	return rs ;
 } /* end method (nodeinfo::env) */
@@ -150,7 +145,7 @@ int nodeinfo::env() noex {
 int nodeinfo::uinfo() noex {
 	int		rs ;
 	if (ucinfo_names uin ; (rs = ucinfo_name(&uin)) >= 0) ylikely {
-	    cint	nl = rmchr(uin.nodename,-1,'.') ;
+	    cint nl = rmchr(uin.nodename,-1,'.') ;
 	    rs = snwcpy(nbuf,nlen,uin.nodename,nl) ;
 	} /* end if (ucinfo_name) */
 	return rs ;
