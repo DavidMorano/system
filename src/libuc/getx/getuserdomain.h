@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	getuserdomain(char *,int,cchar *) noex ;
 EXTERNC_end
 
