@@ -24,10 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getsocktype(int) noex ;
-
+EXTERNC_beg
+    extern int	getsocktype(int) noex ;
 EXTERNC_end
 
 
