@@ -77,14 +77,14 @@ struct project {
 
 #ifndef	SUBROUTINE_GETPROJID
 #define	SUBROUTINE_GETPROJID
-EXTERNC_begin
+EXTERNC_beg
     extern projid_t getprojid() noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_GETPROJID */
 
 #ifndef	SUBROUTINE_GETPJ
 #define	SUBROUTINE_GETPJ
-EXTERNC_begin
+EXTERNC_beg
     extern void	setprojent() noex ;
     extern void	endprojent() noex ;
     extern CPROJECT *getprojent(PROJECT *,void *,size_t) noex ;
@@ -98,7 +98,7 @@ EXTERNC_end
 
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
-EXTERNC_begin
+EXTERNC_beg
     extern unixret_t	getpjent_rp(PROJECT *,char *,int) noex ;
     extern unixret_t	getpjnam_rp(PROJECT *,char *,int,cchar *) noex ;
     extern unixret_t	getpjpid_rp(PROJECT *,char *,int,projid_t) noex ;
