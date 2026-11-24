@@ -24,10 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getfstype(char *,int,int) noex ;
-
+EXTERNC_beg
+    extern int	getfstype(char *,int,int) noex ;
 EXTERNC_end
 
 
