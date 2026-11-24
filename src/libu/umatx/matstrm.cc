@@ -17,8 +17,8 @@
 
 /*******************************************************************************
 
-	Name:
-	matp{x}str
+	Group:
+	matstrm
 
 	Description:
 	Check that the given string matches the LEADING part of
@@ -29,10 +29,12 @@
 	array index.  If we do not match, we return "less-than-zero".
 
 	Synopsis:
-	int matp{x}str(con mainv a,int n,cchar *sp,int sl) noex
+	int matstrmbc(con mainv a,int n,cchar *sp,int sl) noex
+	int matstrmic(con mainv a,int n,cchar *sp,int sl) noex
+	int matstrmfc(con mainv a,int n,cchar *sp,int sl) noex
 
 	Arguments:
-	{x}		base, case, fold
+	{x}		one of: b, i, f
 	a		array of string to match against
 	n		minimum number of characters that must match
 	sp		string to test against array
