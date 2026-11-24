@@ -25,7 +25,7 @@
 #include	<ucentnw.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	uc_getnwbegin	(int) noex ;
     extern int	uc_getnwent	(ucentnw *,char *,int) noex ;
     extern int	uc_getnwnam	(ucentnw *,char *,int,cchar *) noex ;
