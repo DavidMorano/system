@@ -26,8 +26,8 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int	matkeystr(con mainv,cchar *,int) noex ;
+EXTERNC_beg
+    extern int	matkeystr(con mainv,cchar *,int) noex ;
 EXTERNC_end
 
 
