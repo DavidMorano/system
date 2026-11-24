@@ -59,7 +59,7 @@
 #define	CGROUP	const struct group
 #endif
 
-EXTERNC_begin
+EXTERNC_beg
     extern unixret_t	getgrent_rp(GROUP *,char *,int) noex ;
     extern unixret_t	getgrnam_rp(GROUP *,char *,int,cchar *) noex ;
     extern unixret_t	getgrgid_rp(GROUP *,char *,int,gid_t) noex ;
