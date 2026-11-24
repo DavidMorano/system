@@ -24,11 +24,9 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getuserorg(char *,int,cchar *) noex ;
-extern int	gethomeorg(char *,int,cchar *) noex ;
-
+EXTERNC_beg
+    extern int	getuserorg(char *,int,cchar *) noex ;
+    extern int	gethomeorg(char *,int,cchar *) noex ;
 EXTERNC_end
 
 
