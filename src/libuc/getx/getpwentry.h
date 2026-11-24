@@ -19,11 +19,9 @@
 #include	<pwentry.h>		/* LIBUC */
 
 
-EXTERNC_begin
-
-extern int getpwentry_name	(pwentry *,char *,int,cchar *) noex ;
-extern int getpwentry_uid	(pwentry *,char *,int,uid_t) noex ;
-
+EXTERNC_beg
+    extern int getpwentry_name	(pwentry *,char *,int,cchar *) noex ;
+    extern int getpwentry_uid	(pwentry *,char *,int,uid_t) noex ;
 EXTERNC_end
 
 
