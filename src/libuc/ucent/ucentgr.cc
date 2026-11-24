@@ -42,9 +42,9 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetgr.h"		/* |uc_getgr{x}(3uc)| */
 #include	"ucentgr.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -213,21 +213,21 @@ int ucentgr::format(char *rbuf,int rlen) noex {
 
 int ucentgr::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    if (gr_name) {
-	        sz += (lenstr(gr_name) + 1) ;
-	    }
-	    if (gr_passwd) {
-	        sz += (lenstr(gr_passwd) + 1) ;
-	    }
-	    if (gr_mem) {
-	        int	i = 0 ;
-	        while (gr_mem[i]) {
-	            sz += (lenstr(gr_mem[i++]) + 1) ;
-	        } /* end while */
-	        sz += ((i + 1) * szof(cchar *)) ;
-	    } /* end if (group members) */
-	    rs = iceil(sz,szof(cchar *)) ;
+	int		sz = 1 ;
+	if (gr_name) {
+	    sz += (lenstr(gr_name) + 1) ;
+	}
+	if (gr_passwd) {
+	    sz += (lenstr(gr_passwd) + 1) ;
+	}
+	if (gr_mem) {
+	    int	i = 0 ;
+	    while (gr_mem[i]) {
+	        sz += (lenstr(gr_mem[i++]) + 1) ;
+	    } /* end while */
+	    sz += ((i + 1) * szof(cchar *)) ;
+	} /* end if (group members) */
+	rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
 } /* end subroutine (ucentgr::size) */
 
