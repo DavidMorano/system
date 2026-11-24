@@ -27,7 +27,7 @@
 
 
 EXTERNC_begin
-extern int	sfcontent	(cchar *,int,cchar **) noex ;
+    extern int	sfcontent	(cchar *,int,cchar **) noex ;
 EXTERNC_end
 
 
