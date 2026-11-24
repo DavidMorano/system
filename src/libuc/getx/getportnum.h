@@ -35,10 +35,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getportnum(cchar *,cchar *) noex ;
-
+EXTERNC_beg
+    extern int	getportnum(cchar *,cchar *) noex ;
 EXTERNC_end
 
 
