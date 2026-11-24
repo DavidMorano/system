@@ -366,7 +366,7 @@ int nodedb_curbegin(ND *op,nodedb_cur *curp) noex {
 	    rs = SR_NOMEM ;
 	    curp->i = -1 ;
 	    if ((curp->ecp = new(nothrow) hdb_cur) != nullptr) ylikely {
-	        if ((rs = hdb_curbegin(op->entsp,curp->ecp)) >= 0) {
+	        if ((rs = hdb_curbeg(op->entsp,curp->ecp)) >= 0) {
 	            op->cursors += 1 ;
 	        }
 		if (rs < 0) {
@@ -662,7 +662,7 @@ local int nodedb_filedump(ND *op,int fi) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (hdb_cur cur ; (rs = hdb_curbegin(elp,&cur)) >= 0) {
+	if (hdb_cur cur ; (rs = hdb_curbeg(elp,&cur)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
 	    while (hdb_curenum(elp,&cur,&key,&val) >= 0) {
