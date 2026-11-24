@@ -43,9 +43,9 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetpw.h"		/* |uc_getpw{x}(3uc)| */
 #include	"ucentpw.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -53,7 +53,7 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	SI		storeitem
+#define	SI	storeitem
 
 
 /* imported namespaces */
@@ -90,7 +90,7 @@ local int ucentpw_parsedefs(ucentpw *,SI *,int) noex ;
 int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if ( pwbuf && sp) ylikely {
+	if (pwbuf && sp) ylikely {
 	    PASSWD *pep = this ;
 	    memclear(pep) ;
 	    if (sl < 0) sl = lenstr(sp) ;
@@ -143,7 +143,7 @@ int ucentpw::load(char *pwbuf,int pwlen,const ucentpw *spwp) noex {
 int ucentpw::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (this && rbuf) ylikely {
+	if (rbuf) ylikely {
 	    if (sbuf b ; (rs = b.start(rbuf,rlen)) >= 0) ylikely {
 	        for (int i = 0 ; i < 7 ; i += 1) {
 	            if (i > 0) rs = b.chr(':') ;
@@ -185,23 +185,23 @@ int ucentpw::format(char *rbuf,int rlen) noex {
 
 int ucentpw::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    if (pw_name) {
-	        sz += (lenstr(pw_name) + 1) ;
-	    }
-	    if (pw_passwd) {
-	        sz += (lenstr(pw_passwd) + 1) ;
-	    }
-	    if (pw_gecos) {
-	        sz += (lenstr(pw_gecos) + 1) ;
-	    }
-	    if (pw_dir) {
-	        sz += (lenstr(pw_dir) + 1) ;
-	    }
-	    if (pw_shell) {
-	        sz += (lenstr(pw_shell) + 1) ;
-	    }
-	    rs = sz ;
+	int		sz = 1 ;
+	if (pw_name) {
+	    sz += (lenstr(pw_name) + 1) ;
+	}
+	if (pw_passwd) {
+	    sz += (lenstr(pw_passwd) + 1) ;
+	}
+	if (pw_gecos) {
+	    sz += (lenstr(pw_gecos) + 1) ;
+	}
+	if (pw_dir) {
+	    sz += (lenstr(pw_dir) + 1) ;
+	}
+	if (pw_shell) {
+	    sz += (lenstr(pw_shell) + 1) ;
+	}
+	rs = sz ;
 	return rs ;
 } /* end subroutine (ucentpw::size) */
 
