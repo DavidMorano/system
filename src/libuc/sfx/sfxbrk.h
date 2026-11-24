@@ -27,14 +27,14 @@
 
 
 EXTERNC_begin
-extern int	sfobrk	(cchar *,int,cchar *,cchar **) noex ;
-extern int	sfrbrk	(cchar *,int,cchar *,cchar **) noex ;
+    extern int	sfobrk	(cchar *,int,cchar *,cchar **) noex ;
+    extern int	sfrbrk	(cchar *,int,cchar *,cchar **) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-local inline int sfbrk(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
+    local inline int sfbrk(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	return sfobrk(sp,sl,ss,rpp) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 
