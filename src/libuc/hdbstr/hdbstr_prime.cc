@@ -158,7 +158,7 @@ local int hdbstr_finents(hdbstr *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (hdb_cur cur ; (rs = hdb_curbegin(op,&cur)) >= 0) ylikely {
+	if (hdb_cur cur ; (rs = hdb_curbeg(op,&cur)) >= 0) ylikely {
             hdb_dat	key{} ;
             hdb_dat	val{} ;
             while ((rs1 = hdb_curenum(op,&cur,&key,&val)) >= 0) {
@@ -334,7 +334,7 @@ int hdbstr_delkey(hdbstr *op,cchar *kstr,int klen) noex {
 	    skey.len = (klen < 0) ? lenstr(kstr) : klen ;
 	    /* delete all of the data associated with this key */
 	    int		rs1 = SR_OK ;
-	    if (hdb_cur cur ; (rs = hdb_curbegin(op,&cur)) >= 0) {
+	    if (hdb_cur cur ; (rs = hdb_curbeg(op,&cur)) >= 0) {
 	        hdb_dat		key{} ;
 	        hdb_dat		val{} ;
 	        while (rs1 >= 0) {
@@ -399,7 +399,7 @@ int hdbstr_curdel(hdbstr *op,hc *curp,int f_adv) noex {
 int hdbstr_curbegin(hdbstr *op,hc *curp) noex {
 	int		rs ;
 	if ((rs = hdbstr_magic(op,curp)) >= 0) ylikely {
-	    rs = hdb_curbegin(op,curp) ;
+	    rs = hdb_curbeg(op,curp) ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (hdbstr_curbegin) */
