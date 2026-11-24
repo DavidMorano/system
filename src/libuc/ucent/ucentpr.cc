@@ -43,9 +43,9 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetpr.h"		/* |uc_getpr{3uc}(3uc)| */
 #include	"ucentpr.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -200,18 +200,18 @@ int ucentpr::format(char *rbuf,int rlen) noex {
 
 int ucentpr::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    if (p_name) {
-	        sz += (lenstr(p_name) + 1) ;
-	    }
-	    if (p_aliases) {
-	        int	i ; /* used-afterwards */
-	        for (i = 0 ; p_aliases[i] ; i += 1) {
-	            sz += (lenstr(p_aliases[i]) + 1) ;
-	        } /* end for */
-	        sz += ((i+1) * szof(cchar *)) ;
-	    } /* end if (group members) */
-	    rs = iceil(sz,szof(cchar *)) ;
+	int		sz = 1 ;
+	if (p_name) {
+	    sz += (lenstr(p_name) + 1) ;
+	}
+	if (p_aliases) {
+	    int	i ; /* used-afterwards */
+	    for (i = 0 ; p_aliases[i] ; i += 1) {
+	        sz += (lenstr(p_aliases[i]) + 1) ;
+	    } /* end for */
+	    sz += ((i+1) * szof(cchar *)) ;
+	} /* end if (group members) */
+	rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
 } /* end subroutine (ucentpr::size) */
 
@@ -247,7 +247,7 @@ local int ucentpr_parsestrs(ucentpr *prp,SI *sip,cchar *sp,int sl) noex {
 	        } /* end if (storeitem-ptab) */
 	    } else {
 	        prp->p_aliases = nullptr ;
-	    }
+	    } /* end */
 	    rs1 = u.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
