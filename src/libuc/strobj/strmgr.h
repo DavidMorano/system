@@ -102,17 +102,17 @@ typedef STRMGR		strmgr ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-extern int strmgr_start		(strmgr *,char *,int) noex ;
-extern int strmgr_avail		(strmgr *) noex ;
-extern int strmgr_rem		(strmgr *) noex ;
-extern int strmgr_lenrem	(strmgr *) noex ;
-extern int strmgr_str		(strmgr *,cchar *,int) noex ;
-extern int strmgr_chr		(strmgr *,int) noex ;
-extern int strmgr_remslash	(strmgr *) noex ;
-extern int strmgr_get		(strmgr *,ccharpp) noex ;
-extern int strmgr_len		(strmgr *) noex ;
-extern int strmgr_reset		(strmgr *) noex ;
-extern int strmgr_finish	(strmgr *) noex ;
+    extern int strmgr_start	(strmgr *,char *,int) noex ;
+    extern int strmgr_avail	(strmgr *) noex ;
+    extern int strmgr_rem	(strmgr *) noex ;
+    extern int strmgr_lenrem	(strmgr *) noex ;
+    extern int strmgr_str	(strmgr *,cchar *,int) noex ;
+    extern int strmgr_chr	(strmgr *,int) noex ;
+    extern int strmgr_remslash	(strmgr *) noex ;
+    extern int strmgr_get	(strmgr *,ccharpp) noex ;
+    extern int strmgr_len	(strmgr *) noex ;
+    extern int strmgr_reset	(strmgr *) noex ;
+    extern int strmgr_finish	(strmgr *) noex ;
 EXTERNC_end
 
 
