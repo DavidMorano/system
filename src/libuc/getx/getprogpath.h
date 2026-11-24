@@ -26,16 +26,14 @@
 #include	<vecstr.h>		/* LIBUC */
 
 
-EXTERNC_begin
-
-extern int	getprogpath(ids *,vecstr *,char *,cchar *,int) noex ;
-
+EXTERNC_beg
+    extern int	getprogpath(ids *,vecstr *,char *,cchar *,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pp) noex {
+    inline int getprogpath(ids *idp,vecstr *plp,char *rbuf,cchar *pp) noex {
     	return getprogpath(idp,plp,rbuf,pp,-1) ;
-} /* end subroutine */
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 
