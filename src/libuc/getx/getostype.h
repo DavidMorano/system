@@ -57,7 +57,7 @@ enum ostypes {
 	ostype_overlast
 } ; /* end enum (ostypes) */
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	getostype() noex ;
 EXTERNC_end
 
