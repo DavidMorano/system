@@ -25,7 +25,7 @@
 #include	<ucentsv.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	uc_getsvbegin	(int) noex ;
     extern int	uc_getsvent	(ucentsv *,char *,int) noex ;
     extern int	uc_getsvnam	(ucentsv *,char *,int,cchar *,cchar *) noex ;
