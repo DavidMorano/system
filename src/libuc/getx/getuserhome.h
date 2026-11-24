@@ -24,10 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getuserhome(char *,int,cchar *) noex ;
-
+EXTERNC_beg
+    extern int	getuserhome(char *,int,cchar *) noex ;
 EXTERNC_end
 
 
