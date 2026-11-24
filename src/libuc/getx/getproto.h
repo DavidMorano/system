@@ -34,10 +34,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getproto_name(cchar *,int) noex ;
-
+EXTERNC_beg
+    extern int	getproto_name(cchar *,int) noex ;
 EXTERNC_end
 
 
