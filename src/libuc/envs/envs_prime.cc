@@ -54,7 +54,7 @@ import libutil ;			/* |emclear(3u)| + |lenstr(3u)| */
 #define	ENVS_DBGETREC(op,cp,kp,vp)	hdb_curget((op),(cp),(kp),(vp))
 #define	ENVS_DBNEXT(op,cp)		hdb_curnext((op),(cp))
 #define	ENVS_DBENUM(op,cp,kp,vp)	hdb_curenum((op),(cp),(kp),(vp))
-#define	ENVS_DBCURBEGIN(op,cp)		hdb_curbegin((op),(cp))
+#define	ENVS_DBCURBEGIN(op,cp)		hdb_curbeg((op),(cp))
 #define	ENVS_DBCUREND(op,cp)		hdb_curend((op),(cp))
 #define	ENVS_DBFETCH(op,k,cp,vp)	hdb_fetch((op),(k),(cp),(vp))
 #define	ENVS_DBCOUNT(op)		hdb_count((op))
