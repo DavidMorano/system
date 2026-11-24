@@ -21,14 +21,11 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<sbuf.h>
-#include	<storeitem.h>
-#include	<vechand.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<sbuf.h>		/* LIBUC */
+#include	<storeitem.h>		/* LIBUC */
+#include	<vechand.h>		/* LIBUC */
 
 
 namespace ucent {
@@ -36,7 +33,7 @@ namespace ucent {
     int si_loadnames(storeitem *,vechand *,cchar *,int) noex ;
     int si_loadname(storeitem *,vechand *,cchar *,int) noex ;
     int si_copystr(storeitem *,char **,cchar *) noex ;
-}
+} /* end namespace (ucent) */
 
 
 #endif /* __cplusplus */
