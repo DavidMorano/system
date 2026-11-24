@@ -46,10 +46,8 @@
 #include	<opendials.h>		/* LIBUC these are the return-values */
 
 
-EXTERNC_begin
-
-extern int	getopendial(cchar *) noex ;
-
+EXTERNC_beg
+    extern int	getopendial(cchar *) noex ;
 EXTERNC_end
 
 
