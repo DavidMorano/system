@@ -107,12 +107,12 @@ int ucenumnw::readent(ucenumnw_ent *uap,char *uabuf,int ualen) noex {
 void ucenumnw::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumnw",rs,"fini-close") ;
-	}
+	} /* end */
 } /* end method (ucenumnw::dtor) */
 
 int ucenumnw_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumnwmem_open:
 	        rs = ucenumnw_open(op,fn) ;
@@ -124,7 +124,7 @@ int ucenumnw_op::operator () (cchar *fn) noex {
 
 ucenumnw_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumnwmem_reset:
 	        rs = ucenumnw_reset(op) ;
