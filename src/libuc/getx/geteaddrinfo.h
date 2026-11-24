@@ -24,10 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int geteaddrinfo(cc *,cc *,ADDRINFO *,char *,ADDRINFO **) noex ;
-
+EXTERNC_beg
+    extern int geteaddrinfo(cc *,cc *,ADDRINFO *,char *,ADDRINFO **) noex ;
 EXTERNC_end
 
 
