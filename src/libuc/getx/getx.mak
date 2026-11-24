@@ -41,7 +41,7 @@ LIBS +=
 
 
 OBJ00= systypenames.o getsystypenum.o
-OBJ01= getdefzdata.o
+OBJ01= getdefzdata.o getuserdomain.o getuserval.o
 OBJ02= getaddr.o getaf.o getarch.o 
 OBJ03= gethz.o getlogx.o getmailgid.o getmjd.o
 OBJ04= getnfile.o getngroups.o getnodedomain.o
@@ -233,10 +233,12 @@ getmaxpid.o:		getmaxpid.cc		getmaxpid.h		$(INCS)
 getnisdomain.o:		getnisdomain.cc		getnisdomain.h		$(INCS)
 getoflags.o:		getoflags.cc		getoflags.h		$(INCS)
 getfstype.o:		getfstype.cc		getfstype.h		$(INCS)
+getuserdomain.o:	getuserdomain.cc	getuserdomain.h		$(INCS)
 getuserhome.o:		getuserhome.cc		getuserhome.h		$(INCS)
 getuserorg.o:		getuserorg.cc		getuserorg.h		$(INCS)
 getuserterm.o:		getuserterm.cc		getuserterm.h		$(INCS)
 getuserterms.o:		getuserterms.cc		getuserterms.h		$(INCS)
+getuserval.o:		getuserval.cc		getuserval.h		$(INCS)
 getxid.o:		getxid.cc		getxid.h		$(INCS)
 
 
