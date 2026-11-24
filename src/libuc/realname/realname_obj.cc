@@ -95,6 +95,10 @@ int realname::mailname(char *rbuf,int rlen) noex {
     	return realname_mailname(this,rbuf,rlen) ;
 } /* end method */
 
+int realname::getpieces(cchar **parts) noex {
+	return realname_getpieces(this,parts) ;
+} /* end method */
+
 void realname::dtor() noex {
 	if (cint rs = int(finish) ; rs < 0) {
 	    ulogerror("realname",rs,"fini-finish") ;
