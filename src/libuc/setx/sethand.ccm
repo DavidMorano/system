@@ -150,7 +150,7 @@ export {
 	    return rs ;
 	} ; /* end */
 	int itbegin(sethand_it *itp) {
-	    return hdb_curbegin(&dlp,&itp->cur) ;
+	    return hdb_curbeg(&dlp,&itp->cur) ;
 	} ; /* end */
 	int itend(sethand_it *itp) {
 	    return hdb_curend(&dlp,&itp->cur) ;
