@@ -25,7 +25,7 @@
 #include	<ucentgr.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	uc_getgrbegin	() noex ;
     extern int	uc_getgrent	(ucentgr *,char *,int) noex ;
     extern int	uc_getgrnam	(ucentgr *,char *,int,cchar *) noex ;
