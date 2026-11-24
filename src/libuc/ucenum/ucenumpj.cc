@@ -106,12 +106,12 @@ int ucenumpj::readent(ucenumpj_ent *uap,char *uabuf,int ualen) noex {
 void ucenumpj::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumpj",rs,"fini-close") ;
-	}
+	} /* end */
 } /* end method (ucenumpj::dtor) */
 
 int ucenumpj_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumpjmem_open:
 	        rs = ucenumpj_open(op,fn) ;
@@ -123,7 +123,7 @@ int ucenumpj_op::operator () (cchar *fn) noex {
 
 ucenumpj_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumpjmem_reset:
 	        rs = ucenumpj_reset(op) ;
