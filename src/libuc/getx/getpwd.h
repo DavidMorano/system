@@ -24,11 +24,9 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getpwd	(char *,int)		noex ;
-extern int	getpwds	(ustat *,char *,int)	noex ;
-
+EXTERNC_beg
+    extern int	getpwd	(char *,int)		noex ;
+    extern int	getpwds	(ustat *,char *,int)	noex ;
 EXTERNC_end
 
 
