@@ -26,19 +26,21 @@
 #include	<usys.h>		/* LIBU |projid_t| */
 
 
-EXTERNC_begin
+EXTERNC_beg
+    extern int	getuid_name	(cchar *,int) noex ;
+    extern int	getuid_user	(cchar *,int) noex ;
+EXTERNC_end
 
-extern int	getuid_name	(cchar *,int) noex ;
-extern int	getuid_user	(cchar *,int) noex ;
+EXTERNC_beg
+    extern int	getgid_name	(cchar *,int) noex ;
+    extern int	getgid_group	(cchar *,int) noex ;
+    extern int	getgid_def	(cchar *,gid_t) noex ;
+EXTERNC_end
 
-extern int	getgid_name	(cchar *,int) noex ;
-extern int	getgid_group	(cchar *,int) noex ;
-extern int	getgid_def	(cchar *,gid_t) noex ;
-
-extern int	getpjid_name	(cchar *,int) noex ;
-extern int	getpjid_proj	(cchar *,int) noex ;
-extern int	getpjid_def	(cchar *,projid_t) noex ;
-
+EXTERNC_beg
+    extern int	getpjid_name	(cchar *,int) noex ;
+    extern int	getpjid_proj	(cchar *,int) noex ;
+    extern int	getpjid_def	(cchar *,projid_t) noex ;
 EXTERNC_end
 
 
