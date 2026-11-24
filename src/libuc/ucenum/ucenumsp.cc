@@ -106,12 +106,12 @@ int ucenumsp::readent(ucenumsp_ent *uap,char *uabuf,int ualen) noex {
 void ucenumsp::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumsp",rs,"fini-close") ;
-	}
+	} /* end */
 } /* end method (ucenumsp::dtor) */
 
 int ucenumsp_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumspmem_open:
 	        rs = ucenumsp_open(op,fn) ;
@@ -123,7 +123,7 @@ int ucenumsp_op::operator () (cchar *fn) noex {
 
 ucenumsp_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumspmem_reset:
 	        rs = ucenumsp_reset(op) ;
