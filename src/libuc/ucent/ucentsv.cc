@@ -43,9 +43,9 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetsv.h"		/* |uc_getsv{x}(3uc)| */
 #include	"ucentsv.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -198,18 +198,18 @@ int ucentsv::format(char *rbuf,int rlen) noex {
 
 int ucentsv::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    if (s_name) {
-	        sz += (lenstr(s_name) + 1) ;
-	    }
-	    if (s_aliases) {
-	        int	i ; /* used-afterwards */
-	        for (i = 0 ; s_aliases[i] ; i += 1) {
-	            sz += (lenstr(s_aliases[i]) + 1) ;
-	        } /* end for */
-	        sz += ((i+1)*szof(cchar *)) ;
-	    } /* end if (group members) */
-	    rs = iceil(sz,szof(cchar *)) ;
+	int		sz = 1 ;
+	if (s_name) {
+	    sz += (lenstr(s_name) + 1) ;
+	}
+	if (s_aliases) {
+	    int	i ; /* used-afterwards */
+	    for (i = 0 ; s_aliases[i] ; i += 1) {
+	        sz += (lenstr(s_aliases[i]) + 1) ;
+	    } /* end for */
+	    sz += ((i+1)*szof(cchar *)) ;
+	} /* end if (group members) */
+	rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
 } /* end subroutine (ucentsv::size) */
 
@@ -261,7 +261,7 @@ local int ucentsv_parsestrs(ucentsv *prp,SI *sip,cchar *sp,int sl) noex {
 	        } /* end if (storeitem-ptab) */
 	    } else {
 	        prp->s_aliases = nullptr ;
-	    }
+	    } /* end */
 	    rs1 = u.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
@@ -273,7 +273,7 @@ local int ucentsv_formatnum(SVE *op,sbuf *sbp) noex {
 	if ((rs = sbp->dec(op->s_port)) >= 0) ylikely {
 	    if ((rs = sbp->chr('/')) >= 0) {
 		rs = sbp->strw(op->s_proto,-1) ;
-	    }
+	    } /* end */
 	} /* end if */
 	return rs ;
 } /* end subroutine (ucentsv_formatnum) */
