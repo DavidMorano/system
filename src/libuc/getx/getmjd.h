@@ -40,11 +40,9 @@ enum mons {
 	mon_overlast
 } ; /* end enum (mons) */
 
-EXTERNC_begin
-
-extern int	getmjd(int,int,int) noex ;
-extern int	getyrd(int,int,int) noex ;
-
+EXTERNC_beg
+    extern int	getmjd(int,int,int) noex ;
+    extern int	getyrd(int,int,int) noex ;
 EXTERNC_end
 
 
