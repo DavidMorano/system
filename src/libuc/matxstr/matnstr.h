@@ -26,13 +26,16 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int	matnbasestr(con mainv,cchar *,int) noex ;
-extern int	matncasestr(con mainv,cchar *,int) noex ;
-extern int	matnfoldstr(con mainv,cchar *,int) noex ;
-local inline int matnstr(con mainv a,cchar *sp,int sl) noex {
+EXTERNC_beg
+    extern int	matnbasestr(con mainv,cchar *,int) noex ;
+    extern int	matncasestr(con mainv,cchar *,int) noex ;
+    extern int	matnfoldstr(con mainv,cchar *,int) noex ;
+EXTERNC_end
+
+EXTERNC_beg
+    local inline int matnstr(con mainv a,cchar *sp,int sl) noex {
     	return matnbasestr(a,sp,sl) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 
