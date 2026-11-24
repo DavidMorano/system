@@ -37,16 +37,14 @@ struct defzdata : defzdata_head {
     	defzdata() = default ;
 	defzdata(const defzdata &) = delete ;
 	defzdata &operator = (const defzdata &) = delete ;
-	int get(char *,int,int) noex ;
+	int get		(char *,int,int) noex ;
 } ; /* end struct (defzdata) */
 #else	/* __cplusplus */
 typedef ZDEFINFO	defzdata ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
-
-extern int	getdefzdata(defzdata *,char *,int,int) noex ;
-
+EXTERNC_beg
+    extern int	getdefzdata(defzdata *,char *,int,int) noex ;
 EXTERNC_end
 
 
