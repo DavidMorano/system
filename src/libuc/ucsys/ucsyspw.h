@@ -59,7 +59,7 @@
 #define	CPASSWD	const struct passwd
 #endif
 
-EXTERNC_begin
+EXTERNC_beg
     extern unixret_t	getpwent_rp(PASSWD *,char *,int) noex ;
     extern unixret_t	getpwnam_rp(PASSWD *,char *,int,cchar *) noex ;
     extern unixret_t	getpwuid_rp(PASSWD *,char *,int,uid_t) noex ;
