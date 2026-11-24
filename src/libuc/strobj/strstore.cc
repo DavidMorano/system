@@ -99,8 +99,8 @@ struct strentry {
 
 /* forward references */
 
-int		strstore_store(strstore *,cchar *,int,cchar **) noex ;
-int		strstore_already(strstore *,cchar *,int) noex ;
+int	strstore_store		(strstore *,cchar *,int,cchar **) noex ;
+int	strstore_already	(strstore *,cchar *,int) noex ;
 
 template<typename ... Args>
 local inline int strstore_ctor(strstore *op,Args ... args) noex {
@@ -319,19 +319,19 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 		if (rpp) {
 		    cchar	*cep = charp(ep) ;
 		    *rpp = (rs >= 0) ? cep : nullptr ;
-		}
+		} /* end */
 	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? si : rs ;
 } /* end subroutine (strstore_store) */
 
-int strstore_curbegin(strstore *op,strstore_cur *curp) noex {
+int strstore_curbeg(strstore *op,strstore_cur *curp) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op,curp)) >= 0) ylikely {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (strstore_curbegin) */
+} /* end subroutine (strstore_curbeg) */
 
 int strstore_curend(strstore *op,strstore_cur *curp) noex {
 	int		rs ;
@@ -353,13 +353,14 @@ int strstore_curenum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
 	                cl = lenstr(cp) ;
 	                if (rpp) *rpp = cp ;
 	                curp->i = val ;
-	            }
+	            } /* end */
 	        } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? cl : rs ;
 } /* end subroutine (strstore_curenum) */
 
 int strstore_already(strstore *op,cchar *sp,int sl) noex {
+    	cnullptr	np{} ;
 	int		rs ;
 	int		si = 0 ;
 	if ((rs = strstore_magic(op,sp)) >= 0) ylikely {
@@ -368,8 +369,8 @@ int strstore_already(strstore *op,cchar *sp,int sl) noex {
 	        hdb_dat	key, val ;
 	        key.buf = sp ;
 	        key.len = sl ;
-	        if ((rs = hdb_fetch(op->hlp,key,nullptr,&val)) >= 0) {
-	            int		*ip = (int *) val.buf ;
+	        if ((rs = hdb_fetch(op->hlp,key,np,&val)) >= 0) {
+	            int *ip = (int *) val.buf ;
 	            si = *ip ;
 	        } /* end if */
 	} /* end if (magic) */
@@ -453,7 +454,7 @@ int strstore_recmk(strstore *op,int *rdata,int rsize) noex {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            rdata[c++] = 0 ;	/* ZERO-entry is NUL-string */
-	            if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
+	            if ((rs = hdb_curbeg(hp,&cur)) >= 0) {
 	                while (hdb_curenum(hp,&cur,&key,&val) >= 0) {
 	                    int	*ip = (int *) val.buf ;
 	                    rdata[c++] = *ip ;
@@ -505,8 +506,8 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
                     hdb_dat         val ;
                     uint            khash, chash, nhash ;
                     int             lhi, nhi, hi, si ;
-                    if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
-                        auto        he = hdb_curenum ;
+                    if ((rs = hdb_curbeg(hp,&cur)) >= 0) {
+                        cauto	he = hdb_curenum ;
                         while ((rs1 = he(hp,&cur,&key,&val)) >= 0) {
                             cint    sl = key.len ;
                             int     *ip = intp(val.buf) ;
@@ -532,8 +533,8 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
                         if (rs >= 0) rs = rs1 ;
                     } /* end if (cursor) */
                     if (rs >= 0) ylikely {
-                        auto        v = vecobj_get ;
-                        void        *vp{} ;
+                        cauto	v = vecobj_get ;
+                        void	*vp{} ;
                         for (int i = 0 ; v(&ses,i,&vp) >= 0 ; i += 1) {
                             strentry        *sep = (strentry *) vp ;
                             int             c = 0 ;
@@ -554,11 +555,11 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
                                 lhi = hi ;
                                 while ((nhi = it[lhi][2]) > 0) {
                                     lhi = nhi ;
-                                }
+                                } /* end while */
                                 hi = hashindex((lhi + 1),il) ;
                                 while (it[hi][0] > 0) {
                                     hi = hashindex((hi + 1),il) ;
-                                }
+                                } /* end while */
                                 it[lhi][2] = hi ;
                             } /* end while */
                             it[hi][0] = si ;
@@ -617,12 +618,12 @@ local int strstore_chunkfins(strstore *op) noex {
 		{
 	            rs1 = chunk_finish(cckp) ;
 	            if (rs >= 0) rs = rs1 ;
-		}
+		} /* end */
 		{
 	            rs1 = lm_free(cckp) ;
 	            if (rs >= 0) rs = rs1 ;
 		} /* end if (memory-release) */
-	    }
+	    } /* end */
 	} /* end for */
 	return rs ;
 } /* end subroutine (strstore_chunkfins) */
@@ -651,7 +652,7 @@ local int chunk_start(strstore_ch *cnp,int csz) noex {
 	if (csz > 0) {
 	    cnp->csz = csz ;
 	    rs = lm_mall(csz,&cnp->cdata) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (chunk_start) */
 
