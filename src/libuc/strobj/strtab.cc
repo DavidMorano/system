@@ -445,7 +445,7 @@ int strtab_recmk(strtab *op,int *rec,int recsize) noex {
 	            hdb_cur	cur{} ;
 	            int		*ip ;
 	            rec[c++] = 0 ;	/* ZERO-entry is NUL-string */
-	            if ((rs = hdb_curbegin(op->hlp,&cur)) >= 0) {
+	            if ((rs = hdb_curbeg(op->hlp,&cur)) >= 0) {
 	                hdb_dat	key{} ;
 	                hdb_dat	val{} ;
 	                while (hdb_curenum(op->hlp,&cur,&key,&val) >= 0) {
@@ -501,7 +501,7 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 	    	        hdb_dat		val{} ;
 	    	        uint		khash, chash, nhash ;
 	    	        int		lhi, nhi, hi, si ;
-	                if ((rs = hdb_curbegin(op->hlp,&cur)) >= 0) {
+	                if ((rs = hdb_curbeg(op->hlp,&cur)) >= 0) {
 			    hdb		*hp = op->hlp ;
 		            int		*ip ;
 		            int		sl ;
