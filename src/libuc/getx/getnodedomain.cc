@@ -21,7 +21,6 @@
 
 	Names:
 	getnodedomain
-    	getuserdomain
     	getsysdomain
 
 	Description:
@@ -29,7 +28,6 @@
 
 	Synopsis:
 	int getnodedomain	(char *nrbuf,char *drbuf) noex
-    	int getuserdomain	(char *rbuf,int rlen) noex
     	int getsysdomain	(char *rbuf,int rlen) noex
 
 	Arguments:
@@ -112,7 +110,6 @@
 #include	<sncpyx.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<strdcpyx.h>		/* LIBUC */
-#include	<nleadstr.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
@@ -137,6 +134,8 @@ import deb ;				/* debugging */
 #define	TO_READ		30		/* time-out for read */
 
 #define	TRY		tryer
+
+#define	ISWHT(ch)	CHAR_ISWHITE(ch)
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
@@ -193,6 +192,9 @@ typedef int (*try_f)(TRY *) noex ;
 
 /* forward references */
 
+local int	getnode		(TRY *,charp) noex ;
+local int	getdomain	(TRY *,charp) noex ;
+
 local int	try_start	(TRY *,char *,char *,int) noex ;
 local int	try_finish	(TRY *) noex ;
 local int	try_resolvefd	(TRY *,char *,int,int) noex ;
@@ -208,6 +210,8 @@ local int	try_uname	(TRY *) noex ;
 local int	try_gethost	(TRY *) noex ;
 local int	try_resolve	(TRY *) noex ;
 local int	try_guess	(TRY *) noex ;
+
+local con guess	*guesser	(ccharp) noex ;
 
 local int	rmwhitedot	(char *,int) noex ;
 
@@ -269,28 +273,9 @@ int getnodedomain(char *nrbuf,char *drbuf) noex {
 	DEBPRINTF("ent\n") ;
 	if ((rs = maxhostlen) >= 0) ylikely {
 	    if (TRY ti ; (rs = try_start(&ti,nrbuf,drbuf,rs)) >= 0) ylikely {
-		/* do we need a nodename? */
-	        if (nrbuf != nullptr) {
-		    DEBPRINTF("req node\n") ;
-	            nrbuf[0] = eos ;
-	            if (! ti.fl.initnode) {
-			rs = try_initnode(&ti) ;
-		    } /* end */
-	        } /* end if (trying to get a nodename) */
-		/* do we need a domainname? */
-	        if ((rs >= 0) && (drbuf != nullptr)) {
-		    DEBPRINTF("req domain\n") ;
-	            drbuf[0] = eos ;
-		    rs = SR_OK ; /* <- need for check below */
-	            for (int i = 0 ; (rs == SR_OK) && tries[i] ; i += 1) {
-		        DEBPRINTF("try i=%d\n",i) ;
-	                rs = (*tries[i])(&ti) ;
-	            } /* end for */
-	            /* remove any stupid trailing dots if any */
-	            if ((rs >= 0) && (drbuf[0] != '\0')) {
-	                rs = rmwhitedot(drbuf,rs) ;
-		    } /* end */
-	        } /* end if (trying to get a domainname) */
+		if ((rs = getnode(&ti,nrbuf)) >= 0) {
+		    rs = getdomain(&ti,drbuf) ;
+		} /* end */
 	        rs1 = try_finish(&ti) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (try) */
@@ -303,11 +288,10 @@ int getsysdomain(char *drbuf,int drlen) noex {
     	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (drbuf) ylikely {
 	    drbuf[0] = eos ;
 	    if (TRY ti ; (rs = try_start(&ti,np,drbuf,drlen)) >= 0) ylikely {
-		/* do we need a domainname? */
 		rs = SR_OK ; /* <- preparation for below */
 	        for (int i = 0 ; (rs == SR_OK) && systries[i] ; i += 1) {
 	            rs = (*systries[i])(&ti) ;
@@ -324,27 +308,56 @@ int getsysdomain(char *drbuf,int drlen) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (getsysdomain) */
 
-int getuserdomain(char *drbuf,int drlen) noex {
+int getinetdomain(char *drbuf,int drlen) noex {
     	cnullptr	np{} ;
-	int		rs = SR_FAULT ;
+    	int		rs ;
 	int		rs1 ;
-	int		len = 0 ;
-	if (drbuf) ylikely {
-	    if (char *dn ; (rs = lm_hostname(&dn)) >= 0) ylikely {
-	        if (drlen < 0) drlen = rs ;
-	        if ((rs = getnodedomain(np,dn)) >= 0) ylikely {
-	            rs = sncpy(drbuf,drlen,dn) ;
-		    len = rs ;
-	        } /* end */
-	        rs1 = lm_free(dn) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (non-null) */
+	int		len = 0 ; /* return-value */
+	if (char *tbuf ; (rs = libmem.hostname(&tbuf)) >= 0) {
+	    if ((rs = getnodedomain(np,tbuf)) >= 0) {
+		rs = sncpy(drbuf,drlen,tbuf,rs) ;
+		len = rs ;
+	    } /* end if (getnodedomain) */
+	    rs1 = libmem.free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (getuserdomain) */
+} /* end subroutine (getsysdomain) */
 
 
 /* local subroutines */
+
+/* do we need a nodename? */
+local int getnode(TRY *tip,charp nrbuf) noex {
+    	int		rs = SR_OK ;
+	if (nrbuf) {
+	    DEBPRINTF("req node\n") ;
+	    nrbuf[0] = eos ;
+	    if (! tip->fl.initnode) {
+	        rs = try_initnode(tip) ;
+	    } /* end */
+	} /* end if (trying to get a nodename) */
+	return rs ;
+} /* end subroutine (getnode) */
+
+/* do we need a domainname? */
+local int getdomain(TRY *tip,charp drbuf) noex {
+    	int		rs = SR_OK ;
+	if (drbuf) {
+	    DEBPRINTF("req domain\n") ;
+	    drbuf[0] = eos ;
+	    rs = SR_OK ; /* <- need for check below */
+	    for (int i = 0 ; (rs == SR_OK) && tries[i] ; i += 1) {
+		DEBPRINTF("try i=%d\n",i) ;
+	        rs = (*tries[i])(tip) ;
+	    } /* end for */
+	    /* remove any stupid trailing dots if any */
+	    if ((rs >= 0) && (drbuf[0] != '\0')) {
+	        rs = rmwhitedot(drbuf,rs) ;
+	    } /* end */
+	} /* end if (trying to get a domainname) */
+	return rs ;
+} /* end subroutine (getdomain) */
 
 local int try_start(TRY *tip,char *nb,char *db,int dl) noex {
 	int		rs = SR_FAULT ;
@@ -423,7 +436,7 @@ local int try_inituname(TRY *tip) noex {
 	    if (! tip->fl.inituname) {
 	        tip->fl.inituname = true ;
 	        if (ucinfo_names uin ; (rs = ucinfo_name(&uin)) >= 0) ylikely {
-	            cchar	*sp = uin.nodename ;
+	            ccharp	sp = uin.nodename ;
 	            int		sl = lenstr(uin.nodename) ;
 	            if (cc *cp ; (rs = libmem.strw(sp,sl,&cp)) >= 0) {
 	                tip->fl.uname = true ;
@@ -446,7 +459,7 @@ local int try_initnode(TRY *tip) noex {
 	        if ((rs = maxnodelen) >= 0) ylikely {
 		    cint maxnode = rs ;
 	            int		sl = -1 ;
-	            cchar	*sp = nullptr ;
+	            ccharp	sp = nullptr ;
 	            cchar	*cp ;
 	            if ((rs >= 0) && (sp == nullptr)) {
 	                if (! tip->fl.initvarnode) {
@@ -500,13 +513,13 @@ local int try_initnode(TRY *tip) noex {
 } /* end subroutine (try_initnode) */
 
 local int try_vardomain(TRY *tip) noex {
-	static cchar	*val = getenver(varname.domain) ;
+	static cchar	*vap = getenver(varname.domain) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	DEBPRINTF("ent\n") ;
-	if (val) {
+	if (vap) {
 	    cchar	*cp{} ;
-	    if (int cl ; (cl = sfshrink(val,-1,&cp)) > 0) {
+	    if (int cl ; (cl = sfshrink(vap,-1,&cp)) > 0) {
 		cint	dlen = tip->dlen ;
 	        rs = snwcpy(tip->drbuf,dlen,cp,cl) ;
 		len = rs ;
@@ -518,18 +531,18 @@ local int try_vardomain(TRY *tip) noex {
 } /* end subroutine (try_vardomain) */
 
 local int try_varlocaldom(TRY *tip) noex {
-	static cchar	*val = getenver(varname.localdomain) ;
+	static cchar	*vap = getenver(varname.localdomain) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	if (val) {
+	if (vap) {
 	    int		cl ;
-	    cchar	*sp = val ;
+	    cchar	*sp = vap ;
 	    cchar	*cp ;
-	    while (CHAR_ISWHITE(*sp)) {
+	    while (ISWHT(*sp)) {
 	        sp += 1 ;
 	    } /* end while */
 	    cp = sp ;
-	    while (*sp && (! CHAR_ISWHITE(*sp)) && (*sp != ':')) {
+	    while (*sp && (! ISWHT(*sp)) && (*sp != ':')) {
 	        sp += 1 ;
 	    } /* end while */
 	    if ((cl = intconv(sp - cp)) > 0) {
@@ -553,10 +566,10 @@ local int try_varnode(TRY *tip) noex {
 	        int sl = -1 ;
 	        if (cchar *tp = strochr(sp,'.')) {
 		    sl = intconv(tp - sp) ;
-	        }
+	        } /* end */
 	        rs = snwcpy(tip->drbuf,dlen,sp,sl) ;
 		len = rs ;
-	    } /* end if (strochr) */
+	    } /* end if */
 	} /* end if */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (try_varnode) */
@@ -569,14 +582,15 @@ local int try_uname(TRY *tip) noex {
 	    rs = try_inituname(tip) ;
 	} /* end */
 	if ((rs >= 0) && tip->fl.uname) ylikely {
-	    cchar	*sp = tip->sysnodename ;
-	    DEBPRINTF("node=»%s«\n",sp) ;
-	    if (cchar *tp = strochr(sp,'.')) {
-	        if (cchar *cp = (tp + 1) ; cp[0]) {
-		    cint	dlen = tip->dlen ;
-	            rs = sncpy(tip->drbuf,dlen,cp) ;
-		    len = rs ;
-		} /* end if (non-empty) */
+	    if (ccharp sp = tip->sysnodename ; sp[0]) {
+	        DEBPRINTF("node=»%s«\n",sp) ;
+	        if (cchar *tp = strochr(sp,'.')) {
+	            if (cchar *cp = (tp + 1) ; cp[0]) {
+		        cint	dlen = tip->dlen ;
+	                rs = sncpy(tip->drbuf,dlen,cp) ;
+		        len = rs ;
+		    } /* end if (non-empty) */
+	        } /* end if */
 	    } /* end if */
 	} /* end if */
 	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
@@ -593,25 +607,24 @@ local int try_gethost(TRY *tip) noex {
 	} /* end */
 	if ((rs >= 0) && tip->fl.node) ylikely {
 	    if (char *hbuf ; (rs = lm_ho(&hbuf)) >= 0) ylikely {
-	        ucentho		he, *hep = &he ;
 	        cint		hlen = rs ;
 	        cchar		*nn = tip->nrbuf ;
-	        if ((rs = uc_gethonam(&he,hbuf,hlen,nn)) >= 0) ylikely {
+		if (ucentho he ; (rs = he.getnam(hbuf,hlen,nn)) >= 0) {
 		    cint	dlen = tip->dlen ;
-	            cchar	*tp{} ;
+	            cchar	*tp{} ; /* used-multiple */
 		    char	*dbuf = tip->drbuf ;
 		    bool	f = true ;
 		    rs = 0 ;
-	            f = f && (hep->h_name != np) ;
-		    f = f && ((tp = strochr(hep->h_name,'.')) != np) ;
+	            f = f && (he.h_name != np) ;
+		    f = f && ((tp = strochr(he.h_name,'.')) != np) ;
 		    if (f) {
 	                rs = sncpy(dbuf,dlen,(tp + 1)) ;
 			len = rs ;
 	            } /* end if (official name) */
-	            if ((rs == 0) && hep->h_aliases) ylikely {
-	                for (int i = 0 ; hep->h_aliases[i] ; i += 1) {
-			    cchar	*ap = hep->h_aliases[i] ;
-	                    if ((tp = strochr(ap,'.')) != nullptr) {
+	            if ((rs == 0) && he.h_aliases) ylikely {
+	                for (int i = 0 ; he.h_aliases[i] ; i += 1) {
+			    cchar	*ap = he.h_aliases[i] ;
+	                    if ((tp = strochr(ap,'.')) != np) {
 	                        rs = sncpy(dbuf,dlen,(tp+1)) ;
 				len = rs ;
 	                    } /* end if */
@@ -668,7 +681,7 @@ local int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 	if (cchar *dp{} ; (rs = tryreader(fd,lbuf,llen,&dp)) > 0) ylikely {
             if (dp) {
 	        cint	dlen = tip->dlen ;
-	        char	*dbuf = tip->drbuf ;
+	        charp	dbuf = tip->drbuf ;
 		len = rs ;
                 rs = snwcpy(dbuf,dlen,dp,rs) ;
 	    } /* end */
@@ -702,29 +715,36 @@ local int try_guess(TRY *tip) noex {
 	        rs = try_initnode(tip) ;
 	    } /* end */
 	    if ((rs >= 0) && tip->fl.node) {
-	        int	si = -1 ;
-	        int	m_max = 0 ;
 	        cchar	*nn = tip->nrbuf ;
-	        rs = 0 ;
-	        for (int i = 0 ; ga[i].name ; i += 1) {
-	            cchar	*gnp = ga[i].name ;
-		    cint	gnl = lenstr(ga[i].name) ;
-	            if (int m ; (m = nleadstr(gnp,nn,-1)) >= gnl) {
-	                if (m > m_max) {
-	                    m_max = m ;
-	                    si = i ;
-	                }
-	            } /* end if */
-	        } /* end for */
-	        if (si >= 0) {
+		if (con guess *resp = guesser(nn)) {
 		    cint	mhl = maxhostlen ;
-	            rs = sncpy(tip->drbuf,mhl,ga[si].domain) ;
+	            rs = sncpy(tip->drbuf,mhl,resp->domain) ;
 		    len = rs ;
 	        } /* end if */
 	    } /* end if (have node) */
 	} /* end if_constexpr (f_guess) */
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (try_guess) */
+
+local con guess *guesser(ccharp nn) noex {
+    	con guess	*resp = nullptr ;
+	int	si = -1 ;
+	int	m_max = 0 ;
+	for (int i = 0 ; ga[i].name ; i += 1) {
+	    ccharp	gnp = ga[i].name ;
+	    cint	gnl = lenstr(ga[i].name) ;
+	    if (int m ; (m = comstr(gnp,nn,-1)) >= gnl) {
+	        if (m > m_max) {
+	            m_max = m ;
+	            si = i ;
+	        }
+	    } /* end if */
+	} /* end for */
+	if (si >= 0) {
+	    resp = (ga + si) ;
+	} /* end if */
+	return resp ;
+} /* end subroutine (guesser) */
 
 /* remove trailing whitespace and dots */
 local int rmwhitedot(char *bp,int bl) noex {
