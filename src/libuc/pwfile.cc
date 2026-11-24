@@ -283,7 +283,7 @@ int pwfile_curbegin(PF *op,PF_CUR *curp) noex {
 	        } /* end if (not locked) */
 	        curp->i = 0 ;
 	        if (rs >= 0) ylikely {
-		    rs = hdb_curbegin(op->ulp,curp->hcp) ;
+		    rs = hdb_curbeg(op->ulp,curp->hcp) ;
 		}
 	        if ((rs < 0) && f_locked) {
 	            op->fl.locked = op->fl.locked_cur = false ;
