@@ -103,7 +103,7 @@ int mapstrint_finish(MSI *dbp) noex {
 	    rs = SR_OK ;
 	    {
 	        mapstrint_cur	kcur ;
-	        if ((rs1 = hdb_curbegin(dbp,&kcur)) >= 0) {
+	        if ((rs1 = hdb_curbeg(dbp,&kcur)) >= 0) {
 	            hdb_dat	key{} ;
 	            hdb_dat	val{} ;
 	            while (hdb_curenum(dbp,&kcur,&key,&val) >= 0) {
@@ -293,7 +293,7 @@ int mapstrint_delkey(MSI *dbp,cchar *kstr,int µklen) noex {
 	    rs = SR_INVALID ;
 	    if (int klen ; (klen = getlenstr(kstr,µklen)) > 0) ylikely {
 	        /* delete all of the data associated with this key */
-	        if (hdb_cur kcur ; (rs = hdb_curbegin(dbp,&kcur)) >= 0) {
+	        if (hdb_cur kcur ; (rs = hdb_curbeg(dbp,&kcur)) >= 0) {
 		    cauto	fetrec = hdb_fetchrec ;
 	            hdb_dat	skey ;
 	            hdb_dat	key{} ;
@@ -350,7 +350,7 @@ int mapstrint_curdel(MSI *dbp,mapstrint_cur *curp,int f_adv) noex {
 } /* end subroutine (mapstrint_curdel) */
 
 int mapstrint_curbegin(MSI *dbp,mapstrint_cur *curp) noex {
-	return hdb_curbegin(dbp,curp) ;
+	return hdb_curbeg(dbp,curp) ;
 } /* end subroutine (mapstrint_curbegin) */
 
 int mapstrint_curend(MSI *dbp,mapstrint_cur *curp) noex {
