@@ -17,12 +17,10 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int getus_begin	() noex ;
-extern int getus_ent	(char *,int) noex ;
-extern int getus_end	() noex ;
-
+EXTERNC_beg
+    extern int getus_begin	() noex ;
+    extern int getus_ent	(char *,int) noex ;
+    extern int getus_end	() noex ;
 EXTERNC_end
 
 
