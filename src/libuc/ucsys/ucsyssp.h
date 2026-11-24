@@ -59,7 +59,7 @@
 
 /* GETSPXXXR begin */
 
-EXTERNC_begin
+EXTERNC_beg
     extern unixret_t	getspent_rp(SPWD *,char *,int) noex ;
     extern unixret_t	getspnam_rp(SPWD *,char *,int,cchar *) noex ;
 EXTERNC_end
