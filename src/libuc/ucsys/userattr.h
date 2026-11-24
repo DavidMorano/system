@@ -67,13 +67,13 @@ typedef userattr_t		userattr ;
 	} userattr ;			/* -> typedef USERATTR */
 #endif /* STRUCT_USERATTR */
 
-EXTERNC_begin
+EXTERNC_beg
     extern void		setuserattr() noex ;
     extern void		enduserattr() noex ;
     extern void		free_userattr(userattr *) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern userattr *getuserattr() noex ;
     extern userattr *getusernam(cchar *) noex ;
     extern userattr *getuseruid(uid_t) noex ;
