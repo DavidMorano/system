@@ -106,12 +106,12 @@ int ucenumsv::readent(ucenumsv_ent *uap,char *uabuf,int ualen) noex {
 void ucenumsv::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumsv",rs,"fini-close") ;
-	}
+	} /* end */
 } /* end method (ucenumsv::dtor) */
 
 int ucenumsv_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumsvmem_open:
 	        rs = ucenumsv_open(op,fn) ;
@@ -123,7 +123,7 @@ int ucenumsv_op::operator () (cchar *fn) noex {
 
 ucenumsv_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumsvmem_reset:
 	        rs = ucenumsv_reset(op) ;
