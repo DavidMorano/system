@@ -98,7 +98,7 @@ struct ucenumnw : ucenumxx {
 typedef UCENUMXX	ucenumnw ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
     extern int ucenumnw_open	(ucenumnw *,cchar *) noex ;
     extern int ucenumnw_close	(ucenumnw *) noex ;
     extern int ucenumnw_readent	(ucenumnw *,ucenumnw_ent *,char *,int) noex ;
