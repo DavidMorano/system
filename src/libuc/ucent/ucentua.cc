@@ -43,9 +43,9 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetua.h"		/* |uc_getua{x}(3uc)| */
 #include	"ucentua.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -53,9 +53,9 @@ import libutil ;			/* |memclear(3u)| */
 
 /* local defines */
 
-#define	SI		storeitem
-#define	UA		ucentua
-#define	CUA		const ucentua
+#define	SI	storeitem
+#define	UA	ucentua
+#define	CUA	const ucentua
 
 
 /* imported namespaces */
@@ -130,7 +130,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	                    if (int cl ; (cl = sfshrink(sp,tl,&cp)) >= 0) {
 	                        rs = si.strw(cp,cl,vpp) ;
 	                    }
-	                }
+	                } /* end if */
 	                sl -= intconv((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
 	                if (rs < 0) break ;
@@ -241,22 +241,22 @@ int ucentua::format(char *rbuf,int rlen) noex {
 
 int ucentua::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    kva_t	*kvap = attr ;
-	    if (name) {
-	        sz += (lenstr(name) + 1) ;
-	    }
-	    if (attr) ylikely {
-	        kv_t	*kvp = kvap->data ;
-	        cint	n = kvap->length ;
-	        sz += szof(kva_t) ;
-	        for (int i = 0 ; i < n ; i += 1) {
-	            sz += (lenstr(kvp[i].key) + 1) ;
-	            sz += (lenstr(kvp[i].value) + 1) ;
-	        } /* end for */
-	        sz += ((n + 1) * szof(kv_t)) ;
-	    } /* end if */
-	    rs = iceil(sz,szof(cchar *)) ;
+	int		sz = 1 ;
+	kva_t	*kvap = attr ;
+	if (name) {
+	    sz += (lenstr(name) + 1) ;
+	}
+	if (attr) ylikely {
+	    kv_t	*kvp = kvap->data ;
+	    cint	n = kvap->length ;
+	    sz += szof(kva_t) ;
+	    for (int i = 0 ; i < n ; i += 1) {
+	        sz += (lenstr(kvp[i].key) + 1) ;
+	        sz += (lenstr(kvp[i].value) + 1) ;
+	    } /* end for */
+	    sz += ((n + 1) * szof(kv_t)) ;
+	} /* end if */
+	rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
 } /* end subroutine (userattrent_size) */
 
@@ -286,7 +286,7 @@ local int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
 	        if (cint tl = intconv(tp - sp) ; tl > 0) {
 		    c += 1 ;
 	            rs = a.add(sp,tl) ;
-	        }
+	        } /* end if */
 	        sl -= intconv((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
@@ -337,7 +337,7 @@ local int si_attrload(SI *sip,kv_t *kvp,int i,cchar *ep) noex {
 	    el = intconv(tp - ep) ;
 	} else {
 	    vp = (ep + lenstr(ep)) ;
-	}
+	} /* end if */
 	{
 	    if (cchar *crp{} ; (rs = sip->strw(ep,el,&crp)) >= 0) {
 		char	*rp = cast_const<charp>(crp) ;
@@ -364,7 +364,7 @@ local int sbuf_fmtattrs(sbuf *sbp,kva_t *attr) noex {
 	            if ((rs >= 0) && (kv[i].value != nullptr)) {
 	                rs = sbp->chr('=') ;
 	                if (rs >= 0) rs = sbp->str(kv[i].value) ;
-	            }
+	            } /* end */
 	        } /* end if */
 	        if (rs < 0) break ;
 	    } /* end for */
