@@ -35,10 +35,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getpf(int) noex ;
-
+EXTERNC_beg
+    extern int	getpf(int) noex ;
 EXTERNC_end
 
 
