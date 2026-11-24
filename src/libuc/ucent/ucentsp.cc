@@ -43,9 +43,9 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetsp.h"		/* |uc_getsp{x}(3uc)| */
 #include	"ucentsp.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -199,14 +199,14 @@ int ucentsp::format(char *rbuf,int rlen) noex {
 
 int ucentsp::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    if (sp_namp) {
-	        sz += (lenstr(sp_namp) + 1) ;
-	    }
-	    if (sp_pwdp) {
-	        sz += (lenstr(sp_pwdp) + 1) ;
-	    }
-	    rs = sz ;
+	int		sz = 1 ;
+	if (sp_namp) {
+	    sz += (lenstr(sp_namp) + 1) ;
+	}
+	if (sp_pwdp) {
+	    sz += (lenstr(sp_pwdp) + 1) ;
+	}
+	rs = sz ;
 	return rs ;
 } /* end subroutine (ucentsp::size) */
 
