@@ -26,10 +26,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getmailgid(cchar *,gid_t) noex ;
-
+EXTERNC_beg
+    extern int	getmailgid(cchar *,gid_t) noex ;
 EXTERNC_end
 
 
