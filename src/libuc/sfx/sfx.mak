@@ -51,18 +51,21 @@ OBJ07= sfxchr.o sfxbrk.o sfxsub.o sfext.o
 
 OBJ08= sfweirdo.o sfcontent.o
 OBJ09= sfkey.o sfkeyval.o
-OBJ10=
+OBJ10= sfmisc.o
 OBJ11=
 
 OBJA= obj00.o obj01.o
 OBJB= obj02.o obj03.o
 OBJC= obj04.o obj05.o
-OBJD= obj06.o obj07.o obj08.o obj09.o
+OBJD= obj06.o obj07.o 
+OBJE= obj08.o obj09.o
+OBJF= obj10.o
 
 OBJG0= obja.o objb.o
 OBJG1= objc.o objd.o
+OBJG2= obje.o objf.o
 
-OBJ= $(OBJG0) $(OBJG1)
+OBJ= $(OBJG0) $(OBJG1) $(OBJG2)
 
 
 INCDIRS=
@@ -180,11 +183,23 @@ objc.o:			$(OBJC)
 objd.o:			$(OBJD)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obje.o:			$(OBJE)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objf.o:			$(OBJF)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 objg0.o:		$(OBJG0)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 objg1.o:		$(OBJG1)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objg2.o:		$(OBJG2)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+objg3.o:		$(OBJG3)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
 
@@ -206,5 +221,7 @@ sfcontent.o:		sfcontent.cc	sfcontent.h		$(INCS)
 
 sfkey.o:		sfkey.cc	sfkey.h			$(INCS)
 sfkeyval.o:		sfkeyval.cc	sfkeyval.h		$(INCS)
+
+sfmisc.o:		sfmisc.cc	sfmisc.h		$(INCS)
 
 
