@@ -18,13 +18,11 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getlogid	(char *,int,pid_t) noex ;
-extern int	getlogname	(char *,int,pid_t) noex ;
-extern int	getlogterm	(char *,int,pid_t) noex ;
-extern int	getloghost	(char *,int,pid_t) noex ;
-
+EXTERNC_beg
+    extern int	getlogid	(char *,int,pid_t) noex ;
+    extern int	getlogname	(char *,int,pid_t) noex ;
+    extern int	getlogterm	(char *,int,pid_t) noex ;
+    extern int	getloghost	(char *,int,pid_t) noex ;
 EXTERNC_end
 
 
