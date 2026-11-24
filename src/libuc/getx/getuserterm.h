@@ -24,10 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getuserterm(char *,int,cchar *) noex ;
-
+EXTERNC_beg
+    extern int	getuserterm(char *,int,cchar *) noex ;
 EXTERNC_end
 
 
