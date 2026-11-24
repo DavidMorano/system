@@ -26,19 +26,22 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int matbasesubstr(con mainv,int,cchar *,int) noex ;
-extern int matcasesubstr(con mainv,int,cchar *,int) noex ;
-extern int matfoldsubstr(con mainv,int,cchar *,int) noex ;
-local inline int matsubstr(con mainv bs,int n,cchar *sp,int sl) noex {
+EXTERNC_beg
+    extern int matbasesubstr(con mainv,int,cchar *,int) noex ;
+    extern int matcasesubstr(con mainv,int,cchar *,int) noex ;
+    extern int matfoldsubstr(con mainv,int,cchar *,int) noex ;
+EXTERNC_end
+
+EXTERNC_beg
+    local inline int matsubstr(con mainv bs,int n,cchar *sp,int sl) noex {
 	return matbasesubstr(bs,n,sp,sl) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int matsubstr(con mainv bs,int n,cchar *sp) noex {
+    inline int matsubstr(con mainv bs,int n,cchar *sp) noex {
 	return matbasesubstr(bs,n,sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
