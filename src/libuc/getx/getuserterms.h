@@ -27,10 +27,8 @@
 #include	<vecstr.h>		/* LIBUC <- results */
 
 
-EXTERNC_begin
-
-extern int	getuserterms(vecstr *,cchar *) noex ;
-
+EXTERNC_beg
+    extern int	getuserterms(vecstr *,cchar *) noex ;
 EXTERNC_end
 
 
