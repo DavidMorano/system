@@ -25,10 +25,8 @@
 #include	<systypenames.h>	/* LIBUC */
 
 
-EXTERNC_begin
-
-extern int	getsystypenum(char *,char *,cc *,cc *) noex ;
-
+EXTERNC_beg
+    extern int	getsystypenum(char *,char *,cc *,cc *) noex ;
 EXTERNC_end
 
 
