@@ -26,19 +26,22 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int matpbasestr(con mainv,int,cchar *,int) noex ;
-extern int matpcasestr(con mainv,int,cchar *,int) noex ;
-extern int matpfoldstr(con mainv,int,cchar *,int) noex ;
-local inline int matpstr(con mainv bs,int n,cchar *sp,int sl) noex {
+EXTERNC_beg
+    extern int matpbasestr(con mainv,int,cchar *,int) noex ;
+    extern int matpcasestr(con mainv,int,cchar *,int) noex ;
+    extern int matpfoldstr(con mainv,int,cchar *,int) noex ;
+EXTERNC_end
+
+EXTERNC_beg
+    local inline int matpstr(con mainv bs,int n,cchar *sp,int sl) noex {
 	return matpbasestr(bs,n,sp,sl) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int matpstr(con mainv bs,int n,cchar *sp) noex {
+    inline int matpstr(con mainv bs,int n,cchar *sp) noex {
 	return matpbasestr(bs,n,sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
