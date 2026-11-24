@@ -29,6 +29,13 @@
 #include	<sncpyxc.h>
 
 
+#ifdef	__cplusplus
+    inline int sncpy(char *rb,int rl,ccp sp,int sl) noex {
+	return sncpy1w(rb,rl,sp,sl) ;
+    } /* end */
+#endif /* __cplusplus */
+
+
 #endif /* SNCPY_INCLUDE */
 
 
