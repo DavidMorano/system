@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	uc_getusbegin	() noex ;
     extern int	uc_getusent	(char *,int) noex ;
     extern int	uc_getusend	() noex ;
