@@ -61,12 +61,12 @@ struct ass : ass_head {
 	    start	(this,assmem_start) ;
 	    len		(this,assmem_len) ;
 	    finish	(this,assmem_finish) ;
-	    rbuf = nullptr ;
+	    rbuf	= nullptr ;
 	} ; /* end ctor */
 	ass(const ass &) = delete ;
 	ass &operator = (const ass &) = delete ;
 	int addchr	(int) noex ;
-	void dtor() noex ;
+	void dtor	() noex ;
 	destruct ass() {
 	    if (rbuf) dtor() ;
 	} ; /* end */
@@ -76,9 +76,9 @@ typedef ASS		ass ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-extern int ass_start	(ass *) noex ;
-extern int ass_addchr	(ass *,int) noex ;
-extern int ass_finish	(ass *) noex ;
+    extern int ass_start	(ass *) noex ;
+    extern int ass_addchr	(ass *,int) noex ;
+    extern int ass_finish	(ass *) noex ;
 EXTERNC_end
 
 
