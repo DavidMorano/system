@@ -25,7 +25,7 @@
 #include	<ucentpj.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	uc_getpjbegin	() noex ;
     extern int	uc_getpjent	(ucentpj *,char *,int) noex ;
     extern int	uc_getpjnam	(ucentpj *,char *,int,cchar *) noex ;
