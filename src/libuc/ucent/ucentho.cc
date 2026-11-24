@@ -46,9 +46,9 @@
 #include	<inetconv.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetho.h"		/* |uc_getho{x}(3uc)| */
 #include	"ucentho.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -214,26 +214,26 @@ int ucentho::format(char *rbuf,int rlen) noex {
 
 int ucentho::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    if (h_name) {
-	        sz += (lenstr(h_name) + 1) ;
-	    }
-	    if (h_aliases) {
-	        int	i = 0 ; /* used-afterwards */
-	        for (i = 0 ; h_aliases[i] ; i += 1) {
-	            sz += (lenstr(h_aliases[i]) + 1) ;
-	        } /* end for */
-	        sz += ((i+1)*szof(cchar *)) ;
-	    } /* end if (name-alias list) */
-	    if (h_addr_list) {
-		cint	asz = h_length ;
-	        int	i = 0 ; /* used-afterwards */
-	        for (i = 0 ; h_addr_list[i] ; i += 1) {
-	            sz += (asz + 1) ;
-	        } /* end for */
-	        sz += ((i + 1) * szof(cchar *)) ;
-	    } /* end if (addr-alias list) */
-	    rs = iceil(sz,szof(cchar *)) ;
+	int		sz = 1 ;
+	if (h_name) {
+	    sz += (lenstr(h_name) + 1) ;
+	}
+	if (h_aliases) {
+	    int	i = 0 ; /* used-afterwards */
+	    for (i = 0 ; h_aliases[i] ; i += 1) {
+	        sz += (lenstr(h_aliases[i]) + 1) ;
+	    } /* end for */
+	    sz += ((i+1)*szof(cchar *)) ;
+	} /* end if (name-alias list) */
+	if (h_addr_list) {
+	    cint	asz = h_length ;
+	    int		i = 0 ; /* used-afterwards */
+	    for (i = 0 ; h_addr_list[i] ; i += 1) {
+	        sz += (asz + 1) ;
+	    } /* end for */
+	    sz += ((i + 1) * szof(cchar *)) ;
+	} /* end if (addr-alias list) */
+	rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
 } /* end subroutine (ucentho::size) */
 
