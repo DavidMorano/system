@@ -26,31 +26,22 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int matstrmbc(con mainv,int,cchar *,int) noex ;
-extern int matstrmic(con mainv,int,cchar *,int) noex ;
-extern int matstrmfc(con mainv,int,cchar *,int) noex ;
-local inline int matstrm(con mainv bs,int n,cchar *sp,int sl) noex {
+EXTERNC_beg
+    extern int matstrmbc(con mainv,int,cchar *,int) noex ;
+    extern int matstrmic(con mainv,int,cchar *,int) noex ;
+    extern int matstrmfc(con mainv,int,cchar *,int) noex ;
+EXTERNC_end
+
+EXTERNC_beg
+    local inline int matstrm(con mainv bs,int n,cchar *sp,int sl) noex {
 	return matstrmbc(bs,n,sp,sl) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int matstrmbc	(con mainv bs,int n,cchar *sp) noex {
+    inline int matstrm(con mainv bs,int n,cchar *sp) noex {
 	return matstrmbc(bs,n,sp,-1) ;
-} /* end */
-inline int matstrmic	(con mainv bs,int n,cchar *sp) noex {
-	return matstrmic(bs,n,sp,-1) ;
-} /* end */
-inline int matstrmfc	(con mainv bs,int n,cchar *sp) noex {
-	return matstrmfc(bs,n,sp,-1) ;
-} /* end */
-#endif /* __cplusplus */
-
-#ifdef	__cplusplus
-inline int matstrm	(con mainv bs,int n,cchar *sp) noex {
-	return matstrmbc(bs,n,sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
