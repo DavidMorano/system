@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	getuserval(char *,int,cchar *,cchar *) noex ;
 EXTERNC_end
 
