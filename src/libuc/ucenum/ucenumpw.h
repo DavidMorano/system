@@ -98,7 +98,7 @@ struct ucenumpw : ucenumxx {
 typedef UCENUMXX	ucenumpw ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
     extern int ucenumpw_open	(ucenumpw *,cchar *) noex ;
     extern int ucenumpw_close	(ucenumpw *) noex ;
     extern int ucenumpw_readent	(ucenumpw *,ucenumpw_ent *,char *,int) noex ;
