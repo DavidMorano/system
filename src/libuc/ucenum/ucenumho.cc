@@ -106,12 +106,12 @@ int ucenumho::readent(ucenumho_ent *uap,char *uabuf,int ualen) noex {
 void ucenumho::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumho",rs,"fini-close") ;
-	}
+	} /* end */
 } /* end method (ucenumho::dtor) */
 
 int ucenumho_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumhomem_open:
 	        rs = ucenumho_open(op,fn) ;
@@ -123,7 +123,7 @@ int ucenumho_op::operator () (cchar *fn) noex {
 
 ucenumho_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumhomem_reset:
 	        rs = ucenumho_reset(op) ;
