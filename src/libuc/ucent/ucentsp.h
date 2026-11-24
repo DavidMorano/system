@@ -29,15 +29,15 @@
 #ifdef	__cplusplus
 
 struct ucentsp : spwd {
-	int parse(char *,int,cchar *,int) noex ;
-	int load(char *,int,const ucentsp *) noex ;
-	int format(char *,int) noex ;
-	int size() noex ;
-	operator int () noex {
+	int parse	(char *,int,cchar *,int) noex ;
+	int load	(char *,int,const ucentsp *) noex ;
+	int format	(char *,int) noex ;
+	int size	() noex ;
+	operator int 	() noex {
 	    return size() ;
 	} ; /* end */
-	int getent(char *,int) noex ;
-	int getnam(char *,int,cchar *) noex ;
+	int getent	(char *,int) noex ;
+	int getnam	(char *,int,cchar *) noex ;
 } ; /* end struct (ucentsp) */
 
 #endif /* __cplusplus */
