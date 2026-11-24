@@ -57,7 +57,6 @@
 #include	<usyscalls.h>		/* LIBU */
 #include	<uclibmem.h>		/* LIBUC */
 #include	<ucpwcache.h>		/* LIBUC */
-#include	<ucpwcache.h>		/* LIBUC */
 #include	<getax.h>		/* LIBUC */
 #include	<getpwx.h>		/* LIBUC */
 #include	<getusername.h>		/* LIBUC */
@@ -143,10 +142,10 @@ constexpr subinfo_f	tries[] = {
 int getuserorg(char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		len = 0 ;
+	int		len = 0 ; /* return-value */
 	if (rbuf && un) ylikely {
 	    rs = SR_INVALID ;
-	    rbuf[0] = '\0' ;
+	    rbuf[0] = eos ;
 	    if (un[0]) ylikely {
 	        subinfo		si, *sip = &si ;
 		cchar		*on = orgcname ;
