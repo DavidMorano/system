@@ -25,10 +25,8 @@
 #include	<ucentpw.h>		/* LIBUC */
 
 
-EXTERNC_begin
-
-extern int	getpwlogname(ucentpw *,char *,int) noex ;
-
+EXTERNC_beg
+    extern int	getpwlogname(ucentpw *,char *,int) noex ;
 EXTERNC_end
 
 
