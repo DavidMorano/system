@@ -108,19 +108,19 @@ typedef STRTAB		strtab ;
 typedef STRTAB_CH	strtab_ch ;
 
 EXTERNC_begin
-extern int	strtab_start	(strtab *,int) noex ;
-extern int	strtab_finish	(strtab *) noex ;
-extern int	strtab_add	(strtab *,cchar *,int) noex ;
-extern int	strtab_addfast	(strtab *,cchar *,int) noex ;
-extern int	strtab_already	(strtab *,cchar *,int) noex ;
-extern int	strtab_count	(strtab *) noex ;
-extern int	strtab_strsize	(strtab *) noex ;
-extern int	strtab_strmk	(strtab *,char *,int) noex ;
-extern int	strtab_recsize	(strtab *) noex ;
-extern int	strtab_recmk	(strtab *,int *,int) noex ;
-extern int	strtab_indlen	(strtab *) noex ;
-extern int	strtab_indsize	(strtab *) noex ;
-extern int	strtab_indmk	(strtab *,int (*)[3],int,int) noex ;
+    extern int	strtab_start	(strtab *,int) noex ;
+    extern int	strtab_finish	(strtab *) noex ;
+    extern int	strtab_add	(strtab *,cchar *,int) noex ;
+    extern int	strtab_addfast	(strtab *,cchar *,int) noex ;
+    extern int	strtab_already	(strtab *,cchar *,int) noex ;
+    extern int	strtab_count	(strtab *) noex ;
+    extern int	strtab_strsize	(strtab *) noex ;
+    extern int	strtab_strmk	(strtab *,char *,int) noex ;
+    extern int	strtab_recsize	(strtab *) noex ;
+    extern int	strtab_recmk	(strtab *,int *,int) noex ;
+    extern int	strtab_indlen	(strtab *) noex ;
+    extern int	strtab_indsize	(strtab *) noex ;
+    extern int	strtab_indmk	(strtab *,int (*)[3],int,int) noex ;
 EXTERNC_end
 
 
