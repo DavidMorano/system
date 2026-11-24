@@ -106,12 +106,12 @@ int ucenumua::readent(ucenumua_ent *uap,char *uabuf,int ualen) noex {
 void ucenumua::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumua",rs,"fini-close") ;
-	}
+	} /* end */
 } /* end method (ucenumua::dtor) */
 
 int ucenumua_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumuamem_open:
 	        rs = ucenumua_open(op,fn) ;
@@ -123,7 +123,7 @@ int ucenumua_op::operator () (cchar *fn) noex {
 
 ucenumua_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumuamem_reset:
 	        rs = ucenumua_reset(op) ;
