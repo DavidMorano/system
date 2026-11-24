@@ -89,27 +89,27 @@ typedef STROP		strop ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
-extern int	strop_start	(strop *,cchar *,int) noex ;
-extern int	strop_shrink	(strop *) noex ;
-extern int	strop_white	(strop *) noex ;
-extern int	strop_whitechr	(strop *,int) noex ;
-extern int	strop_fieldwht	(strop *,cchar **) noex ;
-extern int	strop_fieldchr	(strop *,int,cchar **) noex ;
-extern int	strop_fieldbrk	(strop *,cchar *,cchar **) noex ;
-extern int	strop_findchr	(strop *,int) noex ;
-extern int	strop_findterm	(strop *,cchar *) noex ;
-extern int	strop_spanterm	(strop *,cchar *) noex ;
-extern int	strop_span	(strop *,cchar *) noex ;
-extern int	strop_finish	(strop *) noex ;
+    extern int	strop_start	(strop *,cchar *,int) noex ;
+    extern int	strop_shrink	(strop *) noex ;
+    extern int	strop_white	(strop *) noex ;
+    extern int	strop_whitechr	(strop *,int) noex ;
+    extern int	strop_fieldwht	(strop *,cchar **) noex ;
+    extern int	strop_fieldchr	(strop *,int,cchar **) noex ;
+    extern int	strop_fieldbrk	(strop *,cchar *,cchar **) noex ;
+    extern int	strop_findchr	(strop *,int) noex ;
+    extern int	strop_findterm	(strop *,cchar *) noex ;
+    extern int	strop_spanterm	(strop *,cchar *) noex ;
+    extern int	strop_span	(strop *,cchar *) noex ;
+    extern int	strop_finish	(strop *) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-inline int strop_whitedash(strop *op) noex {
+    inline int strop_whitedash(strop *op) noex {
 	return strop_whitechr(op,'-') ;
-} /* end */
-inline int strop_whitecolon(strop *op) noex {
+    } /* end */
+    inline int strop_whitecolon(strop *op) noex {
 	return strop_whitechr(op,':') ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 
