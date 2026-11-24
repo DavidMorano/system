@@ -27,7 +27,7 @@
 
 
 EXTERNC_begin
-extern int	sfweirdo(cchar *,int,cchar *,cchar **) noex ;
+    extern int	sfweirdo(cchar *,int,cchar *,cchar **) noex ;
 EXTERNC_end
 
 
