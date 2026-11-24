@@ -43,9 +43,9 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
 
+#include	"ucentxx.hh"
 #include	"ucgetpj.h"		/* |uc_getpj{x}(3uc)| */
 #include	"ucentpj.h"
-#include	"ucentxx.hh"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 
@@ -250,30 +250,30 @@ int ucentpj::format(char *rbuf,int rlen) noex {
 
 int ucentpj::size() noex {
 	int		rs = SR_OK ;
-	    int		sz = 1 ;
-	    int		i = 0 ;
-	    if (pj_name) {
-	        sz += (lenstr(pj_name) + 1) ;
-	    }
-	    if (pj_comment) {
-	        sz += (lenstr(pj_comment) + 1) ;
-	    }
-	    if (pj_attr) {
-	        sz += (lenstr(pj_attr) + 1) ;
-	    }
-	    if (pj_users) {
-	        for (i = 0 ; pj_users[i] ; i += 1) {
-	            sz += (lenstr(pj_users[i]) + 1) ;
-	        } /* end for */
-	        sz += ((i+1)*szof(cchar *)) ;
-	    } /* end if */
-	    if (pj_groups) {
-	        for (i = 0 ; pj_groups[i] ; i += 1) {
-	            sz += (lenstr(pj_groups[i]) + 1) ;
-	        } /* end for */
-	        sz += ((i+1)*szof(cchar *)) ;
-	    } /* end if */
-	    rs = iceil(sz,szof(cchar *)) ;
+	int		sz = 1 ;
+	int		i = 0 ;
+	if (pj_name) {
+	    sz += (lenstr(pj_name) + 1) ;
+	}
+	if (pj_comment) {
+	    sz += (lenstr(pj_comment) + 1) ;
+	}
+	if (pj_attr) {
+	    sz += (lenstr(pj_attr) + 1) ;
+	}
+	if (pj_users) {
+	    for (i = 0 ; pj_users[i] ; i += 1) {
+	        sz += (lenstr(pj_users[i]) + 1) ;
+	    } /* end for */
+	    sz += ((i+1)*szof(cchar *)) ;
+	} /* end if */
+	if (pj_groups) {
+	    for (i = 0 ; pj_groups[i] ; i += 1) {
+	        sz += (lenstr(pj_groups[i]) + 1) ;
+	    } /* end for */
+	    sz += ((i+1)*szof(cchar *)) ;
+	} /* end if */
+	rs = iceil(sz,szof(cchar *)) ;
 	return rs ;
 } /* end subroutine (ucentpj::size) */
 
