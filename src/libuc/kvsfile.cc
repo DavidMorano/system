@@ -388,7 +388,7 @@ int kvsfile_curbegin(kvsfile *op,KF_CUR *curp) noex {
 	    rs = SR_NOMEM ;
 	    if ((curp->ecp = new(nothrow) hdb_cur) != nullptr) ylikely {
 	        curp->i = -1 ;
-	        rs = hdb_curbegin(op->elp,curp->ecp) ;
+	        rs = hdb_curbeg(op->elp,curp->ecp) ;
 	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
 	return rs ;
@@ -718,7 +718,7 @@ local int kvsfile_already(kvsfile *op,KF_ENT *nep) noex {
 #ifdef	COMMENT
 	{
 	    hdb_cur	cur ;
-	    hdb_curbegin(op->elp,&cur) ;
+	    hdb_curbeg(op->elp,&cur) ;
 	    while (hdb_fetch(op->elp,key,&cur,&val) >= 0) {
 	        KF_ENT	*ep = cast_static<entp>(val.buf) ;
 	        f = (cmpstr(nep->vname,ep->vname) == 0) ;
@@ -755,7 +755,7 @@ local int kvsfile_addentry(kvsfile *op,KF_ENT *nep) noex {
 	        rs = hdb_store(op->elp,key,val) ;
 	        if (rs < 0) {
 	            hdb_cur	cur ;
-	            hdb_curbegin(op->kvlp,&cur) ;
+	            hdb_curbeg(op->kvlp,&cur) ;
 	            {
 	                key.buf = ep ;
 	                key.len = szof(KF_ENT) ;
@@ -779,7 +779,7 @@ local int kvsfile_filedump(kvsfile *op,int fi) noex {
 	hdb_datum	val{} ;
 	int		rs ;
 	int		rs1 ;
-	if (hdb_cur cur ; (rs = hdb_curbegin(op->kvlp,&cur)) >= 0) ylikely {
+	if (hdb_cur cur ; (rs = hdb_curbeg(op->kvlp,&cur)) >= 0) ylikely {
 	    while (hdb_curenum(op->kvlp,&cur,&key,&val) >= 0) {
 	        ep = entp(val.buf) ;
 	        if ((ep->fi == fi) || (fi < 0)) {
@@ -791,7 +791,7 @@ local int kvsfile_filedump(kvsfile *op,int fi) noex {
 	} /* end if (cursor) */
 	/* delete all entries w/ this KF_FILE */
 	if (rs >= 0) ylikely {
-	    if (hdb_cur cur ; (rs = hdb_curbegin(op->elp,&cur)) >= 0) {
+	    if (hdb_cur cur ; (rs = hdb_curbeg(op->elp,&cur)) >= 0) {
 	        while (hdb_curenum(op->elp,&cur,&key,&val) >= 0) {
 	            ep = entp(val.buf) ;
 	            if ((ep->fi == fi) || (fi < 0)) {
