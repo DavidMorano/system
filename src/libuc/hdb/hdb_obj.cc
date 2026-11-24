@@ -190,7 +190,7 @@ int hdb::have(HDB_D key) noex {
 } /* end method */
 
 int hdb::curbegin(CUR *curp) noex {
-	return hdb_curbegin(this,curp) ;
+	return hdb_curbeg(this,curp) ;
 } /* end method */
 
 int hdb::curend(CUR *curp) noex {
