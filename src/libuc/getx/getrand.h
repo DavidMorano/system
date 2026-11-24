@@ -25,30 +25,26 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getrand		(void *,int)	noex ;
-extern int	getrandi	(int *)		noex ;
-extern int	getrandl	(long *)	noex ;
-extern int	getrandll	(longlong *)	noex ;
-
+EXTERNC_beg
+    extern int	getrand		(void *,int)	noex ;
+    extern int	getrandi	(int *)		noex ;
+    extern int	getrandl	(long *)	noex ;
+    extern int	getrandll	(longlong *)	noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-local inline int getrand(int *p,int n = 1)	noex {
+    local inline int getrand(int *p,int n = 1)	noex {
 	cint	sz = szof(int) ;
 	return getrand(p,(sz * n)) ;
-}
-local inline int getrand(long *p,int n = 1)	noex {
+    } /* end */
+    local inline int getrand(long *p,int n = 1)	noex {
 	cint	sz = szof(long) ;
 	return getrand(p,(sz * n)) ;
-}
-local inline int getrand(longlong *p,int n = 1)	noex {
+    } /* end */
+    local inline int getrand(longlong *p,int n = 1)	noex {
 	cint	sz = szof(ulonglong) ;
 	return getrand(p,(sz * n)) ;
-}
-
+    } /* end */
 #endif /* __cplusplus */
 
 
