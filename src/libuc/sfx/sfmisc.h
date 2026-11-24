@@ -27,24 +27,24 @@
 
 
 EXTERNC_begin
-extern int sfbaselib	(cchar *,int,cchar **) noex ;
-extern int sfbracketval	(cchar *,int,cchar **) noex ;
-extern int sfcookkey	(cchar *,int,cchar **) noex ;
-extern int sfdequote	(cchar *,int,cchar **) noex ;
-extern int sflast	(cchar *,int,int,cchar **) noex ;
-extern int sfnamecomp	(cchar *,int,cchar **) noex ;
+    extern int sfbaselib	(cchar *,int,cchar **) noex ;
+    extern int sfbracketval	(cchar *,int,cchar **) noex ;
+    extern int sfcookkey	(cchar *,int,cchar **) noex ;
+    extern int sfdequote	(cchar *,int,cchar **) noex ;
+    extern int sflast		(cchar *,int,int,cchar **) noex ;
+    extern int sfnamecomp	(cchar *,int,cchar **) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int sfprogroot	(cchar *,int,cchar **) noex ;
-extern int sfshrink	(cchar *,int,cchar **) noex ;
-extern int sfskipwhite	(cchar *,int,cchar **) noex ;
-extern int sfsubstance	(cchar *,int,cchar **) noex ;
-extern int sfthing	(cchar *,int,cchar *,cchar **) noex ;
-extern int sfwhitedot	(cchar *,int,cchar **) noex ;
-extern int sfword	(cchar *,int,cchar **) noex ;
-extern int sfsign	(cchar *,int,cchar **,bool *) noex ;
-extern int sfcenter	(cchar *,int,cchar *,cchar **) noex ;
+    extern int sfprogroot	(cchar *,int,cchar **) noex ;
+    extern int sfshrink		(cchar *,int,cchar **) noex ;
+    extern int sfskipwhite	(cchar *,int,cchar **) noex ;
+    extern int sfsubstance	(cchar *,int,cchar **) noex ;
+    extern int sfthing		(cchar *,int,cchar *,cchar **) noex ;
+    extern int sfwhitedot	(cchar *,int,cchar **) noex ;
+    extern int sfword		(cchar *,int,cchar **) noex ;
+    extern int sfsign		(cchar *,int,cchar **,bool *) noex ;
+    extern int sfcenter		(cchar *,int,cchar *,cchar **) noex ;
 EXTERNC_end
 
 
