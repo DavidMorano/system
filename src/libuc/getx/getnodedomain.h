@@ -24,18 +24,13 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	getnodedomain	(char *,char *) noex ;
     extern int	getsysdomain	(char *,int) noex ;
+    extern int	getinetdomain	(char *,int) noex ;
 EXTERNC_end
 
-EXTERNC_begin
-    local inline int getinetdomain	(char *rbuf,int rlen) noex {
-	return getsysdomain(rbuf,rlen) ;
-    } /* end */
-    local inline int getnetdomain	(char *rbuf,int rlen) noex {
-	return getsysdomain(rbuf,rlen) ;
-    } /* end */
+EXTERNC_beg
     local inline int getdomainnamex	(char *rbuf,int rlen) noex {
 	return getsysdomain(rbuf,rlen) ;
     } /* end */
