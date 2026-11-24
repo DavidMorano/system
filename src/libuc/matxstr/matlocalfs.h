@@ -56,8 +56,8 @@ enum localfses {
 	localfs_overlast
 } ; /* end enum (localfses) */
 
-EXTERNC_begin
-extern int	matlocalfs(cchar *sp,int sl) noex ;
+EXTERNC_beg
+    extern int	matlocalfs(cchar *sp,int sl) noex ;
 EXTERNC_end
 
 
