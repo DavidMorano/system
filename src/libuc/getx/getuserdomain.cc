@@ -123,15 +123,24 @@ int getuserdomain(char *rbuf,int rlen,cchar *un) noex {
 
 /* local subroutines */
 
-local int getuserdomu(char *rbuf,int rlen,ccp un) noex {
-    	int		rs = SR_OK ;
-	(void) rbuf ;
-	(void) rlen ;
+local int getuserdomu(char *drbuf,int drlen,ccp un) noex {
+    	cnullptr	np{} ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ;
 	(void) un ;
-	{
-	    rs = getsysdomain(rbuf,rlen) ;
-	}
-	return rs ;
+	if (drbuf) ylikely {
+	    if (char *dn ; (rs = lm_hostname(&dn)) >= 0) ylikely {
+	        if (drlen < 0) drlen = rs ;
+	        if ((rs = getnodedomain(np,dn)) >= 0) ylikely {
+	            rs = sncpy(drbuf,drlen,dn) ;
+	            len = rs ;
+	        } /* end */
+	        rs1 = lm_free(dn) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 } /* end subroutine (getuserdomainu) */
 
 
