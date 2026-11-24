@@ -106,12 +106,12 @@ int ucenumpr::readent(ucenumpr_ent *uap,char *uabuf,int ualen) noex {
 void ucenumpr::dtor() noex {
 	if (cint rs = close ; rs < 0) {
 	    ulogerror("ucenumpr",rs,"fini-close") ;
-	}
+	} /* end */
 } /* end method (ucenumpr::dtor) */
 
 int ucenumpr_op::operator () (cchar *fn) noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumprmem_open:
 	        rs = ucenumpr_open(op,fn) ;
@@ -123,7 +123,7 @@ int ucenumpr_op::operator () (cchar *fn) noex {
 
 ucenumpr_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;
-	if (op) {
+	if (op) ylikely {
 	    switch (w) {
 	    case ucenumprmem_reset:
 	        rs = ucenumpr_reset(op) ;
