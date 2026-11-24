@@ -29,14 +29,14 @@
 #ifdef	__cplusplus
 
 struct ucentnw : netent {
-	int parse(char *,int,cchar *,int) noex ;
-	int load(char *,int,const ucentnw *) noex ;
-	int format(char *,int) noex ;
-	int size() noex ;
-	int getent(char *,int) noex ;
-	int getnam(char *,int,cchar *) noex ;
-	int getnum(char *,int,int,uint32_t) noex ;
-	operator int () noex {
+	int parse	(char *,int,cchar *,int) noex ;
+	int load	(char *,int,const ucentnw *) noex ;
+	int format	(char *,int) noex ;
+	int size	() noex ;
+	int getent	(char *,int) noex ;
+	int getnam	(char *,int,cchar *) noex ;
+	int getnum	(char *,int,int,uint32_t) noex ;
+	operator int 	() noex {
 	    return size() ;
 	} ; /* end */
 } ; /* end struct (ucentnw) */
