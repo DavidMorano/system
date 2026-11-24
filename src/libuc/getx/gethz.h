@@ -34,10 +34,8 @@ enum gethzes {
 	gethz_overlast
 } ; /* end enum (gethzes) */
 
-EXTERNC_begin
-
-extern int	gethz(int) noex ;
-
+EXTERNC_beg
+    extern int	gethz(int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -47,7 +45,7 @@ namespace ucgetx {
 	int operator () (gethzes = gethz_any) noex ;
 	operator int () noex {
 	    return operator () (gethz_any) ;
-	} ;
+	} ; /* end */
     } ; /* end struct (gethzer) */
 } /* end namespace (ucgetx) */
 
