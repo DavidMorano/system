@@ -30,15 +30,15 @@ enum grouptypes {
     	grouptype_overlast
 } ; /* end enum */
 
-EXTERNC_begin
+EXTERNC_beg
     extern int getngroups()		noex ;
     extern int getngroupsx(grouptypes)	noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int getngroups(grouptypes w) noex {
+    inline int getngroups(grouptypes w) noex {
     	return getngroupsx(w) ;
-} /* end subroutine */
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 
