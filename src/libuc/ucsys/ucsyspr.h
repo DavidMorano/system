@@ -45,13 +45,13 @@
 #define	CPROTOENT	const struct protoent
 #endif
 
-EXTERNC_begin
+EXTERNC_beg
     extern PROTOENT	*getprent() noex ;
     extern PROTOENT	*getprnam(cchar *) noex ;
     extern PROTOENT	*getprnum(int) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern unixret_t	getprent_rp(PROTOENT *,char *,int) noex ;
     extern unixret_t	getprnam_rp(PROTOENT *,char *,int,cchar *) noex ;
     extern unixret_t	getprnum_rp(PROTOENT *,char *,int,int) noex ;
