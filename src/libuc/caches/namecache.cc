@@ -345,7 +345,7 @@ local int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	if (epp) *epp = nullptr ;
-	if (hdb_cur cur{} ; (rs = hdb_curbegin(dbp,&cur)) >= 0) ylikely {
+	if (hdb_cur cur{} ; (rs = hdb_curbeg(dbp,&cur)) >= 0) ylikely {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    while ((rs = hdb_curenum(dbp,&cur,&key,&val)) >= 0) {
@@ -371,7 +371,7 @@ local int namecache_entfins(NC *op) noex {
 	hdb		*elp = op->dbp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (hdb_cur cur{} ; (rs1 = hdb_curbegin(elp,&cur)) >= 0) ylikely {
+	if (hdb_cur cur{} ; (rs1 = hdb_curbeg(elp,&cur)) >= 0) ylikely {
 	    hdb_dat	key ;
 	    hdb_dat	val{} ;
 	    while (hdb_curenum(elp,&cur,&key,&val) >= 0) {
