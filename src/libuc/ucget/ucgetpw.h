@@ -25,7 +25,7 @@
 #include	<ucentpw.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	uc_getpwbegin	() noex ;
     extern int	uc_getpwent	(ucentpw *,char *,int) noex ;
     extern int	uc_getpwnam	(ucentpw *,char *,int,cchar *) noex ;
