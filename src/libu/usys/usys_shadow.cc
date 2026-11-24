@@ -44,12 +44,12 @@
 #include	<climits>		/* CSTD */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* |getenv(3c)| + |getprogname(3c)| */
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usysdefs.h>
-#include	<usysrets.h>
-#include	<localmisc.h>
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
+#include	<utypealiases.h>	/* LIBU */
+#include	<usysdefs.h>		/* LIBU */
+#include	<usysrets.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"usys_shadow.h"
 
