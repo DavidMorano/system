@@ -161,7 +161,7 @@ int cachetime_finish(CT *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        if (hdb_cur cur ; (rs1 = hdb_curbegin(op->dbp,&cur)) >= 0) {
+	        if (hdb_cur cur ; (rs1 = hdb_curbeg(op->dbp,&cur)) >= 0) {
 	            hdb_dat	key ;
 	            hdb_dat	val ;
 	            while (hdb_curenum(op->dbp,&cur,&key,&val) >= 0) {
@@ -225,7 +225,7 @@ int cachetime_curbegin(CT *op,CT_CUR *curp) noex {
 	    if ((curp->hcp = new(nt) hdb_cur) != np) ylikely {
 	        ptm *mxp = op->mxp ;
 	        if ((rs = mxp->lockbeg) >= 0) ylikely {
-	            rs = hdb_curbegin(op->dbp,curp->hcp) ;
+	            rs = hdb_curbeg(op->dbp,curp->hcp) ;
 	            if (rs < 0) {
 		        mxp->lockend() ;
 	            } /* end if (ok) */
