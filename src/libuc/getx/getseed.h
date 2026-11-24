@@ -45,10 +45,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getseed(int) noex ;
-
+EXTERNC_beg
+    extern int	getseed(int) noex ;
 EXTERNC_end
 
 
