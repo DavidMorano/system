@@ -121,7 +121,7 @@ namespace ucent {
 	int		rs ;
 	if (cchar *cp{} ; (rs = sip->strw(sp,sl,&cp)) >= 0) {
 	    rs = ulp->add(cp) ;
-	}
+	} /* end */
 	return rs ;
     } /* end subroutine (si_loadname) */
 } /* end namespace (ucent) */
@@ -133,7 +133,7 @@ namespace ucent {
 	*cpp = nullptr ;
 	if (sp) {
 	    rs = sip->strw(sp,-1,cpp) ;
-	}
+	} /* end */
 	return rs ;
     } /* end subroutine (si_copystr) */
 } /* end namespace (ucent) */
