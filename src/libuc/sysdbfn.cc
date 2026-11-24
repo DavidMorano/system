@@ -170,7 +170,7 @@ int sysdbfn_get(enum sysdbfiles w,cchar *fname,cchar **rpp) noex {
 		    } /* end if (valid) */
 		} else {
 		    rs = sysdbmgr_data.get(w,rpp) ;
-		}
+		} /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -193,7 +193,7 @@ int sysdbmgr::init() noex {
 	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) ylikely {
 	                    finitdone = true ;
 	                    f = true ;
-	                }
+	                } /* end */
 	                if (rs < 0) {
 	                    uc_forkatexp(b,a,a) ;
 			} /* end if (error) */
@@ -213,7 +213,7 @@ int sysdbmgr::init() noex {
 		        rsl = SR_LOCKFAIL ;
 	            } else if (finitdone) {
 		        rsl = 1 ;
-	            }
+	            } /* end */
 	            return rsl ;
 	        } ; /* end lambda (lamb) */
 	        rs = tw(lamb) ;		/* <- time watching */
@@ -235,17 +235,17 @@ int sysdbmgr::fini() noex {
 			strs[i] = nullptr ;
 		    }
 		} /* end for */
-	    }
+	    } /* end */
 	    {
 	        con void_f	b = sysdbmgr_forkatbefore ;
 	        con void_f	a = sysdbmgr_forkatafter ;
 	        rs1 = uc_forkatexp(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    finitdone = false ;
 	    finit = false ;
 	} /* end if (was initialized) */
@@ -302,13 +302,13 @@ local void sysdbmgr_forkatafter() noex {
 local void sysdbmgr_exit() noex {
 	if (cint rs = sysdbmgr_data.fini() ; rs < 0) {
 	    ulogerror("sysdbmgr",rs,"exit-fini") ;
-	}
+	} /* end */
 } /* end subroutine (sysdbmgr_exit) */
 
 void sysdbmgr::dtor() noex {
 	if (cint rs = fini() ; rs < 0) {
 	    ulogerror("sysdbmgr",rs,"dtor-fini") ;
-	}
+	} /* end */
 } /* end method (sysdbmgr::dtor) */
 
 
