@@ -23,10 +23,9 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
-EXTERNC_begin
 
-extern int	getserv_name(cchar *,cchar *) noex ;
-
+EXTERNC_beg
+    extern int	getserv_name(cchar *,cchar *) noex ;
 EXTERNC_end
 
 
