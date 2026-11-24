@@ -512,13 +512,13 @@ int hdb_count(hdb *op) noex {
 	return rs ;
 } /* end subroutine (hdb_count) */
 
-int hdb_curbegin(hdb *op,CUR *curp) noex {
+int hdb_curbeg(hdb *op,CUR *curp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) ylikely {
 	    *curp = icur ;
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (hdb_curbegin) */
+} /* end subroutine (hdb_curbeg) */
 
 int hdb_curdone(hdb *op,CUR *curp) noex {
 	int		rs ;
