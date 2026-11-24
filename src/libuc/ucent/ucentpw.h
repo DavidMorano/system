@@ -28,14 +28,14 @@
 #ifdef	__cplusplus
 
 struct ucentpw : passwd {
-	int parse(char *,int,cchar *,int) noex ;
-	int load(char *,int,const ucentpw *) noex ;
-	int format(char *,int) noex ;
-	int size() noex ;
-	int getent(char *,int) noex ;
-	int getnam(char *,int,cchar *) noex ;
-	int getuid(char *,int,uid_t) noex ;
-	operator int () noex {
+	int parse	(char *,int,cchar *,int) noex ;
+	int load	(char *,int,const ucentpw *) noex ;
+	int format	(char *,int) noex ;
+	int size	() noex ;
+	int getent	(char *,int) noex ;
+	int getnam	(char *,int,cchar *) noex ;
+	int getuid	(char *,int,uid_t) noex ;
+	operator int 	() noex {
 	    return size() ;
 	} ; /* end */
 } ; /* end struct (ucentpw) */
