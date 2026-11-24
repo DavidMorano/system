@@ -25,7 +25,7 @@
 #include	<ucentho.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	uc_gethobegin	(int) noex ;
     extern int	uc_gethoent	(ucentho *,char *,int) noex ;
     extern int	uc_gethonam	(ucentho *,char *,int,cchar *) noex ;
