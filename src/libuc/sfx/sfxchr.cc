@@ -21,37 +21,37 @@
 	Names:
 	sfochr
 	afrchr
-	sfwhitedot
-
-	Philosophy:
-	The terminator is *required* in order for a non-empty result
-	string to be returned.
-
-
-	Name:
-	sfwhitedot
 
 	Description:
-	This subroutine retrieves the substring *before* the first
-	dot character.  If there is no explict terminator (dot
-	character), an empty indication (result = 0) is returned.
-	The returned string is white-space shrunken.
+	These subroutines search for the specified character and
+	then return the c-string **before** the found character.
+	the returned c-string is white-space-shrunked before being
+	returned.  Both searching forward (obverse) from the beginning
+	of the given c-string, and searching backward from the
+	(reverse) from the end of the given c-string is provided.
 
 	Synopsis:
-	int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex
+	int sfochr(ccharp sp,int sl,cchar **rpp) noex
+	int afrchr(ccharp sp,int sl,cchar **rpp) noex
 
 	Arguments:
-	sp		given string
-	sl		given string length
-	rpp		pointer to hold result pointer
+	sp	given search c-string pointer
+	sl	given search c-string length
+	rpp	pointer to hold pointer to result string if found
 
 	Returns:
-	>=0		length of retrieved nodename
-	<0		error (system-return)
+	>=0	number of bytes found in given c-string
+	<0	the character was **not** found in the given string
 
 	Philosophy:
 	The terminator is *required* in order for a non-empty result
 	string to be returned.
+
+	Notes:
+	1. The terminator is *required* to be found in order for a
+	non-empty result string to be returned.
+	2. The returned string (if found) is what is found **before**
+	the given c-string.
 
 *******************************************************************************/
 
@@ -123,10 +123,6 @@ int sfrchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	return so(sp,sl,sch,rpp) ;
 } /* end subroutine */
 
-int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
-	return sfochr(sp,sl,'.',rpp) ;
-} /* end subroutine (sfwhitedot) */
-
 
 /* local subroutines */
 
@@ -138,12 +134,12 @@ int sub_sfxchr::operator () (cchar *sp,int µsl,int sch,cchar **rpp) noex {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    if (cchar *tp = fun(sp,sl,sch) ; tp) {
+	    if (cchar *tp = fun(sp,sl,sch)) {
 	        rl = intconv(tp - sp) ;
 		rp = sp ;
 	        while (rl && ISWHT(rp[rl - 1])) {
 	            rl -= 1 ;
-	        }
+	        } /* end white */
 	    } /* end if (hit) */
 	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
