@@ -24,10 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getnfile(int) noex ;
-
+EXTERNC_beg
+    extern int	getnfile(int) noex ;
 EXTERNC_end
 
 
