@@ -45,13 +45,13 @@
 #define	CSERVENT	const struct servent
 #endif
 
-EXTERNC_begin
+EXTERNC_beg
    extern SERVENT	*getsvent() noex ;
    extern SERVENT	*getsvnam(cchar *,cchar *) noex ;
    extern SERVENT	*getsvpor(int,cchar *) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
    extern unixret_t	getsvent_rp(SERVENT *,char *,int) noex ;
    extern unixret_t	getsvnam_rp(SERVENT *,char *,int,cchar *,cchar *) noex ;
    extern unixret_t	getsvpor_rp(SERVENT *,char *,int,int,cchar *) noex ;
