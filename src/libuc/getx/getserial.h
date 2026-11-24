@@ -24,8 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int	getserial(cchar *) noex ;
+EXTERNC_beg
+    extern int	getserial(cchar *) noex ;
 EXTERNC_end
 
 
