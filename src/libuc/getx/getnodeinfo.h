@@ -40,10 +40,8 @@
 #include	<vecstr.h>		/* LIBUC */
 
 
-EXTERNC_begin
-
-extern int getnodeinfo(cchar *,char *,char *,vecstr *,cc *) noex ;
-
+EXTERNC_beg
+    extern int getnodeinfo(cchar *,char *,char *,vecstr *,cc *) noex ;
 EXTERNC_end
 
 
