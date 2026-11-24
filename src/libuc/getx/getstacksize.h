@@ -25,10 +25,8 @@
 #include	<stacktypes.h>		/* LIBUC */
 
 
-EXTERNC_begin
-
-extern int	getstacksize(stacktypes) noex ;
-
+EXTERNC_beg
+    extern int	getstacksize(stacktypes) noex ;
 EXTERNC_end
 
 
