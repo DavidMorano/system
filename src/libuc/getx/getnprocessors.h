@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	getnprocessors(con mainv,int) noex ;
 EXTERNC_end
 
