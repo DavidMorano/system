@@ -141,7 +141,7 @@ int keys_ender(PI *pip,hdb *dbp,bfile *ofp,ptm omp,cc *fn,
 	    uint	tagoff = roff ;
 	    uint	taglen = rlen ;
 	    dhB_cur	keycursor ;
-	    if ((rs = hdb_curbegin(dbp,&keycursor)) >= 0) {
+	    if ((rs = hdb_curbeg(dbp,&keycursor)) >= 0) {
 	        hdb_dat	key ;
 	        hdb_dat	value ;
 	        if (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
@@ -167,7 +167,7 @@ int keys_ender(PI *pip,hdb *dbp,bfile *ofp,ptm omp,cc *fn,
 	    } /* end if (cursor) */
 	    /* delete this whole DB */
 	    if (rs >= 0) {
-	        if ((rs1 = hdb_curbegin(dbp,&keycursor)) >= 0) {
+	        if ((rs1 = hdb_curbeg(dbp,&keycursor)) >= 0) {
 	            hdb_dat	key ;
 	            hdb_dat	value ;
 	            while (hdb_curenum(dbp,&keycursor,&key,&value) >= 0) {
