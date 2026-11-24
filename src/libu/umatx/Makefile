@@ -43,16 +43,16 @@ LIBS +=
 DEPS=
 DEPSV=
 
-OBJ0= matstrk.o matstrm.o matstro.o
-OBJ1= matstrx.o 
-OBJ2=
+OBJ0= matstr.o
+OBJ1= matstrk.o matstrm.o matstro.o
+OBJ2= matstrx.o 
 OBJ3=
 OBJ4=
 OBJ5=
 OBJ6=
 OBJ7=
 
-OBJA= obj0.o obj1.o
+OBJA= obj0.o obj1.o obj2.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o
