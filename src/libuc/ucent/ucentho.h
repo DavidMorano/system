@@ -28,14 +28,14 @@
 #ifdef	__cplusplus
 
 struct ucentho : hostent {
-	int parse(char *,int,cchar *,int) noex ;
-	int load(char *,int,const ucentho *) noex ;
-	int format(char *,int) noex ;
-	int size() noex ;
-	int getent(char *,int) noex ;
-	int getnam(char *,int,cchar *) noex ;
-	int getadd(char *,int,int,cvoid *,int) noex ;
-	operator int () noex {
+	int parse	(char *,int,cchar *,int) noex ;
+	int load	(char *,int,const ucentho *) noex ;
+	int format	(char *,int) noex ;
+	int size	() noex ;
+	int getent	(char *,int) noex ;
+	int getnam	(char *,int,cchar *) noex ;
+	int getadd	(char *,int,int,cvoid *,int) noex ;
+	operator int 	() noex {
 	    return size() ;
 	} ; /* end */
 } ; /* end struct (ucentho) */
