@@ -31,7 +31,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 namespace libuc {
     extern int	prgetclustername(cchar *,char *,int,cchar *) noex ;
-}
+} /* end extern (libuc) */
 #endif /* __cplusplus */
 
 
