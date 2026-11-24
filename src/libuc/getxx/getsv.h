@@ -18,14 +18,12 @@
 #include	<ucentsv.h>		/* LIBUC */
 
 
-EXTERNC_begin
-
-extern int getsv_begin	(int) noex ;
-extern int getsv_ent	(ucentsv *,char *,int) noex ;
-extern int getsv_name	(ucentsv *,char *,int,cchar *,cchar *) noex ;
-extern int getsv_port	(ucentsv *,char *,int,int,cchar *) noex ;
-extern int getsv_end	() noex ;
-
+EXTERNC_beg
+    extern int getsv_begin	(int) noex ;
+    extern int getsv_ent	(ucentsv *,char *,int) noex ;
+    extern int getsv_name	(ucentsv *,char *,int,cchar *,cchar *) noex ;
+    extern int getsv_port	(ucentsv *,char *,int,int,cchar *) noex ;
+    extern int getsv_end	() noex ;
 EXTERNC_end
 
 
