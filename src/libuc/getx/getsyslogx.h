@@ -24,12 +24,13 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
+EXTERNC_beg
 extern int	getlogfac	(cchar *,int)	noex ;
 extern int	getsyslogpri	(cchar *,int)	noex ;
-extern cchar	*strfacname	(int)		noex ;
+EXTERNC_end
 
+EXTERNC_beg
+extern cchar	*strfacname	(int)		noex ;
 EXTERNC_end
 
 
