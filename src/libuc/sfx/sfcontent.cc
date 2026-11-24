@@ -95,7 +95,7 @@ int sfcontent(cchar *sp,int µsl,cchar **rpp) noex {
 		    rl = sfshrink(sp,sl,&rp) ;
 		} else {
 		    rp = sp ;
-		}
+		} /* end */
 	    } /* end if (non-zero positive) */
 	} /* end if (getlenstr) */
 	if (rpp) *rpp = rp ;
