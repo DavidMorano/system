@@ -130,7 +130,7 @@ int mater::matnxstr(con mainv a,cchar *sp,int µsl) noex {
 	    for (i = 0 ; a[i] ; i += 1) {
 	        if ((lc == a[i][0]) && (xcmp(a[i],sp,sl) == 0)) break ;
 	    } /* end for */
-	    rc = (a[i] != nullptr) ? i : -1 ;
+	    rc = (a[i]) ? i : -1 ;
 	} /* end if (getlenstr) */
 	return rc ;
 } /* end subroutine (matnxstr) */
