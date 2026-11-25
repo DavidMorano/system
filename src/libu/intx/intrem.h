@@ -27,39 +27,39 @@
 
 
 EXTERNC_begin
+    extern int		irem	(int,int)	noex ;
+    extern long		lrem	(long,int)	noex ;
+    extern longlong	llrem	(longlong,int)	noex ;
+EXTERNC_end
 
-extern int		irem	(int,int) noex ;
-extern long		lrem	(long,int) noex ;
-extern longlong		llrem	(longlong,int) noex ;
-
-extern uint		urem	(uint,int) noex ;
-extern ulong		ulrem	(ulong,int) noex ;
-extern ulonglong	ullrem	(ulonglong,int) noex ;
-
+EXTERNC_begin
+    extern uint		urem	(uint,int)	noex ;
+    extern ulong	ulrem	(ulong,int)	noex ;
+    extern ulonglong	ullrem	(ulonglong,int)	noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-inline int rem(int v,int d) noex {
+    inline int		rem(int v,int d)	noex {
 	return irem(v,d) ;
-}
-inline long rem(long v,int d) noex {
+    } /* end */
+    inline long		rem(long v,int d)	noex {
 	return lrem(v,d) ;
-}
-inline longlong rem(longlong v,int d) noex {
+    } /* end */
+    inline longlong	rem(longlong v,int d)	noex {
 	return llrem(v,d) ;
-}
+    } /* end */
+#endif /* __cplusplus */
 
-inline uint rem(uint v,int d) noex {
+#ifdef	__cplusplus
+    inline uint		rem(uint v,int d)	noex {
 	return urem(v,d) ;
-}
-inline ulong rem(ulong v,int d) noex {
+    } /* end */
+    inline ulong	rem(ulong v,int d)	noex {
 	return ulrem(v,d) ;
-}
-inline ulonglong rem(ulonglong v,int d) noex {
+    } /* end */
+    inline ulonglong	rem(ulonglong v,int d)	noex {
 	return ullrem(v,d) ;
-}
-
+    } /* end */
 #endif /* __cplusplus */
 
 
