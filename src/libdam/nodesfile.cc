@@ -326,7 +326,7 @@ local int nodesfile_finents(NF *op) noex {
     	int		rs ;
 	int		rs1 ;
 	int		rs2 ;
-	if (hdb_cur cur ; (rs = hdb_curbegin(elp,&cur)) >= 0) {
+	if (hdb_cur cur ; (rs = hdb_curbeg(elp,&cur)) >= 0) {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
 	    while ((rs2 = hdb_curenum(elp,&cur,&key,&val)) >= 0) {
@@ -428,7 +428,7 @@ int nodesfile_curbegin(NF *op,NF_CUR *curp) noex {
 		rs = SR_BUGCHECK ;
 		if ((curp->hcp = new(vp) hdb_cur) != np) {
 		    {
-	                rs = hdb_curbegin(op->elp,curp->hcp) ;
+	                rs = hdb_curbeg(op->elp,curp->hcp) ;
 		    }
 		    if (rs < 0) {
 		        destroy_at(curp->hcp) ;
