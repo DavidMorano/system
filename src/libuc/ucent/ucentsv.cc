@@ -79,9 +79,9 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* forward references */
 
-local int ucentsv_parsenum(SVE *,SI *,cchar *,int) noex ;
-local int ucentsv_parsestrs(SVE *,SI *,cchar *,int) noex ;
-local int ucentsv_formatnum(SVE *,sbuf *) noex ;
+local int ucentsv_parsenum	(SVE *,SI *,cchar *,int) noex ;
+local int ucentsv_parsestrs	(SVE *,SI *,cchar *,int) noex ;
+local int ucentsv_formatnum	(SVE *,sbuf *) noex ;
 
 
 /* local variables */
