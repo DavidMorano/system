@@ -122,6 +122,7 @@ constexpr bool bit(uint v,int b) noex {
 
 /* local variables */
 
+constexpr gid_t		gidend		= gid_t(-1) ;
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_linux		= F_LINUX ;
@@ -129,19 +130,17 @@ constexpr bool		f_getgrentr	= F_GETGRENTR ;
 constexpr bool		f_getgrnamr	= F_GETGRNAMR ;
 constexpr bool		f_getgrgidr	= F_GETGRGIDR ;
 
-constexpr gid_t		gidend = gid_t(-1) ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int uc_getgrbegin() noex {
+int uc_getgrbeg() noex {
 	errno = 0 ;
 	setgrent() ;
 	return (neg errno) ;
-} /* end subroutine (uc_getgrbegin) */
+} /* end subroutine (uc_getgrbeg) */
 
 int uc_getgrend() noex {
 	errno = 0 ;
