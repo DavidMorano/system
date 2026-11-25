@@ -29,7 +29,7 @@
 
 
 extern int dprint	(cc *,cc *,int = -1) noex ;
-extern int dprintline	(cc *,cc *,int = -1) noex ;
+extern int dprintln	(cc *,cc *,int = -1) noex ;
 extern int dprintstr	(cc *,cc *,cc *,int = -1) noex ;
 
 
@@ -40,8 +40,7 @@ extern int dprintstr	(cc *,cc *,cc *,int = -1) noex ;
 
 #define DPRINTF(FMT, ...) 						\
     if_constexpr (f_debug) {						\
-        fprintf(stderr,"%s: ",__func__) ;				\
-        fprintf(stderr,FMT __VA_OPT__(,) __VA_ARGS__) ;			\
+        dprintf(stderr,__func__,FMT __VA_OPT__(,) __VA_ARGS__) ;	\
     }
 
 #define DPRINT(DBUF,DLEN)						\
@@ -54,9 +53,9 @@ extern int dprintstr	(cc *,cc *,cc *,int = -1) noex ;
         dprintstr(__func__,(str),(DBUF),(DLEN)) ;			\
     }
 
-#define DPRINTLINE(DBUF,DLEN)						\
+#define DPRINTLN(DBUF,DLEN)						\
     if_constexpr (f_debug) {						\
-        dprintline(__func__,DBUF,DLEN) ;				\
+        dprintln(__func__,DBUF,DLEN) ;					\
     }
 
 
