@@ -130,6 +130,7 @@ constexpr bool bit(uint v,int b) noex {
 
 /* local variables */
 
+constexpr projid_t	pjidend		= projid_t(-1) ;
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_linux		= F_LINUX ;
@@ -138,19 +139,17 @@ constexpr bool		f_getpjnamr	= F_GETPJNAMR ;
 constexpr bool		f_getpjpidr	= F_GETPJPIDR ;
 constexpr bool		f_getpjdefr	= F_GETPJDEFR ;
 
-constexpr projid_t	pjidend = projid_t(-1) ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int uc_getpjbegin() noex {
+int uc_getpjbeg() noex {
 	errno = 0 ;
 	setprojent() ;
 	return (neg errno) ;
-} /* end subroutine (uc_getpjbegin) */
+} /* end subroutine (uc_getpjbeg) */
 
 int uc_getpjend() noex {
 	errno = 0 ;
