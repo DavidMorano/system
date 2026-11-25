@@ -281,7 +281,7 @@ int percache_finireg(percache *pcp) noex {
 		if ((f = (! pcp->f_finireg)) > 0) {
 	            pcp->f_finireg = true ;
 		}
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (percache_finireg) */
@@ -382,7 +382,7 @@ int percache_getnodename(percache *pcp,time_t dt,cchar **rpp) noex {
 	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,rpp) ;
 	    rs = go(pertype_nodename) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine */
 
@@ -391,7 +391,7 @@ int percache_getnetdomain(percache *pcp,time_t dt,cchar **rpp) noex {
 	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,rpp) ;
 	    rs = go(pertype_netdomain) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (percache_getnetdomain) */
 
@@ -400,7 +400,7 @@ int percache_getnisdomain(percache *pcp,time_t dt,cchar **rpp) noex {
 	if (pcp) ylikely {
     	    geter go(pcp,dt,nullptr,rpp) ;
 	    rs = go(pertype_nisdomain) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (percache_getnisdomain) */
 
@@ -409,7 +409,7 @@ int percache_getnetload(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 	if (pcp && pr) ylikely {
     	    geter go(pcp,dt,pr,rpp) ;
 	    rs = go(pertype_netload) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (percache_getnetload) */
 
@@ -418,7 +418,7 @@ int percache_getsystat(percache *pcp,time_t dt,cchar *pr,cchar **rpp) noex {
 	if (pcp && pr) ylikely {
     	    geter go(pcp,dt,pr,rpp) ;
 	    rs = go(pertype_systat) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (percache_getsystat) */
 
@@ -494,19 +494,19 @@ int geter::getstr(int pt) noex {
 	} /* end if (update needed) */
 	if (rpp) {
 	    *rpp = (rs >= 0) ? pcp->items[pt].data : nullptr ;
-	}
+	} /* end */
 	return (rs >= 0) ? len : rs ;
 } /* end method (geter::getstr) */
 
 int geter::getv(int pt) noex {
     	int		rs = SR_BUGCHECK ;
-	switch (pt) {
+	switch (pt) ylikely {
 	case pertype_nprocs:
 	    if ((rs = uc_nprocs(0)) < 0) {
 		if (isNoProcs(rs)) {
 		    rs = SR_OK ;
 		}
-	    }
+	    } /* end */
 	    break ;
 	case pertype_runlevel:
 	    rs = utmpacc_runlevel() ;
@@ -521,7 +521,7 @@ int geter::getv(int pt) noex {
 /* this (below) kind-of serves as our "virtual" function w/o the b*llsh*t */
 int geter::getx(int pt,char *dbuf,int dlen) noex {
     	int		rs = SR_BUGCHECK ;
-	switch (pt) {
+	switch (pt) ylikely {
 	case pertype_nodename:
 	    rs = getnodename(dbuf,dlen) ;
 	    break ;
