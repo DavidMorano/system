@@ -82,7 +82,6 @@ import libutil ;			/* |memclear(3u)| */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -111,18 +110,19 @@ template<typename ... Args>
 local int sysnamedb_ctor(sysnamedb *op,Args ... args) noex {
     	SYSNAMEDB	*hop = op ;
 	cnullptr	np{} ;
+	cnothrow	nt{} ;
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = SR_NOMEM ;
 	    memclear(hop) ;
-	    if ((op->nlp = new(nothrow) nodedb) != np) ylikely {
-	        if ((op->clp = new(nothrow) clusterdb) != np) ylikely {
+	    if ((op->nlp = new(nt) nodedb) != np) ylikely {
+	        if ((op->clp = new(nt) clusterdb) != np) ylikely {
 		    rs = SR_OK ;
-		}
+		} /* end */
 		if (rs < 0) {
 		    delete op->nlp ;
 		    op->nlp = nullptr ;
-		}
+		} /* end if (error) */
 	    } /* end if (new-nodedb) */
 	} /* end if (non-null) */
 	return rs ;
@@ -135,11 +135,11 @@ local int sysnamedb_dtor(sysnamedb *op) noex {
 	    if (op->clp) ylikely {
 		delete op->clp ;
 		op->clp = nullptr ;
-	    }
+	    } /* end */
 	    if (op->nlp) ylikely {
 		delete op->nlp ;
 		op->nlp = nullptr ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (sysnamedb_dtor) */
@@ -149,7 +149,7 @@ local inline int sysnamedb_magic(sysnamedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) ylikely {
 	    rs = (op->magval == SYSNAMEDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sysnamedb_magic) */
 
@@ -183,10 +183,10 @@ int sysnamedb_open(sysnamedb *op,cchar *pr) noex {
 	                if ((rs = sysnamedb_nodebegin(op,&id,pr)) >= 0) {
 	                    if ((rs = sysnamedb_clusterbegin(op,&id,pr)) >= 0) {
 			        op->magval = SYSNAMEDB_MAGIC ;
-			    }
+			    } /* end */
 	                    if (rs < 0) {
 	                        sysnamedb_nodeend(op) ;
-		            }
+		            } /* end if (error) */
 	                } /* end if (node-db) */
 	                rs1 = id.release ;
 	                if (rs >= 0) rs = rs1 ;
@@ -195,7 +195,7 @@ int sysnamedb_open(sysnamedb *op,cchar *pr) noex {
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		sysnamedb_dtor(op) ;
-	    }
+	    } /* end if (error) */
 	} /* end if (sysnamedb_ctor) */
 	return rs ;
 } /* end subroutine (sysnamedb_open) */
@@ -207,15 +207,15 @@ int sysnamedb_close(sysnamedb *op) noex {
 	    {
 	        rs1 = sysnamedb_nodeend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = sysnamedb_clusterend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    {
 	        rs1 = sysnamedb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end */
 	    op->magval = 0 ;
 	} /* end if (non-null) */
 	return rs ;
@@ -232,7 +232,7 @@ int sysnamedb_getclusters(sysnamedb *op,vecstr *slp,cchar *nn) noex {
 		    if ((rs = sysnamedb_tryclusters(op,slp,nn)) >= 0) {
 			c += rs ;
 		    }
-		}
+		} /* end */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
@@ -267,7 +267,7 @@ int sysnamedb_getnodes(sysnamedb *op,vecstr *clp,vecstr *nlp) noex {
 	                    rs1 = clusterdb_curend(cop,&cur) ;
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (clusterdb-cursor) */
-	            }
+	            } /* end */
 	            if (rs < 0) break ;
 	        } /* end for */
 		rs1 = lm_free(cbuf) ;
@@ -290,14 +290,14 @@ local int sysnamedb_nodebegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	                nodedb	*ndp = op->nlp ;
 	                if ((rs = nodedb_open(ndp,tbuf)) >= 0) {
 	                    op->fl.node = true ;
-	                }
+	                } /* end */
 	            } else if (isNotAccess(rs)) {
 	                rs = SR_OK ;
-	            }
+	            } /* end */
 	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
-	        }
-	    }
+	        } /* end */
+	    } /* end */
 	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
@@ -312,7 +312,7 @@ local int sysnamedb_nodeend(sysnamedb *op) noex {
 	    op->fl.node = false ;
 	    rs1 = nodedb_close(ndp) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sysnamedb_nodeend) */
 
@@ -326,13 +326,13 @@ local int sysnamedb_clusterbegin(sysnamedb *op,ids *idp,cchar *pr) noex {
 	                clusterdb	*ndp = op->clp ;
 	                if ((rs = clusterdb_open(ndp,tbuf)) >= 0) {
 	                    op->fl.clu = true ;
-	                }
+	                } /* end */
 	            } else if (isNotAccess(rs)) {
 	                rs = SR_OK ;
-	            }
+	            } /* end */
 	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
-	        }
+	        } /* end */
 	    } /* end if (mkpath) */
 	    rs1 = lm_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -348,7 +348,7 @@ local int sysnamedb_clusterend(sysnamedb *op) noex {
 	    op->fl.clu = false ;
 	    rs1 = clusterdb_close(ndp) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (sysnamedb_clusterend) */
 
@@ -424,7 +424,7 @@ vars::operator int () noex {
 	if ((rs = bufsizeget(bufsize_nn)) >= 0) {
 	    nodenamelen = rs ;
 	    elen = (rs * EBUFMULT) ;
-	}
+	} /* end */
     	return rs ;
 } /* end method (vars::operator) */
 
