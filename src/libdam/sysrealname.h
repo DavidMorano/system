@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>		/* LIBU */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<modload.h>		/* LIBU */
 
 
@@ -72,10 +73,9 @@ typedef	SYSREALNAME_CUR		sysrealname_cur ;
 typedef	SYSREALNAME_INFO	sysrealname_info ;
 
 EXTERNC_begin
-
 extern int sysrealname_open(sysrealname *,cchar *) noex ;
 extern int sysrealname_getinfo(sysrealname *,sysrealname_info *) noex ;
-extern int sysrealname_curbegin(sysrealname *,sysrealname_cur *) noex ;
+extern int sysrealname_curbeg(sysrealname *,sysrealname_cur *) noex ;
 extern int sysrealname_curend(sysrealname *,sysrealname_cur *) noex ;
 extern int sysrealname_curlook(sysrealname *,sysrealname_cur *,int,
 		cchar *,int) noex ;
@@ -87,8 +87,13 @@ extern int sysrealname_curenum(sysrealname *,sysrealname_cur *,char *,
 		cchar **,char *,int) noex ;
 extern int sysrealname_audit(sysrealname *) noex ;
 extern int sysrealname_close(sysrealname *) noex ;
-
 EXTERNC_end
+
+#ifdef	__cplusplus
+    inline int sysrealname_open(sysrealname *snp) noex {
+        return sysrealname_open(snp,nullptr) ;
+    } /* end */
+#endif /* __cplusplus */
 
 
 #endif /* SYSREALNAME_INCLUDE */
