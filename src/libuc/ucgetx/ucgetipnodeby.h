@@ -35,17 +35,14 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<netdb.h>		/* POSIX® */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
-
-extern int uc_getipnodebyname	(HOSTENT **,cchar *,int,int) noex ;
-extern int uc_getipnodebyaddr	(HOSTENT **,cvoid *,int,int) noex ;
-extern int uc_hostentfree	(HOSTENT *) noex ;
-
+    extern int uc_getipnodebyname	(HOSTENT **,cchar *,int,int) noex ;
+    extern int uc_getipnodebyaddr	(HOSTENT **,cvoid *,int,int) noex ;
+    extern int uc_hostentfree		(HOSTENT *) noex ;
 EXTERNC_end
 
 
