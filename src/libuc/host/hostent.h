@@ -33,7 +33,6 @@ struct hostent_cursor {
 typedef HOSTENT_CUR	hostent_cur ;
 
 EXTERNC_begin
-
 extern int hostent_getofficial(HOSTENT *,cchar **) noex ;
 extern int hostent_getcanonical(HOSTENT *,cchar **) noex ;
 extern int hostent_getaf(HOSTENT *) noex ;
@@ -44,7 +43,6 @@ extern int hostent_curenumname(HOSTENT *,hostent_cur *,cchar **) noex ;
 extern int hostent_curenumaddr(HOSTENT *,hostent_cur *,const uchar **) noex ;
 extern int hostent_size(HOSTENT *) noex ;
 extern int hostent_load(HOSTENT *,char *,int,const HOSTENT *) noex ;
-
 EXTERNC_end
 
 
