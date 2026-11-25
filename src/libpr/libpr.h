@@ -29,6 +29,7 @@
 #include	<prmkfname.h>
 #include	<prmktmpdir.h>
 #include	<prqotd.h>
+#include	<pruserdom.h>
 
 
 #endif /* LIBPR_INCLUDE */
