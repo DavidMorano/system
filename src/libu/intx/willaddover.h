@@ -28,29 +28,27 @@
 
 
 EXTERNC_begin
+    extern bool willaddoveri	(int,int)		noex ;
+    extern bool willaddoverl	(long,long)		noex ;
+    extern bool willaddoverll	(longlong,longlong)	noex ;
+EXTERNC_end
 
-extern bool willaddoveri(int,int) noex ;
-extern bool willaddoverl(long,long) noex ;
-extern bool willaddoverll(longlong,longlong) noex ;
-
-local inline bool willAddOver(int n1,int n2) noex {
+EXTERNC_begin
+    local inline bool willAddOver(int n1,int n2)	noex {
 	return willaddoveri(n1,n2) ;
-}
-
+    } /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-inline bool willaddover(int n1,int n2) noex {
+    inline bool willaddover(int n1,int n2)		noex {
 	return willaddoveri(n1,n2) ;
-}
-inline bool willaddover(long n1,long n2) noex {
+    } /* end */
+    inline bool willaddover(long n1,long n2)		noex {
 	return willaddoverl(n1,n2) ;
-}
-inline bool willaddover(longlong n1,longlong n2) noex {
+    } /* end */
+    inline bool willaddover(longlong n1,longlong n2)	noex {
 	return willaddoverll(n1,n2) ;
-}
-
+    } /* end */
 #endif /* __cplusplus */
 
 
