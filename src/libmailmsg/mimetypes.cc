@@ -151,7 +151,7 @@ int mimetypes_finish(mt *op) noex {
 	    rs = SR_OK ;
 	    if (op->dbp) ylikely {
 	        hdb	*dbp = op->dbp ;
-	        if (mt_cur cur ; (rs = hdb_curbegin(dbp,&cur)) >= 0) ylikely {
+	        if (mt_cur cur ; (rs = hdb_curbeg(dbp,&cur)) >= 0) ylikely {
 	            mt_dat	key ;
 	            mt_dat	data ;
 	            while ((rs2 = hdb_curenum(dbp,&cur,&key,&data)) >= 0) {
@@ -293,7 +293,7 @@ int mimetypes_find(mt *op,char *typespec,cchar *ext) noex {
 int mimetypes_curbegin(mt *op,mt_cur *curp) noex {
     	int		rs ;
 	if ((rs = mimetypes_magic(op,curp)) >= 0) ylikely {
-	    rs = hdb_curbegin(op->dbp,curp) ;
+	    rs = hdb_curbeg(op->dbp,curp) ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (mimetypes_curbegin) */
