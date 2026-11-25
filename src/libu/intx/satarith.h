@@ -28,39 +28,39 @@
 
 
 EXTERNC_begin
+    extern int		iaddsat		(int,int)		noex ;
+    extern long		laddsat		(long,long)		noex ;
+    extern longlong	lladdsat	(longlong,longlong)	noex ;
+EXTERNC_end
 
-extern int		iaddsat		(int,int) noex ;
-extern long		laddsat		(long,long) noex ;
-extern longlong		lladdsat	(longlong,longlong) noex ;
-
-extern uint		uiaddsat	(uint,uint) noex ;
-extern ulong		uladdsat	(ulong,ulong) noex ;
-extern ulonglong	ulladdsat	(ulonglong,ulonglong) noex ;
-
+EXTERNC_begin
+    extern uint		uiaddsat	(uint,uint)		noex ;
+    extern ulong	uladdsat	(ulong,ulong)		noex ;
+    extern ulonglong	ulladdsat	(ulonglong,ulonglong)	noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-inline int 		addsat(int v1,int v2) noex {
+    inline int 		addsat(int v1,int v2)			noex {
 	return iaddsat(v1,v2) ;
-}
-inline long 		addsat(long v1,long v2) noex {
+    } /* end */
+    inline long 	addsat(long v1,long v2)			noex {
 	return laddsat(v1,v2) ;
-}
-inline longlong		addsat(longlong v1,longlong v2) noex {
+    } /* end */
+    inline longlong	addsat(longlong v1,longlong v2)		noex {
 	return lladdsat(v1,v2) ;
-}
+    } /* end */
+#endif /* __cplusplus */
 
-inline uint		addsat(uint v1,uint v2) noex {
+#ifdef	__cplusplus
+    inline uint		addsat(uint v1,uint v2)			noex {
 	return uiaddsat(v1,v2) ;
-}
-inline ulong		addsat(ulong v1,ulong v2) noex {
+    } /* end */
+    inline ulong	addsat(ulong v1,ulong v2)		noex {
 	return uladdsat(v1,v2) ;
-}
-inline ulonglong	addsat(ulonglong v1,ulonglong v2) noex {
+    } /* end */
+    inline ulonglong	addsat(ulonglong v1,ulonglong v2)	noex {
 	return ulladdsat(v1,v2) ;
-}
-
+    } /* end */
 #endif /* __cplusplus */
 
 
