@@ -74,7 +74,7 @@ constexpr int		rsn = SR_NOTFOUND ;
 /* exported subroutines */
 
 int getpw_begin() noex {
-	return uc_getpwbegin() ;
+	return uc_getpwbeg() ;
 } /* end subroutine (getpw_begin) */
 
 int getpw_end() noex {
@@ -99,7 +99,7 @@ int getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 
 
 int getua_begin() noex {
-	return uc_getuabegin() ;
+	return uc_getuabeg() ;
 } /* end */
 
 int getua_end() noex {
@@ -120,7 +120,7 @@ int getua_entuid(ucentua *ep,char *ebuf,int elen,uid_t uid) noex {
 
 
 int getsp_begin() noex {
-	return uc_getspbegin() ;
+	return uc_getspbeg() ;
 } /* end subroutine (getsp_begin) */
 
 int getsp_end() noex {
@@ -141,7 +141,7 @@ int getsp_name(ucentsp *spp,char *rbuf,int rlen,cchar *name) noex {
 
 
 int getgr_begin() noex {
-	return uc_getgrbegin() ;
+	return uc_getgrbeg() ;
 } /* end subroutine (getgr_begin) */
 
 int getgr_end() noex {
@@ -166,7 +166,7 @@ int getgr_gid(ucentgr *grp,char *rbuf,int rlen,gid_t gid) noex {
 
 
 int getpj_begin() noex {
-	return uc_getpjbegin() ;
+	return uc_getpjbeg() ;
 } /* end subroutine (getpj_begin) */
 
 int getpj_end() noex {
