@@ -38,9 +38,7 @@
 
 
 EXTERNC_begin
-
-extern uint	inet4int(cvoid *) noex ;
-
+    extern uint	inet4int(cvoid *) noex ;
 EXTERNC_end
 
 
