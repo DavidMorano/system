@@ -140,7 +140,6 @@ namespace {
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_linux		= F_LINUX ;
-
 constexpr bool		f_getnwxxxr	= F_GETNWXXXR ;
 
 
@@ -149,11 +148,11 @@ constexpr bool		f_getnwxxxr	= F_GETNWXXXR ;
 
 /* exported subroutines */
 
-int uc_getnwbegin(int stayopen) noex {
+int uc_getnwbeg(int stayopen) noex {
 	errno = 0 ;
 	setnetent(stayopen) ;
 	return (neg errno) ;
-} /* end subroutine (uc_getnwbegin) */
+} /* end subroutine (uc_getnwbeg) */
 
 int uc_getnwend() noex {
 	errno = 0 ;
