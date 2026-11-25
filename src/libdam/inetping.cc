@@ -290,7 +290,7 @@ local int pingone(cchar *pingprog,const in4_addr_t *ap,int to) noex {
 	if (inetaddr ia ; (rs = inetaddr_start(&ia,at,ap,-1)) >= 0) ylikely {
 	    cint	dotlen = DOTBUFLEN ;
 	    char	dotbuf[DOTBUFLEN + 1] ;
-	    if ((rs = inetaddr_getdotaddr(&ia,dotbuf,dotlen)) >= 0) ylikely {
+	    if ((rs = inetaddr_getdot(&ia,dotbuf,dotlen)) >= 0) ylikely {
 		spawnproc_con	ps{} ;
 		cint		tolen = TOBUFLEN ;
 		int		ai = 0 ;
@@ -324,7 +324,7 @@ local int pingone(cchar *pingprog,const in4_addr_t *ap,int to) noex {
 		    u_close(fd) ;
 		} /* end if (spawnproc) */
 		CDEBPR("spawnproc-out rs=%d\n",rs) ;
-	    } /* end if (inetaddr_getdotaddr) */
+	    } /* end if (inetaddr_getdot) */
 	    rs1 = inetaddr_finish(&ia) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (inetaddr) */
