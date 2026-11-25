@@ -5,6 +5,7 @@
 /* UCENTHO object management */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -45,20 +46,27 @@
 #include	<cfdec.h>		/* LIBUC */
 #include	<inetconv.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU */
+#include	<deb.hh>		/* LIBU */
 
 #include	"ucentxx.hh"
 #include	"ucgetho.h"		/* |uc_getho{x}(3uc)| */
 #include	"ucentho.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |memclear(3u)| */
+import deb ;				/* debugging */
 
 /* local defines */
 
-#define	NWE	ucentho
-#define	CNWE	const ucentho
+#define	HOE	ucentho
+#define	CHOE	const ucentho
 #define	SI	storeitem
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -88,14 +96,15 @@ constexpr int		inet4addrlen	= int(INET4ADDRLEN) ;
 constexpr int		inet6addrlen	= int(INET6ADDRLEN) ;
 constexpr int		inetxaddrlen	= max(inet4addrlen,inet6addrlen) ;
 constexpr int		astrlen		= int(INETX_ADDRSTRLEN) ;
+constexpr bool		f_debug		= CF_DEBUG ;
 
 
 /* forward references */
 
-local int ucentho_parseaddr(NWE *,SI *,cchar *,int) noex ;
-local int ucentho_parsestrs(NWE *,SI *,cchar *,int) noex ;
-local int ucentho_formataddr(NWE *,sbuf *) noex ;
-local int ucentho_formatname(NWE *,sbuf *) noex ;
+local int ucentho_parseaddr	(HOE *,SI *,cchar *,int) noex ;
+local int ucentho_parsestrs	(HOE *,SI *,cchar *,int) noex ;
+local int ucentho_formataddr	(HOE *,sbuf *) noex ;
+local int ucentho_formatname	(HOE *,sbuf *) noex ;
 
 local inline int getaflen(int) noex ;
 
@@ -136,7 +145,7 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	            } /* end switch */
 		    if ((rs >= 0) && vpp) {
 	        	rs = si.strw(cp,cl,vpp) ;
-		    }
+		    } /* end */
 	            sl -= intconv((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
 	            if (rs < 0) break ;
@@ -151,22 +160,31 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	DEBPRINTF("ent\n") ;
 	if (rbuf && chop) ylikely {
 	    HOSTENT *hep = this ;
 	    *hep = *chop ; /* shallow copy */
+	DEBPRINTF("mid1\n") ;
+	DEBPRINTF("other h_length=%d\n",chop->h_length) ;
 	    if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) ylikely {
+	DEBPRINTF("storeitem_start() rs=%d\n",rs) ;
 	        if (chop->h_aliases) {
 	            cint	n = lenstrarr(chop->h_aliases) ;
+	DEBPRINTF("mid3 n=%d rs=%d\n",n,rs) ;
 	            if (void **tab{} ; (rs = si.ptab(n,&tab)) >= 0) {
 		        cchar	**aliases = ccharpp(chop->h_aliases) ;
 		        int	i ; /* used-afterwards */
 	                h_aliases = charpp(tab) ;
+	DEBPRINTF("mid4 rs=%d\n",rs) ;
 	                for (i = 0 ; chop->h_aliases[i] ; i += 1) {
 	                    rs = si_copystr(&si,(h_aliases + i),aliases[i]) ;
+	DEBPRINTF("si_copystr() rs=%d\n",rs) ;
 	                    if (rs < 0) break ;
 	                } /* end for */
+	DEBPRINTF("for-out rs=%d\n",rs) ;
 	                h_aliases[i] = nullptr ;
 	            } /* end if (storeitem-ptab) */
+	DEBPRINTF("ptab-out rs=%d\n",rs) ;
 	        } else {
 		    h_aliases = nullptr ;
 	        } /* end if (aliases) */
@@ -176,7 +194,9 @@ int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
 	        rs1 = si.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (storeitem) */
+	DEBPRINTF("storeitem-out rs=%d\n",rs) ;
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (ucentho::load) */
 
@@ -217,7 +237,7 @@ int ucentho::size() noex {
 	int		sz = 1 ;
 	if (h_name) {
 	    sz += (lenstr(h_name) + 1) ;
-	}
+	} /* end */
 	if (h_aliases) {
 	    int	i = 0 ; /* used-afterwards */
 	    for (i = 0 ; h_aliases[i] ; i += 1) {
@@ -290,7 +310,7 @@ local int ucentho_parsestrs(ucentho *prp,SI *sip,cchar *sp,int sl) noex {
 	        } /* end if (storeitem-ptab) */
 	    } else {
 	        prp->h_aliases = nullptr ;
-	    }
+	    } /* end */
 	    rs1 = u.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vechand) */
@@ -305,20 +325,20 @@ local int ucentho_formataddr(ucentho *hep,sbuf *sbp) noex {
 	cvoid		*binaddr = voidp(hep->h_addr_list[0]) ;
 	if ((rs = inetntop(pbuf,plen,af,binaddr)) >= 0) {
 	    rs = sbp->strw(pbuf,rs) ;
-	}
+	} /* end */
 	return rs ;
 } /* end subroutine (ucentho_formataddr) */
 
 local int ucentho_formatname(ucentho *hep,sbuf *sbp) noex {
-	cint		clen = 16 ;
+	cint		clen = 16 ; /* <- spacing (arbitrary) */
 	int		rs ;
 	if ((rs = sbp->getlen) >= 0) {
 	    cint	idx = rs ;
-	    cint	nb = (idx >= clen) ? 1 : (clen-idx) ;
+	    cint	nb = (idx >= clen) ? 1 : (clen - idx) ;
 	    if ((rs = sbp->blanks(nb)) >= 0) {
 		rs = sbp->str(hep->h_name) ;
-	    }
-	} /*end if */
+	    } /* end */
+	} /* end if */
 	return rs ;
 } /* end subroutine (ucentho_formatname) */
 
