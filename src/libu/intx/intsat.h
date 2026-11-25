@@ -30,42 +30,44 @@
 
 
 EXTERNC_begin
-
-local inline int intsati(cint v) noex {
+    local inline int intsati	(cint v)	noex {
 	return v ;
-}
+    } /* end */
+EXTERNC_end
 
-extern int intsatl	(clong)		noex ;
-extern int intsatll	(clonglong)	noex ;
+EXTERNC_begin
+    extern int intsatl		(clong)		noex ;
+    extern int intsatll		(clonglong)	noex ;
+EXTERNC_end
 
-extern int intsatui	(cuint)		noex ;
-extern int intsatul	(culong)	noex ;
-extern int intsatull	(culonglong)	noex ;
-
+EXTERNC_begin
+    extern int intsatui		(cuint)		noex ;
+    extern int intsatul		(culong)	noex ;
+    extern int intsatull	(culonglong)	noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-local inline int intsat(cint v)		noex {
+    local inline int intsat(cint v)		noex {
 	return intsati(v) ;
-} /* end */
-local inline int intsat(clong v)	noex {
+    } /* end */
+    local inline int intsat(clong v)		noex {
 	return intsatl(v) ;
-} /* end */
-local inline int intsat(clonglong v)	noex {
+    } /* end */
+    local inline int intsat(clonglong v)	noex {
 	return intsatll(v) ;
-} /* end */
+    } /* end */
+#endif /* __cplusplus */
 
-local inline int intsat(cuint v)	noex {
+#ifdef	__cplusplus
+    local inline int intsat(cuint v)		noex {
 	return intsatui(v) ;
-} /* end */
-local inline int intsat(culong v)	 noex {
+    } /* end */
+    local inline int intsat(culong v)	 	noex {
 	return intsatul(v) ;
-} /* end */
-local inline int intsat(culonglong v)	noex {
+    } /* end */
+    local inline int intsat(culonglong v)	noex {
 	return intsatull(v) ;
-} /* end */
-
+    } /* end */
 #endif /* __cplusplus */
 
 
