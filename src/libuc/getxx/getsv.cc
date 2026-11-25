@@ -76,7 +76,7 @@
 /* exported subroutines */
 
 int getsv_begin(int sf) noex {
-	return uc_getsvbegin(sf) ;
+	return uc_getsvbeg(sf) ;
 } /* end subroutine (getsv_begin) */
 
 int getsv_end() noex {
