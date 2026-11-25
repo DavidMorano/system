@@ -5,7 +5,7 @@
 /* get the local node-name and INET domain-name */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	0		/* debugging */
+#define	CF_DEBUG	1		/* debugging */
 #define	CF_GUESS	1		/* try to guess domain names? */
 
 /* revision history:
@@ -602,42 +602,58 @@ local int try_gethost(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
+	DEBPRINTF("ent\n") ;
 	if (! tip->fl.initnode) {
 	    rs = try_initnode(tip) ;
 	} /* end */
+	DEBPRINTF("mid1 rs=%d\n",rs) ;
 	if ((rs >= 0) && tip->fl.node) ylikely {
 	    if (char *hbuf ; (rs = lm_ho(&hbuf)) >= 0) ylikely {
 	        cint		hlen = rs ;
 	        cchar		*nn = tip->nrbuf ;
+	DEBPRINTF("mid2 bef nn=%s rs=%d\n",nn,rs) ;
 		if (ucentho he ; (rs = he.getnam(hbuf,hlen,nn)) >= 0) {
 		    cint	dlen = tip->dlen ;
 	            cchar	*tp{} ; /* used-multiple */
 		    char	*dbuf = tip->drbuf ;
 		    bool	f = true ;
-		    rs = 0 ;
+		    rs = 0 ; /* <- set-up */
 	            f = f && (he.h_name != np) ;
 		    f = f && ((tp = strochr(he.h_name,'.')) != np) ;
 		    if (f) {
 	                rs = sncpy(dbuf,dlen,(tp + 1)) ;
 			len = rs ;
 	            } /* end if (official name) */
+	DEBPRINTF("mid2 alias-bef in rs=%d\n",rs) ;
 	            if ((rs == 0) && he.h_aliases) ylikely {
+	DEBPRINTF("mid2 for-bef rs=%d\n",rs) ;
+	DEBPRINTF("mid2 for-test-bef h_aliases=%p\n",he.h_aliases) ;
+	DEBPRINTF("mid2 for-test-bef h_aliases[0]=%p\n",he.h_aliases[0]) ;
+	DEBPRINTF("mid2 for-test-alias=%s\n",he.h_aliases[0]) ;
+	DEBPRINTF("mid2 for-test-aft\n") ;
 	                for (int i = 0 ; he.h_aliases[i] ; i += 1) {
 			    cchar	*ap = he.h_aliases[i] ;
+	DEBPRINTF("mid2 for i=%d ap=%s\n",i,ap) ;
 	                    if ((tp = strochr(ap,'.')) != np) {
 	                        rs = sncpy(dbuf,dlen,(tp+1)) ;
 				len = rs ;
 	                    } /* end if */
+	DEBPRINTF("mid2 for i=%d out=%d\n",i,rs) ;
 			    if (rs != 0) break ;
 	                } /* end for */
+	DEBPRINTF("mid2 for-aft rs=%d\n",rs) ;
 	            } /* end if (alias names) */
-		    rs1 = lm_free(hbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
-	    } else if (isNotPresent(rs)) {
-	        rs = SR_OK ;
-	    } /* end if */
+	DEBPRINTF("mid2 alias-aft rs=%d\n",rs) ;
+	        } else if (isNotPresent(rs)) {
+	DEBPRINTF("mid2 not-present rs=%d\n",rs) ;
+	            rs = SR_OK ;
+	        } /* end if */
+	DEBPRINTF("mid2 get-aft rs=%d\n",rs) ;
+		rs1 = lm_free(hbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (have node) */
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (try_gethost) */
 
