@@ -22,11 +22,9 @@
 	cfinet
 
 	Description:
-	This subroutine converts a character string representing a
-	time-interval to an integer |int| tpye variable.  The
-	time-interval is returned in an integer.  The character
-	string representing a time-interval has the form:
-		<mum>[<alpha>[<num>[<alpha>[<num>]]]] ...
+	This subroutine was created to solve some problem.  I have
+	no idea what that particular problem was.  I have no idea
+	why this subroutine is located here either.
 
 	Synopsis:
 	int cfinet{x}(cchar *sbuf,int slen,uint *rp) noex
