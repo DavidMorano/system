@@ -44,6 +44,8 @@
 
 #include	"sysrealname.h"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
 import libutil ;
 
 /* local defines */
@@ -78,14 +80,14 @@ using std::nothrow ;			/* constant */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*soopen_f)(void *,cchar *) noex ;
-    typedef int (*sogetinfo_f)(void *,IPW_INFO *) noex ;
-    typedef int (*socurbegin_f)(void *,IPW_CUR *) noex ;
-    typedef int (*socurend_f)(void *,IPW_CUR *) noex ;
+    typedef int (*soopen_f)	(void *,cchar *) noex ;
+    typedef int (*sogetinfo_f)	(void *,IPW_INFO *) noex ;
+    typedef int (*socurbegin_f)	(void *,IPW_CUR *) noex ;
+    typedef int (*socurend_f)	(void *,IPW_CUR *) noex ;
     typedef int (*socurenum_f)(void *,IPW_CUR *,char *,cc **,char *,int) noex ;
-    typedef int (*socurfetch_f)(void *,IPW_CUR *,int,char *,cc **,int) noex ;
-    typedef int (*soaudit_f)(void *) noex ;
-    typedef int (*soclose_f)(void *) noex ;
+    typedef int (*socurfetch_f)	(void *,IPW_CUR *,int,char *,cc **,int) noex ;
+    typedef int (*soaudit_f)	(void *) noex ;
+    typedef int (*soclose_f)	(void *) noex ;
 } /* end extern (C) */
 
 
@@ -179,7 +181,7 @@ static bool	isrequired(int) noex ;
 enum subs {
 	sub_open,
 	sub_getinfo,
-	sub_curbegin,
+	sub_curbeg,
 	sub_curend,
 	sub_curenum,
 	sub_curfetch,
@@ -285,7 +287,7 @@ int sysrealname_getinfo(SRN *op,SRN_INFO *ip) noex {
 	return (rs >= 0) ? n : rs ;
 } /* end subroutine (sysrealname_getinfo) */
 
-int sysrealname_curbegin(SRN *op,SRN_CUR *curp) noex {
+int sysrealname_curbeg(SRN *op,SRN_CUR *curp) noex {
 	int		rs ;
 	if ((rs = sysrealname_magic(op,curp)) >= 0) ylikely {
             sysrealname_calls	*callp = callsp(op->callp) ;
@@ -308,7 +310,7 @@ int sysrealname_curbegin(SRN *op,SRN_CUR *curp) noex {
 	    }
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (sysrealname_curbegin) */
+} /* end subroutine (sysrealname_curbeg) */
 
 int sysrealname_curend(SRN *op,SRN_CUR *curp) noex {
 	int		rs ;
@@ -391,8 +393,8 @@ int sysrealname_curlookread(SRN *op,SRN_CUR *curp,char *rbuf) noex {
 	            cchar	**sa = curp->sa ;
 	            if ((rs = co(op->obj,icp,fo,rbuf,sa,sn)) == rsn) {
 		        rs = SR_OK ;
-	            }
-	        }
+	            } /* end */
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
@@ -514,7 +516,7 @@ local int sysrealname_loadcalls(SRN *op,vecstr *slp) noex {
                 case sub_getinfo:
                     callp->getinfo = sogetinfo_f(snp) ;
                     break ;
-                case sub_curbegin:
+                case sub_curbeg:
                     callp->curbegin = socurbegin_f(snp) ;
                     break ;
                 case sub_curenum:
@@ -549,13 +551,13 @@ local int sysrealname_curload(SRN *op,SRN_CUR *curp,
 	    int		sasz ;
 	    int		ssz = 0 ;
 	    if (sn < 0) {
-	        for (sn = 0 ; sa[sn] != nullptr ; sn += 1) ;
-	    }
+	        for (sn = 0 ; sa[sn] ; sn += 1) ;
+	    } /* end */
 	    sasz = ((sn + 1) * szof(cchar *)) ;
 	    ssz += sasz ;
 	    for (int i = 0 ; i < sn ; i += 1) {
 	        ssz += (lenstr(sa[i]) + 1) ;
-	    }
+	    } /* end for */
 	    if (char *bp ; (rs = mem.mall(ssz,&bp)) >= 0) ylikely {
 	        int	i{} ; /* used-afterwards */
 	        cchar	**sap = (cchar **) bp ;
@@ -577,7 +579,7 @@ local bool isrequired(int i) noex {
 	bool		f = false ;
 	switch (i) {
 	case sub_open:
-	case sub_curbegin:
+	case sub_curbeg:
 	case sub_curend:
 	case sub_curfetch:
 	case sub_close:
