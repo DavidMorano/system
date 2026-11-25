@@ -15,6 +15,28 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Group:
+
+	Description:
+	These subroutines (below) are part of the collection of
+	subroutine groups that try to form a common thread-safe
+	interface to the system databases.  The managed system
+	databaes are:
+
+	+ passwd
+	+ shadow
+	+ userattr
+	+ group
+	+ project
+	+ protocols
+	+ networks
+	+ hosts
+	+ services
+
+*******************************************************************************/
+
 #ifndef	UCGETSV_INCLUDE
 #define	UCGETSV_INCLUDE
 
@@ -26,7 +48,7 @@
 
 
 EXTERNC_beg
-    extern int	uc_getsvbegin	(int) noex ;
+    extern int	uc_getsvbeg	(int) noex ;
     extern int	uc_getsvent	(ucentsv *,char *,int) noex ;
     extern int	uc_getsvnam	(ucentsv *,char *,int,cchar *,cchar *) noex ;
     extern int	uc_getsvnum	(ucentsv *,char *,int,int,cchar *) noex ;
