@@ -127,11 +127,11 @@ constexpr bool		f_getspnamr 	= F_GETSPNAMR ;
 
 /* exported subroutines */
 
-int uc_getspbegin() noex {
+int uc_getspbeg() noex {
 	errno = 0 ;
 	setspent() ;
 	return (neg errno) ;
-} /* end subroutine (uc_getspbegin) */
+} /* end subroutine (uc_getspbeg) */
 
 int uc_getspend() noex {
 	errno = 0 ;
