@@ -412,7 +412,7 @@ local int mailmsgfile_filefins(MMF *op) noex {
 	hdb_cur		cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if ((rs1 = hdb_curbegin(mp,&cur)) >= 0) ylikely {
+	if ((rs1 = hdb_curbeg(mp,&cur)) >= 0) ylikely {
 	    MMF_MI	*mip ;
 	    while (hdb_curenum(mp,&cur,&key,&val) >= 0) {
 	        mip = (MMF_MI *) val.buf ;
