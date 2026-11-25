@@ -41,9 +41,7 @@ typedef INETADDRPARSE		inetaddrparse ;
 typedef INETADDRPARSE_SO	inetaddrparse_so ;
 
 EXTERNC_begin
-
-extern int inetaddrparse_load(inetaddrparse *,cchar *,int) noex ;
-
+    extern int inetaddrparse_load(inetaddrparse *,cchar *,int) noex ;
 EXTERNC_end
 
 
