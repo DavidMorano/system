@@ -91,27 +91,30 @@
 #include	<bits.h>		/* LIBUC */
 #include	<strstore.h>		/* LIBUC */
 #include	<storeitem.h>		/* LIBUC */
-#include	<filereadln.h>		/* LIBUC */
 #include	<strn.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<sncpyx.h>		/* LIBUC */
 #include	<snxxx.h>		/* LIBUC |snsd(3uc)| */
 #include	<snwcpy.h>		/* LIBUC |snwcpyhyphen(3uc)| */
 #include	<mkx.h>			/* LIBUC */
+#include	<mkpath.h>		/* LIBUC */
 #include	<mklogid.h>		/* LIBUC */
+#include	<filereadln.h>		/* LIBUC */
 #include	<char.h>		/* LIBUC */
 #include	<isnot.h>		/* LIBUC */
 #include	<vardefs.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |DIGBUFLEN| + |REALNAMELEN| */
-#include	<libdebug.h>		/* LIBEBUG |DEBUGPRINTF(3u)| */
+#include	<deb.hh>		/* LIBU |DEBPRINTF(3u)| */
 
 #include	"userinfo.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
 #pragma		GCC dependency		"mod/uconstants.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |memclear(3u)| */
 import uconstants ;			/* |sysword(3u)| */
+import deb ;				/* debugging */
 
 /* local defines */
 
@@ -151,31 +154,29 @@ import uconstants ;			/* |sysword(3u)| */
 #ifndef	VARPRBIN
 #define	VARPRBIN	"PRINTERBIN"
 #endif
-
 #ifndef	VAROFFICE
 #define	VAROFFICE	"OFFICE"
 #endif
-
 #ifndef	VARWSTATION
 #define	VARWSTATION	"WSTATION"
 #endif
 
+#define	HOME_NORMNAME	".name"
+#define	HOME_FULLNAME	".fullname"
+#define	HOME_ORG	".organization"
+
 #ifndef	UA_DN
 #define	UA_DN		"dn"		/* INET domain-name */
 #endif
-
 #ifndef	UA_PROJECT
 #define	UA_PROJECT	"project"	/* UNIX® project */
 #endif
-
 #ifndef	UA_TZ
 #define	UA_TZ		"tz"		/* time-zone specification */
 #endif
-
 #ifndef	UA_MD
 #define	UA_MD		"md"		/* mail-spool directory */
 #endif
-
 #ifndef	UA_WS
 #define	UA_WS		"ws"		/* weather station */
 #endif
@@ -223,7 +224,7 @@ enum uits {
 	uit_name,
 	uit_fullname,
 	uit_groupname,
-	uit_project,
+	uit_projname,
 	uit_tz,
 	uit_md,
 	uit_wstation,
@@ -252,6 +253,7 @@ struct submgr {
 	strstore	*stp ;		/* supplied argument */
 	int		*sis ;		/* supplied argument */
 	cchar		*username ;	/* supplied argument */
+	cchar		*userhome ;	/* calculated user home directory */
 	char		*a ;		/* the memory allocation */
 	userattrdb	*uap ;
 	char		*pwbuf ;	/* specially allocated */
@@ -263,6 +265,7 @@ struct submgr {
 	int		pwlen ;
 	int		tlen ;
 	int getpwu	(ucentpw *pwp,ccp un) noex ;
+	int rdhomefile	(charp,int,ccharp) noex ;
 } ; /* end struct */
 
 namespace {
@@ -339,10 +342,10 @@ local int submgr_mailname	(SMGR *) noex ;
 local int submgr_name		(SMGR *) noex ;
 local int submgr_fullname	(SMGR *) noex ;
 local int submgr_groupname	(SMGR *) noex ;
+local int submgr_projname	(SMGR *) noex ;
 local int submgr_unixname	(SMGR *) noex ;
 local int submgr_nodename	(SMGR *) noex ;
 local int submgr_domain		(SMGR *) noex ;
-local int submgr_project	(SMGR *) noex ;
 local int submgr_tz		(SMGR *) noex ;
 local int submgr_md		(SMGR *) noex ;
 local int submgr_wstation	(SMGR *) noex ;
@@ -368,10 +371,10 @@ constexpr int		(*components[])(SMGR *) = {
 	submgr_name,
 	submgr_fullname,
 	submgr_groupname,
+	submgr_projname,
 	submgr_unixname,
 	submgr_nodename,
 	submgr_domain,
-	submgr_project,
 	submgr_tz,
 	submgr_md,
 	submgr_wstation,
@@ -393,11 +396,11 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	DEBUGPRINTF("ent\n") ;
+	DEBPRINTF("ent\n") ;
 	if ((rs = userinfo_ctor(uip)) >= 0) ylikely {
 	    if (static cint rsv = var ; (rs = rsv) >= 0) ylikely {
-		static cchar	*nn = getenver(varname.node) ;
-	        uip->nodename = nn ;
+		static cchar	*v_node = getenver(varname.node) ;
+	        uip->nodename = v_node ;
 	        if ((rs = userinfo_id(uip)) >= 0) ylikely {
 	            cint	sz = (uit_overlast * szof(cchar *)) ;
 	            if (void *vp ; (rs = lm_call(1,sz,&vp)) >= 0) ylikely {
@@ -424,7 +427,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 		userinfo_dtor(uip) ;
 	    } /* end if (error) */
 	} /* end if (userinfo_ctor) */
-	DEBUGPRINTF("ret rs=%d len=%d\n",rs,len) ;
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (userinfo_start) */
 
@@ -453,17 +456,17 @@ local int userinfo_proc(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
-	DEBUGPRINTF("ent\n") ;
+	DEBPRINTF("ent\n") ;
 	if (SMGR pi ; (rs = submgr_start(&pi,uip,stp,sis)) >= 0) ylikely {
 	    if ((rs = submgr_pwext(&pi,un)) >= 0) {
 		rs = submgr_comps(&pi) ;
 		rv = rs ;
-		DEBUGPRINTF("find() rs=%d\n",rs) ;
+		DEBPRINTF("find() rs=%d\n",rs) ;
 	    } /* end */
 	    rs1 = submgr_finish(&pi) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (submgr) */
-	DEBUGPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
+	DEBPRINTF("ret rs=%d rv=%d\n",rs,rv) ;
 	return (rs >= 0) ? rv : rs ;
 } /* end subroutine (userinfo_proc) */
 
@@ -477,7 +480,7 @@ local int userinfo_id(UI *uip) noex {
 	    uip->egid	= getegid() ;
 	    if ((rs = ostype) >= 0) {
 	        uip->ostype = rs ;
-	    }
+	    } /* end if */
 	} /* end if (ucpid) */
 	return rs ;
 } /* end subroutine (userinfo_id) */
@@ -564,7 +567,7 @@ local int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	                case uit_groupname:
 	                    vpp = &uip->groupname ;
 	                    break ;
-	                case uit_project:
+	                case uit_projname:
 	                    vpp = &uip->projname ;
 	                    break ;
 	                case uit_tz:
@@ -665,24 +668,25 @@ local int submgr_finish(SMGR *pip) noex {
 	return rs ;
 } /* end subroutine (submgr_finish) */
 
-local int submgr_store(SMGR *pip,int uit,cc *vp,int vl,cc **rpp) noex {
-	strstore	*stp = pip->stp ;
+local int submgr_store(SMGR *pip,int uit,cc *vap,int val,cc **rpp) noex {
 	int		rs = SR_OK ;
+	int		len = 0 ; /* return-value */
 	if (uit >= 0) {
 	    if (pip->sis[uit] == 0) {
-	        rs = strstore_store(stp,vp,vl,rpp) ;
-	        pip->sis[uit] = rs ;
-	        if (rs >= 0) {
+	        strstore *stp = pip->stp ;
+	        if ((rs = strstore_store(stp,vap,val,rpp)) >= 0) {
+		    len = rs ;
+	            pip->sis[uit] = rs ;
 	            rs = bits_set(&pip->have,uit) ;
-		}
-	    }
+		} /* end if (strstr_store) */
+	    } /* end if (needed) */
 	} else {
 	    rs = SR_BUGCHECK ;
 	} /* end if (error) */
 	if (rpp && (rs < 0)) {
 	    *rpp = nullptr ;
 	} /* end if (error) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 } /* end subroutine (submgr_store) */
 
 local int submgr_uaready(SMGR *pip) noex {
@@ -696,7 +700,7 @@ local int submgr_uaready(SMGR *pip) noex {
 local int submgr_uabeg(SMGR *pip) noex {
 	int		rs = SR_OK ;
 	int		f = false ; /* return-value */
-	DEBUGPRINTF("ent\n") ;
+	DEBPRINTF("ent\n") ;
 	if ((! pip->fl.uaopen) && pip->fl.pw) {
 	    if ((rs = submgr_uaobjbeg(pip)) >= 0) {
 	        cchar	*un = pip->pw.pw_name ;
@@ -709,7 +713,7 @@ local int submgr_uabeg(SMGR *pip) noex {
 		} /* end if (error) */
 	    } /* end if (submgr_uaobjbeg) */
 	} /* end if (fl.uaopen) */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (submgr_uabeg) */
 
@@ -778,59 +782,62 @@ local int submgr_ualookup(SMGR *pip,char *rbuf,int rlen,cc *kn) noex {
 local int submgr_pwext(SMGR *pip,cchar *un) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs ;
-	DEBUGPRINTF("ent\n") ;
+	DEBPRINTF("ent\n") ;
 	if ((rs = submgr_pwentry(pip,un)) >= 0) ylikely {
 	    cint	dlen = DIGBUFLEN ;
 	    int		cl = -1 ;
 	    int		uit ;
 	    cchar	*cp{} ;
 	    char	dbuf[DIGBUFLEN+1] ;
-	DEBUGPRINTF("1 rs=%d\n",rs) ;
+	DEBPRINTF("1 rs=%d\n",rs) ;
 	    if (rs > 0) {
 	        cchar	*vap{} ;
 	        cp = pip->pw.pw_name ;
 	        if (rs >= 0) {
-	DEBUGPRINTF("2 rs=%d\n",rs) ;
+	DEBPRINTF("2 rs=%d\n",rs) ;
 	            uit = uit_password ;
 	            vap = pip->pw.pw_passwd ;
 	            rs = submgr_store(pip,uit,vap,-1) ;
 	        }
-	DEBUGPRINTF("3 rs=%d\n",rs) ;
+	DEBPRINTF("3 rs=%d\n",rs) ;
 	        if (rs >= 0) {
 	            uit = uit_gecos ;
 	            vap = pip->pw.pw_gecos ;
 	            rs = submgr_store(pip,uit,vap,-1) ;
 	        }
-	DEBUGPRINTF("4 rs=%d\n",rs) ;
+	DEBPRINTF("4 rs=%d\n",rs) ;
 	        if (rs >= 0) {
+		    cauto sm_st = submgr_store ;
 	            uit = uit_homedname ;
 	            vap = pip->pw.pw_dir ;
-	            rs = submgr_store(pip,uit,vap,-1) ;
-	        }
-	DEBUGPRINTF("5 rs=%d\n",rs) ;
+	            if (ccharp hd ; (rs = sm_st(pip,uit,vap,-1,&hd)) >= 0) {
+			pip->userhome = hd ;
+		    } /* end */
+	        } /* end if (ok) */
+	DEBPRINTF("5 rs=%d\n",rs) ;
 	    } else {
 	        uint	uv = (uint) uip->ruid ;
 		rs = snsd(dbuf,dlen,"U",uv) ;
-	DEBUGPRINTF("6 rs=%d\n",rs) ;
+	DEBPRINTF("6 rs=%d\n",rs) ;
 	    } /* end if */
-	DEBUGPRINTF("7 rs=%d\n",rs) ;
+	DEBPRINTF("7 rs=%d\n",rs) ;
 	    if (rs >= 0) {
 	        uit = uit_username ;
 	        rs = submgr_store(pip,uit,cp,cl) ;
 	    }
 	} /* end if (submgr_pwentry) */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_pwext) */
 
 local int submgr_comps(SMGR *pip) noex {
     	int		rs = SR_OK ;
 	for (int i = 0 ; components[i] ; i += 1) {
-	DEBUGPRINTF("loop i=%d rs=%d\n",i,rs) ;
+	DEBPRINTF("loop i=%d rs=%d\n",i,rs) ;
 	    rs = (*components[i])(pip) ;
 	    if (rs < 0) break ;
 	} /* end for */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_comps) */
 
@@ -856,54 +863,44 @@ local int submgr_pwentry(SMGR *pip,cchar *un) noex {
 	return (rs >= 0) ? f : rs ;
 } /* end subroutine (submgr_pwentry) */
 
-int submgr::getpwu(ucentpw *pwp,ccp un) noex {
-	int		rs ;
-	if ((un != nullptr) && (un[0] != '-') && (un[0] != '\0')) {
-	    rs = getpwx_name(pwp,tbuf,tlen,un) ;
-	} else {
-	    rs = getpwusername(pwp,tbuf,tlen,uip->ruid) ;
-	} /* end */
-	if (rs >= 0) {
-	    fl.pw = true ;
-	    fl.altuser = (pwp->pw_uid != uip->ruid) ;
-	    uip->pwuid = pwp->pw_uid ;
-	    uip->pwgid = pwp->pw_gid ;
-	} /* end if (ok) */
-	return rs ;
-} /* end method (submgr::getpwu) */
-
 local int submgr_homedname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_homedname ;
+	DEBPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->homedname == nullptr)) {
 	    cchar	*vap = nullptr ;
 	    if ((vap == nullptr) || (vap[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vap = getenver(varname.home) ;
-	        }
+		    static ccp v_home = getenver(varname.home) ;
+	            vap = v_home ;
+	        } /* end if */
 	    } /* end */
 	    if ((vap == nullptr) || (vap[0] == '\0')) {
-	        vap = getenver(varname.tmpdir) ;
+	        static ccp v_tmpdir = getenver(varname.tmpdir) ;
+	        vap = v_tmpdir ;
 	    } /* end */
 	    if ((vap == nullptr) || (vap[0] == '\0')) {
 	        vap = sysword.w_tmpdir ;
 	    } /* end */
 	    uip->homedname = vap ;
 	} /* end */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_homedname) */
 
 local int submgr_shell(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		uit = uit_shell ;
-	if ((pip->sis[uit] == 0) && (uip->shell == nullptr)) {
+	if ((pip->sis[uit] == 0) && (uip->shell == np)) {
 	    cchar	*vap = nullptr ;
 	    if ((vap == nullptr) || (vap[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vap = getenver(varname.shell) ;
-	        }
+		    static ccp v_shell = getenver(varname.shell) ;
+	            vap = v_shell ;
+	        } /* end if */
 	    } /* end */
 	    if (vap && (vap[0] != '\0')) {
 	        uip->shell = vap ;
@@ -927,8 +924,9 @@ local int submgr_org(SMGR *pip) noex {
 	    if (char *orgfname ; (rs = lm_mp(&orgfname)) >= 0) ylikely {
 	        if ((vap == nullptr) || (vap[0] == '\0')) {
 	            if (! pip->fl.altuser) {
-	                vap = getenver(varname.organization) ;
-	            }
+	                static ccp v_org = getenver(varname.organization) ;
+	                vap = v_org ;
+	            } /* end if */
 	        } /* end */
 	        if ((vap == nullptr) || (vap[0] == '\0')) {
 	            char	cname[orglen+1] ;
@@ -947,7 +945,7 @@ local int submgr_org(SMGR *pip) noex {
 	                    vap = rbuf ;
 			} else if (isNotPresent(rs)) {
 			    rs = SR_OK ;
-			}
+			} /* end */
 	            } /* end if (ok) */
 	        } /* end if */
 	        if (rs >= 0) ylikely {
@@ -970,8 +968,9 @@ local int submgr_prbin(SMGR *pip) noex {
 	    cchar	*vap = nullptr ;
 	    if ((vap == nullptr) || (vap[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vap = getenver(VARPRBIN) ;
-	        }
+		    static ccp v_prbin = getenver(VARPRBIN) ;
+	            vap = v_prbin ;
+	        } /* end if */
 	    } /* end */
 	    if ((vap != nullptr) && (vap[0] != '\0')) {
 	        uip->prbin = vap ;
@@ -1006,8 +1005,9 @@ local int submgr_printer(SMGR *pip) noex {
 	    cchar	*vap = nullptr ;
 	    if ((vap == nullptr) || (vap[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            vap = getenver(varname.printer) ;
-	        }
+	            static ccp v_printer = getenver(varname.printer) ;
+	            vap = v_printer ;
+	        } /* end if */
 	    } /* end */
 	    if ((vap != nullptr) && (vap[0] != '\0')) {
 	        uip->printer = vap ;
@@ -1133,13 +1133,12 @@ local int submgr_gecosname(SMGR *pip) noex {
 	    cchar	*gstr = pip->pw.pw_gecos ;
 	    if ((gstr != nullptr) && (gstr[0] != '\0')) {
 	        cint	nlen = REALNAMELEN ;
-	        int	vl ;
-	        cchar	*vp ;
 	        char	nbuf[REALNAMELEN+1] ;
-	        if ((vl = mkgecosname(nbuf,nlen,gstr)) > 0) {
-	            vp = nbuf ;
-	            rs = submgr_store(pip,uit,vp,vl) ;
-	        }
+	        if ((rs = mkgecosname(nbuf,nlen,gstr)) > 0) {
+		    cint val = rs ;
+	            ccp vap = nbuf ;
+	            rs = submgr_store(pip,uit,vap,val) ;
+	        } /* end if (mkgecosname) */
 	    } /* end */
 	} /* end */
 	return rs ;
@@ -1149,29 +1148,30 @@ local int submgr_realname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_realname ;
-	DEBUGPRINTF("ent\n") ;
+	DEBPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->realname == nullptr)) {
 	    cint	nlen = REALNAMELEN ;
 	    cchar	*sp = pip->tstrs.gecosname ;
 	    char	nbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            sp = getenver(varname.name) ;
-	        }
+	            static ccp v_name = getenver(varname.name) ;
+	            sp = v_name ;
+	        } /* end if */
 	    } /* end */
 	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        if ((rs = mkrealname(nbuf,nlen,sp,-1)) > 0) {
 	            strstore	*stp = pip->stp ;
 	            cchar	*cp ;
-	DEBUGPRINTF("mkrealname() rs=%d\n",rs) ;
+	DEBPRINTF("mkrealname() rs=%d\n",rs) ;
 	            rs = strstore_store(stp,nbuf,rs,&cp) ;
 	            pip->sis[uit] = rs ;
 	            pip->tstrs.realname = cp ;
 	        } /* end */
-	DEBUGPRINTF("mkrealname-out rs=%d\n",rs) ;
+	DEBPRINTF("mkrealname-out rs=%d\n",rs) ;
 	    } /* end */
 	} /* end if (needed) */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_realname) */
 
@@ -1179,7 +1179,7 @@ local int submgr_mailname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_mailname ;
-	DEBUGPRINTF("ent\n") ;
+	DEBPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->mailname == nullptr)) {
 	    cint	nlen = REALNAMELEN ;
 	    cint	mlen = REALNAMELEN ;
@@ -1189,8 +1189,9 @@ local int submgr_mailname(SMGR *pip) noex {
 	    char	mbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            sp = getenver(varname.mailname) ;
-	        }
+	            static ccp v_mailname = getenver(varname.mailname) ;
+	            sp = v_mailname ;
+	        } /* end if */
 	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        sp = pip->tstrs.gecosname ;
@@ -1201,16 +1202,17 @@ local int submgr_mailname(SMGR *pip) noex {
 	            sp = nbuf ;
 	            rs = mkgecosname(nbuf,nlen,gn) ;
 		    sl = rs ;
-	DEBUGPRINTF("mkgecosname() rs=%d\n",rs) ;
+	DEBPRINTF("mkgecosname() rs=%d\n",rs) ;
 	        } /* end if (has-pw) */
 	    } /* end */
-	DEBUGPRINTF("mid2() rs=%d\n",rs) ;
+	DEBPRINTF("mid2() rs=%d\n",rs) ;
 	    if (rs >= 0) {
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            sp = getenver(varname.name) ;
+	            static ccp v_name = getenver(varname.name) ;
+	            sp = v_name ;
 		    sl = -1 ;
-	        }
+	        } /* end if */
 	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (pip->fl.pw) {
@@ -1222,11 +1224,11 @@ local int submgr_mailname(SMGR *pip) noex {
 	        if ((rs = mkmailname(mbuf,mlen,sp,sl)) > 0) {
 	            rs = submgr_store(pip,uit,mbuf,rs) ;
 		} /* end if (mkmailname) */
-	DEBUGPRINTF("mkmailname-out rs=%d\n",rs) ;
+	DEBPRINTF("mkmailname-out rs=%d\n",rs) ;
 	    } /* end */
 	    } /* end if (ok) */
 	} /* end */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_mailname) */
 
@@ -1234,7 +1236,7 @@ local int submgr_name(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_name ;
-	DEBUGPRINTF("ent\n") ;
+	DEBPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->name == nullptr)) {
 	    cint	glen = REALNAMELEN ;
 	    cint	rlen = REALNAMELEN ;
@@ -1244,8 +1246,9 @@ local int submgr_name(SMGR *pip) noex {
 	    char	rbuf[REALNAMELEN+1] ;
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->fl.altuser) {
-	            sp = getenver(varname.name) ;
-	        }
+	            static ccp v_name = getenver(varname.name) ;
+		    sp = v_name ;
+	        } /* end if */
 	    } /* end */
 	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        sp = pip->tstrs.realname ;
@@ -1254,22 +1257,22 @@ local int submgr_name(SMGR *pip) noex {
 	            int		gl = -1 ;
 	            if (gp == nullptr) {
 	                cchar	*gn = pip->pw.pw_gecos ;
-	DEBUGPRINTF("1 gn=%s\n",gn) ;
+	DEBPRINTF("1 gn=%s\n",gn) ;
 	                gp = gbuf ;
 	                rs = mkgecosname(gbuf,glen,gn) ;
 			gl = rs ;
-	DEBUGPRINTF("mkgecosname() rs=%d\n",rs) ;
+	DEBPRINTF("mkgecosname() rs=%d\n",rs) ;
 		    } /* end */
 		    if (rs >= 0) {
-	DEBUGPRINTF("2 gp=%s\n",gp) ;
+	DEBPRINTF("2 gp=%s\n",gp) ;
 	                sp = rbuf ;
 	                rs = mkrealname(rbuf,rlen,gp,gl) ;
 		        sl = rs ;
-	DEBUGPRINTF("mkrealname() rs=%d\n",rs) ;
+	DEBPRINTF("mkrealname() rs=%d\n",rs) ;
 		    } /* end */
 	        } /* end */
 	    } /* end */
-	DEBUGPRINTF("mid3 rs=%d\n",rs) ;
+	DEBPRINTF("mid3 rs=%d\n",rs) ;
 	    if (rs >= 0) {
 	        if ((sp == nullptr) || (sp[0] == '\0')) {
 	            if (pip->fl.pw) {
@@ -1282,23 +1285,34 @@ local int submgr_name(SMGR *pip) noex {
 	        } /* end */
 	    } /* end if */
 	} /* end */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_name) */
 
 local int submgr_fullname(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		uit = uit_fullname ;
+	DEBPRINTF("ent\n") ;
 	if ((pip->sis[uit] == 0) && (uip->fullname == nullptr)) {
-	    cchar	*sp = nullptr ;
-	    if (! pip->fl.altuser) {
-	        sp = getenver(varname.fullname) ;
-	    } /* end */
-	    if ((sp != nullptr) && (sp[0] != '\0')) {
-	        uip->fullname = sp ;
-	    } /* end */
-	} /* end */
+	    ccp vap = nullptr ;
+	    if ((vap == np) || (vap[0] == '\0')) {
+	        static ccp v_fullname = getenver(varname.fullname) ;
+		vap = v_fullname ;
+	    } /* end if */
+	    if ((vap == np) || (vap[0] == '\0')) {
+	        cint	nlen = REALNAMELEN ;
+		char	nbuf[REALNAMELEN + 1] ;
+		if ((rs = pip->rdhomefile(nbuf,nlen,HOME_FULLNAME)) > 0) {
+	            rs = submgr_store(pip,uit,nbuf,rs) ;
+		} /* end if (rdhomefile) */
+	DEBPRINTF("rdhomefle-out rs=%d\n",rs) ;
+	    } else {
+	            uip->fullname = vap ;
+	    } /* end if */
+	} /* end if (needed) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_fullname) */
 
@@ -1323,14 +1337,14 @@ local int submgr_nodename(SMGR *pip) noex {
 
 local int submgr_domain(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		uit = uit_domainname ;
-	DEBUGPRINTF("ent\n") ;
-	if ((pip->sis[uit] == 0) && (uip->domainname == nullptr)) {
+	DEBPRINTF("ent\n") ;
+	if ((pip->sis[uit] == 0) && (uip->domainname == np)) {
 	    uip->domainname = nullptr ;
 	    if (uip->domainname == nullptr) {
 	        if (! pip->fl.altuser) {
-		    cnullptr	np{} ;
 		    cchar	*valp ; 
 		    if ((valp = getenver(varname.localdomain)) != np) {
 			valp = getenver(varname.domain) ;
@@ -1338,76 +1352,40 @@ local int submgr_domain(SMGR *pip) noex {
 	            uip->domainname = valp ;
 	        } /* end if (getting env-domain) */
 	    } /* end */
-	DEBUGPRINTF("mid1 rs=%d\n",rs) ;
+	DEBPRINTF("mid1 rs=%d\n",rs) ;
 	    if (uip->domainname == nullptr) {
 	        cint	dlen = var.hostnamelen ;
 	        int	dl = -1 ;
 	        char	*dbuf = pip->domainname ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	DEBUGPRINTF("pw1 rs=%d\n",rs) ;
+	DEBPRINTF("pw1 rs=%d\n",rs) ;
 	            if (pip->fl.pw) {
 	                cchar	*kn = UA_DN ;
-	DEBUGPRINTF("pw2 rs=%d\n",rs) ;
+	DEBPRINTF("pw2 rs=%d\n",rs) ;
 	                rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
-	DEBUGPRINTF("pw5 rs=%d\n",rs) ;
+	DEBPRINTF("pw5 rs=%d\n",rs) ;
 	            } /* end if (has-pw) */
 	        } /* end */
-	DEBUGPRINTF("mid2 rs=%d\n",rs) ;
+	DEBPRINTF("mid2 rs=%d\n",rs) ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
 	            if ((rs = getinetdomain(dbuf,dlen)) >= 0) {
+	DEBPRINTF("getinetdm() dbuf=%s\n",dbuf) ;
 	                dl = rs ;
 		    } else if (isNotPresent(rs)) {
-	                dbuf[0] = '\0' ;
+	DEBPRINTF("getinetdm() failed rs=%d\n",rs) ;
+	                dbuf[0] = eos ;
 	                rs = SR_OK ;
 	            } /* end */
 	        } /* end */
-	DEBUGPRINTF("mid3 rs=%d\n",rs) ;
+	DEBPRINTF("mid3 rs=%d\n",rs) ;
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
 	            rs = submgr_store(pip,uit,dbuf,dl) ;
 	        } /* end */
 	    } /* end */
-	} /* end */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
+	} /* end if (needed) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (submgr_domainename) */
-
-local int submgr_project(SMGR *pip) noex {
-    	cnullptr	np{} ;
-	int		rs = SR_OK ;
-	DEBUGPRINTF("ent\n") ;
-	if (syshas.project) {
-	    userinfo	*uip = pip->uip ;
-	    cint	dlen = var.projnamelen ;
-	    int		uit = uit_project ;
-	    if ((pip->sis[uit] == 0) && (uip->projname == np)) {
-	        int	dl = 0 ;
-	        char	dbuf[dlen+1] = { 0 } ;
-	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	            if (pip->fl.pw) {
-	                cchar	*kn = UA_PROJECT ;
-	                rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
-	                dl = rs ;
-	            } /* end if (fl.pw) */
-	        } /* end */
-	        if ((rs >= 0) && (dl == 0) && (dbuf[0] == '\0')) {
-	            if (pip->fl.pw) {
-	                cchar	*un = pip->pw.pw_name ;
-	                if ((rs = getprojname(dbuf,dlen,un)) >= 0) {
-	                    dl = rs ;
-			} else if (isNoEnt(rs)) {
-	                    dbuf[0] = eos ;
-	                    rs = SR_OK ;
-	                } /* end */
-	            } /* end */
-	        } /* end */
-	        if ((rs >= 0) && (dl > 0) && dbuf[0]) {
-	            rs = submgr_store(pip,uit,dbuf,dl) ;
-	        } /* end */
-	    } /* end if (project) */
-	} /* end if (syshas.project) */
-	DEBUGPRINTF("ret rs=%d\n",rs) ;
-	return rs ;
-} /* end subroutine (submgr_project) */
 
 local int submgr_tz(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
@@ -1418,8 +1396,9 @@ local int submgr_tz(SMGR *pip) noex {
 	    uip->tz = nullptr ;
 	    if (uip->tz == nullptr) {
 	        if (! pip->fl.altuser) {
-	            uip->tz = getenver(varname.tz) ;
-	        }
+	            static ccp v_tz = getenver(varname.tz) ;
+	            uip->tz = v_tz ;
+	        } /* end if */
 	    } /* end if */
 	    if ((rs >= 0) && (uip->tz == np)) {
 	        cint	dlen = var.tznamelen ;
@@ -1430,7 +1409,7 @@ local int submgr_tz(SMGR *pip) noex {
 	            if ((rs = submgr_ualookup(pip,dbuf,dlen,kn)) >= 0) {
 	                dl = rs ;
 		    } else if (isNotPresent(rs)) {
-	                dbuf[0] = '\0' ;
+	                dbuf[0] = eos ;
 	                rs = SR_OK ;
 	            } /* end */
 	        } /* end if (has-pw) */
@@ -1444,15 +1423,17 @@ local int submgr_tz(SMGR *pip) noex {
 
 local int submgr_md(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		uit = uit_md ;
-	if ((pip->sis[uit] == 0) && (uip->md == nullptr)) {
+	if ((pip->sis[uit] == 0) && (uip->md == np)) {
 	    uip->md = nullptr ;
 	    if (uip->md == nullptr) {
 	        if (! pip->fl.altuser) {
-	            uip->md = getenver(varname.maildir) ;
-	        } /* end */
+	            static ccp v_maildir = getenver(varname.maildir) ;
+	            uip->md = v_maildir ;
+	        } /* end if */
 	    } /* end */
 	    if (uip->md == nullptr) {
 	        int	dl = -1 ;
@@ -1464,7 +1445,7 @@ local int submgr_md(SMGR *pip) noex {
 	                    if ((rs = submgr_ualookup(pip,dbuf,dlen,kn)) >= 0) {
 	                        dl = rs ;
 			    } else if (isNotPresent(rs)) {
-	                        dbuf[0] = '\0' ;
+	                        dbuf[0] = eos ;
 	                        rs = SR_OK ;
 	                    } /* end */
 	                } /* end if (has-pw) */
@@ -1482,14 +1463,16 @@ local int submgr_md(SMGR *pip) noex {
 
 local int submgr_wstation(SMGR *pip) noex {
 	userinfo	*uip = pip->uip ;
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		uit = uit_wstation ;
-	if ((pip->sis[uit] == 0) && (uip->wstation == nullptr)) {
+	if ((pip->sis[uit] == 0) && (uip->wstation == np)) {
 	    uip->wstation = nullptr ;
 	    if (uip->wstation == nullptr) {
 	        if (! pip->fl.altuser) {
-	            uip->wstation = getenver(VARWSTATION) ;
-	        }
+	            static ccp v_wstation = getenver(VARWSTATION) ;
+	            uip->wstation = v_wstation ;
+	        } /* end if */
 	    } /* end */
 	    if (uip->wstation == nullptr) {
 	        cint	dlen = WSLEN ;
@@ -1501,7 +1484,7 @@ local int submgr_wstation(SMGR *pip) noex {
 	                if ((rs = submgr_ualookup(pip,dbuf,dlen,kn)) >= 0) {
 	                    dl = rs ;
 			} else if (isNotPresent(rs)) {
-	                    dbuf[0] = '\0' ;
+	                    dbuf[0] = eos ;
 	                    rs = SR_OK ;
 	                } /* end */
 	            } /* end if (has-pw) */
@@ -1532,27 +1515,69 @@ local int submgr_logid(SMGR *pip) noex {
 	            rs = submgr_store(pip,uit,lbuf,rs) ;
 	        }
 	    }
-	} /* end if */
+	} /* end if (needed) */
 	return rs ;
 } /* end subroutine (submgr_logid) */
 
 local int submgr_groupname(SMGR *pip) noex {
     	userinfo	*uip = pip->uip ;
+	cnullptr	np{} ;
     	int		rs ;
 	int		rs1 ;
-	if (charp grbuf ; (rs = lm_gr(&grbuf)) >= 0) {
-	    cint grlen = rs ;
-	    con gid_t pwgid = uip->pwgid ;
-	    if (ucentgr gr ; (rs = gr.getgid(grbuf,grlen,pwgid)) >= 0) {
-		rs = SR_OK ;
-	    } else if (isNoEnt(rs)) {
-		rs = SR_OK ;
-	    } /* end */
-	    rs1 = lm_free(grbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
+	int		uit = uit_groupname ;
+	if ((pip->sis[uit] == 0) && (uip->groupname == np)) {
+	    if (charp grbuf ; (rs = lm_gr(&grbuf)) >= 0) {
+	        cint grlen = rs ;
+	        con gid_t pwgid = uip->pwgid ;
+	        if (ucentgr gr ; (rs = gr.getgid(grbuf,grlen,pwgid)) >= 0) {
+	            rs = submgr_store(pip,uit,gr.gr_name,-1) ;
+	        } else if (isNoEnt(rs)) {
+		    rs = SR_OK ;
+	        } /* end */
+	        rs1 = lm_free(grbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (needed) */
 	return rs ;
 } /* end subroutine (submgr_groupname) */
+
+local int submgr_projname(SMGR *pip) noex {
+    	cnullptr	np{} ;
+	int		rs = SR_OK ;
+	DEBPRINTF("ent\n") ;
+	if (syshas.project) {
+	    userinfo	*uip = pip->uip ;
+	    cint	dlen = var.projnamelen ;
+	    int		uit = uit_projname ;
+	    if ((pip->sis[uit] == 0) && (uip->projname == np)) {
+	        int	dl = 0 ;
+	        char	dbuf[dlen+1] = { 0 } ;
+	        if ((rs >= 0) && (dbuf[0] == '\0')) {
+	            if (pip->fl.pw) {
+	                cchar	*kn = UA_PROJECT ;
+	                rs = submgr_ualookup(pip,dbuf,dlen,kn) ;
+	                dl = rs ;
+	            } /* end if (fl.pw) */
+	        } /* end */
+	        if ((rs >= 0) && (dl == 0) && (dbuf[0] == '\0')) {
+	            if (pip->fl.pw) {
+	                cchar	*un = pip->pw.pw_name ;
+	                if ((rs = getprojname(dbuf,dlen,un)) >= 0) {
+	                    dl = rs ;
+			} else if (isNoEnt(rs)) {
+	                    dbuf[0] = eos ;
+	                    rs = SR_OK ;
+	                } /* end */
+	            } /* end */
+	        } /* end */
+	        if ((rs >= 0) && (dl > 0) && dbuf[0]) {
+	            rs = submgr_store(pip,uit,dbuf,dl) ;
+	        } /* end */
+	    } /* end if (project) */
+	} /* end if (syshas.project) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end subroutine (submgr_projname) */
 
 local int submgr_unixname(SMGR *pip) noex {
 	int		rs ;
@@ -1571,6 +1596,42 @@ local int submgr_unixname(SMGR *pip) noex {
 	return rs ;
 } /* end subroutine (submgr_unixname) */
 
+int submgr::getpwu(ucentpw *pwp,ccp un) noex {
+	int		rs ;
+	if ((un != nullptr) && (un[0] != '-') && (un[0] != '\0')) {
+	    rs = getpwx_name(pwp,tbuf,tlen,un) ;
+	} else {
+	    rs = getpwusername(pwp,tbuf,tlen,uip->ruid) ;
+	} /* end */
+	if (rs >= 0) {
+	    fl.pw = true ;
+	    fl.altuser = (pwp->pw_uid != uip->ruid) ;
+	    uip->pwuid = pwp->pw_uid ;
+	    uip->pwgid = pwp->pw_gid ;
+	} /* end if (ok) */
+	return rs ;
+} /* end method (submgr::getpwu) */
+
+int submgr::rdhomefile(charp rbuf,int rlen,ccp fn) noex {
+    	int		rs = SR_OK ;
+	int		len = 0 ; /* return-value */
+	rbuf[0] = eos ;
+	DEBPRINTF("ent fn=%s\n",fn) ;
+	if (userhome) {
+	DEBPRINTF("userhome=%s\n",userhome) ;
+	        if ((rs = mkpath(tbuf,userhome,fn)) >= 0) {
+	DEBPRINTF("tbuf=%s\n",tbuf) ;
+		    if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
+		        len = rs ;
+		    } else if (isNotPresent(rs)) {
+			rs = SR_OK ;
+		    } /* end */
+		} /* end if (mkpath) */
+	} /* end if (have home-dir) */
+	DEBPRINTF("ret rs=%d len=%d\n",rs,len) ;
+	return (rs >= 0) ? len : rs ;
+} /* end method (submgr::rdhomefile) */
+
 void userinfo::dtor() noex {
 	if (cint rs = finish ; rs < 0) {
 	    ulogerror("userinfo",rs,"fini-finish") ;
@@ -1579,7 +1640,7 @@ void userinfo::dtor() noex {
 
 userinfo_cos::operator int () noex {
     	int		rs = SR_BUGCHECK ;
-	DEBUGPRINTF("ent op-int\n") ;
+	DEBPRINTF("ent op-int\n") ;
 	if (op) ylikely {
 	    rs = userinfo_start(op,nullptr) ;
 	} /* end if (non-null) */
@@ -1588,7 +1649,7 @@ userinfo_cos::operator int () noex {
 
 int userinfo_cos::operator () (cchar *un) noex {
     	int		rs = SR_BUGCHECK ;
-	DEBUGPRINTF("ent op-call\n") ;
+	DEBPRINTF("ent op-call\n") ;
 	if (op) ylikely {
 	    rs = userinfo_start(op,un) ;
 	} /* end if (non-null) */
@@ -1621,11 +1682,11 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	                cchar	*sp ;
 	                cchar	**rpp = nullptr ;
 	                oup->ostype = u.ostype ;
-	                oup->pid = u.pid ;
-	                oup->uid = u.uid ;
-	                oup->euid = u.euid ;
-	                oup->gid = u.gid ;
-	                oup->egid = u.egid ;
+	                oup->pid	= u.pid ;
+	                oup->ruid	= u.ruid ;
+	                oup->euid	= u.euid ;
+	                oup->rgid	= u.rgid ;
+	                oup->egid	= u.egid ;
 	                for (int i = 0 ; i < uit_overlast ; i += 1) {
 	                    sp = nullptr ;
 	                    switch (i) {
@@ -1725,7 +1786,7 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	                        rpp = &oup->groupname ;
 	                        sp = u.groupname ;
 	                        break ;
-	                    case uit_project:
+	                    case uit_projname:
 	                        rpp = &oup->projname ;
 	                        sp = u.projname ;
 	                        break ;
