@@ -90,9 +90,9 @@
 
 /* exported subroutines */
 
-int uc_getuabegin() noex {
+int uc_getuabeg() noex {
 	return uc_userattrbeg() ;
-} /* end subroutine (uc_getuabegin) */
+} /* end subroutine (uc_getuabeg) */
 
 int uc_getuaend() noex {
 	return uc_userattrend() ;
