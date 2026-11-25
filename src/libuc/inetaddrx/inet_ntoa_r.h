@@ -30,9 +30,7 @@
 
 
 EXTERNC_begin
-
-extern char *inet_ntoa_r(INADDR,char *,int) noex ;
-
+    extern char *inet_ntoa_r(INADDR,char *,int) noex ;
 EXTERNC_end
 
 
