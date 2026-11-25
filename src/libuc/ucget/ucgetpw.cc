@@ -24,7 +24,7 @@
 	uc_getpw{x}
 
 	Names:
-	uc_getpwbegin
+	uc_getpwbeg
 	uc_getpwent
 	uc_getpwnam
 	uc_getpwuid
@@ -37,7 +37,7 @@
 	implementation of UNIX® 'passwd' database access subroutines.
 
 	Synopsis:
-	int uc_getpwbegin() noex
+	int uc_getpwbeg() noex
 	int uc_getpwent(ucentpw *,char *,int) noex
 	int uc_getpwnam(ucentpw *,char *,int,cchar *) noex
 	int uc_getpwuid(ucentpw *,char *,int,uid_t) noex
@@ -150,11 +150,11 @@ constexpr bool		f_getpwuidr	= F_GETPWUIDR ;
 
 /* exported subroutines */
 
-int uc_getpwbegin() noex {
+int uc_getpwbeg() noex {
 	errno = 0 ;
 	setpwent() ;
 	return (neg errno) ;
-} /* end subroutine (uc_getpwbegin) */
+} /* end subroutine (uc_getpwbeg) */
 
 int uc_getpwend() noex {
 	errno = 0 ;
