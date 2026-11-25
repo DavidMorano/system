@@ -91,7 +91,7 @@
 /* exported subroutines */
 
 int getho_begin(int stayopen) noex {
-	return uc_gethobegin(stayopen) ;
+	return uc_gethobeg(stayopen) ;
 } /* end subroutine (getho_begin) */
 
 int getho_end() noex {
