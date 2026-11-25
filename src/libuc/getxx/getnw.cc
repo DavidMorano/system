@@ -75,7 +75,7 @@
 /* exported subroutines */
 
 int getnw_begin(int sf) noex {
-	return uc_getnwbegin(sf) ;
+	return uc_getnwbeg(sf) ;
 } /* end subroutine (getnw_begin) */
 
 int getnw_end() noex {
