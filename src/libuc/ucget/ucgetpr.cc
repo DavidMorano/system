@@ -145,11 +145,11 @@ constexpr bool		f_getprxxxr	= F_GETPRXXXR ;
 
 /* exported subroutines */
 
-int uc_getprbegin(int stayopen) noex {
+int uc_getprbeg(int stayopen) noex {
 	errno = 0 ;
 	setprotoent(stayopen) ;
 	return (neg errno) ;
-} /* end subroutine (uc_getprbegin) */
+} /* end subroutine (uc_getprbeg) */
 
 int uc_getprend() noex {
 	errno = 0 ;
