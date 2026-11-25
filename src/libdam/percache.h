@@ -46,7 +46,7 @@ struct percache_dataitem {
     	char		*data ;
 	uint		t ;		/* time (of acquisition) */
 	uint		v ;		/* value (acquired) */
-} ;
+} ; /* end struct */
 
 struct percache_head {
 	PERCACHE_ITEM	items[pertype_overlast] ;
@@ -60,7 +60,6 @@ typedef PERCACHE	percache ;
 typedef	PERCACHE_ITEM	percache_item ;
 
 EXTERNC_begin
-
 extern int percache_init	(percache *) noex ;
 extern int percache_finireg	(percache *) noex ;
 extern int percache_invalidate	(percache *) noex ;
@@ -75,7 +74,6 @@ extern int percache_getnisdomain(percache *,time_t,cchar **) noex ;
 extern int percache_getnetload	(percache *,time_t,cchar *,cchar **) noex ;
 extern int percache_getsystat	(percache *,time_t,cchar *,cchar **) noex ;
 extern int percache_fini	(percache *) noex ;
-
 EXTERNC_end
 
 
