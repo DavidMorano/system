@@ -22,7 +22,8 @@
 	cfdec
 
 	Description:
-	Convert from a decimal representation to its binary integer.
+	Convert from a decimal digit representation to its binary
+	integer.
 
 *******************************************************************************/
 
