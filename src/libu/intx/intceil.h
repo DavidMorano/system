@@ -30,62 +30,66 @@
 
 
 EXTERNC_begin
+    extern int		iceil	(int,int)	noex ;
+    extern long		lceil	(long,int)	noex ;
+    extern longlong	llceil	(longlong,int)	noex ;
+    extern off_t	ofceil	(off_t,int)	noex ;
+    extern intptr_t	ipceil	(intptr_t,int)	noex ;
+EXTERNC_end
 
-extern int		iceil(int,int) noex ;
-extern long		lceil(long,int) noex ;
-extern longlong		llceil(longlong,int) noex ;
-extern off_t		ofceil(off_t,int) noex ;
-extern intptr_t		ipceil(intptr_t,int) noex ;
-
-extern uint		uceil(uint,int) noex ;
-extern ulong		ulceil(ulong,int) noex ;
-extern ulonglong	ullceil(ulonglong,int) noex ;
-extern size_t		szceil(size_t,int) noex ;
-extern uintptr_t	uipceil(uintptr_t,int) noex ;
-
+EXTERNC_begin
+    extern uint		uceil	(uint,int)	noex ;
+    extern ulong	ulceil	(ulong,int)	noex ;
+    extern ulonglong	ullceil	(ulonglong,int)	noex ;
+    extern size_t	szceil	(size_t,int)	noex ;
+    extern uintptr_t	uipceil	(uintptr_t,int)	noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-inline int ceil(int v,int m) noex {
+    inline int		ceil(int v,int m)	noex {
 	return iceil(v,m) ;
-}
-inline long ceil(long v,int m) noex {
+    } /* end */
+    inline long		ceil(long v,int m)	noex {
 	return lceil(v,m) ;
-}
-inline longlong ceil(longlong v,int m) noex {
+    } /* end */
+    inline longlong	ceil(longlong v,int m)	noex {
 	return llceil(v,m) ;
-}
-inline off_t ceil(off_t v,int m) noex {
+    } /* end */
+    inline off_t ceil	(off_t v,int m)		noex {
 	return ofceil(v,m) ;
-}
-
-#ifdef	COMMENT
-inline intptr_t ceil(intptr_t v,int m) noex {
-	return ipceil(v,m) ;
-}
-#endif /* COMMENT */
-
-inline uint ceil(uint v,int m) noex {
-	return uceil(v,m) ;
-}
-inline ulong ceil(ulong v,int m) noex {
-	return ulceil(v,m) ;
-}
-inline ulonglong ceil(ulonglong v,int m) noex {
-	return ullceil(v,m) ;
-}
-
-#ifdef	COMMENT
-inline size_t ceil(size_t v,int m) noex {
-	return szceil(v,m) ;
-}
-inline uintptr_t ceil(uintptr_t v,int m) noex {
-	return uipceil(v,m) ;
-}
-#endif /* COMMENT */
-
+    } /* end */
 #endif /* __cplusplus */
+
+#ifdef	COMMENT
+#ifdef	__cplusplus
+    inline intptr_t ceil(intptr_t v,int m)	noex {
+	return ipceil(v,m) ;
+    } /* end */
+#endif /* __cplusplus */
+#endif /* COMMENT */
+
+#ifdef	__cplusplus
+    inline uint		ceil(uint v,int m)	noex {
+	return		uceil(v,m) ;
+    } /* end */
+    inline ulong	ceil(ulong v,int m)	noex {
+	return ulceil(v,m) ;
+    } /* end */
+    inline ulonglong	ceil(ulonglong v,int m)	noex {
+	return ullceil(v,m) ;
+    } /* end */
+#endif /* __cplusplus */
+
+#ifdef	COMMENT
+#ifdef	__cplusplus
+    inline size_t	ceil(size_t v,int m)	noex {
+	return szceil(v,m) ;
+    } /* end */
+    inline uintptr_t	ceil(uintptr_t v,int m)	noex {
+	return uipceil(v,m) ;
+    } /* end */
+#endif /* __cplusplus */
+#endif /* COMMENT */
 
 
 #endif /* INTCEIL_INCLUDE */
