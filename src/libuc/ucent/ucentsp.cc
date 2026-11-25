@@ -75,8 +75,8 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* forward references */
 
-local int ucentsp_parseone(ucentsp *,SI *,int,cchar *,int) noex ;
-local int ucentsp_parsedefs(ucentsp *,SI *,int) noex ;
+local int ucentsp_parseone	(ucentsp *,SI *,int,cchar *,int) noex ;
+local int ucentsp_parsedefs	(ucentsp *,SI *,int) noex ;
 
 
 /* local variables */
