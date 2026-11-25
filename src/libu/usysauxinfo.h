@@ -39,7 +39,7 @@
 
 namespace usysauxinfo {
     extern int ugetauxinfo(char *,int,int) noex ;
-}
+} /* end namespace */
 
 
 #endif /* __cplusplus */
