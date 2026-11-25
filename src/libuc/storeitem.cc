@@ -5,6 +5,7 @@
 /* storage object */
 /* version %I% last-modified %G% */
 
+#define	CF_DEBUG	1		/* debugging */
 
 /* revision history:
 
@@ -57,14 +58,21 @@
 #include	<ctdec.h>		/* LIBUC */
 #include	<snwcpy.h>		/* LIBUC */
 #include	<localmisc.h>		/* LIBU |DIGBUFLEN| */
+#include	<deb.hh>		/* LIBU */
 
 #include	"storeitem.h"
 
 #pragma		GCC dependency		"mod/libutil.ccm"
+#pragma		GCC dependency		"mod/deb.ccm"
 
 import libutil ;			/* |lenstr(3u)| */
+import deb ;				/* debugging */
 
 /* local defines */
+
+#ifndef	CF_DEBUG
+#define	CF_DEBUG	0		/* debugging */
+#endif
 
 
 /* imported namespaces */
@@ -89,6 +97,8 @@ using std::has_single_bit ;		/* subroutine-template */
 
 /* local variables */
 
+cbool			f_debug		= CF_DEBUG ;
+
 
 /* exported variables */
 
@@ -97,6 +107,7 @@ using std::has_single_bit ;		/* subroutine-template */
 
 int storeitem_start(storeitem *op,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
+	DEBPRINTF("ent\n") ;
 	if (op && dbuf) ylikely {
 	    rs = SR_INVALID ;
 	    if (dlen > 0) ylikely {
@@ -107,6 +118,7 @@ int storeitem_start(storeitem *op,char *dbuf,int dlen) noex {
 	        op->f_overflow = false ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (storeitem_start) */
 
@@ -309,7 +321,7 @@ int storeitem_ptab(storeitem *op,int n,void ***vppp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vpp) ylikely {
 	    rs = SR_INVALID ;
-	    if (n > 0) ylikely {
+	    if (n >= 0) ylikely {
 	        cint	bs = ((n + 1) * align) ;
 	        if ((rs = storeitem_block(op,bs,align,vpp)) >= 0) ylikely {
 		    (*vppp)[n] = nullptr ;
