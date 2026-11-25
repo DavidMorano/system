@@ -67,7 +67,7 @@
 /* exported subroutines */
 
 int getpr_begin(int sf) noex {
-	return uc_getprbegin(sf) ;
+	return uc_getprbeg(sf) ;
 } /* end subroutine (getpr_begin) */
 
 int getpr_end() noex {
