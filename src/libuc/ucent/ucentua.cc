@@ -54,8 +54,8 @@ import libutil ;			/* |memclear(3u)| */
 /* local defines */
 
 #define	SI	storeitem
-#define	UA	ucentua
-#define	CUA	const ucentua
+#define	UAE	ucentua
+#define	CUAE	const ucentua
 
 
 /* imported namespaces */
@@ -77,8 +77,8 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 /* forward references */
 
-local int userattrent_parseattr(UA *,storeitem *,cchar *,int) noex ;
-local int userattrent_parseattrload(UA *,storeitem *,vecstr *,int) noex ;
+local int userattrent_parseattr		(UAE *,storeitem *,cchar *,int) noex ;
+local int userattrent_parseattrload	(UAE *,storeitem *,vecstr *,int) noex ;
 
 local int si_attrload(storeitem *,kv_t *,int,cchar *) noex ;
 
@@ -147,7 +147,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	return (rs >= 0) ? wlen : rs ;
 } /* end subroutine (ucentua::parse) */
 
-int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
+int ucentua::load(char *uabuf,int ualen,CUAE *suap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -275,7 +275,7 @@ int ucentua::getuid(char *uabuf,int ualen,uid_t uid) noex {
 
 /* local subroutines */
 
-local int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
+local int userattrent_parseattr(UAE *uap,SI *sip,cc *sp,int sl) noex {
     	cnullptr	np{} ;
 	int		rs ;
 	int		rs1 ;
@@ -304,7 +304,7 @@ local int userattrent_parseattr(UA *uap,SI *sip,cc *sp,int sl) noex {
 	return rs ;
 } /* end subroutine (userattrent_parseattr) */
 
-local int userattrent_parseattrload(UA *uap,SI *sip,vecstr *alp,int n) noex {
+local int userattrent_parseattrload(UAE *uap,SI *sip,vecstr *alp,int n) noex {
 	cint		ksz = szof(kva_t) ;
 	cint		al = szof(void *) ;
 	int		rs ;
