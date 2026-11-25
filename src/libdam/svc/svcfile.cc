@@ -437,7 +437,7 @@ int svcfile_curbegin(svcfile *op,svcfile_cur *curp) noex {
 	        curp->i = -1 ;
 		if (void *vp ; (rs = lm_mall(csz,&vp)) >= 0) ylikely {
 		    hdb_cur	*ecp = (hdb_cur *) vp ;
-	            if ((rs = hdb_curbegin(elp,ecp)) >= 0) {
+	            if ((rs = hdb_curbeg(elp,ecp)) >= 0) {
 			curp->ecp = ecp ;
 	                op->ncursors += 1 ;
 	                op->magval = SVF_MAG ;
@@ -533,7 +533,7 @@ int svcfile_curfetch(svcfile *op,cc *svcname,svcfile_cur *curp,svcfile_ent *ep,
 	        hdb_cur		cur ;
 	        hdb_cur		*ecp{} ;
 	        if (curp == nullptr) {
-	            if ((rs = hdb_curbegin(op->elp,&cur)) >= 0) {
+	            if ((rs = hdb_curbeg(op->elp,&cur)) >= 0) {
 			ecp = &cur ;
 		    }
 	        } else {
@@ -929,7 +929,7 @@ local int svcfile_filedump(svcfile *op,int fi) noex {
 	int		rs1 ;
 	int		rs2 ;
 	int		c = 0 ;
-	if ((rs = hdb_curbegin(op->elp,&cur)) >= 0) {
+	if ((rs = hdb_curbeg(op->elp,&cur)) >= 0) {
 	    SVF_IE	*ep ;
 	    while ((rs2 = hdb_curenum(op->elp,&cur,&key,&val)) >= 0) {
 	        ep = (SVF_IE *) val.buf ;
