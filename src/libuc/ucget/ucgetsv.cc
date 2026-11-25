@@ -21,7 +21,7 @@
 	uc_getsv{x}
 
 	Name:
-	uc_getsvbegin
+	uc_getsvbeg
 	uc_getsvent
 	uc_getsvnam
 	uc_getsvnum
@@ -32,7 +32,7 @@
 	INET service (and retrieve it into the object |ucentsv|).
 
 	Synopsis:
-	int uc_getsvbegin(int so) noex
+	int uc_getsvbeg(int so) noex
 	int uc_getsvend() noex
 	int uc_getsvent(ucentsv *svp,char *svbuf,int svlen) noex
 	int uc_getsvnam(ucentsv *svp,char *svbuf,int svlen,cc *n,cc *p) noex
@@ -123,7 +123,6 @@ namespace {
 constexpr bool		f_sunos		= F_SUNOS ;
 constexpr bool		f_darwin	= F_DARWIN ;
 constexpr bool		f_linux		= F_LINUX ;
-
 constexpr bool		f_getsvxxxr	= F_GETSVXXXR ;
 
 
@@ -132,11 +131,11 @@ constexpr bool		f_getsvxxxr	= F_GETSVXXXR ;
 
 /* exported subroutines */
 
-int uc_getsvbegin(int stayopen) noex {
+int uc_getsvbeg(int stayopen) noex {
 	errno = 0 ;
 	setservent(stayopen) ;
 	return (neg errno) ;
-} /* end subroutine (uc_getsvbegin) */
+} /* end subroutine (uc_getsvbeg) */
 
 int uc_getsvend() noex {
 	errno = 0 ;
