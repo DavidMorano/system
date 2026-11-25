@@ -24,10 +24,8 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
-
-extern int	getoflags(cchar *) noex ;
-
+EXTERNC_beg
+    extern int	getoflags(cchar *) noex ;
 EXTERNC_end
 
 
