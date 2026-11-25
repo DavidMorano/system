@@ -29,10 +29,10 @@
 
 
 namespace ucent {
-    int sbuf_fmtstr(sbuf *,cchar *) noex ;
-    int si_loadnames(storeitem *,vechand *,cchar *,int) noex ;
-    int si_loadname(storeitem *,vechand *,cchar *,int) noex ;
-    int si_copystr(storeitem *,char **,cchar *) noex ;
+    int sbuf_fmtstr	(sbuf *,cchar *) noex ;
+    int si_loadnames	(storeitem *,vechand *,cchar *,int) noex ;
+    int si_loadname	(storeitem *,vechand *,cchar *,int) noex ;
+    int si_copystr	(storeitem *,char **,cchar *) noex ;
 } /* end namespace (ucent) */
 
 
