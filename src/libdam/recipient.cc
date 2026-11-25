@@ -174,7 +174,7 @@ int recipient_finish(RC *op) noex {
 	int		rs2 ;
 	if ((rs = recipient_magic(op)) >= 0) ylikely {
 	    /* pop the hash table first */
-	    if (hdb_cur kcur ; (rs = hdb_curbegin(op->hlp,&kcur)) >= 0) {
+	    if (hdb_cur kcur ; (rs = hdb_curbeg(op->hlp,&kcur)) >= 0) {
 		hdb_dat		key{} ;
 		hdb_dat		val{} ;
 	        while ((rs2 = hdb_curenum(op->hlp,&kcur,&key,&val)) >= 0) {
@@ -298,7 +298,7 @@ int recipient_already(RC *op,cchar *host,cchar *locvap,int type) noex {
 	            hdb_dat	val{} ;
 	            key.buf = hbuf ;
 	            key.len = hl ;
-	            if (hdb_cur cur ; (rs = hdb_curbegin(op->hlp,&cur)) >= 0) {
+	            if (hdb_cur cur ; (rs = hdb_curbeg(op->hlp,&cur)) >= 0) {
 	                while ((rs = hdb_fetch(op->hlp,key,&cur,&val)) >= 0) {
 		            RC_VAL	*valp = (RC_VAL *) val.buf ;
 	                    bool	f = true ;
@@ -405,7 +405,7 @@ int recipient_hcurend(RC *op,RC_HCUR *hcp) noex {
 int recipient_vcurbegin(RC *op,RC_VCUR *vcp) noex {
 	int		rs ;
 	if ((rs = recipient_magic(op,vcp)) >= 0) {
-	    rs = hdb_curbegin(op->hlp,vcp) ;
+	    rs = hdb_curbeg(op->hlp,vcp) ;
 	} /* end if (magic) */
 	return rs ;
 } /* end subroutine (recipient_vcurbegin) */
