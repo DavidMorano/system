@@ -15,6 +15,28 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+  	Group:
+
+	Description:
+	These subroutines (below) are part of the collection of
+	subroutine groups that try to form a common thread-safe
+	interface to the system databases.  The managed system
+	databaes are:
+
+	+ passwd
+	+ shadow
+	+ userattr
+	+ group
+	+ project
+	+ protocols
+	+ networks
+	+ hosts
+	+ services
+
+*******************************************************************************/
+
 #ifndef	UCGETSP_INCLUDE
 #define	UCGETSP_INCLUDE
 
@@ -26,7 +48,7 @@
 
 
 EXTERNC_beg
-    extern int	uc_getspbegin	() noex ;
+    extern int	uc_getspbeg	() noex ;
     extern int	uc_getspent	(ucentsp *,char *,int) noex ;
     extern int	uc_getspnam	(ucentsp *,char *,int,cchar *) noex ;
     extern int	uc_getspend	() noex ;
