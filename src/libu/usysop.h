@@ -43,11 +43,9 @@
 
 
 EXTERNC_begin
-
-extern int u_adjtime	(CTIMEVAL *tvp,TIMEVAL *ovp) noex ;
-extern int u_stime	(time_t *tp) noex ;
-extern int u_time	(time_t *rp) noex ;
-
+    extern int u_adjtime	(CTIMEVAL *tvp,TIMEVAL *ovp) noex ;
+    extern int u_stime		(time_t *tp) noex ;
+    extern int u_time		(time_t *rp) noex ;
 EXTERNC_end
 
 
