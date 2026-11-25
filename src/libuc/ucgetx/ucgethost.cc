@@ -127,7 +127,7 @@
 /* exported subroutines */
 
 int uc_gethostbegin(int stayopen) noex {
-    	return uc_gethobegin(stayopen) ;
+    	return uc_gethobeg(stayopen) ;
 } /* end subrouttine (uc_gethostbegin) */
 
 int uc_gethostend() noex {
