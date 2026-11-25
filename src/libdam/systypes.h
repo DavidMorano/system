@@ -14,13 +14,13 @@
 /* Copyright © 1992 David A­D­ Morano.  All rights reserved. */
 /* Use is subject to license terms. */
 
-#ifndef	SSTYPES_INCLUDE
-#define	SSTYPES_INCLUDE
+#ifndef	SYSTYPES_INCLUDE
+#define	SYSTYPES_INCLUDE
 
 
 #include	<sys/types.h>
 
 
-#endif /* SSTYPES_INCLUDE */
+#endif /* SYSTYPES_INCLUDE */
 
 
