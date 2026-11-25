@@ -82,8 +82,8 @@
 
 
 EXTERNC_begin
-extern bool	isin4mapped(ushort *) noex ;
-extern bool	isin6loopback(ushort *) noex ;
+    extern bool	isin4mapped	(ushort *) noex ;
+    extern bool	isin6loopback	(ushort *) noex ;
 EXTERNC_end
 
 
