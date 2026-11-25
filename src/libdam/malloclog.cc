@@ -294,7 +294,7 @@ int malloclog_dump()
 
 	}
 
-	hdb_curbegin(&track,&c) ;
+	hdb_curbeg(&track,&c) ;
 
 	while ((rs = hdb_curenum(&track,&c,&key,&value)) >= 0) {
 
