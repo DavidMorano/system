@@ -61,12 +61,10 @@ typedef	SYSNAMEDB	sysnamedb ;
 typedef	SYSNAMEDB_FL	sysnamedb_fl ;
 
 EXTERNC_begin
-
-extern int sysnamedb_open(sysnamedb *,cchar *) noex ;
-extern int sysnamedb_getclusters(sysnamedb *,vecstr *,cchar *) noex ;
-extern int sysnamedb_getnodes(sysnamedb *,vecstr *,vecstr *) noex ;
-extern int sysnamedb_close(sysnamedb *) noex ;
-
+extern int sysnamedb_open		(sysnamedb *,cchar *) noex ;
+extern int sysnamedb_getclusters	(sysnamedb *,vecstr *,cchar *) noex ;
+extern int sysnamedb_getnodes		(sysnamedb *,vecstr *,vecstr *) noex ;
+extern int sysnamedb_close		(sysnamedb *) noex ;
 EXTERNC_end
 
 
