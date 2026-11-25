@@ -33,7 +33,9 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU |rmeol(3u)| */
+#include	<usysutility.hh>	/* LIBU |snvprintf(3u)| */
 #include	<strnul.hh>		/* LIBU */
+#include	<intsat.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU */
 
 #include	"dprint.hh"		/* LIBU */
@@ -43,11 +45,17 @@
 import libutil ;			/* |lenstr(3u)| */
 
 
+using libu::sncpy ;			/* subroutine */
 using libu::rmeol ;			/* subroutine */
+using libu::snprintf ;			/* subroutine */
+using libu::snvprintf ;			/* subroutine */
 
 
-static FILE	*efp = stderr ;
-cint		llen = MAXLINELEN ;
+local int fwriter(FILE *,cvoid *,int) noex ;
+
+
+static FILE	*efp		= stderr ;
+cint		maxline		= MAXLINELEN ;
 
 
 int dprint(cc *func,cc *sp,int µsl) noex {
@@ -80,8 +88,56 @@ int dprintstr(cc *func,cc *str,cc *sp,int µsl) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (dprintstr) */
 
-int dprintline(cc *func,cc *sp,int sl) noex {
+int dprintln(cc *func,cc *sp,int sl) noex {
     	return dprint(func,sp,sl) ;
-} /* end subroutine (dprintline) */
+} /* end subroutine (dprintln) */
+
+int dprintf(cchar *func,cchar *fmt,...) noex {
+    	va_list		ap ;
+	cnothrow	nt{} ;
+	cint		flen = maxline ;
+    	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
+	if (func && fmt) ylikely {
+	    va_begin(ap,fmt) ;
+            rs = SR_NOMEM ;
+	    if (char *fbuf = new(nt) char[flen + 1]) ylikely {
+		if ((rs = sncpy(fbuf,flen,func,": ")) >= 0) {
+		    charp	bp = (fbuf + rs) ;
+		    cint	bl = (flen - rs) ;
+		    len += rs ;
+	            if ((rs = snvprintf(bp,bl,fmt,ap)) >= 0) {
+			len += rs ;
+		        rs = fwriter(stderr,fbuf,len) ;
+	            } /* end if (snvprintf) */
+		} /* end if (sncpy) */
+		delete [] fbuf ;
+	    } /* end if (m-a-f) */
+	    va_end(ap) ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+} /* end subroutine (dprintf) */
+
+
+/* local subroutines */
+
+local int fwriter(FILE *fp,cvoid *vap,int µval) noex {
+	int		rs = SR_FAULT ;
+	int		wlen = 0 ; /* return-value */
+	if (fp && vap) ylikely {
+	    cchar *sbuf = charp(vap) ;
+	    rs = SR_OK ;
+	    if (cint llen = getlenstr(sbuf,µval) ; llen > 0) ylikely {
+		csize nsize = size_t(llen) ;
+		csize lsize = 1uz ;
+	        if (size_t res = fwrite(vap,lsize,nsize,fp) ; res > 0) {
+	            wlen += intsat(res) ;
+		} else {
+		    rs = (errno) ? (neg errno) : SR_OK ;
+		} /* end if (error) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? wlen : rs ;
+} /* end subroutine (fwriter) */
 
 
