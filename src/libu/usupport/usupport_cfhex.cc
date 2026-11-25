@@ -22,7 +22,8 @@
 	cfhex
 
 	Description:
-	Convert from a decimal representation to its binary integer.
+	Convert from a hexadecimal digit representation to its
+	binary integer.
 
 *******************************************************************************/
 
