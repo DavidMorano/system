@@ -42,7 +42,7 @@ LIBS += -ldebug -luo -lu
 
 OBJ0= prgetclustername.o prgetprogpath.o
 OBJ1= prmkfname.o prmktmpdir.o
-OBJ2= prqotd.o
+OBJ2= prqotd.o pruserdom.o
 OBJ3=
 
 OBJA= obj0.o obj1.o obj2.o
@@ -143,6 +143,7 @@ prgetprogpath.o:	prgetprogpath.cc	prgetprogpath.h		$(INCS)
 prmkfname.o:		prmkfname.cc		prmkfname.h		$(INCS)
 prmktmpdir.o:		prmktmpdir.cc		prmktmpdir.h		$(INCS)
 prenvfile.o:		prenvfile.cc		prenvfile.h		$(INCS)
+pruserdom.o:		pruserdom.cc		pruserdom.h		$(INCS)
 
 prqotd.o:		prqotd.dir					$(INCS)
 prqotd.dir:
