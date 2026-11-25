@@ -62,14 +62,14 @@
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<uinet.h>		/* LIBU |AF_INET4| */
-#include	<inetaddr.h>		/* LIBUC */
+#include	<ucinet.h>		/* LIBUC |uc_inetntop(3uc)| */
+#include	<inetaddr.h>		/* LIBUC unused */
 #include	<sncpyx.h>		/* LIBUC */
-#include	<strdcpyx.h>		/* LIBUC */
 #include	<cthex.h>		/* LIBUC */
 #include	<mkchar.h>		/* LIBU */
 #include	<localmisc.h>		/* LIBU |MAX| + |HEXBUFLEN| */
 
-#include	"snx.h"
+#include	"sninetaddr.h"
 
 
 /* local defines */
@@ -137,29 +137,17 @@ int sninetaddr(char *dbuf,int dlen,int af,cchar *addr) noex {
 /* local subroutines */
 
 local int snunix(char *dbuf,int dlen,cchar *addr) noex {
-	int		rs ;
-	if_constexpr (f_cthexuc) {
-	    rs = intconv(strdcpy(dbuf,dlen,addr) - dbuf) ;
-	} else {
+	int		rs = SR_FAULT ;
+	if (dbuf && addr) {
+	    addr += 2 ; /* skip the first two byyes (which is the AF) */
 	    rs = sncpy(dbuf,dlen,addr) ;
-	} /* end if_constexpr (f_cthexuc) */
+	} /* end if (non-null) */
 	return rs ;
 } /* end subroutine (snunix) */
 
 local int sninet4(char *dbuf,int dlen,cchar *addr) noex {
-    	con inetaddrs	at = inetaddr_str ;
-	int		rs ;
-	int		rs1 ;
-	int		len = 0 ; /* return-value */
-	if (inetaddr ia ; (rs = ia.start(at,addr)) >= 0) ylikely {
-	    {
-	        rs = ia.getdotaddr(dbuf,dlen) ;
-		len = rs ;
-	    }
-	    rs1 = ia.finish ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (inetaddr) */
-	return (rs >= 0) ? len : rs ;
+    	cint	af = AF_INET4 ;
+    	return uc_inetntop(dbuf,dlen,af,addr) ;
 } /* end subroutine (sninet4) */
 
 local int sninet6(char *dbuf,int dlen,cchar *addr) noex {
