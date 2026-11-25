@@ -41,9 +41,7 @@
 
 
 EXTERNC_begin
-
-extern int	uc_getloadavg(double *,int) noex ;
-
+    extern int	uc_getloadavg(double *,int) noex ;
 EXTERNC_end
 
 
