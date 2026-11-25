@@ -35,20 +35,17 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<netdb.h>		/* POSIX® */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
-
-extern int uc_gethostbegin	(int)					noex ;
-extern int uc_gethostent	(HOSTENT *,char *,int)			noex ;
-extern int uc_gethostend	()					noex ;
-extern int uc_gethostbyname	(HOSTENT *,char *,int,cc *)		noex ;
-extern int uc_gethostbyaddr	(HOSTENT *,char *,int,int,cc *,int)	noex ;
-extern int uc_gethostfree	(HOSTENT *)				noex ;
-
+    extern int uc_gethostbegin	(int)					noex ;
+    extern int uc_gethostent	(HOSTENT *,char *,int)			noex ;
+    extern int uc_gethostend	()					noex ;
+    extern int uc_gethostbyname	(HOSTENT *,char *,int,cc *)		noex ;
+    extern int uc_gethostbyaddr	(HOSTENT *,char *,int,int,cc *,int)	noex ;
+    extern int uc_gethostfree	(HOSTENT *)				noex ;
 EXTERNC_end
 
 
