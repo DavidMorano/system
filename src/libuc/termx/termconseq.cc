@@ -82,7 +82,7 @@ int termconseqa(char *dp,int dl,int name,cchar *is,int na,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    rs = termconseqva(dp,dl,name,is,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
