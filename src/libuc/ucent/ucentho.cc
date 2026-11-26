@@ -6,6 +6,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUG	1		/* debugging */
+#define	CF_LOADER	1		/* user loader code */
 
 /* revision history:
 
@@ -66,6 +67,9 @@ import deb ;				/* debugging */
 
 #ifndef	CF_DEBUG
 #define	CF_DEBUG	0		/* debugging */
+#endif
+#ifndef	CF_LOADER
+#define	CF_LOADER	1		/* user loader code */
 #endif
 
 
@@ -157,7 +161,77 @@ int ucentho::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	return rs ;
 } /* end subroutine (ucentho::parse) */
 
-int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
+namespace {
+    struct loader {
+	ucentho		*lep ;
+	con ucentho	*oep ;
+	loader(ucentho *lp,con ucentho *op) noex : lep(lp), oep(op) { } ;
+	int operator ()	(charp,int) noex ;
+	int ldmisc	(storeitem *sip) noex ;
+	int ldname	(storeitem *sip) noex ;
+	int ldaliases	(storeitem *sip) noex ;
+    } ; /* end struct (loader) */
+    typedef int (loader::*loader_m)(storeitem *) noex ;
+} /* end namespace */
+
+#if	CF_LOADER
+constexpr loader_m	loads[] = {
+    	&loader::ldmisc,
+    	&loader::ldname,
+    	&loader::ldaliases
+} ; /* end array (loads) */
+int ucentho::load(char *rbuf,int rlen,con ucentho *chop) noex {
+    	int		rs = SR_FAULT ;
+	DEBPRINTF("ent ×\n") ;
+	if (rbuf && chop) ylikely {
+	    loader lo(this,chop) ;
+	    memclear(this) ;
+	    rs = lo(rbuf,rlen) ;
+	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d\n",rs) ;
+	return rs ;
+} /* end method (ucentho::load) */
+int loader::operator () (charp rbuf,int rlen) noex {
+    	int		rs ;
+	int		rs1 ;
+	int		len = 0 ; /* return-value */
+	if (storeitem si ; (rs = si.start(rbuf,rlen)) >= 0) ylikely {
+	    for (cauto &m : loads) {
+		rs = (this->*m)(&si) ;
+		len += rs ;
+		if (rs < 0) break ;
+	    } /* end for */
+	    rs1 = si.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (storeitem) */
+	return (rs >= 0) ? len : rs ;
+} /* end method (loader::operator) */
+int loader::ldmisc(storeitem *) noex {
+    	int		rs = SR_OK ;
+	lep->h_addrtype	= oep->h_addrtype ;
+	lep->h_length	= oep->h_length ;
+	return rs ;
+} /* end method (loader::ldmisc) */
+int loader::ldname(storeitem *sip) noex {
+    	int		rs ;
+	int		len = 0 ; /* return-value */
+	ccharp		sp = oep->h_name ;
+	if (ccp rp ; (rs = sip->strw(sp,-1,&rp)) >= 0) {
+	    len += (lenstr(sp) + 1) ;
+	    lep->h_name = cast_const<charp>(rp) ;
+	} /* end */
+	return (rs >= 0) ? len : rs ;
+} /* end method (loader::ldname) */
+int loader::ldaliases(storeitem *sip) noex {
+    	int		rs{} ;
+	int		len = 0 ; /* return-value */
+	(void) sip ;
+	{
+	}
+	return (rs >= 0) ? len : rs ;
+} /* end method (loader::ldaliases) */
+#else /* CF_LOADER */
+int ucentho::load(char *rbuf,int rlen,con ucentho *chop) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	DEBPRINTF("ent\n") ;
@@ -199,6 +273,7 @@ int ucentho::load(char *rbuf,int rlen,const ucentho *chop) noex {
 	DEBPRINTF("ret rs=%d\n",rs) ;
 	return rs ;
 } /* end subroutine (ucentho::load) */
+#endif /* CF_LOADER */
 
 int ucentho::format(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
@@ -219,7 +294,7 @@ int ucentho::format(char *rbuf,int rlen) noex {
 			    if (h_aliases) {
 				cchar	**sv = ccharpp(h_aliases) ;
 				rs = b.strs(' ',sv) ;
-			    }
+			    } /* end */
 	                    break ;
 	                } /* end switch */
 	            } /* end if */
