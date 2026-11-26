@@ -45,13 +45,11 @@
 typedef	PROJECTENT	projectent ;
 
 EXTERNC_begin
-
-extern int projectent_load	(projectent *,char *,int,
+    extern int projectent_load	(projectent *,char *,int,
 					con projectent *) noex ;
-extern int projectent_parse	(projectent *,char *,int,cchar *,int) noex ;
-extern int projectent_size	(con projectent *) noex ;
-extern int projectent_format	(con projectent *,char *,int) noex ;
-
+    extern int projectent_parse	(projectent *,char *,int,cchar *,int) noex ;
+    extern int projectent_size	(con projectent *) noex ;
+    extern int projectent_fmt	(con projectent *,char *,int) noex ;
 EXTERNC_end
 
 
