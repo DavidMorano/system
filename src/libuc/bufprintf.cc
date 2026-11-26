@@ -67,7 +67,7 @@ int bufprintf(char *dbuf,int dlen,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt) {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = fmtstr(dbuf,dlen,mo,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
