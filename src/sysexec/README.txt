@@ -1,6 +1,6 @@
 SYSEXEC
 
-This program performs an 'exec(2)' operation on a program located
+This program performs an |exec(2)| operation on a program located
 in one of several possible "system" directories.  These "system"
 directories are:
 	/usr/xpg4/bin
