@@ -76,14 +76,6 @@ import libutil ;			/* lenstr(3u)| */
 
 /* local defines */
 
-#ifndef	UA_DN
-#define	UA_DN		"dn"		/* INET domain-name */
-#endif
-
-#ifndef	CF_UDOMAIN
-#define	CF_UDOMAIN	0
-#endif
-
 
 /* imported namespaces */
 
@@ -143,11 +135,6 @@ local int	userattrdb_openudomain	(uad *) noex ;
 
 /* local variables */
 
-constexpr cpcchar	specials[] = {
-	UA_DN,
-	nullptr
-} ; /* end array */
-
 
 /* exported variables */
 
@@ -159,9 +146,12 @@ int userattrdb_open(uad *op,cchar *username) noex {
 	if ((rs = userattrdb_ctor(op,username)) >= 0) ylikely {
 	    rs = SR_INVALID ;
 	    if (username[0]) ylikely {
-		rs = SR_OK ;
-	        op->username = username ;
-	        op->magval = USERATTRDB_MAGIC ;
+		rs = SR_NOSYS ;
+		if (syshas.userattr) {
+		    rs = SR_OK ;
+	            op->username = username ;
+	            op->magval = USERATTRDB_MAGIC ;
+		} /* end if (syshas.userattr) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		userattrdb_dtor(op) ;
@@ -250,7 +240,7 @@ local int userattrdb_sysdb(uad *op,char *rbuf,int rlen,cc *kn) noex {
 	        cchar	*cp{} ;
 		if ((rs = uc_kvamatch(op->uap->attr,kn,&cp)) >= 0) {
 		    if (rbuf) {
-		        rs = sncpy1(rbuf,rlen,cp) ;
+		        rs = sncpy(rbuf,rlen,cp) ;
 		    } else {
 		        rs = lenstr(cp) ;
 		    } /* end */
