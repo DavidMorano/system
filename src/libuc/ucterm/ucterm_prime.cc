@@ -275,7 +275,7 @@ int ucterm_control(ucterm *op,int cmd,...) noex {
 	    cint	fc = (cmd & FM_CMDMASK) ;
 	    int		iw ;
 	    int		*iwp ;
-	    va_begin(ap,cmd) ;
+	    va_beg(ap,cmd) ;
 	    switch (fc) {
 	    case uctermcmd_noop:
 		break ;
@@ -366,7 +366,7 @@ int ucterm_status(ucterm *op,int cmd,...) noex {
 	va_list		ap ;
 	int		rs ;
 	if ((rs = ucterm_magic(op)) >= 0) ylikely {
-	    va_begin(ap,cmd) ;
+	    va_beg(ap,cmd) ;
 	    switch (cmd) {
 	    case uctermcmd_noop:
 	        break ;
