@@ -114,7 +114,7 @@ char *stpncpy6(char *dp,
 char *stpncpyx(char *dp,int dl,int na,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    bool fbad = false ;
 	    char *ep = (dp + dl) ;
 	    for (int i = 0 ; (dp < ep) && (i < na) ; i += 1) {
