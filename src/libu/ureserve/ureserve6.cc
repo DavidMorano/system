@@ -118,7 +118,7 @@ int fieldtermsx(char *terms,int f,int na,...) noex {
 		memclear(terms,fieldterms_termsize) ;
 	    } /* end if */
 	    if (na > 0) ylikely {
-		va_begin(ap,na) ;
+		va_beg(ap,na) ;
 	        for (int i = 0 ; i < na ; i += 1) {
 		    int	ch = (int) va_arg(ap,int) ;
 		    ch &= UCHAR_MAX ;
