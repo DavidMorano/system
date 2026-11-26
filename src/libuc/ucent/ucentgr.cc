@@ -155,14 +155,14 @@ int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	                int	i ; /* used-afterwards */
 	                gr_mem = charpp(ptab) ;
 	                for (i = 0 ; (rs >= 0) && sgrp->gr_mem[i] ; i += 1) {
-			    char	**rpp = (gr_mem + i) ;
+			    charpp rpp = (gr_mem + i) ;
 	                    rs = si_copystr(&si,rpp,sgrp->gr_mem[i]) ;
 	                } /* end for */
 	                gr_mem[i] = nullptr ;
 	            } /* end if (storeitem-ptab) */
 	        } else {
 	            gr_mem = nullptr ;
-	        }
+	        } /* end */
 		if (rs >= 0) ylikely {
 	            si_copystr(&si,&gr_name,sgrp->gr_name) ;
 	            si_copystr(&si,&gr_passwd,sgrp->gr_passwd) ;
