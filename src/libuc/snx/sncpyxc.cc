@@ -196,7 +196,7 @@ int sncpybcx(char *dp,int dl,int na,...) noex {
     	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    rs = sncpyxcx(chtobc,dp,dl,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
@@ -207,7 +207,7 @@ int sncpylcx(char *dp,int dl,int na,...) noex {
     	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    rs = sncpyxcx(chtolc,dp,dl,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
@@ -218,7 +218,7 @@ int sncpyucx(char *dp,int dl,int na,...) noex {
     	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    rs = sncpyxcx(chtouc,dp,dl,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
@@ -229,7 +229,7 @@ int sncpyfcx(char *dp,int dl,int na,...) noex {
     	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    rs = sncpyxcx(chtofc,dp,dl,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
