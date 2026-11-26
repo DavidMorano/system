@@ -47,7 +47,6 @@ import libutil ;			/* |lenstr(3u)| */
 
 using libu::sncpy ;			/* subroutine */
 using libu::rmeol ;			/* subroutine */
-using libu::snprintf ;			/* subroutine */
 using libu::snvprintf ;			/* subroutine */
 
 
@@ -73,6 +72,10 @@ int dprint(cc *func,cc *sp,int µsl) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (dprint) */
 
+int dprintln(cc *func,cc *sp,int sl) noex {
+    	return dprint(func,sp,sl) ;
+} /* end subroutine (dprintln) */
+
 int dprintstr(cc *func,cc *str,cc *sp,int µsl) noex {
     	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -88,10 +91,6 @@ int dprintstr(cc *func,cc *str,cc *sp,int µsl) noex {
 	return (rs >= 0) ? len : rs ;
 } /* end subroutine (dprintstr) */
 
-int dprintln(cc *func,cc *sp,int sl) noex {
-    	return dprint(func,sp,sl) ;
-} /* end subroutine (dprintln) */
-
 int dprintf(cchar *func,cchar *fmt,...) noex {
     	va_list		ap ;
 	cnothrow	nt{} ;
@@ -99,7 +98,7 @@ int dprintf(cchar *func,cchar *fmt,...) noex {
     	int		rs = SR_FAULT ;
 	int		len = 0 ; /* return-value */
 	if (func && fmt) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
             rs = SR_NOMEM ;
 	    if (char *fbuf = new(nt) char[flen + 1]) ylikely {
 		if ((rs = sncpy(fbuf,flen,func,": ")) >= 0) {
