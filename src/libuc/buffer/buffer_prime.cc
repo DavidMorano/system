@@ -261,7 +261,7 @@ int buffer_printf(buffer *op,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (op && fmt) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = buffer_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
