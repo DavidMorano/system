@@ -20,11 +20,16 @@
 
 /*******************************************************************************
 
+  	Group:
+	ucsyspw
+
+  	Description:
 	This file contains the UNIX system types that the brain-damaged
 	Apple Darwin operating system does NOT have.  We are trying
 	in a very small way to make up for some of the immense
 	brain-damage within the Apple Darwin operating system.
 
+	Philosophy:
 	The idea here is that each OS needs to supply two types of
 	possibly interfaces.  One interface to be supplied is the
 	normal non-reentrant type interfaces IF your OS is missing
