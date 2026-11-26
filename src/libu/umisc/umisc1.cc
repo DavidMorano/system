@@ -125,7 +125,7 @@ int mknpathx(char *pbuf,int µplen,int n,...) noex {
 	if (pbuf) ylikely {
 	    if ((rs = getrlen(µplen)) >= 0) ylikely {
 		cint plen = rs ;
-	        va_begin(ap,n) ;
+	        va_beg(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	            ccharp  sp = (ccharp) va_arg(ap,ccharp) ;
 		    if (! sp) break ;
