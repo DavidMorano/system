@@ -477,7 +477,7 @@ int u_ftruncate(int fd,off_t fo) noex {
 int u_ioctl(int fd,int cmd,...) noex {
 	va_list		ap ;
 	int		rs = SR_INVALID ;
-	va_begin(ap,cmd) ;
+	va_beg(ap,cmd) ;
 	{
 	    caddr_t anyarg = va_arg(ap,caddr_t) ;
 	    if (cmd >= 0) {
