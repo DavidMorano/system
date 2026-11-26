@@ -209,7 +209,7 @@ int sncpyx(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    if (dl >= 0) {
 		rs = sncpyx_pos(dp,dl,n,ap) ;
 	    } else {
