@@ -277,7 +277,7 @@ int logfile_printf(logfile *op,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	if ((rs = logfile_magic(op)) >= 0) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = logfile_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (magic) */
