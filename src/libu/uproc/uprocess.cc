@@ -414,7 +414,7 @@ int u_ulimit(int cmd,...) noex {
 	    rval = ulimit(cmd,rval) ;
 	    break ;
 	case UL_SETFSIZE:
-	    va_begin(ap,cmd) ;
+	    va_beg(ap,cmd) ;
 	    {
 		csize	sz = size_t(va_arg(ap,long)) ;
 		{
