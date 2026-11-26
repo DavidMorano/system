@@ -63,8 +63,8 @@ struct bufstr_co {
 	    op = p ;
 	    w = m ;
 	} ; /* end */
-	operator int () noex ;
-	int operator () () noex { 
+	operator int	() noex ;
+	int operator ()	() noex { 
 	    return operator int () ;
 	} ; /* end */
 } ; /* end struct (bufstr_co) */
@@ -97,139 +97,161 @@ typedef BUFSTR		bufstr ;
 #endif /* __cplusplus */
 
 EXTERNC_begin
+    extern int	bufstr_start	(bufstr *) noex ;
+    extern int	bufstr_strw	(bufstr *,cchar *,int) noex ;
+    extern int	bufstr_chr	(bufstr *,int) noex ;
+EXTERNC_end
 
-extern int	bufstr_start	(bufstr *) noex ;
-extern int	bufstr_strw	(bufstr *,cchar *,int) noex ;
-extern int	bufstr_chr	(bufstr *,int) noex ;
+EXTERNC_begin
+    extern int	bufstr_bini	(bufstr *,int) noex ;
+    extern int	bufstr_binl	(bufstr *,long) noex ;
+    extern int	bufstr_binll	(bufstr *,longlong) noex ;
+    extern int	bufstr_binui	(bufstr *,uint) noex ;
+    extern int	bufstr_binul	(bufstr *,ulong) noex ;
+    extern int	bufstr_binull	(bufstr *,ulonglong) noex ;
+EXTERNC_end
 
-extern int	bufstr_bini	(bufstr *,int) noex ;
-extern int	bufstr_binl	(bufstr *,long) noex ;
-extern int	bufstr_binll	(bufstr *,longlong) noex ;
-extern int	bufstr_binui	(bufstr *,uint) noex ;
-extern int	bufstr_binul	(bufstr *,ulong) noex ;
-extern int	bufstr_binull	(bufstr *,ulonglong) noex ;
+EXTERNC_begin
+    extern int	bufstr_octi	(bufstr *,int) noex ;
+    extern int	bufstr_octl	(bufstr *,long) noex ;
+    extern int	bufstr_octll	(bufstr *,longlong) noex ;
+    extern int	bufstr_octui	(bufstr *,uint) noex ;
+    extern int	bufstr_octul	(bufstr *,ulong) noex ;
+    extern int	bufstr_octull	(bufstr *,ulonglong) noex ;
+EXTERNC_end
 
-extern int	bufstr_octi	(bufstr *,int) noex ;
-extern int	bufstr_octl	(bufstr *,long) noex ;
-extern int	bufstr_octll	(bufstr *,longlong) noex ;
-extern int	bufstr_octui	(bufstr *,uint) noex ;
-extern int	bufstr_octul	(bufstr *,ulong) noex ;
-extern int	bufstr_octull	(bufstr *,ulonglong) noex ;
+EXTERNC_begin
+    extern int	bufstr_deci	(bufstr *,int) noex ;
+    extern int	bufstr_decl	(bufstr *,long) noex ;
+    extern int	bufstr_decll	(bufstr *,longlong) noex ;
+    extern int	bufstr_decui	(bufstr *,uint) noex ;
+    extern int	bufstr_decul	(bufstr *,ulong) noex ;
+    extern int	bufstr_decull	(bufstr *,ulonglong) noex ;
+EXTERNC_end
 
-extern int	bufstr_deci	(bufstr *,int) noex ;
-extern int	bufstr_decl	(bufstr *,long) noex ;
-extern int	bufstr_decll	(bufstr *,longlong) noex ;
-extern int	bufstr_decui	(bufstr *,uint) noex ;
-extern int	bufstr_decul	(bufstr *,ulong) noex ;
-extern int	bufstr_decull	(bufstr *,ulonglong) noex ;
+EXTERNC_begin
+    extern int	bufstr_hexi	(bufstr *,int) noex ;
+    extern int	bufstr_hexl	(bufstr *,long) noex ;
+    extern int	bufstr_hexll	(bufstr *,longlong) noex ;
+    extern int	bufstr_hexui	(bufstr *,uint) noex ;
+    extern int	bufstr_hexul	(bufstr *,ulong) noex ;
+    extern int	bufstr_hexull	(bufstr *,ulonglong) noex ;
+EXTERNC_end
 
-extern int	bufstr_hexi	(bufstr *,int) noex ;
-extern int	bufstr_hexl	(bufstr *,long) noex ;
-extern int	bufstr_hexll	(bufstr *,longlong) noex ;
-extern int	bufstr_hexui	(bufstr *,uint) noex ;
-extern int	bufstr_hexul	(bufstr *,ulong) noex ;
-extern int	bufstr_hexull	(bufstr *,ulonglong) noex ;
-
-extern int	bufstr_get	(bufstr *,cchar **) noex ;
-extern int	bufstr_finish	(bufstr *) noex ;
-
+EXTERNC_begin
+    extern int	bufstr_get	(bufstr *,cchar **) noex ;
+    extern int	bufstr_finish	(bufstr *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-inline int bufstr_bin(bufstr *op,int v) noex {
+    inline int bufstr_bin(bufstr *op,int v) noex {
 	return bufstr_bini(op,v) ;
-} /* end */
-inline int bufstr_bin(bufstr *op,long v) noex {
+    } /* end */
+    inline int bufstr_bin(bufstr *op,long v) noex {
 	return bufstr_binl(op,v) ;
-} /* end */
-inline int bufstr_bin(bufstr *op,longlong v) noex {
+    } /* end */
+    inline int bufstr_bin(bufstr *op,longlong v) noex {
 	return bufstr_binll(op,v) ;
-} /* end */
+    } /* end */
+#endif /* __cplusplus */
 
-inline int bufstr_bin(bufstr *op,uint v) noex {
+#ifdef	__cplusplus
+    inline int bufstr_bin(bufstr *op,uint v) noex {
 	return bufstr_binui(op,v) ;
-} /* end */
-inline int bufstr_bin(bufstr *op,ulong v) noex {
+    } /* end */
+    inline int bufstr_bin(bufstr *op,ulong v) noex {
 	return bufstr_binul(op,v) ;
-} /* end */
-inline int bufstr_bin(bufstr *op,ulonglong v) noex {
+    } /* end */
+    inline int bufstr_bin(bufstr *op,ulonglong v) noex {
 	return bufstr_binull(op,v) ;
-} /* end */
+    } /* end */
+#endif /* __cplusplus */
 
-inline int bufstr_oct(bufstr *op,int v) noex {
+#ifdef	__cplusplus
+    inline int bufstr_oct(bufstr *op,int v) noex {
 	return bufstr_octi(op,v) ;
-} /* end */
-inline int bufstr_oct(bufstr *op,long v) noex {
+    } /* end */
+    inline int bufstr_oct(bufstr *op,long v) noex {
 	return bufstr_octl(op,v) ;
-} /* end */
-inline int bufstr_oct(bufstr *op,longlong v) noex {
+    } /* end */
+    inline int bufstr_oct(bufstr *op,longlong v) noex {
 	return bufstr_octll(op,v) ;
-} /* end */
+    } /* end */
+#endif /* __cplusplus */
 
-inline int bufstr_oct(bufstr *op,uint v) noex {
+#ifdef	__cplusplus
+    inline int bufstr_oct(bufstr *op,uint v) noex {
 	return bufstr_octui(op,v) ;
-} /* end */
-inline int bufstr_oct(bufstr *op,ulong v) noex {
+    } /* end */
+    inline int bufstr_oct(bufstr *op,ulong v) noex {
 	return bufstr_octul(op,v) ;
-} /* end */
-inline int bufstr_oct(bufstr *op,ulonglong v) noex {
+    } /* end */
+    inline int bufstr_oct(bufstr *op,ulonglong v) noex {
 	return bufstr_octull(op,v) ;
-} /* end */
+    } /* end */
+#endif /* __cplusplus */
 
-inline int bufstr_dec(bufstr *op,int v) noex {
+#ifdef	__cplusplus
+    inline int bufstr_dec(bufstr *op,int v) noex {
 	return bufstr_deci(op,v) ;
-} /* end */
-inline int bufstr_dec(bufstr *op,long v) noex {
+    } /* end */
+    inline int bufstr_dec(bufstr *op,long v) noex {
 	return bufstr_decl(op,v) ;
-} /* end */
-inline int bufstr_dec(bufstr *op,longlong v) noex {
+    } /* end */
+    inline int bufstr_dec(bufstr *op,longlong v) noex {
 	return bufstr_decll(op,v) ;
-} /* end */
+    } /* end */
+#endif /* __cplusplus */
 
-inline int bufstr_dec(bufstr *op,uint v) noex {
+#ifdef	__cplusplus
+    inline int bufstr_dec(bufstr *op,uint v) noex {
 	return bufstr_decui(op,v) ;
-} /* end */
-inline int bufstr_dec(bufstr *op,ulong v) noex {
+    } /* end */
+    inline int bufstr_dec(bufstr *op,ulong v) noex {
 	return bufstr_decul(op,v) ;
-} /* end */
-inline int bufstr_dec(bufstr *op,ulonglong v) noex {
+    } /* end */
+    inline int bufstr_dec(bufstr *op,ulonglong v) noex {
 	return bufstr_decull(op,v) ;
-} /* end */
+    } /* end */
+#endif /* __cplusplus */
 
-inline int bufstr_hex(bufstr *op,int v) noex {
+#ifdef	__cplusplus
+    inline int bufstr_hex(bufstr *op,int v) noex {
 	return bufstr_hexi(op,v) ;
-} /* end */
-inline int bufstr_hex(bufstr *op,long v) noex {
+    } /* end */
+    inline int bufstr_hex(bufstr *op,long v) noex {
 	return bufstr_hexl(op,v) ;
-} /* end */
-inline int bufstr_hex(bufstr *op,longlong v) noex {
+    } /* end */
+    inline int bufstr_hex(bufstr *op,longlong v) noex {
 	return bufstr_hexll(op,v) ;
-} /* end */
+    } /* end */
+#endif /* __cplusplus */
 
-inline int bufstr_hex(bufstr *op,uint v) noex {
+#ifdef	__cplusplus
+    inline int bufstr_hex(bufstr *op,uint v) noex {
 	return bufstr_hexui(op,v) ;
-} /* end */
-inline int bufstr_hex(bufstr *op,ulong v) noex {
+    } /* end */
+    inline int bufstr_hex(bufstr *op,ulong v) noex {
 	return bufstr_hexul(op,v) ;
-} /* end */
-inline int bufstr_hex(bufstr *op,ulonglong v) noex {
+    } /* end */
+    inline int bufstr_hex(bufstr *op,ulonglong v) noex {
 	return bufstr_hexull(op,v) ;
 } /* end */
+#endif /* __cplusplus */
 
-template<typename Binary> int bufstr::bin(Binary v) noex {
+#ifdef	__cplusplus
+    template<typename Binary>		int bufstr::bin(Binary v)	noex {
 	return bufstr_bin(this,v) ;
-} /* end */
-template<typename Octal> int bufstr::oct(Octal v) noex {
+    } /* end */
+    template<typename Octal>		int bufstr::oct(Octal v)	noex {
 	return bufstr_oct(this,v) ;
-} /* end */
-template<typename Decimal> int bufstr::dec(Decimal v) noex {
+    } /* end */
+    template<typename Decimal>		int bufstr::dec(Decimal v)	noex {
 	return bufstr_dec(this,v) ;
-} /* end */
-template<typename Hexadecimal> int bufstr::hex(Hexadecimal v) noex {
+    } /* end */
+    template<typename Hexadecimal>	int bufstr::hex(Hexadecimal v)	noex {
 	return bufstr_hex(this,v) ;
-} /* end */
-
+    } /* end */
 #endif /* __cplusplus */
 
 
