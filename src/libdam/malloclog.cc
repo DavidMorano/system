@@ -332,7 +332,7 @@ int malloclog_printf(cchar fmt[],...)
 	if (u_access(MALLOCLOG_FILE,W_OK) < 0)
 	    return SR_NOTOPEN ;
 
-	va_begin(ap,fmt) ;
+	va_beg(ap,fmt) ;
 	len = fmtstr(buf,MALLOCLOG_BUFLEN,1,fmt,ap) ;
 	va_end(ap) ;
 
