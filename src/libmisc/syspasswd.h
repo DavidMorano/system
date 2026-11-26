@@ -31,12 +31,10 @@ struct syspasswd_head {
 typedef SYSPASSWD	syspasswd ;
 
 EXTERNC_begin
-
-extern int syspasswd_open	(syspasswd *,cchar *) noex ;
-extern int syspasswd_close	(syspasswd *) noex ;
-extern int syspasswd_readent	(syspasswd *,ucentpw *,char *,int) noex ;
-extern int syspasswd_reset	(syspasswd *) noex ;
-
+    extern int syspasswd_open	(syspasswd *,cchar *) noex ;
+    extern int syspasswd_close	(syspasswd *) noex ;
+    extern int syspasswd_read	(syspasswd *,ucentpw *,char *,int) noex ;
+    extern int syspasswd_reset	(syspasswd *) noex ;
 EXTERNC_end
 
 
