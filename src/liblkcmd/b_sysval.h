@@ -1,4 +1,9 @@
-/* config */
+/* sysval_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* test program */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,14 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	SYSVALCONFIG_INCLUDE
+#define	SYSVALCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 
 
 #define	VERSION		"0"
@@ -87,5 +100,8 @@
 #define	TO_TZ		(60*60)			/* time-out for TZ */
 
 #define	USAGECOLS	4
+
+
+#endif /* SYSVALCONFIG_INCLUDE */
 
 
