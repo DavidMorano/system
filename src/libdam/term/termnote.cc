@@ -387,7 +387,7 @@ int termnote_printf(TN *op,cc **rpp,int n,int o,cc *fmt,...) noex {
 	int		rs ;
 	assert(op) ;
 	if ((rs = termnote_magic(op,rpp,fmt)) >= 0) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = termnote_vprintf(op,rpp,n,o,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (magic) */
