@@ -141,7 +141,7 @@ int sysusershells_close(sysusershells *op) noex {
 } 
 /* end subroutine (sysusershells_close) */
 
-int sysusershells_readent(sysusershells *op,char *ubuf,int ulen) noex {
+int sysusershells_read(sysusershells *op,char *ubuf,int ulen) noex {
 	int		rs ;
 	if ((rs = sysusershells_magic(op,ubuf)) >= 0) ylikely {
 	    cchar	*lp ;
