@@ -972,7 +972,7 @@ LOCINFO	*lip ;
 	    HDB		*dbp = &lip->wdb ;
 	    HDB_CUR	cur ;
 	    HDB_DATUM	k, v ;
-	    if ((rs1 = hdb_curbegin(dbp,&cur)) >= 0) {
+	    if ((rs1 = hdb_curbeg(dbp,&cur)) >= 0) {
 	        while (hdb_curenum(dbp,&cur,&k,&v) >= 0) {
 	            struct wordent	*ep = (struct wordent *) v.buf ;
 	            rs1 = uc_free(ep) ;
@@ -1441,7 +1441,7 @@ local int procoutcounts(PROGINFO *pip,void *ofp)
 	int	wlen = 0 ;
 
 	dbp = &lip->wdb ;
-	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
+	if ((rs = hdb_curbeg(dbp,&cur)) >= 0) {
 	    struct wordent	*ep ;
 	    cchar	*fmt = "%-6u %r\n" ;
 	    cchar	*wp ;
