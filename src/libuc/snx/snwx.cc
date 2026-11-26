@@ -125,7 +125,7 @@ int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	if (rbuf && fmt) ylikely {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && fmt[0]) ylikely {
-		va_begin(ap,fmt) ;
+		va_beg(ap,fmt) ;
 		rs = snwvprintf(rbuf,rlen,fmt,ap) ;
 		len = rs ;
 		va_end(ap) ;
@@ -139,7 +139,7 @@ namespace libuc {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (rbuf && fmt) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = snwvprintf(rbuf,rlen,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
