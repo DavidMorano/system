@@ -133,7 +133,7 @@ int mknpathxw(char *pbuf,int µplen,int n,...) noex {
 	    if ((rs = getrlen(µplen)) >= 0) ylikely {
 		cint	plen = rs ;
 	        int	sl = -1 ;
-	        va_begin(ap,n) ;
+	        va_beg(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	            ccp  sp = (ccharp) va_arg(ap,char *) ;
 	            if (i == (n - 1)) sl = (int) va_arg(ap,int) ;
