@@ -1,4 +1,9 @@
-/* config */
+/* sysdb_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* SYSDB program */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,14 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	SYSDBCONFIG_INCLUDE
+#define	SYSDBCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<utypedefs.h>		/* LIBU */
 
 
 #define	VERSION		"0"
@@ -88,5 +101,8 @@
 
 #define	TO_CACHE	2
 #define	TO_LOADAVG	1
+
+
+#endif /* SYSDBCONFIG_INCLUDE */
 
 
