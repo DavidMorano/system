@@ -199,7 +199,7 @@ namespace libu {
 	if (rbuf && fmt) ylikely {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && fmt[0]) ylikely {
-		va_begin(ap,fmt) ;
+		va_beg(ap,fmt) ;
 		rs = snvprintf(rbuf,rlen,fmt,ap) ;
 		va_end(ap) ;
 	    } /* end if (valid) */
