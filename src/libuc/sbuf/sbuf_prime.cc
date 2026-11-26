@@ -504,7 +504,7 @@ int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (op && fmt) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = sbuf_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
@@ -602,7 +602,7 @@ int sbuf::printf(cchar *fmt,...) noex {
     	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (fmt) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = sbuf_vprintf(this,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
