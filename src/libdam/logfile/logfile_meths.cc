@@ -99,7 +99,7 @@ int logfile::printf(cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	{
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = logfile_vprintf(this,fmt,ap) ;
 	    va_end(ap) ;
 	}
