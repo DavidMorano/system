@@ -54,7 +54,7 @@
 #include	<netdb.h>		/* POSIX® */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<string>		/* CSTD |memcpy(3c)| */
+#include	<string>		/* CSTD |strchr(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<usupport.h>		/* LIBU */
@@ -300,7 +300,7 @@ int hostent_load(HE *hep,char *hebuf,int helen,HOSTENT *lp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (hep && hebuf && lp) ylikely {
-	    memcpy(hep,lp) ;
+	    memcopy(hep,lp) ;
 	    if (storeitem ib ; (rs = ib.start(hebuf,helen)) >= 0) ylikely {
 	        if (rs >= 0) rs = si_copyaliases(&ib,hep,lp) ;
 	        if (rs >= 0) rs = si_copyaddrs(&ib,hep,lp) ;
