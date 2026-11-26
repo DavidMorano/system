@@ -31,12 +31,10 @@ struct sysusernames_head {
 typedef SYSUSERNAMES	sysusernames ;
 
 EXTERNC_begin
-
-extern int sysusernames_open	(sysusernames *,cchar *) noex ;
-extern int sysusernames_close	(sysusernames *) noex ;
-extern int sysusernames_readent	(sysusernames *,char *,int) noex ;
-extern int sysusernames_reset	(sysusernames *) noex ;
-
+    extern int sysusernames_open	(sysusernames *,cchar *) noex ;
+    extern int sysusernames_close	(sysusernames *) noex ;
+    extern int sysusernames_read	(sysusernames *,char *,int) noex ;
+    extern int sysusernames_reset	(sysusernames *) noex ;
 EXTERNC_end
 
 
