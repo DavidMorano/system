@@ -1,11 +1,11 @@
-/* perdata */
+/* perdata SUPPORT */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
 
 /* persistent data */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
+#define	CF_DEBUG	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -18,16 +18,17 @@
 
 /*******************************************************************************
 
-        This is the actual data for an instantiation for the PERCACHE object. If
-        you want to join this shared cache, just include this module in your
-        link step.
-
+  	Description:
+	This is the actual data for an instantiation for the PERCACHE
+	object.  If you want to join this shared cache, just include
+	this module in your link step.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	"percache.h"
+#include	<clanguage.h>
+#include	<usysbase.h>
+#include	<percache.h>
 
 
 /* local defines */
@@ -48,9 +49,11 @@
 /* local variables */
 
 
-/* global data */
+/* exported variables */
 
 PERCACHE 	pc ;		/* unitialized it stays in BSS */
 
+
+/* exported subroutines */
 
 
