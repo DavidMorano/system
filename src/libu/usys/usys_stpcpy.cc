@@ -99,7 +99,7 @@ char *stpcpy6(char *dp,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 char *usys_stpcpy(char *dp,int n,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    for (int i = 0 ; i < n ; i += 1) {
 	        cchar	*sp = (cchar *) va_arg(ap,char *) ;
 		dp = stpcpy(dp,sp) ;
