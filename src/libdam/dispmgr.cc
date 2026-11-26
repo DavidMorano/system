@@ -232,7 +232,7 @@ int dispmgr_printf(DS *op,int w,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	if ((rs = dispmgr_magic(op,fmt)) >= 0) {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = termdisp_vpprintf(op->tdp,w,-1,-1,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (magic) */
@@ -243,7 +243,7 @@ int dispmgr_pprintf(DS *op,int w,int r,int c,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	if ((rs = dispmgr_magic(op,fmt)) >= 0) {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = termdisp_vpprintf(op->tdp,w,r,c,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (magic) */
