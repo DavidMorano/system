@@ -187,8 +187,8 @@ struct storebuf_co {
 	    op = p ;
 	    w = m ;
 	} ; /* end methodd */
-	operator int () noex ;
-	int operator () () noex {
+	operator int	() noex ;
+	int operator ()	() noex {
 	    return operator int () ;
 	} ; /* end */
 } ; /* end struct (storebuf_co) */
