@@ -51,12 +51,10 @@
 typedef	USERATTRENT	userattrent ;
 
 EXTERNC_begin
-
 extern int userattrent_load(userattrent *,char *,int,con userattrent *) noex ;
 extern int userattrent_parse(userattrent *,char *,int,cchar *,int) noex ;
 extern int userattrent_size(con userattrent *) noex ;
-extern int userattrent_format(con userattrent *,char *,int) noex ;
-
+extern int userattrent_fmt(con userattrent *,char *,int) noex ;
 EXTERNC_end
 
 
