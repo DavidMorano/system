@@ -206,7 +206,7 @@ int outline_printf(outline *op,cchar *fmt,...) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op && fmt) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = outline_vprintf(op,fmt,ap) ;
 	    wlen = rs ;
 	    va_end(ap) ;
@@ -263,7 +263,7 @@ int outline::printf(cchar *fmt,...) noex {
     	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (fmt) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = outline_vprintf(this,fmt,ap) ;
 	    va_end(ap) ;
 	}
