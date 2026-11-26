@@ -155,7 +155,7 @@ char *strbcpyx_neg(char *dp,int dl,int na,va_list ap) noex {
 char *strbcpyx(char *dp,int dl,int na,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    if (dl >= 0) {
 		dp = strbcpyx_pos(dp,dl,na,ap) ;
 	    } else {
