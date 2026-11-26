@@ -20,14 +20,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>		/* POSIX® system types */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
 
 EXTERNC_begin
-extern int	uc_getpid() noex ;
-extern int	uc_setpid(pid_t) noex ;
+    extern int	uc_getpid() noex ;
+    extern int	uc_setpid(pid_t) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -37,13 +36,13 @@ namespace libuc {
     	operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (ucpider) */
     struct ucsider {
     	operator int () noex ;
 	int operator () () noex {
 	    return operator int () ;
-	} ;
+	} ; /* end */
     } ; /* end struct (ucsider) */
 } /* end namespace (libuc) */
 
