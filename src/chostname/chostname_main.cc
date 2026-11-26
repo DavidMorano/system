@@ -704,7 +704,7 @@ local int printinfo(PI *pip,int f_auth,bfile *ofp,cc *name,int as
 		inetaddrs at = inetaddr_bin ;
 	        if (inetaddr ia ; (rs = inetaddr_start(&ia,at,ap,-1)) >= 0) {
 
-	        if ((rs1 = inetaddr_getdotaddr(&ia,iabuf,IABUFLEN)) >= 0) {
+	        if ((rs1 = inetaddr_getdot(&ia,iabuf,IABUFLEN)) >= 0) {
 			iwap = (in_addr_t *) ap ;
 			iwa = *iwap ;
 	            rs = bprintf(ofp,"\taddr=%s (\\x%08x)\n",iabuf,
