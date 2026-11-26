@@ -140,7 +140,7 @@ int sysusernames_close(sysusernames *op) noex {
 } 
 /* end subroutine (sysusernames_close) */
 
-int sysusernames_readent(sysusernames *op,char *ubuf,int ulen) noex {
+int sysusernames_read(sysusernames *op,char *ubuf,int ulen) noex {
 	int		rs ;
 	if ((rs = sysusernames_magic(op,ubuf)) >= 0) ylikely {
 	    ubuf[0] = '\0' ;
@@ -153,7 +153,7 @@ int sysusernames_readent(sysusernames *op,char *ubuf,int ulen) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (sysusernames_readent) */
+/* end subroutine (sysusernames_read) */
 
 int sysusernames_reset(sysusernames *op) noex {
 	int		rs ;
