@@ -29,8 +29,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<new>			/* C++STD |nothrow(3c++)| */
-#include	<algorithm>		/* C++STD |min(3c++)| + |max(3c++)| */
+#include	<new>			/* C++STD */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 #include	<storeitem.h>		/* LIBUC */
@@ -88,7 +87,7 @@ namespace ucent {
 	    cint	nb = (idx >= clen) ? 1 : (clen-idx) ;
 	    if ((rs = sbp->blanks(nb)) >= 0) {
 		rs = sbp->str(sp) ;
-	    }
+	    } /* end */
 	} /* end if */
 	return rs ;
     } /* end subroutine (sbuf_fmtstr) */
@@ -97,9 +96,10 @@ namespace ucent {
 
 namespace ucent {
     int si_loadnames(SI *sip,vechand *ulp,cchar *sp,int sl) noex {
+	cnullptr	np{} ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	for (cchar *tp ; (tp = strnbrk(sp,sl," ,")) != nullptr ; ) {
+	for (cchar *tp ; (tp = strnbrk(sp,sl," ,")) != np ; ) {
 	    if (cint tl = intconv(tp - sp) ; tl > 0) {
 		c += 1 ;
 		rs = si_loadname(sip,ulp,sp,tl) ;
@@ -127,12 +127,11 @@ namespace ucent {
 } /* end namespace (ucent) */
 
 namespace ucent {
-    int si_copystr(SI *sip,char **pp,cchar *sp) noex {
+    int si_copystr(SI *sip,cchar **pp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = ccharpp(pp) ;
-	*cpp = nullptr ;
+	*pp = nullptr ;
 	if (sp) {
-	    rs = sip->strw(sp,-1,cpp) ;
+	    rs = sip->strw(sp,sl,pp) ;
 	} /* end */
 	return rs ;
     } /* end subroutine (si_copystr) */
