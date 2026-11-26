@@ -172,7 +172,7 @@ int debprintf(cchar *func,cchar *fmt,...) noex {
 	if (func && fmt) ylikely {
 	    rs = SR_OK ;
 	    if (dfd >= 0) ylikely {
-	        va_begin(ap,fmt) ;
+	        va_beg(ap,fmt) ;
     	        rs = SR_NOMEM ;
 	        if (char *fbuf = new(nt) char[flen + 1]) ylikely {
 		    if ((rs = sncpy(fbuf,flen,func,": ")) >= 0) {
