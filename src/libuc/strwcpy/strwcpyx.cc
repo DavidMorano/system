@@ -148,7 +148,7 @@ char *strwcpy6(char *dp,
 char *strwcpyx(char *dp,int n,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    if (n > 1) {
 	        for (int i = 0 ; i < (n - 1) ; i += 1) {
 	            ccp sp = (cchar *)	va_arg(ap,char *) ;
