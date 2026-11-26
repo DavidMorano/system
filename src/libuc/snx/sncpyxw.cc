@@ -154,7 +154,7 @@ int sncpyxw(char *dp,int dl,int n,...) noex {
 	if (dl < 0) dl = INT_MAX ;
 	if (dp) ylikely {
 	    charp bp = dp ;
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    rs = SR_OVERFLOW ;
 	    dp[0] = eos ;
 	    for (int i = 0 ; dp && (i < (n - 1)) ; i += 1) {
