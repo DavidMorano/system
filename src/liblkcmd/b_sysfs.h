@@ -1,4 +1,9 @@
-/* config */
+/* sysfs_config HEADER */
+/* charset=ISO8859-1 */
+/* lang=C++20 (conformance reviewed) */
+
+/* test program */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,6 +14,14 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+
+#ifndef	SYSFSCONFIG_INCLUDE
+#define	SYSFSCONFIG_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<sysbase.h>		/* LIBU */
 
 
 #define	VERSION		"0"
@@ -87,5 +100,8 @@
 
 #define	TO_CACHE	2
 #define	TO_LOADAVG	1
+
+
+#endif /* SYSFSCONFIG_INCLUDE */
 
 
