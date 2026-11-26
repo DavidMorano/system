@@ -39,30 +39,31 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
-
-#include	<usystem.h>
+#include	<climits>		/* CSTD */
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+#include	<nulstr.h>		/* LIBU */
+#include	<bwops.h>		/* LIBU */
+#include	<getxx.h>
 #include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<setstr.h>
-#include	<bwops.h>
 #include	<field.h>
-#include	<nulstr.h>
-#include	<getxx.h>
 #include	<passwdent.h>
 #include	<shadowent.h>
 #include	<groupent.h>
 #include	<projectent.h>
 #include	<userattrent.h>
 #include	<isnot.h>
-#include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<exitcodes.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -70,14 +71,17 @@
 #include	"defs.h"
 #include	"opensysfs.hh"
 
+#pragma		GCC dependency		"mod/libutil.ccm"
+
+import libutil ;			/* |lenstr(3u)| */
 
 /* local defines */
 
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
+#define	LI		locinfo
+#define	LI_FL	locinfo_flags
 
-#define	PROCUSERS	struct procusers
-#define	PROCUSERS_FL	struct procusers_flags
+#define	PROCUSERS	procusers
+#define	PROCUSERS_FL	procusers_flags
 
 #define	PU		PROCUSERS
 
@@ -87,7 +91,7 @@
 /* external subroutines */
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
-extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
+extern int	proginfo_setpiv(PI *,cchar *,const struct pivars *) ;
 
 
 /* external variables */
@@ -102,23 +106,23 @@ struct locinfo_flags {
 	uint		wargs:1 ;
 	uint		dbfname:1 ;
 	uint		to:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
-	PROGINFO	*pip ;
+	PI		*pip ;
 	cchar		*dbfname ;
 	cchar		*fname ;
-	LOCINFO_FL	have, f, changed, finval ;
-	LOCINFO_FL	init, open ;
+	LI_FL		have, f, changed, finval ;
+	LI_FL		init, open ;
 	vecstr		stores ;
 	uint		wargs ;
 	int		pagesize ;
 	int		to ;
-} ;
+} ; /* end struct */
 
 struct procusers_flags {
 	uint		users:1 ;
-} ;
+} ; /* end struct */
 
 struct procusers {
 	bfile		utfile ;
@@ -135,64 +139,51 @@ struct procusers {
 	char		*utfname ;
 	char		*ptfname ;
 	char		*lbuf ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
 local int	mainsub(int,mainv,mainv,void *) noex ;
 
-local int	usage(PROGINFO *) noex ;
+local int	usage(PI *) noex ;
 
-local int	procsysdir(PROGINFO *) noex ;
-local int	procdirgroup(PROGINFO *,cchar *,USTAT *) noex ;
-local int	procuhdir(PROGINFO *,char *,int,cchar *) noex ;
-local int	proctmpfile(PROGINFO *,char *,cchar *,mode_t) noex ;
-local int	process(PROGINFO *,int) noex ;
-local int	procwarg(PROGINFO *,int) noex ;
-local int	procusers(PROGINFO *,int) noex ;
-local int	procusers_begin(PROGINFO *,PU *) noex ;
-local int	procusers_allocbegin(PROGINFO *,PU *) noex ;
-local int	procusers_allocend(PROGINFO *,PU *) noex ;
-local int	procusers_beginer(PROGINFO *,PU *,cchar *,mode_t) noex ;
-local int	procusers_ent(PROGINFO *,PU *,PASSWD *) noex ;
-local int	procusers_end(PROGINFO *,PU *) noex ;
-local int	procuserlink(PROGINFO *,char *,int,PASSWD *) noex ;
-local int	procgroups(PROGINFO *,int) noex ;
-local int	procgroups_load(PROGINFO *,bfile *,bfile *) noex ;
-local int	procgroups_ent(PROGINFO *,bfile *,bfile *,
+local int	procsysdir(PI *) noex ;
+local int	procdirgroup(PI *,cchar *,USTAT *) noex ;
+local int	procuhdir(PI *,char *,int,cchar *) noex ;
+local int	proctmpfile(PI *,char *,cchar *,mode_t) noex ;
+local int	process(PI *,int) noex ;
+local int	procwarg(PI *,int) noex ;
+local int	procusers(PI *,int) noex ;
+local int	procusers_begin(PI *,PU *) noex ;
+local int	procusers_allocbegin(PI *,PU *) noex ;
+local int	procusers_allocend(PI *,PU *) noex ;
+local int	procusers_beginer(PI *,PU *,cchar *,mode_t) noex ;
+local int	procusers_ent(PI *,PU *,PASSWD *) noex ;
+local int	procusers_end(PI *,PU *) noex ;
+local int	procuserlink(PI *,char *,int,PASSWD *) noex ;
+local int	procgroups(PI *,int) noex ;
+local int	procgroups_load(PI *,bfile *,bfile *) noex ;
+local int	procgroups_ent(PI *,bfile *,bfile *,
 			char *,int,GROUP *) noex ;
-local int	procprojects(PROGINFO *,int) noex ;
-local int	procprojects_load(PROGINFO *,bfile *,bfile *) noex ;
-local int	procshells(PROGINFO *,int) noex ;
-local int	procshadow(PROGINFO *,int) noex ;
-local int	procuserattr(PROGINFO *,int) noex ;
+local int	procprojects(PI *,int) noex ;
+local int	procprojects_load(PI *,bfile *,bfile *) noex ;
+local int	procshells(PI *,int) noex ;
+local int	procshadow(PI *,int) noex ;
+local int	procuserattr(PI *,int) noex ;
 
-local int	procopts(PROGINFO *,keyopt *) noex ;
+local int	procopts(PI *,keyopt *) noex ;
 
-local int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
-local int	locinfo_warg(LOCINFO *,int) noex ;
-local int	locinfo_dbfname(LOCINFO *,cchar *) noex ;
-local int	locinfo_to(LOCINFO *,int) noex ;
-local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) noex ;
-local int	locinfo_defaults(LOCINFO *) noex ;
-local int	locinfo_finish(LOCINFO *) noex ;
+local int	locinfo_start(LI *,PI *) noex ;
+local int	locinfo_warg(LI *,int) noex ;
+local int	locinfo_dbfname(LI *,cchar *) noex ;
+local int	locinfo_to(LI *,int) noex ;
+local int	locinfo_setentry(LI *,cchar **,cchar *,int) noex ;
+local int	locinfo_defaults(LI *) noex ;
+local int	locinfo_finish(LI *) noex ;
 
 
 /* local variables */
-
-static cchar	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"db",
-	nullptr
-} ;
 
 enum argopts {
 	argopt_root,
@@ -205,15 +196,28 @@ enum argopts {
 	argopt_of,
 	argopt_db,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
-static const PIVARS	initvars = {
+constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"db",
+	nullptr
+} ; /* end array */
+
+constexpr PIVARS	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end array */
 
 static const MAPEX	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -227,35 +231,19 @@ static const MAPEX	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
-
-static cchar	*akonames[] = {
-	"utf",
-	"db",
-	nullptr
-} ;
+} ; /* end array */
 
 enum akonames {
 	akoname_utf,
 	akoname_db,
 	akoname_overlast
-} ;
+} ; /* end enum */
 
-/* define the configuration keywords */
-static cchar	*wopts[] = {
-	"userhomes",
-	"usernames",
-	"groupnames",
-	"projectnames",
-	"passwd",
-	"group",
-	"project",
-	"realname",
-	"shells",
-	"shadow",
-	"userattr",
+constexpr cpcchar	akonames[] = {
+	"utf",
+	"db",
 	nullptr
-} ;
+} ; /* end array */
 
 enum wopts {
 	wopt_userhomes,
@@ -270,7 +258,23 @@ enum wopts {
 	wopt_shadow,
 	wopt_userattr,
 	wopt_overlast
-} ;
+} ; /* end enum */
+
+/* define the configuration keywords */
+constexpr cpcchar	wopts[] = {
+	"userhomes",
+	"usernames",
+	"groupnames",
+	"projectnames",
+	"passwd",
+	"group",
+	"project",
+	"realname",
+	"shells",
+	"shadow",
+	"userattr",
+	nullptr
+} ; /* end array */
 
 
 /* exported variables */
@@ -278,7 +282,7 @@ enum wopts {
 
 /* exported subroutines */
 
-int b_sysfs(int argc,mainv argv,void *contextp) noex {
+int b_sysfs(int argc,con mainv argv,void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
@@ -290,20 +294,18 @@ int b_sysfs(int argc,mainv argv,void *contextp) noex {
 	} /* end if (ksh) */
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
 	return ex ;
-}
-/* end subroutine (b_sysfs) */
+} /* end subroutine (b_sysfs) */
 
-int p_sysfs(int argc,mainv argv,mainv envv,void *contextp) noex {
+int p_sysfs(int argc,con mainv argv,con mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_sysfs) */
+} /* end subroutine (p_sysfs) */
 
 
 /* local subroutines */
 
-local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
-	PROGINFO	pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+local int mainsub(int argc,con mainv argv,con mainv envv,void *contextp) noex {
+	PI		pi, *pip = &pi ;
+	LI		li, *lip = &li ;
 	bits		pargs ;
 	keyopt		akopts ;
 	SHIO		errfile ;
@@ -846,10 +848,9 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
-local int usage(PROGINFO *pip) noex {
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -864,12 +865,11 @@ local int usage(PROGINFO *pip) noex {
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
+} /* end subroutine (usage) */
 
 /* process the program ako-options */
-local int procopts(PROGINFO *pip,keyopt *kop) noex {
-	LOCINFO		*lip = pip->lip ;
+local int procopts(PI *pip,keyopt *kop) noex {
+	LI		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
@@ -918,10 +918,9 @@ local int procopts(PROGINFO *pip,keyopt *kop) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procopts) */
+} /* end subroutine (procopts) */
 
-local int procsysdir(PROGINFO *pip) noex {
+local int procsysdir(PI *pip) noex {
 	cmode		dm = (0777 | S_ISGID|S_IXGRP) ;
 	int		rs ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
@@ -946,10 +945,9 @@ local int procsysdir(PROGINFO *pip) noex {
 	} /* end if */
 
 	return rs ;
-}
-/* end subroutine (procsysdir) */
+} /* end subroutine (procsysdir) */
 
-local int procdirgroup(PROGINFO *pip,cchar *sdname,USTAT *sbp) noex {
+local int procdirgroup(PI *pip,cchar *sdname,USTAT *sbp) noex {
 	USTAT		psb ;
 	int		rs = SR_OK ;
 	int		cl ;
@@ -974,10 +972,9 @@ local int procdirgroup(PROGINFO *pip,cchar *sdname,USTAT *sbp) noex {
 	} /* end if (sfdirname) */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subrotine (procdirgroup) */
+} /* end subrotine (procdirgroup) */
 
-local int process(PROGINFO *pip,int w) noex {
+local int process(PI *pip,int w) noex {
 	int		rs ;
 
 	if ((rs = procwarg(pip,w)) > 0) {
@@ -1016,11 +1013,10 @@ local int process(PROGINFO *pip,int w) noex {
 	} /* end if (proc-warg) */
 
 	return rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
-local int procwarg(PROGINFO *pip,int w) noex {
-	LOCINFO		*lip = pip->lip ;
+local int procwarg(PI *pip,int w) noex {
+	LI		*lip = pip->lip ;
 	cint wusers[] = { wopt_userhomes, wopt_usernames, 
 	            wopt_passwd, -1 } ;
 	cint wgroups[] = { wopt_groupnames, wopt_group, -1 } ;
@@ -1055,10 +1051,9 @@ local int procwarg(PROGINFO *pip,int w) noex {
 	} /* end if */
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (procwarg) */
+} /* end subroutine (procwarg) */
 
-local int procusers(PROGINFO *pip,int w) noex {
+local int procusers(PI *pip,int w) noex {
 	PROCUSERS	pu ;
 	int		rs ;
 	int		rs1 ;
@@ -1085,10 +1080,9 @@ local int procusers(PROGINFO *pip,int w) noex {
 	}
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procusers) */
+} /* end subroutine (procusers) */
 
-local int procusers_begin(PROGINFO *pip,PU *pup) noex {
+local int procusers_begin(PI *pip,PU *pup) noex {
 	int		rs ;
 	cchar		*sd = OPENSYSFS_SYSDNAME ;
 	cchar		*uh = OPENSYSFS_FUSERHOMES ;
@@ -1111,10 +1105,9 @@ local int procusers_begin(PROGINFO *pip,PU *pup) noex {
 	} /* end if (procusers_allocbegin) */
 
 	return rs ;
-}
-/* end subroutine (procusers_begin) */
+} /* end subroutine (procusers_begin) */
 
-local int procusers_allocbegin(PROGINFO *pip,PU *pup) noex {
+local int procusers_allocbegin(PI *pip,PU *pup) noex {
 	cint		pwlen = bufsizeget(bufsize_pw) ;
 	cint		plen = MAXPATHLEN ;
 	int		rs ;
@@ -1137,10 +1130,9 @@ local int procusers_allocbegin(PROGINFO *pip,PU *pup) noex {
 	    pup->llen = llen ;
 	} /* end if (memory-ållocation) */
 	return rs ;
-}
-/* end subroutine (procusers_allocbegin) */
+} /* end subroutine (procusers_allocbegin) */
 
-local int procusers_allocend(PROGINFO *pip,PU *pup) noex {
+local int procusers_allocend(PI *pip,PU *pup) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (pip) {
@@ -1155,10 +1147,9 @@ local int procusers_allocend(PROGINFO *pip,PU *pup) noex {
 	    }
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (procusers_allocend) */
+} /* end subroutine (procusers_allocend) */
 
-local int procusers_beginer(PROGINFO *pip,PU *pup,cc *sd,mode_t om) noex {
+local int procusers_beginer(PI *pip,PU *pup,cc *sd,mode_t om) noex {
 	cint		n = 50 ;
 	int		rs ;
 	cchar		*ufn = pup->utfname ;
@@ -1182,10 +1173,9 @@ local int procusers_beginer(PROGINFO *pip,PU *pup,cc *sd,mode_t om) noex {
 	    }
 	} /* end if (file-open) */
 	return rs ;
-}
-/* end subroutine (procusers_beginer) */
+} /* end subroutine (procusers_beginer) */
 
-local int procusers_end(PROGINFO *pip,PU *pup) noex {
+local int procusers_end(PI *pip,PU *pup) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	cchar		*sdname = OPENSYSFS_SYSDNAME ;
@@ -1228,10 +1218,9 @@ local int procusers_end(PROGINFO *pip,PU *pup) noex {
 	}
 	} /* end if (non-null) */
 	return rs ;
-}
-/* end subroutine (procusers_end) */
+} /* end subroutine (procusers_end) */
 
-local int procusers_ent(PROGINFO *pip,PU *pup,PASSWD *pwp) noex {
+local int procusers_ent(PI *pip,PU *pup,PASSWD *pwp) noex {
 	setstr		*usp = &pup->users ;
 	bfile		*ufp = &pup->utfile ;
 	bfile		*pfp = &pup->ptfile ;
@@ -1257,10 +1246,9 @@ local int procusers_ent(PROGINFO *pip,PU *pup,PASSWD *pwp) noex {
 	} /* end if (setstr_add) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procuser_ent) */
+} /* end subroutine (procuser_ent) */
 
-local int procuserlink(PROGINFO *pip,char *uhbuf,int uhlen,PASSWD *pwp) noex {
+local int procuserlink(PI *pip,char *uhbuf,int uhlen,PASSWD *pwp) noex {
 	int		rs ;
 
 	if (pip == nullptr) return SR_FAULT ;
@@ -1280,10 +1268,9 @@ local int procuserlink(PROGINFO *pip,char *uhbuf,int uhlen,PASSWD *pwp) noex {
 	} /* end if (mkpath) */
 
 	return rs ;
-}
-/* end subroutine (procuserlink) */
+} /* end subroutine (procuserlink) */
 
-local int procgroups(PROGINFO *pip,int w) noex {
+local int procgroups(PI *pip,int w) noex {
 	cmode		om = SYSMODE ;
 	int		rs ;
 	int		rs1 ;
@@ -1332,10 +1319,9 @@ local int procgroups(PROGINFO *pip,int w) noex {
 	}
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procgroups) */
+} /* end subroutine (procgroups) */
 
-local int procgroups_load(PROGINFO *pip,bfile *gsfp,bfile *grfp) noex {
+local int procgroups_load(PI *pip,bfile *gsfp,bfile *grfp) noex {
 	GROUP		gr ;
 	setstr		groups, *gsp = &groups ;
 	cint		n = 40 ;
@@ -1372,10 +1358,9 @@ local int procgroups_load(PROGINFO *pip,bfile *gsfp,bfile *grfp) noex {
 	    uc_free(bp) ;
 	} /* end if (memory-allocation) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procgroups_load) */
+} /* end subroutine (procgroups_load) */
 
-local int procgroups_ent(PROGINFO *pip,bfile *gsfp,bfile *grfp,
+local int procgroups_ent(PI *pip,bfile *gsfp,bfile *grfp,
 	char *lbuf,int llen,GROUP *grp) noex {
 	int		rs ;
 	int		c = 0 ;
@@ -1388,10 +1373,9 @@ local int procgroups_ent(PROGINFO *pip,bfile *gsfp,bfile *grfp,
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procgroups_ent) */
+} /* end subroutine (procgroups_ent) */
 
-local int procprojects(PROGINFO *pip,int w) noex {
+local int procprojects(PI *pip,int w) noex {
 	cmode		om = SYSMODE ;
 	int		rs ;
 	int		rs1 ;
@@ -1440,10 +1424,9 @@ local int procprojects(PROGINFO *pip,int w) noex {
 	}
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procprojects) */
+} /* end subroutine (procprojects) */
 
-local int procprojects_load(PROGINFO *pip,bfile *pnfp,bfile *pjfp) noex {
+local int procprojects_load(PI *pip,bfile *pnfp,bfile *pjfp) noex {
 	PROJECT		pj ;
 	cint	pjlen = bufsizeget(bufsize_pj) ;
 	int		rs ;
@@ -1475,10 +1458,9 @@ local int procprojects_load(PROGINFO *pip,bfile *pnfp,bfile *pjfp) noex {
 	    uc_free(bp) ;
 	} /* end if (memory-allocation) */
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procprojects_load) */
+} /* end subroutine (procprojects_load) */
 
-local int procshells(PROGINFO *pip,int w) noex {
+local int procshells(PI *pip,int w) noex {
 	cmode		om = SYSMODE ;
 	int		rs ;
 	int		rs1 ;
@@ -1519,10 +1501,9 @@ local int procshells(PROGINFO *pip,int w) noex {
 	}
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procshells) */
+} /* end subroutine (procshells) */
 
-local int procshadow(PROGINFO *pip,int w) noex {
+local int procshadow(PI *pip,int w) noex {
 	cmode		om = 0660 ;
 	int		rs ;
 	int		rs1 ;
@@ -1571,10 +1552,9 @@ local int procshadow(PROGINFO *pip,int w) noex {
 	}
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procshadow) */
+} /* end subroutine (procshadow) */
 
-local int procuserattr(PROGINFO *pip,int w) noex {
+local int procuserattr(PI *pip,int w) noex {
 	cmode		om = 0664 ;
 	int		rs ;
 	int		rs1 ;
@@ -1623,10 +1603,9 @@ local int procuserattr(PROGINFO *pip,int w) noex {
 	}
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procuserattr) */
+} /* end subroutine (procuserattr) */
 
-local int procuhdir(PROGINFO *pip,char *uhbuf,int uhlen,cchar *uhfname) noex {
+local int procuhdir(PI *pip,char *uhbuf,int uhlen,cchar *uhfname) noex {
 	cmode		dm = 0777 ;
 	int		rs ;
 	int		unl = 0 ;
@@ -1654,10 +1633,9 @@ local int procuhdir(PROGINFO *pip,char *uhbuf,int uhlen,cchar *uhfname) noex {
 	} /* end if (mkpath user-home dir) */
 
 	return (rs >= 0) ? unl : rs ;
-}
-/* end subroutine (procuhdir) */
+} /* end subroutine (procuhdir) */
 
-local int proctmpfile(PROGINFO *pip,char *tbuf,cchar *sdname,mode_t om) noex {
+local int proctmpfile(PI *pip,char *tbuf,cchar *sdname,mode_t om) noex {
 	int		rs ;
 	cchar		*cname = ".sysfsXXXXXXXX" ;
 	char		template[MAXPATHLEN+1] ;
@@ -1669,23 +1647,21 @@ local int proctmpfile(PROGINFO *pip,char *tbuf,cchar *sdname,mode_t om) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (proctmpfile) */
+} /* end subroutine (proctmpfile) */
 
-local int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
+local int locinfo_start(LI *lip,PI *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == nullptr) return SR_FAULT ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 	lip->pip = pip ;
 	lip->to = -1 ;
 
 	return rs ;
-}
-/* end subroutine (locinfo_start) */
+} /* end subroutine (locinfo_start) */
 
-local int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1698,10 +1674,9 @@ local int locinfo_finish(LOCINFO *lip) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_finish) */
+} /* end subroutine (locinfo_finish) */
 
-local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
 	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -1732,10 +1707,9 @@ local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_setentry) */
+} /* end subroutine (locinfo_setentry) */
 
-local int locinfo_warg(LOCINFO *lip,int w) noex {
+local int locinfo_warg(LI *lip,int w) noex {
 	int		rs ;
 	int		f = false ;
 
@@ -1745,10 +1719,9 @@ local int locinfo_warg(LOCINFO *lip,int w) noex {
 	}
 
 	return (rs >= 0) ? f : rs ;
-}
-/* end subroutine (locinfo_warg) */
+} /* end subroutine (locinfo_warg) */
 
-local int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
+local int locinfo_dbfname(LI *lip,cchar *dbfname) noex {
 	if (lip == nullptr) return SR_FAULT ;
 
 	if (dbfname != nullptr) {
@@ -1758,19 +1731,17 @@ local int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
 	}
 
 	return SR_OK ;
-}
-/* end subroutine (locinfo_dbfname) */
+} /* end subroutine (locinfo_dbfname) */
 
-local int locinfo_to(LOCINFO *lip,int to) noex {
+local int locinfo_to(LI *lip,int to) noex {
 	if (to < 0) to = TO_CACHE ;
 
 	lip->to = to ;
 	return SR_OK ;
-}
-/* end subroutine (locinfo_to) */
+} /* end subroutine (locinfo_to) */
 
-local int locinfo_defaults(LOCINFO *lip) noex {
-	PROGINFO	*pip = lip->pip ;
+local int locinfo_defaults(LI *lip) noex {
+	PI		*pip = lip->pip ;
 	int		rs = SR_OK ;
 
 	if (lip == nullptr)
@@ -1785,7 +1756,6 @@ local int locinfo_defaults(LOCINFO *lip) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_defaults) */
+} /* end subroutine (locinfo_defaults) */
 
 
