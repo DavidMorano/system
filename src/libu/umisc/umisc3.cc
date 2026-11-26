@@ -105,7 +105,7 @@ int pathnaddx(char *pbuf,int plen,int pl,int n,...) noex {
 	if (pbuf) ylikely {
 	    rs = SR_INVALID ;
 	    if ((plen >= 0) && (pl >= 0)) ylikely {
-	        va_begin(ap,n) ;
+	        va_beg(ap,n) ;
 		rs = SR_OK ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
 		    ccharp sp = (ccharp) va_arg(ap,ccharp) ;
