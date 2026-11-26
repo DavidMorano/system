@@ -54,7 +54,7 @@ struct rebuf_co {
         void operator () (rebuf *p,int m) noex {
             op = p ;
             w = m ;
-        } ;
+        } ; /* end */
         operator int () noex ;
 } ; /* end struct (rebuf_co) */
 struct rebuf : sbuf {
