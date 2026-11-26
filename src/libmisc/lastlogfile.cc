@@ -320,13 +320,13 @@ int lastlogfile_check(LLF *op,time_t daytime) noex {
 	return rs ;
 } /* end subroutine (lastlogfile_check) */
 
-int lastlogfile_curbegin(LLF *op,LLF_CUR *curp) noex {
+int lastlogfile_curbeg(LLF *op,LLF_CUR *curp) noex {
 	int		rs ;
 	if ((rs = lastlogfile_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
-} /* end subroutine (lastlogfile_curbegin) */
+} /* end subroutine (lastlogfile_curbeg) */
 
 int lastlogfile_curend(LLF *op,LLF_CUR *curp) noex {
 	int		rs ;
