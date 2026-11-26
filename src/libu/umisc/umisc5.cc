@@ -78,7 +78,7 @@ int snaddx(char *rbuf,int rlen,int rl,int n,...) noex {
 	    rs = SR_INVALID ;
 	    if ((rlen >= 0) && (rl >= 0)) ylikely {
 	        cint rls = rl ;
-	        va_begin(ap,n) ;
+	        va_beg(ap,n) ;
 	        rs = SR_OK ;
 	        for (int i = 0 ; (rs >= SR_OK) && (i < n) ; i += 1) {
 		    ccharp sp = (ccharp) va_arg(ap,ccharp) ;
