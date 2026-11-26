@@ -19,6 +19,11 @@
 #define	TLIADDRCONFIG_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
+
+
 #define	VERSION		"0a"
 #define	WHATINFO	"@(#)TLIADDR "
 #define	BANNER		"TLI Address"
