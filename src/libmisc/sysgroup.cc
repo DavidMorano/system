@@ -123,7 +123,7 @@ int sysgroup_close(sysgroup *op) noex {
 } 
 /* end subroutine (sysgroup_close) */
 
-int sysgroup_readent(sysgroup *op,ucentgr *grp,char *grbuf,int grlen) noex {
+int sysgroup_read(sysgroup *op,ucentgr *grp,char *grbuf,int grlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && grp && grbuf) {
 	    rs = SR_NOTOPEN ;
@@ -140,7 +140,7 @@ int sysgroup_readent(sysgroup *op,ucentgr *grp,char *grbuf,int grlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (sysgroup_readent) */
+/* end subroutine (sysgroup_read) */
 
 int sysgroup_reset(sysgroup *op) noex {
 	int		rs = SR_FAULT ;
