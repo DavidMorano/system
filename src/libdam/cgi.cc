@@ -211,7 +211,7 @@ int cgi_printf(cgi *op,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	if ((rs = cgi_magic(op,fmt)) >= 0) {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = cgi_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (magic) */
