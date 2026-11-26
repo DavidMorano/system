@@ -200,7 +200,7 @@ int projectent_load(PJE *pjp,char *pjbuf,int pjlen,CPJE *spjp) noex {
 }
 /* end subroutine (projectent_load) */
 
-int projectent_format(PJE *pjp,char *rbuf,int rlen) noex {
+int projectent_fmt(PJE *pjp,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (pjp && rbuf) ylikely {
@@ -239,7 +239,7 @@ int projectent_format(PJE *pjp,char *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (projectent_format) */
+/* end subroutine (projectent_fmt) */
 
 int projectent_size(CPJE *pjp) noex {
 	int		rs = SR_FAULT ;
