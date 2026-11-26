@@ -171,7 +171,7 @@ local char *strdcpyxw_neg(char *dp,int,int n,va_list ap) noex {
 char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    if (dl >= 0) {
 		dp = strdcpyxw_pos(dp,dl,n,ap) ;
 	    } else {
