@@ -24,10 +24,8 @@
 
 
 EXTERNC_begin
-
-extern int uc_addrinfoget(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
-extern int uc_addrinfofree(ADDRINFO *) noex ;
-
+    extern int uc_addrinfoget(ccp,ccp,con ADDRINFO *,ADDRINFO **) noex ;
+    extern int uc_addrinfofree(ADDRINFO *) noex ;
 EXTERNC_end
 
 
