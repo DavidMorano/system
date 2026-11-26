@@ -235,7 +235,7 @@ local char *strnwcpyx_neg(char *dp,int dl,int n,int len,va_list ap) noex {
 char *strnwcpyx(char *dp,int dl,int n,int len,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,len) ;
+	    va_beg(ap,len) ;
 	    if (dl >= 0) {
 		dp = strnwcpyx_pos(dp,dl,n,len,ap) ;
 	    } else {
