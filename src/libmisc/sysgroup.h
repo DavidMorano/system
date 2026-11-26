@@ -36,12 +36,10 @@ struct sysgroup_head {
 typedef SYSGROUP	sysgroup ;
 
 EXTERNC_begin
-
 extern int sysgroup_open	(sysgroup *,cchar *) noex ;
 extern int sysgroup_close	(sysgroup *) noex ;
-extern int sysgroup_readent	(sysgroup *,ucentgr *,char *,int) noex ;
+extern int sysgroup_read	(sysgroup *,ucentgr *,char *,int) noex ;
 extern int sysgroup_reset	(sysgroup *) noex ;
-
 EXTERNC_end
 
 
