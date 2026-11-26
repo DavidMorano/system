@@ -218,7 +218,7 @@ int userattrent_load(UA *uap,char *uabuf,int ualen,CUA *suap) noex {
 }
 /* end subroutine (userattrent_load) */
 
-int userattrent_format(UA *uap,char *rbuf,int rlen) noex {
+int userattrent_fmt(UA *uap,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uap && rbuf) {
@@ -263,7 +263,7 @@ int userattrent_format(UA *uap,char *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (userattrent_format) */
+/* end subroutine (userattrent_fmt) */
 
 int userattrent_size(UA *uap) noex {
 	int		rs = SR_FAULT ;
@@ -366,11 +366,10 @@ local int si_attrload(SI *ibp,kv_t *kvp,int i,cchar *ep) noex {
 
 local int si_copystr(SI *ibp,cchar **pp,cchar *p1) noex {
 	int		rs = SR_OK ;
-	cchar		**cpp = (cchar **) pp ;
-	*cpp = nullptr ;
+	*pp = nullptr ;
 	if (p1) {
-	    rs = storeitem_strw(ibp,p1,-1,cpp) ;
-	}
+	    rs = storeitem_strw(ibp,p1,-1,pp) ;
+	} /* end */
 	return rs ;
 } /* end subroutine (si_copystr) */
 
