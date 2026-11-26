@@ -131,7 +131,7 @@ char *strdcpy6(char *dp,int dl,
 char *strdcpyx(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    if (dl >= 0) {
 	        for (int i = 0 ; (dl > 0) && (i < n) ; i += 1) {
 	            ccharp sp = (cchar *) va_arg(ap,char *) ;
