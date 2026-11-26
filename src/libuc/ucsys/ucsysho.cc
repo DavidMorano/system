@@ -335,8 +335,8 @@ HOSTENT *gethoent() noex {
 HOSTENT *gethonam(cchar *n) noex {
 	HOSTENT		*rp = nullptr ;
 	errno_t		ec = EOK ;
-	if (n) {
-	    if (n[0]) {
+	if (n) ylikely {
+	    if (n[0]) ylikely {
 		errno = 0 ;
 		rp = gethostbyname(n) ;
 	    } else {
@@ -352,8 +352,8 @@ HOSTENT *gethonam(cchar *n) noex {
 HOSTENT *gethoadd(int af,cvoid *abuf,int alen) noex {
 	HOSTENT		*rp = nullptr ;
 	errno_t		ec = EOK ;
-	if (abuf) {
-	    if ((alen > 0) && (af >= 0)) {
+	if (abuf) ylikely {
+	    if ((alen > 0) && (af >= 0)) ylikely {
 		errno = 0 ;
 		rp = gethostbyaddr(abuf,alen,af) ;
 	    } else {
