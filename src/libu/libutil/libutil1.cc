@@ -97,7 +97,7 @@ int loadstrs(cc **strs,int n,...) noex {
     	va_list		ap ;
 	int		i = -1 ; /* return-value */
 	if (strs) ylikely {
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    for (i = 0 ; i < n ; i += 1) {
 		cc *cp = (ccharp) va_arg(ap,charp) ;
 		strs[i] = cp ;
