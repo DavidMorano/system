@@ -25,6 +25,9 @@
 #ifndef	va_begin
 #define	va_begin(ap,arg)	va_start((ap),(arg))
 #endif
+#ifndef	va_beg
+#define	va_beg(ap,arg)		va_start((ap),(arg))
+#endif
 #ifndef	va_get
 #define	va_get(ap,atype)	va_arg(ap,atype)
 #endif
