@@ -211,7 +211,7 @@ int snwcpyx(char *dp,int dl,int na,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    *dp = eos ;
 	    if (dl >= 0) {
 		rs = snwcpyx_pos(dp,dl,na,ap) ;
