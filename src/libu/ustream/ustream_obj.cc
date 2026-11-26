@@ -133,7 +133,7 @@ int ustream::printf(cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	if ((rs = magic(fmt)) >= 0) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = ustream_vprintf(this,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (ustream_magic) */
