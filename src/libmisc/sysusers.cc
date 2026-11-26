@@ -148,7 +148,7 @@ int sysusers_close(sysusers *op) noex {
 } 
 /* end subroutine (sysusers_close) */
 
-int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
+int sysusers_read(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = sysusers_magic(op,pwp,pwbuf)) >= 0) ylikely {
@@ -171,7 +171,7 @@ int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (sysusers_readent) */
+/* end subroutine (sysusers_read) */
 
 int sysusers_reset(sysusers *op) noex {
 	int		rs ;
