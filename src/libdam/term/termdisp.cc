@@ -503,7 +503,7 @@ int termdisp_pprintf(TD *op,int wn,int r,int c,cchar *fmt,...) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = termdisp_magic(op,fmt)) >= 0) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = termdisp_vpprintf(op,wn,r,c,fmt,ap) ;
 	    len = rs ;
 	    va_end(ap) ;
@@ -517,7 +517,7 @@ int termdisp_printf(TD *op,int wn,cchar *fmt,...) noex {
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = termdisp_magic(op,fmt)) >= 0) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = termdisp_vpprintf(op,wn,-1,-1,fmt,ap) ;
 	    len = rs ;
 	    va_end(ap) ;
