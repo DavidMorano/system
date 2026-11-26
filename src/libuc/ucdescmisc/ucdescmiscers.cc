@@ -72,7 +72,7 @@ int uc_fcntl(int fd,int cmd,...) noex {
 	va_list		ap ;
 	int		rs = SR_INVALID ;
 	if (cmd >= 0) {
-	    va_begin(ap,cmd) ;
+	    va_beg(ap,cmd) ;
 	    caddr_t	any = va_arg(ap,caddr_t) ;
 	    rs = u_fcntl(fd,cmd,any) ;
 	    va_end(ap) ;
@@ -84,7 +84,7 @@ int uc_ioctl(int fd,int cmd,...) noex {
 	va_list		ap ;
 	int		rs = SR_INVALID ;
 	if (cmd >= 0) {
-	    va_begin(ap,cmd) ;
+	    va_beg(ap,cmd) ;
 	    caddr_t	any = va_arg(ap,caddr_t) ;
 	    rs = u_ioctl(fd,cmd,any) ;
 	    va_end(ap) ;
