@@ -20,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* CSTD |wchar_t| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -29,7 +28,7 @@
 
 
 EXTERNC_begin
-extern int snwcpyexpesc(char *,int,cchar *,int) noex ;
+    extern int snwcpyexpesc(char *,int,cchar *,int) noex ;
 EXTERNC_end
 
 
