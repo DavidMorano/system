@@ -129,7 +129,7 @@ namespace libu {
     char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    if (dl < 0) dl = INT_MAX ;
 	    for (int i = 0 ; (dl > 0) && (i < (n - 1)) ; i += 1) {
 	        ccp sp = (cchar *)	va_arg(ap,char *) ;
