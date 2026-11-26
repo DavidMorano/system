@@ -1,9 +1,0 @@
-gethobegin
-getnwbegin
-getprbegin
-getsvbegin
-getpwbegin
-getspbegin
-getuabegin
-getgrbegin
-getpjbegin
