@@ -102,7 +102,7 @@ int filer::printf(cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs = SR_FAULT ;
 	if (fmt) {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = filer_vprintf(this,fmt,ap) ;
 	    va_end(ap) ;
 	}
