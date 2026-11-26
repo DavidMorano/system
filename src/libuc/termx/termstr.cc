@@ -517,7 +517,7 @@ local int termstr_conseq(termstr *op,int name,int na,...) noex {
 	if (name != 0) ylikely {
 	    cint	tlen = TLEN ;
 	    char	tbuf[TLEN + 1] ;
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    if ((rs = termconseqva(tbuf,tlen,name,np,na,ap)) >= 0) {
 	        cint	tl = rs ;
 	        rs = buffer_strw(op->sbp,tbuf,tl) ;
