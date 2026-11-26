@@ -132,7 +132,7 @@ int uc_inetnetpton(void *dbuf,int dlen,int af,cchar *straddr) noex {
 	            rs = SR_INVALID ;
 	        } else if (rv < 0) {
 	            rs = (neg errno) ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -149,7 +149,7 @@ int uc_inetpton(void *binaddr,int af,cchar *straddr) noex {
 	            rs = SR_INVALID ;
 	        } else if (rv < 0) {
 	            rs = (neg errno) ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -160,11 +160,11 @@ int uc_inetntop(char *rbuf,int rlen,int af,cvoid *binaddr) noex {
 	if (rbuf && binaddr) {
 	    rs = SR_INVALID ;
 	    if ((af >= 0) && (rlen > 0)) {
-	        if (cc *rp = inet_ntop(af,binaddr,rbuf,rlen) ; rp) {
+	        if (cc *rp = inet_ntop(af,binaddr,rbuf,rlen)) {
 		    rs = lenstr(rbuf) ;
 		} else {
 		    rs = (neg errno) ;
-		}
+		} /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
