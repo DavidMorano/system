@@ -129,7 +129,7 @@ int u_fcntl(int fd,int cmd,...) noex {
 	if (fd >= 0) {
 	    rs = SR_INVALID ;
 	    if (cmd >= 0) {
-	        va_begin(ap,cmd) ;
+	        va_beg(ap,cmd) ;
 		if_constexpr (machendian.islittle) {
 	            const uintptr_t	anyarg = va_arg(ap,uintptr_t) ;
 		    rs = try_fcntl(fd,cmd,anyarg) ;
