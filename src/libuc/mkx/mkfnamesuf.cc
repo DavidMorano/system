@@ -111,7 +111,7 @@ int mkfnamesufx(char *rbuf,int n,cc *p1,...) noex {
 	                rs = sb.chr('.') ;
 		    } /* end */
 	            if (rs >= 0) ylikely {
-	                va_begin(ap,p1) ;
+	                va_beg(ap,p1) ;
 	                for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	                    cc	*sp = (cc *) va_arg(ap,cc *) ;
 		            if (sp) {
