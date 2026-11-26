@@ -32,12 +32,10 @@ struct sysproject_head {
 typedef SYSPROJECT	sysproject ;
 
 EXTERNC_begin
-
-extern int sysproject_open	(sysproject *,cchar *) noex ;
-extern int sysproject_close	(sysproject *) noex ;
-extern int sysproject_readent	(sysproject *,PROJECT *,char *,int) noex ;
-extern int sysproject_reset	(sysproject *) noex ;
-
+    extern int sysproject_open	(sysproject *,cchar *) noex ;
+    extern int sysproject_close	(sysproject *) noex ;
+    extern int sysproject_read	(sysproject *,PROJECT *,char *,int) noex ;
+    extern int sysproject_reset	(sysproject *) noex ;
 EXTERNC_end
 
 
