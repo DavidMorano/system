@@ -144,7 +144,7 @@ int syspasswd_close(syspasswd *op) noex {
 } 
 /* end subroutine (syspasswd_close) */
 
-int syspasswd_readent(syspasswd *op,ucentpw *pwp,char *pwbuf,int pwlen) noex {
+int syspasswd_read(syspasswd *op,ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
 	if ((rs = syspasswd_magic(op,pwp,pwbuf)) >= 0) ylikely {
 	    filemap	*fmp = op->fmp ;
@@ -155,7 +155,7 @@ int syspasswd_readent(syspasswd *op,ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (syspasswd_readent) */
+/* end subroutine (syspasswd_read) */
 
 int syspasswd_reset(syspasswd *op) noex {
 	int		rs ;
