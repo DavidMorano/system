@@ -41,15 +41,15 @@ LIBS +=
 
 
 OBJ0= userattrdb.o
-OBJ1= userdomain.o
-OBJ2= userports.o
+OBJ1= userports.o
+OBJ2=
 OBJ3= 
 OBJ4= 
 OBJ5= 
 OBJ6= 
 OBJ7= 
 
-OBJA= obj0.o obj1.o obj2.o
+OBJA= obj0.o obj1.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
 
 OBJ= obja.o
@@ -158,7 +158,6 @@ obj.o:			$(OBJ)
 
 
 userattrdb.o:		userattrdb.cc	userattrdb.h			$(INCS)
-userdomain.o:		userdomain.cc	userdomain.h			$(INCS)
 userports.o:		userports.cc	userports.h			$(INCS)
 
 
