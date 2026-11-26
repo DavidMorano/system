@@ -36,6 +36,7 @@
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
+#include	<concepts>		/* C++STD */
 
 #include	<concharp.hh>
 #include	<conintx.hh>
