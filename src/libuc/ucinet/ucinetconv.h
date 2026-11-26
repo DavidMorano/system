@@ -36,11 +36,9 @@
 
 
 EXTERNC_begin
-
-extern int uc_inetnetpton	(void *,int,int,cchar *) noex ;
-extern int uc_inetpton		(void *,int,cchar *) noex ;
-extern int uc_inetntop		(char *,int,int,cvoid *) noex ;
-
+    extern int uc_inetnetpton	(void *,int,int,cchar *) noex ;
+    extern int uc_inetpton	(void *,int,cchar *) noex ;
+    extern int uc_inetntop	(char *,int,int,cvoid *) noex ;
 EXTERNC_end
 
 
