@@ -157,7 +157,7 @@ int u_semctl(int semid,int semnum,int cmd,...) noex {
 	int		to_nomem = utimeout[uto_nomem] ;
 	bool		f_exit = false ;
 	SEMUN		*unp ;
-	va_begin(ap,cmd) ;
+	va_beg(ap,cmd) ;
 	unp = (SEMUN *) va_arg(ap,SEMUN *) ;
 	repeat {
 	    if ((rs = semctl(semid,semnum,cmd,unp)) < 0) {
