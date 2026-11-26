@@ -47,21 +47,19 @@ typedef	LASTLOGFILE_CUR	lastlogfile_cur ;
 typedef	LASTLOGFILE_ENT	lastlogfile_ent ;
 
 EXTERNC_begin
-
-extern int lastlogfile_open(lastlogfile *,cchar *,int) noex ;
-extern int lastlogfile_rdinfo(lastlogfile *,uid_t,time_t *,
+    extern int lastlogfile_open(lastlogfile *,cchar *,int) noex ;
+    extern int lastlogfile_rdinfo(lastlogfile *,uid_t,time_t *,
 		char *,char *) noex ;
-extern int lastlogfile_wrinfo(lastlogfile *,uid_t,time_t,
+    extern int lastlogfile_wrinfo(lastlogfile *,uid_t,time_t,
 		cchar *,cchar *) noex ;
-extern int lastlogfile_rdent(lastlogfile *,uid_t,lastlogfile_ent *) noex ;
-extern int lastlogfile_wrent(lastlogfile *,uid_t,lastlogfile_ent *) noex ;
-extern int lastlogfile_check(lastlogfile *,time_t) noex ;
-extern int lastlogfile_curbegin(lastlogfile *,lastlogfile_cur *) noex ;
-extern int lastlogfile_curend(lastlogfile *,lastlogfile_cur *) noex ;
-extern int lastlogfile_curenum(lastlogfile *,lastlogfile_cur *,
+    extern int lastlogfile_rdent(lastlogfile *,uid_t,lastlogfile_ent *) noex ;
+    extern int lastlogfile_wrent(lastlogfile *,uid_t,lastlogfile_ent *) noex ;
+    extern int lastlogfile_check(lastlogfile *,time_t) noex ;
+    extern int lastlogfile_curbeg(lastlogfile *,lastlogfile_cur *) noex ;
+    extern int lastlogfile_curend(lastlogfile *,lastlogfile_cur *) noex ;
+    extern int lastlogfile_curenum(lastlogfile *,lastlogfile_cur *,
 		uid_t *,time_t *,char *,char *) noex ;
-extern int lastlogfile_close(lastlogfile *) noex ;
-
+    extern int lastlogfile_close(lastlogfile *) noex ;
 EXTERNC_end
 
 
