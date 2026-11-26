@@ -150,7 +150,7 @@ template<integral_unsigned T> constexpr int ffbsx(T uv) noex {
 	int		bn = -1 ;
 	if (uv) {
 	    bn = countr_zero(uv) ;
-	}
+	} /* end */
 	return bn ;
 } /* end subroutine-template (ffbsx) */
 
@@ -159,7 +159,7 @@ template<integral_unsigned T> constexpr int ffbcx(T uv) noex {
 	int		bn = -1 ;
 	if (uv != allones) {
 	    bn = countr_one(uv) ;
-	}
+	} /* end */
 	return bn ;
 } /* end subroutine-template (ffbcx) */
 
