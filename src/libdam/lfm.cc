@@ -435,7 +435,7 @@ int lfm_printf(lfm *op,cchar *fmt,...) noex {
 	            /* seek up to the proper place to start writing */
 	            if ((rs = u_seek(op->lfd,op->owrite,SEEK_SET)) >= 0) {
 		        if (char *lbuf{} ; (rs = mem.ml(&lbuf)) >= 0) {
-	                    va_begin(ap,fmt) ;
+	                    va_beg(ap,fmt) ;
 		            cint	llen = rs ;
 	                    if ((rs = fmtstr(lbuf,llen,0,fmt,ap)) >= 0) {
 	                        if ((rs = u_write(op->lfd,lbuf,rs)) >= 0) {
