@@ -21,8 +21,6 @@ module ;
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
-#include	<cstdarg>		/* CSTD */
-#include	<cstring>		/* CSTD |strlen(3c)| + |strnlen(3c)| */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
@@ -36,7 +34,7 @@ export {
     	int	n = -1 ; /* return-value */
 	if (a) ylikely {
 	    for (n = 0 ; a[n] ; n += 1) ;
-	}
+	} /* end */
 	return n ;
     } /* end subroutine (lenstrarr) */
 } /* end export */
