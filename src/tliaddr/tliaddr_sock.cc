@@ -71,7 +71,7 @@
 #endif
 
 #ifndef	SOCKADDRESSLEN
-#define	SOCKADDRESSLEN		sizeof(SOCKADDRESS)
+#define	SOCKADDRESSLEN		sizeof(sockaddress)
 #endif
 
 #ifndef	PROTONAME
@@ -88,7 +88,7 @@
 
 /* external subroutines */
 
-extern int	progout_printf(PI *,cchar *,...) ;
+extern int	progout_printf(PI *,cchar *,...) noex ;
 
 
 /* external variables */
@@ -96,11 +96,11 @@ extern int	progout_printf(PI *,cchar *,...) ;
 
 /* forward references */
 
-int		progout_open(PI *) ;
-int		progout_close(PI *) ;
+int		progout_open(PI *) noex ;
+int		progout_close(PI *) noex ;
 
-local int	procsocker(PI *,int,cchar *,int) ;
-local int	gethostinfo(PI *,char *,int,cchar *,int *) ;
+local int	procsocker(PI *,int,cchar *,int) noex ;
+local int	gethostinfo(PI *,char *,int,cchar *,int *) noex ;
 
 
 /* local structures */
@@ -121,7 +121,7 @@ int progsock(PI *pip,cchar *famname,cchar *naddr1,cchar *naddr2) noex {
 	int		af = AF_UNSPEC ;
 	int		port = -1 ;
 	int		aport = -1 ;
-	cchar	*proto = PROTONAME ;
+	cchar		*proto = PROTONAME ;
 	char		naddr[SOCKADDRESSLEN + 1] ;
 
 #if	CF_DEBUG
@@ -129,13 +129,13 @@ int progsock(PI *pip,cchar *famname,cchar *naddr1,cchar *naddr2) noex {
 	    debugprintf("progsock: famname=%s\n",famname) ;
 #endif
 
-	if (naddr1 == NULL) return SR_FAULT ;
+	if (naddr1 == nullptr) return SR_FAULT ;
 
 	if ((naddr1[0] == '\0') || (naddr1[0] == '-')) {
 	    naddr1 = ANYHOST ;
 	}
 
-	if (famname != NULL) {
+	if (famname != nullptr) {
 	    rs = getaf(famname,-1) ;
 	    af = rs ;
 	} else {
@@ -174,7 +174,7 @@ int progsock(PI *pip,cchar *famname,cchar *naddr1,cchar *naddr2) noex {
 #endif
 	    if (port < 0) port = aport ;
 	    rs1 = SR_NOTFOUND ;
-	    if ((rs >= 0) && (naddr2 != NULL)) {
+	    if ((rs >= 0) && (naddr2 != nullptr)) {
 	        rs1 = getportnum(proto,naddr2) ;
 	        port = rs1 ;
 	    }
@@ -207,20 +207,17 @@ int progsock(PI *pip,cchar *famname,cchar *naddr1,cchar *naddr2) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (progsock) */
+} /* end subroutine (progsock) */
 
 
 /* local subroutine */
 
-
-local int procsocker(PI *pip,int af,cchar *naddr,int port)
-{
-	SOCKADDRESS	sa ;
+local int procsocker(PI *pip,int af,cchar *naddr,int port) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
+	sockaddress	sa ;
 	if ((rs = sockaddress_start(&sa,af,naddr,port,0)) >= 0) {
 	    cint	hlen = HEXBUFLEN ;
 	    char	hbuf[HEXBUFLEN + 1] ;
@@ -252,17 +249,9 @@ local int procsocker(PI *pip,int af,cchar *naddr,int port)
 	} /* end if (sockaddress) */
 
 	return rs ;
-}
-/* end subroutine (procsocker) */
+} /* end subroutine (procsocker) */
 
-local int gethostinfo(pip,naddr,af,namespec,pp)
-PI	*pip ;
-char		naddr[] ;
-int		af ;
-cchar	namespec[] ;
-int		*pp ;
-{
-	HOSTINFO	hi ;
+local int gethostinfo(PI *pip,char *naddr,int af,ccp namespec,int *pp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl ;
@@ -272,8 +261,8 @@ int		*pp ;
 	char		hostname[MAXHOSTNAMELEN + 1] ;
 	char		portname[PORTNAMELEN + 1] ;
 
-	if (namespec == NULL) return SR_INVALID ;
-	if (naddr == NULL) return SR_FAULT ;
+	if (namespec == nullptr) return SR_INVALID ;
+	if (naddr == nullptr) return SR_FAULT ;
 
 	if (namespec[0] == '\0') return SR_INVALID ;
 
@@ -281,7 +270,7 @@ int		*pp ;
 
 	hostname[0] = '\0' ;
 	portname[0] = '\0' ;
-	if ((af == AF_INET4) && ((tp = strchr(namespec,':')) != NULL)) {
+	if ((af == AF_INET4) && ((tp = strchr(namespec,':')) != nullptr)) {
 
 	    sl = (tp - namespec) ;
 	    snwcpy(hostname,MAXHOSTNAMELEN,namespec,sl) ;
@@ -292,13 +281,15 @@ int		*pp ;
 	    sncpy1(hostname,MAXHOSTNAMELEN,namespec) ;
 	}
 
-	if (pp != NULL)
+	if (pp != nullptr) {
 	    *pp = -1 ;
+	}
 
 /* resolve the host name first if possible */
 
+	hostinfo	hi ;
 	if ((rs = hostinfo_start(&hi,af,hostname)) >= 0) {
-	    HOSTINFO_CUR	hc ;
+	    hostinfo_cur	hc ;
 	    if ((rs = hostinfo_curbegin(&hi,&hc)) >= 0) {
 		cint		aflen = getaflen(af) ;
 		const uchar	*ap ;
@@ -337,7 +328,6 @@ int		*pp ;
 #endif
 
 	return (rs >= 0) ? al : rs ;
-}
-/* end subroutine (gethostinfo) */
+} /* end subroutine (gethostinfo) */
 
 
