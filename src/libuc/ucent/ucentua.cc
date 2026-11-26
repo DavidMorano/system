@@ -79,10 +79,8 @@ using ucent::si_copystr ;		/* local group support subroutine */
 
 local int userattrent_parseattr		(UAE *,storeitem *,cchar *,int) noex ;
 local int userattrent_parseattrload	(UAE *,storeitem *,vecstr *,int) noex ;
-
-local int si_attrload(storeitem *,kv_t *,int,cchar *) noex ;
-
-local int sbuf_fmtattrs(sbuf *,kva_t *) noex ;
+local int si_attrload			(storeitem *,kv_t *,int,cchar *) noex ;
+local int sbuf_fmtattrs			(sbuf *,kva_t *) noex ;
 
 
 /* local variables */
@@ -129,7 +127,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	                    cchar	*cp{} ;
 	                    if (int cl ; (cl = sfshrink(sp,tl,&cp)) >= 0) {
 	                        rs = si.strw(cp,cl,vpp) ;
-	                    }
+	                    } /* end */
 	                } /* end if */
 	                sl -= intconv((tp + 1) - sp) ;
 	                sp = (tp + 1) ;
@@ -245,7 +243,7 @@ int ucentua::size() noex {
 	kva_t	*kvap = attr ;
 	if (name) {
 	    sz += (lenstr(name) + 1) ;
-	}
+	} /* end */
 	if (attr) ylikely {
 	    kv_t	*kvp = kvap->data ;
 	    cint	n = kvap->length ;
