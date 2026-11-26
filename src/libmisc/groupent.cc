@@ -69,7 +69,7 @@ import libutil ;			/* |memclear(3u)| */
 /* forward references */
 
 local int groupent_parseusers(GROUP *,SI *,cchar *,int) noex ;
-local int groupent_formatusers(GROUP *,sbuf *) noex ;
+local int groupent_fmtusers(GROUP *,sbuf *) noex ;
 
 local int si_copystr(SI *,char **,cchar *) noex ;
 
@@ -171,7 +171,7 @@ int groupent_load(GROUP *grp,char *grbuf,int grlen,CGROUP *sgrp) noex {
 }
 /* end subroutine (groupent_load) */
 
-int groupent_format(GROUP *grp,char *rbuf,int rlen) noex {
+int groupent_fmt(GROUP *grp,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (grp && rbuf) {
@@ -192,7 +192,7 @@ int groupent_format(GROUP *grp,char *rbuf,int rlen) noex {
 	                    rs = sbuf_deci(&b,v) ;
 	                    break ;
 	                case 3:
-	                    rs = groupent_formatusers(grp,&b) ;
+	                    rs = groupent_fmtusers(grp,&b) ;
 	                    break ;
 	                } /* end switch */
 	            } /* end if */
@@ -204,7 +204,7 @@ int groupent_format(GROUP *grp,char *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (groupent_format) */
+/* end subroutine (groupent_fmt) */
 
 int groupent_size(CGROUP *grp) noex {
 	int		rs = SR_FAULT ;
@@ -257,7 +257,7 @@ local int groupent_parseusers(GROUP *grp,SI *ibp,cchar *sp,int sl) noex {
 	return rs ;
 } /* end subroutine (groupent_parseusers) */
 
-local int groupent_formatusers(GROUP *grp,sbuf *bp) noex {
+local int groupent_fmtusers(GROUP *grp,sbuf *bp) noex {
 	int		rs = SR_OK ;
 	if (grp->gr_mem) {
 	    for (int i = 0 ; grp->gr_mem[i] ; i += 1) {
@@ -269,7 +269,7 @@ local int groupent_formatusers(GROUP *grp,sbuf *bp) noex {
 	    } /* end for */
 	} /* end if (non-null members) */
 	return rs ;
-} /* end subroutine (groupent_formatusers) */
+} /* end subroutine (groupent_fmtusers) */
 
 local int storeitem_loadusers(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
     	cnullptr	np{} ;
