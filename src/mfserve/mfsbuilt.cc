@@ -321,7 +321,7 @@ int mfsbuilt_curbegin(MFSBUILT *op,MFSBUILT_CUR *curp) noex {
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
 	hcp = &curp->hcur ;
-	if ((rs = hdb_curbegin(dbp,hcp)) >= 0) {
+	if ((rs = hdb_curbeg(dbp,hcp)) >= 0) {
 	    curp->magic = MFSBUILT_MAGIC ;
 	}
 #if	CF_DEBUGS
@@ -390,7 +390,7 @@ int mfsbuilt_strsize(MFSBUILT *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
-	if ((rs = hdb_curbegin(dbp,&hcur)) >= 0) {
+	if ((rs = hdb_curbeg(dbp,&hcur)) >= 0) {
 	    while ((rs1 = hdb_curenum(dbp,&hcur,&k,&v)) >= 0) {
 	        cchar	*sp = (cchar *) k.buf ;
 		size += (lenstr(sp)+1) ;
@@ -416,7 +416,7 @@ int mfsbuilt_strvec(MFSBUILT *op,cchar **va,char *rbuf,int rlen) noex {
 	if (rbuf == nullptr) return SR_FAULT ;
 	if (op->magic != MFSBUILT_MAGIC) return SR_NOTOPEN ;
 	dbp = &op->db ;
-	if ((rs = hdb_curbegin(dbp,&hcur)) >= 0) {
+	if ((rs = hdb_curbeg(dbp,&hcur)) >= 0) {
 	    char	*bp = rbuf ;
 	    while ((rs1 = hdb_curenum(dbp,&hcur,&k,&v)) >= 0) {
 	        cchar	*sp = (cchar *) k.buf ;
@@ -467,7 +467,7 @@ local int mfsbuilt_entprune(MFSBUILT *op) noex {
 	debugprintf("mfsbuilt_entprune: ent\n") ;
 #endif
 
-	if ((rs = hdb_curbegin(dbp,&c)) >= 0) {
+	if ((rs = hdb_curbeg(dbp,&c)) >= 0) {
 	    ENT		*ep ;
 	    cint	rsn = SR_NOTFOUND ;
 	    int		i ;
@@ -593,7 +593,7 @@ local int mfsbuilt_fins(MFSBUILT *op) noex {
 	debugprintf("mfsbuilt_fins: ent\n") ;
 #endif
 
-	if ((rs = hdb_curbegin(dbp,&c)) >= 0) {
+	if ((rs = hdb_curbeg(dbp,&c)) >= 0) {
 	    ENT		*ep ;
 	    cint	rsn = SR_NOTFOUND ;
 	    int		i ;
