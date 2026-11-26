@@ -540,7 +540,7 @@ int htm_printf(htm *op,cchar *fmt,...) noex {
 	va_list		ap ;
 	int		rs ;
 	if ((rs = htm_magic(op)) >= 0) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = htm_vprintf(op,fmt,ap) ;
 	    va_end(ap) ;
 	} /* end if (magic) */
