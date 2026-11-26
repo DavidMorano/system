@@ -21,41 +21,34 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>		/* CSTD */
-#include	<cstdlib>		/* CSTD */
-#include	<cstdio>		/* CSTD |stderr| */
 #include	<clanguage.h>		/* LIBU */
 #include	<usysbase.h>		/* LIBU */
 
 
 extern int dprint	(cc *,cc *,int = -1) noex ;
 extern int dprintln	(cc *,cc *,int = -1) noex ;
+extern int dprintf	(cc *,cc *,...) noex ;
 extern int dprintstr	(cc *,cc *,cc *,int = -1) noex ;
 
-
-#define DPRINTR(FMT, ...) 						\
-    if_constexpr (f_debug) {						\
-        fprintf(stderr,FMT __VA_OPT__(,) __VA_ARGS__) ;			\
-    }
-
-#define DPRINTF(FMT, ...) 						\
-    if_constexpr (f_debug) {						\
-        dprintf(stderr,__func__,FMT __VA_OPT__(,) __VA_ARGS__) ;	\
-    }
 
 #define DPRINT(DBUF,DLEN)						\
     if_constexpr (f_debug) {						\
         dprint(__func__,DBUF,DLEN) ;					\
     }
 
-#define DPRINTSTR(str,DBUF,DLEN)					\
-    if_constexpr (f_debug) {						\
-        dprintstr(__func__,(str),(DBUF),(DLEN)) ;			\
-    }
-
 #define DPRINTLN(DBUF,DLEN)						\
     if_constexpr (f_debug) {						\
         dprintln(__func__,DBUF,DLEN) ;					\
+    }
+
+#define DPRINTF(FMT, ...) 						\
+    if_constexpr (f_debug) {						\
+        dprintf(__func__,FMT __VA_OPT__(,) __VA_ARGS__) ;		\
+    }
+
+#define DPRINTSTR(str,DBUF,DLEN)					\
+    if_constexpr (f_debug) {						\
+        dprintstr(__func__,(str),(DBUF),(DLEN)) ;			\
     }
 
 
