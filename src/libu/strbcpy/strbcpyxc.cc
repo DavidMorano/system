@@ -227,7 +227,7 @@ char *strbcpyfc(char *dp,int dl,cchar *sp) noex {
 char *strbcpybcx(char *dp,int dl,int na,...) noex {
     	va_list ap ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    dp = strbcpyxcx(chtobc,dp,dl,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
@@ -237,7 +237,7 @@ char *strbcpybcx(char *dp,int dl,int na,...) noex {
 char *strbcpylcx(char *dp,int dl,int na,...) noex {
     	va_list ap ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    dp = strbcpyxcx(chtolc,dp,dl,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
@@ -247,7 +247,7 @@ char *strbcpylcx(char *dp,int dl,int na,...) noex {
 char *strbcpyucx(char *dp,int dl,int na,...) noex {
     	va_list ap ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    dp = strbcpyxcx(chtouc,dp,dl,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
@@ -257,7 +257,7 @@ char *strbcpyucx(char *dp,int dl,int na,...) noex {
 char *strbcpyfcx(char *dp,int dl,int na,...) noex {
     	va_list ap ;
 	if (dp) ylikely {
-	    va_begin(ap,na) ;
+	    va_beg(ap,na) ;
 	    dp = strbcpyxcx(chtofc,dp,dl,na,ap) ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
