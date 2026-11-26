@@ -119,7 +119,7 @@ int mkfnamex(char *rbuf,int na,...) noex {
 	if (rbuf) ylikely {
 	    if ((rs = maxpathlen) >= 0) ylikely {
 	        storebuf	sb(rbuf,rs) ;
-	        va_begin(ap,na) ;
+	        va_beg(ap,na) ;
 	        for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
 	            cc	*sp = (cc *) va_arg(ap,cc *) ;
 		    if (sp) {
