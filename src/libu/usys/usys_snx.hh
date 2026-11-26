@@ -34,23 +34,19 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stddef.h>		/* CSTD */
-#include	<stdlib.h>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
 #include	<utypedefs.h>		/* LIBU */
 #include	<utypealiases.h>	/* LIBU */
 #include	<usysdefs.h>		/* LIBU */
 
 
-#ifndef	DECLARATION_SNCPY
-#define	DECLARATION_SNCPY
 namespace usys {
-    extern int sncpy1(char *,int,cchar *) noex ;
-    inline int sncpy(char *rb,int rl,cchar *sp) noex {
+    extern int sncpy1	(char *,int,cchar *) noex ;
+    extern int sncpy	(char *,int,cchar *,int) noex ;
+    inline int sncpy	(char *rb,int rl,cchar *sp) noex {
 	return sncpy1(rb,rl,sp) ;
     } /* end */
 } /* end namespace (usys) */
-#endif /* DECLARATION_SNWCPY */
 
 
 #endif /* __cplusplus */
