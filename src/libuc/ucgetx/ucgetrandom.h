@@ -37,10 +37,8 @@
 #endif
 
 EXTERNC_begin
-
-extern int uc_getrandom		(void *,int,uint)	noex ;
-extern int uc_getentropy	(void *,int)		noex ;
-
+    extern int uc_getrandom	(void *,int,uint)	noex ;
+    extern int uc_getentropy	(void *,int)		noex ;
 EXTERNC_end
 
 
