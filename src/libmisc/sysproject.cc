@@ -144,7 +144,7 @@ int sysproject_close(sysproject *op) noex {
 } 
 /* end subroutine (sysproject_close) */
 
-int sysproject_readent(sysproject *op,ucentpj *pwp,char *pwbuf,int pwlen) noex {
+int sysproject_read(sysproject *op,ucentpj *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
 	if ((rs = sysproject_magic(op,pwp,pwbuf)) >= 0) ylikely {
 	    filemap	*fmp = op->fmp ;
@@ -155,7 +155,7 @@ int sysproject_readent(sysproject *op,ucentpj *pwp,char *pwbuf,int pwlen) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (sysproject_readent) */
+/* end subroutine (sysproject_read) */
 
 int sysproject_reset(sysproject *op) noex {
 	int		rs ;
