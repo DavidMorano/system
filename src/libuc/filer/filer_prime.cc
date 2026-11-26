@@ -462,7 +462,7 @@ int filer_printf(filer *op,cchar *fmt,...) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op && fmt) ylikely {
-	    va_begin(ap,fmt) ;
+	    va_beg(ap,fmt) ;
 	    rs = filer_vprintf(op,fmt,ap) ;
 	    wlen = rs ;
 	    va_end(ap) ;
