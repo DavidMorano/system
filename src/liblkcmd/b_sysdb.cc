@@ -5,7 +5,6 @@
 /* SHELL built-in to query system databases */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 
@@ -42,15 +41,15 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<netdb.h>
-
-#include	<usystem.h>
-#include	<exitcodes.h>
+#include	<climits>
+#include	<cstddef>		/* CSTD */
+#include	<cstdlib>		/* CSTD */
+#include	<cstring>
+#include	<clanguage.h>		/* LIBU */
+#include	<usysbase.h>		/* LIBU */
 #include	<bufsizeget.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -72,7 +71,6 @@
 #include	"shio.h"
 #include	"kshlib.h"
 #include	"b_sysdb.h"
-#include	"defs.h"
 
 
 /* local defines */
@@ -80,9 +78,6 @@
 #define	PI		proginfo
 #define	LI		locinfo
 #define	LI_FL		locinfo_flags
-
-#define	LOCINFO		struct locinfo
-#define	LOCINFO_FL	struct locinfo_flags
 
 #define	SYSMODE		0664
 
@@ -104,20 +99,20 @@ struct locinfo_flags {
 	uint		to:1 ;
 	uint		all:1 ;
 	uint		proto:1 ;
-} ;
+} ; /* end struct */
 
 struct locinfo {
 	PI		*pip ;
 	cchar		*dbfname ;
 	cchar		*fname ;
 	cchar		*proto ;
-	LOCINFO_FL	have, f, changed, finval ;
-	LOCINFO_FL	init, open ;
+	LI_FL	have, f, changed, finval ;
+	LI_FL	init, open ;
 	vecstr		stores ;
 	uint		ndb ;
 	int		pagesize ;
 	int		to ;
-} ;
+} ; /* end struct */
 
 struct procusers {
 	bfile		utfile ;
@@ -126,61 +121,61 @@ struct procusers {
 	char		uhbuf[MAXPATHLEN+1] ;
 	char		utfname[MAXPATHLEN+1] ;
 	char		ptfname[MAXPATHLEN+1] ;
-} ;
+} ; /* end struct */
 
 
 /* forward references */
 
-local int	mainsub(int,cchar **,cchar **,void *) ;
+local int	mainsub(int,cchar **,cchar **,void *) noex ;
 
-local int	usage(PI *) ;
+local int	usage(PI *) noex ;
 
-local int	locinfo_start(LOCINFO *,PI *) ;
-local int	locinfo_dbfname(LOCINFO *,cchar *) ;
-local int	locinfo_to(LOCINFO *,int) ;
-local int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
-local int	locinfo_defaults(LOCINFO *) ;
-local int	locinfo_finish(LOCINFO *) ;
+local int	locinfo_start(LI *,PI *) noex ;
+local int	locinfo_dbfname(LI *,cchar *) noex ;
+local int	locinfo_to(LI *,int) noex ;
+local int	locinfo_setentry(LI *,cchar **,cchar *,int) noex ;
+local int	locinfo_defaults(LI *) noex ;
+local int	locinfo_finish(LI *) noex ;
 
-local int	procopts(PI *,keyopt *) ;
-local int	process(PI *,ARGINFO *,bits *,cchar *,cchar *,int) ;
-local int	procall(PI *,int,void *) ;
-local int	procsome(PI *,int,void *,ARGINFO *,bits *,cchar *) ;
-local int	procspecs(PI *,void *,int,cchar *,int) ;
-local int	procspec(PI *,void *,int,cchar *,int) ;
+local int	procopts(PI *,keyopt *) noex ;
+local int	process(PI *,ARGINFO *,bits *,cchar *,cchar *,int) noex ;
+local int	procall(PI *,int,void *) noex ;
+local int	procsome(PI *,int,void *,ARGINFO *,bits *,cchar *) noex ;
+local int	procspecs(PI *,void *,int,cchar *,int) noex ;
+local int	procspec(PI *,void *,int,cchar *,int) noex ;
 
-local int process_begin(PI *,int) ;
-local int process_end(PI *,int) ;
+local int process_begin(PI *,int) noex ;
+local int process_end(PI *,int) noex ;
 
-local int procshells_begin(PI *,int) ;
-local int procshells_end(PI *,int) ;
-local int procshells_all(PI *,int,void *) ;
-local int procshells_query(PI *,int,void *,cchar *,int) ;
+local int procshells_begin(PI *,int) noex ;
+local int procshells_end(PI *,int) noex ;
+local int procshells_all(PI *,int,void *) noex ;
+local int procshells_query(PI *,int,void *,cchar *,int) noex ;
 
-local int procprotos_begin(PI *,int) ;
-local int procprotos_all(PI *,int,void *) ;
-local int procprotos_query(PI *,int,void *,cchar *,int) ;
-local int procprotos_end(PI *,int) ;
+local int procprotos_begin(PI *,int) noex ;
+local int procprotos_all(PI *,int,void *) noex ;
+local int procprotos_query(PI *,int,void *,cchar *,int) noex ;
+local int procprotos_end(PI *,int) noex ;
 
-local int procnets_begin(PI *,int) ;
-local int procnets_all(PI *,int,void *) ;
-local int procnets_query(PI *,int,void *,cchar *,int) ;
-local int procnets_end(PI *,int) ;
+local int procnets_begin(PI *,int) noex ;
+local int procnets_all(PI *,int,void *) noex ;
+local int procnets_query(PI *,int,void *,cchar *,int) noex ;
+local int procnets_end(PI *,int) noex ;
 
-local int prochosts_begin(PI *,int) ;
-local int prochosts_all(PI *,int,void *) ;
-local int prochosts_query(PI *,int,void *,cchar *,int) ;
-local int prochosts_end(PI *,int) ;
+local int prochosts_begin(PI *,int) noex ;
+local int prochosts_all(PI *,int,void *) noex ;
+local int prochosts_query(PI *,int,void *,cchar *,int) noex ;
+local int prochosts_end(PI *,int) noex ;
 
-local int procsvcs_begin(PI *,int) ;
-local int procsvcs_all(PI *,int,void *) ;
-local int procsvcs_query(PI *,int,void *,cchar *,int) ;
-local int procsvcs_end(PI *,int) ;
+local int procsvcs_begin(PI *,int) noex ;
+local int procsvcs_all(PI *,int,void *) noex ;
+local int procsvcs_query(PI *,int,void *,cchar *,int) noex ;
+local int procsvcs_end(PI *,int) noex ;
 
-local int procuas_begin(PI *,int) ;
-local int procuas_all(PI *,int,void *) ;
-local int procuas_query(PI *,int,void *,cchar *,int) ;
-local int procuas_end(PI *,int) ;
+local int procuas_begin(PI *,int) noex ;
+local int procuas_all(PI *,int,void *) noex ;
+local int procuas_query(PI *,int,void *,cchar *,int) noex ;
+local int procuas_end(PI *,int) noex ;
 
 
 /* local variables */
@@ -197,7 +192,7 @@ enum argopts {
 	argopt_if,
 	argopt_db,
 	argopt_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	argopts[] = {
 	"ROOT",
@@ -211,7 +206,7 @@ constexpr cpcchar	argopts[] = {
 	"if",
 	"db",
 	nullptr
-} ;
+} ; /* end arrau */
 
 constexpr  PIVARS	initvars = {
 	VARPROGRAMROOT1,
@@ -219,7 +214,7 @@ constexpr  PIVARS	initvars = {
 	VARPROGRAMROOT3,
 	PROGRAMROOT,
 	VARPRNAME
-} ;
+} ; /* end arrau */
 
 constexpr MAPEX	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
@@ -233,19 +228,19 @@ constexpr MAPEX	mapexs[] = {
 	{ SR_INTR, EX_INTR },
 	{ SR_EXIT, EX_TERM },
 	{ 0, 0 }
-} ;
+} ; /* end arrau */
 
 enum akonames {
 	akoname_utf,
 	akoname_db,
 	akoname_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	akonames[] = {
 	"utf",
 	"db",
 	nullptr
-} ;
+} ; /* end arrau */
 
 enum dbnames {
 	dbname_shells,
@@ -255,7 +250,7 @@ enum dbnames {
 	dbname_services,
 	dbname_userattrs,
 	dbname_overlast
-} ;
+} ; /* end enum */
 
 constexpr cpcchar	dbnames[] = {
 	"shells",
@@ -265,9 +260,9 @@ constexpr cpcchar	dbnames[] = {
 	"services",
 	"userattrs",
 	nullptr
-} ;
+} ; /* end arrau */
 
-static const uchar	aterms[] = {
+constexpr char		aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -276,7 +271,7 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
-} ;
+} ; /* end arrau */
 
 
 /* exported variables */
@@ -299,26 +294,24 @@ int b_sysdb(int argc,cchar *argv[],void *contextp) noex {
 	if ((rs < 0) && (ex == EX_OK)) ex = EX_DATAERR ;
 
 	return ex ;
-}
-/* end subroutine (b_sysdb) */
+} /* end subroutine (b_sysdb) */
 
 int p_sysdb(int argc,mainv argv,mainv envv,void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
-}
-/* end subroutine (p_sysdb) */
+} /* end subroutine (p_sysdb) */
 
 
 /* local subroutines */
 
 local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PI		pi, *pip = &pi ;
-	LOCINFO		li, *lip = &li ;
+	LI		li, *lip = &li ;
 	ARGINFO		ainfo ;
 	bits		pargs ;
 	keyopt		akopts ;
 	SHIO		errfile ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
 
@@ -347,14 +340,14 @@ local int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	cchar		*cp ;
 
 
-#if	CF_DEBUGS || CF_DEBUG
+#if	CF_DEBUG || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("b_sysdb: starting DFD=%d\n",rs) ;
 	}
-#endif /* CF_DEBUGS */
+#endif /* CF_DEBUG */
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	uc_mallset(1) ;
 	uc_mallout(&mo_start) ;
 #endif
@@ -920,7 +913,7 @@ badlocstart:
 
 badprogstart:
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
+#if	(CF_DEBUG || CF_DEBUG) && CF_DEBUGMALL
 	{
 	    uint	mi[12] ;
 	    uint	mo ;
@@ -958,7 +951,7 @@ badprogstart:
 	}
 #endif /* CF_DEBUGMALL */
 
-#if	(CF_DEBUGS || CF_DEBUG)
+#if	(CF_DEBUG || CF_DEBUG)
 	debugclose() ;
 #endif
 
@@ -972,12 +965,9 @@ badarg:
 	usage(pip) ;
 	goto retearly ;
 
-}
-/* end subroutine (mainsub) */
+} /* end subroutine (mainsub) */
 
-
-local int usage(PI *pip)
-{
+local int usage(PI *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	cchar		*pn = pip->progname ;
@@ -992,14 +982,11 @@ local int usage(PI *pip)
 	wlen += rs ;
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (usage) */
-
+} /* end subroutine (usage) */
 
 /* process the program ako-options */
-local int procopts(PI *pip,keyopt *kop)
-{
-	LOCINFO		*lip = pip->lip ;
+local int procopts(PI *pip,keyopt *kop) noex {
+	LI		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*cp ;
@@ -1048,13 +1035,10 @@ local int procopts(PI *pip,keyopt *kop)
 	} /* end if (ok) */
 
 	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (procopts) */
-
+} /* end subroutine (procopts) */
 
 local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
-		int w)
-{
+		int w) noex {
 	SHIO		ofile, *ofp = &ofile ;
 	int		rs ;
 	int		rs1 ;
@@ -1064,7 +1048,7 @@ local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 	    ofn = STDFNOUT ;
 
 	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
-	    LOCINFO	*lip = pip->lip ;
+	    LI	*lip = pip->lip ;
 	    if ((rs = process_begin(pip,w)) >= 0) {
 	        if (lip->fl.all) {
 	            rs = procall(pip,w,ofp) ;
@@ -1085,12 +1069,9 @@ local int process(PI *pip,ARGINFO *aip,bits *bop,cchar *ofn,cchar *afn,
 	    shio_printf(pip->efp,"%s: ofile=%s\n",pn,ofn) ;
 	} /* end if (open-file) */
 	return rs ;
-}
-/* end subroutine (process) */
+} /* end subroutine (process) */
 
-
-local int process_begin(PI *pip,int w)
-{
+local int process_begin(PI *pip,int w) noex {
 	int		rs ;
 
 #if	CF_DEBUG
@@ -1128,12 +1109,9 @@ local int process_begin(PI *pip,int w)
 #endif
 
 	return rs ;
-}
-/* end subroutine (process_begin) */
+} /* end subroutine (process_begin) */
 
-
-local int process_end(PI *pip,int w)
-{
+local int process_end(PI *pip,int w) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUG
@@ -1171,12 +1149,9 @@ local int process_end(PI *pip,int w)
 #endif
 
 	return rs ;
-}
-/* end subrotine (process_end) */
+} /* end subrotine (process_end) */
 
-
-local int procall(PI *pip,int w,void *ofp)
-{
+local int procall(PI *pip,int w,void *ofp) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUG
@@ -1214,13 +1189,10 @@ local int procall(PI *pip,int w,void *ofp)
 #endif
 
 	return rs ;
-}
-/* end subroutine (procall) */
-
+} /* end subroutine (procall) */
 
 local int procsome(PI *pip,int w,void *ofp,ARGINFO *aip,bits *bop,
-		cchar *afn)
-{
+		cchar *afn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pan = 0 ;
@@ -1292,11 +1264,10 @@ local int procsome(PI *pip,int w,void *ofp,ARGINFO *aip,bits *bop,
 	} /* end if (processing file argument file list) */
 
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procsome) */
+} /* end subroutine (procsome) */
 
 local int procspecs(PI *pip,void *ofp,int w,cchar *lbuf,int llen) noex {
-	FIELD		fsb ;
+	field		fsb ;
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
@@ -1313,8 +1284,7 @@ local int procspecs(PI *pip,void *ofp,int w,cchar *lbuf,int llen) noex {
 	    field_finish(&fsb) ;
 	} /* end if (field) */
 	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procspecs) */
+} /* end subroutine (procspecs) */
 
 local int procspec(PI *pip,void *ofp,int w,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
@@ -1349,8 +1319,7 @@ local int procspec(PI *pip,void *ofp,int w,cchar *sp,int sl) noex {
 #endif
 
 	return rs ;
-}
-/* end subroutine (procspec) */
+} /* end subroutine (procspec) */
 
 /* ARGSUSED */
 local int procshells_begin(PI *pip,int w) noex {
@@ -1359,7 +1328,7 @@ local int procshells_begin(PI *pip,int w) noex {
 	    debugprintf("b_sysdb/procshells_begin: ent\n") ;
 #endif
 	return getus_begin() ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procshells_end(PI *pip,int w) noex {
@@ -1368,7 +1337,7 @@ local int procshells_end(PI *pip,int w) noex {
 	    debugprintf("b_sysdb/procshells_end: ent\n") ;
 #endif
 	return getus_end() ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procshells_all(PI *pip,int w,void *ofp) noex {
@@ -1380,12 +1349,12 @@ local int procshells_all(PI *pip,int w,void *ofp) noex {
 	    if (rs < 0) break ;
 	} /* end while */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procshells_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	return SR_INVALID ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procprotos_begin(PI *pip,int w) noex {
@@ -1394,7 +1363,7 @@ local int procprotos_begin(PI *pip,int w) noex {
 	    debugprintf("b_sysdb/procprotos_begin: ent\n") ;
 #endif
 	return getpe_begin(FALSE) ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procprotos_end(PI *pip,int w) noex {
@@ -1403,7 +1372,7 @@ local int procprotos_end(PI *pip,int w) noex {
 	    debugprintf("b_sysdb/procprotos_end: ent\n") ;
 #endif
 	return getpe_end() ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procprotos_all(PI *pip,int w,void *ofp) noex {
@@ -1438,7 +1407,7 @@ local int procprotos_all(PI *pip,int w,void *ofp) noex {
 	    debugprintf("b_sysdb/procprotos_end: ret rs=%d\n",rs) ;
 #endif
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procprotos_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
@@ -1460,22 +1429,22 @@ local int procprotos_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procnets_begin(PI *pip,int w) noex {
 	return getne_begin(TRUE) ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procnets_end(PI *pip,int w) noex {
 	return getne_end() ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procnets_all(PI *pip,int w,void *ofp) noex {
-	struct netent	ne ;
-	cint	nelen = bufsizeget(bufsize_nw) ;
+	netent		ne ;
+	cint		nelen = bufsizeget(bufsize_nw) ;
 	int		rs ;
 	int		rs1 ;
 	char		*nebuf ;
@@ -1497,7 +1466,7 @@ local int procnets_all(PI *pip,int w,void *ofp) noex {
 	    uc_free(nebuf) ;
 	} /* end if (m-a) */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procnets_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
@@ -1519,17 +1488,17 @@ local int procnets_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int prochosts_begin(PI *pip,int w) noex {
 	return gethe_begin(FALSE) ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int prochosts_end(PI *pip,int w) noex {
 	return gethe_end() ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int prochosts_all(PI *pip,int w,void *ofp) noex {
@@ -1556,7 +1525,7 @@ local int prochosts_all(PI *pip,int w,void *ofp) noex {
 	    uc_free(hebuf) ;
 	} /* end if (m-a) */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int prochosts_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
@@ -1578,17 +1547,17 @@ local int prochosts_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procsvcs_begin(PI *pip,int w) noex {
 	return getse_begin(FALSE) ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procsvcs_end(PI *pip,int w) noex {
 	return getse_end() ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procsvcs_all(PI *pip,int w,void *ofp) noex {
@@ -1615,11 +1584,11 @@ local int procsvcs_all(PI *pip,int w,void *ofp) noex {
 	    uc_free(sebuf) ;
 	} /* end if (m-a) */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procsvcs_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
-	LOCINFO		*lip = pip->lip ;
+	LI		*lip = pip->lip ;
 	nulstr		s ;
 	int		rs ;
 	int		rs1 ;
@@ -1639,17 +1608,17 @@ local int procsvcs_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procuas_begin(PI *pip,int w) noex {
 	return getua_begin(FALSE) ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procuas_end(PI *pip,int w) noex {
 	return getua_end() ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procuas_all(PI *pip,int w,void *ofp) noex {
@@ -1679,7 +1648,7 @@ local int procuas_all(PI *pip,int w,void *ofp) noex {
 	    uc_free(uabuf) ;
 	} /* end if (m-a) */
 	return rs ;
-}
+} /* end */
 
 /* ARGSUSED */
 local int procuas_query(PI *pip,int w,void *ofp,cchar *sp,int sl) noex {
@@ -1701,25 +1670,23 @@ local int procuas_query(PI *pip,int w,void *ofp,cchar *sp,int sl) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 	return rs ;
-}
-/* end subroutine (procus_query) */
+} /* end subroutine (procus_query) */
 
-local int locinfo_start(LOCINFO *lip,PI *pip) noex {
+local int locinfo_start(LI *lip,PI *pip) noex {
 	int		rs = SR_OK ;
 
 	if (lip == nullptr)
 	    return SR_FAULT ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memset(lip,0,sizeof(LI)) ;
 	lip->pip = pip ;
 	lip->to = -1 ;
 	lip->proto = DEFPROTO ;
 
 	return rs ;
-}
-/* end subroutine (locinfo_start) */
+} /* end subroutine (locinfo_start) */
 
-local int locinfo_finish(LOCINFO *lip) noex {
+local int locinfo_finish(LI *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1732,10 +1699,9 @@ local int locinfo_finish(LOCINFO *lip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
-}
-/* end subroutine (locinfo_finish) */
+} /* end subroutine (locinfo_finish) */
 
-local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
+local int locinfo_setentry(LI *lip,cchar **epp,cchar *vp,int vl) noex {
 	vecstr		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -1766,10 +1732,9 @@ local int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
 	} /* end if (ok) */
 
 	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_setentry) */
+} /* end subroutine (locinfo_setentry) */
 
-local int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
+local int locinfo_dbfname(LI *lip,cchar *dbfname) noex {
 	if (lip == nullptr)
 	    return SR_FAULT ;
 
@@ -1780,18 +1745,16 @@ local int locinfo_dbfname(LOCINFO *lip,cchar *dbfname) noex {
 	}
 
 	return SR_OK ;
-}
-/* end subroutine (locinfo_dbfname) */
+} /* end subroutine (locinfo_dbfname) */
 
-local int locinfo_to(LOCINFO *lip,int to) noex {
+local int locinfo_to(LI *lip,int to) noex {
 	if (to < 0) to = TO_CACHE ;
 
 	lip->to = to ;
 	return SR_OK ;
-}
-/* end subroutine (locinfo_to) */
+} /* end subroutine (locinfo_to) */
 
-local int locinfo_defaults(LOCINFO *lip) noex {
+local int locinfo_defaults(LI *lip) noex {
 	PI		*pip = lip->pip ;
 	int		rs = SR_OK ;
 
@@ -1807,7 +1770,6 @@ local int locinfo_defaults(LOCINFO *lip) noex {
 	}
 
 	return rs ;
-}
-/* end subroutine (locinfo_defaults) */
+} /* end subroutine (locinfo_defaults) */
 
 
