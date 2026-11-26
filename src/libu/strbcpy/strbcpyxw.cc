@@ -183,7 +183,7 @@ local char *strbcpyxw_neg(char *dp,int,int n,va_list ap) noex {
 char *strbcpyxw(char *dp,int dl,int n,...) noex {
 	va_list		ap ;
 	if (dp) ylikely {
-	    va_begin(ap,n) ;
+	    va_beg(ap,n) ;
 	    if (dl >= 0) {
 		dp = strbcpyxw_pos(dp,dl,n,ap) ;
 	    } else {
