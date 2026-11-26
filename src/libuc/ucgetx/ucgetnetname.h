@@ -25,9 +25,7 @@
 
 
 EXTERNC_begin
-
-extern int	uc_getnetname(char *,int) noex ;
-
+    extern int	uc_getnetname(char *,int) noex ;
 EXTERNC_end
 
 
