@@ -1157,7 +1157,7 @@ local int procprint4(PI *pip,bfile *ofp,cchar *indent,
 	if ((rs = inetaddr_start(&ia,at,ap,-1)) >= 0) {
 	    cint	aslen = INET4_ADDRSTRLEN ;
 
-	    if ((rs = inetaddr_getdotaddr(&ia,astr4,aslen)) >= 0) {
+	    if ((rs = inetaddr_getdot(&ia,astr4,aslen)) >= 0) {
 	        if (f_all) {
 	            uint	v ;
 	            morder_ruint(ap,&v) ;
