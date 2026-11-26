@@ -95,7 +95,7 @@ int sbuf_termconseq(sbuf *op,int name,cchar *is,int na,...) noex {
 		cauto tc = termconseqva ;
 	        cint	tlen = TERMCONSEQLEN ;
 	        char	tbuf[TERMCONSEQLEN + 1] ;
-		va_begin(ap,na) ;
+		va_beg(ap,na) ;
 	        if ((rs = tc(tbuf,tlen,name,is,na,ap)) >= 0) ylikely {
 	            tl = rs ;
 	            rs = sbuf_strw(op,tbuf,tl) ;
