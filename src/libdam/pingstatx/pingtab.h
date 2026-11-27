@@ -36,7 +36,7 @@ struct pingtab_ent {
 typedef	PINGTAB		pingtab ;
 typedef	PINGTAB_ENT	pingtab_ent ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int pingtab_open		(pingtab *,cchar *) noex ;
 extern int pingtab_close	(pingtab *) noex ;
