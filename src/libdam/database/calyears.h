@@ -83,7 +83,7 @@ typedef	CALYEARS_CUR	calyears_cur ;
 typedef	CALYEARS_ENT	calyears_ent ;
 typedef	CALYEARS_Q	calyears_q ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int calyears_open(calyears *,cchar *,cchar **,cchar **) noex ;
 extern int calyears_count(calyears *) noex ;
