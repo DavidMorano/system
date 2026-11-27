@@ -102,7 +102,7 @@ typedef MSFILE		msfile ;
 typedef MSFILE_CUR	msfile_cur ;
 typedef MSFILE_ENT	msfile_ent ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int msfile_open(msfile *,cchar *,int,mode_t) noex ;
 extern int msfile_curbegin(msfile *,msfile_cur *) noex ;
