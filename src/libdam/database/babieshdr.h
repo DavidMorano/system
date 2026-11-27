@@ -61,7 +61,7 @@ struct babieshdr : babieshdr_head {
 typedef	BABIESHDR	babieshdr ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	babieshdr_rd(babieshdr *,char *,int) noex ;
 extern int	babieshdr_wr(babieshdr *,cchar *,int) noex ;
