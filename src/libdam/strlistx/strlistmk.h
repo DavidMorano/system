@@ -43,7 +43,7 @@ struct strlistmk_head {
 typedef	STRLISTMK	strlistmk ;
 typedef	STRLISTMK_FL	strlistmk_fl ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int strlistmk_open(strlistmk *,cc *,cc *,int,mode_t,int) noex ;
 extern int strlistmk_chgrp(strlistmk *,gid_t) noex ;
