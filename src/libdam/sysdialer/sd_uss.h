@@ -44,7 +44,7 @@ struct uss_head {
 	int		fd ;
 } ; /* end struct */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int uss_open(USS *,SYSDIALER_ARGS *,
 		cchar *,cchar *,cchar **) const ;
