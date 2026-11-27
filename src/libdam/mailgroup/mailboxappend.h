@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	mailboxappend(cchar *,int,int,int) noex ;
 
