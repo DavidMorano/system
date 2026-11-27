@@ -55,7 +55,7 @@ typedef	COMMANDMENT		commandment ;
 typedef	COMMANDMENT_FL		commandment_fl ;
 typedef	COMMANDMENT_CUR		commandment_cur ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	commandment_open(commandment *,cchar *,cchar *) noex ;
 extern int	commandment_audit(commandment *) noex ;
