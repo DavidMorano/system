@@ -29,7 +29,7 @@ struct tcpmux_head {
 
 typedef	TCPMUX		tcpmux ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int tcpmux_open(TCPMUX *,SYSDIALER_ARGS *,
 		cchar *,cchar *,cchar **) noex ;
