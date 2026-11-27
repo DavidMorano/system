@@ -26,7 +26,7 @@
 #include	<bfile.h>		/* LIBB */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	varsub_expfile(varsub *,bfile *,bfile *) noex ;
 
