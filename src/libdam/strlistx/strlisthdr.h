@@ -50,7 +50,7 @@ struct strlisthdr_head {
 
 typedef STRLISTHDR	strlisthdr ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 /* read from object; into the supplied buffer (like |read(2)|) */
 extern int strlisthdr_rd(strlisthdr *,char *,int) noex ;
