@@ -198,7 +198,7 @@ enum muximsgrcs {
 	muximsgrc_overlast
 } ; /* end enum */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int muximsg_response(struct muximsg_response *,int,char *,int) ;
 extern int muximsg_noop(struct muximsg_noop *,int,char *,int) ;
