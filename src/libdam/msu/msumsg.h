@@ -96,7 +96,7 @@ enum msumsgrcs {
 	msumsgrc_overlast
 } ; /* end enum */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int msumsg_getstatus(struct msumsg_getstatus *,int,char *,int) ;
 extern int msumsg_status(struct msumsg_status *,int,char *,int) ;
