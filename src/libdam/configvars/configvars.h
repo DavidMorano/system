@@ -79,7 +79,7 @@ typedef CONFIGVARS_FILE	configvars_file ;
 typedef CONFIGVARS_CUR	configvars_cur ;
 typedef CONFIGVARS_VFL	configvars_vfl ;
 
-EXTERNC_begin
+EXTERNC_beg
 int configvars_open(configvars *,cchar *,vecobj *) noex ;
 int configvars_addfile(configvars *,cchar *,vecobj *) noex ;
 int configvars_check(configvars *,time_t) noex ;
