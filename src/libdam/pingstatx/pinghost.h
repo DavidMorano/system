@@ -24,7 +24,7 @@ struct pinghost {
 	int		to ;
 } ; /* end struct */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int pinghost_start	(pinghost *,cchar *,int,int,int) noex ;
 extern int pinghost_finish	(pinghost *) noex ;
