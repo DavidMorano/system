@@ -19,7 +19,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern double	cvtfahtocen(double) noex ;
 extern double	cvtcentofah(double) noex ;
