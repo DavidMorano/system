@@ -94,7 +94,7 @@ typedef	COMMANDMENTS_CUR	commandments_cur ;
 typedef	COMMANDMENTS_ENT	commandments_ent ;
 typedef	COMMANDMENTS_OBJ	commandments_obj ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	commandments_open(commandments *,cchar *,cchar *) noex ;
 extern int	commandments_audit(commandments *) noex ;
