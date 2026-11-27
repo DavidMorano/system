@@ -27,7 +27,7 @@
 #include	<usysrets.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int localsetnetload	(cchar *,cchar *,int) noex ;
 extern int localsetsystat	(cchar *,cchar *,int) noex ;
