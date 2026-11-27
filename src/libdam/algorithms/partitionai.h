@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 typedef int	(*partitionai_f)(int,int) noex ;
 
