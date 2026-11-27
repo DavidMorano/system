@@ -72,7 +72,7 @@ typedef ACCTAB_ENT	acctab_ent ;
 typedef ACCTAB_CUR	acctab_cur ;
 typedef ACCTAB_ERR	acctab_err ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int acctab_open(acctab *,cchar *) noex ;
 extern int acctab_fileadd(acctab *,cchar *) noex ;
