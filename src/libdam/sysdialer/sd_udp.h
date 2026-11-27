@@ -35,7 +35,7 @@ struct udp_head {
 	int		fd ;
 } ; /* end struct */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int udp_open(UDP *,SYSDIALER_ARGS *,cchar *,cchar *,cchar **) noex ;
 extern int udp_reade(UDP *,char *,int,int,int) noex ;
