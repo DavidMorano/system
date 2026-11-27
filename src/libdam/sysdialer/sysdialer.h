@@ -145,7 +145,7 @@ struct sysdialer_fext {
 
 #ifdef	__cplusplus
 namespace sysdialer_util {
-    EXTERNC_begin
+    EXTERNC_beg
         typedef int (*soopen_f)(void *,SYSDIALER_ARGS *,
 			cchar *,cchar *,cchar **) noex ;
         typedef int (*soreade_f)(void *,char *,int,int,int) noex ;
@@ -201,7 +201,7 @@ typedef	SYSDIALER_ARGS	sysdialer_args ;
 typedef	SYSDIALER_PRC	sysdialer_prc ;
 typedef	SYSDIALER_MOD	sysdialer_mod ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int sysdialer_start	(sysdialer *,cchar *,mainv,mainv) noex ;
 extern int sysdialer_loadin	(sysdialer *,cchar *,sysdialer_ent **) noex ;
