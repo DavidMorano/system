@@ -137,7 +137,7 @@ struct msent_stime {
 	uint	stime ;
 } ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int msent_proc(msent *,int,char *,int) noex ;
 
