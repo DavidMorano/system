@@ -47,7 +47,7 @@ struct sdprog_head {
 
 typedef SDPROG		sdprog ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int sdprog_open(sdprog *,SDPROG_A *,cchar *,cchar *,cchar **) noex ;
 extern int sdprog_reade(sdprog *,char *,int,int,int) noex ;
