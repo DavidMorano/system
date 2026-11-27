@@ -75,7 +75,7 @@ typedef	CM		cm ;
 typedef	CM_ARGS		cm_args ;
 typedef	CM_INFO		cm_info ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int cm_open	(cm *,cm_args *,cchar *,cchar *,con mainv) noex ;
 extern int cm_getinfo	(cm *,char *,int,cm_info *) noex ;
