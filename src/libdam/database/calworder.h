@@ -40,7 +40,7 @@ struct calworder_head {
 
 typedef	CALWORDER	calworder ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	calworder_start(calworder *,cchar *,calent *) noex ;
 extern int	calworder_finish(calworder *) noex ;
