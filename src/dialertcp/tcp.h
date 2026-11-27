@@ -38,7 +38,7 @@ struct tcp_head {
 
 typedef	TCP		tcp ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int tcp_open(TCP *,SYSDIALER_ARGS *,cchar *,cchar *,cchar **) noex ;
 extern int tcp_reade(TCP *,char *,int,int,int) noex ;
