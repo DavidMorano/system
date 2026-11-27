@@ -77,7 +77,7 @@ typedef	PINGSTATDB_ENT		pingstatdb_ent ;
 typedef	PINGSTATDB_CUR		pingstatdb_cur ;
 typedef	PINGSTATDB_UP		pingstatdb_up ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int pingstatdb_open(pingstatdb *,cchar *,int,mode_t) noex ;
 extern int pingstatdb_close(pingstatdb *) noex ;
