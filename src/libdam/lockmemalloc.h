@@ -31,7 +31,7 @@ enum lockmemallocsets {
     lockmemallocset_overlast
 } ; /* end enum (lockmemallocsets) */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	lockmemalloc_set(int) noex ;
 
