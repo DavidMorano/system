@@ -38,7 +38,7 @@ struct key_netstarg {
 
 typedef STUBRPC_KEYNETSTARG	key_netstarg ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	key_secretkey_is_set(void) noex ;
 extern int	key_setnet(key_netstarg *) noex ;
