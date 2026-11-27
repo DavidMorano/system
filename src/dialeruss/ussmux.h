@@ -44,7 +44,7 @@ struct ussmux_head {
 	int		fd ;
 } ; /* end struct (ussmux_head) */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int ussmux_open(USSMUX *,SYSDIALER_ARGS *,
 		cchar *,cchar *,cchar **) noex ;
