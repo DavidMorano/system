@@ -37,7 +37,7 @@ struct mailaddrquote_head {
 typedef	MAILADDRQUOTE		mailaddrquote ;
 typedef	MAILADDRQUOTE_FL	mailaddrquote_fl ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int mailaddrquote_start(mailaddrquote *,cchar *,int,cchar **) noex ;
 extern int mailaddrquote_finish(mailaddrquote *) noex ;
