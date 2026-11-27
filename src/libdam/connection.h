@@ -88,7 +88,7 @@ typedef CONNECTION	connection ;
 
 typedef	CONNECTION_FL	connection_fl ;
 
-EXTERNC_begin
+EXTERNC_beg
 extern int connection_start(connection *,cchar *) noex ;
 extern int connection_socklocname(connection *,char *,int,int) noex ;
 extern int connection_sockremname(connection *,char *,int,int) noex ;
