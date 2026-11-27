@@ -125,7 +125,7 @@ typedef	PARAMOPT_NAME	paramopt_name ;
 typedef	PARAMOPT_VAL	paramopt_val ;
 typedef	PARAMOPT_CUR	paramopt_cur ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int paramopt_start	(paramopt *) noex ;
 extern int paramopt_loadu	(paramopt *,cchar *,int) noex ;
