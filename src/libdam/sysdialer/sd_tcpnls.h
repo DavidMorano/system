@@ -36,7 +36,7 @@ struct tcpnls_head {
 	int		fd ;
 } ; /* end struct */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int tcpnls_open(TCPNLS *,SYSDIALER_ARGS *,
 		cchar *,cchar *,cchar **) noex ;
