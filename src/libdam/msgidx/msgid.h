@@ -107,7 +107,7 @@ typedef MSGID_CUR	msgid_cur ;
 typedef MSGID_KEY	msgid_key ;
 typedef	MSGID_BUF	msgid_buf ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int msgid_open(msgid *,cchar *,int,mode_t,int) noex ;
 extern int msgid_check(msgid *,time_t) noex ;
