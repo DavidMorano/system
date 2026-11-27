@@ -59,7 +59,7 @@ typedef	BABYCALC		babycalc ;
 typedef	BABYCALC_FL		babycalc_fl ;
 typedef	BABYCALC_INFO		babycalc_info ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	babycalc_open(babycalc *,cchar *,cchar *) noex ;
 extern int	babycalc_check(babycalc *,time_t) noex ;
