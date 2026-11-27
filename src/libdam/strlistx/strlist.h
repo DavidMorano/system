@@ -83,7 +83,7 @@ typedef	STRLIST_CUR	strlist_cur ;
 typedef	STRLIST_FM	strlist_fm ;
 typedef	STRLIST_MI	strlist_mi ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	strlist_open(strlist *,cchar *) noex ;
 extern int	strlist_count(strlist *) noex ;
