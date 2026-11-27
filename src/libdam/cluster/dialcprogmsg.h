@@ -53,7 +53,7 @@ struct dialcprogmsg_light {
 	SOCKADDRESS	saerr ;
 } ; /* end struct */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int dialcprogmsg_end	(char *,int,int,DIALCPROGMSG_END *) noex ;
 extern int dialcprogmsg_light	(char *,int,int,DIALCPROGMSG_LIGHT *) noex ;
