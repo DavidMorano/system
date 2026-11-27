@@ -44,7 +44,7 @@ struct usd_head {
 	int		fd ;
 } ; /* end struct */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int usd_open(USD *,SYSDIALER_ARGS *,
 		cchar *,cchar *,cchar **) noex ;
