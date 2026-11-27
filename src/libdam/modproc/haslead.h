@@ -26,7 +26,7 @@
 #include	<usysdefs.h>
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern bool	haslead(cchar *,int,int) noex ;
 extern bool	hasleadcolon(cchar *,int) noex ;
