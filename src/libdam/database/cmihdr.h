@@ -46,7 +46,7 @@ struct cmihdr : cmihdr_head {
 typedef	CMIHDR		cmihdr ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	cmihdr_rd(cmihdr *,char *,int) noex ;
 extern int	cmihdr_wr(cmihdr *,cchar *,int) noex ;
