@@ -70,7 +70,7 @@ typedef	STRLISTMKS	strlistmks ;
 typedef	STRLISTMKS_FL	strlistmks_fl ;
 typedef	STRLISTMKS_OBJ	strlistmks_obj ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int strlistmks_open	(strlistmks *,cchar *,int,mode_t,int) noex ;
 extern int strlistmks_addvar	(strlistmks *,cchar *,int) noex ;
