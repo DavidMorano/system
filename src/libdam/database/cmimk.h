@@ -88,7 +88,7 @@ typedef CMIMK_LINE	cmimk_line ;
 typedef CMIMK_INFO	cmimk_info ;
 typedef	CMIMK_FL	cmimk_fl ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	cmimk_open(cmimk *,cchar *,int,mode_t) noex ;
 extern int	cmimk_setdb(cmimk *,size_t,time_t) noex ;
