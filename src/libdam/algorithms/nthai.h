@@ -20,7 +20,7 @@
 #include	<usysrets.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	nthai(int *,int,int,int) noex ;
 
