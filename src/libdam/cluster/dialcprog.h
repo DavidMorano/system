@@ -26,7 +26,7 @@
 #include	<dialopts.h>
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int dialcprog(cchar *,cchar *,cchar *,mainv,mainv,int,int,int *) noex ;
 
