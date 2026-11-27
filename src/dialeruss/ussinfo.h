@@ -110,7 +110,7 @@ struct ussinfo_head {
 
 typedef	USSINFO		ussinfo ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	ussinfo_start(ussinfo *,void *,SYSDIALER_INFO *,
 			SYSDIALER_ARGS *,cchar *,cchar *) noex ;
