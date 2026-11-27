@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int localgetnetload	(cchar *,char *,int) noex ;
 extern int localgetorg		(cchar *,char *,int,cchar *) noex ;
