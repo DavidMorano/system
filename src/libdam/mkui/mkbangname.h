@@ -48,7 +48,7 @@
 #include	<userinfo.h>		/* LIBUC <- money shot */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	mkbangname(char *,int,userinfo *) noex ;
 
