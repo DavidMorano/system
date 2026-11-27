@@ -27,7 +27,7 @@
 #include	<usysrets.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 typedef int	(*msortcmp_f)(cvoid *,cvoid *) noex ;
 
