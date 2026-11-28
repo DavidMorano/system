@@ -25,7 +25,7 @@
 #include	<recip.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	recip_copyparts(recip *,int,int) noex ;
 
