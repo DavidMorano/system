@@ -52,7 +52,7 @@ struct grcache_head {
 typedef	GRCACHE		grcache ;
 typedef	GRCACHE_ST	grcache_st ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int grcache_start(grcache *,int,int) noex ;
 extern int grcache_lookname(grcache *,ucentgr *,char *,int,cchar *) noex ;
