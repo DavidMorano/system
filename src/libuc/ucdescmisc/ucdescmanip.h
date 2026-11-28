@@ -35,7 +35,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int uc_duper(int,int) noex ;
 extern int uc_moveup(int,int) noex ;
