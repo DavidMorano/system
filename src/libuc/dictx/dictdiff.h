@@ -19,7 +19,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	dictdiff(int,int) noex ;
 EXTERNC_end
 
