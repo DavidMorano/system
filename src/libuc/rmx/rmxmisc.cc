@@ -95,7 +95,7 @@ int rmext(cchar *sp,int sl) noex {
 	    if (sl < 0) sl = lenstr(sp) ;
     	    if (cint si = siext(sp,sl) ; si >= 0) {
 	        sl = si ;
-	    }
+	    } /* end */
 	} else {
 	    sl = -1 ;
 	} /* end if (non-null) */
@@ -108,7 +108,7 @@ int rmcomment(cchar *lp,int ll) noex {
 	    if (ll < 0) ll = lenstr(lp) ;
 	    if ((rl = rmochr(lp,ll,'#')) == ll) {
 	       rl = rmeol(lp,ll) ;
-	    }
+	    } /* end */
 	} /* end if (non-null) */
 	return rl ;
 } /* end subroutine (rmcomment) */
