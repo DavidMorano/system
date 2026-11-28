@@ -62,7 +62,7 @@ struct cvtdater : cvtdater_head {
 typedef CVTDATER	cvtdater ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	cvtdater_start	(cvtdater *,time_t) noex ;
 extern int	cvtdater_load	(cvtdater *,time_t *,cchar *,int) noex ;
