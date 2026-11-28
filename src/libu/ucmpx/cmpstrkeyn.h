@@ -27,63 +27,63 @@
 
 
 EXTERNC_beg
-extern int	cmpstrkeynbc		(cchar *,cchar *,int) noex ;
-extern int	cmpstrkeynic		(cchar *,cchar *,int) noex ;
-extern int	cmpstrkeynfc		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynbc		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynic		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynfc		(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-local inline int cmpstrkeyn		(cchar *a,cchar *sp,int sl) noex {
+    local inline int cmpstrkeyn		(cchar *a,cchar *sp,int sl) noex {
     	return cmpstrkeynbc(a,sp,sl) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrkeynbco		(cchar *,cchar *,int) noex ;
-extern int	cmpstrkeynbcr		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynbco		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynbcr		(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrkeynico		(cchar *,cchar *,int) noex ;
-extern int	cmpstrkeynicr		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynico		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynicr		(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrkeynfco		(cchar *,cchar *,int) noex ;
-extern int	cmpstrkeynfcr		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynfco		(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynfcr		(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrkeynøbco	(cchar *,cchar *,int) noex ;
-extern int	cmpstrkeynøbcr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynøbco	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynøbcr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrkeynøico	(cchar *,cchar *,int) noex ;
-extern int	cmpstrkeynøicr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynøico	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynøicr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrkeynøfco	(cchar *,cchar *,int) noex ;
-extern int	cmpstrkeynøfcr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynøfco	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrkeynøfcr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-local inline int cmpstrkeynøbc	(cchar *s1,cchar *s2,int n) noex {
+    local inline int cmpstrkeynøbc	(cchar *s1,cchar *s2,int n) noex {
     	return cmpstrkeynøbco(s1,s2,n) ;
-} /* end */
-local inline int cmpstrkeynøic	(cchar *s1,cchar *s2,int n) noex {
+    } /* end */
+    local inline int cmpstrkeynøic	(cchar *s1,cchar *s2,int n) noex {
     	return cmpstrkeynøico(s1,s2,n) ;
-} /* end */
-local inline int cmpstrkeynøfc	(cchar *s1,cchar *s2,int n) noex {
+    } /* end */
+    local inline int cmpstrkeynøfc	(cchar *s1,cchar *s2,int n) noex {
     	return cmpstrkeynøfco(s1,s2,n) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int	cmpstrkeyn	(cchar *s1,cchar *s2) noex {
+    inline int	cmpstrkeyn	(cchar *s1,cchar *s2) noex {
     	return cmpstrkeyn(s1,s2,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
