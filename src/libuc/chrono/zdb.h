@@ -60,7 +60,7 @@ struct zdb : zdb_head {
 typedef ZDB		zdb ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	zdb_nameoff	(zdb *,cchar *,int,int) noex ;
 extern int	zdb_setname	(zdb *,cchar *,int) noex ;
