@@ -25,13 +25,13 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfa26i	(cchar *,int,int *)		noex ;
 extern int cfa26l	(cchar *,int,long *)		noex ;
 extern int cfa26ll	(cchar *,int,longlong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfa26ui	(cchar *,int,uint *)		noex ;
 extern int cfa26ul	(cchar *,int,ulong *)		noex ;
 extern int cfa26ull	(cchar *,int,ulonglong *)	noex ;
