@@ -69,7 +69,7 @@ struct inetaddr : inetaddr_head {
 typedef INETADDR	inetaddr ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
     extern int inetaddr_start	(inetaddr *,inetaddrs,cvoid *,int) noex ;
     extern int inetaddr_gethex	(inetaddr *,char *,int) noex ;
     extern int inetaddr_getdot	(inetaddr *,char *,int) noex ;
