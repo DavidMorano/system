@@ -83,7 +83,7 @@ struct comparse : comparse_head {
 typedef COMPARSE	comparse ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int comparse_start	(comparse *,cchar *,int) noex ;
 extern int comparse_getval	(comparse *,cchar **) noex ;
