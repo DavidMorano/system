@@ -25,7 +25,7 @@
 #include	<dialopts.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int dialuss	(cchar *,int,int) noex ;
 extern int dialussnls	(cc *,cc *,int,int) noex ;
