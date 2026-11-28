@@ -25,7 +25,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	mkfiledate	(char *,cchar *,cchar *,mode_t) noex ;
 extern int	mkfilejob	(char *,cchar *,mode_t) noex ;
 extern int	mkfileart	(char *,cchar *,cchar *,int,mode_t) noex ;
