@@ -110,7 +110,7 @@ struct tmz {
 
 typedef TMZ_FL		tmz_fl ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	tmz_init	(tmz *) noex ;
 extern int	tmz_xstd	(tmz *,cchar *,int) noex ;
