@@ -21,6 +21,7 @@
 	Names:
 	u_uname
 	u_getnodename
+	u_gethostname
 	u_getauxinfo
     	libu::loadhwserial
     	libu::ugethostid
@@ -31,6 +32,7 @@
 	Synopsis:
 	int u_uname		(utsname *up) noex
 	int u_getnodename	(char *rbuf,int rlen) noex
+	int u_gethostname	(char *rbuf,int rlen) noex
 	int u_getauxinfo	(char *rbuf,int rlen,int req) noex
 	int u_gethostid		(ulong *) noex
     	int libu::loadhwserial	(char *,int) noex
@@ -78,6 +80,7 @@
 #include	<climits>		/* CSTD |INT_MAX| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
+#include	<cstring>		/* CSTD |strrchr(3c)| */
 #include	<new>			/* C++STD |nothrow(3c++)| */
 #include	<utility>		/* C++STD |unreachable(3c++)| */
 #include	<clanguage.h>		/* LIBU */
@@ -93,7 +96,8 @@
 
 #include	"usysdata.h"
 
-import ulibvals ;			/* |ulibval(3u)| */
+import libutil ;
+import ulibvals ;
 
 /* local defines */
 
@@ -105,6 +109,7 @@ using libu::ugethostid ;		/* subroutine */
 using libu::sncpy ;			/* subroutine */
 using libu::snwcpy ;			/* subroutine */
 using libu::strwcpy ;			/* subroutine */
+using libu::rmdot ;			/* subroutine */
 using usysauxinfo::ugetauxinfo ;	/* subroutine */
 
 
@@ -128,22 +133,22 @@ namespace {
 	syscaller_m	m = nullptr ;
 	utsname		*utsp ;
 	ulong		*idp ;
-	int operator () (utsname *p) noex {
+	int operator	() (utsname *p) noex {
 	    utsp = p ;
 	    return handler() ;
 	} ; /* end */
-	int operator () (ulong *p) noex {
+	int operator ()	(ulong *p) noex {
 	    idp = p ;
 	    return handler() ;
 	} ; /* end */
-        int callstd() noex override {
+        int callstd	() noex override {
             int         rs = SR_BUGCHECK ;
             if (m) {
                 rs = (this->*m)() ;
             } /* end */
             return rs ;
         } ; /* end method (callstd) */
-	int std_uname() noex ;
+	int std_uname	() noex ;
 	int std_gethostid() noex ;
     } ; /* end struct (syscaller) */
 } /* end namespace */
@@ -246,7 +251,25 @@ int u_getnodename(char *rbuf,int rlen) noex {
 	    } /* end if (utsname) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
-} /* end subroutine (u_uname) */
+} /* end subroutine (u_getnodename) */
+
+int u_gethostname(char *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	if (hbuf) {
+	    rs = SR_INVALID ;
+	    hbuf[0] = eos ;
+	    if (hlen > 0) {
+		csize	hsize = size_t(hlen + 1) ;
+	        if ((rs = gethostname(hbuf,hsize)) >= 0) {
+	            hbuf[hlen] = eos ;
+	            rs = lenstr(hbuf) ;
+	        } else {
+	            rs = (neg errno) ;
+	        } /* end */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+} /* end subroutine (u_gethostname) */
 
 int u_getauxinfo(char *rbuf,int rlen,int req) noex {
 	int		rs = SR_FAULT ;
@@ -320,8 +343,8 @@ local sysret_t uname_machine(utsname *up) noex {
 local sysret_t uname_nodename(utsname *up) noex {
 	int		rs = SR_OK ;
 	if (char *nn = up->nodename) {
-	    if (char *cp = strchr(nn,'.')) {
-	        *cp = eos ;
+	    if (cint nl  = rmdot(nn) ; nl >= 0) {
+	        nn[nl] = eos ;
 	    } /* end */
 	} /* end */
 	return rs ;
