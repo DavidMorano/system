@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int inetnetpton	(void *,int,int,cchar *,int) noex ;
     extern int inetpton		(void *,int,int,cchar *,int) noex ;
     extern int inetntop		(char *,int,int,cvoid *) noex ;
