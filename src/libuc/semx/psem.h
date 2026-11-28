@@ -112,7 +112,7 @@ struct psem : psem_head {
 typedef PSEM		psem ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	psem_create	(psem *,int,int) noex ;
 extern int	psem_destroy	(psem *) noex ;
