@@ -80,7 +80,7 @@ struct envhelp : envhelp_head {
 typedef ENVHELP		envhelp ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int envhelp_start	(envhelp *,mainv,mainv) noex ;
 extern int envhelp_present	(envhelp *,cchar *,int,cchar **) noex ;
