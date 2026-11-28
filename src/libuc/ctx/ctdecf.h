@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	ctdecf(char *,int,double,int,int,int,int) noex ;
 EXTERNC_end
 
