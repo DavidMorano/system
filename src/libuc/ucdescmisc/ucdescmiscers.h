@@ -47,7 +47,7 @@
 #include	<ucftruncate.h>
 #include	<ucnonblock.h>
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	uc_fcntl	(int,int,...)			noex ;
 extern int	uc_ioctl	(int,int,...)			noex ;
