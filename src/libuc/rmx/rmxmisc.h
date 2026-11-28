@@ -26,26 +26,26 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int	rmext		(cchar *,int) noex ;
-extern int	rmcomment	(cchar *,int) noex ;
-extern int	rmslashes	(cchar *,int) noex ;
-extern int	rmdot		(cchar *,int) noex ;
+EXTERNC_beg
+    extern int	rmext		(cchar *,int) noex ;
+    extern int	rmcomment	(cchar *,int) noex ;
+    extern int	rmslashes	(cchar *,int) noex ;
+    extern int	rmdot		(cchar *,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int	rmext		(cchar *sp) noex {
+    inline int	rmext		(cchar *sp) noex {
     	return rmext(sp,-1) ;
-} /* end */
-inline int	rmcomment	(cchar *sp) noex {
+    } /* end */
+    inline int	rmcomment	(cchar *sp) noex {
     	return rmcomment(sp,-1) ;
-} /* end */
-inline int	rmslashes	(cchar *sp) noex {
+    } /* end */
+    inline int	rmslashes	(cchar *sp) noex {
     	return rmslashes(sp,-1) ;
-} /* end */
-inline int	rmdot		(cchar *sp) noex {
+    } /* end */
+    inline int	rmdot		(cchar *sp) noex {
     	return rmdot(sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
