@@ -35,7 +35,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int converte(double,int,int *,int *,char *) noex ;
 extern int convertf(double,int,int *,int *,char *) noex ;
 extern int convertg(double,int,int,char *) noex ;
