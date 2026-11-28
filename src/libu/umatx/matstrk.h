@@ -31,9 +31,9 @@ EXTERNC_beg
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int matstrk(con mainv bs,cchar *sp) noex {
+    inline int matstrk(con mainv bs,cchar *sp) noex {
     	return matstrk(bs,sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
