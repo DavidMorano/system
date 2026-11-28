@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	sfkeyval	(cchar *,int,cchar *,cchar **) noex ;
 EXTERNC_end
 
