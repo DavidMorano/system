@@ -25,7 +25,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int initnow(TIMEB *,char *,int) noex ;
 
