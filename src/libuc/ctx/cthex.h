@@ -25,7 +25,7 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cthexsc	(char *,int,schar)		noex ;
 extern int cthexss	(char *,int,sshort)		noex ;
 extern int cthexsi	(char *,int,sint)		noex ;
@@ -33,7 +33,7 @@ extern int cthexsl	(char *,int,slong)		noex ;
 extern int cthexsll	(char *,int,slonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cthexuc	(char *,int,uchar)		noex ;
 extern int cthexus	(char *,int,ushort)		noex ;
 extern int cthexui	(char *,int,uint)		noex ;
@@ -41,7 +41,7 @@ extern int cthexul	(char *,int,ulong)		noex ;
 extern int cthexull	(char *,int,ulonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 local inline int cthexc(char *bp,int bl,char v)		noex {
 	return cthexsc(bp,bl,v) ;
 } /* end */
