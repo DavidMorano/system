@@ -27,11 +27,11 @@
 #include	<strdcpyxw.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern char *strdcpyx(char *,int,int,...) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern char *strdcpy1(char *,int,cc *) noex ;
 extern char *strdcpy2(char *,int,cc *,cc *) noex ;
 extern char *strdcpy3(char *,int,cc *,cc *,cc *) noex ;
