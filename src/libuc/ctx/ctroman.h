@@ -25,13 +25,13 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int ctromansi	(char *,int,sint)		noex ;
 extern int ctromansl	(char *,int,slong)		noex ;
 extern int ctromansll	(char *,int,slonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int ctromanui	(char *,int,uint)		noex ;
 extern int ctromanul	(char *,int,ulong)		noex ;
 extern int ctromanull	(char *,int,ulonglong)		noex ;
