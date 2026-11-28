@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int zos_set	(char *,int,int) noex ;
 extern int zos_get	(cchar *,int,int *) noex ;
