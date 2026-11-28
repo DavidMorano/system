@@ -25,7 +25,7 @@
 
 
 EXTERNC_begin
-extern int cmpitermerval(CITIMERVAL *,CITIMERVAL *) noex ;
+    extern int cmpitermerval(CITIMERVAL *,CITIMERVAL *) noex ;
 EXTERNC_end
 
 
