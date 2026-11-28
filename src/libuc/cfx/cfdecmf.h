@@ -25,13 +25,13 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfdecmfi	(cchar *,int,int *)		noex ;
 extern int cfdecmfl	(cchar *,int,long *)		noex ;
 extern int cfdecmfll	(cchar *,int,longlong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfdecmfui	(cchar *,int,uint *)		noex ;
 extern int cfdecmful	(cchar *,int,ulong *)		noex ;
 extern int cfdecmfull	(cchar *,int,ulonglong *)	noex ;
