@@ -36,19 +36,19 @@
 	<0		error code (system-return)
 
 	Notes:
-	What does each OS take as a buffer length?
+	What does each OS take as the type of the buffer length
+	to their |getdomainname(3c)| subroutine?
 	OS			type		caveats
 	-----------------------------------------------------
 	+ POSIX®		size_t
 	+ Linux			size_t
-	+ Solaris®		int		contraru to online man-pages
+	+ Solaris®		int		contrary to online man-pages!
 	+ Darwin (macOS)	int
-
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>		/* |getdomainname(3c)| */
+#include	<unistd.h>		/* POSIX® |getdomainname(3c)| */
 #include	<cstddef>		/* CSTD */
 #include	<cstdlib>		/* CSTD */
 #include	<clanguage.h>		/* LIBU */
@@ -57,8 +57,12 @@
 #include	<usysdefs.h>		/* LIBU */
 #include	<usysrets.h>		/* LIBU */
 #include	<usysflag.h>		/* LIBU */
+#include	<localmisc.h>		/* LIBU |eos| */
 
+#include	"usys_lenstr.hh"
 #include	"usys_ugetnisdom.h"
+
+using usys::lenstr ;			/* subroutine */
 
 #if	F_SUNOS || F_DARWIN
 
@@ -78,20 +82,22 @@ local unixret_t getdom(char *rbuf,int rlen) noex {
 
 namespace libu {
     sysret_t ugetnisdom(char *rbuf,int rlen) noex {
-        cint		maxlen = (2*1024) ; /* pseudo-random value */
+        cint		maxlen = (2 * 1024) ; /* pseudo-random value */
 	int		rs = SR_FAULT ;
+	int		len = 0 ; /* return-value */
 	if (rbuf) ylikely {
 	    rs = SR_INVALID ;
-	    if (rlen >= 0) ylikely {
+	    if (rlen > 0) ylikely {
 	        if (rlen > maxlen) rlen = maxlen ;
 	        if ((rs = getdom(rbuf,rlen)) >= 0) ylikely {
-	            rbuf[rlen] = '\0' ; /* for safety */
+	            rbuf[rlen] = eos ; /* for safety */
+		    len = lenstr(rbuf) ;
 	        } else {
 	            rs = (neg errno) ;
-	        }
+	        } /* end */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
     } /* end subroutine (ugetnisdom) */
 } /* end namespace (libu) */
 
