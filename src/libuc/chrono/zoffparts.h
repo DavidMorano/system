@@ -61,7 +61,7 @@ struct zoffparts : zoffparts_head {
 typedef ZOFFPARTS	zoffparts ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int zoffparts_set	(zoffparts *,int) noex ;
 extern int zoffparts_get	(zoffparts *,int *) noex ;
