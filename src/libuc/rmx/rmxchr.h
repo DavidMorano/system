@@ -26,15 +26,15 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int	rmochr(cchar *,int,int) noex ;
-extern int	rmrchr(cchar *,int,int) noex ;
+EXTERNC_beg
+    extern int	rmochr(cchar *,int,int) noex ;
+    extern int	rmrchr(cchar *,int,int) noex ;
 EXTERNC_end
 
-EXTERNC_begin
-local inline int rmchr(cchar *sp,int sl,int sch) noex {
+EXTERNC_beg
+    local inline int rmchr(cchar *sp,int sl,int sch) noex {
 	return rmochr(sp,sl,sch) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 
