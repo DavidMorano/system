@@ -96,7 +96,7 @@ struct rpsem : rpsem_head {
 typedef RPSEM		rpsem ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	rpsem_create	(rpsem *,int,int) noex ;
 extern int	rpsem_destroy	(rpsem *) noex ;
