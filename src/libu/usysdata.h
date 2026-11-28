@@ -21,6 +21,7 @@
 	Names:
 	int u_uname		(UTSNAME *) noex
 	int u_getnodename	(char *,int) noex
+    	int u_gethostname	(char *,int) noex ;
 	int u_getauxinfo	(char *,int,int) noex
 	int u_gethostid		(ulong *) noex
 
@@ -46,15 +47,16 @@
 
 
 EXTERNC_begin
-extern int u_uname		(UTSNAME *) noex ;
-extern int u_getnodename	(char *,int) noex ;
-extern int u_getauxinfo		(char *,int,int) noex ;
-extern int u_gethostid		(ulong *) noex ;
+    extern int u_uname		(UTSNAME *) noex ;
+    extern int u_getnodename	(char *,int) noex ;
+    extern int u_gethostname	(char *,int) noex ;
+    extern int u_getauxinfo	(char *,int,int) noex ;
+    extern int u_gethostid	(ulong *) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
 namespace libu {
-    extern int locdhwserial	(char *,int) noex ;
+    extern int loadhwserial	(char *,int) noex ;
     extern int ugethostid	(ulong *) noex ;
 } /* end namespace (libu) */
 #endif /* __cplusplus */
