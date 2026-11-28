@@ -17,7 +17,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int storebuf_buf		(char *,int,int,cchar *,int)	noex ;
 extern int storebuf_strw	(char *,int,int,cchar *,int)	noex ;
 extern int storebuf_chr		(char *,int,int,int)		noex ;
@@ -26,7 +26,7 @@ extern int storebuf_addslash	(char *,int,int)		noex ;
 extern int storebuf_checknul	(char *)			noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int storebuf_bini	(char *,int,int,int)		noex ;
 extern int storebuf_binl	(char *,int,int,long)		noex ;
 extern int storebuf_binll	(char *,int,int,longlong)	noex ;
@@ -35,7 +35,7 @@ extern int storebuf_binul	(char *,int,int,ulong)		noex ;
 extern int storebuf_binull	(char *,int,int,ulonglong)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int storebuf_octi	(char *,int,int,int)		noex ;
 extern int storebuf_octl	(char *,int,int,long)		noex ;
 extern int storebuf_octll	(char *,int,int,longlong)	noex ;
@@ -44,7 +44,7 @@ extern int storebuf_octul	(char *,int,int,ulong)		noex ;
 extern int storebuf_octull	(char *,int,int,ulonglong)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int storebuf_deci	(char *,int,int,int)		noex ;
 extern int storebuf_decl	(char *,int,int,long)		noex ;
 extern int storebuf_decll	(char *,int,int,longlong)	noex ;
@@ -53,7 +53,7 @@ extern int storebuf_decul	(char *,int,int,ulong)		noex ;
 extern int storebuf_decull	(char *,int,int,ulonglong)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int storebuf_hexi	(char *,int,int,int)		noex ;
 extern int storebuf_hexl	(char *,int,int,long)		noex ;
 extern int storebuf_hexll	(char *,int,int,longlong)	noex ;
@@ -62,7 +62,7 @@ extern int storebuf_hexul	(char *,int,int,ulong)		noex ;
 extern int storebuf_hexull	(char *,int,int,ulonglong)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 local inline int storebuf_str(char *bp,int bl,int i,cchar *sp)	noex {
 	return storebuf_strw(bp,bl,i,sp,-1) ;
 } /* end */
