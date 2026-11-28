@@ -32,7 +32,7 @@ struct hostent_cursor {
 
 typedef HOSTENT_CUR	hostent_cur ;
 
-EXTERNC_begin
+EXTERNC_beg
 extern int hostent_getofficial(HOSTENT *,cchar **) noex ;
 extern int hostent_getcanonical(HOSTENT *,cchar **) noex ;
 extern int hostent_getaf(HOSTENT *) noex ;
