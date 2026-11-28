@@ -38,7 +38,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern bool	ismmclass_7bit	(int) noex ;
 extern bool	ismmclass_8bit	(int) noex ;
