@@ -42,7 +42,7 @@
 #define	BUFSIZEGET_DEFVAL	(4*1024)
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	bufsizeget(int) noex ;
 
