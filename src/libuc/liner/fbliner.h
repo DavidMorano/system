@@ -93,7 +93,7 @@ struct fbliner : fbliner_head {
 typedef FBLINER		fbliner ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int fbliner_start	(fbliner *,filer *,off_t,int) noex ;
 extern int fbliner_getln	(fbliner *,cchar **) noex ;
