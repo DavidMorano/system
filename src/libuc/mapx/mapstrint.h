@@ -32,7 +32,7 @@
 typedef	MAPSTRINT	mapstrint ;
 typedef	MAPSTRINT_CUR	mapstrint_cur ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int mapstrint_start(mapstrint *,int) noex ;
 extern int mapstrint_count(mapstrint *) noex ;
