@@ -43,7 +43,7 @@
 #include	<dialopts.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int dialticotsord	(cc *,int,int,int)			noex ;
 extern int dialticotsordnls	(cc *,int,cc *,int,int)			noex ;
