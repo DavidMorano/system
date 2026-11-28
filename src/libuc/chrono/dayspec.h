@@ -66,7 +66,7 @@ struct dayspec : dayspec_head {
 typedef DAYSPEC		dayspec ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int dayspec_def	(dayspec *) noex ;
 extern int dayspec_load	(dayspec *,cchar *,int) noex ;
