@@ -21,7 +21,7 @@
 #include	<usysrets.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int spwdent_load		(SPWD *,char *,int,CSPWD *) noex ;
 extern int spwdent_parse	(SPWD *,char *,int,cchar *,int) noex ;
