@@ -25,13 +25,13 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	ctdecpi		(char *,int,int,int)		noex ;
 extern int	ctdecpl		(char *,int,int,long)		noex ;
 extern int	ctdecpll	(char *,int,int,longlong)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	ctdecpui	(char *,int,int,uint)		noex ;
 extern int	ctdecpul	(char *,int,int,ulong)		noex ;
 extern int	ctdecpull	(char *,int,int,ulonglong)	noex ;
