@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int sfbaselib	(cchar *,int,cchar **) noex ;
     extern int sfbracketval	(cchar *,int,cchar **) noex ;
     extern int sfcookkey	(cchar *,int,cchar **) noex ;
@@ -35,7 +35,7 @@ EXTERNC_begin
     extern int sfnamecomp	(cchar *,int,cchar **) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern int sfprogroot	(cchar *,int,cchar **) noex ;
     extern int sfshrink		(cchar *,int,cchar **) noex ;
     extern int sfskipwhite	(cchar *,int,cchar **) noex ;
