@@ -58,7 +58,7 @@ struct gncache_head {
 typedef	GNCACHE		gncache ;
 typedef	GNCACHE_ST	gncache_st ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int gncache_start(gncache *,int,int) noex ;
 extern int gncache_add(gncache *,gid_t,char *) noex ;
