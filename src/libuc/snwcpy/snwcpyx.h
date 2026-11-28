@@ -26,7 +26,7 @@
 #include	<snwcpyxc.h>
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	snwcpy(char *,int,cchar *,int) noex ;
 EXTERNC_end
 
@@ -37,7 +37,7 @@ EXTERNC_end
 #endif /* __cplusplus */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int snwcpyclean	(char *,int,int,cchar *,int) noex ;
     extern int snwcpycompact	(char *,int,cchar *,int) noex ;
     extern int snwcpyhyphen	(char *,int,cchar *,int) noex ;
@@ -48,11 +48,11 @@ EXTERNC_begin
     extern int snwcpywidehdr	(char *,int,const wchar_t *,int) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern int snwcpyx(char *,int,int,...) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern int snwcpy1(char *,int,ccp,int) noex ;
     extern int snwcpy2(char *,int,ccp,ccp,int) noex ;
     extern int snwcpy3(char *,int,ccp,ccp,ccp,int) noex ;
