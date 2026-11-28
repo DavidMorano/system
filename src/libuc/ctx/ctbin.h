@@ -25,19 +25,19 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int ctbinsi	(char *,int,sint)		noex ;
 extern int ctbinsl	(char *,int,slong)		noex ;
 extern int ctbinsll	(char *,int,slonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int ctbinui	(char *,int,uint)		noex ;
 extern int ctbinul	(char *,int,ulong)		noex ;
 extern int ctbinull	(char *,int,ulonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 inline int ctbini(char *bp,int bl,int v)			noex {
 	return ctbinsi(bp,bl,v) ;
 } /* end */
