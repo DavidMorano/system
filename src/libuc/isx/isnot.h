@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern bool isNotPresent	(int) noex ;
 extern bool isNotAccess		(int) noex ;
