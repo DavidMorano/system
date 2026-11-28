@@ -37,7 +37,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern uint	inet4int(cvoid *) noex ;
 EXTERNC_end
 
