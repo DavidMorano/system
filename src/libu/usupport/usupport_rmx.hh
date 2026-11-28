@@ -36,9 +36,6 @@ namespace libu {
     inline int rmchr(cchar *sp,int sl,int sch) noex {
 	return libu::rmochr(sp,sl,sch) ;
     } /* end subroutine */
-    inline int rmdot(cchar *sp,int sl = -1) noex {
-	return libu::rmrchr(sp,sl,'.') ;
-    } /* end subroutine */
 } /* end namespace (libu) */
 
 namespace libu {
@@ -47,6 +44,12 @@ namespace libu {
     extern int rmblk(cchar *sp,int sl = -1) noex ;
     extern int rmtrailclass(cchar *sp,int sl,cchar *ss) noex ;
     extern int rmtrailchr(cchar *sp,int sl,int sch) noex ;
+} /* end namespace (libu) */
+
+namespace libu {
+    inline int rmdot(cchar *sp,int sl = -1) noex {
+	return libu::rmtrailchr(sp,sl,'.') ;
+    } /* end subroutine */
 } /* end namespace (libu) */
 
 
