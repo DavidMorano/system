@@ -53,7 +53,7 @@ struct namecache_head {
 typedef	NAMECACHE		namecache ;
 typedef	NAMECACHE_ST		namecache_st ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int namecache_start(namecache *,cchar *,int,int) noex ;
 extern int namecache_add(namecache *,cchar *,cchar *,int) noex ;
