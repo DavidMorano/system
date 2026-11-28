@@ -25,19 +25,19 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int ctoctsi	(char *,int,sint)		noex ;
 extern int ctoctsl	(char *,int,slong)		noex ;
 extern int ctoctsll	(char *,int,slonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int ctoctui	(char *,int,uint)		noex ;
 extern int ctoctul	(char *,int,ulong)		noex ;
 extern int ctoctull	(char *,int,ulonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 local inline int ctocti(char *bp,int bl,int v)		noex {
 	return ctoctsi(bp,bl,v) ;
 } /* end */
