@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern bool isindomain(cchar *,cchar *) noex ;
 
