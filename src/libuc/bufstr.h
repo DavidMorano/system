@@ -96,13 +96,13 @@ struct bufstr : bufstr_head {
 typedef BUFSTR		bufstr ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	bufstr_start	(bufstr *) noex ;
     extern int	bufstr_strw	(bufstr *,cchar *,int) noex ;
     extern int	bufstr_chr	(bufstr *,int) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	bufstr_bini	(bufstr *,int) noex ;
     extern int	bufstr_binl	(bufstr *,long) noex ;
     extern int	bufstr_binll	(bufstr *,longlong) noex ;
@@ -111,7 +111,7 @@ EXTERNC_begin
     extern int	bufstr_binull	(bufstr *,ulonglong) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	bufstr_octi	(bufstr *,int) noex ;
     extern int	bufstr_octl	(bufstr *,long) noex ;
     extern int	bufstr_octll	(bufstr *,longlong) noex ;
@@ -120,7 +120,7 @@ EXTERNC_begin
     extern int	bufstr_octull	(bufstr *,ulonglong) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	bufstr_deci	(bufstr *,int) noex ;
     extern int	bufstr_decl	(bufstr *,long) noex ;
     extern int	bufstr_decll	(bufstr *,longlong) noex ;
@@ -129,7 +129,7 @@ EXTERNC_begin
     extern int	bufstr_decull	(bufstr *,ulonglong) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	bufstr_hexi	(bufstr *,int) noex ;
     extern int	bufstr_hexl	(bufstr *,long) noex ;
     extern int	bufstr_hexll	(bufstr *,longlong) noex ;
@@ -138,7 +138,7 @@ EXTERNC_begin
     extern int	bufstr_hexull	(bufstr *,ulonglong) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
     extern int	bufstr_get	(bufstr *,cchar **) noex ;
     extern int	bufstr_finish	(bufstr *) noex ;
 EXTERNC_end
