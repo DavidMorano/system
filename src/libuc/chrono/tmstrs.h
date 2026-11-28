@@ -24,7 +24,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int tmstrsday	(cchar *,int) noex ;
 extern int tmstrsmonth	(cchar *,int) noex ;
