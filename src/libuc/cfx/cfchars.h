@@ -25,13 +25,13 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfcharsi	(cchar *,int,int *)		noex ;
 extern int cfcharsl	(cchar *,int,long *)		noex ;
 extern int cfcharsll	(cchar *,int,longlong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfcharsui	(cchar *,int,uint *)		noex ;
 extern int cfcharsul	(cchar *,int,ulong *)		noex ;
 extern int cfcharsull	(cchar *,int,ulonglong *)	noex ;
