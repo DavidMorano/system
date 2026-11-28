@@ -27,7 +27,7 @@
 #include	<usysrets.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	ncolchar	(int,int,int) noex ;
 extern int	ncolstr		(int,int,cchar *,int) noex ;
