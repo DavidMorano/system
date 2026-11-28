@@ -5,7 +5,7 @@
 /* storage object */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUG	1		/* debugging */
+#define	CF_DEBUG	0		/* debugging */
 
 /* revision history:
 
@@ -146,24 +146,24 @@ int storeitem_finish(storeitem *op) noex {
 
 int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		wlen = 0 ;
+	int		inc = 0 ; /* return-value */
 	if (rpp) *rpp = nullptr ;
 	if (op && sp) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->dbuf) ylikely {
 		if ((rs = op->index) >= 0) ylikely {
-	            int		dlen = (op->dlen - op->index) ;
-	            charp	dbuf = (op->dbuf + op->index) ;
+	            int		dl = (op->dlen - op->index) ;
+	            charp	dp = (op->dbuf + op->index) ;
 		    {
-		        char	*dp = dbuf ;
-			while (sl-- && *sp && dlen--) {
+			charp dbase = dp ;
+			while (sl-- && *sp && dl--) {
 	    		    *dp++ = *sp++ ;
 			} /* end while */
-			*dp = eos ;
-			if (dlen >= 0) {
-	    		    wlen = intconv(dp - dbuf) ;
-	    		    op->index += (wlen + 1) ;
-	            	    if (rpp) *rpp = dbuf ;
+			if (dl >= 1) {
+			    *dp++ = eos ;
+			    inc = intconv(dp - dbase) ;
+	    		    op->index += inc ;
+	            	    if (rpp) *rpp = dbase ;
 			} else {
 	    		    op->f_overflow = true ;
 	    		    rs = SR_OVERFLOW ;
@@ -173,18 +173,17 @@ int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 		} /* end if (no-errors) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? wlen : rs ;
+	return (rs >= 0) ? inc : rs ;
 } /* end subroutine (storeitem_strw) */
 
 int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		wlen = 0 ;
+	int		inc = 0 ;
 	if (rpp) *rpp = nullptr ;
 	if (op && vbp) ylikely {
 	    rs = SR_NOTOPEN ;
 	    if (op->dbuf) ylikely {
-		rs = op->index ;
-	        if (op->index >= 0) ylikely {
+	        if ((rs = op->index) >= 0) ylikely {
 		    int		dlen = (op->dlen - op->index) ;
 		    charp	dbuf = (op->dbuf + op->index) ;
 		    {
@@ -194,10 +193,9 @@ int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 			while (sl-- && dlen--) {
 	    		    *dp++ = *sp++ ;
 			} /* end while */
-			*dp = eos ;
 			if (dlen >= 0) {
-	    		    wlen = intconv(dp - dbuf) ;
-	    		    op->index += (wlen + 1) ;
+	    		    inc = intconv(dp - dbuf) ;
+	    		    op->index += inc ;
 	    		    if (rpp) *rpp = dbuf ;
 			} else {
 	    		    op->f_overflow = true ;
@@ -208,7 +206,7 @@ int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 		} /* end if (no-errors) */
 	    } /* end if (open) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? wlen : rs ;
+	return (rs >= 0) ? inc : rs ;
 } /* end subroutine (storeitem_buf) */
 
 int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
@@ -285,12 +283,14 @@ int storeitem_nul(storeitem *op,cchar **rpp) noex {
 int storeitem_block(storeitem *op,int bsz,int esz,void ***vppp) noex {
 	int		rs = SR_FAULT ;
 	int		inc = 0 ; /* return-value */
+	DEBPRINTF("ent hsz=%d align=%d\n",bsz,esz) ;
 	if (op && vppp) ylikely {
 	    if ((rs = op->aligner(esz)) >= 0) {
 	        int	bl = (op->dlen - op->index) ;
 	        charp	bp = (op->dbuf + op->index) ;
 	        inc += rs ;
 	        rs = SR_OVERFLOW ;
+	DEBPRINTF("mid1 rs=%d inc=%d\n",rs,inc) ;
 	        if (bl >= bsz) {
 		    voidpp vpp = voidpp(bp) ;
 		    rs = memclear(bp,bsz) ;
@@ -301,9 +301,11 @@ int storeitem_block(storeitem *op,int bsz,int esz,void ***vppp) noex {
 	            op->f_overflow = true ;
 		    op->index = rs ;
 	        } /* end if (overflow or not) */
+	DEBPRINTF("mid2 rs=%d inc=%d\n",rs,inc) ;
 	    } /* end if (aligner) */
 	} /* end if (non-null) */
 	if (rs < 0) *vppp = nullptr ;
+	DEBPRINTF("ret rs=%d inc=%d\n",rs,inc) ;
 	return (rs >= 0) ? inc : rs ;
 } /* end subroutine (storeitem_block) */
 
@@ -378,6 +380,7 @@ int storeitem::block(int bsz,int esz,void ***vppp) noex {
 int storeitem::strtab(ccharpp *rsap,con mainv sa) noex  {
     	int		rs = SR_FAULT ;
 	int		inc = 0 ; /* return-value */
+	DEBPRINTF("ent\n") ;
 	if (rsap) ylikely {
 	    rs = SR_OK ;
 	    if (sa) ylikely {
@@ -386,12 +389,15 @@ int storeitem::strtab(ccharpp *rsap,con mainv sa) noex  {
 		    int	i ; /* used-afterwards */
 	            ccharpp rsa = ccharpp(tab) ;
 		    inc += rs ;
+	DEBPRINTF("ptab rs=%d inc=%d\n",rs,inc) ;
 	            for (i = 0 ; (rs >= 0) && (i < n) && sa[i] ; i += 1) {
 	                rs = strw((rsa + i),sa[i]) ;
 			inc += rs ;
+	DEBPRINTF("strw rs=%d inc=%d\n",rs,inc) ;
 	            } /* end for */
 	            rsa[i] = nullptr ;
 		    *rsap = rsa ;
+	DEBPRINTF("for rs=%d inc=%d\n",rs,inc) ;
 		} else {
 	            *rsap = nullptr ;
 	        } /* end if (storeitem-ptab) */
@@ -399,6 +405,7 @@ int storeitem::strtab(ccharpp *rsap,con mainv sa) noex  {
 	        *rsap = nullptr ;
 	    } /* end if (aliases) */
 	} /* end if (non-null) */
+	DEBPRINTF("ret rs=%d inc=%d\n",rs,inc) ;
 	return (rs >= 0) ? inc : rs ;
 } /* end method (storeitem::strtab) */
 
@@ -412,9 +419,9 @@ int storeitem::aligner(int sz) noex {
     	cuint		usz = uint(sz) ;
     	int		rs = SR_INVALID ;
 	int		inc = 0 ; /* return-value */
+	DEBPRINTF("ent align=%d\n",sz) ;
 	if ((sz >= 0) && (sz <= szmax) && has_single_bit(usz)) {
 	    if ((rs = index) >= 0) {
-		rs = SR_OK ;
 		if ((inc = getinc(sz)) > 0) {
 		    index += inc ;
 		    if (index > dlen) {
@@ -424,6 +431,7 @@ int storeitem::aligner(int sz) noex {
 		} /* end */
 	    } /* end if (ok) */
 	} /* end if (valid-alignment) */
+	DEBPRINTF("ret rs=%d inc=%d\n",rs,inc) ;
 	return (rs >= 0) ? inc : rs ;
 } /* end method (storeitem::aligner) */
 
