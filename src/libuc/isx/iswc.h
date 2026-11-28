@@ -28,7 +28,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern bool	iswcwhite(wchar_t) noex ;
 
