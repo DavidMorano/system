@@ -74,7 +74,7 @@ typedef XWORDS		xwords ;
 
 typedef	XWORDS_WORD	xwords_word ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	xwords_start	(xwords *,cchar *,int) noex ;
 extern int	xwords_get	(xwords *,int,cchar **) noex ;
