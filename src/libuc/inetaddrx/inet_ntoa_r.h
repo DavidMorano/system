@@ -29,7 +29,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern char *inet_ntoa_r(INADDR,char *,int) noex ;
 EXTERNC_end
 
