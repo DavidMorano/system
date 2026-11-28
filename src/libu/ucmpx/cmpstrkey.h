@@ -28,57 +28,57 @@
 
 
 EXTERNC_begin
-extern int cmpstrkeybco(cchar *,cchar *) noex ;
-extern int cmpstrkeybcr(cchar *,cchar *) noex ;
+    extern int cmpstrkeybco(cchar *,cchar *) noex ;
+    extern int cmpstrkeybcr(cchar *,cchar *) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int cmpstrkeyico(cchar *,cchar *) noex ;
-extern int cmpstrkeyicr(cchar *,cchar *) noex ;
+    extern int cmpstrkeyico(cchar *,cchar *) noex ;
+    extern int cmpstrkeyicr(cchar *,cchar *) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int cmpstrkeyfco(cchar *,cchar *) noex ;
-extern int cmpstrkeyfcr(cchar *,cchar *) noex ;
+    extern int cmpstrkeyfco(cchar *,cchar *) noex ;
+    extern int cmpstrkeyfcr(cchar *,cchar *) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int cmpstrkeybc(cchar *,cchar *) noex ;
-extern int cmpstrkeyic(cchar *,cchar *) noex ;
-extern int cmpstrkeyfc(cchar *,cchar *) noex ;
+    extern int cmpstrkeybc(cchar *,cchar *) noex ;
+    extern int cmpstrkeyic(cchar *,cchar *) noex ;
+    extern int cmpstrkeyfc(cchar *,cchar *) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-local inline int cmpstrkey(cchar *s1,cchar *s2) noex {
+    local inline int cmpstrkey(cchar *s1,cchar *s2) noex {
     	return cmpstrkeybc(s1,s2) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 EXTERNC_begin
-extern int cmpstrkeyøbco(cchar *,cchar *) noex ;
-extern int cmpstrkeyøbcr(cchar *,cchar *) noex ;
+    extern int cmpstrkeyøbco(cchar *,cchar *) noex ;
+    extern int cmpstrkeyøbcr(cchar *,cchar *) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int cmpstrkeyøico(cchar *,cchar *) noex ;
-extern int cmpstrkeyøicr(cchar *,cchar *) noex ;
+    extern int cmpstrkeyøico(cchar *,cchar *) noex ;
+    extern int cmpstrkeyøicr(cchar *,cchar *) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-extern int cmpstrkeyøfco(cchar *,cchar *) noex ;
-extern int cmpstrkeyøfcr(cchar *,cchar *) noex ;
+    extern int cmpstrkeyøfco(cchar *,cchar *) noex ;
+    extern int cmpstrkeyøfcr(cchar *,cchar *) noex ;
 EXTERNC_end
 
 EXTERNC_begin
-local inline int cmpstrkeyøbc(cchar *s1,cchar *s2) noex {
+    local inline int cmpstrkeyøbc(cchar *s1,cchar *s2) noex {
     	return cmpstrkeyøbco(s1,s2) ;
-} /* end */
-local inline int cmpstrkeyøic(cchar *s1,cchar *s2) noex {
+    } /* end */
+    local inline int cmpstrkeyøic(cchar *s1,cchar *s2) noex {
     	return cmpstrkeyøico(s1,s2) ;
-} /* end */
-local inline int cmpstrkeyøfc(cchar *s1,cchar *s2) noex {
+    } /* end */
+    local inline int cmpstrkeyøfc(cchar *s1,cchar *s2) noex {
     	return cmpstrkeyøfco(s1,s2) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 
