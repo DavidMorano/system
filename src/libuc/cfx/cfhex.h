@@ -25,19 +25,19 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfhexsi	(cchar *,int,sint *)		noex ;
 extern int cfhexsl	(cchar *,int,slong *)		noex ;
 extern int cfhexsll	(cchar *,int,slonglong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfhexui	(cchar *,int,uint *)		noex ;
 extern int cfhexul	(cchar *,int,ulong *)		noex ;
 extern int cfhexull	(cchar *,int,ulonglong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 local inline int cfhexi(cchar *sp,int sl,int *rp)		noex {
 	return cfhexsi(sp,sl,rp) ;
 } /* end */
