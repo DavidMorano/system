@@ -25,19 +25,19 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfxxxsi	(cchar *,int,int,sint *)	noex ;
 extern int cfxxxsl	(cchar *,int,int,slong *)	noex ;
 extern int cfxxxsll	(cchar *,int,int,slonglong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfxxxui	(cchar *,int,int,uint *)	noex ;
 extern int cfxxxul	(cchar *,int,int,ulong *)	noex ;
 extern int cfxxxull	(cchar *,int,int,ulonglong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 inline int cfxxxi(cchar *sp,int sl,int b,int *rp)	noex {
 	return cfxxxsi(sp,sl,b,rp) ;
 } /* end */
