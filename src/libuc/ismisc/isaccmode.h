@@ -33,7 +33,7 @@ struct isaccmoder {
 } ; /* end struct (isaccmoder) */
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern bool	isaccmode_readable(int) noex ;
 extern bool	isaccmode_writable(int) noex ;
