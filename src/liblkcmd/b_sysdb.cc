@@ -1327,7 +1327,7 @@ local int procshells_begin(PI *pip,int w) noex {
 	if (DEBUGLEVEL(3))
 	    debugprintf("b_sysdb/procshells_begin: ent\n") ;
 #endif
-	return getus_begin() ;
+	return getus_beg() ;
 } /* end */
 
 /* ARGSUSED */
@@ -1612,7 +1612,7 @@ local int procsvcs_query(PI *pip,int w,void *ofp,cc *sp,int sl) noex {
 
 /* ARGSUSED */
 local int procuas_begin(PI *pip,int w) noex {
-	return getua_begin(FALSE) ;
+	return getua_beg(FALSE) ;
 } /* end */
 
 /* ARGSUSED */
