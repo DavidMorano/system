@@ -27,7 +27,7 @@
 #include	<usysrets.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	ncolline(int,int,cchar *,int) noex ;
 
