@@ -39,21 +39,21 @@ EXTERNC_beg
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int matstrobc	(con mainv bs,int n,cchar *sp) noex {
+    inline int matstrobc	(con mainv bs,int n,cchar *sp) noex {
 	return matstrobc(bs,n,sp,-1) ;
-} /* end */
-inline int matstroic	(con mainv bs,int n,cchar *sp) noex {
+    } /* end */
+    inline int matstroic	(con mainv bs,int n,cchar *sp) noex {
 	return matstroic(bs,n,sp,-1) ;
-} /* end */
-inline int matstrofc	(con mainv bs,int n,cchar *sp) noex {
+    } /* end */
+    inline int matstrofc	(con mainv bs,int n,cchar *sp) noex {
 	return matstrofc(bs,n,sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
-inline int matstro	(con mainv bs,int n,cchar *sp) noex {
+    inline int matstro	(con mainv bs,int n,cchar *sp) noex {
 	return matstrobc(bs,n,sp,-1) ;
-} /* end subroutine */
+    } /* end subroutine */
 #endif /* __cplusplus */
 
 
