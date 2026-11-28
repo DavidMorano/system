@@ -27,15 +27,15 @@
 
 
 EXTERNC_begin
-extern int cmpstrwbc(cchar *,cchar *,int) noex ;	/* base */
-extern int cmpstrwic(cchar *,cchar *,int) noex ;	/* insensitive */
-extern int cmpstrwfc(cchar *,cchar *,int) noex ;	/* fold */
+    extern int cmpstrwbc(cchar *,cchar *,int) noex ;	/* base */
+    extern int cmpstrwic(cchar *,cchar *,int) noex ;	/* insensitive */
+    extern int cmpstrwfc(cchar *,cchar *,int) noex ;	/* fold */
 EXTERNC_end
 
 EXTERNC_begin
-local inline int cmpstrw(cchar *bs,cchar *sp,int sl) noex {
+    local inline int cmpstrw(cchar *bs,cchar *sp,int sl) noex {
 	return cmpstrwbc(bs,sp,sl) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 
