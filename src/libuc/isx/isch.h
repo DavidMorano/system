@@ -27,7 +27,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern bool	ischalpha	(int) noex attrpure ;
 extern bool	ischalnum	(int) noex attrpure ;
 extern bool	ischdigit	(int) noex attrpure ;
@@ -44,7 +44,7 @@ extern bool	ischcmdstart	(int) noex attrpure ;
 extern bool	ischhdrkey	(int) noex attrpure ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 local inline bool	ischpl	(int ch) noex attrconst {
 	return (ch == '+') ;
 } /* end */
