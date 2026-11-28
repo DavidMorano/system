@@ -20,13 +20,13 @@
 
 
 EXTERNC_begin
-extern int	cmpstrvaln	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrvaln	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int	cmpstrvaln	(cchar *s1,cchar *s2) noex {
+    inline int	cmpstrvaln	(cchar *s1,cchar *s2) noex {
     	return cmpstrvaln(s1,s2,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
