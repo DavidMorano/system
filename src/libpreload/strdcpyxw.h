@@ -26,11 +26,11 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern char *strdcpyxw(char *,int,int,...) noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern char *strdcpy1w(char *,int,cc *,int) noex ;
 extern char *strdcpy2w(char *,int,cc *,cc *,int) noex ;
 extern char *strdcpy3w(char *,int,cc *,cc *,cc *,int) noex ;
