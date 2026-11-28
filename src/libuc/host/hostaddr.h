@@ -41,7 +41,7 @@ struct hostaddr_cursor {
 typedef HOSTADDR		hostaddr ;
 typedef HOSTADDR_CUR		hostaddr_cur ;
 
-EXTERNC_begin
+EXTERNC_beg
     extern int hostaddr_start(hostaddr *,cchar *,cchar *,ADDRINFO *) noex ;
     extern int hostaddr_getcanonical(hostaddr *,cchar **) noex ;
     extern int hostaddr_curbegin(hostaddr *,hostaddr_cur *) noex ;
