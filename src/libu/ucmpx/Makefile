@@ -54,12 +54,12 @@ OBJ7= cmpval.o
 
 OBJ8= cmpvstrx.o
 OBJ9= cmpvstr.o cmpvstrk.o
-OBJ10=
+OBJ10= cmpmem.o
 OBJ11=
 
 OBJA= obj0.o obj1.o obj2.o obj3.o
 OBJB= obj4.o obj5.o obj6.o obj7.o
-OBJC= obj8.o obj9.o
+OBJC= obj8.o obj9.o obj10.o
 
 OBJ= obja.o objb.o objc.o
 
@@ -158,6 +158,12 @@ obj8.o:			$(OBJ8)
 obj9.o:			$(OBJ9)
 	$(LD) -r $(LDFLAGS) -o $@ $^
 
+obj10.o:		$(OBJ10)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
+obj11.o:		$(OBJ11)
+	$(LD) -r $(LDFLAGS) -o $@ $^
+
 
 obja.o:			$(OBJA)
 	$(LD) -r $(LDFLAGS) -o $@ $^
@@ -175,6 +181,7 @@ obj.o:			$(OBJ)
 
 cmporders.o:		cmporders.cc	cmporders.h			$(INCS)
 
+cmpmem.o:		cmpmem.cc	cmpmem.h		$(DEPS)	$(INCS)
 cmpitimer.o:		cmpitimer.cc	cmpitimer.h		$(DEPS)	$(INCS)
 cmptimeval.o:		cmptimeval.cc	cmptimeval.h		$(DEPS)	$(INCS)
 cmptimespec.o:		cmptimespec.cc	cmptimespec.h		$(DEPS)	$(INCS)
