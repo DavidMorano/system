@@ -88,7 +88,7 @@ struct dialoptms {
 #define	DIALOPT_CLOEXEC		(1 << dialopt_cloexec)
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	dialopts(int,int) noex ;
 
