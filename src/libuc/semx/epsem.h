@@ -97,7 +97,7 @@ struct epsem : csem {
 typedef EPSEM		epsem ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	epsem_create	(epsem *,int,int) noex ;
 extern int	epsem_destroy	(epsem *) noex ;
