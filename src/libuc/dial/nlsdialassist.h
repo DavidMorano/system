@@ -40,7 +40,7 @@
 #define	NLPS_TO		30		/* time-out in seconds */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	mknlsreq	(char *,int,cchar *,int) noex ;
 extern int	readnlsresp	(int,char *,int,int) noex ;
