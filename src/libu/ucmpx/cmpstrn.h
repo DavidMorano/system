@@ -27,51 +27,51 @@
 
 
 EXTERNC_beg
-extern int	cmpstrnbc	(cchar *,cchar *,int) noex ;	/* base */
-extern int	cmpstrnic	(cchar *,cchar *,int) noex ;	/* insenstive */
-extern int	cmpstrnfc	(cchar *,cchar *,int) noex ;	/* fold */
+    extern int	cmpstrnbc	(cchar *,cchar *,int) noex ;	/* base */
+    extern int	cmpstrnic	(cchar *,cchar *,int) noex ;	/* insenstive */
+    extern int	cmpstrnfc	(cchar *,cchar *,int) noex ;	/* fold */
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrnbco	(cchar *,cchar *,int) noex ;
-extern int	cmpstrnbcr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnbco	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnbcr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrnico	(cchar *,cchar *,int) noex ;
-extern int	cmpstrnicr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnico	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnicr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrnfco	(cchar *,cchar *,int) noex ;
-extern int	cmpstrnfcr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnfco	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnfcr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrnøbco	(cchar *,cchar *,int) noex ;
-extern int	cmpstrnøbcr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnøbco	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnøbcr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrnøico	(cchar *,cchar *,int) noex ;
-extern int	cmpstrnøicr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnøico	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnøicr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-extern int	cmpstrnøfco	(cchar *,cchar *,int) noex ;
-extern int	cmpstrnøfcr	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnøfco	(cchar *,cchar *,int) noex ;
+    extern int	cmpstrnøfcr	(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-local inline int cmpstrnøbc	(cchar *s1,cchar *s2,int n) noex {
+    local inline int cmpstrnøbc	(cchar *s1,cchar *s2,int n) noex {
     	return cmpstrnøbco(s1,s2,n) ;
-} /* end */
-local inline int cmpstrnøic	(cchar *s1,cchar *s2,int n) noex {
+    } /* end */
+    local inline int cmpstrnøic	(cchar *s1,cchar *s2,int n) noex {
     	return cmpstrnøico(s1,s2,n) ;
-} /* end */
-local inline int cmpstrnøfc	(cchar *s1,cchar *s2,int n) noex {
+    } /* end */
+    local inline int cmpstrnøfc	(cchar *s1,cchar *s2,int n) noex {
     	return cmpstrnøfco(s1,s2,n) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 
