@@ -26,24 +26,24 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int	rmeol		(cchar *,int) noex ;
-extern int	rmwht		(cchar *,int) noex ;
-extern int	rmblk		(cchar *,int) noex ;
-extern int	rmtrailclass	(cchar *,int,cchar *) noex ;
-extern int	rmtrailchr	(cchar *,int,int) noex ;
+EXTERNC_beg
+    extern int	rmeol		(cchar *,int) noex ;
+    extern int	rmwht		(cchar *,int) noex ;
+    extern int	rmblk		(cchar *,int) noex ;
+    extern int	rmtrailclass	(cchar *,int,cchar *) noex ;
+    extern int	rmtrailchr	(cchar *,int,int) noex ;
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int rmeol		(cchar *sp) noex {
+    inline int rmeol		(cchar *sp) noex {
     	return rmeol(sp,-1) ;
-} /* end */
-inline int rmwht		(cchar *sp) noex {
+    } /* end */
+    inline int rmwht		(cchar *sp) noex {
     	return rmwht(sp,-1) ;
-} /* end */
-inline int rmblk		(cchar *sp) noex {
+    } /* end */
+    inline int rmblk		(cchar *sp) noex {
     	return rmblk(sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
