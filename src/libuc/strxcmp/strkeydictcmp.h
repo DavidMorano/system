@@ -26,8 +26,8 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
-extern int strkeydictcmp(cchar *,cchar *) noex ;
+EXTERNC_beg
+    extern int strkeydictcmp(cchar *,cchar *) noex ;
 EXTERNC_end
 
 
