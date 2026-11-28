@@ -25,7 +25,7 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfhexstr	(cchar *,int,uchar *)		noex ;
 EXTERNC_end
 
