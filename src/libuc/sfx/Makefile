@@ -51,7 +51,7 @@ OBJ07= sfxchr.o sfxbrk.o sfxsub.o sfext.o
 
 OBJ08= sfweirdo.o sfcontent.o
 OBJ09= sfkey.o sfkeyval.o
-OBJ10= sfmisc.o
+OBJ10= sfmisc.o sfdomain.o
 OBJ11=
 
 OBJA= obj00.o obj01.o
@@ -218,6 +218,7 @@ sfprogname.o:		sfprogname.cc	sfxname.h		$(INCS)
 sfrootname.o:		sfrootname.cc	sfxname.h		$(INCS)
 
 sfcontent.o:		sfcontent.cc	sfcontent.h		$(INCS)
+sfdomain.o:		sfdomain.cc	sfdomain.h		$(INCS)
 
 sfkey.o:		sfkey.cc	sfkey.h			$(INCS)
 sfkeyval.o:		sfkeyval.cc	sfkeyval.h		$(INCS)
