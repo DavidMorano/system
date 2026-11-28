@@ -25,19 +25,19 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfoctsi	(cchar *,int,sint *)		noex ;
 extern int cfoctsl	(cchar *,int,slong *)		noex ;
 extern int cfoctsll	(cchar *,int,slonglong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfoctui	(cchar *,int,uint *)		noex ;
 extern int cfoctul	(cchar *,int,ulong *)		noex ;
 extern int cfoctull	(cchar *,int,ulonglong *)	noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 local inline int cfocti(cchar *sp,int sl,int *rp)		noex {
 	return cfoctsi(sp,sl,rp) ;
 } /* end */
