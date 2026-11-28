@@ -43,7 +43,7 @@
 #include	<usysrets.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	fieldterms	(char *,int,cchar *) noex ;
 extern int	fieldtermsx	(char *,int,int,...) noex ;
