@@ -31,7 +31,7 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int stdorder_rc	(cchar *,char *)	noex ;
 extern int stdorder_rs	(cchar *,short *)	noex ;
