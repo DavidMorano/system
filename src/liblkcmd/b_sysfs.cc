@@ -1063,7 +1063,7 @@ local int procusers(PI *pip,int w) noex {
 	    PASSWD	pw ;
 	    cint	pwlen = pu.pwlen ;
 	    char	*pwbuf = pu.pwbuf ;
-	    if ((rs = getpw_begin()) >= 0) {
+	    if ((rs = getpw_beg()) >= 0) {
 	        while ((rs = getpw_ent(&pw,pwbuf,pwlen)) > 0) {
 	            rs = procusers_ent(pip,&pu,&pw) ;
 		    c += rs ;
@@ -1341,7 +1341,7 @@ local int procgroups_load(PI *pip,bfile *gsfp,bfile *grfp) noex {
 	    grbuf = (bp+0) ;
 	    lbuf = (bp+(grlen+1)) ;
 	    if ((rs = setstr_start(gsp,n)) >= 0) {
-	        if ((rs = getgr_begin()) >= 0) {
+	        if ((rs = getgr_beg()) >= 0) {
 	            while ((rs = getgr_ent(&gr,grbuf,grlen)) > 0) {
 	                cchar	*gn = gr.gr_name ;
 		        if ((rs = setstr_add(gsp,gn,-1)) > 0) {
@@ -1442,7 +1442,7 @@ local int procprojects_load(PI *pip,bfile *pnfp,bfile *pjfp) noex {
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
 	    pjbuf = (bp+0) ;
 	    lbuf = (bp+(pjlen+1)) ;
-	    if ((rs = getpj_begin()) >= 0) {
+	    if ((rs = getpj_beg()) >= 0) {
 	        while ((rs = getpj_ent(&pj,pjbuf,pjlen)) > 0) {
 	            cchar	*pn = pj.pj_name ;
 	            c += 1 ;
@@ -1473,7 +1473,7 @@ local int procshells(PI *pip,int w) noex {
 	    if ((rs = bopenmod(usfp,tmpusfname,"wct",om)) >= 0) {
 	        cint	rlen = MAXPATHLEN ;
 	        char		rbuf[MAXPATHLEN+1] ;
-	        if ((rs = getus_begin()) >= 0) {
+	        if ((rs = getus_beg()) >= 0) {
 	            while ((rs = getus_ent(rbuf,rlen)) > 0) {
 	                c += 1 ;
 	                rs = bprintln(usfp,rbuf,rs) ;
@@ -1518,7 +1518,7 @@ local int procshadow(PI *pip,int w) noex {
 	        cint	splen = bufsizeget(bufsize_sp) ;
 	        char		*spbuf ;
 		if ((rs = uc_malloc((splen+1),&spbuf)) >= 0) {
-	            if ((rs = getsp_begin()) >= 0) {
+	            if ((rs = getsp_beg()) >= 0) {
 	                while ((rs = getsp_ent(&sp,spbuf,splen)) > 0) {
 	                    cint	llen = LINEBUFLEN ;
 	                    char	lbuf[LINEBUFLEN+1] ;
@@ -1569,7 +1569,7 @@ local int procuserattr(PI *pip,int w) noex {
 	        cint	ualen = bufsizeget(bufsize_ua) ;
 	        char		*uabuf ;
 		if ((rs = uc_malloc((ualen+1),&uabuf)) >= 0) {
-	            if ((rs = getua_begin()) >= 0) {
+	            if ((rs = getua_beg()) >= 0) {
 	                while ((rs = getua_ent(&ua,uabuf,ualen)) > 0) {
 	                    cint	llen = LINEBUFLEN ;
 	                    char	lbuf[LINEBUFLEN+1] ;
