@@ -75,7 +75,7 @@ typedef HOSTINFO_ADDR		hostinfo_addr ;
 typedef HOSTINFO_ARGS		hostinfo_args ;
 typedef HOSTINFO_CUR		hostinfo_cur ;
 
-EXTERNC_begin
+EXTERNC_beg
 extern int hostinfo_start(hostinfo *,int,cchar *) noex ;
 extern int hostinfo_geteffective(hostinfo *,cchar **) noex ;
 extern int hostinfo_getcanonical(hostinfo *,cchar **) noex ;
