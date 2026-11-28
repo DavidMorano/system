@@ -79,7 +79,7 @@ struct envlist : envlist_head {
 typedef ENVLIST		envlist ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int envlist_start	(envlist *,int) noex ;
 extern int envlist_addkeyval	(envlist *,cchar *,cchar *,int) noex ;
