@@ -27,7 +27,7 @@
 #include	<stdintx.h>		/* extended integer */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern uint		bitrotateui(uint,int) noex ;
 extern ulong		bitrotateul(ulong,int) noex ;
