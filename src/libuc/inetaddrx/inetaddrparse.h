@@ -40,7 +40,7 @@ struct inetaddrparse_head {
 typedef INETADDRPARSE		inetaddrparse ;
 typedef INETADDRPARSE_SO	inetaddrparse_so ;
 
-EXTERNC_begin
+EXTERNC_beg
     extern int inetaddrparse_load(inetaddrparse *,cchar *,int) noex ;
 EXTERNC_end
 
