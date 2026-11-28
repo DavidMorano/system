@@ -34,7 +34,7 @@ struct envmk_head {
 
 typedef ENVMK		envmk ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int envmk_start	(envmk *,mainv) noex ;
 extern int envmk_envset	(envmk *,cchar *,cchar *,int) noex ;
