@@ -63,7 +63,7 @@ typedef CACHETIME_CUR		cachetime_cur ;
 typedef CACHETIME_ENT		cachetime_ent ;
 typedef CACHETIME_ST		cachetime_st ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int cachetime_start(cachetime *) noex ;
 extern int cachetime_lookup(cachetime *,cchar *,int,time_t *) noex ;
