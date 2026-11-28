@@ -105,7 +105,7 @@ typedef	BITS		bits ;
 
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	bits_start	(bits *,int) noex ;
 extern int	bits_set	(bits *,int) noex ;
