@@ -33,7 +33,7 @@ struct mapstrs_head {
 
 typedef MAPSTRS		mapstrs ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int mapstrs_start	(mapstrs *,int) noex ;
 extern int mapstrs_add		(mapstrs *,cchar *,int,cchar *,int) noex ;
