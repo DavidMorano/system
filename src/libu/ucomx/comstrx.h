@@ -27,33 +27,33 @@
 
 
 EXTERNC_beg
-extern int comstrbc(cchar *,cchar *,int) noex ;
-extern int comstric(cchar *,cchar *,int) noex ;
-extern int comstrfc(cchar *,cchar *,int) noex ;
+    extern int comstrbc(cchar *,cchar *,int) noex ;
+    extern int comstric(cchar *,cchar *,int) noex ;
+    extern int comstrfc(cchar *,cchar *,int) noex ;
 EXTERNC_end
 
 EXTERNC_beg
-local inline int comstr(cchar *bs,cchar *sp,int sl) noex {
+    local inline int comstr(cchar *bs,cchar *sp,int sl) noex {
 	return comstrbc(bs,sp,sl) ;
-} /* end */
+    } /* end */
 EXTERNC_end
 
 #ifdef	__cplusplus
-inline int comstrbc(cchar *bs,cchar *sp) noex {
+    inline int comstrbc(cchar *bs,cchar *sp) noex {
     	return comstrbc(bs,sp,-1) ;
-} /* end */
-inline int comstric(cchar *bs,cchar *sp) noex {
+    } /* end */
+    inline int comstric(cchar *bs,cchar *sp) noex {
     	return comstric(bs,sp,-1) ;
-} /* end */
-inline int comstrfc(cchar *bs,cchar *sp) noex {
+    } /* end */
+    inline int comstrfc(cchar *bs,cchar *sp) noex {
     	return comstrfc(bs,sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 #ifdef	__cplusplus
-inline int comstr(cchar *bs,cchar *sp) noex {
+    inline int comstr(cchar *bs,cchar *sp) noex {
     	return comstrbc(bs,sp,-1) ;
-} /* end */
+    } /* end */
 #endif /* __cplusplus */
 
 
