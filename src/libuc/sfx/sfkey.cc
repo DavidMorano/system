@@ -88,16 +88,16 @@ int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	int		kl = -1 ; /* return-value */
 	if (sp) ylikely {
 	    if (sl < 0) sl = lenstr(sp) ;
-	    if (cchar *tp = strnchr(sp,sl,'=') ; tp) {
+	    if (cchar *tp = strnchr(sp,sl,'=')) {
 	        kl = intconv(tp - sp) ;
 	        while ((kl > 0) && ISWHT(sp[kl - 1])) {
 	            kl -= 1 ;
-		}
+		} /* end while */
 	    } /* end if */
 	} /* end if (non-null) */
 	if (rpp) {
 	    *rpp = (kl >= 0) ? sp : nullptr ;
-	}
+	} /* end */
 	return kl ;
 } /* end subroutine (sfkey) */
 
