@@ -89,7 +89,7 @@ struct csem : csem_head {
 typedef CSEM		csem ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	csem_create	(csem *,int,int) noex ;
 extern int	csem_decr	(csem *,int,int) noex ;
