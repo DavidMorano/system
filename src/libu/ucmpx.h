@@ -25,6 +25,7 @@
 
 #include	<cmporders.h>
 #include	<cmpitimer.h>
+#include	<cmpmem.h>
 #include	<cmptimeval.h>
 #include	<cmptimespec.h>
 #include	<cmpstrkeyval.h>
