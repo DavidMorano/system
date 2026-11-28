@@ -104,7 +104,7 @@ typedef FDLINER		fdliner ;
 
 typedef FDLINER_FL	fdliner_fl ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int fdliner_start	(fdliner *,int,off_t,int) noex ;
 extern int fdliner_getln	(fdliner *,cchar **) noex ;
