@@ -70,7 +70,7 @@ struct date : date_head {
 typedef DATE		date ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int date_start		(date *,time_t,int,int,cchar *,int) noex ;
 extern int date_setzname	(date *,cchar *,int) noex ;
