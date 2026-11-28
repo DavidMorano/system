@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
     extern int sfbasename	(cchar *,int,cchar **) noex ;
     extern int sfdirname	(cchar *,int,cchar **) noex ;
     extern int sfprogname	(cchar *,int,cchar **) noex ;
