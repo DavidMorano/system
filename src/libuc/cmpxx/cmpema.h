@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	cmpema		(cchar *,cchar *) noex ;
 extern int	cmpemaø		(cchar *,cchar *) noex ;
 EXTERNC_end
