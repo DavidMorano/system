@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern bool isoneof	(cint *,int) noex ;
 extern bool isonebad	(cint *,int) noex ;
