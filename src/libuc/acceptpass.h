@@ -35,7 +35,7 @@
 #include	<usysbase.h>
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	acceptpass(int,STRRECVFD *,int) noex ;
 
