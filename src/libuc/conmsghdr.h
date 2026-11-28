@@ -32,7 +32,7 @@ typedef CONMSGHDR	conmsghdr ;
 
 #endif /* TYPEDEF_CONMSGHDR */
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	conmsghdr_passed(CONMSGHDR *) noex ;
 EXTERNC_end
 
