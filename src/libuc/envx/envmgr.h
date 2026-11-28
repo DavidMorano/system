@@ -39,7 +39,7 @@ struct envmgr_head {
 
 typedef ENVMGR		envmgr ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	envmgr_start	(envmgr *) noex ;
 extern int	envmgr_set	(envmgr *,cchar *,cchar *,int) noex ;
