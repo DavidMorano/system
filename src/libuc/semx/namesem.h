@@ -86,7 +86,7 @@ struct namesem : namesem_head {
 typedef NAMESEM		namesem ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	namesem_open	(namesem *,cchar *,int,mode_t,uint) noex ;
 extern int	namesem_close	(namesem *) noex ;
