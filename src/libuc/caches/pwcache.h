@@ -50,7 +50,7 @@ struct pwcache_head {
 typedef	PWCACHE		pwcache ;
 typedef PWCACHE_ST	pwcache_st ;
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int pwcache_start(pwcache *,int,int) noex ;
 extern int pwcache_lookup(pwcache *,ucentpw *,char *,int,cchar *) noex ;
