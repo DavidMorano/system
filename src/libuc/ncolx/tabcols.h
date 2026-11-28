@@ -29,7 +29,7 @@
 #define	TABCOLS_DEF	8		/* eight columns per TAB character */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	tabcols(int,int) noex ;
 
