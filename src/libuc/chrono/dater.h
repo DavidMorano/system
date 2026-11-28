@@ -158,7 +158,7 @@ struct dater : dater_head {
 typedef DATER		dater ;
 #endif /* __cplusplus */
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int dater_start		(dater *,TIMEB *,cchar *,int) noex ;
 extern int dater_startcopy	(dater *,dater *) noex ;
