@@ -27,7 +27,7 @@
 #include	<stpcpyxc.h>		/* LIBUC */
 
 
-EXTERNC_begin
+EXTERNC_beg
 local inline char * strcpybc (char *dp,cchar *sp) noex {
 	return stpcpybc(dp,sp) ;
 } /* end */
