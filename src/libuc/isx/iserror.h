@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern bool isFailOpen	(int) noex ;
 extern bool isFailConn	(int) noex ;
