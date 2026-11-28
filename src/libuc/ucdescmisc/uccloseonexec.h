@@ -37,7 +37,7 @@
 #include	<usysbase.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern int	uc_closeonexec(int,int) noex ;
 
