@@ -26,7 +26,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 
 extern char	* stpcpybcx(char *,int,...) noex ;
 extern char	* stpcpylcx(char *,int,...) noex ;
