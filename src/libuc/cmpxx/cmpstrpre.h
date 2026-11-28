@@ -19,7 +19,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	cmpstrpre	(cchar *,cchar *) noex ;
 extern int	cmpstrpreø	(cchar *,cchar *) noex ;
 EXTERNC_end
