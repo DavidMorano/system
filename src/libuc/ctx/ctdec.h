@@ -31,19 +31,19 @@
 #include	<ctdecp.h>		/* <- extra convenience */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int ctdecsi	(char *,int,sint)		noex ;
 extern int ctdecsl	(char *,int,slong)		noex ;
 extern int ctdecsll	(char *,int,slonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 extern int ctdecui	(char *,int,uint)		noex ;
 extern int ctdecul	(char *,int,ulong)		noex ;
 extern int ctdecull	(char *,int,ulonglong)		noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 local inline int ctdeci(char *bp,int bl,int v)		noex {
 	return ctdecsi(bp,bl,v) ;
 } /* end */
