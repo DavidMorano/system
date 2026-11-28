@@ -377,7 +377,6 @@ ucobjmode.o:		ucobjmode.cc
 ucunlink.o:		ucunlink.cc
 uclibmem.o:		uclibmem.cc	uclibmem.h		$(INCS)
 ucrand.o:		ucrand.cc	ucrand.h		$(INCS)
-ucinfo.o:		ucinfo.cc	ucinfo.h		$(INCS)
 
 # SYSTEM
 ucsysauxinfo.o:		ucsysauxinfo.cc ucsysauxinfo.h
