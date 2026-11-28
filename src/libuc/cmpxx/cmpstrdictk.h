@@ -19,7 +19,7 @@
 #include	<usysdefs.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int	cmpstrdictk	(cchar *,cchar *) noex ;
 EXTERNC_end
 
