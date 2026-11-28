@@ -25,11 +25,11 @@
 #include	<stdintx.h>		/* LIBU */
 
 
-EXTERNC_begin
+EXTERNC_beg
 extern int cfdecti	(cchar *,int,int *)			noex ;
 EXTERNC_end
 
-EXTERNC_begin
+EXTERNC_beg
 local inline int cfdect(cchar *sp,int sl,int *rp)		noex {
 	return cfdecti(sp,sl,rp) ;
 } /* end subroutine */
